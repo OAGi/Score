@@ -10,6 +10,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
+import javax.print.DocFlavor;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
@@ -97,10 +98,10 @@ public class JooqCcReadRepository
 
             List<DtScManifestRecord> dtScManifestRecordList =
                     ccMap.dtScManifestRecordMap.getOrDefault(dtManifestRecord.getDtManifestId(), Collections.emptyList());
+            if (dtScManifestRecordMap == null) {
+                dtScManifestRecordMap = new HashMap();
+            }
             dtScManifestRecordList.forEach(dtScManifestRecord -> {
-                if (dtScManifestRecordMap == null) {
-                    dtScManifestRecordMap = new HashMap();
-                }
                 dtScManifestRecordMap.putIfAbsent(dtScManifestRecord.getDtScManifestId(), dtScManifestRecord);
             });
         }
@@ -963,12 +964,15 @@ public class JooqCcReadRepository
         }
 
         ULong nextAsccpManifestId = null;
+        String releaseNum = null;
         while (nextAsccpManifestId == null) {
             Record record = dslContext().select(
                     ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
                     ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID,
-                    ASCCP_MANIFEST.RELEASE_ID)
+                    ASCCP_MANIFEST.RELEASE_ID,
+                    RELEASE.RELEASE_NUM)
                     .from(ASCCP_MANIFEST)
+                    .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                     .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
                     .fetchOptional().orElse(null);
             if (record == null) {
@@ -980,9 +984,10 @@ public class JooqCcReadRepository
             }
 
             asccpManifestId = record.get(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID).toBigInteger();
+            releaseNum = record.get(RELEASE.RELEASE_NUM);
         }
 
-        return new FindNextAsccpManifestResponse((nextAsccpManifestId != null) ? nextAsccpManifestId.toBigInteger() : null);
+        return new FindNextAsccpManifestResponse((nextAsccpManifestId != null) ? nextAsccpManifestId.toBigInteger() : null, releaseNum);
     }
 
 }

@@ -1,6 +1,6 @@
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {emptyToUndefined, hashCode, hashCode4String, toCamelCase,} from '../../common/utility';
-import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
 
 export class CcNode {
   type: string;
@@ -75,6 +75,10 @@ export class CcBccpNode extends CcNode {
   bccManifestId: number;
   seqKey: number;
   attribute: boolean;
+}
+
+export class CcBdtNode extends CcNode {
+  btdId: number;
 }
 
 export class CcAsccNode extends CcNode {
@@ -1121,6 +1125,252 @@ export class CcBccpNodeDetail extends CcNodeDetail {
   }
 }
 
+export class CcBdtPriRestri {
+  type: string;
+  cdtAwdPriId: number;
+  primitiveName: string;
+  codeListId: number;
+  codeListName: string;
+  agencyIdListId: number;
+  agencyIdListName: string;
+  default: boolean;
+  xbtList: CcXbt[];
+
+  constructor(obj) {
+    this.type = obj.type;
+    this.cdtAwdPriId = obj.cdtAwdPriId;
+    this.primitiveName = obj.primitiveName;
+    this.codeListId = obj.codeListId;
+    this.codeListName = obj.codeListName;
+    this.agencyIdListId = obj.agencyIdListId;
+    this.agencyIdListName = obj.agencyIdListName;
+    this.default = obj.default;
+    this.xbtList = obj.xbtList;
+  }
+
+  get name(): string {
+    if (this.type === 'Primitive') {
+      return this.primitiveName;
+    } else if (this.type === 'CodeList') {
+      return this.codeListName;
+    } else {
+      return this.agencyIdListName;
+    }
+  }
+}
+
+export class CcBdtScPriRestri {
+  type: string;
+  cdtScAwdPriId: number;
+  primitiveName: string;
+  codeListId: number;
+  codeListName: string;
+  agencyIdListId: number;
+  agencyIdListName: string;
+  default: boolean;
+  xbtList: CcXbt[];
+
+  constructor(obj) {
+    this.type = obj.type;
+    this.cdtScAwdPriId = obj.cdtScAwdPriId;
+    this.primitiveName = obj.primitiveName;
+    this.codeListId = obj.codeListId;
+    this.codeListName = obj.codeListName;
+    this.agencyIdListId = obj.agencyIdListId;
+    this.agencyIdListName = obj.agencyIdListName;
+    this.default = obj.default;
+    this.xbtList = obj.xbtList;
+  }
+
+  get name(): string {
+    if (this.type === 'Primitive') {
+      return this.primitiveName;
+    } else if (this.type === 'CodeList') {
+      return this.codeListName;
+    } else {
+      return this.agencyIdListName;
+    }
+  }
+}
+
+export class CcXbt {
+  xbtId: number;
+  xbtName: string;
+  default: boolean;
+}
+
+export class CcBdtNodeDetail extends CcNodeDetail {
+  bdtId: number;
+  private _definition: string;
+  private _definitionSource: string;
+
+  dtType: string;
+  versionNum: string;
+  dataTypeTerm: string;
+  qualifier: string;
+  basedBdtId: number;
+  basedBdtManifestId: number;
+  basedBdtDen: string;
+  contentComponentDen: string;
+  private _contentComponentDefinition: string;
+  commonlyUsed: boolean;
+  namespaceId: number;
+  state: string;
+  owner: string;
+  releaseId: number;
+  releaseNum: string;
+  revisionId: number;
+  revisionNum: number;
+  revisionTrackingNum: number;
+
+  bdtPriRestriList: CcBdtPriRestri[];
+
+  constructor(node: BdtFlatNode, obj: any) {
+    super(node);
+
+    this.bdtId = obj.bdtId;
+    this.guid = obj.guid;
+    this._definition = obj.definition;
+    this._definitionSource = obj.definitionSource;
+    this.dtType = obj.dtType;
+    this.versionNum = obj.versionNum;
+    this.dataTypeTerm = obj.dataTypeTerm;
+    this.qualifier = obj.qualifier;
+    this.basedBdtId = obj.basedBdtId;
+    this.basedBdtManifestId = obj.basedBdtManifestId;
+    this.basedBdtDen = obj.basedBdtDen;
+    this.contentComponentDen = obj.contentComponentDen;
+    this._contentComponentDefinition = obj.contentComponentDefinition;
+    this.commonlyUsed = obj.commonlyUsed;
+    this.namespaceId = obj.namespaceId;
+    this.state = obj.state;
+    this.owner = obj.owner;
+    this.releaseId = obj.releaseId;
+    this.releaseNum = obj.releaseNum;
+    this.revisionId = obj.revisionId;
+    this.revisionNum = obj.revisionNum;
+    this.revisionTrackingNum = obj.revisionTrackingNum;
+
+    this.bdtPriRestriList = obj.bdtPriRestriList;
+
+    this.reset();
+  }
+
+  get json(): any {
+    return {
+      bdtId: this.bdtId,
+      manifestId: this.manifestId,
+      guid: this.guid,
+      definition: this.definition,
+      definitionSource: this.definitionSource,
+      dtType: this.dtType,
+      versionNum: this.versionNum,
+      dataTypeTerm: this.dataTypeTerm,
+      qualifier: this.qualifier,
+      basedBdtId: this.basedBdtId,
+      basedBdtManifestId: this.basedBdtManifestId,
+      basedBdtDen: this.basedBdtDen,
+      contentComponentDen: this.contentComponentDen,
+      _contentComponentDefinition: this._contentComponentDefinition,
+      commonlyUsed: this.commonlyUsed,
+      namespaceId: this.namespaceId,
+      state: this.state,
+      owner: this.owner,
+      releaseId: this.releaseId,
+      releaseNum: this.releaseNum,
+      revisionNum: this.revisionNum,
+      revisionTrackingNum: this.revisionTrackingNum,
+      bdtPriRestriList: this.bdtPriRestriList
+    }
+  }
+
+  get hashCode(): number {
+    let defaultPri = "";
+    this.bdtPriRestriList.filter(row => row.default).forEach( row => {
+      if (row.type === 'Primitive') {
+        defaultPri = row.type + row.cdtAwdPriId + "xbt" + row.xbtList.filter(e => e.default)[0].xbtId;
+      } else if (row.type === 'CodeList') {
+        defaultPri = row.type + row.codeListId;
+      } else {
+        defaultPri = row.type + row.agencyIdListId;
+      }
+    });
+    return ((this.bdtId) ? this.bdtId : 0) +
+      ((this.manifestId) ? this.manifestId : 0) +
+      ((this.guid) ? hashCode4String(this.guid) : 0) +
+      ((this.dtType) ? hashCode4String(this.dtType) : 0) +
+      ((this.versionNum) ? hashCode4String(this.versionNum) : 0) +
+      ((this.dataTypeTerm) ? hashCode4String(this.dataTypeTerm) : 0) +
+      ((this.qualifier) ? hashCode4String(this.qualifier) : 0) +
+      ((this.basedBdtId) ? this.basedBdtId : 0) +
+      ((this.basedBdtManifestId) ? this.basedBdtManifestId : 0) +
+      ((this.basedBdtDen) ? hashCode4String(this.basedBdtDen) : 0) +
+      ((this.contentComponentDen) ? hashCode4String(this.contentComponentDen) : 0) +
+      ((!!this.contentComponentDefinition) ? hashCode4String(this.contentComponentDefinition) : 0) +
+      ((this.commonlyUsed) ? hashCode4String('true') : 0) +
+      ((this.namespaceId) ? this.namespaceId : 0) +
+      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
+      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
+      ((!!this.state) ? hashCode4String(this.state) : 0) +
+      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
+      ((this.releaseId) ? this.releaseId : 0) +
+      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
+      ((this.revisionNum) ? this.revisionNum : 0) +
+      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0) +
+      ((defaultPri) ? hashCode4String(defaultPri) : 0) ;
+  }
+
+  get manifestId(): number {
+    return (this._node as BdtFlatNode).bdtNode.manifestId;
+  }
+
+  set manifestId(value: number) {
+    (this._node as BdtFlatNode).bdtNode.manifestId = value;
+  }
+
+  get guid(): string {
+    return (this._node as BdtFlatNode).bdtNode.guid;
+  }
+
+  set guid(value: string) {
+    (this._node as BdtFlatNode).bdtNode.guid = value;
+  }
+
+  get den(): string {
+    return (this._node as BdtFlatNode).den;
+  }
+
+  set den(val: string) { // do nothing
+  }
+
+  get definition(): string {
+    return this._definition;
+  }
+
+  set definition(value: string) {
+    value = emptyToUndefined(value);
+    this._definition = value;
+  }
+
+  get definitionSource(): string {
+    return this._definitionSource;
+  }
+
+  set definitionSource(value: string) {
+    value = emptyToUndefined(value);
+    this._definitionSource = value;
+  }
+
+  get contentComponentDefinition(): string {
+    return this._contentComponentDefinition;
+  }
+
+  set contentComponentDefinition(value: string) {
+    value = emptyToUndefined(value);
+    this._contentComponentDefinition = value;
+  }
+}
+
 export class CcBdtScNodeDetail extends CcNodeDetail {
   bdtScId: number;
   private _definition: string;
@@ -1136,6 +1386,10 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
+  propertyTerm: string;
+  representationTerm: string;
+
+  bdtScPriRestriList: CcBdtScPriRestri[];
 
   constructor(node: BdtScFlatNode, obj: any) {
     super(node);
@@ -1154,6 +1408,9 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this.revisionId = obj.revisionId;
     this.revisionNum = obj.revisionNum;
     this.revisionTrackingNum = obj.revisionTrackingNum;
+    this.bdtScPriRestriList = obj.bdtScPriRestriList;
+    this.propertyTerm = obj.propertyTerm;
+    this.representationTerm = obj.representationTerm;
 
     this.reset();
   }
@@ -1172,11 +1429,24 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum
+      revisionTrackingNum: this.revisionTrackingNum,
+      bdtScPriRestriList: this.bdtScPriRestriList,
+      propertyTerm: this.propertyTerm,
+      representationTerm: this.representationTerm
     }
   }
 
   get hashCode(): number {
+    let defaultPri = "";
+    this.bdtScPriRestriList.filter(row => row.default).forEach( row => {
+      if (row.type === 'Primitive') {
+        defaultPri = row.type + row.cdtScAwdPriId + "xbt" + row.xbtList.filter(e => e.default)[0].xbtId;
+      } else if (row.type === 'CodeList') {
+        defaultPri = row.type + row.codeListId;
+      } else {
+        defaultPri = row.type + row.agencyIdListId;
+      }
+    });
     return ((this.bdtScId) ? this.bdtScId : 0) +
       ((this.manifestId) ? this.manifestId : 0) +
       ((this.guid) ? hashCode4String(this.guid) : 0) +
@@ -1191,7 +1461,10 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       ((this.releaseId) ? this.releaseId : 0) +
       ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
       ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0) +
+      ((this.propertyTerm) ? hashCode4String(this.propertyTerm) : 0) +
+      ((this.representationTerm) ? hashCode4String(this.representationTerm) : 0) +
+      ((defaultPri) ? hashCode4String(defaultPri) : 0);
   }
 
   get manifestId(): number {
@@ -1276,6 +1549,7 @@ export class CcGraphNode {
   type: string;
   manifestId: number;
   state: string;
+  deprecated: boolean;
   guid: string;
   objectClassTerm?: string;
   den?: string;

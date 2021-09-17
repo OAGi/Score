@@ -66,16 +66,16 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
     }
 
     /**
-     * Setter for <code>oagi.module_code_list_manifest.module_set_assignment_id</code>.
+     * Setter for <code>oagi.module_code_list_manifest.module_id</code>. This indicates a module.
      */
-    public void setModuleSetAssignmentId(ULong value) {
+    public void setModuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_code_list_manifest.module_set_assignment_id</code>.
+     * Getter for <code>oagi.module_code_list_manifest.module_id</code>. This indicates a module.
      */
-    public ULong getModuleSetAssignmentId() {
+    public ULong getModuleId() {
         return (ULong) get(3);
     }
 
@@ -175,7 +175,7 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
 
     @Override
     public Field<ULong> field4() {
-        return ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST.MODULE_SET_ASSIGNMENT_ID;
+        return ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST.MODULE_ID;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
 
     @Override
     public ULong component4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
 
     @Override
     public ULong value4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
 
     @Override
     public ModuleCodeListManifestRecord value4(ULong value) {
-        setModuleSetAssignmentId(value);
+        setModuleId(value);
         return this;
     }
 
@@ -353,13 +353,13 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
     /**
      * Create a detached, initialised ModuleCodeListManifestRecord
      */
-    public ModuleCodeListManifestRecord(ULong moduleCodeListManifestId, ULong moduleSetReleaseId, ULong codeListManifestId, ULong moduleSetAssignmentId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleCodeListManifestRecord(ULong moduleCodeListManifestId, ULong moduleSetReleaseId, ULong codeListManifestId, ULong moduleId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST);
 
         setModuleCodeListManifestId(moduleCodeListManifestId);
         setModuleSetReleaseId(moduleSetReleaseId);
         setCodeListManifestId(codeListManifestId);
-        setModuleSetAssignmentId(moduleSetAssignmentId);
+        setModuleId(moduleId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

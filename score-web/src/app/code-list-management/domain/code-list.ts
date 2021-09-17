@@ -14,7 +14,6 @@ export class CodeListForListRequest {
   access: string;
   states: string[] = [];
   deprecated: boolean[] = [];
-  extensible: boolean;
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   updatedDate: {
@@ -51,7 +50,6 @@ export class CodeListForListRequest {
 
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
-    this.extensible = (params.get('extensible')) ? (('true' === params.get('extensible'))) : undefined;
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updatedDate = {
@@ -81,9 +79,6 @@ export class CodeListForListRequest {
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
-    }
-    if (this.extensible !== undefined) {
-      params = params.set('extensible', (this.extensible) ? 'true' : 'false');
     }
     if (this.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (this.ownedByDeveloper) ? 'true' : 'false');
@@ -125,7 +120,6 @@ export class CodeListForList {
   agencyIdName: string;
   versionId: string;
   lastUpdateTimestamp: Date;
-  extensible: boolean;
   state: string;
   owner: string;
   access: string;
@@ -150,7 +144,6 @@ export class CodeList {
   definitionSource: string;
   remark: string;
 
-  extensible: boolean;
   deprecated: boolean;
   state: string;
   access: string;
@@ -172,7 +165,6 @@ export class CodeListValue {
 
   used: boolean;
   locked: boolean;
-  extension: boolean;
   deprecated: boolean;
   derived: boolean;
 }

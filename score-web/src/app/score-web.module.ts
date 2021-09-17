@@ -9,6 +9,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MarkdownModule, MarkedOptions} from 'ngx-markdown';
 
 import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
+import {AgencyIdListModule} from './agency-id-list-management/agency-id-list.module';
 import {scoreRxStompConfig} from './common/score-rx-stomp-config';
 
 import {AuthService, ErrorAlertInterceptor, XhrInterceptor} from './authentication/auth.service';
@@ -76,6 +77,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ContextManagementModule,
     CcManagementModule,
     CodeListModule,
+    AgencyIdListModule,
     LogManagementModule,
     NamespaceManagementModule,
     ReleaseManagementModule,

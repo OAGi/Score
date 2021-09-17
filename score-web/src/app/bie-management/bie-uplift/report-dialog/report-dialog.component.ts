@@ -1,5 +1,4 @@
-import {templateJitUrl} from '@angular/compiler';
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
@@ -16,12 +15,13 @@ export class ReportDialogComponent implements OnInit {
   dataSource = new MatTableDataSource<MatchInfo>();
 
   displayedColumns: string[] = [
-    'sourceDisplayPath', 'targetDisplayPath', 'match', 'reuse', 'validCode'
+    'ccType', 'sourceDisplayPath', 'context', 'targetDisplayPath', 'match', 'reuse', 'validCode'
   ];
 
   hideSystemMatched = true;
   matches: MatchInfo[];
   matchMap: Map<string, MatchInfo>;
+  downloadHeader: string;
   loading = false;
 
   constructor(
@@ -32,9 +32,8 @@ export class ReportDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    const topLevelAsbiepId = this.data.topLevelAsbiepId;
-    const releaseId = this.data.releaseId;
-    const targetAsccpManifestId = this.data.targetAsccpManifestId;
+    const {topLevelAsbiepId, releaseId, targetAsccpManifestId, sourceReleaseNum, targetReleaseNum } = this.data;
+    this.downloadHeader = `Source ${sourceReleaseNum} Path, Source Context Definition, Target ${targetReleaseNum} Path, Type, Matched, Reused, Code List Issue\n`;
     this.matchMap = new Map<string, MatchInfo>();
     this.matches = this.data.matches;
     this.matches.forEach(m => this.matchMap.set(m.bieType + '-' + m.bieId, m));
@@ -75,10 +74,20 @@ export class ReportDialogComponent implements OnInit {
 
   onDownload(): void {
     let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += 'Source Path, Target Path, Matched, Reused, Code List Issue\n';
+    csvContent += this.downloadHeader;
     csvContent += this.dataSource.data.map(e => {
-          return e.sourceDisplayPath + ',' + e.targetDisplayPath + ',' + e.match + ',' + e.reuse + ',' + e.message;
+          return e.sourceDisplayPath + ',' + e.context + ',' + e.targetDisplayPath + ',' + e.ccType + ',' + e.match + ',' + e.reuse + ',' + e.message;
       }).join('\n');
-    window.open(encodeURI(csvContent));
+    // window.open(encodeURI(csvContent));
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.style.visibility = 'hidden';
+    link.setAttribute("href", encodedUri);
+
+    link.setAttribute("download", `UpliftReport-${this.data.name}-${this.data.guid}.csv`);
+    document.body.appendChild(link); // Required for FF
+    link.click();
+    document.body.removeChild(link);
   }
 }

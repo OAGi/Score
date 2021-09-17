@@ -65,9 +65,9 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
     public final TableField<ModuleDtManifestRecord, ULong> DT_MANIFEST_ID = createField(DSL.name("dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the dt manifest record.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.module_set_assignment_id</code>.
+     * The column <code>oagi.module_dt_manifest.module_id</code>. This indicates a module.
      */
-    public final TableField<ModuleDtManifestRecord, ULong> MODULE_SET_ASSIGNMENT_ID = createField(DSL.name("module_set_assignment_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<ModuleDtManifestRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module.");
 
     /**
      * The column <code>oagi.module_dt_manifest.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this record.
@@ -144,12 +144,12 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
 
     @Override
     public List<ForeignKey<ModuleDtManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ModuleDtManifestRecord, ?>>asList(Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK, Keys.MODULE_DT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
+        return Arrays.<ForeignKey<ModuleDtManifestRecord, ?>>asList(Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
     private transient ModuleSetRelease _moduleSetRelease;
     private transient DtManifest _dtManifest;
-    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient Module _module;
     private transient AppUser _moduleDtManifestCreatedByFk;
     private transient AppUser _moduleDtManifestLastUpdatedByFk;
 
@@ -167,11 +167,11 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return _dtManifest;
     }
 
-    public ModuleSetAssignment moduleSetAssignment() {
-        if (_moduleSetAssignment == null)
-            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+    public Module module() {
+        if (_module == null)
+            _module = new Module(this, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK);
 
-        return _moduleSetAssignment;
+        return _module;
     }
 
     public AppUser moduleDtManifestCreatedByFk() {

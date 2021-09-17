@@ -20,7 +20,8 @@ public class AgencyIdListValueRepository implements ScoreRepository<AgencyIdList
     public List<AgencyIdListValue> findAll() {
         return dslContext.select(Tables.AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID, Tables.AGENCY_ID_LIST_VALUE.NAME,
                 Tables.AGENCY_ID_LIST_VALUE.OWNER_LIST_ID, Tables.AGENCY_ID_LIST_VALUE.DEFINITION,
-                Tables.AGENCY_ID_LIST_VALUE.VALUE).from(Tables.AGENCY_ID_LIST_VALUE).fetchInto(AgencyIdListValue.class);
+                Tables.AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE, Tables.AGENCY_ID_LIST_VALUE.VALUE)
+                .from(Tables.AGENCY_ID_LIST_VALUE).fetchInto(AgencyIdListValue.class);
     }
 
     @Override
@@ -30,7 +31,8 @@ public class AgencyIdListValueRepository implements ScoreRepository<AgencyIdList
         }
         return dslContext.select(Tables.AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID, Tables.AGENCY_ID_LIST_VALUE.NAME,
                 Tables.AGENCY_ID_LIST_VALUE.OWNER_LIST_ID, Tables.AGENCY_ID_LIST_VALUE.DEFINITION,
-                Tables.AGENCY_ID_LIST_VALUE.VALUE).from(Tables.AGENCY_ID_LIST_VALUE)
+                Tables.AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE, Tables.AGENCY_ID_LIST_VALUE.VALUE)
+                .from(Tables.AGENCY_ID_LIST_VALUE)
                 .where(Tables.AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(ULong.valueOf(id)))
                 .fetchOneInto(AgencyIdListValue.class);
     }

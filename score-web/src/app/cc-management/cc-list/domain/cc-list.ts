@@ -58,10 +58,12 @@ export class CcListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
+    // TODO: temporary hide DT
+    // this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP', 'BDT'];
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')) ? true : false)] : undefined;
-    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')) ? true : false)] : [true];
+    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')) ? true : false)] : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
@@ -161,6 +163,7 @@ export class CcList {
   lastUpdateUser: string;
   lastUpdateTimestamp: Date;
   id: number;
+  ownedByDeveloper: boolean;
 }
 
 export class CcUpdateStateListRequest {

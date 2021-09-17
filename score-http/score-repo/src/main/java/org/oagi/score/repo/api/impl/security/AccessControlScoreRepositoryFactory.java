@@ -1,6 +1,8 @@
 package org.oagi.score.repo.api.impl.security;
 
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.agency.AgencyIdListReadRepository;
+import org.oagi.score.repo.api.agency.AgencyIdListWriteRepository;
 import org.oagi.score.repo.api.base.Request;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.BieReadRepository;
@@ -154,11 +156,6 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     }
 
     @Override
-    public ModuleReadRepository createModuleReadRepository() throws ScoreDataAccessException {
-        return wrapForAccessControl(delegate.createModuleReadRepository(), ModuleReadRepository.class);
-    }
-
-    @Override
     public ModuleWriteRepository createModuleWriteRepository() throws ScoreDataAccessException {
         return wrapForAccessControl(delegate.createModuleWriteRepository(), ModuleWriteRepository.class);
     }
@@ -181,6 +178,16 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     @Override
     public ModuleSetReleaseWriteRepository createModuleSetReleaseWriteRepository() throws ScoreDataAccessException {
         return wrapForAccessControl(delegate.createModuleSetReleaseWriteRepository(), ModuleSetReleaseWriteRepository.class);
+    }
+
+    @Override
+    public AgencyIdListReadRepository createAgencyIdListReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createAgencyIdListReadRepository(), AgencyIdListReadRepository.class);
+    }
+
+    @Override
+    public AgencyIdListWriteRepository createAgencyIdListWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createAgencyIdListWriteRepository(), AgencyIdListWriteRepository.class);
     }
 
     @Override

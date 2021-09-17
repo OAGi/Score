@@ -4,11 +4,11 @@ import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.repo.api.module.ModuleReadRepository;
 import org.oagi.score.repo.api.module.ModuleSetReadRepository;
-import org.oagi.score.repo.api.module.model.Module;
 import org.oagi.score.repo.api.module.model.*;
+import org.oagi.score.repo.api.module.model.Module;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
@@ -172,5 +173,81 @@ public class JooqModuleSetReadRepository
         }
 
         return (request.getSortDirection() == ASC) ? field.asc() : field.desc();
+    }
+
+    @Override
+    public List<Module> getToplevelModules(BigInteger moduleSetId) throws ScoreDataAccessException {
+        ModuleRecord rootModule = dslContext().selectFrom(MODULE)
+                .where(and(MODULE.PARENT_MODULE_ID.isNull(), MODULE.MODULE_SET_ID.eq(ULong.valueOf(moduleSetId)))).fetchOne();
+        return dslContext().select(
+                MODULE.MODULE_ID,
+                MODULE.PARENT_MODULE_ID,
+                MODULE.PATH,
+                MODULE.TYPE,
+                MODULE.NAME,
+                MODULE.VERSION_NUM,
+                MODULE.NAMESPACE_ID,
+                NAMESPACE.URI,
+                MODULE.CREATION_TIMESTAMP,
+                MODULE.LAST_UPDATE_TIMESTAMP)
+                .from(MODULE)
+                .join(NAMESPACE).on(NAMESPACE.NAMESPACE_ID.eq(MODULE.NAMESPACE_ID))
+                .where(and(MODULE.MODULE_SET_ID.eq(ULong.valueOf(moduleSetId)), MODULE.PARENT_MODULE_ID.eq(rootModule.getModuleId())))
+                .fetchStream().map(record -> {
+                    Module module = new Module();
+                    module.setModuleId(record.get(MODULE.MODULE_ID).toBigInteger());
+                    if (record.get(MODULE.PARENT_MODULE_ID) != null) {
+                        module.setParentModuleId(record.get(MODULE.PARENT_MODULE_ID).toBigInteger());
+                    }
+                    module.setPath(record.get(MODULE.PATH));
+                    module.setNamespaceUri(record.get(NAMESPACE.URI));
+                    module.setNamespaceId(record.get(MODULE.NAMESPACE_ID).toBigInteger());
+                    module.setName(record.get(MODULE.NAME));
+                    module.setType(record.get(MODULE.TYPE));
+                    module.setVersionNum(record.get(MODULE.VERSION_NUM));
+
+                    module.setCreationTimestamp(
+                            Date.from(record.get(MODULE.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    module.setLastUpdateTimestamp(
+                            Date.from(record.get(MODULE.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    return module;
+                }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Module> getAllModules(BigInteger moduleSetId) throws ScoreDataAccessException {
+        return dslContext().select(
+                MODULE.MODULE_ID,
+                MODULE.PARENT_MODULE_ID,
+                MODULE.PATH,
+                MODULE.TYPE,
+                MODULE.NAME,
+                MODULE.VERSION_NUM,
+                MODULE.NAMESPACE_ID,
+                NAMESPACE.URI,
+                MODULE.CREATION_TIMESTAMP,
+                MODULE.LAST_UPDATE_TIMESTAMP)
+                .from(MODULE)
+                .join(NAMESPACE).on(NAMESPACE.NAMESPACE_ID.eq(MODULE.NAMESPACE_ID))
+                .where(MODULE.MODULE_SET_ID.eq(ULong.valueOf(moduleSetId)))
+                .fetchStream().map(record -> {
+                    Module module = new Module();
+                    module.setModuleId(record.get(MODULE.MODULE_ID).toBigInteger());
+                    if (record.get(MODULE.PARENT_MODULE_ID) != null) {
+                        module.setParentModuleId(record.get(MODULE.PARENT_MODULE_ID).toBigInteger());
+                    }
+                    module.setPath(record.get(MODULE.PATH));
+                    module.setNamespaceUri(record.get(NAMESPACE.URI));
+                    module.setNamespaceId(record.get(MODULE.NAMESPACE_ID).toBigInteger());
+                    module.setName(record.get(MODULE.NAME));
+                    module.setType(record.get(MODULE.TYPE));
+                    module.setVersionNum(record.get(MODULE.VERSION_NUM));
+
+                    module.setCreationTimestamp(
+                            Date.from(record.get(MODULE.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    module.setLastUpdateTimestamp(
+                            Date.from(record.get(MODULE.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    return module;
+                }).collect(Collectors.toList());
     }
 }

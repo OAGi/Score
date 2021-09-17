@@ -15,72 +15,59 @@ import java.util.Map;
 @Data
 public class AnalysisBieUpliftingResponse implements BieUpliftingListener {
 
-    private Map<BigInteger, String> sourceAsbiePathMap = new HashMap();
-    private Map<BigInteger, String> targetAsbiePathMap = new HashMap();
+    @Data
+    private class BieContextPath {
+        private String path;
+        private String context;
 
-    private Map<BigInteger, String> sourceBbiePathMap = new HashMap();
-    private Map<BigInteger, String> targetBbiePathMap = new HashMap();
-
-    private Map<BigInteger, String> sourceBbieScPathMap = new HashMap();
-    private Map<BigInteger, String> targetBbieScPathMap = new HashMap();
-
-    public Map<BigInteger, String> getSourceAsbiePathMap() {
-        return sourceAsbiePathMap;
+        public BieContextPath(String path, String context) {
+            this.path = path;
+            this.context = context;
+        }
     }
 
-    public Map<BigInteger, String> getTargetAsbiePathMap() {
-        return targetAsbiePathMap;
-    }
+    private Map<BigInteger, BieContextPath> sourceAsbiePathMap = new HashMap();
+    private Map<BigInteger, BieContextPath> targetAsbiePathMap = new HashMap();
 
-    public Map<BigInteger, String> getSourceBbiePathMap() {
-        return sourceBbiePathMap;
-    }
+    private Map<BigInteger, BieContextPath> sourceBbiePathMap = new HashMap();
+    private Map<BigInteger, BieContextPath> targetBbiePathMap = new HashMap();
 
-    public Map<BigInteger, String> getTargetBbiePathMap() {
-        return targetBbiePathMap;
-    }
+    private Map<BigInteger, BieContextPath> sourceBbieScPathMap = new HashMap();
+    private Map<BigInteger, BieContextPath> targetBbieScPathMap = new HashMap();
 
-    public Map<BigInteger, String> getSourceBbieScPathMap() {
-        return sourceBbieScPathMap;
-    }
-
-    public Map<BigInteger, String> getTargetBbieScPathMap() {
-        return targetBbieScPathMap;
+    @Override
+    public void notFoundMatchedAsbie(Asbie asbie, AsccManifest sourceAsccManifest, String sourceAsccPath, String sourceContextDefinition) {
+        sourceAsbiePathMap.put(asbie.getAsbieId(), new BieContextPath(sourceAsccPath, sourceContextDefinition));
     }
 
     @Override
-    public void notFoundMatchedAsbie(Asbie asbie, AsccManifest sourceAsccManifest, String sourceAsccPath) {
-        sourceAsbiePathMap.put(asbie.getAsbieId(), sourceAsccPath);
-    }
-
-    @Override
-    public void foundBestMatchedAsbie(Asbie asbie, AsccManifest sourceAsccManifest, String sourceAsccPath,
+    public void foundBestMatchedAsbie(Asbie asbie, AsccManifest sourceAsccManifest, String sourceAsccPath, String sourceContextDefinition,
                                       AsccManifest targetAsccManifest, String targetAsccPath) {
-        sourceAsbiePathMap.put(asbie.getAsbieId(), sourceAsccPath);
-        targetAsbiePathMap.put(asbie.getAsbieId(), targetAsccPath);
+        sourceAsbiePathMap.put(asbie.getAsbieId(), new BieContextPath(sourceAsccPath, sourceContextDefinition));
+        targetAsbiePathMap.put(asbie.getAsbieId(), new BieContextPath(targetAsccPath, sourceContextDefinition));
     }
 
     @Override
-    public void notFoundMatchedBbie(Bbie bbie, BccManifest sourceBccManifest, String sourceBccPath) {
-        sourceBbiePathMap.put(bbie.getBbieId(), sourceBccPath);
+    public void notFoundMatchedBbie(Bbie bbie, BccManifest sourceBccManifest, String sourceBccPath, String sourceContextDefinition) {
+        sourceBbiePathMap.put(bbie.getBbieId(), new BieContextPath(sourceBccPath, sourceContextDefinition));
     }
 
     @Override
-    public void foundBestMatchedBbie(Bbie bbie, BccManifest sourceBccManifest, String sourceBccPath,
+    public void foundBestMatchedBbie(Bbie bbie, BccManifest sourceBccManifest, String sourceBccPath, String sourceContextDefinition,
                                      BccManifest targetBccManifest, String targetBccPath) {
-        sourceBbiePathMap.put(bbie.getBbieId(), sourceBccPath);
-        targetBbiePathMap.put(bbie.getBbieId(), targetBccPath);
+        sourceBbiePathMap.put(bbie.getBbieId(), new BieContextPath(sourceBccPath, sourceContextDefinition));
+        targetBbiePathMap.put(bbie.getBbieId(), new BieContextPath(targetBccPath, sourceContextDefinition));
     }
 
     @Override
-    public void notFoundMatchedBbieSc(BbieSc bbieSc, DtScManifest sourceDtScManifest, String sourceDtScPath) {
-        sourceBbieScPathMap.put(bbieSc.getBbieScId(), sourceDtScPath);
+    public void notFoundMatchedBbieSc(BbieSc bbieSc, DtScManifest sourceDtScManifest, String sourceDtScPath, String sourceContextDefinition) {
+        sourceBbieScPathMap.put(bbieSc.getBbieScId(), new BieContextPath(sourceDtScPath, sourceContextDefinition));
     }
 
     @Override
-    public void foundBestMatchedBbieSc(BbieSc bbieSc, DtScManifest sourceAsccManifest, String sourceDtScPath,
+    public void foundBestMatchedBbieSc(BbieSc bbieSc, DtScManifest sourceAsccManifest, String sourceDtScPath, String sourceContextDefinition,
                                        DtScManifest targetDtScManifest, String targetDtScPath) {
-        sourceBbieScPathMap.put(bbieSc.getBbieScId(), sourceDtScPath);
-        targetBbieScPathMap.put(bbieSc.getBbieScId(), targetDtScPath);
+        sourceBbieScPathMap.put(bbieSc.getBbieScId(), new BieContextPath(sourceDtScPath, sourceContextDefinition));
+        targetBbieScPathMap.put(bbieSc.getBbieScId(), new BieContextPath(targetDtScPath, sourceContextDefinition));
     }
 }

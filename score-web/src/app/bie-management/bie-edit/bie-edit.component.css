@@ -15,6 +15,10 @@
   align-items: center;
 }
 
+.mat-tree-node .deprecated {
+  background-color: #ececec;
+}
+
 .mat-tree-node .material-icons {
   font-size: 20px;
 }
@@ -278,7 +282,7 @@
   margin-bottom: 15px;
 }
 
-.hide-unused {
+.hide-unused, .exclude-scs {
   vertical-align: middle;
   margin-right: 5px;
 }

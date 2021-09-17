@@ -5,6 +5,7 @@ export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
   target: BieUpliftTargetFlatNode;
   fixed: boolean;
   bieId: number;
+  context: string;
 
   constructor(node: BieFlatNode) {
     super(node);
@@ -81,6 +82,7 @@ export class BieUpliftTargetFlatNode extends WrappedBieFlatNode {
 
 export class FindTargetAsccpManifestResponse {
   asccpManifestId: number;
+  releaseNum: string;
 }
 
 export class UpliftNode {
@@ -101,13 +103,18 @@ export class UpliftNode {
   }
 }
 
+export interface BiePathContext {
+  path: string;
+  context: string;
+}
+
 export class BieUpliftMap {
-  sourceAsbiePathMap: Map<number, string>;
-  targetAsbiePathMap: Map<number, string>;
-  sourceBbiePathMap: Map<number, string>;
-  targetBbiePathMap: Map<number, string>;
-  sourceBbieScPathMap: Map<number, string>;
-  targetBbieScPathMap: Map<number, string>;
+  sourceAsbiePathMap: Map<number, BiePathContext>;
+  targetAsbiePathMap: Map<number, BiePathContext>;
+  sourceBbiePathMap: Map<number, BiePathContext>;
+  targetBbiePathMap: Map<number, BiePathContext>;
+  sourceBbieScPathMap: Map<number, BiePathContext>;
+  targetBbieScPathMap: Map<number, BiePathContext>;
 
   sourceUsedMap: Map<string, number>;
   targetUsedMap: Map<string, number>;
@@ -116,12 +123,12 @@ export class BieUpliftMap {
   unMatchedMap: Map<string, UpliftNode>;
 
   constructor(obj) {
-    this.sourceAsbiePathMap = new Map<number, string>();
-    this.targetAsbiePathMap = new Map<number, string>();
-    this.sourceBbiePathMap = new Map<number, string>();
-    this.targetBbiePathMap = new Map<number, string>();
-    this.sourceBbieScPathMap = new Map<number, string>();
-    this.targetBbieScPathMap = new Map<number, string>();
+    this.sourceAsbiePathMap = new Map<number, BiePathContext>();
+    this.targetAsbiePathMap = new Map<number, BiePathContext>();
+    this.sourceBbiePathMap = new Map<number, BiePathContext>();
+    this.targetBbiePathMap = new Map<number, BiePathContext>();
+    this.sourceBbieScPathMap = new Map<number, BiePathContext>();
+    this.targetBbieScPathMap = new Map<number, BiePathContext>();
     this.sourceUsedMap = new Map<string, number>();
     this.targetUsedMap = new Map<string, number>();
     this.unMatchedMap = new Map<string, UpliftNode>();
@@ -168,6 +175,7 @@ export class BieUpliftMap {
 export class MatchInfo {
   name: string;
   bieType: string;
+  ccType: string;
   bieId: number;
   sourcePath: string;
   sourceDisplayPath: string;
@@ -179,11 +187,13 @@ export class MatchInfo {
   reuse: string;
   message: string;
   valid: boolean;
+  context: string;
 
   constructor(source: BieUpliftSourceFlatNode) {
     const target = source.target;
     this.name = source.name;
     this.bieId = source.bieId;
+    this.context = source.context || '';
     this.valid = false;
     this.message = '';
     switch (source.bieType.toUpperCase()) {
@@ -191,6 +201,7 @@ export class MatchInfo {
         break;
       case 'ASBIEP':
         this.bieType = 'ASBIE';
+        this.ccType = 'ASCCP';
         this.sourceManifestId = (source._node as AsbiepFlatNode).asccNode.manifestId;
         this.sourcePath = (source._node as AsbiepFlatNode).asbiePath;
         if (target) {
@@ -200,6 +211,7 @@ export class MatchInfo {
         break;
       case 'BBIEP':
         this.bieType = 'BBIE';
+        this.ccType = 'BCCP';
         this.sourceManifestId = (source._node as BbiepFlatNode).bccNode.manifestId;
         this.sourcePath = (source._node as BbiepFlatNode).bbiePath;
         if (target) {
@@ -209,6 +221,7 @@ export class MatchInfo {
         break;
       case 'BBIE_SC':
         this.bieType = 'BBIE_SC';
+        this.ccType = 'DT_SC';
         this.sourceManifestId = (source._node as BbieScFlatNode).bdtScNode.manifestId;
         this.sourcePath = (source._node as BbieScFlatNode).bbieScPath;
         if (target) {

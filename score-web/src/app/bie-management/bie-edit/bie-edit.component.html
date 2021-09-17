@@ -52,6 +52,12 @@
                           <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
                                                 [hidden]="!searcher.isSearching"></mat-progress-spinner>
                         </div>
+                        <div class="ml-auto align-self-center pl-2">
+                          <mat-checkbox class="exclude-scs"
+                                        [(ngModel)]="excludeSCs" (change)="changeExcludeSCs()">
+                            <span>Exclude SCs</span>
+                          </mat-checkbox>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -140,6 +146,7 @@
                         </mat-checkbox>
 
                         <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
+                          node.deprecated ? 'deprecated' : 'dummy',
                           this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
                           this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd']"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
@@ -275,11 +282,19 @@
                             <input matInput [(ngModel)]="rootNode.topLevelAsbiepState" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="rootNode.loginId" [disabled]="true">
                           </mat-form-field>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="resetDetail(selectedNode)"
+                                  *ngIf="state === 'WIP'"
+                                  matTooltip="Reset detail"
+                                  [disabled]="isUpdating || access !== 'CanEdit'">
+                            <mat-icon>refresh</mat-icon>
+                          </button>
                         </div>
                       </div>
                       <div class="row">
@@ -403,7 +418,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-5">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAsbiepDetail().asbie.nillable"
@@ -414,6 +429,14 @@
                               Nillable
                             </mat-checkbox>
                           </div>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="resetDetail(selectedNode)"
+                                  *ngIf="state === 'WIP'"
+                                  matTooltip="Reset detail"
+                                  [disabled]="isUpdating || access !== 'CanEdit' || !selectedNode.used">
+                            <mat-icon>refresh</mat-icon>
+                          </button>
                         </div>
                       </div>
 
@@ -626,7 +649,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-5">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbiepDetail().bbie.nillable"
@@ -637,6 +660,14 @@
                               Nillable
                             </mat-checkbox>
                           </div>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="resetDetail(selectedNode)"
+                                  *ngIf="state === 'WIP'"
+                                  matTooltip="Reset detail"
+                                  [disabled]="isUpdating || access !== 'CanEdit' || !selectedNode.used">
+                            <mat-icon>refresh</mat-icon>
+                          </button>
                         </div>
                       </div>
                       <div class="row">
@@ -754,7 +785,7 @@
                           <mat-card>
                             <mat-card-content>
                               <mat-form-field>
-                                <mat-select placeholder="Value Domain Type" required
+                                <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbiepDetail().bbie.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
@@ -797,11 +828,13 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <span [class]="!isValidState(codeList.state) ? 'text-warning' : 'dummy'"
-                                    [matTooltip]="'This code list is usable but unstable'"
-                                    [matTooltipDisabled]="isValidState(codeList.state)">
-                                      {{ codeList.name }}
-                                    </span>
+                                    <div [class]="['d-flex', !isValidState(codeList.state) ? 'text-warning' : 'dummy',
+                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                         [matTooltip]="'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state)">
+                                      <span>{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span>)</span>
+                                    </div>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -820,7 +853,13 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    {{ agency.name }}
+                                    <div [class]="['d-flex', !isValidState(agency.state) ? 'text-warning' : 'dummy',
+                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                         [matTooltip]="'This agency id list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state)">
+                                      <span>{{ agency.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span>)</span>
+                                    </div>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -873,7 +912,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-11">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [checked]="selectedNode.used"
@@ -884,6 +923,14 @@
                               Used
                             </mat-checkbox>
                           </div>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="resetDetail(selectedNode)"
+                                  *ngIf="state === 'WIP'"
+                                  matTooltip="Reset detail"
+                                  [disabled]="isUpdating || access !== 'CanEdit' || !selectedNode.used">
+                            <mat-icon>refresh</mat-icon>
+                          </button>
                         </div>
                       </div>
 
@@ -1004,7 +1051,7 @@
                           <mat-card>
                             <mat-card-content>
                               <mat-form-field>
-                                <mat-select placeholder="Value Domain Type" required
+                                <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
@@ -1048,11 +1095,13 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <span [class]="!isValidState(codeList.state) ? 'text-warning' : 'dummy'"
-                                          [matTooltip]="'This code list is usable but unstable'"
-                                          [matTooltipDisabled]="isValidState(codeList.state)">
-                                      {{ codeList.name }}
-                                    </span>
+                                    <div [class]="['d-flex', !isValidState(codeList.state) ? 'text-warning' : 'dummy',
+                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                         [matTooltip]="'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state)">
+                                      <span>{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span>)</span>
+                                    </div>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -1071,7 +1120,13 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    {{ agency.name }}
+                                    <div [class]="['d-flex', !isValidState(agency.state) ? 'text-warning' : 'dummy',
+                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                         [matTooltip]="'This agency id list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state)">
+                                      <span>{{ agency.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span>)</span>
+                                    </div>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>

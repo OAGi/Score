@@ -14,6 +14,7 @@ import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.compo
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
 
 const routes: Routes = [
   {
@@ -42,6 +43,7 @@ const routes: Routes = [
     TranslateModule,
     ScoreCommonModule,
     SearchOptionsDialogModule,
+    FindUsagesDialogModule,
     DragDropModule,
     AngularSplitModule
   ],

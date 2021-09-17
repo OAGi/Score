@@ -5,6 +5,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.module.ModuleSetWriteRepository;
 import org.oagi.score.repo.api.module.model.ModuleSet;
@@ -12,12 +13,12 @@ import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.MODULE;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.MODULE_SET;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.ScoreGuidUtils.randomGuid;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -36,6 +37,10 @@ public class JooqModuleSetWriteRepository
         ScoreUser requester = request.getRequester();
         ULong requesterUserId = ULong.valueOf(requester.getUserId());
         LocalDateTime timestamp = LocalDateTime.now();
+
+        if (!StringUtils.hasLength(request.getName())) {
+            throw new IllegalArgumentException("Module set name cannot be empty.");
+        }
 
         ModuleSetRecord moduleSetRecord = dslContext().insertInto(MODULE_SET)
                 .set(MODULE_SET.GUID, randomGuid())
@@ -59,7 +64,27 @@ public class JooqModuleSetWriteRepository
         moduleSet.setLastUpdateTimestamp(
                 Date.from(moduleSetRecord.getLastUpdateTimestamp().atZone(ZoneId.systemDefault()).toInstant()));
 
-        return new CreateModuleSetResponse(moduleSet);
+        ULong namespaceId = dslContext().select(NAMESPACE.NAMESPACE_ID).from(NAMESPACE)
+                .where(NAMESPACE.IS_STD_NMSP.eq((byte) 1)).limit(1).fetchOneInto(ULong.class);
+
+        ULong rootModuleSetId = dslContext().insertInto(MODULE)
+                .setNull(MODULE.PARENT_MODULE_ID)
+                .set(MODULE.PATH, "")
+                .set(MODULE.TYPE, ModuleType.DIRECTORY.name())
+                .set(MODULE.NAME, "")
+                .set(MODULE.MODULE_SET_ID, moduleSetRecord.getModuleSetId())
+                .set(MODULE.NAMESPACE_ID, namespaceId)
+                .setNull(MODULE.VERSION_NUM)
+                .set(MODULE.CREATED_BY, requesterUserId)
+                .set(MODULE.OWNER_USER_ID, requesterUserId)
+                .set(MODULE.LAST_UPDATED_BY, requesterUserId)
+                .set(MODULE.CREATION_TIMESTAMP, timestamp)
+                .set(MODULE.LAST_UPDATE_TIMESTAMP, timestamp)
+                .returning().fetchOne().getModuleId();
+
+        CreateModuleSetResponse response = new CreateModuleSetResponse(moduleSet);
+        response.setRootModuleId(rootModuleSetId.toBigInteger());
+        return response;
     }
 
     @Override
@@ -68,6 +93,10 @@ public class JooqModuleSetWriteRepository
         ScoreUser requester = request.getRequester();
         ULong requesterUserId = ULong.valueOf(requester.getUserId());
         LocalDateTime timestamp = LocalDateTime.now();
+
+        if (!StringUtils.hasLength(request.getName())) {
+            throw new IllegalArgumentException("Module set name cannot be empty.");
+        }
 
         ModuleSetRecord moduleSetRecord = dslContext().selectFrom(MODULE_SET)
                 .where(MODULE_SET.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId())))
@@ -103,9 +132,42 @@ public class JooqModuleSetWriteRepository
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public DeleteModuleSetResponse deleteModuleSet(DeleteModuleSetRequest request) throws ScoreDataAccessException {
+        if (dslContext().selectFrom(MODULE_SET_RELEASE)
+                .where(MODULE_SET_RELEASE.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId())))
+                .fetch().size() > 0) {
+            throw new IllegalArgumentException("This ModuleSet in use can not be discard.");
+        }
+
+        dslContext().update(MODULE)
+                .setNull(MODULE.PARENT_MODULE_ID)
+                .where(MODULE.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId()))).execute();
+        dslContext().deleteFrom(MODULE)
+                .where(MODULE.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId()))).execute();
         dslContext().deleteFrom(MODULE_SET)
                 .where(MODULE_SET.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId()))).execute();
 
         return new DeleteModuleSetResponse();
+    }
+
+    @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public DeleteModuleSetAssignmentResponse unassignModule(DeleteModuleSetAssignmentRequest request) throws ScoreDataAccessException {
+
+        deleteModule(ULong.valueOf(request.getModuleId()));
+
+        return new DeleteModuleSetAssignmentResponse();
+    }
+
+    private void deleteModule(ULong moduleId) {
+        dslContext().delete(MODULE_ACC_MANIFEST).where(MODULE_ACC_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_ASCCP_MANIFEST).where(MODULE_ASCCP_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_BCCP_MANIFEST).where(MODULE_BCCP_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_CODE_LIST_MANIFEST).where(MODULE_CODE_LIST_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_AGENCY_ID_LIST_MANIFEST).where(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_DT_MANIFEST).where(MODULE_DT_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_BLOB_CONTENT_MANIFEST).where(MODULE_BLOB_CONTENT_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+        dslContext().delete(MODULE_XBT_MANIFEST).where(MODULE_XBT_MANIFEST.MODULE_ID.eq(moduleId)).execute();
+
+        dslContext().delete(MODULE).where(MODULE.MODULE_ID.eq(moduleId)).execute();
     }
 }

@@ -25,10 +25,9 @@
           <ng-container matColumnDef="check">
             <th mat-header-cell *matHeaderCellDef>Compare</th>
             <td mat-cell *matCellDef="let element">
-              <mat-checkbox [disabled]="!this.selection.isSelected(element) && this.selection.selected.length > 1"
-                            (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(element) : null"
-                            [checked]="selection.isSelected(element)"></mat-checkbox>
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? toggle(element) : null"
+                            [checked]="isSelected(element)"></mat-checkbox>
             </td>
           </ng-container>
 

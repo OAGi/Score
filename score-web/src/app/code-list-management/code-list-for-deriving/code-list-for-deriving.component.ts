@@ -61,7 +61,6 @@ export class CodeListForDerivingComponent implements OnInit {
     this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.states.push('Published');
-    this.request.extensible = true;
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

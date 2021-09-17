@@ -2,6 +2,7 @@ package org.oagi.score.repo.api.impl.jooq.corecomponent;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.agency.model.AgencyIdList;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
@@ -132,23 +133,24 @@ public class JooqValueDomainReadRepository
                 .collect(groupingBy(BdtScPriRestri::getBdtScId));
     }
 
-    // TODO: AGENCY_ID_LIST
-//    @Override
-//    public Map<BigInteger, AgencyIdList> getAgencyIdListMap(BigInteger releaseId) throws ScoreDataAccessException {
-//        List<AgencyIdList> codeListRecords = dslContext()
-//                .select(CODE_LIST.CODE_LIST_ID,
-//                        CODE_LIST.GUID,
-//                        CODE_LIST.NAME,
-//                        CODE_LIST.VERSION_ID,
-//                        CODE_LIST.AGENCY_ID,
-//                        CODE_LIST.PREV_CODE_LIST_ID,
-//                        CODE_LIST.NEXT_CODE_LIST_ID)
-//                .from(CODE_LIST)
-//                .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
-//                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
-//                .fetchInto(AgencyIdList.class);
-//
-//        return codeListRecords.stream()
-//                .collect(Collectors.toMap(AgencyIdList::getAgencyIdListId, Function.identity()));
-//    }
+    @Override
+    public List<AgencyIdList> getAgencyIdListList(BigInteger releaseId) throws ScoreDataAccessException {
+        return dslContext()
+                .select(AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
+                        AGENCY_ID_LIST.GUID,
+                        AGENCY_ID_LIST.NAME,
+                        AGENCY_ID_LIST.LIST_ID,
+                        AGENCY_ID_LIST.VERSION_ID,
+                        AGENCY_ID_LIST_MANIFEST.as("based_ail").AGENCY_ID_LIST_ID.as("based_agency_id_list_id"),
+                        AGENCY_ID_LIST_VALUE.NAME.as("agencyIdListValueName"),
+                        AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID,
+                        AGENCY_ID_LIST.NEXT_AGENCY_ID_LIST_ID)
+                .from(AGENCY_ID_LIST)
+                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                .leftOuterJoin(AGENCY_ID_LIST_MANIFEST.as("based_ail")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_ail").AGENCY_ID_LIST_MANIFEST_ID))
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchInto(AgencyIdList.class);
+    }
 }

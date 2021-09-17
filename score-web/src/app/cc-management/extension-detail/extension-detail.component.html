@@ -104,6 +104,12 @@
                           <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
                                                 [hidden]="!searcher.isSearching"></mat-progress-spinner>
                         </div>
+                        <div class="ml-auto align-self-center pl-2">
+                          <mat-checkbox class="exclude-scs"
+                                        [(ngModel)]="excludeSCs" (change)="changeExcludeSCs()">
+                            <span>Exclude SCs</span>
+                          </mat-checkbox>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -201,6 +207,7 @@
                         </ng-template>
 
                         <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
+                          node.deprecated ? 'deprecated' : 'dummy',
                           this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
                           this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd']"
                               [matTooltip]="node.state === 'Deleted' ? 'Deleted' : ''"
@@ -236,6 +243,9 @@
                     <ng-template contextMenuItem (execute)="openHistory($event.item)">
                       <span class="context-menu-item">Show History</span>
                     </ng-template>
+                    <ng-template contextMenuItem (execute)="findUsages($event.item)" [visible]="visibleFindUsages">
+                      <span class="context-menu-item">Where Used</span>
+                    </ng-template>
                   </context-menu>
 
                   <context-menu #rootNodeContextMenu>
@@ -263,6 +273,9 @@
                     <ng-template contextMenuItem divider="true"></ng-template>
                     <ng-template contextMenuItem (execute)="openHistory($event.item)">
                       <span class="context-menu-item">Show History</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="findUsages($event.item)" [visible]="visibleFindUsages">
+                      <span class="context-menu-item">Where Used</span>
                     </ng-template>
                   </context-menu>
 
@@ -303,6 +316,9 @@
                     <ng-template contextMenuItem (execute)="openHistory($event.item)">
                       <span class="context-menu-item">Show History</span>
                     </ng-template>
+                    <ng-template contextMenuItem (execute)="findUsages($event.item)" [visible]="visibleFindUsages">
+                      <span class="context-menu-item">Where Used</span>
+                    </ng-template>
                   </context-menu>
 
                   <context-menu #associationAppendAbleNodeContextMenu>
@@ -333,6 +349,9 @@
                     </ng-template>
                     <ng-template contextMenuItem (execute)="openHistory($event.item)">
                       <span class="context-menu-item">Show History</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="findUsages($event.item)" [visible]="visibleFindUsages">
+                      <span class="context-menu-item">Where Used</span>
                     </ng-template>
                   </context-menu>
 

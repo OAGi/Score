@@ -49,7 +49,7 @@ export class BieCreateAsccpComponent implements OnInit {
   displayedColumns: string[] = [
     'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
-  stateList = ['Published'];
+  stateList = ['Published', 'Production'];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
   expandedElement: CcList | null;
@@ -84,7 +84,7 @@ export class BieCreateAsccpComponent implements OnInit {
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.types = ['ASCCP'];
-    this.request.states = ['Published'];
+    this.request.states = this.stateList;
     this.request.isBIEUsable = true;
 
     this.paginator.pageIndex = this.request.page.pageIndex;
@@ -255,6 +255,11 @@ export class BieCreateAsccpComponent implements OnInit {
 
         this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);
       });
+  }
+
+  get isDeveloper(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.role === 'developer';
   }
 
 }

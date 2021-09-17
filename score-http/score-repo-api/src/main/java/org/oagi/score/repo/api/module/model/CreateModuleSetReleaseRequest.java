@@ -13,6 +13,8 @@ public class CreateModuleSetReleaseRequest extends Request {
 
     private boolean isDefault;
 
+    private BigInteger baseModuleSetReleaseId;
+
     public BigInteger getModuleSetId() {
         return moduleSetId;
     }
@@ -37,7 +39,15 @@ public class CreateModuleSetReleaseRequest extends Request {
         isDefault = aDefault;
     }
 
-    public CreateModuleSetReleaseRequest(ScoreUser requester) {
-        super(requester);
+    public CreateModuleSetReleaseRequest() {
+        super();
+    }
+
+    public BigInteger getBaseModuleSetReleaseId() {
+        return baseModuleSetReleaseId;
+    }
+
+    public void setBaseModuleSetReleaseId(BigInteger baseModuleSetReleaseId) {
+        this.baseModuleSetReleaseId = baseModuleSetReleaseId;
     }
 }

@@ -26,7 +26,6 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Exception;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Log;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleBlobContentManifest;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleDir;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 
@@ -70,7 +69,6 @@ public class Indexes {
     public static final Index EXCEPTION_EXCEPTION_TAG_IDX = Internal.createIndex(DSL.name("exception_tag_idx"), Exception.EXCEPTION, new OrderField[] { Exception.EXCEPTION.TAG }, false);
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MMODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK = Internal.createIndex(DSL.name("mmodule_blob_content_manifest_last_updated_by_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.LAST_UPDATED_BY }, false);
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MODULE_BLOB_CONTENT_MANIFEST_BLOB_CONTENT_MANIFEST_ID_FK = Internal.createIndex(DSL.name("module_blob_content_manifest_blob_content_manifest_id_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID }, false);
-    public static final Index MODULE_DIR_MODULE_DIR_PATH_K = Internal.createIndex(DSL.name("module_dir_path_k"), ModuleDir.MODULE_DIR, new OrderField[] { ModuleDir.MODULE_DIR.PATH }, false);
     public static final Index COMMENT_REFERENCE = Internal.createIndex(DSL.name("reference"), Comment.COMMENT, new OrderField[] { Comment.COMMENT.REFERENCE }, false);
     public static final Index LOG_REFERENCE = Internal.createIndex(DSL.name("reference"), Log.LOG, new OrderField[] { Log.LOG.REFERENCE }, false);
     public static final Index SEQ_KEY_SEQ_KEY_ASCC_MANIFEST_ID = Internal.createIndex(DSL.name("seq_key_ascc_manifest_id"), SeqKey.SEQ_KEY, new OrderField[] { SeqKey.SEQ_KEY.ASCC_MANIFEST_ID }, false);

@@ -37,6 +37,7 @@ import {
 } from '../domain/core-component-node';
 import {UnboundedPipe} from '../../common/utility';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
+import {RefactorAsccDialogComponent} from '../refactor-ascc-dialog/refactor-ascc-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
@@ -51,6 +52,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {CcList} from '../cc-list/domain/cc-list';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
+import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 
 @Component({
   selector: 'score-acc-detail',
@@ -70,7 +72,7 @@ export class AccDetailComponent implements OnInit {
 
   rootNode: AccFlatNode;
   dataSource: VSCcTreeDataSource<CcFlatNode>;
-  treeControl: VSFlatTreeControl<CcFlatNode> = new VSFlatTreeControl<CcFlatNode>();
+  treeControl: VSFlatTreeControl<CcFlatNode>;
   searcher: DataSourceSearcher<CcFlatNode>;
 
   lastRevision: CcRevisionResponse;
@@ -87,6 +89,7 @@ export class AccDetailComponent implements OnInit {
   commentControl: CommentControl;
 
   hasBasedAcc: boolean;
+  excludeSCs: boolean;
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
@@ -123,6 +126,7 @@ export class AccDetailComponent implements OnInit {
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
     this.hasBasedAcc = false;
+    this.excludeSCs = true;
 
     this.isUpdating = true;
     this.route.paramMap.pipe(
@@ -164,7 +168,8 @@ export class AccDetailComponent implements OnInit {
 
       const flattener = new CcFlatNodeFlattener(ccGraph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
         this.rootNode = nodes[0] as AccFlatNode;
@@ -175,7 +180,7 @@ export class AccDetailComponent implements OnInit {
           this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
         }
 
-        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
         this.onClick(this.rootNode);
       }, 0);
     });
@@ -213,7 +218,7 @@ export class AccDetailComponent implements OnInit {
       const flattener = new CcFlatNodeFlattener(
         graph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
         return callbackFn(nodes);
       });
     });
@@ -228,14 +233,15 @@ export class AccDetailComponent implements OnInit {
       const flattener = new CcFlatNodeFlattener(
         graph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
         this.rootNode = nodes[0] as AccFlatNode;
         this.rootNode.access = rootNode.access;
         this.rootNode.state = rootNode.state;
         this.rootNode.reset();
-        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
         this.treeControl.expand(this.dataSource.getRootNode());
         this.onClick(this.dataSource.getRootNode());
       }, 0);
@@ -561,14 +567,8 @@ export class AccDetailComponent implements OnInit {
         association.manifestId,
         association.type,
         pos !== -1 && this.hasBasedAcc ? pos -1 : pos).subscribe(_ => {
-          this.getGraph((nodes: CcFlatNode[]) => {
-            const targetNodes = this.dataSource.getNodesByLevelAndIndex(nodes, pos);
-            this.dataSource.insertNodes(targetNodes, pos);
-            this.snackBar.open((pos === -1) ? 'Appended' : 'Inserted', '', {
-              duration: 3000,
-            });
-            this.isUpdating = false;
-          });
+          this.reload((pos === -1) ? 'Appended' : 'Inserted');
+          this.isUpdating = false;
       }, err => {
         this.isUpdating = false;
       });
@@ -592,13 +592,8 @@ export class AccDetailComponent implements OnInit {
         this.isUpdating = true;
         this.service.discardBasedAcc(this.rootNode.manifestId).subscribe(ccAccNode => {
           this.hasBasedAcc = false;
-          this.getGraph((nodes: CcFlatNode[]) => {
-            this.dataSource.removeNodes(0);
-            this.snackBar.open('Discarded', '', {
-              duration: 3000,
-            });
-            this.isUpdating = false;
-          });
+          this.reload('Updated');
+          this.isUpdating = false;
         }, err => {
           this.isUpdating = false;
         });
@@ -618,7 +613,9 @@ export class AccDetailComponent implements OnInit {
           this.isUpdating = false;
           return;
         }
-        this.service.createAsccp(this.rootNode.releaseId, this.rootNode.manifestId, null, this.rootNode.name)
+
+        const initialPropertyTerm = (this.rootNode.detail as CcAccNodeDetail).objectClassTerm;
+        this.service.createAsccp(this.rootNode.releaseId, this.rootNode.manifestId, null, initialPropertyTerm)
           .pipe(finalize(() => {
             this.isUpdating = false;
           })).subscribe(resp => {
@@ -655,12 +652,8 @@ export class AccDetailComponent implements OnInit {
       this.isUpdating = true;
       this.service.setBasedAcc(this.rootNode.manifestId, basedAccManifestId).subscribe(_ => {
         this.hasBasedAcc = true;
-        this.getGraph((nodes: CcFlatNode[]) => {
-          const targetNodes = this.dataSource.getNodesByLevelAndIndex(nodes, 0);
-          this.dataSource.insertNodes(targetNodes, 0);
-          this.snackBar.open('Updated', '', { duration: 3000});
-          this.isUpdating = false;
-        });
+        this.reload('Updated');
+        this.isUpdating = false;
       }, err => {
         this.isUpdating = false;
       });
@@ -1202,6 +1195,23 @@ export class AccDetailComponent implements OnInit {
     window.open('/log/core-component/' + node.guid, '_blank');
   }
 
+  visibleFindUsages(node: CcFlatNode): boolean {
+    return node.type.toUpperCase() === 'ACC' || node.type.toUpperCase() === 'ASCCP' || node.type.toUpperCase() === 'BCCP';
+  }
+
+  findUsages(node: CcFlatNode) {
+    const dialogRef = this.dialog.open(FindUsagesDialogComponent, {
+      data: {
+        type: node.type,
+        manifestId: node.manifestId
+      },
+      width: '600px',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(_ => {});
+  }
+
   openComments(type: string, node?: CcFlatNode) {
     if (!node) {
       node = this.selectedNode;
@@ -1356,5 +1366,60 @@ export class AccDetailComponent implements OnInit {
     this.searcher.go(val).subscribe(index => {
       this.virtualScroll.scrollToIndex(index);
     });
+  }
+
+  refactor(node: CcFlatNode): void {
+    let parentAccManifestId;
+    let targetManifestId;
+    let associationType;
+    if (node.type === 'ASCCP') {
+      targetManifestId = (node as AsccpFlatNode).asccManifestId;
+      associationType = 'ASCC';
+    } else if (node.type === 'BCCP') {
+      targetManifestId = (node as BccpFlatNode).bccManifestId;
+      associationType = 'BCC';
+    } else {
+      return;
+    }
+
+    if (node.parent && (node.parent as AccFlatNode).accManifestId) {
+      parentAccManifestId = (node.parent as AccFlatNode).accManifestId;
+      const dialogRef = this.dialog.open(RefactorAsccDialogComponent, {
+        data: {accManifestId: parentAccManifestId, title: node.name},
+        width: '100%',
+        maxWidth: '100%',
+        height: '100%',
+        maxHeight: '100%',
+        autoFocus: false
+      });
+
+      dialogRef.afterClosed().subscribe(accManifestId => {
+        if (accManifestId) {
+          this.service.refactorAscc(associationType, targetManifestId, accManifestId).subscribe(_ => {
+            this.reload("Refactored.")
+          });
+        }
+      });
+    }
+  }
+
+  changeExcludeSCs(): void{
+    if (this.isChanged) {
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Warning';
+      dialogConfig.data.content = ['Unsaved changes will be lost.'];
+      dialogConfig.data.action = 'Okay';
+
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+        .subscribe(result => {
+          if (!result) {
+            this.excludeSCs = !this.excludeSCs;
+            return;
+          }
+          this.reload();
+        });
+    } else {
+      this.reload();
+    }
   }
 }

@@ -1,5 +1,8 @@
 package org.oagi.score.gateway.http.api.module_management.controller;
 
+import net.sf.cglib.asm.$ConstantDynamic;
+import org.oagi.score.gateway.http.api.module_management.data.ModuleSetRequest;
+import org.oagi.score.gateway.http.api.module_management.service.ModuleSetReleaseService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.gateway.http.api.module_management.service.ModuleSetService;
@@ -80,11 +83,15 @@ public class ModuleSetController {
     @RequestMapping(value = "/module_set", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ModuleSet createModuleSet(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                   @RequestBody ModuleSet moduleSet) {
+                                                   @RequestBody ModuleSetRequest moduleSet) {
         CreateModuleSetRequest request = new CreateModuleSetRequest(sessionService.asScoreUser(user));
         request.setName(moduleSet.getName());
         request.setDescription(moduleSet.getDescription());
+        request.setCreateModuleSetRelease(moduleSet.createModuleSetRelease);
+        request.setTargetModuleSetReleaseId(moduleSet.targetModuleSetReleaseId);
+        request.setTargetReleaseId(moduleSet.targetReleaseId);
         CreateModuleSetResponse response = service.createModuleSet(request);
+
         return response.getModuleSet();
     }
 
@@ -110,41 +117,61 @@ public class ModuleSetController {
         service.discardModuleSet(request);
     }
 
-    @RequestMapping(value = "/module_set/{id}/module", method = RequestMethod.GET,
+    @RequestMapping(value = "/module_set/{id}/modules", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetModuleListResponse getModuleSetModuleList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                                @PathVariable("id") BigInteger moduleSetId,
-                                                                @RequestParam(name = "path", required = false) String path,
-                                                                @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
-                                                                @RequestParam(name = "updateStart", required = false) String updateStart,
-                                                                @RequestParam(name = "updateEnd", required = false) String updateEnd,
-                                                                @RequestParam(name = "sortActive") String sortActive,
-                                                                @RequestParam(name = "sortDirection") String sortDirection,
-                                                                @RequestParam(name = "pageIndex") int pageIndex,
-                                                                @RequestParam(name = "pageSize") int pageSize) {
-
-        GetModuleListRequest request = new GetModuleListRequest(sessionService.asScoreUser(user));
-
+    public ModuleElement getModuleSetModules(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                             @PathVariable("id") BigInteger moduleSetId) {
+        GetModuleElementRequest request = new GetModuleElementRequest(sessionService.asScoreUser(user));
         request.setModuleSetId(moduleSetId);
-
-        request.setUpdaterUsernameList(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
-                Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
-
-        if (StringUtils.hasLength(updateStart)) {
-            request.setUpdateStartDate(new Timestamp(Long.valueOf(updateStart)).toLocalDateTime());
-        }
-        if (StringUtils.hasLength(updateEnd)) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(Long.valueOf(updateEnd));
-            calendar.add(Calendar.DATE, 1);
-            request.setUpdateEndDate(new Timestamp(calendar.getTimeInMillis()).toLocalDateTime());
-        }
-
-        request.setPageIndex(pageIndex);
-        request.setPageSize(pageSize);
-        request.setSortActive(sortActive);
-        request.setSortDirection("asc".equalsIgnoreCase(sortDirection) ? ASC : DESC);
-        return service.getModuleSetModuleList(request);
+        return service.getModuleSetModules(request);
     }
 
+    @RequestMapping(value = "/module_set/{id}/module/create", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CreateModuleResponse addModuleSetModule(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @PathVariable("id") BigInteger moduleSetId,
+                                            @RequestBody ModuleElement moduleElement) {
+        CreateModuleRequest request = new CreateModuleRequest(sessionService.asScoreUser(user));
+        request.setModuleSetId(moduleSetId);
+        request.setName(moduleElement.getName());
+        request.setModuleType(moduleElement.isDirectory() ? ModuleType.DIRECTORY : ModuleType.FILE);
+        request.setNamespaceId(moduleElement.getNamespaceId());
+        request.setVersionNum(moduleElement.getVersionNum());
+        request.setParentModuleId(moduleElement.getParentModuleId());
+        return service.createModule(request);
+    }
+
+    @RequestMapping(value = "/module_set/{id}/module/{moduleId}", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public UpdateModuleResponse updateModuleSetModule(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                   @PathVariable("id") BigInteger moduleSetId,
+                                                   @PathVariable("moduleId") BigInteger moduleId,
+                                                   @RequestBody ModuleElement moduleElement) {
+        UpdateModuleRequest request = new UpdateModuleRequest(sessionService.asScoreUser(user));
+        request.setModuleId(moduleElement.getModuleId());
+        request.setName(moduleElement.getName());
+        request.setNamespaceId(moduleElement.getNamespaceId());
+        request.setVersionNum(moduleElement.getVersionNum());
+        return service.updateModule(request);
+    }
+
+    @RequestMapping(value = "/module_set/{id}/module/{moduleId}", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteModuleSetModule(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                      @PathVariable("id") BigInteger moduleSetId,
+                                      @PathVariable("moduleId") BigInteger moduleId) {
+        DeleteModuleRequest request = new DeleteModuleRequest(sessionService.asScoreUser(user));
+        request.setModuleId(moduleId);
+        service.deleteModule(request);
+    }
+
+    @RequestMapping(value = "/module_set/{id}/module/{parentModuleId}/copy", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public void copyModule(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                           @PathVariable("id") BigInteger moduleSetId,
+                           @PathVariable("parentModuleId") BigInteger parentModuleId,
+                           @RequestBody CopyModuleRequest request) {
+        request.setRequester(sessionService.asScoreUser(user));
+        service.copyModule(request);
+    }
 }

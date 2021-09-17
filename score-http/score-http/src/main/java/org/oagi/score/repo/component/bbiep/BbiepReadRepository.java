@@ -7,7 +7,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.component.bccp.BccpReadRepository;
-import org.oagi.score.repo.component.dt.DtReadRepository;
+import org.oagi.score.repo.component.dt.BdtReadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +26,7 @@ public class BbiepReadRepository {
     private BccpReadRepository bccpReadRepository;
 
     @Autowired
-    private DtReadRepository dtReadRepository;
+    private BdtReadRepository bdtReadRepository;
 
     private BbiepRecord getBbiepByTopLevelAsbiepIdAndHashPath(BigInteger topLevelAsbiepId, String hashPath) {
         return dslContext.selectFrom(BBIEP)
@@ -56,7 +56,7 @@ public class BbiepReadRepository {
         bccp.setDefaultValue(bccpRecord.getDefaultValue());
         bccp.setFixedValue(bccpRecord.getFixedValue());
 
-        DtRecord bdtRecord = dtReadRepository.getDtByBccpManifestId(bccpManifestId);
+        DtRecord bdtRecord = bdtReadRepository.getDtByBccpManifestId(bccpManifestId);
 
         BbiepNode.Bdt bdt = bbiepNode.getBdt();
         bdt.setGuid(bdtRecord.getGuid());

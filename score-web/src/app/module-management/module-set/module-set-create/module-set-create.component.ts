@@ -1,14 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {ModuleSet} from '../../domain/module';
-import {ModuleService} from '../../domain/module.service';
 import {Location} from '@angular/common';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ActivatedRoute, Router} from '@angular/router';
+import {finalize} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
+import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {finalize, switchMap} from 'rxjs/operators';
 import {hashCode} from '../../../common/utility';
+import {ReleaseService} from '../../../release-management/domain/release.service';
+import {ModuleSet, ModuleSetRelease} from '../../domain/module';
+import {ModuleService} from '../../domain/module.service';
 
 @Component({
   selector: 'score-module-set-create',
@@ -20,10 +22,13 @@ export class ModuleSetCreateComponent implements OnInit {
   title = 'Create Module Set';
   isUpdating: boolean;
   moduleSet: ModuleSet = new ModuleSet();
+  moduleSetReleaseList: ModuleSetRelease[] = [];
+  releaseList: Release[] = [];
   private $hashCode: string;
 
   constructor(private service: ModuleService,
               private location: Location,
+              private releaseService: ReleaseService,
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
@@ -32,8 +37,34 @@ export class ModuleSetCreateComponent implements OnInit {
               private confirmDialogService: ConfirmDialogService) {
   }
 
+  get canCreate(): boolean {
+    if (!this.moduleSet) {
+      return false;
+    }
+    if (this.moduleSet.createModuleSetRelease) {
+      if (!this.moduleSet.targetReleaseId) {
+        return false;
+      }
+      if (!this.moduleSet.targetModuleSetReleaseId) {
+        return false;
+      }
+    }
+
+    return this.moduleSet.name && this.moduleSet.name.length > 0;
+  }
+
   ngOnInit(): void {
+    this.moduleSetReleaseList = [];
+    this.releaseList = [];
     this.init(this.moduleSet);
+
+    this.service.getModuleSetReleaseList().subscribe(resp => {
+      this.moduleSetReleaseList = resp.results;
+    });
+
+    this.releaseService.getSimpleReleases().subscribe(list => {
+      this.releaseList.push(...list);
+    });
   }
 
   init(moduleSet: ModuleSet) {
@@ -41,12 +72,8 @@ export class ModuleSetCreateComponent implements OnInit {
     this.$hashCode = hashCode(this.moduleSet);
   }
 
-  get isChanged(): boolean {
-    return hashCode(this.moduleSet) !== this.$hashCode;
-  }
-
   createModuleSet() {
-    if (!this.isChanged) {
+    if (!this.canCreate) {
       return;
     }
 

@@ -32,7 +32,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class BieOpenAPIGenerateExpression implements BieGenerateExpression, InitializingBean {
 
-    private static final String OPEN_API_VERSION = "3.0.2";
+    private static final String OPEN_API_VERSION = "3.0.3";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ObjectMapper mapper;
@@ -126,6 +126,10 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         generateTopLevelAsbiep(topLevelAsbiep);
     }
 
+    private boolean isFriendly() {
+        return this.option.isOpenAPICodeGenerationFriendly();
+    }
+
     private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId());
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
@@ -167,7 +171,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         path.put("description", "");
 
         if (option.isOpenAPI30GetTemplate()) {
-            String schemaName = "get-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+            String schemaName;
+            if (isFriendly()) {
+                schemaName = "get-" + bieName;
+            } else {
+                schemaName = "get-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+            }
             path.put("get", ImmutableMap.<String, Object>builder()
                     .put("summary", "")
                     .put("description", "")
@@ -178,7 +187,9 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                     .put("in", "query")
                                     .put("description", "")
                                     .put("required", false)
-                                    .put("schema", ImmutableMap.<String, Object>builder()
+                                    .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
+                                            .put("type", "integer")
+                                            .build() : ImmutableMap.<String, Object>builder()
                                             .put("$ref", "#/components/schemas/integer")
                                             .build())
                                     .build()
@@ -197,7 +208,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                             .build())
                     .build());
 
-            if (!schemas.containsKey("integer")) {
+            if (!isFriendly() && !schemas.containsKey("integer")) {
                 schemas.put("integer", ImmutableMap.<String, Object>builder()
                         .put("type", "integer")
                         .build());
@@ -212,7 +223,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         if (option.isOpenAPI30PostTemplate()) {
-            String schemaName = "post-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+            String schemaName;
+            if (isFriendly()) {
+                schemaName = "post-" + bieName;
+            } else {
+                schemaName = "post-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+            }
             path.put("post", ImmutableMap.<String, Object>builder()
                     .put("summary", "")
                     .put("description", "")
@@ -651,7 +667,13 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         List<BBIESC> bbieScList = generationContext.queryBBIESCs(bbie)
                 .stream().filter(e -> e.getCardinalityMax() != 0).collect(Collectors.toList());
         if (bbieScList.isEmpty()) {
-            properties.put("$ref", ref);
+            if (ref == null && isFriendly()) {
+                Xbt xbt = getXbt(bbie, bdt);
+                Map<String, Object> content = toProperties(xbt);
+                properties.putAll(content);
+            } else {
+                properties.put("$ref", ref);
+            }
             properties = oneOf(allOf(properties), isNillable);
         } else {
             properties.put("type", "object");
@@ -660,7 +682,13 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             properties.put("properties", new LinkedHashMap<String, Object>());
 
             Map<String, Object> contentProperties = new LinkedHashMap();
-            contentProperties.put("$ref", ref);
+            if (ref == null && isFriendly()) {
+                Xbt xbt = getXbt(bbie, bdt);
+                Map<String, Object> content = toProperties(xbt);
+                contentProperties.putAll(content);
+            } else {
+                contentProperties.put("$ref", ref);
+            }
             for (String key : Arrays.asList("enum", "default", "example")) {
                 if (properties.containsKey(key)) {
                     contentProperties.put(key, properties.remove(key));
@@ -727,6 +755,18 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         return properties;
     }
 
+    private Xbt getXbt(BBIE bbie, DT bdt) {
+        if (bbie.getBdtPriRestriId() == null) {
+            BdtPriRestri bdtPriRestri =
+                    generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+            return Helper.getXbt(generationContext, bdtPriRestri);
+        } else {
+            BdtPriRestri bdtPriRestri =
+                    generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+            return Helper.getXbt(generationContext, bdtPriRestri);
+        }
+    }
+
     private String getReference(Map<String, Object> schemas, BBIE bbie, DT bdt,
                                 GenerationContext generationContext) {
         CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
@@ -738,22 +778,32 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                Xbt xbt;
-                if (bbie.getBdtPriRestriId() == null) {
-                    BdtPriRestri bdtPriRestri =
-                            generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
-                    xbt = Helper.getXbt(generationContext, bdtPriRestri);
+                if (!isFriendly()) {
+                    Xbt xbt = getXbt(bbie, bdt);
+                    ref = fillSchemas(schemas, xbt);
                 } else {
-                    BdtPriRestri bdtPriRestri =
-                            generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
-                    xbt = Helper.getXbt(generationContext, bdtPriRestri);
+                    ref = null;
                 }
-
-                ref = fillSchemas(schemas, xbt);
             }
         }
 
         return ref;
+    }
+
+    private Xbt getXbt(BBIESC bbieSc, DTSC dtSc) {
+        if (bbieSc.getDtScPriRestriId() == null) {
+            BdtScPriRestri bdtScPriRestri =
+                    generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
+            CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
+                    generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
+            return generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+        } else {
+            BdtScPriRestri bdtScPriRestri =
+                    generationContext.findBdtScPriRestri(bbieSc.getDtScPriRestriId());
+            CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
+                    generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
+            return generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+        }
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -808,26 +858,22 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                Xbt xbt;
-                if (bbieSc.getDtScPriRestriId() == null) {
-                    BdtScPriRestri bdtScPriRestri =
-                            generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
-                    CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
-                            generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
-                    xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+                if (!isFriendly()) {
+                    Xbt xbt = getXbt(bbieSc, dtSc);
+                    ref = fillSchemas(schemas, xbt);
                 } else {
-                    BdtScPriRestri bdtScPriRestri =
-                            generationContext.findBdtScPriRestri(bbieSc.getDtScPriRestriId());
-                    CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
-                            generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
-                    xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+                    ref = null;
                 }
-
-                ref = fillSchemas(schemas, xbt);
             }
         }
 
-        properties.put("$ref", ref);
+        if (ref == null && isFriendly()) {
+            Xbt xbt = getXbt(bbieSc, dtSc);
+            Map<String, Object> content = toProperties(xbt);
+            properties.putAll(content);
+        } else {
+            properties.put("$ref", ref);
+        }
         properties = allOf(properties);
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);

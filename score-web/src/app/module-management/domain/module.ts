@@ -1,12 +1,34 @@
+import {HttpParams} from '@angular/common/http';
+import {ParamMap} from '@angular/router';
 import {ScoreUser} from '../../authentication/domain/auth';
 import {PageRequest} from '../../basis/basis';
-import {ParamMap} from '@angular/router';
-import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
 
 export class SimpleModule {
   moduleId: number;
   module: string;
+}
+
+export class Module {
+  moduleId: number;
+  name: string;
+  namespaceId: number;
+  parentModuleId: number;
+  versionNum: string;
+  path: string;
+}
+
+export class ModuleElement {
+  moduleId: number;
+  name: string;
+  namespaceUri: string;
+  parentModuleId: number;
+  namespaceId: number;
+  versionNum: string;
+  directory: boolean;
+  moduleSetId: number;
+  path: string;
+  child: ModuleElement[];
 }
 
 export class ModuleSetListRequest {
@@ -88,6 +110,10 @@ export class ModuleSet {
   description: string;
   lastUpdateTimestamp: Date;
   lastUpdatedBy: ScoreUser;
+  createModuleSetRelease: boolean;
+  targetReleaseId: number;
+  targetModuleSetReleaseId: number;
+
 }
 
 export class ModuleSetModuleListRequest {
@@ -195,7 +221,7 @@ export class ModuleSetRelease {
 
 export class ModuleSetReleaseListRequest {
   filters: {
-    keyword: string;
+    name: string;
   };
   updaterLoginIds: string[] = [];
   updatedDate: {
@@ -232,7 +258,7 @@ export class ModuleSetReleaseListRequest {
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
-      keyword: params.get('keyword') || '',
+      name: params.get('name') || '',
     };
   }
 
@@ -252,10 +278,16 @@ export class ModuleSetReleaseListRequest {
     if (this.updatedDate.end) {
       params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
     }
-    if (this.filters.keyword && this.filters.keyword.length > 0) {
-      params = params.set('keyword', '' + this.filters.keyword);
+    if (this.filters.name && this.filters.name.length > 0) {
+      params = params.set('name', '' + this.filters.name);
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+
+}
+
+export interface Tile {
+  elements: ModuleElement[];
+  current: ModuleElement;
 }

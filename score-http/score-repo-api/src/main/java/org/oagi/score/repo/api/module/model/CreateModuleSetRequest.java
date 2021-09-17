@@ -13,6 +13,12 @@ public class CreateModuleSetRequest extends Request {
 
     private String description;
 
+    private boolean createModuleSetRelease;
+
+    private BigInteger targetReleaseId;
+
+    private BigInteger targetModuleSetReleaseId;
+
     public CreateModuleSetRequest(ScoreUser requester) {
         super(requester);
     }
@@ -39,5 +45,29 @@ public class CreateModuleSetRequest extends Request {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isCreateModuleSetRelease() {
+        return createModuleSetRelease;
+    }
+
+    public void setCreateModuleSetRelease(boolean createModuleSetRelease) {
+        this.createModuleSetRelease = createModuleSetRelease;
+    }
+
+    public BigInteger getTargetReleaseId() {
+        return targetReleaseId;
+    }
+
+    public void setTargetReleaseId(BigInteger targetReleaseId) {
+        this.targetReleaseId = targetReleaseId;
+    }
+
+    public BigInteger getTargetModuleSetReleaseId() {
+        return targetModuleSetReleaseId;
+    }
+
+    public void setTargetModuleSetReleaseId(BigInteger targetModuleSetReleaseId) {
+        this.targetModuleSetReleaseId = targetModuleSetReleaseId;
     }
 }

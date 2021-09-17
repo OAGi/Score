@@ -69,6 +69,10 @@
     <ng-template contextMenuItem (execute)="createBccp()">
       <span class="context-menu-item">BCCP</span>
     </ng-template>
+    <!-- TODO: temporary hide DT -->
+<!--    <ng-template contextMenuItem (execute)="createBdt()">-->
+<!--      <span class="context-menu-item">BDT</span>-->
+<!--    </ng-template>-->
     <ng-template contextMenuItem [divider]="true" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
     </ng-template>
     <ng-template contextMenuItem (execute)="createBOD()" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
@@ -351,7 +355,7 @@
           <ng-container matColumnDef="module">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Module</th>
             <td mat-cell *matCellDef="let element">
-              <span>{{ element.module }}</span>
+              <span [innerHTML]="element.module"></span>
             </td>
           </ng-container>
 

@@ -6,7 +6,11 @@ import java.io.Serializable;
 
 public class Request implements Serializable {
 
-    private final ScoreUser requester;
+    public void setRequester(ScoreUser requester) {
+        this.requester = requester;
+    }
+
+    private ScoreUser requester;
 
     public Request() {
         this.requester = null;
@@ -20,7 +24,7 @@ public class Request implements Serializable {
         this.requester = requester;
     }
 
-    public final ScoreUser getRequester() {
+    public ScoreUser getRequester() {
         return this.requester;
     }
 

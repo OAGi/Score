@@ -76,6 +76,7 @@ public class CodeListReadRepository {
                     CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
                     CODE_LIST.CODE_LIST_ID,
                     CODE_LIST.NAME.as("code_list_name"),
+                    CODE_LIST.VERSION_ID,
                     CODE_LIST.STATE)
                     .from(CODE_LIST)
                     .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
@@ -112,7 +113,9 @@ public class CodeListReadRepository {
                         CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
                         CODE_LIST.CODE_LIST_ID,
                         CODE_LIST.NAME.as("code_list_name"),
-                        CODE_LIST.STATE)
+                        CODE_LIST.VERSION_ID,
+                        CODE_LIST.STATE,
+                        CODE_LIST.IS_DEPRECATED)
                         .from(CODE_LIST)
                         .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
                         .where(and(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(ULong.valueOf(codeListManifestId)),
@@ -137,7 +140,9 @@ public class CodeListReadRepository {
                 CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
                 CODE_LIST.CODE_LIST_ID,
                 CODE_LIST.NAME.as("code_list_name"),
-                CODE_LIST.STATE)
+                CODE_LIST.VERSION_ID,
+                CODE_LIST.STATE,
+                CODE_LIST.IS_DEPRECATED)
                 .from(CODE_LIST)
                 .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
                 .where(conditions)

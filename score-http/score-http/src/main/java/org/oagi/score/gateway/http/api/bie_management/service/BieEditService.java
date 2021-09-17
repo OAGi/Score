@@ -23,10 +23,7 @@ import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbieRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbiepRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.abie.AbieReadRepository;
@@ -61,7 +58,7 @@ import org.oagi.score.repo.component.bdt_sc_pri_restri.BdtScPriRestriReadReposit
 import org.oagi.score.repo.component.code_list.AvailableCodeList;
 import org.oagi.score.repo.component.code_list.CodeListReadRepository;
 import org.oagi.score.repo.component.dt.BdtNode;
-import org.oagi.score.repo.component.dt.DtReadRepository;
+import org.oagi.score.repo.component.dt.BdtReadRepository;
 import org.oagi.score.repo.component.top_level_asbiep.TopLevelAsbiepWriteRepository;
 import org.oagi.score.repo.component.top_level_asbiep.UpdateTopLevelAsbiepRequest;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
@@ -514,7 +511,7 @@ public class BieEditService implements InitializingBean {
     }
 
     @Autowired
-    private DtReadRepository bdtReadRepository;
+    private BdtReadRepository bdtReadRepository;
 
     public BdtNode getBdtDetail(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId,
                                 BigInteger dtManifestId) {
@@ -801,5 +798,230 @@ public class BieEditService implements InitializingBean {
         }
 
         dslContext.deleteFrom(ASBIE).where(ASBIE.ASBIE_ID.eq(asbieRecord.getAsbieId())).execute();
+    }
+
+    @Transactional
+    public void resetDetailBIE(AuthenticatedPrincipal user, ResetDetailBIERequest request) {
+        AppUser requester = sessionService.getAppUser(user);
+
+        TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getTopLevelAsbiepId())))
+                .fetchOne();
+
+        if (!topLevelAsbiepRecord.getOwnerUserId().toBigInteger().equals(requester.getAppUserId())) {
+            throw new IllegalArgumentException("Requester is not an owner of the target BIE.");
+        }
+        if (BieState.valueOf(topLevelAsbiepRecord.getState()) != BieState.WIP) {
+            throw new IllegalArgumentException("Target BIE cannot edit.");
+        }
+
+
+        switch (request.getBieType().toUpperCase()) {
+            case "ABIE":
+                AbieRecord abieRecord = dslContext.selectFrom(ABIE).where(
+                        and(ABIE.PATH.eq(request.getPath()),
+                                ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))).fetchOne();
+
+                if (abieRecord == null) {
+                    return;
+                }
+
+                abieRecord.setBizTerm(null);
+                abieRecord.setDefinition(null);
+                abieRecord.setRemark(null);
+                abieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                abieRecord.setLastUpdateTimestamp(LocalDateTime.now());
+
+                abieRecord.update(ABIE.BIZ_TERM,
+                        ABIE.DEFINITION,
+                        ABIE.REMARK,
+                        ABIE.LAST_UPDATED_BY,
+                        ABIE.LAST_UPDATE_TIMESTAMP);
+
+                AsbiepRecord asbiepRecord = dslContext.selectFrom(ASBIEP).where(
+                        and(ASBIEP.ROLE_OF_ABIE_ID.eq(abieRecord.getAbieId()),
+                                ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))).fetchOne();
+
+                asbiepRecord.setBizTerm(null);
+                asbiepRecord.setDefinition(null);
+                asbiepRecord.setRemark(null);
+                asbiepRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                asbiepRecord.setLastUpdateTimestamp(LocalDateTime.now());
+
+                asbiepRecord.update(ASBIEP.BIZ_TERM,
+                        ASBIEP.DEFINITION,
+                        ASBIEP.REMARK,
+                        ASBIEP.LAST_UPDATED_BY,
+                        ASBIEP.LAST_UPDATE_TIMESTAMP);
+
+                topLevelAsbiepRecord.setVersion(null);
+                topLevelAsbiepRecord.setStatus(null);
+
+                topLevelAsbiepRecord.update(TOP_LEVEL_ASBIEP.VERSION,
+                        TOP_LEVEL_ASBIEP.STATUS);
+                break;
+            case "ASBIEP":
+                AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE).where(
+                        and(ASBIE.PATH.eq(request.getPath()),
+                                ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))).fetchOne();
+
+                if (asbieRecord == null) {
+                    return;
+                }
+
+                AsccManifestRecord asccManifestRecord = dslContext.selectFrom(ASCC_MANIFEST)
+                        .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asbieRecord.getBasedAsccManifestId()))
+                        .fetchOne();
+
+                AsccRecord asccRecord = dslContext.selectFrom(ASCC)
+                        .where(ASCC.ASCC_ID.eq(asccManifestRecord.getAsccId()))
+                        .fetchOne();
+
+                AsbiepRecord asbiep = dslContext.selectFrom(ASBIEP)
+                        .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId())).fetchOne();
+
+                asbieRecord.setCardinalityMin(asccRecord.getCardinalityMin());
+                asbieRecord.setCardinalityMax(asccRecord.getCardinalityMax());
+
+                asbieRecord.setDefinition(null);
+                asbieRecord.setIsNillable((byte) 0);
+                asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
+
+                asbieRecord.update(ASBIE.CARDINALITY_MIN,
+                        ASBIE.CARDINALITY_MAX,
+                        ASBIE.DEFINITION,
+                        ASBIE.IS_NILLABLE,
+                        ASBIE.LAST_UPDATED_BY,
+                        ASBIE.LAST_UPDATE_TIMESTAMP);
+
+                asbiep.setRemark(null);
+                asbiep.setBizTerm(null);
+                asbiep.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                asbiep.setLastUpdateTimestamp(LocalDateTime.now());
+
+                asbiep.update(ASBIEP.BIZ_TERM,
+                        ASBIEP.REMARK,
+                        ASBIEP.LAST_UPDATED_BY,
+                        ASBIEP.LAST_UPDATE_TIMESTAMP);
+                break;
+            case "BBIEP":
+                BbieRecord bbieRecord = dslContext.selectFrom(BBIE).where(
+                        and(BBIE.PATH.eq(request.getPath()),
+                                BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))).fetchOne();
+
+                if (bbieRecord == null) {
+                    return;
+                }
+
+                BccManifestRecord bccManifestRecord = dslContext.selectFrom(BCC_MANIFEST)
+                        .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bbieRecord.getBasedBccManifestId()))
+                        .fetchOne();
+
+                BccRecord bccRecord = dslContext.selectFrom(BCC)
+                        .where(BCC.BCC_ID.eq(bccManifestRecord.getBccId()))
+                        .fetchOne();
+
+                BbiepRecord bbiepRecord = dslContext.selectFrom(BBIEP).where(BBIEP.BBIEP_ID.eq(bbieRecord.getToBbiepId())).fetchOne();
+
+                bbieRecord.setCardinalityMin(bccRecord.getCardinalityMin());
+                bbieRecord.setCardinalityMax(bccRecord.getCardinalityMax());
+                bbieRecord.setDefaultValue(null);
+                bbieRecord.setFixedValue(null);
+                bbieRecord.setIsNull((byte) 0);
+                bbieRecord.setIsNillable(bccRecord.getIsNillable());
+                bbieRecord.setDefinition(null);
+                bbieRecord.setExample(null);
+
+                List<AvailableBdtPriRestri> bdtPriRestriList =
+                        bdtPriRestriReadRepository.availableBdtPriRestriListByBccManifestId(bbieRecord.getBasedBccManifestId().toBigInteger());
+                bdtPriRestriList = bdtPriRestriList.stream().filter(e -> e.isDefault())
+                        .collect(Collectors.toList());
+                if (bdtPriRestriList.size() != 1) {
+                    throw new IllegalArgumentException();
+                }
+
+                bbieRecord.setBdtPriRestriId(ULong.valueOf(bdtPriRestriList.get(0).getBdtPriRestriId()));
+                bbieRecord.setCodeListId(null);
+                bbieRecord.setAgencyIdListId(null);
+                bbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                bbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
+
+                bbieRecord.update(BBIE.CARDINALITY_MIN,
+                        BBIE.CARDINALITY_MAX,
+                        BBIE.DEFAULT_VALUE,
+                        BBIE.FIXED_VALUE,
+                        BBIE.DEFINITION,
+                        BBIE.BDT_PRI_RESTRI_ID,
+                        BBIE.CODE_LIST_ID,
+                        BBIE.AGENCY_ID_LIST_ID,
+                        BBIE.EXAMPLE,
+                        BBIE.IS_NULL,
+                        BBIE.IS_NILLABLE,
+                        BBIE.LAST_UPDATED_BY,
+                        BBIE.LAST_UPDATE_TIMESTAMP);
+
+                bbiepRecord.setRemark(null);
+                bbiepRecord.setBizTerm(null);
+
+                bbiepRecord.update(BBIEP.REMARK, BBIEP.BIZ_TERM);
+                break;
+            case "BBIE_SC":
+                BbieScRecord bbieScRecord = dslContext.selectFrom(BBIE_SC).where(
+                        and(BBIE_SC.PATH.eq(request.getPath()),
+                                BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))).fetchOne();
+
+                if (bbieScRecord == null) {
+                    return;
+                }
+
+                DtScManifestRecord dtScManifestRecord = dslContext.selectFrom(DT_SC_MANIFEST)
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(bbieScRecord.getBasedDtScManifestId()))
+                        .fetchOne();
+
+                DtScRecord dtScRecord = dslContext.selectFrom(DT_SC)
+                        .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId()))
+                        .fetchOne();
+
+                bbieScRecord.setCardinalityMin(dtScRecord.getCardinalityMin());
+                bbieScRecord.setCardinalityMax(dtScRecord.getCardinalityMax());
+
+                List<AvailableBdtScPriRestri> bdtScPriRestriList =
+                        bdtScPriRestriReadRepository.availableBdtScPriRestriListByBdtScManifestId(bbieScRecord.getBasedDtScManifestId().toBigInteger());
+                bdtScPriRestriList = bdtScPriRestriList.stream().filter(e -> e.isDefault())
+                        .collect(Collectors.toList());
+                if (bdtScPriRestriList.size() != 1) {
+                    throw new IllegalArgumentException();
+                }
+
+                bbieScRecord.setDtScPriRestriId(ULong.valueOf(bdtScPriRestriList.get(0).getBdtScPriRestriId()));
+                bbieScRecord.setCodeListId(null);
+                bbieScRecord.setAgencyIdListId(null);
+                bbieScRecord.setDefaultValue(null);
+                bbieScRecord.setFixedValue(null);
+                bbieScRecord.setExample(null);
+                bbieScRecord.setDefinition(null);
+                bbieScRecord.setRemark(null);
+                bbieScRecord.setBizTerm(null);
+                bbieScRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                bbieScRecord.setLastUpdateTimestamp(LocalDateTime.now());
+
+                bbieScRecord.update(BBIE_SC.CARDINALITY_MIN,
+                        BBIE_SC.CARDINALITY_MAX,
+                        BBIE_SC.DT_SC_PRI_RESTRI_ID,
+                        BBIE_SC.CODE_LIST_ID,
+                        BBIE_SC.AGENCY_ID_LIST_ID,
+                        BBIE_SC.DEFAULT_VALUE,
+                        BBIE_SC.FIXED_VALUE,
+                        BBIE_SC.EXAMPLE,
+                        BBIE_SC.REMARK,
+                        BBIE_SC.BIZ_TERM,
+                        BBIE_SC.DEFINITION,
+                        BBIE_SC.LAST_UPDATED_BY,
+                        BBIE_SC.LAST_UPDATE_TIMESTAMP);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot fount target BIE.");
+        }
     }
 }

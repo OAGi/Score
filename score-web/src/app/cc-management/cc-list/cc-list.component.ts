@@ -1,6 +1,7 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {forkJoin, ReplaySubject} from 'rxjs';
+import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
 import {CcListService} from './domain/cc-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
@@ -48,6 +49,8 @@ export class CcListComponent implements OnInit {
 
   title = 'Core Component';
 
+  // TODO: temporary hide DT
+  // typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'BDT', 'ASCC', 'BCC'];
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'ASCC', 'BCC'];
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -161,12 +164,12 @@ export class CcListComponent implements OnInit {
         if (this.request.filters.module.length > 0) {
           elm.module = elm.module.replace(
             new RegExp(this.request.filters.module, 'ig'),
-            '<b>$&</b>');
+            '<b class="bg-warning">$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
           elm.definition = elm.definition.replace(
             new RegExp(this.request.filters.definition, 'ig'),
-            '<b>$&</b>');
+            '<b class="bg-warning">$&</b>');
         }
         return elm;
       });
@@ -222,12 +225,14 @@ export class CcListComponent implements OnInit {
         } else {
           return 'acc/' + ccList.manifestId;
         }
-
       case 'ASCCP':
         return 'asccp/' + ccList.manifestId;
 
       case 'BCCP':
         return 'bccp/' + ccList.manifestId;
+
+      case 'BDT':
+        return 'bdt/' + ccList.manifestId;
 
       default:
         return window.location.pathname;
@@ -456,6 +461,39 @@ export class CcListComponent implements OnInit {
         this.loading = false;
       })).subscribe(resp => {
         return this.router.navigateByUrl('/core_component/bccp/' + resp.manifestId);
+      });
+    });
+  }
+
+  createBdt() {
+    this.loading = true;
+
+    const dialogRef = this.dialog.open(CreateBdtDialogComponent, {
+      data: {
+        releaseId: this.request.release.releaseId,
+        action: 'create',
+        stateList: (this.request.release.releaseId === this.workingRelease.releaseId)
+          ? this.workingStateList : this.releaseStateList
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe(bdtManifestId => {
+      if (!bdtManifestId) {
+        return;
+      }
+
+      this.loading = true;
+      this.nodeService.createBdt(this.request.release.releaseId, bdtManifestId).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(resp => {
+        return this.router.navigateByUrl('/core_component/bdt/' + resp.manifestId);
       });
     });
   }

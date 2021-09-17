@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
 import {
   CcAccNode, CcAccNodeDetail,
   CcAsccpNode,
   CcAsccpNodeDetail,
   CcBccpNode,
-  CcBccpNodeDetail,
+  CcBccpNodeDetail, CcBdtNode, CcBdtNodeDetail,
   CcBdtScNodeDetail,
   CcCreateResponse,
   CcGraph,
@@ -58,6 +58,13 @@ export class CcNodeService {
     });
   }
 
+  createBdt(releaseId: number, bdtManifestId: number): Observable<CcCreateResponse> {
+    return this.http.post<CcCreateResponse>('/api/core_component/bdt', {
+      releaseId,
+      bdtManifestId,
+    });
+  }
+
   createBOD(verbManifestId: number, nounManifestId: number): Observable<CcCreateResponse> {
     return this.http.post<CcCreateResponse>('/api/core_component/oagis/bod', {
       verbManifestId,
@@ -97,6 +104,10 @@ export class CcNodeService {
     return this.http.get<CcBccpNode>('/api/core_component/bccp/' + manifestId);
   }
 
+  getBdtNode(manifestId: number): Observable<CcBdtNode> {
+    return this.http.get<CcBdtNode>('/api/core_component/bdt/' + manifestId);
+  }
+
   getGraphNode(type: string, manifestId: number): Observable<CcGraph> {
     return this.http.get<CcGraph>('/api/graphs/' + type.toLowerCase() + '/' + manifestId);
   }
@@ -113,6 +124,9 @@ export class CcNodeService {
           break;
         case 'BCCP':
           node.detail = new CcBccpNodeDetail(node as BccpFlatNode, detail);
+          break;
+        case 'BDT':
+          node.detail = new CcBdtNodeDetail(node as BdtFlatNode, detail);
           break;
         case 'BDT_SC':
           node.detail = new CcBdtScNodeDetail(node as BdtScFlatNode, detail);
@@ -138,6 +152,8 @@ export class CcNodeService {
       }
       params = params.set('manifestId', String((node as BccpFlatNode).bccpManifestId));
       params = params.set('bdtManifestId', String((node as BccpFlatNode).bdtManifestId));
+    } else if (node.type.toUpperCase() === 'BDT') {
+      params = params.set('manifestId', String((node as BdtFlatNode).manifestId));
     } else if (node.type.toUpperCase() === 'BDT_SC') {
       params = params.set('manifestId', String((node as BdtScFlatNode).bdtScManifestId));
     }
@@ -268,6 +284,14 @@ export class CcNodeService {
 
   updateCcSeq(changes: CcSeqUpdateRequest, manifestId: number): Observable<any> {
     return this.http.post('/api/core_component/acc/' + manifestId + '/seq_key', changes);
+  }
+
+  refactorAscc(type: string, targeteManifestId: number, destinationManifestId: number): Observable<any> {
+    return this.http.post('/api/core_component/' + type + '/refactor', {
+      type: type,
+      targetManifestId: targeteManifestId,
+      destinationManifestId: destinationManifestId
+    })
   }
 
 }

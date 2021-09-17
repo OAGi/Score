@@ -1,0 +1,675 @@
+<mat-sidenav-container class="example-container" [hasBackdrop]="false">
+  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15" >
+    <div class="ui header">
+      <h3 class="dividing">Comment</h3>
+      <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
+    </div>
+    <div class="ui feed">
+      <div class="event" *ngFor="let comment of commentControl.comments" [class]="comment.isNew ? 'new-message': ''">
+        <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
+          <div class="summary">
+            <a>{{ comment.loginId }}</a>
+            <div class="date">{{ comment.timestamp | dateAgo }}</div>
+            <mat-icon class="pointer icon"
+                      *ngIf="comment.loginId === currentUser && !comment.hidden"
+                      [inline]="true"
+                      (click)="commentControl.deleteComment(comment)">close</mat-icon>
+          </div>
+          <div class="extra text">
+            <div *ngIf="!comment.isEditing">
+              <span *ngIf="!comment.hidden">{{ comment.text }}</span>
+              <span *ngIf="comment.hidden" class="text-muted">(This message has been deleted.)</span>
+              <mat-icon class="pointer icon mt-1"
+                        *ngIf="comment.loginId === currentUser && !comment.hidden"
+                        [inline]="true"
+                        (click)="commentControl.openEditComment(comment)">edit</mat-icon>
+            </div>
+            <div *ngIf="comment.isEditing">
+              <mat-form-field>
+                <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
+              </mat-form-field>
+              <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
+              <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
+            </div>
+          </div>
+          <div class="meta" *ngIf="comment.prevCommentId === null && commentControl.replyCommentId !== comment.commentId">
+            <a class="like" (click)="commentControl.openReply(comment)">Reply</a>
+          </div>
+          <div class="reply-box" *ngIf="commentControl.replyCommentId === comment.commentId">
+            <mat-form-field>
+              <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
+            </mat-form-field>
+            <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
+            <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="commentControl.replyOpened === false">
+        <mat-form-field>
+          <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
+        </mat-form-field>
+        <button mat-stroked-button (click)="commentControl.addComment()">
+          Comment
+        </button>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content (click)="sidenav.close();">
+    <div class="loading-container" *ngIf="isUpdating">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+    <div class="context-section">
+      <div class="row m-0">
+        <div class="col-12 p-0">
+          <mat-card class="search-box-container mb-1">
+            <mat-card-content>
+              <div class="container-fluid" *ngIf="searcher && dataSource">
+                <div class="row">
+                  <div class="col-5 tree-search-box">
+                    <div class="row">
+                      <div class="col-9">
+                        <mat-form-field>
+                          <mat-placeholder *ngIf="!selectedNode">Search</mat-placeholder>
+                          <mat-placeholder *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-placeholder>
+                          <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                                 (keyup.enter)="search(searcher.inputKeyword)">
+                          <mat-hint matSuffix *ngIf="searcher.searchResult.length > 0"
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchResult.length === 0"
+                                    align="end">0/0</mat-hint>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3 buttons">
+                        <button mat-icon-button
+                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                (click)="move(-1)">
+                          <mat-icon>keyboard_arrow_up</mat-icon>
+                        </button>
+                        <button mat-icon-button
+                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                (click)="move(1)">
+                          <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                        <button mat-icon-button
+                                (click)="search(searcher.inputKeyword, false, true)">
+                          <mat-icon>search</mat-icon>
+                        </button>
+                        <button mat-icon-button
+                                [hidden]="!searcher.inputKeyword"
+                                (click)="searcher.resetSearch()">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                        <div style="height: 19px;">
+                          <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                                                [hidden]="!searcher.isSearching"></mat-progress-spinner>
+                        </div>
+                        <div class="ml-auto align-self-center pl-2">
+                          <mat-checkbox class="exclude-scs"
+                                        [(ngModel)]="excludeSCs" (change)="changeExcludeSCs()">
+                            <span>Exclude SCs</span>
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-7 actions-wrap">
+                    <div class="actions ml-auto" *ngIf="isWorkingRelease()">
+                      <button mat-raised-button color="primary" (click)="updateDetails()"
+                              *ngIf="state === 'WIP' && access === 'CanEdit'"
+                              [disabled]="!isChanged">
+                        Update
+                      </button>
+                      <button mat-raised-button color="accent" (click)="updateState('Draft')"
+                              *ngIf="state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating || isChanged || !isEditable()">
+                        Move to Draft
+                      </button>
+                      <button mat-raised-button color="warn" (click)="updateState('WIP')"
+                              *ngIf="(state === 'Draft' || state === 'Candidate') && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        Back to WIP
+                      </button>
+                      <button mat-raised-button color="accent" (click)="updateState('Candidate')"
+                              *ngIf="state === 'Draft' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        Move to Candidate
+                      </button>
+                      <button mat-raised-button color="warn" (click)="makeNewRevision()"
+                              *ngIf="state === 'Published' && userRole === 'developer' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                      </button>
+                      <button mat-raised-button color="warn" (click)="deleteNode()"
+                              *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
+                              [disabled]="isUpdating || isChanged">
+                        Delete
+                      </button>
+                      <button mat-raised-button color="primary" (click)="restoreNode()"
+                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
+                        Restore
+                      </button>
+                      <button mat-raised-button color="primary" (click)="cancelRevision()"
+                              *ngIf="state === 'WIP' && hasRevision() && access === 'CanEdit'">
+                        Cancel
+                      </button>
+                    </div>
+                    <div class="actions ml-auto" *ngIf="!isWorkingRelease()">
+                      <button mat-raised-button color="primary" (click)="updateDetails()"
+                              *ngIf="state === 'WIP' && access === 'CanEdit'"
+                              [disabled]="!isChanged">
+                        Update
+                      </button>
+                      <button mat-raised-button color="accent" (click)="updateState('QA')"
+                              *ngIf="state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating || isChanged || !isEditable()">
+                        Move to QA
+                      </button>
+                      <button mat-raised-button color="warn" (click)="updateState('WIP')"
+                              *ngIf="state === 'QA' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        Back to WIP
+                      </button>
+                      <button mat-raised-button color="accent" (click)="updateState('Production')"
+                              *ngIf="state === 'QA' && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        Move to Production
+                      </button>
+                      <button mat-raised-button color="warn" (click)="makeNewRevision()"
+                              *ngIf="(state === 'Published' || state === 'Production') && (access === 'CanMove' || access === 'CanEdit')"
+                              [disabled]="isUpdating">
+                        {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                      </button>
+                      <button mat-raised-button color="warn" (click)="deleteNode()"
+                              *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
+                              [disabled]="isUpdating || isChanged">
+                        Delete
+                      </button>
+                      <button mat-raised-button color="primary" (click)="restoreNode()"
+                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
+                        Restore
+                      </button>
+                      <button mat-raised-button color="primary" (click)="cancelRevision()"
+                              *ngIf="state === 'WIP' && hasRevision() && access === 'CanEdit'">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="tree-breadcrumbs-wrap" id="cc-tree-breadcrumbs-wrap" *ngIf="selectedNode">
+                    <div class="tree-breadcrumb"
+                         *ngFor="let bread of selectedNode.parents; let last = last;">
+                      <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                      <span *ngIf="last"
+                            class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('cc-tree-breadcrumbs-wrap') : '' }}</span>
+                      <span *ngIf="!last" class="tree-breadcrumb-item"
+                            (click)="scrollToNode(bread)">{{ bread.name }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+      <div class="row m-0" (window:resize)="onResize($event)">
+        <div class="col-12 p-0">
+          <as-split unit="percent" [direction]="'horizontal'">
+            <as-split-area class="left-panel" size="30">
+              <mat-card class="cc-node-tree-panel">
+                <mat-card-content class="mat-card-container">
+                  <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
+                                               [style.height.px]="innerHeight" #virtualScroll>
+                    <div *cdkVirtualFor="let node of dataSource" class="example-item">
+                      <div class="mat-tree-node d-flex pointer"
+                           tabIndex="0"
+                           [class]="{'tree-node-selected': cursorNode === node}"
+                           (click)="onClick(node, $event)"
+                           (keydown)="keyNavigation($event)"
+                           [matTooltip]="'Circular reference detected.'"
+                           [matTooltipDisabled]="!node.isCycle"
+                           [style.padding-left]="node.level * paddingPixel + 'px'">
+                        <button *ngIf="treeControl.isExpandable(node); else disabledRef;"
+                                (click)="toggle(node, $event)"
+                                class="align-self-center"
+                                mat-icon-button>
+                          <mat-icon class="mat-icon-rtl-mirror">
+                            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                          </mat-icon>
+                        </button>
+                        <ng-template #disabledRef>
+                          <button mat-icon-button disabled></button>
+                        </ng-template>
+
+                        <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
+                          node.deprecated ? 'deprecated' : 'dummy',
+                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
+                          this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd',
+                          node.state === 'Deleted' ? 'text-line-through' : 'text-none']"
+                              [matTooltip]="node.state === 'Deleted' ? 'Deleted' : ''"
+                              [innerHTML]="node.name | highlight : searcher.searchKeyword">
+                        </span>
+                        <mat-icon class="align-self-center ml-auto"
+                                  *ngIf="!node.isCycle"
+                                  (click)="onContextMenu($event, node)">more_vert
+                        </mat-icon>
+                      </div>
+                    </div>
+                  </cdk-virtual-scroll-viewport>
+
+                  <context-menu #defaultContextMenu>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
+                      <span class="context-menu-item">Expand 2</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
+                      <span class="context-menu-item">Expand 3</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
+                      <span class="context-menu-item">Expand All</span>
+                    </ng-template>
+                    <ng-template contextMenuItem divider="true"></ng-template>
+                    <ng-template contextMenuItem (execute)="openCoreComponent($event.item)">
+                      <span class="context-menu-item">Open in new tab</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="openHistory($event.item)">
+                      <span class="context-menu-item">Show History</span>
+                    </ng-template>
+                  </context-menu>
+
+                  <context-menu #bccpContextMenu>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
+                      <span class="context-menu-item">Expand 2</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
+                      <span class="context-menu-item">Expand 3</span>
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
+                      <span class="context-menu-item">Expand All</span>
+                    </ng-template>
+                    <ng-template *ngIf="isEditable()"
+                                 contextMenuItem divider="true"></ng-template>
+                    <ng-template *ngIf="isEditable()"
+                                 contextMenuItem (execute)="changeBdt($event.item)">
+                      <span class="context-menu-item">Change BDT</span>
+                    </ng-template>
+                    <ng-template contextMenuItem divider="true"></ng-template>
+                    <ng-template contextMenuItem (execute)="openHistory($event.item)">
+                      <span class="context-menu-item">Show History</span>
+                    </ng-template>
+                  </context-menu>
+                </mat-card-content>
+              </mat-card>
+            </as-split-area>
+            <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
+
+              <!-- BCC & BCCP & BDT -->
+              <div class="cc-node-detail-panel" *ngIf="isBdtDetail()">
+                <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
+                  <mat-tab label="{{ asBdtDetail().den }}">
+                    <div class="cc-node-detail-container">
+                      <div class="row">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DT" [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>Release</mat-label>
+                            <input matInput [(ngModel)]="asBdtDetail().releaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>Revision</mat-label>
+                            <input matInput [(ngModel)]="asBdtDetail().revisionNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>State</mat-label>
+                            <input matInput [(ngModel)]="asBdtDetail().state" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Owner</mat-label>
+                            <input matInput [(ngModel)]="asBdtDetail().owner" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="openComments('BDT')">
+                            <mat-icon>comments</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>GUID</mat-label>
+                            <input matInput maxlength="41"
+                                   [(ngModel)]="asBdtDetail().guid" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Based Data Type</mat-label>
+                            <input matInput maxlength="41"
+                                   [(ngModel)]="asBdtDetail().basedBdtDen" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <input matInput placeholder="Data Type Term" maxlength="45"
+                                   [(ngModel)]="asBdtDetail().dataTypeTerm" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>{{ 'DATA_TYPE_DETAIL.DEN' | translate }}</mat-label>
+                            <input matInput maxlength="200"
+                                   [(ngModel)]="asBdtDetail().den" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <input matInput placeholder="Qualifier" maxlength="100"
+                                   [(ngModel)]="asBdtDetail().qualifier" [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <input matInput placeholder="Content Component Den" maxlength="100"
+                                   [(ngModel)]="asBdtDetail().contentComponentDen" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-select placeholder="Namespace"
+                                        [(ngModel)]="asBdtDetail().namespaceId"
+                                        [disabled]="false">
+                              <mat-option [value]="0">-</mat-option>
+                              <mat-option *ngFor="let namespace of getSelectableNamespaces(asBdtDetail().namespaceId)"
+                                          [value]="namespace.namespaceId">
+                                {{namespace.uri}}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-5">
+                          <mat-form-field>
+                            <mat-select placeholder="Primitive Type"
+                                        [(ngModel)]="selectedBdtPriRestri"
+                                        [disabled]="false">
+                              <mat-select-trigger class="d-flex">
+                                <span>{{ selectedBdtPriRestri.name | separate }}</span>
+                                <span class="f12 ml-auto">{{ selectedBdtPriRestri.type }}</span>
+                              </mat-select-trigger>
+                              <mat-option *ngFor="let restri of asBdtDetail().bdtPriRestriList"
+                                          [value]="restri">
+                                <div class="d-flex">
+                                  <span>{{ restri.name | separate }}</span>
+                                  <span class="f12 ml-auto">{{ restri.type }}</span>
+                                </div>
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button matTooltip="Add Primitive Type">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-select placeholder="Primitive XML Expression"
+                                        [(ngModel)]="selectedXbt" [disabled]="selectedBdtPriRestri.type !== 'Primitive'">
+                              <mat-option *ngFor="let xbt of selectedBdtPriRestri.xbtList"
+                                          [value]="xbt">{{xbt.xbtName}}</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <input matInput placeholder="Definition Source" maxlength="200"
+                                   [(ngModel)]="asBdtDetail().definitionSource" [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <textarea matInput rows="6" cols="30"
+                                      placeholder="Definition"
+                                      [(ngModel)]="asBdtDetail().definition"
+                                      [disabled]="false"></textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <textarea matInput rows="6" cols="30"
+                                      placeholder="Content Component Definition"
+                                      [(ngModel)]="asBdtDetail().contentComponentDefinition"
+                                      [disabled]="false"></textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+
+              <!-- BDT_SC -->
+              <div class="cc-node-detail-panel" *ngIf="isBdtScDetail()">
+                <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
+                  <mat-tab label="{{ asBdtScDetail().den }}">
+                    <div class="cc-node-detail-container">
+                      <div class="row">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type Supplementary Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DTSC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>Release</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().releaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>Revision</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().revisionNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                          <mat-form-field>
+                            <mat-label>State</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().state" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Owner</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().owner" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button (click)="openComments('BDT_SC')">
+                            <mat-icon>comments</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>GUID</mat-label>
+                            <input matInput maxlength="41"
+                                   [(ngModel)]="asBdtScDetail().guid" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>{{ 'BDT_SC_DETAIL.DEN' | translate }}</mat-label>
+                            <input matInput maxlength="200"
+                                   [(ngModel)]="asBdtScDetail().den" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Property Term</mat-label>
+                            <input matInput maxlength="60"
+                                   [(ngModel)]="asBdtScDetail().propertyTerm">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Representation Term</mat-label>
+                            <input matInput maxlength="20"
+                                   [(ngModel)]="asBdtScDetail().representationTerm">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <input matInput placeholder="Cardinality Min"
+                                   [(ngModel)]="asBdtScDetail().cardinalityMin"
+                                   [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <input matInput placeholder="{{ 'BDT_SC_DETAIL.MAX' | translate }}"
+                                   [value]="asBdtScDetail().cardinalityMax | unbounded"
+                                   [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-3 col-sm-3">
+                          <mat-form-field>
+                            <mat-label>Value Constraint</mat-label>
+                            <mat-select [(ngModel)]="asBdtScDetail().fixedOrDefault"
+                                        [disabled]="false">
+                              <mat-option value="none">None</mat-option>
+                              <mat-option value="fixed">Fixed Value</mat-option>
+                              <mat-option value="default">Default Value</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-9 col-sm-9">
+                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'none'">
+                            <input matInput placeholder="No value constraints"
+                                   [disabled]="false">
+                          </mat-form-field>
+
+                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'fixed'">
+                            <input matInput placeholder="Fixed Value"
+                                   [(ngModel)]="asBdtScDetail().fixedValue"
+                                   [disabled]="false">
+                          </mat-form-field>
+
+                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'default'">
+                            <input matInput placeholder="Default Value"
+                                   [(ngModel)]="asBdtScDetail().defaultValue"
+                                   [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-5">
+                          <mat-form-field>
+                            <mat-select placeholder="Primitive Type"
+                                        [(ngModel)]="selectedBdtScPriRestri"
+                                        [disabled]="false">
+                              <mat-select-trigger class="d-flex">
+                                <span>{{ selectedBdtScPriRestri.name | separate }}</span>
+                                <span class="f12 ml-auto">{{ selectedBdtScPriRestri.type }}</span>
+                              </mat-select-trigger>
+                              <mat-option *ngFor="let restri of asBdtScDetail().bdtScPriRestriList"
+                                          [value]="restri">
+                                <div class="d-flex">
+                                  <span>{{ restri.name | separate }}</span>
+                                  <span class="f12 ml-auto">{{ restri.type }}</span>
+                                </div>
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1">
+                          <button mat-icon-button matTooltip="Add Primitive Type">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-select placeholder="Primitive XML Expression"
+                                        [(ngModel)]="selectedXbt" [disabled]="selectedBdtScPriRestri.type !== 'Primitive'">
+                              <mat-option *ngFor="let xbt of selectedBdtScPriRestri.xbtList"
+                                          [value]="xbt">{{xbt.xbtName}}</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <input matInput placeholder="Definition Source" maxlength="200"
+                                   [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="false">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <textarea matInput rows="6" cols="30"
+                                      placeholder="Definition"
+                                      [(ngModel)]="asBdtScDetail().definition"
+                                      [disabled]="false"></textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+            </as-split-area>
+          </as-split>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

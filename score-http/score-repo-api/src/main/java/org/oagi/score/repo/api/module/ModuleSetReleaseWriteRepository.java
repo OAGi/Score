@@ -13,4 +13,8 @@ public interface ModuleSetReleaseWriteRepository {
 
     DeleteModuleSetReleaseResponse deleteModuleSetRelease(
             DeleteModuleSetReleaseRequest request) throws ScoreDataAccessException;
+
+    void createModuleManifest(CreateModuleManifestRequest request) throws ScoreDataAccessException;
+
+    void deleteModuleManifest(DeleteModuleManifestRequest request) throws ScoreDataAccessException;
 }

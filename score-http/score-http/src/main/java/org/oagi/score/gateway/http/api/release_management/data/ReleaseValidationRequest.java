@@ -13,4 +13,5 @@ public class ReleaseValidationRequest {
     private List<BigInteger> assignedAsccpComponentManifestIds = Collections.emptyList();
     private List<BigInteger> assignedBccpComponentManifestIds = Collections.emptyList();
     private List<BigInteger> assignedCodeListComponentManifestIds = Collections.emptyList();
+    private List<BigInteger> assignedAgencyIdListComponentManifestIds = Collections.emptyList();
 }

@@ -7,13 +7,18 @@ import java.math.BigInteger;
 public class FindNextAsccpManifestResponse extends Response {
 
     private final BigInteger nextAsccpManifestId;
+    private final String releaseNum;
 
-    public FindNextAsccpManifestResponse(BigInteger nextAsccpManifestId) {
+    public FindNextAsccpManifestResponse(BigInteger nextAsccpManifestId, String releaseNum) {
         this.nextAsccpManifestId = nextAsccpManifestId;
+        this.releaseNum = releaseNum;
     }
 
     public BigInteger getNextAsccpManifestId() {
         return nextAsccpManifestId;
     }
 
+    public String getReleaseNum() {
+        return releaseNum;
+    }
 }

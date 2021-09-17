@@ -163,9 +163,10 @@ export class BieUpliftComponent implements OnInit {
   @ViewChild('defaultTargetContextMenu', {static: true}) public defaultTargetContextMenu: ContextMenuComponent;
 
   sourceTreeControl: VSBieFlatTreeControl<BieUpliftSourceFlatNode> =
-    new VSBieFlatTreeControl<BieUpliftSourceFlatNode>(true);
+    new VSBieFlatTreeControl<BieUpliftSourceFlatNode>(true, undefined, undefined, undefined);
   targetTreeControl: VSBieFlatTreeControl<BieUpliftTargetFlatNode> =
-    new VSBieFlatTreeControl<BieUpliftTargetFlatNode>(false);
+    new VSBieFlatTreeControl<BieUpliftTargetFlatNode>(false, undefined, undefined, undefined);
+
   sourceDataSource: VSBieUpliftSourceFlatTreeDataSource;
   targetDataSource: VSBieFlatTreeDataSource<BieUpliftTargetFlatNode>;
   sourceSearcher: BieDataSourceSearcher;
@@ -179,6 +180,10 @@ export class BieUpliftComponent implements OnInit {
   topLevelAsbiepId: number;
   targetAsccpManifestId: number;
   targetReleaseId: number;
+  bieGuid: string;
+  bieName: string;
+  sourceReleaseNum: string;
+  targetReleaseNum: string;
 
   unmatchedSource: BieUpliftSourceFlatNode[] = [];
   currentUnmatchedSource: BieUpliftSourceFlatNode;
@@ -209,6 +214,7 @@ export class BieUpliftComponent implements OnInit {
     this.loading = true;
     this.bieUpliftService.findTargetAsccpManifest(this.topLevelAsbiepId, this.targetReleaseId).subscribe(resp => {
       this.targetAsccpManifestId = resp.asccpManifestId;
+      this.targetReleaseNum = resp.releaseNum;
 
       merge(
         forkJoin([
@@ -218,6 +224,9 @@ export class BieUpliftComponent implements OnInit {
           this.bieEditService.getRefBieList(this.topLevelAsbiepId)
         ]).pipe(map(([sourceCcGraph, sourceRootNode,
                        sourceUsedBieList, sourceRefBieList]) => {
+          this.bieGuid = sourceRootNode.guid;
+          this.bieName = sourceRootNode.name;
+          this.sourceReleaseNum = sourceRootNode.releaseNum;
           return new BieUpliftSourceFlatNodeFlattener(
             sourceCcGraph, sourceRootNode.asccpManifestId, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList)
             .flatten();
@@ -343,16 +352,17 @@ export class BieUpliftComponent implements OnInit {
       }
     });
 
-    for (const [asbieId, sourceAsbiePath] of Object.entries(bieUpliftMap.sourceAsbiePathMap)) {
-      const sourceManifestId = this._getManifestId(this._getLastTag(sourceAsbiePath));
+    for (const [asbieId, sourceAsbiePathContext] of Object.entries(bieUpliftMap.sourceAsbiePathMap)) {
+      const sourceManifestId = this._getManifestId(this._getLastTag(sourceAsbiePathContext.path));
       const source = (sourceAsbiepList.has(sourceManifestId) ? sourceAsbiepList.get(sourceManifestId) : [])
-        .find(e => (e._node as AsbiepFlatNode).asbiePath === sourceAsbiePath);
+        .find(e => (e._node as AsbiepFlatNode).asbiePath === sourceAsbiePathContext.path);
       if (!!source) {
         source.bieId = Number(asbieId);
-        const targetAsbiePath = bieUpliftMap.targetAsbiePathMap[asbieId];
-        const targetManifestId = this._getManifestId(this._getLastTag(targetAsbiePath));
+        source.context = sourceAsbiePathContext.context;
+        const targetAsbiePathContext = bieUpliftMap.targetAsbiePathMap[asbieId];
+        const targetManifestId = this._getManifestId(this._getLastTag(targetAsbiePathContext?.path));
         const target = (targetAsbiepList.has(targetManifestId) ? targetAsbiepList.get(targetManifestId) : [])
-          .find(e => (e._node as AsbiepFlatNode).asbiePath === targetAsbiePath);
+          .find(e => (e._node as AsbiepFlatNode).asbiePath === targetAsbiePathContext?.path);
         if (!!target) {
           source.target = target;
           source.fixed = true;
@@ -360,16 +370,17 @@ export class BieUpliftComponent implements OnInit {
         }
       }
     }
-    for (const [bbieId, sourceBbiePath] of Object.entries(bieUpliftMap.sourceBbiePathMap)) {
-      const sourceManifestId = this._getManifestId(this._getLastTag(sourceBbiePath));
+    for (const [bbieId, sourceBbiePathContext] of Object.entries(bieUpliftMap.sourceBbiePathMap)) {
+      const sourceManifestId = this._getManifestId(this._getLastTag(sourceBbiePathContext.path));
       const source = (sourceBbiepList.has(sourceManifestId) ? sourceBbiepList.get(sourceManifestId) : [])
-        .find(e => (e._node as BbiepFlatNode).bbiePath === sourceBbiePath);
+        .find(e => (e._node as BbiepFlatNode).bbiePath === sourceBbiePathContext.path);
       if (!!source) {
         source.bieId = Number(bbieId);
-        const targetBbiePath = bieUpliftMap.targetBbiePathMap[bbieId];
-        const targetManifestId = this._getManifestId(this._getLastTag(targetBbiePath));
+        source.context = sourceBbiePathContext.context;
+        const targetBbiePathContext = bieUpliftMap.targetBbiePathMap[bbieId];
+        const targetManifestId = this._getManifestId(this._getLastTag(targetBbiePathContext?.path));
         const target = (targetBbiepList.has(targetManifestId) ? targetBbiepList.get(targetManifestId) : [])
-          .find(e => (e._node as BbiepFlatNode).bbiePath === targetBbiePath);
+          .find(e => (e._node as BbiepFlatNode).bbiePath === targetBbiePathContext?.path);
         if (!!target) {
           source.target = target;
           source.fixed = true;
@@ -377,16 +388,17 @@ export class BieUpliftComponent implements OnInit {
         }
       }
     }
-    for (const [bbieScId, sourceBbieScPath] of Object.entries(bieUpliftMap.sourceBbieScPathMap)) {
-      const sourceManifestId = this._getManifestId(this._getLastTag(sourceBbieScPath));
+    for (const [bbieScId, sourceBbieScPathContext] of Object.entries(bieUpliftMap.sourceBbieScPathMap)) {
+      const sourceManifestId = this._getManifestId(this._getLastTag(sourceBbieScPathContext.path));
       const source = (sourceBbieScList.has(sourceManifestId) ? sourceBbieScList.get(sourceManifestId) : [])
-        .find(e => (e._node as BbieScFlatNode).bbieScPath === sourceBbieScPath);
+        .find(e => (e._node as BbieScFlatNode).bbieScPath === sourceBbieScPathContext.path);
       if (!!source) {
         source.bieId = Number(bbieScId);
-        const targetBbieScPath = bieUpliftMap.targetBbieScPathMap[bbieScId];
-        const targetManifestId = this._getManifestId(this._getLastTag(targetBbieScPath));
+        source.context = sourceBbieScPathContext.context;
+        const targetBbieScPathContext = bieUpliftMap.targetBbieScPathMap[bbieScId];
+        const targetManifestId = this._getManifestId(this._getLastTag(targetBbieScPathContext?.path));
         const target = (targetBbieScList.has(targetManifestId) ? targetBbieScList.get(targetManifestId) : [])
-          .find(e => (e._node as BbieScFlatNode).bbieScPath === targetBbieScPath);
+          .find(e => (e._node as BbieScFlatNode).bbieScPath === targetBbieScPathContext?.path);
         if (!!target) {
           source.target = target;
           source.fixed = true;
@@ -655,6 +667,10 @@ export class BieUpliftComponent implements OnInit {
         targetAsccpManifestId: this.targetAsccpManifestId,
         releaseId: this.targetReleaseId,
         matches: reports,
+        name: this.bieName,
+        guid: this.bieGuid,
+        sourceReleaseNum: this.sourceReleaseNum,
+        targetReleaseNum: this.targetReleaseNum
       },
       width: '100%',
       maxWidth: '100%',

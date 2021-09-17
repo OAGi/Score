@@ -66,16 +66,16 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
     }
 
     /**
-     * Setter for <code>oagi.module_dt_manifest.module_set_assignment_id</code>.
+     * Setter for <code>oagi.module_dt_manifest.module_id</code>. This indicates a module.
      */
-    public void setModuleSetAssignmentId(ULong value) {
+    public void setModuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_dt_manifest.module_set_assignment_id</code>.
+     * Getter for <code>oagi.module_dt_manifest.module_id</code>. This indicates a module.
      */
-    public ULong getModuleSetAssignmentId() {
+    public ULong getModuleId() {
         return (ULong) get(3);
     }
 
@@ -175,7 +175,7 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
 
     @Override
     public Field<ULong> field4() {
-        return ModuleDtManifest.MODULE_DT_MANIFEST.MODULE_SET_ASSIGNMENT_ID;
+        return ModuleDtManifest.MODULE_DT_MANIFEST.MODULE_ID;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
 
     @Override
     public ULong component4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
 
     @Override
     public ULong value4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
 
     @Override
     public ModuleDtManifestRecord value4(ULong value) {
-        setModuleSetAssignmentId(value);
+        setModuleId(value);
         return this;
     }
 
@@ -353,13 +353,13 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
     /**
      * Create a detached, initialised ModuleDtManifestRecord
      */
-    public ModuleDtManifestRecord(ULong moduleDtManifestId, ULong moduleSetReleaseId, ULong dtManifestId, ULong moduleSetAssignmentId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleDtManifestRecord(ULong moduleDtManifestId, ULong moduleSetReleaseId, ULong dtManifestId, ULong moduleId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleDtManifest.MODULE_DT_MANIFEST);
 
         setModuleDtManifestId(moduleDtManifestId);
         setModuleSetReleaseId(moduleSetReleaseId);
         setDtManifestId(dtManifestId);
-        setModuleSetAssignmentId(moduleSetAssignmentId);
+        setModuleId(moduleId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

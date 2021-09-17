@@ -1,19 +1,19 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatDialog} from '@angular/material/dialog';
+import {MatSort} from '@angular/material/sort';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {ModuleService} from '../../domain/module.service';
-import {ModuleSet, ModuleSetModule, ModuleSetModuleListRequest} from '../../domain/module';
-import {finalize, switchMap} from 'rxjs/operators';
 import {hashCode} from '../../../common/utility';
-import {MatTableDataSource} from '@angular/material/table';
-import {SelectionModel} from '@angular/cdk/collections';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {PageRequest} from '../../../basis/basis';
+import {ModuleElement, ModuleSet, Tile} from '../../domain/module';
+import {ModuleService} from '../../domain/module.service';
+import {ModuleAddDialogComponent} from './module-add-dialog/module-add-dialog.component';
+import {ModuleEditDialogComponent} from './module-edit-dialog/module-edit-dialog.component';
+import {UserToken} from '../../../authentication/domain/auth';
 
 @Component({
   selector: 'score-module-set-edit',
@@ -22,21 +22,14 @@ import {PageRequest} from '../../../basis/basis';
 })
 export class ModuleSetEditComponent implements OnInit {
 
-  title = 'Edit Module Set';
+  title;
   isUpdating: boolean;
   moduleSet: ModuleSet = new ModuleSet();
-  private $hashCode: string;
-
-  request: ModuleSetModuleListRequest;
-  displayedColumns: string[] = [
-    'select', 'path', 'namespaceUri', 'assigned', 'lastUpdateTimestamp'
-  ];
-
-  dataSource = new MatTableDataSource<ModuleSetModule>();
-  selection = new SelectionModel<number>(true, []);
-
+  tiles: Tile[] = [];
+  rootElement: ModuleElement;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  private $hashCode: string;
 
   constructor(private service: ModuleService,
               private location: Location,
@@ -46,33 +39,41 @@ export class ModuleSetEditComponent implements OnInit {
               private dialog: MatDialog,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService) {
+    this.title = (this.role === 'developer') ? 'Edit Module Set' : 'View Module Set';
+  }
+
+  get canUpdate(): boolean {
+    if (this.moduleSet && !this.moduleSet.name) {
+      return false;
+    }
+    return hashCode(this.moduleSet) !== this.$hashCode;
   }
 
   ngOnInit(): void {
-    this.request = new ModuleSetModuleListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadModuleSetModuleList();
-    });
-
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const moduleSetId = Number(params.get('moduleSetId'));
-        this.request.moduleSetId = moduleSetId;
-        return this.service.getModuleSet(this.request.moduleSetId);
+        return this.service.getModuleSet(moduleSetId);
       }))
       .subscribe(moduleSet => {
         this.init(moduleSet);
-        this.loadModuleSetModuleList(true);
+        this.service.getModules(this.moduleSet.moduleSetId).subscribe(resp => {
+          this.rootElement = resp as ModuleElement;
+          this.tiles.push({elements: this.rootElement.child, current: undefined});
+          if (this.rootElement.child && this.rootElement.child.length > 0) {
+            this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
+          }
+        });
       });
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get role(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.role : undefined;
   }
 
   init(moduleSet: ModuleSet) {
@@ -80,12 +81,8 @@ export class ModuleSetEditComponent implements OnInit {
     this.$hashCode = hashCode(this.moduleSet);
   }
 
-  get isChanged(): boolean {
-    return hashCode(this.moduleSet) !== this.$hashCode;
-  }
-
   updateModuleSet() {
-    if (!this.isChanged) {
+    if (!this.canUpdate) {
       return;
     }
 
@@ -103,66 +100,98 @@ export class ModuleSetEditComponent implements OnInit {
       });
   }
 
-  onPageChange(event: PageEvent) {
-    this.loadModuleSetModuleList();
-  }
-
-  loadModuleSetModuleList(isInit?: boolean) {
-    this.isUpdating = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getModuleSetModuleList(this.request).pipe(
-      finalize(() => {
-        this.isUpdating = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-
-      this.dataSource.data = resp.results.map((elm: ModuleSetModule) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
-
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: ModuleSetModule) {
-    this.selection.select(row.moduleId);
-  }
-
-  toggle(row: ModuleSetModule) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.moduleId);
-    } else {
-      this.select(row);
+  onClickElement(tile: Tile, element: ModuleElement) {
+    tile.current = element;
+    let tileIndex = this.tiles.indexOf(tile) + 1;
+    if (this.tiles.length > tileIndex) {
+      this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
+    }
+    if (element.directory) {
+      this.tiles.push({elements: element.child.sort(this._sort), current: undefined});
     }
   }
 
-  isSelected(row: ModuleSetModule) {
-    return this.selection.isSelected(row.moduleId);
+  _sort(e1: ModuleElement, e2: ModuleElement): number {
+    // @ts-ignore
+    return e2.directory - e1.directory ? e2.directory - e1.directory : e1.name > e2.name ? 1 : -1;
   }
 
+  openAddDialog(tile: Tile) {
+    const tileIndex = this.tiles.indexOf(tile);
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+
+    dialogConfig.data = {
+      moduleSetId: this.moduleSet.moduleSetId,
+      parentModuleId: tileIndex > 0 ? this.tiles[tileIndex - 1].current.moduleId : this.rootElement.moduleId,
+      parentDirName: tileIndex > 0 ? this.tiles[tileIndex - 1].current.name : this.rootElement.name
+    };
+    const dialogRef = this.dialog.open(ModuleAddDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(resp => {
+      if (resp) {
+        if (resp === true) {
+          this.service.getModules(this.moduleSet.moduleSetId).subscribe(modules => {
+            this.rootElement = modules as ModuleElement;
+            this.tiles = [];
+            this.tiles.push({elements: this.rootElement.child, current: undefined});
+          });
+        } else {
+          tile.elements.push(resp);
+          this.onClickElement(tile, resp);
+        }
+      }
+    });
+
+  }
+
+  openEditDialog(element: ModuleElement, tile: Tile) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth / 2 + 'px';
+    element.moduleSetId = this.moduleSet.moduleSetId;
+    dialogConfig.data = element;
+    const buf = {
+      'name': element.name,
+      'versionNum': element.versionNum,
+      'namespaceUri': element.namespaceUri,
+      'namespaceId': element.namespaceId,
+    };
+    const dialogRef = this.dialog.open(ModuleEditDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(action => {
+      switch (action) {
+        case 'Discarded':
+        case 'Unassigned':
+          const tileIndex = this.tiles.indexOf(tile);
+          if (tileIndex > 0) {
+            const child = this.tiles[tileIndex - 1].current.child;
+            const elementIndex = child.indexOf(element);
+            child.splice(elementIndex, 1);
+            this.onClickElement(this.tiles[tileIndex - 1], this.tiles[tileIndex - 1].current);
+          } else {
+            const child = this.rootElement.child;
+            const elementIndex = child.indexOf(element);
+            child.splice(elementIndex, 1);
+            this.tiles[0].current = undefined;
+            if (element.directory) {
+              this.tiles = [{elements: this.rootElement.child, current: undefined}];
+            }
+          }
+
+          this.snackBar.open(action, '', {
+            duration: 3000,
+          });
+          break;
+        case 'Updated':
+          this.snackBar.open(action, '', {
+            duration: 3000,
+          });
+          break;
+        default:
+          element.name = buf['name'];
+          element.versionNum = buf['versionNum'];
+          element.namespaceUri = buf['namespaceUri'];
+          element.namespaceId = buf['namespaceId'];
+          break;
+      }
+    });
+  }
 }

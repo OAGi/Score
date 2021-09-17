@@ -66,12 +66,14 @@ public class ReleaseValidationResponse {
     private Map<BigInteger, Set<ValidationMessage>> statusMapForAsccp = new HashMap();
     private Map<BigInteger, Set<ValidationMessage>> statusMapForBccp = new HashMap();
     private Map<BigInteger, Set<ValidationMessage>> statusMapForCodeList = new HashMap();
+    private Map<BigInteger, Set<ValidationMessage>> statusMapForAgencyIdList = new HashMap();
 
     public boolean isSucceed() {
         return (statusMapForAcc.isEmpty() || statusMapForAcc.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0) &&
                (statusMapForAsccp.isEmpty() || statusMapForAsccp.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0) &&
                (statusMapForBccp.isEmpty() || statusMapForBccp.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0) &&
-               (statusMapForCodeList.isEmpty() || statusMapForCodeList.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0);
+               (statusMapForCodeList.isEmpty() || statusMapForCodeList.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0) &&
+               (statusMapForAgencyIdList.isEmpty() || statusMapForAgencyIdList.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0);
     }
 
     public void clearWarnings() {
@@ -85,6 +87,9 @@ public class ReleaseValidationResponse {
             e.setValue(e.getValue().stream().filter(x -> x.getLevel() != Warning).collect(Collectors.toSet()));
         });
         statusMapForCodeList.entrySet().forEach(e -> {
+            e.setValue(e.getValue().stream().filter(x -> x.getLevel() != Warning).collect(Collectors.toSet()));
+        });
+        statusMapForAgencyIdList.entrySet().forEach(e -> {
             e.setValue(e.getValue().stream().filter(x -> x.getLevel() != Warning).collect(Collectors.toSet()));
         });
     }
@@ -103,6 +108,10 @@ public class ReleaseValidationResponse {
 
     public void addMessageForCodeList(BigInteger manifestId, ValidationMessageLevel level, String message, ValidationMessageCode code) {
         addMessage(statusMapForCodeList, manifestId, level, message, code);
+    }
+
+    public void addMessageForAgencyIdList(BigInteger manifestId, ValidationMessageLevel level, String message, ValidationMessageCode code) {
+        addMessage(statusMapForAgencyIdList, manifestId, level, message, code);
     }
 
     private void addMessage(Map<BigInteger, Set<ValidationMessage>> statusMap,

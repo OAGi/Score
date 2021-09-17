@@ -12,7 +12,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row10;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -62,6 +62,11 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
      * The column <code>oagi.agency_id_list_manifest.agency_id_list_id</code>.
      */
     public final TableField<AgencyIdListManifestRecord, ULong> AGENCY_ID_LIST_ID = createField(DSL.name("agency_id_list_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+
+    /**
+     * The column <code>oagi.agency_id_list_manifest.agency_id_list_value_manifest_id</code>.
+     */
+    public final TableField<AgencyIdListManifestRecord, ULong> AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
 
     /**
      * The column <code>oagi.agency_id_list_manifest.based_agency_id_list_manifest_id</code>.
@@ -148,11 +153,12 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
 
     @Override
     public List<ForeignKey<AgencyIdListManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AgencyIdListManifestRecord, ?>>asList(Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK);
+        return Arrays.<ForeignKey<AgencyIdListManifestRecord, ?>>asList(Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK);
     }
 
     private transient Release _release;
     private transient AgencyIdList _agencyIdList;
+    private transient AgencyIdListValueManifest _agencyIdListValueManifest;
     private transient AgencyIdListManifest _agencyIdListManifestBasedAgencyIdListManifestIdFk;
     private transient Log _log;
     private transient AgencyIdListManifest _agencyIdListReplacementAgencyIdListManifestIdFk;
@@ -171,6 +177,13 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
             _agencyIdList = new AgencyIdList(this, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK);
 
         return _agencyIdList;
+    }
+
+    public AgencyIdListValueManifest agencyIdListValueManifest() {
+        if (_agencyIdListValueManifest == null)
+            _agencyIdListValueManifest = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK);
+
+        return _agencyIdListValueManifest;
     }
 
     public AgencyIdListManifest agencyIdListManifestBasedAgencyIdListManifestIdFk() {
@@ -235,11 +248,11 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row10 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
+        return (Row10) super.fieldsRow();
     }
 }

@@ -17,7 +17,7 @@ public enum CcState {
                 return (to == WIP);
 
             case WIP:
-                return (to == Draft || to == QA);
+                return (to == Draft || to == QA || to == Deleted);
 
             case Draft:
                 return (to == WIP || to == Candidate);

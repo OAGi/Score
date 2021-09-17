@@ -2,6 +2,8 @@ package org.oagi.score.repo.api.impl.jooq;
 
 import org.jooq.DSLContext;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.agency.AgencyIdListReadRepository;
+import org.oagi.score.repo.api.agency.AgencyIdListWriteRepository;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.BieWriteRepository;
@@ -11,6 +13,8 @@ import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
 import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyReadRepository;
 import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyWriteRepository;
+import org.oagi.score.repo.api.impl.jooq.agency.JooqAgencyIdListReadRepository;
+import org.oagi.score.repo.api.impl.jooq.agency.JooqAgencyIdListWriteRepository;
 import org.oagi.score.repo.api.impl.jooq.bie.JooqBieReadRepository;
 import org.oagi.score.repo.api.impl.jooq.bie.JooqBieWriteRepository;
 import org.oagi.score.repo.api.impl.jooq.businesscontext.*;
@@ -114,11 +118,6 @@ public class JooqScoreRepositoryFactory implements ScoreRepositoryFactory {
     }
 
     @Override
-    public ModuleReadRepository createModuleReadRepository() throws ScoreDataAccessException {
-        return new JooqModuleReadRepository(this.dslContext);
-    }
-
-    @Override
     public ModuleWriteRepository createModuleWriteRepository() throws ScoreDataAccessException {
         return new JooqModuleWriteRepository(this.dslContext);
     }
@@ -141,6 +140,16 @@ public class JooqScoreRepositoryFactory implements ScoreRepositoryFactory {
     @Override
     public ModuleSetReleaseWriteRepository createModuleSetReleaseWriteRepository() throws ScoreDataAccessException {
         return new JooqModuleSetReleaseWriteRepository(this.dslContext);
+    }
+
+    @Override
+    public AgencyIdListReadRepository createAgencyIdListReadRepository() throws ScoreDataAccessException {
+        return new JooqAgencyIdListReadRepository(this.dslContext);
+    }
+
+    @Override
+    public AgencyIdListWriteRepository createAgencyIdListWriteRepository() throws ScoreDataAccessException {
+        return new JooqAgencyIdListWriteRepository(this.dslContext);
     }
 
     @Override

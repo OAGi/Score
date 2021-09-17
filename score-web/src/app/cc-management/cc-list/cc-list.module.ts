@@ -7,6 +7,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
 import {CcListComponent} from './cc-list.component';
+import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CcListService} from './domain/cc-list.service';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog.component';
@@ -40,12 +41,14 @@ const routes: Routes = [
     CcListComponent,
     CreateAsccpDialogComponent,
     CreateBccpDialogComponent,
+    CreateBdtDialogComponent,
     CreateBodDialogComponent,
     CreateVerbDialogComponent,
   ],
   entryComponents: [
     CreateAsccpDialogComponent,
     CreateBccpDialogComponent,
+    CreateBdtDialogComponent,
     CreateBodDialogComponent,
     CreateVerbDialogComponent,
   ],

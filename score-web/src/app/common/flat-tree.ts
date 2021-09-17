@@ -1,9 +1,13 @@
+import {BieEditFlatNodeFlattener} from '../bie-management/bie-edit/bie-edit.component';
+import {BbiepFlatNode} from '../bie-management/domain/bie-flat-tree';
+import {AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeFlattener} from '../cc-management/domain/cc-flat-tree';
 import {CcGraph, CcGraphNode} from '../cc-management/domain/core-component-node';
 import {FlatTreeControl, FlatTreeControlOptions} from '@angular/cdk/tree';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {BehaviorSubject, empty, Observable} from 'rxjs';
 
 export interface FlatNode {
+  type: string;
   name: string;
   level: number;
   expanded: boolean;
@@ -14,12 +18,21 @@ export interface FlatNode {
 }
 
 export class FlatNodeImpl implements FlatNode {
+  private _type: string;
   name: string;
   level: number;
   _expanded: boolean;
 
   parent?: FlatNode;
   children: FlatNode[] = [];
+
+  get type(): string {
+    return this._type;
+  }
+
+  set type(value: string) {
+    this._type = value;
+  }
 
   get expanded(): boolean {
     return this._expanded || false;
@@ -54,8 +67,11 @@ export interface FlatNodeFlattenerListener<T extends FlatNode> {
 export class VSFlatTreeControl<T extends FlatNode> extends FlatTreeControl<T> {
   dataSource: VSFlatTreeDataSource<T>;
 
-  constructor(isExpandable?: (dataNode: T) => boolean, options?: FlatTreeControlOptions<T, T> | undefined) {
+  ccFlattener: CcFlatNodeFlattener;
+
+  constructor(isExpandable?: (dataNode: T) => boolean, options?: FlatTreeControlOptions<T, T> | undefined, flattener?: CcFlatNodeFlattener) {
     super(t => t.level, (isExpandable) ? isExpandable : t => t.expandable, options);
+    this.ccFlattener = flattener;
   }
 
   isExpanded(dataNode: T): boolean {
@@ -83,6 +99,14 @@ export class VSFlatTreeControl<T extends FlatNode> extends FlatTreeControl<T> {
     }
 
     dataNode.expanded = true;
+
+    if (!!this.ccFlattener && dataNode.type === 'BCCP' && dataNode.children.length === 0) {
+      const node = dataNode as unknown as BccpFlatNode;
+      node.children = this.ccFlattener.getChildren(node);
+      const index = this.dataSource.cachedData.indexOf(dataNode);
+      this.dataSource.cachedData.splice(index + 1, 0, ...node.children as T[]);
+    }
+
     if (dataNode.parent) {
       this.expand(dataNode.parent as T, false);
     }
@@ -218,10 +242,12 @@ export interface ExpressionEvaluator<T extends FlatNode> {
 export class ExactMatchExpressionEvaluator<T extends FlatNode> implements ExpressionEvaluator<T> {
   private _expr: string;
   private _caseSensitive: boolean;
+  private _excludeSCs: boolean;
 
-  constructor(expr: string, caseSensitive?: boolean) {
+  constructor(expr: string, caseSensitive?: boolean, excludeSCs?: boolean) {
     this._expr = expr.replace(/([a-z])([A-Z])/g, '$1 $2').trim();
     this._caseSensitive = caseSensitive || false;
+    this._excludeSCs = excludeSCs || false;
   }
 
   range(data: T[], current: T): T[] {
@@ -235,6 +261,9 @@ export class ExactMatchExpressionEvaluator<T extends FlatNode> implements Expres
   }
 
   eval(node: T): boolean {
+    if (this._excludeSCs && node.type.toUpperCase().indexOf("SC") > -1) {
+      return false;
+    }
     if (this._caseSensitive) {
       return node.name.indexOf(this._expr) > -1;
     } else {
@@ -251,14 +280,16 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
   private _root: boolean = false;
   private _tokens: string[];
   private _caseSensitive: boolean;
+  private _excludeSCs: boolean;
 
-  constructor(expr: string, caseSensitive?: boolean) {
+  constructor(expr: string, caseSensitive?: boolean, excludeSCs?: boolean) {
     if (expr.startsWith('/')) {
       this._root = true;
       expr = expr.substring(1);
     }
     this._tokens = expr.split('/');
     this._caseSensitive = caseSensitive || false;
+    this._excludeSCs = excludeSCs;
   }
 
   range(data: T[], current: T): T[] {
@@ -297,6 +328,9 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
   }
 
   protected doEval(node: T, token: string): boolean {
+    if (this._excludeSCs && node.type.toUpperCase().indexOf("_SC") > -1) {
+      return false;
+    }
     if (this._caseSensitive) {
       return node.name.indexOf(token) > -1;
     } else {
@@ -319,9 +353,11 @@ export class DataSourceSearcher<T extends FlatNode> {
   searchIndex: number = 0;
   isSearching: boolean = false;
   searchPrefix: string = '';
+  excludeSCs: boolean = true;
 
-  constructor(dataSource: VSFlatTreeDataSource<T>) {
+  constructor(dataSource: VSFlatTreeDataSource<T>, excludeSCs?: boolean) {
     this.dataSource = dataSource;
+    this.excludeSCs = excludeSCs || false;
   }
 
   prev(node: T): T {
@@ -412,6 +448,6 @@ export class DataSourceSearcher<T extends FlatNode> {
   }
 
   protected getEvaluator(expr: string): ExpressionEvaluator<T> {
-    return new PathLikeExpressionEvaluator(expr, false);
+    return new PathLikeExpressionEvaluator(expr, false, this.excludeSCs);
   }
 }

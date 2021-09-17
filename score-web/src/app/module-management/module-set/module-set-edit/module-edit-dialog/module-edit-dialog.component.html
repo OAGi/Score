@@ -1,0 +1,52 @@
+<div *ngIf="isUpdating" class="loading-container">
+  <mat-spinner [diameter]="40"></mat-spinner>
+</div>
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>Edit "{{title}}"</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content style="padding-bottom: 50px">
+  <div *ngIf="!element.directory">
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input [(ngModel)]="element.name" data-id="module.name" matInput maxlength="100" required/>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Namespace</mat-label>
+      <mat-select [(ngModel)]="element.namespaceId">
+        <mat-option *ngFor="let namespace of namespaceList" [value]="namespace.namespaceId">
+          {{namespace.uri}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Version</mat-label>
+      <input [(ngModel)]="element.versionNum" data-id="module.versionNum" matInput maxlength="100"/>
+    </mat-form-field>
+  </div>
+  <div *ngIf="element.directory">
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input [(ngModel)]="element.name" data-id="moduleDir.name" matInput maxlength="100" required/>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="d-block">
+  <button (click)="cancel()" color="warn" mat-raised-button>
+    <mat-icon>close</mat-icon>
+    Cancel
+  </button>
+  <button (click)="onUpdateElement()" color="primary" mat-raised-button
+    [disabled]="!canUpdate()">
+    <mat-icon>check</mat-icon>
+    Update
+  </button>
+
+  <button mat-raised-button class="float-right" color="accent" (click)="deleteModule()">
+    <mat-icon>delete</mat-icon>
+    Discard
+  </button>
+</mat-dialog-actions>

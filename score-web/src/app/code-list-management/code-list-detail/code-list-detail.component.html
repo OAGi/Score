@@ -109,7 +109,7 @@
             </div>
             <div class="col-12 actions-wrap" *ngIf="!isWorkingRelease()">
               <button mat-raised-button color="accent" (click)="derive()"
-                      *ngIf="codeList.state === 'Published' && codeList.extensible && userRole !== 'developer'">
+                      *ngIf="codeList.state === 'Published' && userRole !== 'developer'">
                 Derive Code List based on this
               </button>
               <button mat-raised-button color="primary" (click)="update()"
@@ -268,11 +268,6 @@
 
             <div class="row" style="padding: 14px 0 22px 0;">
               <div class="col-12">
-                <mat-checkbox color="primary" class="mr-3"
-                              data-id="codeList.extensible" [(ngModel)]="codeList.extensible"
-                              [disabled]="access !== 'CanEdit' || !canExtensible">
-                  <span>Extensible</span>
-                </mat-checkbox>
                 <mat-checkbox color="primary"
                               data-id="codeList.deprecated" [(ngModel)]="codeList.deprecated"
                               [disabled]="access !== 'CanEdit' || !canDeprecate">

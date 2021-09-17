@@ -10,4 +10,5 @@ public enum CcType {
     BDT_SC,
     XBT,
     CODE_LIST,
+    AGENCY_ID_LIST,
 }

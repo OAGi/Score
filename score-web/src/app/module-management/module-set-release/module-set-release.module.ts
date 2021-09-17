@@ -1,15 +1,16 @@
-import {NgModule} from '@angular/core';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {CommonModule} from '@angular/common';
-import {RouterModule, Routes} from '@angular/router';
+import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RouterModule, Routes} from '@angular/router';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {AuthService} from '../../authentication/auth.service';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {MaterialModule} from '../../material.module';
+import {ModuleSetReleaseAssignComponent} from './module-set-release-assign/module-set-release-assign.component';
 import {ModuleSetReleaseCreateComponent} from './module-set-release-create/module-set-release-create.component';
 import {ModuleSetReleaseDetailComponent} from './module-set-release-detail/module-set-release-detail.component';
 import {ModuleSetReleaseListComponent} from './module-set-release-list/module-set-release-list.component';
-
 
 const routes: Routes = [
   {
@@ -29,6 +30,10 @@ const routes: Routes = [
         path: ':moduleSetReleaseId',
         component: ModuleSetReleaseDetailComponent,
         canActivate: [AuthService],
+      }, {
+        path: ':moduleSetReleaseId/assign',
+        component: ModuleSetReleaseAssignComponent,
+        canActivate: [AuthService],
       }
     ]
   }
@@ -42,12 +47,15 @@ const routes: Routes = [
     MaterialModule,
     CommonModule,
     ContextMenuModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    DragDropModule
   ],
   declarations: [
     ModuleSetReleaseListComponent,
     ModuleSetReleaseCreateComponent,
-    ModuleSetReleaseDetailComponent
+    ModuleSetReleaseDetailComponent,
+    ModuleSetReleaseAssignComponent
   ],
 })
-export class ModuleSetReleaseModule { }
+export class ModuleSetReleaseModule {
+}

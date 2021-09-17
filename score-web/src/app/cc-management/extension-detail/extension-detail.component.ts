@@ -50,6 +50,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {CcList} from '../cc-list/domain/cc-list';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
+import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 
 @Component({
   selector: 'score-extension-detail',
@@ -84,6 +85,8 @@ export class ExtensionDetailComponent implements OnInit {
   workingRelease = WorkingRelease;
   namespaces: SimpleNamespace[];
   commentControl: CommentControl;
+
+  excludeSCs: boolean;
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
@@ -121,6 +124,7 @@ export class ExtensionDetailComponent implements OnInit {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
     this.isUpdating = true;
+    this.excludeSCs = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.manifestId = parseInt(params.get('manifestId'), 10);
@@ -160,7 +164,8 @@ export class ExtensionDetailComponent implements OnInit {
 
       const flattener = new CcFlatNodeFlattener(ccGraph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
         this.rootNode = nodes[0] as AccFlatNode;
@@ -168,7 +173,7 @@ export class ExtensionDetailComponent implements OnInit {
         this.rootNode.state = rootNode.state;
         this.rootNode.reset();
 
-        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
         this.onClick(this.rootNode);
       }, 0);
     });
@@ -206,7 +211,7 @@ export class ExtensionDetailComponent implements OnInit {
       const flattener = new CcFlatNodeFlattener(
         graph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
         return callbackFn(nodes);
       });
     });
@@ -220,14 +225,15 @@ export class ExtensionDetailComponent implements OnInit {
     ]).subscribe(([rootNode, graph]) => {
       const flattener = new CcFlatNodeFlattener(graph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
         this.rootNode = nodes[0] as AccFlatNode;
         this.rootNode.access = rootNode.access;
         this.rootNode.state = rootNode.state;
         this.rootNode.reset();
-        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
         this.treeControl.expand(this.dataSource.getRootNode());
         this.onClick(this.dataSource.getRootNode());
       }, 0);
@@ -1049,6 +1055,23 @@ export class ExtensionDetailComponent implements OnInit {
 
   openHistory(node: CcFlatNode) {
     window.open('/log/core-component/' + node.guid, '_blank');
+  }
+
+  visibleFindUsages(node: CcFlatNode): boolean {
+    return node.type.toUpperCase() === 'ACC' || node.type.toUpperCase() === 'ASCCP' || node.type.toUpperCase() === 'BCCP';
+  }
+
+  findUsages(node: CcFlatNode) {
+    const dialogRef = this.dialog.open(FindUsagesDialogComponent, {
+      data: {
+        type: node.type,
+        manifestId: node.manifestId
+      },
+      width: '600px',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(_ => {});
   }
 
   openComments(type: string, node?: CcFlatNode) {

@@ -11,4 +11,6 @@ public class FindTargetAsccpManifestResponse {
 
     private BieDocument bieDocument;
 
+    private String releaseNum;
+
 }

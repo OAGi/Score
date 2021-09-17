@@ -34,4 +34,6 @@ public class CcList {
     private Date lastUpdateTimestamp;
     private String releaseNum;
     private BigInteger id;
+
+    private boolean ownedByDeveloper;
 }

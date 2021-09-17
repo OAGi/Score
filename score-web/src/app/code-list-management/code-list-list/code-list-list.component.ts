@@ -47,7 +47,7 @@ export class CodeListListComponent implements OnInit {
 
   displayedColumns: string[] = [
     'select', 'state', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'extensible', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
+    'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<CodeListForList>(true, []);

@@ -37,7 +37,7 @@
 
       <div class="row">
         <div class="col-12">
-          <mat-checkbox color="warn" *ngIf="!codeListValue.extension" class="mr-2"
+          <mat-checkbox color="warn" class="mr-2"
                         [disabled]="!isEditable || (this.hasRevision && isUsedBefore)"
                         [(ngModel)]="codeListValue.used">
             <span>Used</span>

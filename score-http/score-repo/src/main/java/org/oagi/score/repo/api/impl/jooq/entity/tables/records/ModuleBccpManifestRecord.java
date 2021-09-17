@@ -66,16 +66,16 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
     }
 
     /**
-     * Setter for <code>oagi.module_bccp_manifest.module_set_assignment_id</code>.
+     * Setter for <code>oagi.module_bccp_manifest.module_id</code>. This indicates a module.
      */
-    public void setModuleSetAssignmentId(ULong value) {
+    public void setModuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_bccp_manifest.module_set_assignment_id</code>.
+     * Getter for <code>oagi.module_bccp_manifest.module_id</code>. This indicates a module.
      */
-    public ULong getModuleSetAssignmentId() {
+    public ULong getModuleId() {
         return (ULong) get(3);
     }
 
@@ -175,7 +175,7 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
 
     @Override
     public Field<ULong> field4() {
-        return ModuleBccpManifest.MODULE_BCCP_MANIFEST.MODULE_SET_ASSIGNMENT_ID;
+        return ModuleBccpManifest.MODULE_BCCP_MANIFEST.MODULE_ID;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
 
     @Override
     public ULong component4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
 
     @Override
     public ULong value4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
 
     @Override
     public ModuleBccpManifestRecord value4(ULong value) {
-        setModuleSetAssignmentId(value);
+        setModuleId(value);
         return this;
     }
 
@@ -353,13 +353,13 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
     /**
      * Create a detached, initialised ModuleBccpManifestRecord
      */
-    public ModuleBccpManifestRecord(ULong moduleBccpManifestId, ULong moduleSetReleaseId, ULong bccpManifestId, ULong moduleSetAssignmentId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleBccpManifestRecord(ULong moduleBccpManifestId, ULong moduleSetReleaseId, ULong bccpManifestId, ULong moduleId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleBccpManifest.MODULE_BCCP_MANIFEST);
 
         setModuleBccpManifestId(moduleBccpManifestId);
         setModuleSetReleaseId(moduleSetReleaseId);
         setBccpManifestId(bccpManifestId);
-        setModuleSetAssignmentId(moduleSetAssignmentId);
+        setModuleId(moduleId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

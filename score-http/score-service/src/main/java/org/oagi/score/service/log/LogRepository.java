@@ -684,6 +684,81 @@ public class LogRepository {
     }
 
     /*
+     * Begins DT
+     */
+    public LogRecord insertBdtLog(DtManifestRecord bdtManifestRecord,
+                                   DtRecord bdtRecord,
+                                   LogAction logAction,
+                                   ULong requesterId,
+                                   LocalDateTime timestamp) {
+        return insertBdtLog(bdtManifestRecord, bdtRecord, null, logAction, requesterId, timestamp);
+    }
+
+    public LogRecord insertBdtLog(DtManifestRecord bdtManifestRecord,
+                                   DtRecord bdtRecord,
+                                   ULong prevLogId,
+                                   LogAction logAction,
+                                   ULong requesterId,
+                                   LocalDateTime timestamp) {
+
+        LogRecord prevLogRecord = null;
+        if (prevLogId != null) {
+            prevLogRecord = dslContext.selectFrom(LOG)
+                    .where(LOG.LOG_ID.eq(prevLogId))
+                    .fetchOne();
+        }
+
+        LogRecord logRecord = new LogRecord();
+        logRecord.setHash(LogUtils.generateHash());
+        if (LogAction.Revised.equals(logAction)) {
+            assert (prevLogRecord != null);
+            logRecord.setRevisionNum(prevLogRecord.getRevisionNum().add(1));
+            logRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+        } else if (LogAction.Canceled.equals(logAction)) {
+            assert (prevLogRecord != null);
+            logRecord.setRevisionNum(prevLogRecord.getRevisionNum().subtract(1));
+            logRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+        } else {
+            if (prevLogRecord != null) {
+                logRecord.setRevisionNum(prevLogRecord.getRevisionNum());
+                logRecord.setRevisionTrackingNum(prevLogRecord.getRevisionTrackingNum().add(1));
+            } else {
+                logRecord.setRevisionNum(UInteger.valueOf(1));
+                logRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+            }
+        }
+
+        List<DtScManifestRecord> dtScManifestRecords = dslContext.selectFrom(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
+                .fetch();
+
+        List<DtScRecord> dtScRecords = dslContext.selectFrom(DT_SC)
+                .where(DT_SC.DT_SC_ID.in(
+                        dtScManifestRecords.stream().map(e -> e.getDtScId()).collect(Collectors.toList())
+                ))
+                .fetch();
+        
+        logRecord.setLogAction(logAction.name());
+        logRecord.setSnapshot(JSON.valueOf(serializer.serialize(bdtManifestRecord, bdtRecord, dtScManifestRecords, dtScRecords)));
+        logRecord.setReference(bdtRecord.getGuid());
+        logRecord.setCreatedBy(requesterId);
+        logRecord.setCreationTimestamp(timestamp);
+        if (prevLogRecord != null) {
+            logRecord.setPrevLogId(prevLogRecord.getLogId());
+        }
+
+        logRecord.setLogId(dslContext.insertInto(LOG)
+                .set(logRecord)
+                .returning(LOG.LOG_ID).fetchOne().getLogId());
+        if (prevLogRecord != null) {
+            prevLogRecord.setNextLogId(logRecord.getLogId());
+            prevLogRecord.update(LOG.NEXT_LOG_ID);
+        }
+
+        return logRecord;
+    }
+
+    /*
      * Begins Code List
      */
     public LogRecord insertCodeListLog(CodeListManifestRecord codeListManifestRecord,

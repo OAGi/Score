@@ -5,6 +5,7 @@ import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 public class CcBdtScNodeDetail implements CcNodeDetail {
@@ -21,6 +22,9 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private String defaultValue;
     private String fixedValue;
 
+    private String propertyTerm;
+    private String representationTerm;
+
     private CcState state;
     private String owner;
     private BigInteger releaseId;
@@ -28,4 +32,6 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private BigInteger logId;
     private int revisionNum;
     private int revisionTrackingNum;
+
+    private List<CcBdtScPriResri> bdtScPriRestriList;
 }

@@ -5,6 +5,7 @@ import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angul
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatDialog} from '@angular/material/dialog';
 import {PageRequest} from '../../basis/basis';
+import {BdtScFlatNode} from '../../cc-management/domain/cc-flat-tree';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {base64Decode, base64Encode, initFilter, UnboundedPipe} from '../../common/utility';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
@@ -24,7 +25,7 @@ import {BieDetailUpdateRequest, BieEditAbieNode, BieEditCreateExtensionResponse,
 import {
   AbieFlatNode, AsbiepDetail,
   AsbiepFlatNode,
-  BbiepFlatNode, BbieScDetail,
+  BbiepFlatNode,
   BbieScFlatNode,
   BdtDetail,
   BieDataSourceSearcher,
@@ -289,8 +290,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   innerY: number = window.innerHeight;
   dataSource: VSBieEditTreeDataSource<BieFlatNode>;
-  treeControl: VSBieFlatTreeControl<BieFlatNode> = new VSBieFlatTreeControl<BieFlatNode>();
+  treeControl: VSBieFlatTreeControl<BieFlatNode>;
   searcher: BieDataSourceSearcher;
+  excludeSCs: boolean = true;
 
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
@@ -320,6 +322,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   valueDomainFilterCtrl: FormControl = new FormControl();
   filteredValueDomains: ReplaySubject<ValueDomain[]> = new ReplaySubject<ValueDomain[]>(1);
   valueDomainTypes = [ValueDomainType.Primitive, ValueDomainType.Code, ValueDomainType.Agency];
+
+  usedBieList: UsedBie[];
 
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
   virtualScrollItemSize: number = 33;
@@ -365,19 +369,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(this.topLevelAsbiepId)
         ]);
       })).subscribe(([ccGraph, usedBieList, refBieList, rootNode, bizCtxResp]) => {
-      this.rootNode = new BieEditAbieNode(rootNode);
-      this.rootNode.reset();
-      const that = this;
-      this.rootNode.listeners.push(new class implements ChangeListener<BieEditNode> {
-        onChange(entity: BieEditNode, propertyName: string, val: any) {
-          if (propertyName === 'version') {
-            that._versionChanged = true;
-            that._changedVersionValue = val;
+      this.initRootNode(rootNode);
 
-            that.assignVersionToVersionIdIfPossible();
-          }
-        }
-      });
+      this.usedBieList = usedBieList;
 
       this.businessContextCtrl = new FormControl({
         disabled: !this.canEdit
@@ -392,13 +386,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       const flattener = new BieEditFlatNodeFlattener(
         ccGraph, rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSBieFlatTreeControl<BieFlatNode>(undefined, undefined, undefined, this.excludeSCs ? flattener : undefined);
         this.dataSource = new VSBieEditTreeDataSource(this.treeControl, nodes, this.service, [this,]);
         this.loading = false;
         nodes[0].used = true;
         nodes[0].reset();
 
-        this.searcher = new BieDataSourceSearcher(this.dataSource);
+        this.searcher = new BieDataSourceSearcher(this.dataSource, this.excludeSCs);
         this.onClick(nodes[0]);
         if(q != undefined) {
           this.selectedNode = nodes[0];
@@ -406,6 +401,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.search(this.searcher.inputKeyword);
         }
       }, 0);
+    });
+  }
+
+  initRootNode(rootNode) {
+    this.rootNode = new BieEditAbieNode(rootNode);
+    this.rootNode.reset();
+    const that = this;
+    this.rootNode.listeners.push(new class implements ChangeListener<BieEditNode> {
+      onChange(entity: BieEditNode, propertyName: string, val: any) {
+        if (propertyName === 'version') {
+          that._versionChanged = true;
+          that._changedVersionValue = val;
+
+          that.assignVersionToVersionIdIfPossible();
+        }
+      }
     });
   }
 
@@ -541,16 +552,17 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.service.getUsedBieList(this.topLevelAsbiepId),
       this.service.getRefBieList(this.topLevelAsbiepId),
     ]).subscribe(([ccGraph, usedBieList, refBieList]) => {
+      this.usedBieList = usedBieList;
       const flattener = new BieEditFlatNodeFlattener(
         ccGraph, this.rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
       setTimeout(() => {
-        const nodes = flattener.flatten();
+        const nodes = flattener.flatten(this.excludeSCs);
         this.dataSource = new VSBieEditTreeDataSource(this.treeControl, nodes, this.service, [this, ]);
         this.loading = false;
         nodes[0].used = true;
         nodes[0].reset();
 
-        this.searcher = new BieDataSourceSearcher(this.dataSource);
+        this.searcher = new BieDataSourceSearcher(this.dataSource, this.excludeSCs);
 
         const current = this.dataSource.getNodeByFullIndex(index);
         this.treeControl.collapseAll();
@@ -1339,12 +1351,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
       if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Code') {
         this.service.getBbiepCodeList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state));
+          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Agency') {
         this.service.getBbiepAgencyIdList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.agencyIdListId, e.agencyIdListName));
+          valueDomains = list.map(e => new ValueDomain(e.agencyIdListId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else {
@@ -1363,12 +1375,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
       if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Code') {
         this.service.getBbieScCodeList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state));
+          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Agency') {
         this.service.getBbieScAgencyIdList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.agencyIdListId, e.agencyIdListName));
+          valueDomains = list.map(e => new ValueDomain(e.agencyIdListId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else {
@@ -1519,7 +1531,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     })).subscribe(resp => {
       this.rootNode.reset();
       this.dataSource.getChanged().forEach(e => e.reset());
-
+      this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(list => this.usedBieList = list);
       if (callbackFn === undefined) {
         this.snackBar.open('Updated', '', {
           duration: 3000,
@@ -1528,6 +1540,70 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         return callbackFn && callbackFn();
       }
     });
+  }
+
+  resetDetail(node: BieFlatNode) {
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Reset current values to initial values.';
+    dialogConfig.data.content = ['Are you sure you want to reset values to initial values?'];
+    dialogConfig.data.action = 'Reset';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .pipe(
+        finalize(() => {
+          this.isUpdating = false;
+        })
+      )
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        node.detail.isLoaded = false;
+
+        let path = node.path;
+
+        if (node.bieType === 'ASBIEP') {
+          path = (node as AsbiepFlatNode).asbiePath;
+        } else if (node.bieType === 'BBIEP') {
+          path = (node as BbiepFlatNode).bbiePath;
+        } else if (node.bieType === 'BBIE_SC') {
+          path = (node as BbieScFlatNode).bbieScPath;
+        }
+
+        this.service.resetDetails(this.topLevelAsbiepId, node.bieType, path).subscribe(_ => {
+          if (node.bieType === 'ABIE') {
+            this.rootNode.status = "";
+            this.rootNode.version = "";
+          } else if (node.bieType === 'ASBIEP') {
+            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = undefined;
+          } else if (node.bieType === 'BBIEP') {
+            (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.fixedOrDefault = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.fixedValue = null;
+            (node.detail as BieEditBbiepNodeDetail).bbie.defaultValue = null;
+            (node.detail as BieEditBbiepNodeDetail).bbie.valueDomainType = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.bdtPriRestriId = null;
+            (node.detail as BieEditBbiepNodeDetail).bbie.codeListId = null;
+            (node.detail as BieEditBbiepNodeDetail).bbie.agencyIdListId = null;
+          } else if (node.bieType === 'BBIE_SC') {
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = undefined;
+
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedOrDefault = undefined;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedValue = null;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.defaultValue = null;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.valueDomainType = undefined;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId = null;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.codeListId = null;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.agencyIdListId = null;
+          }
+          this.snackBar.open('Reset.', '', {
+            duration: 3000,
+          });
+          this.onClick(node);
+        })
+      });
   }
 
   updateState(state: string) {
@@ -1598,5 +1674,25 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   isValidState(state: string): boolean {
     const validState = ['Published', 'Production'];
     return validState.indexOf(state) > -1;
+  }
+
+  changeExcludeSCs(): void{
+    if (this.isChanged) {
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Warning';
+      dialogConfig.data.content = ['Unsaved changes will be lost.'];
+      dialogConfig.data.action = 'Okay';
+
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+        .subscribe(result => {
+          if (!result) {
+            this.excludeSCs = !this.excludeSCs;
+            return;
+          }
+          this.reloadTree(this.selectedNode);
+        });
+    } else {
+      this.reloadTree(this.selectedNode);
+    }
   }
 }

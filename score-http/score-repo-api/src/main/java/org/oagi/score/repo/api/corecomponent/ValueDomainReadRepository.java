@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.corecomponent;
 
+import org.oagi.score.repo.api.agency.model.AgencyIdList;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.model.BdtPriRestri;
 import org.oagi.score.repo.api.corecomponent.model.BdtScPriRestri;
@@ -26,7 +27,6 @@ public interface ValueDomainReadRepository {
     Map<BigInteger, List<BdtScPriRestri>> getBdtScPriRestriBdtScIdMap(
             BigInteger ReleaseId) throws ScoreDataAccessException;
 
-    // TODO: AGENCY_ID_LIST
-//    Map<BigInteger, AgencyIdList> getAgencyIdListMap(
-//            BigInteger ReleaseId) throws ScoreDataAccessException;
+    List<AgencyIdList> getAgencyIdListList(
+            BigInteger ReleaseId) throws ScoreDataAccessException;
 }

@@ -229,7 +229,6 @@ public class CodeListController {
         request.setRequester(sessionService.asScoreUser(user));
         request.setCodeListManifestId(manifestId);
 
-
         return upliftingService.upliftCodeList(request);
     }
 }

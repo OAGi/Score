@@ -130,4 +130,9 @@ export class BieEditService {
     };
     return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/global', params);
   }
+
+  resetDetails(topLevelAsbiepId: number, type: string, path: string): Observable<any> {
+    const url = '/api/profile_bie/' + topLevelAsbiepId + '/reset_detail';
+    return this.http.post<any>(url, {bieType: type, path: path});
+  }
 }

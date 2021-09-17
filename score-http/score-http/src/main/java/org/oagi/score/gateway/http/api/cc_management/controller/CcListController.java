@@ -41,8 +41,6 @@ public class CcListController {
             @RequestParam(name = "dtTypes", required = false) String dtTypes,
             @RequestParam(name = "asccpTypes", required = false) String asccpTypes,
             @RequestParam(name = "excludes", required = false) String excludes,
-            @RequestParam(name = "findUsagesType", required = false) String findUsagesType,
-            @RequestParam(name = "findUsagesManifestId", required = false) BigInteger findUsagesManifestId,
             @RequestParam(name = "isBIEUsable", required = false) String isBIEUsable,
             @RequestParam(name = "commonlyUsed", required = false) String commonlyUsed,
             @RequestParam(name = "sortActive") String sortActive,
@@ -94,9 +92,6 @@ public class CcListController {
                 Arrays.asList(asccpTypes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setExcludes(!StringUtils.hasLength(excludes) ? Collections.emptyList() :
                 Arrays.asList(excludes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
-        if (StringUtils.hasLength(findUsagesType) && findUsagesManifestId != null && findUsagesManifestId.compareTo(BigInteger.ZERO) > 0) {
-            request.setFindUsages(new CcId(findUsagesType, findUsagesManifestId));
-        }
 
         if (StringUtils.hasLength(updateStart)) {
             request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));

@@ -1,0 +1,111 @@
+<div *ngIf="isUpdating" class="loading-container">
+  <mat-spinner [diameter]="40"></mat-spinner>
+</div>
+
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>Add module/directory to "{{parentDirName}}"</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content style="padding-bottom: 50px">
+  <mat-accordion [@.disabled]="disableAnimation">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Create new module file
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input [(ngModel)]="module.name" data-id="module.name" matInput maxlength="100" required/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Namespace</mat-label>
+          <mat-select [(ngModel)]="module.namespaceId">
+            <mat-option *ngFor="let namespace of namespaceList" [value]="namespace.namespaceId">
+              {{namespace.uri}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Version</mat-label>
+          <input [(ngModel)]="module.versionNum" data-id="module.versionNum" matInput maxlength="100"/>
+        </mat-form-field>
+        <button (click)="onCreateModule()" [disabled]="!canCreateModule()" color="primary" mat-raised-button>
+          <mat-icon>check</mat-icon>
+          Create
+        </button>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Create new module directory
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input [(ngModel)]="moduleDir.name" data-id="moduleDir.name" matInput maxlength="100" required/>
+        </mat-form-field>
+        <button (click)="onCreateModuleDir()" [disabled]="!canCreateModuleDir()" color="primary" mat-raised-button>
+          <mat-icon>check</mat-icon>
+          Create
+        </button>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Copy from exist module Set.
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field>
+          <mat-label>ModuleSet</mat-label>
+          <mat-select [(ngModel)]="selectedModuleSetId" (ngModelChange)="onModuleSetChange(selectedModuleSetId)">
+            <mat-option *ngFor="let moduleSet of moduleSetList" [value]="moduleSet.moduleSetId">
+              {{moduleSet.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="finder-wrapper">
+          <div class="finder-content">
+            <div *ngFor="let tile of tiles;" class="finder-grid">
+              <div class="finder-grid-left">
+                <div *ngFor="let element of tile.elements" class="grid-element">
+                  <div (click)="onClickElement(tile, element)"
+                       [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                    <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
+                    <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
+                    <div class="float-left element-title">
+                      <span>{{element.name}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <button (click)="onCopy()" color="primary" mat-raised-button [disabled]="!this.selected">
+            <mat-icon>content_copy</mat-icon>
+            Copy
+          </button>
+          <mat-checkbox [(ngModel)]="copySubModules" style="margin-left: 10px; display: inline-flex;">Copy all
+            submodules. Overwrite if there's duplicated module name.
+          </mat-checkbox>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button color="warn" mat-raised-button (click)="cancel()">
+    <mat-icon>close</mat-icon>
+    Cancel
+  </button>
+</mat-dialog-actions>

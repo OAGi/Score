@@ -31,7 +31,12 @@
 
 .mat-tree-node span {
   cursor: pointer;
-  padding-right: 10px;
+  padding-right: 0px !important;
+  margin-right: 10px;
+}
+
+.mat-tree-node .deprecated {
+  background-color: #ececec;
 }
 
 .mat-tree-node .acc, .mat-tree-node .acc-group {
@@ -234,4 +239,9 @@
 button:focus, button:active:focus, button.active:focus {
   outline: none !important;
   outline-style: none !important;
+}
+
+.exclude-scs {
+  vertical-align: middle;
+  margin-right: 5px;
 }

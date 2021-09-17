@@ -17,10 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class CcNodeController {
@@ -53,6 +50,14 @@ public class CcNodeController {
     public CcNode getBccpNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                               @PathVariable("manifestId") BigInteger manifestId) {
         return service.getBccpNode(user, manifestId);
+    }
+
+    @RequestMapping(value = "/core_component/bdt/{manifestId:[\\d]+}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcNode getBdtNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                              @PathVariable("manifestId") BigInteger manifestId) {
+        return service.getBdtNode(user, manifestId);
     }
 
     @RequestMapping(value = "/core_component",
@@ -241,6 +246,9 @@ public class CcNodeController {
             case BCCP:
                 CcBccpNode bccpNode = convertValue(data, CcBccpNode.class);
                 return service.getBccpNodeDetail(user, bccpNode);
+            case BDT:
+                CcBdtNode bdtNode = convertValue(data, CcBdtNode.class);
+                return service.getBdtNodeDetail(user, bdtNode);
             case BDT_SC:
                 CcBdtScNode bdtScNode = convertValue(data, CcBdtScNode.class);
                 return service.getBdtScNodeDetail(user, bdtScNode);
@@ -327,6 +335,17 @@ public class CcNodeController {
         return resp;
     }
 
+    @RequestMapping(value = "/core_component/bdt", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcCreateResponse createBdt(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                       @RequestBody CcBdtCreateRequest request) {
+        BigInteger manifestId = service.createBdt(user, request);
+
+        CcCreateResponse resp = new CcCreateResponse();
+        resp.setManifestId(manifestId);
+        return resp;
+    }
+
     @RequestMapping(value = "/core_component/acc/extension", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcCreateResponse createAccExtensionComponent(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -350,6 +369,8 @@ public class CcNodeController {
                 return service.getAsccpNodeRevision(user, manifestId);
             case BCCP:
                 return service.getBccpNodeRevision(user, manifestId);
+            case BDT:
+                return service.getBdtNodeRevision(user, manifestId);
             default:
                 throw new UnsupportedOperationException();
         }
@@ -401,4 +422,38 @@ public class CcNodeController {
         CreateOagisVerbResponse response = service.createOagisVerb(user, request);
         return response;
     }
+
+    @RequestMapping(value = "/core_component/acc/{manifestId:[\\d]+}/base_acc_list",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CcList> baseAccList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                    @PathVariable("manifestId") BigInteger manifestId) {
+
+        return service.getBaseAccList(user, manifestId);
+    }
+
+    @RequestMapping(value = "/core_component/{type}/refactor",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcNodeUpdateResponse refactorAssociation(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                               @PathVariable("type") String type,
+                                               @RequestBody CcRefactorRequest request) {
+
+        CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
+        resp.setType(CcType.valueOf(type.toUpperCase()));
+
+        switch (resp.getType()) {
+            case BCC:
+                service.refactorBcc(user, request.getTargetManifestId(), request.getDestinationManifestId());
+                break;
+            case ASCC:
+                service.refactorAscc(user, request.getTargetManifestId(), request.getDestinationManifestId());
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+        return resp;
+    }
+
+
 }

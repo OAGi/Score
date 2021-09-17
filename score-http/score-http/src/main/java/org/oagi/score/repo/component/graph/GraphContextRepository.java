@@ -1,10 +1,7 @@
 package org.oagi.score.repo.component.graph;
 
 import org.jooq.DSLContext;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CodeListManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +27,10 @@ public class GraphContextRepository {
 
     public CoreComponentGraphContext buildGraphContext(BccpManifestRecord bccpManifest) {
         return buildGraphContext(bccpManifest.getReleaseId().toBigInteger());
+    }
+
+    public CoreComponentGraphContext buildGraphContext(DtManifestRecord dtManifest) {
+        return buildGraphContext(dtManifest.getReleaseId().toBigInteger());
     }
 
     public CodeListGraphContext buildGraphContext(CodeListManifestRecord codeListManifest) {

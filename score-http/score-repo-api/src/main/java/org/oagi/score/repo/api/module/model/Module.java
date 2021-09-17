@@ -9,7 +9,7 @@ public class Module extends Auditable implements Comparable<Module>, Serializabl
 
     private BigInteger moduleId;
 
-    private BigInteger moduleDirId;
+    private BigInteger parentModuleId;
 
     private String path;
 
@@ -23,6 +23,16 @@ public class Module extends Auditable implements Comparable<Module>, Serializabl
 
     private String versionNum;
 
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public BigInteger getModuleId() {
         return moduleId;
     }
@@ -31,12 +41,12 @@ public class Module extends Auditable implements Comparable<Module>, Serializabl
         this.moduleId = moduleId;
     }
 
-    public BigInteger getModuleDirId() {
-        return moduleDirId;
+    public BigInteger getParentModuleId() {
+        return parentModuleId;
     }
 
-    public void setModuleDirId(BigInteger moduleDirId) {
-        this.moduleDirId = moduleDirId;
+    public void setParentModuleId(BigInteger parentModuleId) {
+        this.parentModuleId = parentModuleId;
     }
 
     public String getName() {

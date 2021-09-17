@@ -90,20 +90,19 @@ export class CodeListDetailComponent implements OnInit {
         return forkJoin([
           this.service.getCodeList(this.manifestId),
           this.service.getCodeListRevision(this.manifestId),
-          this.service.getSimpleAgencyIdListValues(),
           this.namespaceService.getSimpleNamespaces()
         ]);
       })).pipe(
       finalize(() => {
         this.isUpdating = false;
       })
-    ).subscribe(([codeList, revision, agencyIdListValues, namespaces]) => {
-      this.agencyIdListValues = agencyIdListValues;
-      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
-
-      this.namespaces = namespaces;
-      this.revision = revision;
-
+    ).subscribe(([codeList, revision, namespaces]) => {
+      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(agencyIdListValues => {
+        this.agencyIdListValues = agencyIdListValues;
+        this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+        this.namespaces = namespaces;
+        this.revision = revision;
+      });
       this.init(codeList);
     });
 
@@ -188,11 +187,7 @@ export class CodeListDetailComponent implements OnInit {
     }
 
     if (codeListValue.used) {
-      if (codeListValue.extension) {
-        return 'green';
-      } else {
-        return 'blue';
-      }
+      return 'blue';
     }
 
     return 'dull-red';
@@ -316,7 +311,7 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   isAvailable(codeListValue: CodeListValue) {
-    return this.codeList.state === 'WIP' && this.color(codeListValue) === 'green';
+    return this.codeList.state === 'WIP';
   }
 
   removeCodeListValues() {
@@ -613,22 +608,10 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   get canDeprecate(): boolean {
-    if (this.revision === null || this.revision.guid === null) {
-      return false;
-    } else {
+    if (this.revision && this.revision.guid) {
       return !this.revision.deprecated;
-    }
-  }
-
-  get canExtensible(): boolean {
-    if (this.userRole !== 'developer') {
-      return false;
-    }
-
-    if (this.revision === null || this.revision.guid === null) {
-      return true;
     } else {
-      return !this.revision.extensible;
+      return false;
     }
   }
 

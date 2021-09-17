@@ -14,6 +14,8 @@ import java.util.TimeZone;
 
 public class Utility {
 
+    public static final String MODULE_SEPARATOR = "\\";
+
     private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "BOD", "IST", "MSDS");
 
     public static String first(String den, boolean upp) {

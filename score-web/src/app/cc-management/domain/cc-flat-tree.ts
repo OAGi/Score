@@ -1,4 +1,4 @@
-import {BbieScFlatNode, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {BbieScFlatNode, BieFlatNode, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {
   FlatNode,
   FlatNodeFlattener,
@@ -11,7 +11,7 @@ import {
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail,
+  CcBccpNodeDetail, CcBdtNodeDetail,
   CcBdtScNodeDetail,
   CcGraph,
   CcGraphNode,
@@ -24,6 +24,7 @@ export interface CcFlatNode extends FlatNode {
   releaseId: number;
   guid: string;
   state: string;
+  deprecated: boolean;
   access: string;
   manifestId: number;
   revisionNum: number;
@@ -43,6 +44,7 @@ export interface CcFlatNode extends FlatNode {
 export abstract class CcFlatNodeImpl implements CcFlatNode {
   level: number;
   _expanded: boolean;
+  expandable: boolean;
 
   parent?: FlatNode;
   children: FlatNode[] = [];
@@ -69,10 +71,6 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
 
   set expanded(expanded: boolean) {
     this._expanded = expanded;
-  }
-
-  get expandable(): boolean {
-    return this.children && this.children.length > 0;
   }
 
   get hasExtension(): boolean {
@@ -136,6 +134,8 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
       this.detail.reset();
     }
   }
+
+  deprecated: boolean;
 }
 
 export class AccFlatNode extends CcFlatNodeImpl {
@@ -144,6 +144,7 @@ export class AccFlatNode extends CcFlatNodeImpl {
   constructor(accNode: CcGraphNode) {
     super();
     this.accNode = accNode;
+    this.deprecated = accNode.deprecated;
   }
 
   get type(): string {
@@ -198,6 +199,7 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
     super();
     this.asccpNode = asccpNode;
     this.asccNode = asccNode;
+    this.deprecated = asccpNode.deprecated || (!!asccNode && asccNode.deprecated);
   }
 
   get type(): string {
@@ -262,6 +264,7 @@ export class BccpFlatNode extends CcFlatNodeImpl {
     this.bccpNode = bccpNode;
     this.bdtNode = bdtNode;
     this.bccNode = bccNode;
+    this.deprecated = bccpNode.deprecated || bdtNode.deprecated || (!!bccNode && bccNode.deprecated);
   }
 
   get type(): string {
@@ -321,6 +324,48 @@ export class BccpFlatNode extends CcFlatNodeImpl {
       return this.bdtNode.manifestId;
     }
     return undefined;
+  }
+}
+
+export class BdtFlatNode extends CcFlatNodeImpl {
+  bdtNode: CcGraphNode;
+
+  constructor(bdtNode: CcGraphNode) {
+    super();
+    this.bdtNode = bdtNode;
+    this.deprecated = bdtNode.deprecated;
+  }
+
+  get type(): string {
+    return 'BDT';
+  }
+
+  get typeClass(): string {
+    return this.type;
+  }
+
+  get guid(): string {
+    return this.bdtNode.guid;
+  }
+
+  get name(): string {
+    return this.bdtNode.den;
+  }
+
+  set name(val: string) {
+    this.bdtNode.den = val;
+  }
+
+  get manifestId(): number {
+    return this.bdtNode.manifestId;
+  }
+
+  get releaseId(): number {
+    return this.detail ? (this.detail as CcBdtNodeDetail).releaseId : undefined;
+  }
+
+  get den(): string {
+    return this.bdtNode.den;
   }
 }
 
@@ -479,7 +524,6 @@ export class VSCcTreeDataSource<T extends CcFlatNode> extends VSFlatTreeDataSour
 
     cachedData.splice(start, end - start);
     this.cachedData = cachedData;
-
   }
 
   getNodesByLevelAndIndex(nodes: T[], siblingIndex: number) {
@@ -500,10 +544,10 @@ export class VSCcTreeDataSource<T extends CcFlatNode> extends VSFlatTreeDataSour
 }
 
 export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
-  private _ccGraph: CcGraph;
-  private _manifestId: number;
-  private _type: string;
-  private _listeners: FlatNodeFlattenerListener<CcFlatNode>[] = [];
+  _ccGraph: CcGraph;
+  _manifestId: number;
+  _type: string;
+  _listeners: FlatNodeFlattenerListener<CcFlatNode>[] = [];
 
   constructor(ccGraph: CcGraph, type: string, manifestId: number) {
     this._ccGraph = ccGraph;
@@ -522,6 +566,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
   toAccNode(accNode: CcGraphNode, parent: CcFlatNode) {
     const node = new AccFlatNode(accNode);
     node.state = accNode.state;
+    node.deprecated = accNode.deprecated;
     node.level = parent.level + 1;
     node.parent = parent;
     return node;
@@ -531,6 +576,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     const asccpNode = next(this._ccGraph, asccNode);
     const node = new AsccpFlatNode(asccpNode, asccNode);
     node.state = asccpNode.state;
+    node.deprecated = asccpNode.deprecated || asccNode.deprecated;
     node.level = parent.level + 1;
     node.parent = parent;
     node.isCycle = this.detectCycle(node);
@@ -541,6 +587,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     const bccpNode = next(this._ccGraph, bccNode);
     const bdtNode = next(this._ccGraph, bccpNode);
     const node = new BccpFlatNode(bccpNode, bdtNode, bccNode);
+    node.deprecated = bccpNode.deprecated || bccNode.deprecated || bdtNode.deprecated;
     node.state = bccpNode.state;
     node.level = parent.level + 1;
     node.parent = parent;
@@ -549,6 +596,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
 
   toBdtScNode(bdtScNode: CcGraphNode, parent: CcFlatNode) {
     const node = new BdtScFlatNode(bdtScNode);
+    node.deprecated = bdtScNode.deprecated;
     node.state = bdtScNode.state;
     node.level = parent.level + 1;
     node.parent = parent;
@@ -561,7 +609,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     });
   }
 
-  flatten(): CcFlatNode[] {
+  flatten(excludeSCs?: boolean): CcFlatNode[] {
     let node;
     if (this._type === 'ACC') {
       const accNode = this._ccGraph.graph.nodes[this.key];
@@ -573,25 +621,34 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       const bccpNode = this._ccGraph.graph.nodes[this.key];
       const bdtNode = next(this._ccGraph, bccpNode);
       node = new BccpFlatNode(bccpNode, bdtNode);
+    } else if (this._type === 'BDT') {
+      const bdtNode = this._ccGraph.graph.nodes[this.key];
+      node = new BdtFlatNode(bdtNode);
     }
     node.level = 0;
     this.fireEvent(node);
 
     const nodes = [node,];
-    this._doFlatten(nodes, node);
+    this._doFlatten(nodes, node, excludeSCs);
     return nodes;
   }
 
-  _doFlatten(nodes: CcFlatNode[], node: CcFlatNode) {
-    node.children = this.getChildren(node);
-    node.children.map(e => e as CcFlatNode).forEach(e => {
-      nodes.push(e);
-      this.fireEvent(e);
-      if (e instanceof AsccpFlatNode && e.isCycle) {
-        return;
-      }
-      this._doFlatten(nodes, e);
-    });
+  _doFlatten(nodes: CcFlatNode[], node: CcFlatNode, excludeSCs?: boolean) {
+    if (excludeSCs && node.type === 'BCCP') {
+      node.children = [];
+      node.expandable = this.hasBdtScChildren((node as BccpFlatNode).bdtNode)
+    } else {
+      node.children = this.getChildren(node);
+      node.expandable = node.children.length > 0;
+      node.children.map(e => e as CcFlatNode).forEach(e => {
+        nodes.push(e);
+        this.fireEvent(e);
+        if (e instanceof AsccpFlatNode && e.isCycle) {
+          return;
+        }
+        this._doFlatten(nodes, e, excludeSCs);
+      });
+    }
   }
 
   detectCycle(node: AsccpFlatNode): boolean {
@@ -612,7 +669,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
   afterBccpFlatNode(node: BccpFlatNode) {
   }
 
-  afterBbieScFlatNode(node: BbieScFlatNode) {
+  afterBdtScFlatNode(node: BbieScFlatNode) {
   }
 
   getChildren(node: CcFlatNode): CcFlatNode[] {
@@ -632,6 +689,14 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     }
 
     let children = [];
+
+    if (node instanceof BdtFlatNode) {
+      targets.forEach(target => {
+        children.push(this.toBdtScNode(nodes[target], node));
+      });
+      return children;
+    }
+
     targets.forEach(target => {
       if (target.startsWith('ACC-')) {
         children.push(this.toAccNode(nodes[target], node));
@@ -659,5 +724,24 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       }
     });
     return children;
+  }
+
+  hasBdtScChildren(node: CcGraphNode): boolean {
+    const nodes = this._ccGraph.graph.nodes;
+    const edges = this._ccGraph.graph.edges;
+
+    const edge = edges[getKey(node)];
+    const targets = (!!edge) ? edge.targets : [];
+    if (!targets || targets.length === 0) {
+      return false;
+    }
+
+    switch (node.type) {
+      case 'BDT':
+        return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).length > 0;
+
+      default :
+        return false;
+    }
   }
 }

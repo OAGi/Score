@@ -13,4 +13,7 @@ public interface ModuleSetWriteRepository {
 
     DeleteModuleSetResponse deleteModuleSet(
             DeleteModuleSetRequest request) throws ScoreDataAccessException;
+
+    DeleteModuleSetAssignmentResponse unassignModule(
+            DeleteModuleSetAssignmentRequest request) throws ScoreDataAccessException;
 }

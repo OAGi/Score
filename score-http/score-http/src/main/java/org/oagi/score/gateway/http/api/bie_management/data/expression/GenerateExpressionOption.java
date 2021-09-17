@@ -26,6 +26,7 @@ public class GenerateExpressionOption {
     private BigInteger paginationResponseTopLevelAsbiepId;
 
     private String openAPIExpressionFormat;
+    private boolean openAPICodeGenerationFriendly;
     private boolean openAPI30GetTemplate;
     private boolean arrayForJsonExpressionForOpenAPI30GetTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30GetTemplate;

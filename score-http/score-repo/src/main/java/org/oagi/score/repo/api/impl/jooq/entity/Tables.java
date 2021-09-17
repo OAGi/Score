@@ -63,11 +63,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAsccpManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleBccpManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleBlobContentManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleCodeListManifest;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleDep;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleDir;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleDtManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSet;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetAssignment;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace;
@@ -396,16 +393,6 @@ If we use a separate table for each expression, then we need binding all the way
     public static final ModuleCodeListManifest MODULE_CODE_LIST_MANIFEST = ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST;
 
     /**
-     * This table carries the dependency between modules in the MODULE table.
-     */
-    public static final ModuleDep MODULE_DEP = ModuleDep.MODULE_DEP;
-
-    /**
-     * The table <code>oagi.module_dir</code>.
-     */
-    public static final ModuleDir MODULE_DIR = ModuleDir.MODULE_DIR;
-
-    /**
      * The table <code>oagi.module_dt_manifest</code>.
      */
     public static final ModuleDtManifest MODULE_DT_MANIFEST = ModuleDtManifest.MODULE_DT_MANIFEST;
@@ -414,11 +401,6 @@ If we use a separate table for each expression, then we need binding all the way
      * The table <code>oagi.module_set</code>.
      */
     public static final ModuleSet MODULE_SET = ModuleSet.MODULE_SET;
-
-    /**
-     * The table <code>oagi.module_set_assignment</code>.
-     */
-    public static final ModuleSetAssignment MODULE_SET_ASSIGNMENT = ModuleSetAssignment.MODULE_SET_ASSIGNMENT;
 
     /**
      * The table <code>oagi.module_set_release</code>.

@@ -30,7 +30,7 @@ export class LogListComponent implements OnInit {
     'check', 'commit', 'revisionNum', 'revisionAction', 'loginId', 'timestamp'
   ];
   dataSource = new MatTableDataSource<Log>();
-  selection = new SelectionModel<Log>(true, []);
+  selection = new SelectionModel<number>(true, []);
 
   constructor(private service: LogService,
               private dialog: MatDialog,
@@ -87,8 +87,20 @@ export class LogListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.selection.clear();
     this.getRevisions();
+  }
+
+  isSelected(elem: Log): boolean {
+    return this.selection.isSelected(elem.logId);
+  }
+
+  toggle(elem: Log) {
+    if (!this.isSelected(elem)) {
+      if (this.selection.selected.length > 1) {
+        this.selection.deselect(this.selection.selected[0]);
+      }
+    }
+    this.selection.toggle(elem.logId);
   }
 
   openCompareDialog() {
@@ -98,12 +110,12 @@ export class LogListComponent implements OnInit {
 
     let before;
     let after;
-    if (this.selection.selected[0].logId > this.selection.selected[1].logId) {
-      before = this.selection.selected[1].logId;
-      after = this.selection.selected[0].logId;
+    if (this.selection.selected[0] > this.selection.selected[1]) {
+      before = this.selection.selected[1];
+      after = this.selection.selected[0];
     } else {
-      before = this.selection.selected[0].logId;
-      after = this.selection.selected[1].logId;
+      before = this.selection.selected[0];
+      after = this.selection.selected[1];
     }
     this.dialog.open(LogCompareDialogComponent, {
       data: {

@@ -18,6 +18,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {initFilter} from '../../../common/utility';
 import {ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
+import {UserToken} from '../../../authentication/domain/auth';
 
 @Component({
   selector: 'score-module-set-release-list',
@@ -27,9 +28,7 @@ import {ModuleService} from '../../domain/module.service';
 export class ModuleSetReleaseListComponent implements OnInit {
   title = 'Module Set Release';
 
-  displayedColumns: string[] = [
-    'name', 'release', 'default', 'lastUpdateTimestamp', 'more'
-  ];
+  displayedColumns: string[];
   dataSource = new MatTableDataSource<ModuleSetRelease>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -45,7 +44,6 @@ export class ModuleSetReleaseListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
-
   constructor(private service: ModuleService,
               private accountService: AccountListService,
               private auth: AuthService,
@@ -54,7 +52,13 @@ export class ModuleSetReleaseListComponent implements OnInit {
               private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute) {
+    this.displayedColumns = (this.role === 'developer') ? [
+      'name', 'release', 'default', 'lastUpdateTimestamp', 'more'
+    ] : [
+      'name', 'release', 'default', 'lastUpdateTimestamp'
+    ];
+  }
 
   ngOnInit(): void {
     this.request = new ModuleSetReleaseListRequest(this.route.snapshot.queryParamMap,
@@ -78,6 +82,15 @@ export class ModuleSetReleaseListComponent implements OnInit {
     });
 
     this.loadModuleSetReleaseList(true);
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get role(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.role : undefined;
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

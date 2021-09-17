@@ -1,6 +1,7 @@
 package org.oagi.score.service.bie;
 
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.agency.model.AgencyIdList;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.*;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
@@ -224,7 +225,7 @@ public class BieUpliftingService {
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
                     listener.notFoundMatchedAsbie(asbie,
-                            (AsccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath());
+                            (AsccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), asbie.getDefinition());
                 });
 
                 currentSourcePath = sourceAssociation.getPath();
@@ -233,7 +234,7 @@ public class BieUpliftingService {
                 Association targetAssociation = (Association) matchingScore.getTarget();
                 this.listeners.forEach(listener -> {
                     listener.foundBestMatchedAsbie(asbie,
-                            (AsccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(),
+                            (AsccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), asbie.getDefinition(),
                             (AsccManifest) targetAssociation.getCcAssociation(), targetAssociation.getPath());
                 });
 
@@ -270,7 +271,7 @@ public class BieUpliftingService {
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
                     listener.notFoundMatchedBbie(bbie,
-                            (BccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath());
+                            (BccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), bbie.getDefinition());
                 });
 
                 currentSourcePath = sourceAssociation.getPath();
@@ -279,7 +280,7 @@ public class BieUpliftingService {
                 Association targetAssociation = (Association) matchingScore.getTarget();
                 this.listeners.forEach(listener -> {
                     listener.foundBestMatchedBbie(bbie,
-                            (BccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(),
+                            (BccManifest) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), bbie.getDefinition(),
                             (BccManifest) targetAssociation.getCcAssociation(), targetAssociation.getPath());
                 });
 
@@ -358,7 +359,7 @@ public class BieUpliftingService {
 
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
-                    listener.notFoundMatchedBbieSc(bbieSc, sourceDtScManifest, sourcePath);
+                    listener.notFoundMatchedBbieSc(bbieSc, sourceDtScManifest, sourcePath, bbieSc.getDefinition());
                 });
             } else {
                 DtScManifest targetDtScManifest = (DtScManifest) matchingScore.getTarget();
@@ -366,7 +367,7 @@ public class BieUpliftingService {
 
                 this.listeners.forEach(listener -> {
                     listener.foundBestMatchedBbieSc(bbieSc,
-                            sourceDtScManifest, sourcePath,
+                            sourceDtScManifest, sourcePath, bbieSc.getDefinition(),
                             targetDtScManifest, targetPath);
                 });
             }
@@ -389,19 +390,20 @@ public class BieUpliftingService {
         }
 
         BieDocument sourceBieDocument = bieReadService.getBieDocument(request.getRequester(), request.getTopLevelAsbiepId());
-        BigInteger targetAsccpManifestId = scoreRepositoryFactory.createCcReadRepository().findNextAsccpManifest(
+        FindNextAsccpManifestResponse findNextAsccpManifestResponse = scoreRepositoryFactory.createCcReadRepository().findNextAsccpManifest(
                 new FindNextAsccpManifestRequest(request.getRequester())
                         .withAsccpManifestId(sourceBieDocument.getRootAsbiep().getBasedAsccpManifestId())
-                        .withNextReleaseId(request.getTargetReleaseId()))
-                .getNextAsccpManifestId();
-        if (targetAsccpManifestId == null) {
+                        .withNextReleaseId(request.getTargetReleaseId()));
+
+        if (findNextAsccpManifestResponse.getNextAsccpManifestId() == null) {
             throw new ScoreDataAccessException("Unable to find the target ASCCP.");
         }
 
-        response.setAsccpManifestId(targetAsccpManifestId);
+        response.setAsccpManifestId(findNextAsccpManifestResponse.getNextAsccpManifestId());
         if (request.isIncludingBieDocument()) {
             response.setBieDocument(sourceBieDocument);
         }
+        response.setReleaseNum(findNextAsccpManifestResponse.getReleaseNum());
         return response;
     }
 
@@ -454,6 +456,9 @@ public class BieUpliftingService {
         private List<CodeList> sourceCodeListList;
         private List<CodeList> targetCodeListList;
 
+        private List<AgencyIdList> sourceAgencyIdListList;
+        private List<AgencyIdList> targetAgencyIdListList;
+
         private Map<BigInteger, BdtPriRestri> sourceBdtPriRestriMap = new HashMap();
         private Map<BigInteger, List<BdtPriRestri>> targetBdtPriRestriBdtIdMap = new HashMap();
 
@@ -479,7 +484,9 @@ public class BieUpliftingService {
                             Map<BigInteger, BdtPriRestri> sourceBdtPriRestriMap,
                             Map<BigInteger, List<BdtPriRestri>> targetBdtPriRestriBdtIdMap,
                             Map<BigInteger, BdtScPriRestri> sourceBdtScPriRestriMap,
-                            Map<BigInteger, List<BdtScPriRestri>> targetBdtScPriRestriBdtScIdMap) {
+                            Map<BigInteger, List<BdtScPriRestri>> targetBdtScPriRestriBdtScIdMap,
+                            List<AgencyIdList> sourceAgencyIdListList,
+                            List<AgencyIdList> targetAgencyIdListList) {
 
             this.requester = requester;
             this.bizCtxIds = bizCtxIds;
@@ -503,6 +510,9 @@ public class BieUpliftingService {
             this.targetBdtPriRestriBdtIdMap = targetBdtPriRestriBdtIdMap;
             this.sourceBdtScPriRestriMap = sourceBdtScPriRestriMap;
             this.targetBdtScPriRestriBdtScIdMap = targetBdtScPriRestriBdtScIdMap;
+
+            this.sourceAgencyIdListList = sourceAgencyIdListList;
+            this.targetAgencyIdListList = targetAgencyIdListList;
         }
 
         public BigInteger uplift() {
@@ -894,7 +904,11 @@ public class BieUpliftingService {
                 targetAsbie.setUsed(asbie.isUsed());
 
                 WrappedAsbie upliftingAsbie = new WrappedAsbie();
-                upliftingAsbie.setFromAbie(this.abieIdToAbieMap.get(asbie.getFromAbieId()));
+                Abie fromAbie = this.abieIdToAbieMap.get(asbie.getFromAbieId());
+                if (fromAbie != null && currentTargetPath.contains(fromAbie.getPath())) {
+                    upliftingAsbie.setFromAbie(fromAbie);
+                }
+
                 upliftingAsbie.setAsbie(targetAsbie);
 
                 if(targetAsccMapping != null) {
@@ -973,10 +987,13 @@ public class BieUpliftingService {
 
                 setValueDomain(bbie, targetBbie, toBccpManifest.getBdtManifestId(),
                         sourceBdtPriRestriMap, targetBdtPriRestriBdtIdMap,
-                        sourceCodeListList, targetCodeListList);
+                        sourceCodeListList, sourceAgencyIdListList);
 
                 WrappedBbie upliftingBbie = new WrappedBbie();
-                upliftingBbie.setFromAbie(abieIdToAbieMap.get(bbie.getFromAbieId()));
+                Abie fromAbie = this.abieIdToAbieMap.get(bbie.getFromAbieId());
+                if (fromAbie != null && currentTargetPath.contains(fromAbie.getPath())) {
+                    upliftingBbie.setFromAbie(fromAbie);
+                }
                 upliftingBbie.setBbie(targetBbie);
 
                 this.toBbiepToBbieMap.put(bbie.getToBbiepId(), upliftingBbie);
@@ -1112,7 +1129,7 @@ public class BieUpliftingService {
 
                 setValueDomain(bbieSc, targetBbieSc, targetDtScManifest.getDtScManifestId(),
                         sourceBdtScPriRestriMap, targetBdtScPriRestriBdtScIdMap,
-                        sourceCodeListList, targetCodeListList);
+                        sourceCodeListList, sourceAgencyIdListList);
 
                 WrappedBbieSc upliftingBbieSc = new WrappedBbieSc();
                 upliftingBbieSc.setBbie(this.bbieMap.get(bbieSc.getBbieId()));
@@ -1128,7 +1145,7 @@ public class BieUpliftingService {
                                     Map<BigInteger, BdtPriRestri> sourceMap,
                                     Map<BigInteger, List<BdtPriRestri>> targetMap,
                                     List<CodeList> codeListSourceList,
-                                    List<CodeList> codeListTargetList) {
+                                    List<AgencyIdList> agencyIdListSourceList) {
 
             BdtPriRestri targetDefaultBdtPriRestri;
             DtManifest targetDtManifest = targetCcDocument.getDtManifest(dtManifestId);
@@ -1161,8 +1178,23 @@ public class BieUpliftingService {
                     }
                 }
             } else if (sourceBbie.getAgencyIdListId() != null) {
-                //TODO: AGECNY_ID_LIST
-                targetBbie.setAgencyIdListId(sourceBbie.getAgencyIdListId());
+                AgencyIdList agencyIdList = agencyIdListSourceList.stream().filter(e -> e.getAgencyIdListId().equals(sourceBbie.getAgencyIdListId())).findAny().orElse(null);
+                List<BdtPriRestri> availableAgencyIdListBdtPriRestri = availableBdtPriRestriList.stream().filter(e -> e.getAgencyIdListId() != null).collect(Collectors.toList());
+                if (availableAgencyIdListBdtPriRestri.size() > 0) {
+                    for (BdtPriRestri restri : availableAgencyIdListBdtPriRestri) {
+                        List<AgencyIdList> availableAgencyIdLists = availableAgencyIdListByAgencyIdListId(restri.getAgencyIdListId(), targetAgencyIdListList);
+                        for (AgencyIdList cl: availableAgencyIdLists) {
+                            if (cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())) {
+                                targetBbie.setAgencyIdListId(cl.getAgencyIdListId());
+                            }
+                        }
+                    }
+                } else {
+                    AgencyIdList found = targetAgencyIdListList.stream().filter(cl -> cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())).findAny().orElse(null);
+                    if (found != null) {
+                        targetBbie.setAgencyIdListId(found.getAgencyIdListId());
+                    }
+                }
             }
 
             if (targetBbie.getBdtPriRestriId() == null &&
@@ -1200,7 +1232,7 @@ public class BieUpliftingService {
                                     Map<BigInteger, BdtScPriRestri> sourceMap,
                                     Map<BigInteger, List<BdtScPriRestri>> targetMap,
                                     List<CodeList> codeListSourceList,
-                                    List<CodeList> codeListTargetList) {
+                                    List<AgencyIdList> agencyIdListSourceList) {
 
             BdtScPriRestri targetDefaultBdtScPriRestri;
             DtScManifest targetDtScManifest = targetCcDocument.getDtScManifest(dtScManifestId);
@@ -1232,8 +1264,23 @@ public class BieUpliftingService {
                     }
                 }
             } else if (sourceBbieSc.getAgencyIdListId() != null) {
-                //TODO: AGECNY_ID_LIST
-                targetBbieSc.setAgencyIdListId(sourceBbieSc.getAgencyIdListId());
+                AgencyIdList agencyIdList = agencyIdListSourceList.stream().filter(e -> e.getAgencyIdListId().equals(sourceBbieSc.getAgencyIdListId())).findAny().orElse(null);
+                List<BdtScPriRestri> availableAgencyIdListBdtPriRestri = availableBdtScPriRestriList.stream().filter(e -> e.getAgencyIdListId() != null).collect(Collectors.toList());
+                if (availableAgencyIdListBdtPriRestri.size() > 0) {
+                    for (BdtScPriRestri restri : availableAgencyIdListBdtPriRestri) {
+                        List<AgencyIdList> availableAgencyIdLists = availableAgencyIdListByAgencyIdListId(restri.getAgencyIdListId(), targetAgencyIdListList);
+                        for (AgencyIdList cl: availableAgencyIdLists) {
+                            if (cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())) {
+                                targetBbieSc.setAgencyIdListId(cl.getAgencyIdListId());
+                            }
+                        }
+                    }
+                } else {
+                    AgencyIdList found = targetAgencyIdListList.stream().filter(cl -> cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())).findAny().orElse(null);
+                    if (found != null) {
+                        targetBbieSc.setAgencyIdListId(found.getAgencyIdListId());
+                    }
+                }
             }
 
             if (targetBbieSc.getDtScPriRestriId() == null &&
@@ -1293,9 +1340,8 @@ public class BieUpliftingService {
         List<CodeList> sourceCodeListList = valueDomainReadRepository.getCodeListList(sourceReleaseId);
         List<CodeList> targetCodeListList = valueDomainReadRepository.getCodeListList(targetReleaseId);
 
-        // TODO: AGENCY_ID_LIST
-//        Map<BigInteger, AgencyIdList> sourceAgencyIdListMap = valueDomainReadRepository.getAgencyIdListMap(sourceRelease.getReleaseId());
-//        Map<BigInteger, AgencyIdList> targetAgencyIdListMap = valueDomainReadRepository.getAgencyIdListMap(request.getTargetReleaseId());
+        List<AgencyIdList> sourceAgencyIdListList = valueDomainReadRepository.getAgencyIdListList(sourceReleaseId);
+        List<AgencyIdList> targetAgencyIdListList = valueDomainReadRepository.getAgencyIdListList(targetReleaseId);
 
         Map<BigInteger, BdtPriRestri> sourceBdtPriRestriMap = valueDomainReadRepository.getBdtPriRestriMap(sourceReleaseId);
         Map<BigInteger, List<BdtPriRestri>> targetBdtPriRestriBdtIdMap = valueDomainReadRepository.getBdtPriRestriBdtIdMap(targetReleaseId);
@@ -1308,7 +1354,8 @@ public class BieUpliftingService {
                         sourceBieDocument, targetCcDocument, targetAsccpManifestId,
                         sourceCodeListList, targetCodeListList,
                         sourceBdtPriRestriMap, targetBdtPriRestriBdtIdMap,
-                        sourceBdtScPriRestriMap, targetBdtScPriRestriBdtScIdMap);
+                        sourceBdtScPriRestriMap, targetBdtScPriRestriBdtScIdMap,
+                        sourceAgencyIdListList, targetAgencyIdListList);
         BigInteger targetTopLevelAsbiepId = upliftingHandler.uplift();
 
         UpliftBieResponse response = new UpliftBieResponse();
@@ -1341,9 +1388,8 @@ public class BieUpliftingService {
         List<CodeList> sourceCodeListList = valueDomainReadRepository.getCodeListList(sourceRelease.getReleaseId());
         List<CodeList> targetCodeListList = valueDomainReadRepository.getCodeListList(request.getTargetReleaseId());
 
-        // TODO: AGENCY_ID_LIST
-//        Map<BigInteger, AgencyIdList> sourceAgencyIdListMap = valueDomainReadRepository.getAgencyIdListMap(sourceRelease.getReleaseId());
-//        Map<BigInteger, AgencyIdList> targetAgencyIdListMap = valueDomainReadRepository.getAgencyIdListMap(request.getTargetReleaseId());
+        List<AgencyIdList> sourceAgencyIdListList = valueDomainReadRepository.getAgencyIdListList(sourceRelease.getReleaseId());
+        List<AgencyIdList> targetAgencyIdListList = valueDomainReadRepository.getAgencyIdListList(request.getTargetReleaseId());
 
         Map<BigInteger, BdtPriRestri> sourceBdtPriRestriMap = valueDomainReadRepository.getBdtPriRestriMap(sourceRelease.getReleaseId());
         Map<BigInteger, List<BdtPriRestri>> targetBdtPriRestriBdtIdMap = valueDomainReadRepository.getBdtPriRestriBdtIdMap(request.getTargetReleaseId());
@@ -1381,10 +1427,9 @@ public class BieUpliftingService {
                         validation.setMessage(checkBdtCodeListIdMappable(sourceCodeList, dtManifest.getDtId(), targetBdtPriRestriBdtIdMap, targetCodeListList));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else {
-                        // TODO: AGENCY_ID_LIST
-                        // validation.setMessage(checkCodeListIdMappable(bbie.getCodeListId(), targetCodeListMap));
-                        // validation.setValid(validation.getMessage().isEmpty());
-                        validation.setValid(true);
+                        AgencyIdList sourceAgencyIdList = sourceAgencyIdListList.stream().filter(codeList -> codeList.getAgencyIdListId().equals(bbie.getAgencyIdListId())).findFirst().orElse(null);
+                        validation.setMessage(checkBdtAgencyIdListIdMappable(sourceAgencyIdList, dtManifest.getDtId(), targetBdtPriRestriBdtIdMap, targetAgencyIdListList));
+                        validation.setValid(validation.getMessage().isEmpty());
                     }
                     break;
                 case "BBIE_SC":
@@ -1404,10 +1449,9 @@ public class BieUpliftingService {
                         validation.setMessage(checkBdtScCodeListIdMappable(sourceCodeList, dtScManifest.getDtScId(), targetBdtScPriRestriBdtScIdMap, targetCodeListList));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else {
-                        // TODO: AGENCY_ID_LIST
-                        // validation.setMessage(checkCodeListIdMappable(bbie.getCodeListId(), targetCodeListMap));
-                        // validation.setValid(validation.getMessage().isEmpty());
-                        validation.setValid(true);
+                        AgencyIdList sourceAgencyIdList = sourceAgencyIdListList.stream().filter(agencyIdList -> agencyIdList.getAgencyIdListId().equals(bbieSc.getAgencyIdListId())).findFirst().orElse(null);
+                        validation.setMessage(checkBdtScAgencyIdListIdMappable(sourceAgencyIdList, dtScManifest.getDtScId(), targetBdtScPriRestriBdtScIdMap, targetAgencyIdListList));
+                        validation.setValid(validation.getMessage().isEmpty());
                     }
                     break;
             }
@@ -1469,6 +1513,31 @@ public class BieUpliftingService {
         return mergedCodeLists.stream().distinct().collect(Collectors.toList());
     }
 
+    private List<AgencyIdList> availableAgencyIdListByAgencyIdListId(BigInteger agencyIdListId, List<AgencyIdList> agencyIdListMap) {
+        if (agencyIdListId == null) {
+            return Collections.emptyList();
+        }
+
+        List<AgencyIdList> availableAgencyIdLists = agencyIdListMap.stream().filter(agencyIdList -> agencyIdList.getAgencyIdListId().equals(agencyIdListId)).collect(Collectors.toList());
+
+        List<BigInteger> basedAgencyIdListIds = availableAgencyIdLists.stream().map(AgencyIdList::getBasedAgencyIdListId).collect(Collectors.toList());
+
+        List<AgencyIdList> associatedAgencyIdLists = agencyIdListMap.stream().filter(agencyIdList -> basedAgencyIdListIds.contains(agencyIdList.getAgencyIdListId())).collect(Collectors.toList());
+
+        List<AgencyIdList> mergedAgencyIdLists = new ArrayList();
+        mergedAgencyIdLists.addAll(availableAgencyIdLists);
+        for (AgencyIdList associatedAgencyIdList : associatedAgencyIdLists) {
+            mergedAgencyIdLists.addAll(
+                    availableAgencyIdListByAgencyIdListId(
+                            associatedAgencyIdList.getAgencyIdListId(), agencyIdListMap)
+            );
+        }
+        List<AgencyIdList> baseAgencyIdLists = agencyIdListMap.stream().filter(agencyIdList -> agencyIdListId.equals(agencyIdList.getBasedAgencyIdListId())).collect(Collectors.toList());
+
+        mergedAgencyIdLists.addAll(baseAgencyIdLists);
+        return mergedAgencyIdLists.stream().distinct().collect(Collectors.toList());
+    }
+
     private String checkBdtCodeListIdMappable(CodeList codeList,
                                            BigInteger targetBdtId,
                                            Map<BigInteger, List<BdtPriRestri>> targetMap,
@@ -1519,5 +1588,57 @@ public class BieUpliftingService {
             }
         }
         return "Code List '" + codeList.getName() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use is  default primitive in the domain value restriction.";
+    }
+
+    private String checkBdtAgencyIdListIdMappable(AgencyIdList agencyIdList,
+                                              BigInteger targetBdtId,
+                                              Map<BigInteger, List<BdtPriRestri>> targetMap,
+                                              List<AgencyIdList> targetAgencyIdListList) {
+
+        List<BdtPriRestri> availableBdtPriRestriList = targetMap.get(targetBdtId);
+        List<BdtPriRestri> availableAgencyIdListBdtPriRestri = availableBdtPriRestriList.stream().filter(e -> e.getAgencyIdListId() != null).collect(Collectors.toList());
+
+        if (availableAgencyIdListBdtPriRestri.size() > 0) {
+            for (BdtPriRestri restri : availableAgencyIdListBdtPriRestri) {
+                List<AgencyIdList> availableAgencyIdLists = availableAgencyIdListByAgencyIdListId(restri.getAgencyIdListId(), targetAgencyIdListList);
+                for (AgencyIdList cl: availableAgencyIdLists) {
+                    if (cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())) {
+                        return "";
+                    }
+                }
+            }
+        } else {
+            boolean found = targetAgencyIdListList.stream().anyMatch(cl -> cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName()));
+            if (found) {
+                return "";
+            }
+        }
+        return "Agency Id List '" + agencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use is  default primitive in the domain value restriction.";
+    }
+
+    private String checkBdtScAgencyIdListIdMappable(AgencyIdList agencyIdList,
+                                                BigInteger targetBdtScId,
+                                                Map<BigInteger, List<BdtScPriRestri>> targetMap,
+                                                List<AgencyIdList> targetAgencyIdListList) {
+
+        List<BdtScPriRestri> availableBdtScPriRestriList = targetMap.get(targetBdtScId);
+        List<BdtScPriRestri> availableAgencyIdListBdtScPriRestri = availableBdtScPriRestriList.stream().filter(e -> e.getAgencyIdListId() != null).collect(Collectors.toList());
+
+        if (availableAgencyIdListBdtScPriRestri.size() > 0) {
+            for (BdtScPriRestri restri : availableAgencyIdListBdtScPriRestri) {
+                List<AgencyIdList> availableAgencyIdLists = availableAgencyIdListByAgencyIdListId(restri.getAgencyIdListId(), targetAgencyIdListList);
+                for (AgencyIdList cl: availableAgencyIdLists) {
+                    if (cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName())) {
+                        return "";
+                    }
+                }
+            }
+        } else {
+            boolean found = targetAgencyIdListList.stream().anyMatch(cl -> cl.getName().equals(agencyIdList.getName()) && cl.getListId().equals(agencyIdList.getListId()) && cl.getAgencyIdListValueName().equals(agencyIdList.getAgencyIdListValueName()));
+            if (found) {
+                return "";
+            }
+        }
+        return "Agency Id List '" + agencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use is  default primitive in the domain value restriction.";
     }
 }

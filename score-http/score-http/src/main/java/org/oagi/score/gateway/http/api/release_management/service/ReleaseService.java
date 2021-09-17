@@ -376,7 +376,8 @@ public class ReleaseService implements InitializingBean {
                     request.getAssignedAccComponentManifestIds(),
                     request.getAssignedAsccpComponentManifestIds(),
                     request.getAssignedBccpComponentManifestIds(),
-                    request.getAssignedCodeListComponentManifestIds());
+                    request.getAssignedCodeListComponentManifestIds(),
+                    request.getAssignedAgencyIdListComponentManifestIds());
 
             /*
              * Message Publishing
@@ -410,7 +411,7 @@ public class ReleaseService implements InitializingBean {
                     Collections.emptyList(),
                     Collections.emptyList(),
                     Collections.emptyList(),
-                    Collections.emptyList()
+                    releaseCreateRequestEvent.getAgencyIdListManifestIds()
             );
             repository.updateState(releaseCreateRequestEvent.getUserId(),
                     releaseCreateRequestEvent.getReleaseId(), ReleaseState.Draft);

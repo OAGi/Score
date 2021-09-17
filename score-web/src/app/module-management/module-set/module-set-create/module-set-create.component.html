@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="isUpdating">
+  <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
 
@@ -11,13 +11,46 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput required data-id="moduleSet.name" [(ngModel)]="moduleSet.name" maxlength="100"/>
+          <input [(ngModel)]="moduleSet.name" data-id="moduleSet.name" matInput maxlength="100" required/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition</mat-label>
-          <textarea rows="6" cols="30" matInput data-id="moduleSet.description"
-                    [(ngModel)]="moduleSet.description"></textarea>
+          <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
+                    rows="6"></textarea>
+        </mat-form-field>
+
+        <mat-checkbox color="primary"
+                      [(ngModel)]="moduleSet.createModuleSetRelease">
+          <span>Create Module Set Release</span>
+        </mat-checkbox>
+
+        <mat-form-field>
+          <mat-label>Release</mat-label>
+          <mat-select [(ngModel)]="moduleSet.targetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
+            <mat-option *ngFor="let release of releaseList" [value]="release.releaseId">
+              <div class="d-flex">
+                <span class="release-num">{{release.releaseNum}}</span>
+                <span *ngIf="release.releaseNum !== 'Working'"
+                      class="f12 ml-auto {{release.state}}">
+                        {{ release.state | separate }}
+                      </span>
+              </div>
+            </mat-option>
+
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Copy CC assignment from Module Set Release</mat-label>
+          <mat-select [(ngModel)]="moduleSet.targetModuleSetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
+            <mat-option *ngFor="let moduleSetRelease of moduleSetReleaseList" [value]="moduleSetRelease.moduleSetReleaseId">
+              <div class="d-flex">
+                <span class="release-num">{{moduleSetRelease.moduleSetName}}</span>
+                &nbsp;<span class="release-num">{{moduleSetRelease.releaseNum}}</span>
+              </div>
+            </mat-option>
+          </mat-select>
         </mat-form-field>
       </mat-card-content>
     </mat-card>
@@ -25,8 +58,8 @@
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
-      <button mat-raised-button color="primary" (click)="createModuleSet()"
-              [disabled]="!isChanged">
+      <button (click)="createModuleSet()" [disabled]="!canCreate" color="primary"
+              mat-raised-button>
         Create
       </button>
     </div>

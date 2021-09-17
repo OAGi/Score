@@ -190,12 +190,13 @@
                 </a>
                 <a target="_blank" rel="noopener noreferrer"
                    routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
-                  <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }} more...</mat-chip>
+                  <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }}
+                    more...
+                  </mat-chip>
                 </a>
               </mat-chip-list>
             </td>
           </ng-container>
-
 
 
           <ng-container matColumnDef="version">
@@ -252,190 +253,181 @@
     <mat-card-content>
       <div class="container-fluid">
         <div class="row">
-          <div class="col-md-10 col-sm-12">
+          <div class="col-md-4 col-sm-12">
             <span class="option-header">Select annotation to generate for BIEs</span>
             <div class="option-body">
-
-              <div class="row">
-
-                <div class="col-md-5 col-sm-12">
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.bieDefinition">BIE Definition</mat-checkbox>
-                  </div>
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'"
-                                  (change)="bieAnnotationChange()">BIE CCTS Meta Data
-                    </mat-checkbox>
-                  </div>
-                  <div class="generate-option dependent-option">
-                    <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
-                                  [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieDefinition">BIE Definition</mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE CCTS Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
                       <span
                         class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
-                    </mat-checkbox>
-                  </div>
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.bieGuid"
-                                  [disabled]="option.expressionOption !== 'XML'">BIE GUID
-                    </mat-checkbox>
-                  </div>
-                </div>
-
-                <div class="col-md-5 col-sm-12">
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.businessContext"
-                                  [disabled]="option.expressionOption !== 'XML'">Business Context
-                    </mat-checkbox>
-                  </div>
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'"
-                                  (change)="bieAnnotationChange()">BIE OAGi/Score Meta Data
-                    </mat-checkbox>
-                  </div>
-                  <div class="generate-option dependent-option">
-                    <mat-checkbox [(ngModel)]="option.includeWhoColumns"
-                                  [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieGuid"
+                              [disabled]="option.expressionOption !== 'XML'">BIE GUID
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.businessContext"
+                              [disabled]="option.expressionOption !== 'XML'">Business Context
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE OAGi/Score Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
                       <span
                         class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
-                    </mat-checkbox>
-                  </div>
-                  <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.basedCcMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'">Based CC Meta Data
-                    </mat-checkbox>
-                  </div>
-                </div>
-
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                              [disabled]="option.expressionOption !== 'XML'">Based CC Meta Data
+                </mat-checkbox>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col-md-10 col-sm-12">
-            <div class="row">
-
-              <div class="col-md-5 col-sm-12" style="padding-top: 20px">
-                <span class="option-header">Select Expressions</span>
-                <div class="option-body">
-                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption" (change)="expressionOptionChange()">
-                    <mat-radio-button class="option-radio-button" value="XML">
-                      XML Schema
-                    </mat-radio-button>
-                    <mat-radio-button class="option-radio-button" value="JSON">
-                      JSON Schema
-                    </mat-radio-button>
-                    <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
-                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
-                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
-                      </mat-checkbox>
-                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
-                                    (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Select an Expression</span>
+            <div class="option-body">
+              <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
+                               (change)="expressionOptionChange()">
+                <mat-radio-button class="option-radio-button" value="XML">
+                  XML Schema
+                </mat-radio-button>
+                <mat-radio-button class="option-radio-button" value="JSON">
+                  JSON Schema
+                </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
+                  <span
+                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
+                                (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
                                              'includeMetaHeaderForJson',
                                              'metaHeaderTopLevelAsbiepId')">
-                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
-                      </mat-checkbox>
-                      <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
-                                    (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
+                  <span
+                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
+                                (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
                                              'includePaginationResponseForJson',
                                              'paginationResponseTopLevelAsbiepId')">
-                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
-                      </mat-checkbox>
-                    </div>
-                    <mat-radio-button class="option-radio-button" value="OpenAPI30">
-                      Open API 3.0 (Early prototype)
-                    </mat-radio-button>
-                    <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
-                      <mat-form-field>
-                        <mat-label>Format</mat-label>
-                        <mat-select [(ngModel)]="option.openAPIExpressionFormat"
-                                    required="true">
-                          <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
-                            {{ openApiFormat }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                      <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
-                      </mat-checkbox>
+                    <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                  </mat-checkbox>
+                </div>
+                <mat-radio-button class="option-radio-button" value="OpenAPI30">
+                  Open API 3.0 (Template)
+                </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
+                  <mat-form-field>
+                    <mat-label>Format</mat-label>
+                    <mat-select [(ngModel)]="option.openAPIExpressionFormat"
+                                required="true">
+                      <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
+                        {{ openApiFormat }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-checkbox [(ngModel)]="option.openAPICodeGenerationFriendly">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">
+                          <div>Code Generation Friendly</div>
+                          <div class="description">(Multiple BIEs of the same Property Term is not supported)</div>
+                        </span>
+                  </mat-checkbox>
 
-                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
-                                    [disabled]="option.openAPI30GetTemplate != true"
-                                    class="generate-second-option">
-                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
-                      </mat-checkbox>
-                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
-                                    [disabled]="option.openAPI30GetTemplate != true"
-                                    class="generate-second-option"
-                                    (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
+                  <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate">
+                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
+                  </mat-checkbox>
+
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true"
+                                class="generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true"
+                                class="generate-second-option"
+                                (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate')">
-                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
-                      </mat-checkbox>
-                      <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
-                                    [disabled]="option.openAPI30GetTemplate != true"
-                                    class="generate-second-option"
-                                    (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true"
+                                class="generate-second-option"
+                                (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
                                              'includePaginationResponseForJsonForOpenAPI30GetTemplate',
                                              'paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate')">
-                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
-                      </mat-checkbox>
+                    <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                  </mat-checkbox>
 
-                      <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30'">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
-                      </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
+                                [disabled]="option.expressionOption !== 'OpenAPI30'">
+                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
+                  </mat-checkbox>
 
-                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
-                                    [disabled]="option.openAPI30PostTemplate != true"
-                                    class="generate-second-option">
-                        <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
-                      </mat-checkbox>
-                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
-                                    [disabled]="option.openAPI30PostTemplate != true"
-                                    class="generate-second-option"
-                                    (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true"
+                                class="generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true"
+                                class="generate-second-option"
+                                (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate')">
-                        <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
-                      </mat-checkbox>
-                    </div>
-                  </mat-radio-group>
+                    <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
                 </div>
-              </div>
+              </mat-radio-group>
+            </div>
+          </div>
 
-              <div class="col-md-5 col-sm-12" style="padding-top: 20px">
-                <span class="option-header">Schema Package Option</span>
-                <div class="option-body">
-                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
-                    <mat-radio-button class="option-radio-button" value="ALL"
-                                      [disabled]="option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)">
-                      Put all schemas in the same file
-                    </mat-radio-button>
-                    <mat-radio-button class="option-radio-button" value="EACH">
-                      Put each schema in an individual file
-                    </mat-radio-button>
-                  </mat-radio-group>
-                </div>
-              </div>
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Schema Package Option</span>
+            <div class="option-body">
+              <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
+                <mat-radio-button class="option-radio-button" value="ALL"
+                                  [disabled]="option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)">
+                  Put all schemas in the same file
+                </mat-radio-button>
+                <mat-radio-button class="option-radio-button" value="EACH">
+                  Put each schema in an individual file
+                </mat-radio-button>
+              </mat-radio-group>
 
+              <div class="actions mt-4">
+                <button mat-raised-button color="primary" (click)="generate()"
+                        [disabled]="selection.selected.length === 0">
+                  Generate
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </mat-card-content>
   </mat-card>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="generate()"
-                [disabled]="selection.selected.length === 0">
-          Generate
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

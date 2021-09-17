@@ -1,0 +1,190 @@
+<div class="context-section">
+  <div *ngIf="isUpdating" class="loading-container">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card class="mt-4">
+    <mat-card-header>
+      <mat-card-title>Edit Modules</mat-card-title>
+    </mat-card-header>
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <div class="finder-wrapper">
+          <div class="finder-content">
+            <div *ngFor="let tile of tiles;" class="finder-grid">
+              <div class="finder-grid-left">
+                <div *ngFor="let element of tile.elements" class="grid-element">
+                  <div (click)="onClickElement(tile, element)"
+                       [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                    <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
+                    <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
+                    <div class="float-left element-title">
+                      <span>{{element.name}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+
+  <mat-card class="mt-4">
+    <mat-card-header>
+      <mat-card-title>Assign CCs</mat-card-title>
+    </mat-card-header>
+
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <div class="assign-cc-wrapper">
+          <div class="assign-cc-table-wrapper">
+            <h4>Unassigned</h4>
+            <div class="assign-cc-table-filter">
+              <div class="assign-cc-table-filter-type">
+                <mat-form-field>
+                  <mat-label>Type</mat-label>
+                  <mat-select (ngModelChange)="updateLeftFilterTypes($event)" [(ngModel)]="leftFilteredValues.types" multiple>
+                    <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="assign-cc-table-filter-den">
+                <mat-form-field>
+                  <mat-label>Den</mat-label>
+                  <input (keyup)="updateLeftFilterDen(leftFilteredValues.den)" [(ngModel)]="leftFilteredValues.den" matInput>
+                </mat-form-field>
+              </div>
+            </div>
+            <table #leftSort="matSort" [dataSource]="leftDataSource" class="assign-cc-table-border" mat-table
+                   matSort>
+              <ng-container matColumnDef="checkbox">
+                <th *matHeaderCellDef mat-header-cell></th>
+                <td *matCellDef="let element" mat-cell>
+                  <mat-checkbox (change)="$event ? leftSelection.toggle(element) : null"
+                                (click)="$event.stopPropagation()"
+                                [checked]="leftSelection.isSelected(element)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="type">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Type</th>
+                <td *matCellDef="let element" mat-cell> {{element.type}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="den">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
+                <td *matCellDef="let element" mat-cell>
+                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den"
+                     routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
+                     target="_blank">{{element.den}}</a>
+                  <a *ngIf="element.type === 'CODE_LIST'" class="den" routerLink="/code_list/{{ element.manifestId }}"
+                     target="_blank">{{element.den}}</a>
+                  <span
+                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="revision">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Revision</th>
+                <td *matCellDef="let element" mat-cell> {{element.revision}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="timestamp">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
+                <td *matCellDef="let element" mat-cell>
+                  <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
+                  <div class="description ellipsis">by <b>{{ element.ownerUserId }}</b>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr (click)="leftSelection.toggle(element)" *matRowDef="let element; columns: displayedColumns;"
+                  class="pointer"
+                  mat-row></tr>
+            </table>
+          </div>
+          <div class="assign-cc-middle">
+            <button (click)="assign()" class="mb-3" mat-stroked-button matTooltip="Assign">
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+
+            <button (click)="unassign()" mat-stroked-button matTooltip="Unassign">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+          </div>
+          <div class="assign-cc-table-wrapper">
+            <h4>Assigned <span *ngIf="selectedModuleElement">"{{selectedModuleElement.name}}"</span></h4>
+            <div class="assign-cc-table-filter">
+              <div class="assign-cc-table-filter-type">
+                <mat-form-field>
+                  <mat-label>Type</mat-label>
+                  <mat-select (ngModelChange)="updateRightFilterTypes($event)" [(ngModel)]="rightFilteredValues.types" multiple>
+                    <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="assign-cc-table-filter-den">
+                <mat-form-field>
+                  <mat-label>Den</mat-label>
+                  <input (keyup)="updateRightFilterDen(rightFilteredValues.den)" [(ngModel)]="rightFilteredValues.den" matInput>
+                </mat-form-field>
+              </div>
+            </div>
+            <table #rightSort="matSort" [dataSource]="rightDataSource" class="assign-cc-table-border" mat-table
+                   matSort>
+              <ng-container matColumnDef="checkbox">
+                <th *matHeaderCellDef mat-header-cell></th>
+                <td *matCellDef="let element" mat-cell>
+                  <mat-checkbox (change)="$event ? rightSelection.toggle(element) : null"
+                                (click)="$event.stopPropagation()"
+                                [checked]="rightSelection.isSelected(element)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="type">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Type</th>
+                <td *matCellDef="let element" mat-cell> {{element.type}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="den">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
+                <td *matCellDef="let element" mat-cell>
+                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den"
+                     routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
+                     target="_blank">{{element.den}}</a>
+                  <a *ngIf="element.type === 'CODE_LIST'" class="den" routerLink="/code_list/{{ element.manifestId }}"
+                     target="_blank">{{element.den}}</a>
+                  <span
+                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="revision">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Revision</th>
+                <td *matCellDef="let element" mat-cell> {{element.revision}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="timestamp">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
+                <td *matCellDef="let element" mat-cell>
+                  <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
+                  <div class="description ellipsis">by <b>{{ element.ownerUserId }}</b>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr (click)="rightSelection.toggle(element)" *matRowDef="let element; columns: displayedColumns;"
+                  class="pointer"
+                  mat-row></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+</div>

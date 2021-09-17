@@ -51,3 +51,61 @@ tr.element-row:not(.expanded-row):active {
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }
+
+.selected {
+  background-color: aliceblue;
+}
+
+.grid-element-content {
+  display: block;
+  overflow-x: hidden;
+}
+
+.finder-wrapper {
+  width: 100%;
+  min-height: 400px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.finder-content {
+  height: 400px;
+  display: inline-flex;
+}
+
+.finder-grid {
+  display: inline-flex;
+}
+
+.finder-grid-left {
+  width: 300px;
+  overflow-y: scroll;
+}
+
+.grid-element {
+  cursor: pointer;
+  padding: 3px;
+}
+
+.element-title {
+  padding-left: 3px;
+  display: flex;
+}
+
+.element-title > span {
+  width: 240px;
+}
+
+.grid-element-content > mat-icon.element-edit-icon {
+  visibility: hidden;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}
+
+.grid-element-content:hover > mat-icon.element-edit-icon {
+  visibility: visible;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}

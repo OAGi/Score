@@ -66,16 +66,16 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
     }
 
     /**
-     * Setter for <code>oagi.module_agency_id_list_manifest.module_set_assignment_id</code>.
+     * Setter for <code>oagi.module_agency_id_list_manifest.module_id</code>. This indicates a module.
      */
-    public void setModuleSetAssignmentId(ULong value) {
+    public void setModuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_agency_id_list_manifest.module_set_assignment_id</code>.
+     * Getter for <code>oagi.module_agency_id_list_manifest.module_id</code>. This indicates a module.
      */
-    public ULong getModuleSetAssignmentId() {
+    public ULong getModuleId() {
         return (ULong) get(3);
     }
 
@@ -175,7 +175,7 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
 
     @Override
     public Field<ULong> field4() {
-        return ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_ASSIGNMENT_ID;
+        return ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_ID;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
 
     @Override
     public ULong component4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
 
     @Override
     public ULong value4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
 
     @Override
     public ModuleAgencyIdListManifestRecord value4(ULong value) {
-        setModuleSetAssignmentId(value);
+        setModuleId(value);
         return this;
     }
 
@@ -353,13 +353,13 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
     /**
      * Create a detached, initialised ModuleAgencyIdListManifestRecord
      */
-    public ModuleAgencyIdListManifestRecord(ULong moduleAgencyIdListManifestId, ULong moduleSetReleaseId, ULong agencyIdListManifestId, ULong moduleSetAssignmentId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleAgencyIdListManifestRecord(ULong moduleAgencyIdListManifestId, ULong moduleSetReleaseId, ULong agencyIdListManifestId, ULong moduleId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST);
 
         setModuleAgencyIdListManifestId(moduleAgencyIdListManifestId);
         setModuleSetReleaseId(moduleSetReleaseId);
         setAgencyIdListManifestId(agencyIdListManifestId);
-        setModuleSetAssignmentId(moduleSetAssignmentId);
+        setModuleId(moduleId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

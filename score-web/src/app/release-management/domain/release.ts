@@ -139,12 +139,21 @@ export const WorkingRelease = {
 };
 
 export class AssignableMap {
-  assignableAccManifestMap: Map<number, string>;
-  assignableAsccpManifestMap: Map<number, string>;
-  assignableBccpManifestMap: Map<number, string>;
-  unassignableAccManifestMap: Map<number, string>;
-  unassignableAsccpManifestMap: Map<number, string>;
-  unassignableBccpManifestMap: Map<number, string>;
+  assignableAccManifestMap: Map<number, AssignableNode>;
+  assignableAsccpManifestMap: Map<number, AssignableNode>;
+  assignableBccpManifestMap: Map<number, AssignableNode>;
+  assignableDtManifestMap: Map<number, AssignableNode>;
+  assignableCodeListManifestMap: Map<number, AssignableNode>;
+  assignableAgencyIdListManifestMap: Map<number, AssignableNode>;
+  assignableXbtManifestMap: Map<number, AssignableNode>;
+
+  assignedAccManifestMap: Map<number, AssignableNode>;
+  assignedAsccpManifestMap: Map<number, AssignableNode>;
+  assignedBccpManifestMap: Map<number, AssignableNode>;
+  assignedDtManifestMap: Map<number, AssignableNode>;
+  assignedCodeListManifestMap: Map<number, AssignableNode>;
+  assignedAgencyIdListManifestMap: Map<number, AssignableNode>;
+  assignedXbtManifestMap: Map<number, AssignableNode>;
 }
 
 export class AssignableNode {
@@ -174,6 +183,7 @@ export class ReleaseValidationRequest {
   assignedAsccpComponentManifestIds: number[] = [];
   assignedBccpComponentManifestIds: number[] = [];
   assignedCodeListComponentManifestIds: number[] = [];
+  assignedAgencyIdListComponentManifestIds: number[] = [];
 }
 
 export class ValidationMessage {
@@ -188,4 +198,5 @@ export class ReleaseValidationResponse {
   statusMapForAsccp: Map<number, ValidationMessage[]>;
   statusMapForBccp: Map<number, ValidationMessage[]>;
   statusMapForCodeList: Map<number, ValidationMessage[]>;
+  statusMapForAgencyIdList: Map<number, ValidationMessage[]>;
 }

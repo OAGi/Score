@@ -1,0 +1,125 @@
+.warning {
+  background-color: #ff4081;
+  color: #fff;
+}
+
+.error {
+  background-color: #ff5722;
+  color: #fff;
+}
+
+.selected {
+  background-color: aliceblue;
+}
+
+.grid-element-content {
+  display: block;
+  overflow-x: hidden;
+}
+
+.finder-wrapper {
+  width: 100%;
+  min-height: 400px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.finder-content {
+  height: 400px;
+  display: inline-flex;
+}
+
+.finder-grid {
+  display: inline-flex;
+}
+
+.finder-grid-left {
+  width: 300px;
+  overflow-y: scroll;
+}
+
+.grid-element {
+  cursor: pointer;
+  padding: 3px;
+}
+
+.element-title {
+  padding-left: 3px;
+  display: flex;
+}
+
+.element-title > span {
+  width: 240px;
+}
+
+.grid-element-content > mat-icon.element-edit-icon {
+  visibility: hidden;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}
+
+.grid-element-content:hover > mat-icon.element-edit-icon {
+  visibility: visible;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}
+
+.assign-cc-wrapper {
+  display: flex;
+  height: 800px;
+}
+
+.assign-cc-table-wrapper {
+  width: 47%;
+  height: 800px;
+  overflow-y: auto;
+}
+
+.assign-cc-table-filter {
+  width: 100%;
+  display: flex;
+}
+
+.assign-cc-table-filter-type {
+  width: 40%;
+  padding-left: 20px;
+}
+
+.assign-cc-table-filter-den {
+  width: 60%;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.assign-cc-table-border {
+  /*border-left: 1px solid #c8c8c8;*/
+}
+
+.assign-cc-middle {
+  width: 6%;
+  height: 800px;
+  text-align: center;
+  padding-top: 300px;
+}
+
+.mat-column-checkbox {
+  width: 65px;
+}
+
+.mat-column-type {
+  width: 140px;
+}
+
+.mat-column-revision {
+  width: 100px;
+}
+
+.mat-column-timestamp {
+  width: 180px;
+}
+
+a.den {
+  color: #1a73e8;
+}

@@ -65,6 +65,10 @@ public enum AccessPrivilege {
         return accessPrivilege;
     }
 
+    public static AccessPrivilege toAccessPrivilege(AppUser requester, AppUser owner, String ccState, boolean isWorkingRelease) {
+        return toAccessPrivilege(requester, owner, CcState.valueOf(ccState), isWorkingRelease);
+    }
+
     public static AccessPrivilege toAccessPrivilege(AppUser requester, BigInteger bieOwnerId, BieState bieState) {
         AccessPrivilege accessPrivilege = Prohibited;
         switch (bieState) {

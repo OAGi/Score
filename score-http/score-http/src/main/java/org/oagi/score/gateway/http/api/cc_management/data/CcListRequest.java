@@ -25,7 +25,6 @@ public class CcListRequest {
     private String module;
     private String componentTypes;
     private List<String> excludes;
-    private CcId findUsages;
     private Boolean isBIEUsable;
     private Boolean commonlyUsed;
 

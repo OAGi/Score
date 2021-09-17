@@ -1,14 +1,12 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {AccountList} from '../../account-management/domain/accounts';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -417,7 +415,25 @@ export class CodeListUpliftComponent implements OnInit {
         this.loading = false;
       }))
       .subscribe(result => {
-        this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+        if (result.duplicatedValues?.length > 0) {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = 'Overwritten Values';
+          dialogConfig.data.content = [
+            'These values are overwritten with the values of the target release.'
+          ];
+
+          result.duplicatedValues.forEach(e => {
+            dialogConfig.data.content.push(" - " + e);
+          });
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(_ => {
+              this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+            });
+
+        } else {
+          this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+        }
       });
   }
 

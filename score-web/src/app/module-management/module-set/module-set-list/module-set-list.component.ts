@@ -1,23 +1,24 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
-import {finalize} from 'rxjs/operators';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormControl} from '@angular/forms';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
+import {ReplaySubject} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
-import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {PageRequest} from '../../../basis/basis';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter} from '../../../common/utility';
 import {ModuleSet, ModuleSetListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
+import {UserToken} from '../../../authentication/domain/auth';
 
 @Component({
   selector: 'score-module-set-list',
@@ -28,9 +29,7 @@ export class ModuleSetListComponent implements OnInit {
 
   title = 'Module Set';
 
-  displayedColumns: string[] = [
-    'name', 'description', 'lastUpdateTimestamp', 'more'
-  ];
+  displayedColumns: string[];
   dataSource = new MatTableDataSource<ModuleSet>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -55,6 +54,11 @@ export class ModuleSetListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
+    this.displayedColumns = (this.role === 'developer') ? [
+      'name', 'description', 'lastUpdateTimestamp', 'more'
+    ] : [
+      'name', 'description', 'lastUpdateTimestamp'
+    ];
   }
 
   ngOnInit() {
@@ -79,6 +83,15 @@ export class ModuleSetListComponent implements OnInit {
     });
 
     this.loadModuleSetList(true);
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get role(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.role : undefined;
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

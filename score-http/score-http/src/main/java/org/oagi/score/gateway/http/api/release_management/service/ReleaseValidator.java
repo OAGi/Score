@@ -29,6 +29,7 @@ public class ReleaseValidator {
     private List<BigInteger> assignedAsccpComponentManifestIds = Collections.emptyList();
     private List<BigInteger> assignedBccpComponentManifestIds = Collections.emptyList();
     private List<BigInteger> assignedCodeListComponentManifestIds = Collections.emptyList();
+    private List<BigInteger> assignedAgencyIdListComponentManifestIds = Collections.emptyList();
 
     private List<AccManifestRecord> accManifestRecords;
     private Map<ULong, AccManifestRecord> accManifestRecordMap;
@@ -57,6 +58,11 @@ public class ReleaseValidator {
     private Map<ULong, CodeListManifestRecord> codeListManifestRecordMap;
     private List<CodeListRecord> codeListRecords;
     private Map<ULong, CodeListRecord> codeListRecordMap;
+
+    private List<AgencyIdListManifestRecord> agencyIdListManifestRecords;
+    private Map<ULong, AgencyIdListManifestRecord> agencyIdListManifestRecordMap;
+    private List<AgencyIdListRecord> agencyIdListRecords;
+    private Map<ULong, AgencyIdListRecord> agencyIdListRecordMap;
 
     public ReleaseValidator(DSLContext dslContext) {
         this.dslContext = dslContext;
@@ -87,6 +93,7 @@ public class ReleaseValidator {
         validateAsccp(response);
         validateBccp(response);
         validateCodeList(response);
+        validateAgencyIdList(response);
 
         return response;
     }
@@ -183,6 +190,22 @@ public class ReleaseValidator {
                 .where(RELEASE.RELEASE_NUM.eq("Working"))
                 .fetchInto(CodeListRecord.class);
         codeListRecordMap = codeListRecords.stream().collect(Collectors.toMap(CodeListRecord::getCodeListId, Function.identity()));
+
+        agencyIdListManifestRecords = dslContext.select(AGENCY_ID_LIST_MANIFEST.fields())
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .fetchInto(AgencyIdListManifestRecord.class);
+        agencyIdListManifestRecordMap = agencyIdListManifestRecords.stream()
+                .collect(Collectors.toMap(AgencyIdListManifestRecord::getAgencyIdListManifestId, Function.identity()));
+
+        agencyIdListRecords = dslContext.select(AGENCY_ID_LIST.fields())
+                .from(AGENCY_ID_LIST)
+                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .fetchInto(AgencyIdListRecord.class);
+        agencyIdListRecordMap = agencyIdListRecords.stream().collect(Collectors.toMap(AgencyIdListRecord::getAgencyIdListId, Function.identity()));
     }
 
     private void validateAcc(ReleaseValidationResponse response) {
@@ -340,5 +363,34 @@ public class ReleaseValidator {
     }
 
     private void validateCodeList(ReleaseValidationResponse response) {
+        for (CodeListManifestRecord codeListManifestRecord : codeListManifestRecords) {
+            ULong codeListId = codeListManifestRecord.getCodeListId();
+            CodeListRecord codeListRecord = codeListRecordMap.get(codeListId);
+            CcState state = CcState.valueOf(codeListRecord.getState());
+            if (state != CcState.Published && !assignedCodeListComponentManifestIds.contains(
+                    codeListManifestRecord.getCodeListManifestId().toBigInteger())) {
+                continue;
+            }
+            if (codeListRecord.getNamespaceId() == null) {
+                response.addMessageForBccp(codeListManifestRecord.getCodeListManifestId().toBigInteger(),
+                        Error, "Namespace is required.", NAMESPACE);
+            }
+        }
+    }
+
+    private void validateAgencyIdList(ReleaseValidationResponse response) {
+        for (AgencyIdListManifestRecord agencyIdListManifestRecord : agencyIdListManifestRecords) {
+            ULong agencyIdListId = agencyIdListManifestRecord.getAgencyIdListId();
+            AgencyIdListRecord agencyIdListRecord = agencyIdListRecordMap.get(agencyIdListId);
+            CcState state = CcState.valueOf(agencyIdListRecord.getState());
+            if (state != CcState.Published && !assignedAgencyIdListComponentManifestIds.contains(
+                    agencyIdListManifestRecord.getAgencyIdListManifestId().toBigInteger())) {
+                continue;
+            }
+            if (agencyIdListRecord.getNamespaceId() == null) {
+                response.addMessageForBccp(agencyIdListManifestRecord.getAgencyIdListManifestId().toBigInteger(),
+                        Error, "Namespace is required.", NAMESPACE);
+            }
+        }
     }
 }

@@ -119,11 +119,15 @@ export class ValueDomain {
   readonly id: number;
   readonly name: string;
   readonly state: string;
+  readonly deprecated: boolean;
+  readonly versionId: string;
 
-  constructor(id: number, name: string, state?: string) {
+  constructor(id: number, name: string, state?: string, versionId?: string, deprecated?: boolean) {
     this.id = id;
     this.name = name;
     this.state = state;
+    this.versionId = versionId;
+    this.deprecated = deprecated;
   }
 }
 
@@ -147,6 +151,8 @@ export class CodeList {
   basedCodeListManifestId: number;
   codeListName: string;
   state: string;
+  deprecated: boolean;
+  versionId: string;
 }
 
 export class AgencyIdList {
@@ -154,6 +160,9 @@ export class AgencyIdList {
   agencyIdListManifestId: number;
   basedAgencyIdListManifestId: number;
   agencyIdListName: string;
+  state: string;
+  deprecated: boolean;
+  versionId: string;
 }
 
 export class BieEditUpdateRequest {

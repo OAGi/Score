@@ -108,7 +108,7 @@
                     </span>
                   </span>
                   <span class="item-display-name">
-                    <a [routerLink]="[item.type === 'CODE_LIST' ? '' : '/core_component', item.type.toLowerCase(), item.manifestId]" target="_blank">
+                    <a [routerLink]="hrefLink(item)" target="_blank">
                       {{ item.den }}
                     </a>
                   </span>
@@ -147,7 +147,7 @@
                 {{ count(itemsList.assignedList) }}
               </span>
               <span>
-                Assign
+                Assigned
               </span>
               <span class="drop-box-head-icon float-right">
                 <mat-icon matTooltip="Sort"
@@ -176,7 +176,7 @@
                     </span>
                   </span>
                   <span class="item-display-name">
-                    <a [routerLink]="[item.type === 'CODE_LIST' ? '' : '/core_component', item.type.toLowerCase(), item.manifestId]" target="_blank">
+                    <a [routerLink]="hrefLink(item)" target="_blank">
                       {{ item.den }}
                     </a>
                   </span>

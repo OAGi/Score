@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
+import static org.oagi.score.gateway.http.helper.Utility.MODULE_SEPARATOR;
 import static org.oagi.score.service.log.model.LogUtils.generateHash;
-import static org.oagi.score.gateway.http.api.module_management.data.Module.MODULE_SEPARATOR;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Component
@@ -42,8 +42,6 @@ public class RepositoryInitializer implements InitializingBean {
         initCodeListValueGuid();
         initAgencyIdListValueGuid();
         initSeqKey();
-
-        initModuleDir();
 
         initAccLog();
         initAsccpLog();
@@ -257,78 +255,6 @@ public class RepositoryInitializer implements InitializingBean {
                         .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(this.bccManifestId))
                         .execute();
             }
-        }
-    }
-
-    private void initModuleDir() {
-        AppUserRecord oagisUser = dslContext.selectFrom(APP_USER)
-                .where(APP_USER.LOGIN_ID.eq("oagis"))
-                .fetchOne();
-
-        for (ModuleRecord moduleRecord : dslContext.selectFrom(MODULE)
-                .where(MODULE.MODULE_DIR_ID.isNull())
-                .fetch()) {
-
-            ModuleDirRecord parent = dslContext.selectFrom(MODULE_DIR)
-                    .where(MODULE_DIR.NAME.eq(""))
-                    .fetchOptional().orElse(null);
-
-            if (parent == null) {
-                LocalDateTime timestamp = LocalDateTime.now();
-                parent = new ModuleDirRecord();
-                parent.setName("");
-                parent.setPath("");
-                parent.setCreatedBy(oagisUser.getAppUserId());
-                parent.setLastUpdatedBy(oagisUser.getAppUserId());
-                parent.setCreationTimestamp(timestamp);
-                parent.setLastUpdateTimestamp(timestamp);
-                parent = dslContext.insertInto(MODULE_DIR)
-                        .set(parent)
-                        .returning().fetchOne();
-            }
-
-            String moduleName = moduleRecord.getName();
-            List<String> paths = Arrays.asList(moduleName.split("\\\\"));
-
-            for (int i = 0, len = paths.size(); i < len - 1; ++i) {
-                String path = paths.get(i);
-                String fullpath = !StringUtils.hasLength(parent.getName()) ? path :
-                        String.join(MODULE_SEPARATOR, Arrays.asList(parent.getPath(), path));
-
-                ModuleDirRecord moduleDirRecord = dslContext.selectFrom(MODULE_DIR)
-                        .where(and(
-                                MODULE_DIR.NAME.eq(path),
-                                MODULE_DIR.PARENT_MODULE_DIR_ID.eq(parent.getModuleDirId())
-                        ))
-                        .fetchOptional().orElse(null);
-
-                if (moduleDirRecord == null) {
-                    LocalDateTime timestamp = LocalDateTime.now();
-                    moduleDirRecord = new ModuleDirRecord();
-                    moduleDirRecord.setParentModuleDirId(parent.getModuleDirId());
-                    moduleDirRecord.setName(path);
-
-                    moduleDirRecord.setPath(fullpath);
-                    moduleDirRecord.setCreatedBy(oagisUser.getAppUserId());
-                    moduleDirRecord.setLastUpdatedBy(oagisUser.getAppUserId());
-                    moduleDirRecord.setCreationTimestamp(timestamp);
-                    moduleDirRecord.setLastUpdateTimestamp(timestamp);
-                    moduleDirRecord = dslContext.insertInto(MODULE_DIR)
-                            .set(moduleDirRecord)
-                            .returning().fetchOne();
-                }
-
-                if (i == len - 2) {
-                    moduleRecord.setModuleDirId(moduleDirRecord.getModuleDirId());
-                    moduleRecord.update(MODULE.MODULE_DIR_ID);
-                } else {
-                    parent = moduleDirRecord;
-                }
-            }
-
-            String filename = paths.get(paths.size() - 1);
-            moduleRecord.setName(filename);
-            moduleRecord.update(MODULE.NAME);
         }
     }
 

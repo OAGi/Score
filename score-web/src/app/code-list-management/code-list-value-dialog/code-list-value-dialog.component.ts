@@ -70,11 +70,7 @@ export class CodeListValueDialogComponent implements OnInit {
     }
 
     if (codeListValue.used) {
-      if (codeListValue.extension) {
-        return 'green';
-      } else {
-        return 'blue';
-      }
+      return 'blue';
     }
 
     return 'dull-red';

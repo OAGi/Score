@@ -1,9 +1,11 @@
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PageResponse, PaginationResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
+import {PaginationResponse} from '../../basis/basis';
+import {AssignableMap, AssignableNode} from '../../release-management/domain/release';
 import {
+  ModuleElement,
   ModuleSet,
   ModuleSetListRequest,
   ModuleSetModule,
@@ -71,18 +73,41 @@ export class ModuleService {
     return this.http.get<ModuleSetRelease>('/api/module_set_release/' + moduleSetReleaseId);
   }
 
+  createModule(module: ModuleElement): Observable<any> {
+    return this.http.put<any>('/api/module_set/'+ module.moduleSetId + '/module/create', module);
+  }
+
+  copyModule(element: ModuleElement, moduleSetId: number, copySubModules: boolean, parentModuleId: number): Observable<any> {
+    return this.http.post<any>('/api/module_set/' + moduleSetId + '/module/' + parentModuleId + '/copy', {
+      targetModuleId: element.moduleId,
+      copySubModules: copySubModules,
+      moduleSetId: moduleSetId,
+      parentModuleId: parentModuleId
+    });
+
+  }
+
   createModuleSet(moduleSet: ModuleSet): Observable<ModuleSet> {
     return this.http.put<ModuleSet>('/api/module_set', {
       name: moduleSet.name,
-      description: moduleSet.description
+      description: moduleSet.description,
+      createModuleSetRelease: moduleSet.createModuleSetRelease,
+      targetReleaseId: moduleSet.targetReleaseId,
+      targetModuleSetReleaseId: moduleSet.targetModuleSetReleaseId,
     });
   }
 
-  createModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<ModuleSetRelease> {
-    return this.http.put<ModuleSetRelease>('/api/module_set_release', {
+  createModuleSetRelease(moduleSetRelease: ModuleSetRelease, basedModuleSetReleaseId?: number): Observable<ModuleSetRelease> {
+    const params = {
       releaseId: moduleSetRelease.releaseId,
-      moduleSetId: moduleSetRelease.moduleSetId
-    });
+      moduleSetId: moduleSetRelease.moduleSetId,
+      default: moduleSetRelease.default
+    };
+
+    if (basedModuleSetReleaseId) {
+      params['baseModuleSetReleaseId'] = basedModuleSetReleaseId;
+    }
+    return this.http.put<ModuleSetRelease>('/api/module_set_release', params);
   }
 
   updateModuleSet(moduleSet: ModuleSet): Observable<any> {
@@ -93,10 +118,16 @@ export class ModuleService {
   }
 
   updateModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<any> {
-    return this.http.post<any>('/api/module_set_Release/' + moduleSetRelease.moduleSetReleaseId, {
+    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId, {
       releaseId: moduleSetRelease.releaseId,
-      moduleSetId: moduleSetRelease.moduleSetId
+      moduleSetId: moduleSetRelease.moduleSetId,
+      default: moduleSetRelease.default
     });
+  }
+
+  getModules(moduleSetId: number): Observable<any> {
+    let url = '/api/module_set/' + moduleSetId + '/modules';
+    return this.http.get<any>(url);
   }
 
   getModuleSetModuleList(request: ModuleSetModuleListRequest): Observable<PaginationResponse<ModuleSetModule>> {
@@ -148,8 +179,8 @@ export class ModuleService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    if (request.filters.keyword) {
-      params = params.set('keyword', request.filters.keyword);
+    if (request.filters.name) {
+      params = params.set('name', request.filters.name);
     }
     return this.http.get<PaginationResponse<ModuleSetRelease>>('/api/module_set_release_list', {params: params})
       .pipe(map((resp: PaginationResponse<ModuleSetRelease>) => {
@@ -158,5 +189,53 @@ export class ModuleService {
         });
         return resp;
       }));
+  }
+
+  deleteModule(element: ModuleElement): Observable<any> {
+    return this.http.delete<any>('/api/module_set/' + element.moduleSetId + '/module/' + element.moduleId);
+  }
+
+  updateModule(element: ModuleElement): Observable<any> {
+    return this.http.post<any>('/api/module_set/' + element.moduleSetId + '/module/' + element.moduleId, {
+      moduleId: element.moduleId,
+      name: element.name,
+      namespaceId: element.namespaceId,
+      versionNum: element.versionNum,
+    });
+  }
+
+  export(moduleSetReleaseId: number): Observable<HttpResponse<Blob>> {
+    return this.http.get('/api/module_set_release/' + moduleSetReleaseId + '/export', {
+      observe: 'response',
+      responseType: 'blob'
+    });
+  }
+
+  getAssignable(moduleSetReleaseId: number): Observable<AssignableMap> {
+    return this.http.get<AssignableMap>('/api/module_set_release/' + moduleSetReleaseId + '/assignable');
+  }
+
+  getAssigned(moduleSetReleaseId: number, moduleId: number): Observable<AssignableMap> {
+    return this.http.get<AssignableMap>('/api/module_set_release/' + moduleSetReleaseId + '/assigned?moduleId=' + moduleId);
+  }
+
+  createAssign(moduleSetRelease: ModuleSetRelease, moduleId: number, nodes: AssignableNode[]): Observable<any> {
+    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId + '/assign', {
+      nodes,
+      moduleId,
+      moduleSetId: moduleSetRelease.moduleSetId,
+      moduleSetReleaseId: moduleSetRelease.moduleSetReleaseId,
+      releaseId: moduleSetRelease.releaseId
+    });
+  }
+
+  discardAssign(moduleSetRelease: ModuleSetRelease, moduleId: number, nodes: AssignableNode[]): Observable<any> {
+    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId + '/unassign', {
+      nodes,
+      moduleId,
+      moduleSetId: moduleSetRelease.moduleSetId,
+      moduleSetReleaseId: moduleSetRelease.moduleSetReleaseId,
+      releaseId: moduleSetRelease.releaseId
+    });
   }
 }

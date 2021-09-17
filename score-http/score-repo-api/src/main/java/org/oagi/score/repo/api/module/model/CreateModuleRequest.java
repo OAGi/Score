@@ -1,15 +1,13 @@
 package org.oagi.score.repo.api.module.model;
 
 import org.oagi.score.repo.api.base.Request;
-import org.oagi.score.repo.api.businesscontext.model.BusinessContextValue;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
-import java.util.Collection;
 
 public class CreateModuleRequest extends Request {
 
-    private BigInteger moduleDirId;
+    private BigInteger parentModuleId;
 
     private String name;
 
@@ -17,12 +15,16 @@ public class CreateModuleRequest extends Request {
 
     private String versionNum;
 
-    public BigInteger getModuleDirId() {
-        return moduleDirId;
+    private BigInteger moduleSetId;
+
+    private ModuleType moduleType;
+
+    public BigInteger getParentModuleId() {
+        return parentModuleId;
     }
 
-    public void setModuleDirId(BigInteger moduleDirId) {
-        this.moduleDirId = moduleDirId;
+    public void setParentModuleId(BigInteger parentModuleId) {
+        this.parentModuleId = parentModuleId;
     }
 
     public String getName() {
@@ -47,5 +49,25 @@ public class CreateModuleRequest extends Request {
 
     public void setVersionNum(String versionNum) {
         this.versionNum = versionNum;
+    }
+
+    public CreateModuleRequest(ScoreUser requester) {
+        super(requester);
+    }
+
+    public BigInteger getModuleSetId() {
+        return moduleSetId;
+    }
+
+    public void setModuleSetId(BigInteger moduleSetId) {
+        this.moduleSetId = moduleSetId;
+    }
+
+    public ModuleType getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(ModuleType moduleType) {
+        this.moduleType = moduleType;
     }
 }

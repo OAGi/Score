@@ -267,4 +267,15 @@ public class BieEditController {
 
         createBieFromExistingBieService.createBieFromExistingBie(user, request);
     }
+
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/reset_detail",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public void resetDetailBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                         @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
+                         @RequestBody ResetDetailBIERequest request) {
+
+        request.setTopLevelAsbiepId(topLevelAsbiepId);
+        service.resetDetailBIE(user, request);
+    }
 }

@@ -66,16 +66,16 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
     }
 
     /**
-     * Setter for <code>oagi.module_xbt_manifest.module_set_assignment_id</code>.
+     * Setter for <code>oagi.module_xbt_manifest.module_id</code>. This indicates a module.
      */
-    public void setModuleSetAssignmentId(ULong value) {
+    public void setModuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_xbt_manifest.module_set_assignment_id</code>.
+     * Getter for <code>oagi.module_xbt_manifest.module_id</code>. This indicates a module.
      */
-    public ULong getModuleSetAssignmentId() {
+    public ULong getModuleId() {
         return (ULong) get(3);
     }
 
@@ -175,7 +175,7 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
 
     @Override
     public Field<ULong> field4() {
-        return ModuleXbtManifest.MODULE_XBT_MANIFEST.MODULE_SET_ASSIGNMENT_ID;
+        return ModuleXbtManifest.MODULE_XBT_MANIFEST.MODULE_ID;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
 
     @Override
     public ULong component4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
 
     @Override
     public ULong value4() {
-        return getModuleSetAssignmentId();
+        return getModuleId();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
 
     @Override
     public ModuleXbtManifestRecord value4(ULong value) {
-        setModuleSetAssignmentId(value);
+        setModuleId(value);
         return this;
     }
 
@@ -353,13 +353,13 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
     /**
      * Create a detached, initialised ModuleXbtManifestRecord
      */
-    public ModuleXbtManifestRecord(ULong moduleXbtManifestId, ULong moduleSetReleaseId, ULong xbtManifestId, ULong moduleSetAssignmentId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleXbtManifestRecord(ULong moduleXbtManifestId, ULong moduleSetReleaseId, ULong xbtManifestId, ULong moduleId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleXbtManifest.MODULE_XBT_MANIFEST);
 
         setModuleXbtManifestId(moduleXbtManifestId);
         setModuleSetReleaseId(moduleSetReleaseId);
         setXbtManifestId(xbtManifestId);
-        setModuleSetAssignmentId(moduleSetAssignmentId);
+        setModuleId(moduleId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

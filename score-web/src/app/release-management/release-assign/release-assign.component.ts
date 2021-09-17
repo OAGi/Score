@@ -115,6 +115,18 @@ export class ReleaseAssignComponent implements OnInit {
       node.visible = true;
       list.assignableList.push(node);
     }
+
+    for (const key of Array.from(Object.keys(map.assignableCodeListManifestMap))) {
+      const node = map.assignableCodeListManifestMap[key] as AssignableNode;
+      node.visible = true;
+      list.assignableList.push(node);
+    }
+
+    for (const key of Array.from(Object.keys(map.assignableAgencyIdListManifestMap))) {
+      const node = map.assignableAgencyIdListManifestMap[key] as AssignableNode;
+      node.visible = true;
+      list.assignableList.push(node);
+    }
     list.assignableList.sort(this._sort);
     list.assignedList.sort(this._sort);
     return list;
@@ -122,7 +134,7 @@ export class ReleaseAssignComponent implements OnInit {
 
   _sort(a: AssignableNode, b: AssignableNode): number {
     const sortStateOrder = ['Candidate', 'Draft', 'WIP', 'Deleted'];
-    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'];
+    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'AGENCY_ID_LIST'];
     if (sortStateOrder.indexOf(a.state) > sortStateOrder.indexOf(b.state)) {
       return 1;
     } else if (sortStateOrder.indexOf(a.state) < sortStateOrder.indexOf(b.state)) {
@@ -234,6 +246,9 @@ export class ReleaseAssignComponent implements OnInit {
         case 'CODE_LIST':
           request.assignedCodeListComponentManifestIds.push(node.manifestId);
           break;
+        case 'AGENCY_ID_LIST':
+          request.assignedAgencyIdListComponentManifestIds.push(node.manifestId);
+          break;
       }
     });
 
@@ -262,7 +277,10 @@ export class ReleaseAssignComponent implements OnInit {
       if (Object.getOwnPropertyNames(map.statusMapForCodeList).length > 0) {
         this.addErrorsToNode(map.statusMapForCodeList, 'CODE_LIST');
       }
-
+      if (Object.getOwnPropertyNames(map.statusMapForAgencyIdList).length > 0) {
+        this.addErrorsToNode(map.statusMapForAgencyIdList, 'AGENCY_ID_LIST');
+      }
+      console.log(map);
       if (map.succeed) {
         this.snackBar.open('All components are valid.', '', {
           duration: 3000,
@@ -310,6 +328,9 @@ export class ReleaseAssignComponent implements OnInit {
               case 'CODE_LIST':
                 request.assignedCodeListComponentManifestIds.push(node.manifestId);
                 break;
+              case 'AGENCY_ID_LIST':
+                request.assignedAgencyIdListComponentManifestIds.push(node.manifestId);
+                break;
             }
           });
 
@@ -338,6 +359,9 @@ export class ReleaseAssignComponent implements OnInit {
             if (Object.getOwnPropertyNames(map.statusMapForCodeList).length > 0) {
               this.addErrorsToNode(map.statusMapForCodeList, 'CODE_LIST');
             }
+            if (Object.getOwnPropertyNames(map.statusMapForAgencyIdList).length > 0) {
+              this.addErrorsToNode(map.statusMapForAgencyIdList, 'AGENCY_ID_LIST');
+            }
             this.isValidated = map.succeed;
 
             if (this.isValidated) {
@@ -350,5 +374,17 @@ export class ReleaseAssignComponent implements OnInit {
           });
         }
       });
+  }
+
+  hrefLink(item: AssignableNode): string[] {
+    const arr = [];
+    if (item.type === 'CODE_LIST' || item.type === 'AGENCY_ID_LIST') {
+      arr.push('');
+    } else {
+      arr.push('/core_component');
+    }
+    arr.push(item.type.toLowerCase());
+    arr.push(item.manifestId);
+    return arr;
   }
 }

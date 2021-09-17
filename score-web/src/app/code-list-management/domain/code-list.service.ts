@@ -47,9 +47,6 @@ export class CodeListService {
     if (request.deprecated.length === 1) {
       params = params.set('deprecated', '' + request.deprecated[0]);
     }
-    if (request.extensible !== undefined) {
-      params = params.set('extensible', (request.extensible) ? 'true' : 'false');
-    }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (request.ownedByDeveloper) ? 'true' : 'false');
     }
@@ -75,8 +72,8 @@ export class CodeListService {
     return this.http.get<PageResponse<CodeList>>('/api/code_list', {params});
   }
 
-  getSimpleAgencyIdListValues(): Observable<SimpleAgencyIdListValue[]> {
-    return this.http.get<SimpleAgencyIdListValue[]>('/api/simple_agency_id_list_values');
+  getSimpleAgencyIdListValues(releaseId: number): Observable<SimpleAgencyIdListValue[]> {
+    return this.http.get<SimpleAgencyIdListValue[]>('/api/simple_agency_id_list_values/' + releaseId);
   }
 
   create(releaseId: number, basedCodeListManifestId?: number): Observable<CcCreateResponse> {
@@ -105,7 +102,6 @@ export class CodeListService {
         definition: codeList.definition,
         definitionSource: codeList.definitionSource,
         remark: codeList.remark,
-        extensible: codeList.extensible,
         codeListValues: codeList.codeListValues,
         deprecated: codeList.deprecated
       };

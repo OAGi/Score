@@ -70,6 +70,9 @@ public class AgencyIdListReadRepository {
                     AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
                     AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
                     AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
+                    AGENCY_ID_LIST.VERSION_ID,
+                    AGENCY_ID_LIST.IS_DEPRECATED,
+                    AGENCY_ID_LIST.STATE,
                     AGENCY_ID_LIST.NAME.as("agency_id_list_name"))
                     .from(AGENCY_ID_LIST)
                     .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
@@ -83,6 +86,9 @@ public class AgencyIdListReadRepository {
                 AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
                 AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
                 AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
+                AGENCY_ID_LIST.VERSION_ID,
+                AGENCY_ID_LIST.IS_DEPRECATED,
+                AGENCY_ID_LIST.STATE,
                 AGENCY_ID_LIST.NAME.as("code_list_name"))
                 .from(AGENCY_ID_LIST)
                 .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))

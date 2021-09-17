@@ -7,12 +7,15 @@ import {MaterialModule} from '../material.module';
 import {AccDetailModule} from './acc-detail/acc-detail.module';
 import {AsccpDetailModule} from './asccp-detail/asccp-detail.module';
 import {BccpDetailModule} from './bccp-detail/bccp-detail.module';
+import {BdtDetailModule} from './bdt-detail/bdt-detail.module';
 import {ExtensionDetailModule} from './extension-detail/extension-detail.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
 
 import {TranslateModule} from '@ngx-translate/core';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {CcListModule} from './cc-list/cc-list.module';
+import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
+import {RefactorAsccDialogModule} from './refactor-ascc-dialog/refactor-ascc-dialog.module';
 
 @NgModule({
   imports: [
@@ -23,13 +26,17 @@ import {CcListModule} from './cc-list/cc-list.module';
     AccDetailModule,
     AsccpDetailModule,
     BccpDetailModule,
+    BdtDetailModule,
     ExtensionDetailModule,
     TransferOwnershipDialogModule,
+    FindUsagesDialogModule,
+    RefactorAsccDialogModule,
     TranslateModule,
     CommonModule,
     ContextMenuModule,
     ScoreCommonModule,
-  ]
+  ],
+  declarations: []
 })
 export class CcManagementModule {
 }

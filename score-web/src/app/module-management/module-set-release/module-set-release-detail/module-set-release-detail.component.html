@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="isUpdating">
+  <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
 
@@ -11,10 +11,10 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Module Set</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
+          <mat-select [(ngModel)]="moduleSetRelease.moduleSetId" [disabled]="true">
             <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
-                                   [placeholderLabel]="'Search...'"
-                                   [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+                                   [noEntriesFoundLabel]="'No matching release found.'"
+                                   [placeholderLabel]="'Search...'"></ngx-mat-select-search>
             <mat-option *ngFor="let moduleSet of filteredModuleSetList | async" [value]="moduleSet.moduleSetId">
               {{ moduleSet.name }}
             </mat-option>
@@ -23,15 +23,15 @@
 
         <mat-form-field>
           <mat-label>Release</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.releaseId">
+          <mat-select [(ngModel)]="moduleSetRelease.releaseId" [disabled]="true">
             <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                   [placeholderLabel]="'Search...'"
-                                   [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+                                   [noEntriesFoundLabel]="'No matching release found.'"
+                                   [placeholderLabel]="'Search...'"></ngx-mat-select-search>
             <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
               <div class="d-flex">
                 <span class="release-num">{{release.releaseNum}}</span>
-                <span class="f12 ml-auto {{release.state}}"
-                      *ngIf="release.releaseNum !== 'Working'">
+                <span *ngIf="release.releaseNum !== 'Working'"
+                      class="f12 ml-auto {{release.state}}">
                         {{ release.state | separate }}
                       </span>
               </div>
@@ -39,17 +39,24 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-checkbox [(ngModel)]="moduleSetRelease.default">Default</mat-checkbox>
-
+        <mat-checkbox [(ngModel)]="moduleSetRelease.default" [disabled]="role !== 'developer'">Default</mat-checkbox>
       </mat-card-content>
     </mat-card>
   </mat-card>
 
-  <div class="row action-group m-0">
+  <div class="row action-group m-0" *ngIf="role === 'developer'">
     <div class="col-12 actions-wrap">
-      <button mat-raised-button color="primary" (click)="createModuleSet()"
-              [disabled]="!isChanged">
+      <button (click)="updateModuleSetRelease()" [disabled]="!isChanged" color="primary"
+              mat-raised-button>
         Update
+      </button>
+
+      <button (click)="exportScheme()" color="primary" mat-raised-button>
+        Export
+      </button>
+
+      <button (click)="assignCCs()" color="primary" mat-raised-button>
+        Assign CCs
       </button>
     </div>
   </div>

@@ -1,20 +1,18 @@
+import {Location} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {PageRequest} from '../../../basis/basis';
-import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
-import {ReleaseListRequest, SimpleRelease} from '../../../release-management/domain/release';
-import {ReleaseService} from '../../../release-management/domain/release.service';
-import {ModuleSet, ModuleSetRelease} from '../../domain/module';
-import {ModuleService} from '../../domain/module.service';
-import {Location} from '@angular/common';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ReplaySubject} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
+import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {finalize, switchMap} from 'rxjs/operators';
-import {hashCode, initFilter} from '../../../common/utility';
+import {hashCode} from '../../../common/utility';
+import {ReleaseService} from '../../../release-management/domain/release.service';
+import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
+import {ModuleService} from '../../domain/module.service';
 
 @Component({
   selector: 'score-module-set-create',
@@ -27,12 +25,18 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
   isUpdating: boolean;
   moduleSetRelease: ModuleSetRelease = new ModuleSetRelease();
 
+  copyFromOther = false;
+
   moduleSetListFilterCtrl: FormControl = new FormControl();
   releaseListFilterCtrl: FormControl = new FormControl();
   filteredModuleSetList: ReplaySubject<ModuleSet[]> = new ReplaySubject<ModuleSet[]>(1);
   filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   moduleSetList: ModuleSet[] = [];
   releaseList: Release[] = [];
+  moduleSetReleaseList: ModuleSetRelease[] = [];
+  copyTargetModuleSetRelease: ModuleSetRelease;
+
+  moduleSetReleaseRequest: ModuleSetReleaseListRequest;
 
   private $hashCode: string;
 
@@ -45,6 +49,15 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
               private dialog: MatDialog,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService) {
+  }
+
+  get canCreate(): boolean {
+    if (this.copyFromOther) {
+      if (!this.copyTargetModuleSetRelease) {
+        return false;
+      }
+    }
+    return this.moduleSetRelease.releaseId !== undefined && this.moduleSetRelease.moduleSetId !== undefined;
   }
 
   ngOnInit(): void {
@@ -85,17 +98,16 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
           );
         });
       this.filteredReleaseList.next(this.releaseList.slice());
-    })
+    });
+
+    this.moduleService.getModuleSetReleaseList().subscribe(resp => {
+      this.moduleSetReleaseList = resp.results;
+    });
   }
 
   init(moduleSetRelease: ModuleSetRelease) {
     this.moduleSetRelease = moduleSetRelease;
     this.$hashCode = hashCode(this.moduleSetRelease);
-  }
-
-
-  get canCreate(): boolean {
-    return this.moduleSetRelease.releaseId !== undefined && this.moduleSetRelease.moduleSetId !== undefined;
   }
 
   createModuleSet() {
@@ -105,7 +117,12 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
 
     this.isUpdating = true;
 
-    this.moduleService.createModuleSetRelease(this.moduleSetRelease)
+    let basedModuleSetReleaseId = undefined;
+    if (this.copyFromOther && this.copyTargetModuleSetRelease) {
+      basedModuleSetReleaseId = this.copyTargetModuleSetRelease.moduleSetReleaseId;
+    }
+
+    this.moduleService.createModuleSetRelease(this.moduleSetRelease, basedModuleSetReleaseId)
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))

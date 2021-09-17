@@ -1,13 +1,16 @@
-import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterModule, Routes} from '@angular/router';
-import {AuthService} from '../../authentication/auth.service';
+import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MaterialModule} from '../../material.module';
+import {RouterModule, Routes} from '@angular/router';
 import {ContextMenuModule} from 'ngx-contextmenu';
-import {ModuleSetListComponent} from './module-set-list/module-set-list.component';
-import {ModuleSetEditComponent} from './module-set-edit/module-set-edit.component';
+import {AuthService} from '../../authentication/auth.service';
+import {ScoreCommonModule} from '../../common/score-common.module';
+import {MaterialModule} from '../../material.module';
 import {ModuleSetCreateComponent} from './module-set-create/module-set-create.component';
+import {ModuleAddDialogComponent} from './module-set-edit/module-add-dialog/module-add-dialog.component';
+import {ModuleEditDialogComponent} from './module-set-edit/module-edit-dialog/module-edit-dialog.component';
+import {ModuleSetEditComponent} from './module-set-edit/module-set-edit.component';
+import {ModuleSetListComponent} from './module-set-list/module-set-list.component';
 
 const routes: Routes = [
   {
@@ -39,12 +42,16 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    ContextMenuModule
+    ContextMenuModule,
+    ScoreCommonModule
   ],
   declarations: [
     ModuleSetListComponent,
     ModuleSetCreateComponent,
-    ModuleSetEditComponent
+    ModuleSetEditComponent,
+    ModuleEditDialogComponent,
+    ModuleAddDialogComponent
   ],
 })
-export class ModuleSetListModule { }
+export class ModuleSetListModule {
+}

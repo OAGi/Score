@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
@@ -34,6 +37,11 @@ public class CodeListUpliftingService {
 
     @Transactional
     public CodeListUpliftingResponse upliftCodeList(CodeListUpliftingRequest request) {
+
+        CodeListUpliftingResponse response = new CodeListUpliftingResponse();
+
+        response.setDuplicatedValues(new ArrayList<>());
+
         ScoreUser requester = request.getRequester();
 
         CodeListManifestRecord codeListManifest = dslContext.selectFrom(CODE_LIST_MANIFEST)
@@ -54,55 +62,152 @@ public class CodeListUpliftingService {
                 ))
                 .fetch();
 
-        LocalDateTime timestamp = LocalDateTime.now();
-        CodeListRecord newCodeList = copyCodeList(codeList, requester, timestamp);
-        newCodeList.setCodeListId(
-                dslContext.insertInto(CODE_LIST)
-                        .set(newCodeList)
-                        .returning(CODE_LIST.CODE_LIST_ID)
-                        .fetchOne().getCodeListId()
-        );
-
         ULong targetReleaseId = ULong.valueOf(request.getTargetReleaseId());
-
+        LocalDateTime timestamp = LocalDateTime.now();
         CodeListManifestRecord newCodeListManifest = new CodeListManifestRecord();
         newCodeListManifest.setReleaseId(targetReleaseId);
-        newCodeListManifest.setCodeListId(newCodeList.getCodeListId());
-        if (newCodeList.getBasedCodeListId() != null) {
-            ULong basedCodeListManifestId =
-                    dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
-                            .from(CODE_LIST_MANIFEST)
-                            .where(and(
-                                    CODE_LIST_MANIFEST.CODE_LIST_ID.eq(newCodeList.getBasedCodeListId()),
-                                    CODE_LIST_MANIFEST.RELEASE_ID.eq(targetReleaseId)
-                            ))
-                            .fetchOptionalInto(ULong.class).orElse(null);
-            newCodeListManifest.setBasedCodeListManifestId(basedCodeListManifestId);
-        }
-        newCodeListManifest.setCodeListManifestId(
-                dslContext.insertInto(CODE_LIST_MANIFEST)
-                        .set(newCodeListManifest)
-                        .returning(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
-                        .fetchOne().getCodeListManifestId()
-        );
 
-        codeListValueList.stream().forEach(e -> {
-            CodeListValueRecord newCodeListValue = copyCodeListValue(e, newCodeList, requester, timestamp);
-            newCodeListValue.setCodeListValueId(
-                    dslContext.insertInto(CODE_LIST_VALUE)
-                            .set(newCodeListValue)
-                            .returning(CODE_LIST_VALUE.CODE_LIST_VALUE_ID)
-                            .fetchOne().getCodeListValueId()
+        CodeListRecord newCodeList;
+
+        // Issue #1073
+        // If the source CL has the base CL, all CL values should be copying from the base again.
+        if (codeListManifest.getBasedCodeListManifestId() != null) {
+            ULong sourceBasedCodeListManifestId = codeListManifest.getBasedCodeListManifestId();
+            CodeListManifestRecord targetBasedCodeListManifest = dslContext.selectFrom(CODE_LIST_MANIFEST)
+                    .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(sourceBasedCodeListManifestId))
+                    .fetchOptional().orElse(null);
+
+            List<String> sourceCodeListValues = dslContext.select(CODE_LIST_VALUE.VALUE)
+                    .from(CODE_LIST_VALUE_MANIFEST)
+                    .join(CODE_LIST_VALUE).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID.eq(CODE_LIST_VALUE.CODE_LIST_VALUE_ID))
+                    .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(sourceBasedCodeListManifestId))
+                    .fetchInto(String.class);
+
+            // Find a target code list manifest recursively
+            while (targetBasedCodeListManifest != null && !targetBasedCodeListManifest.getReleaseId().equals(targetReleaseId)) {
+                targetBasedCodeListManifest = dslContext.selectFrom(CODE_LIST_MANIFEST)
+                        .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(targetBasedCodeListManifest.getNextCodeListManifestId()))
+                        .fetchOptional().orElse(null);
+            }
+
+            if (targetBasedCodeListManifest == null) {
+                throw new IllegalStateException();
+            }
+
+            newCodeList = copyCodeList(codeList, requester, timestamp);
+            newCodeList.setBasedCodeListId(targetBasedCodeListManifest.getCodeListId());
+            newCodeList.setCodeListId(
+                    dslContext.insertInto(CODE_LIST)
+                            .set(newCodeList)
+                            .returning(CODE_LIST.CODE_LIST_ID)
+                            .fetchOne().getCodeListId()
             );
 
-            CodeListValueManifestRecord newCodeListValueManifest = new CodeListValueManifestRecord();
-            newCodeListValueManifest.setReleaseId(targetReleaseId);
-            newCodeListValueManifest.setCodeListValueId(newCodeListValue.getCodeListValueId());
-            newCodeListValueManifest.setCodeListManifestId(newCodeListManifest.getCodeListManifestId());
-            dslContext.insertInto(CODE_LIST_VALUE_MANIFEST)
-                    .set(newCodeListValueManifest)
-                    .execute();
-        });
+            newCodeListManifest.setCodeListId(newCodeList.getCodeListId());
+            newCodeListManifest.setBasedCodeListManifestId(targetBasedCodeListManifest.getCodeListManifestId());
+            newCodeListManifest.setCodeListManifestId(
+                    dslContext.insertInto(CODE_LIST_MANIFEST)
+                            .set(newCodeListManifest)
+                            .returning(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                            .fetchOne().getCodeListManifestId()
+            );
+
+            List<CodeListValueManifestRecord> targetBasedCodeListValueManifestList = dslContext.selectFrom(CODE_LIST_VALUE_MANIFEST)
+                    .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(targetBasedCodeListManifest.getCodeListManifestId()))
+                    .fetch();
+
+            List<CodeListValueRecord> targetBasedCodeListValueList = dslContext.selectFrom(CODE_LIST_VALUE)
+                    .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.in(
+                            targetBasedCodeListValueManifestList.stream().map(e -> e.getCodeListValueId()).collect(Collectors.toList())
+                    ))
+                    .fetch();
+
+            // Use case-insensitive a value set to prevent duplicated CL values
+            Set<String> basedCodeListValueSet = new HashSet();
+            targetBasedCodeListValueList.forEach(e -> {
+                CodeListValueRecord newCodeListValue = copyCodeListValue(e, newCodeList, requester, timestamp);
+                newCodeListValue.setCodeListValueId(
+                        dslContext.insertInto(CODE_LIST_VALUE)
+                                .set(newCodeListValue)
+                                .returning(CODE_LIST_VALUE.CODE_LIST_VALUE_ID)
+                                .fetchOne().getCodeListValueId()
+                );
+
+                CodeListValueManifestRecord newCodeListValueManifest = new CodeListValueManifestRecord();
+                newCodeListValueManifest.setReleaseId(targetReleaseId);
+                newCodeListValueManifest.setCodeListValueId(newCodeListValue.getCodeListValueId());
+                newCodeListValueManifest.setCodeListManifestId(newCodeListManifest.getCodeListManifestId());
+                dslContext.insertInto(CODE_LIST_VALUE_MANIFEST)
+                        .set(newCodeListValueManifest)
+                        .execute();
+
+                basedCodeListValueSet.add(newCodeListValue.getValue().toLowerCase());
+            });
+
+            codeListValueList.stream().forEach(e -> {
+                if (basedCodeListValueSet.contains(e.getValue().toLowerCase())) {
+                    response.getDuplicatedValues().add(e.getValue().toLowerCase());
+                    return;
+                }
+
+                CodeListValueRecord newCodeListValue = copyCodeListValue(e, newCodeList, requester, timestamp);
+                newCodeListValue.setCodeListValueId(
+                        dslContext.insertInto(CODE_LIST_VALUE)
+                                .set(newCodeListValue)
+                                .returning(CODE_LIST_VALUE.CODE_LIST_VALUE_ID)
+                                .fetchOne().getCodeListValueId()
+                );
+
+                CodeListValueManifestRecord newCodeListValueManifest = new CodeListValueManifestRecord();
+                newCodeListValueManifest.setReleaseId(targetReleaseId);
+                newCodeListValueManifest.setCodeListValueId(newCodeListValue.getCodeListValueId());
+                newCodeListValueManifest.setCodeListManifestId(newCodeListManifest.getCodeListManifestId());
+                dslContext.insertInto(CODE_LIST_VALUE_MANIFEST)
+                        .set(newCodeListValueManifest)
+                        .execute();
+            });
+
+            sourceCodeListValues.forEach(e -> {
+                if (response.getDuplicatedValues().indexOf(e.toLowerCase()) > -1 ) {
+                    response.getDuplicatedValues().remove(response.getDuplicatedValues().indexOf(e.toLowerCase()));
+                }
+            });
+
+        } else {
+            newCodeList = copyCodeList(codeList, requester, timestamp);
+            newCodeList.setCodeListId(
+                    dslContext.insertInto(CODE_LIST)
+                            .set(newCodeList)
+                            .returning(CODE_LIST.CODE_LIST_ID)
+                            .fetchOne().getCodeListId()
+            );
+
+            newCodeListManifest.setCodeListId(newCodeList.getCodeListId());
+            newCodeListManifest.setCodeListManifestId(
+                    dslContext.insertInto(CODE_LIST_MANIFEST)
+                            .set(newCodeListManifest)
+                            .returning(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                            .fetchOne().getCodeListManifestId()
+            );
+
+            codeListValueList.stream().forEach(e -> {
+                CodeListValueRecord newCodeListValue = copyCodeListValue(e, newCodeList, requester, timestamp);
+                newCodeListValue.setCodeListValueId(
+                        dslContext.insertInto(CODE_LIST_VALUE)
+                                .set(newCodeListValue)
+                                .returning(CODE_LIST_VALUE.CODE_LIST_VALUE_ID)
+                                .fetchOne().getCodeListValueId()
+                );
+
+                CodeListValueManifestRecord newCodeListValueManifest = new CodeListValueManifestRecord();
+                newCodeListValueManifest.setReleaseId(targetReleaseId);
+                newCodeListValueManifest.setCodeListValueId(newCodeListValue.getCodeListValueId());
+                newCodeListValueManifest.setCodeListManifestId(newCodeListManifest.getCodeListManifestId());
+                dslContext.insertInto(CODE_LIST_VALUE_MANIFEST)
+                        .set(newCodeListValueManifest)
+                        .execute();
+            });
+        }
 
         LogRecord logRecord = logRepository.insertCodeListLog(newCodeListManifest,
                 newCodeList,
@@ -115,7 +220,6 @@ public class CodeListUpliftingService {
                 .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(newCodeListManifest.getCodeListManifestId()))
                 .execute();
 
-        CodeListUpliftingResponse response = new CodeListUpliftingResponse();
         response.setCodeListManifestId(newCodeListManifest.getCodeListManifestId().toBigInteger());
         return response;
     }

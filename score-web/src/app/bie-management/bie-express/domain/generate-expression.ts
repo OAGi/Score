@@ -20,6 +20,7 @@ export class BieExpressOption {
   includePaginationResponseForJson: boolean;
   paginationResponseTopLevelAsbiepId: number;
 
+  openAPICodeGenerationFriendly: boolean;
   openAPIExpressionFormat: string;
   openAPI30GetTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30GetTemplate: boolean;

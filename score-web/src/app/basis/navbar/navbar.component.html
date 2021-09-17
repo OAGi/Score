@@ -50,18 +50,25 @@
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
         <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
+        <!-- TODO: temporary hide AgencyIdList -->
+<!--        <button mat-menu-item routerLink="agency_id_list">View/Edit Agency Id List</button>-->
         <button mat-menu-item routerLink="release">View/Edit Release</button>
         <button mat-menu-item routerLink="namespace">View/Edit Namespace</button>
       </ng-template>
     </mat-menu>
 
+    <!-- TODO: temporary hide Module -->
 <!--    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>-->
-<!--    <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">-->
-<!--      <ng-template matMenuContent>-->
-<!--        <button mat-menu-item routerLink="module_management/module_set">View/Edit Module Set</button>-->
-<!--        <button mat-menu-item routerLink="module_management/module_set_release">View/Edit Module Set Release</button>-->
-<!--      </ng-template>-->
-<!--    </mat-menu>-->
+    <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
+      <ng-template matMenuContent>
+        <button mat-menu-item routerLink="module_management/module_set">
+          {{ (role === 'developer') ? 'View/Edit Module Set' : 'View Module Set' }}
+        </button>
+        <button mat-menu-item routerLink="module_management/module_set_release">
+          {{ (role === 'developer') ? 'View/Edit Module Set Release' : 'View Module Set Release' }}
+        </button>
+      </ng-template>
+    </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="role === 'developer'">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">

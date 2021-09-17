@@ -13,11 +13,13 @@ public class AssignComponents {
     private Map<BigInteger, AssignableNode> assignableAsccpManifestMap = new HashMap();
     private Map<BigInteger, AssignableNode> assignableBccpManifestMap = new HashMap();
     private Map<BigInteger, AssignableNode> assignableCodeListManifestMap = new HashMap();
+    private Map<BigInteger, AssignableNode> assignableAgencyIdListManifestMap = new HashMap();
 
     private Map<BigInteger, AssignableNode> unassignableAccManifestMap = new HashMap();
     private Map<BigInteger, AssignableNode> unassignableAsccpManifestMap = new HashMap();
     private Map<BigInteger, AssignableNode> unassignableBccpManifestMap = new HashMap();
     private Map<BigInteger, AssignableNode> unassignableCodeListManifestMap = new HashMap();
+    private Map<BigInteger, AssignableNode> unassignableAgencyIdListManifestMap = new HashMap();
 
     public void addAssignableAccManifest(BigInteger accManifestId, AssignableNode node) {
         assignableAccManifestMap.put(accManifestId, node);
@@ -32,7 +34,11 @@ public class AssignComponents {
     }
 
     public void addAssignableCodeListManifest(BigInteger codeListManifestId, AssignableNode node) {
-        assignableBccpManifestMap.put(codeListManifestId, node);
+        assignableCodeListManifestMap.put(codeListManifestId, node);
+    }
+
+    public void addAssignableAgencyIdListManifest(BigInteger agencyIdListManifestId, AssignableNode node) {
+        assignableAgencyIdListManifestMap.put(agencyIdListManifestId, node);
     }
 
     public void addUnassignableAccManifest(BigInteger accManifestId, AssignableNode node) {
@@ -49,5 +55,9 @@ public class AssignComponents {
 
     public void addUnassignableCodeListManifest(BigInteger codeListManifestId, AssignableNode node) {
         unassignableCodeListManifestMap.put(codeListManifestId, node);
+    }
+
+    public void addUnassignableAgencyIdListManifest(BigInteger agencyIdListManifestId, AssignableNode node) {
+        unassignableAgencyIdListManifestMap.put(agencyIdListManifestId, node);
     }
 }

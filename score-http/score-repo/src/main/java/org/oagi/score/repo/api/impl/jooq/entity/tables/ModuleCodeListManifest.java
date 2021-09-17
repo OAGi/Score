@@ -65,9 +65,9 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     public final TableField<ModuleCodeListManifestRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the code list manifest record.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.module_set_assignment_id</code>.
+     * The column <code>oagi.module_code_list_manifest.module_id</code>. This indicates a module.
      */
-    public final TableField<ModuleCodeListManifestRecord, ULong> MODULE_SET_ASSIGNMENT_ID = createField(DSL.name("module_set_assignment_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<ModuleCodeListManifestRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module.");
 
     /**
      * The column <code>oagi.module_code_list_manifest.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this record.
@@ -144,12 +144,12 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
 
     @Override
     public List<ForeignKey<ModuleCodeListManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ModuleCodeListManifestRecord, ?>>asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+        return Arrays.<ForeignKey<ModuleCodeListManifestRecord, ?>>asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
     private transient ModuleSetRelease _moduleSetRelease;
     private transient CodeListManifest _codeListManifest;
-    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient Module _module;
     private transient AppUser _moduleCodeListManifestCreatedByFk;
     private transient AppUser _moduleCodeListManifestLastUpdatedByFk;
 
@@ -167,11 +167,11 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return _codeListManifest;
     }
 
-    public ModuleSetAssignment moduleSetAssignment() {
-        if (_moduleSetAssignment == null)
-            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+    public Module module() {
+        if (_module == null)
+            _module = new Module(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK);
 
-        return _moduleSetAssignment;
+        return _module;
     }
 
     public AppUser moduleCodeListManifestCreatedByFk() {

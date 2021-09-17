@@ -1,0 +1,101 @@
+.mat-paginator {
+  margin-bottom: 20px;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 5%;
+}
+
+.mat-column-bizTerm, .mat-column-remark {
+  width: 10%;
+}
+
+.mat-column-state, .mat-column-owner {
+  width: 90px;
+}
+
+.mat-column-owner {
+  width: 10%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.selected {
+  background-color: aliceblue;
+}
+
+.grid-element-content {
+  display: block;
+  overflow-x: hidden;
+}
+
+.finder-wrapper {
+  width: 100%;
+  min-height: 400px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.finder-content {
+  height: 400px;
+  display: inline-flex;
+}
+
+.finder-grid {
+  display: inline-flex;
+}
+
+.finder-grid-left {
+  width: 300px;
+  overflow-y: scroll;
+}
+
+.grid-element {
+  cursor: pointer;
+  padding: 3px;
+}
+
+.element-title {
+  padding-left: 3px;
+}
+
+.grid-element-content > mat-icon.element-edit-icon {
+  visibility: hidden;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}
+
+.grid-element-content:hover > mat-icon.element-edit-icon {
+  visibility: visible;
+  cursor: pointer;
+  float: right;
+  margin-right: 3px;
+}
