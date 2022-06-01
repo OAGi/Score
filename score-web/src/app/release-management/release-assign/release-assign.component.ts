@@ -29,7 +29,7 @@ export class ReleaseAssignComponent implements OnInit {
 
   title = 'Releases Assign';
   $hashCode: string;
-  typeList: string[] = ['ACC', 'ASCCP', 'BCCP'];
+  typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'DT'];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
@@ -59,7 +59,7 @@ export class ReleaseAssignComponent implements OnInit {
 
   ngOnInit() {
     const userToken = this.auth.getUserToken();
-    if (userToken.role !== 'developer') {
+    if (!userToken.roles.includes('developer')) {
       this.router.navigateByUrl('/');
     }
     this.isLoading = true;
@@ -127,6 +127,12 @@ export class ReleaseAssignComponent implements OnInit {
       node.visible = true;
       list.assignableList.push(node);
     }
+
+    for (const key of Array.from(Object.keys(map.assignableDtManifestMap))) {
+      const node = map.assignableDtManifestMap[key] as AssignableNode;
+      node.visible = true;
+      list.assignableList.push(node);
+    }
     list.assignableList.sort(this._sort);
     list.assignedList.sort(this._sort);
     return list;
@@ -134,7 +140,7 @@ export class ReleaseAssignComponent implements OnInit {
 
   _sort(a: AssignableNode, b: AssignableNode): number {
     const sortStateOrder = ['Candidate', 'Draft', 'WIP', 'Deleted'];
-    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'AGENCY_ID_LIST'];
+    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'AGENCY_ID_LIST', 'DT'];
     if (sortStateOrder.indexOf(a.state) > sortStateOrder.indexOf(b.state)) {
       return 1;
     } else if (sortStateOrder.indexOf(a.state) < sortStateOrder.indexOf(b.state)) {
@@ -249,6 +255,9 @@ export class ReleaseAssignComponent implements OnInit {
         case 'AGENCY_ID_LIST':
           request.assignedAgencyIdListComponentManifestIds.push(node.manifestId);
           break;
+        case 'DT':
+          request.assignedDtComponentManifestIds.push(node.manifestId);
+          break;
       }
     });
 
@@ -279,6 +288,9 @@ export class ReleaseAssignComponent implements OnInit {
       }
       if (Object.getOwnPropertyNames(map.statusMapForAgencyIdList).length > 0) {
         this.addErrorsToNode(map.statusMapForAgencyIdList, 'AGENCY_ID_LIST');
+      }
+      if (Object.getOwnPropertyNames(map.statusMapForDt).length > 0) {
+        this.addErrorsToNode(map.statusMapForDt, 'DT');
       }
       console.log(map);
       if (map.succeed) {
@@ -331,6 +343,9 @@ export class ReleaseAssignComponent implements OnInit {
               case 'AGENCY_ID_LIST':
                 request.assignedAgencyIdListComponentManifestIds.push(node.manifestId);
                 break;
+              case 'DT':
+                request.assignedDtComponentManifestIds.push(node.manifestId);
+                break;
             }
           });
 
@@ -361,6 +376,9 @@ export class ReleaseAssignComponent implements OnInit {
             }
             if (Object.getOwnPropertyNames(map.statusMapForAgencyIdList).length > 0) {
               this.addErrorsToNode(map.statusMapForAgencyIdList, 'AGENCY_ID_LIST');
+            }
+            if (Object.getOwnPropertyNames(map.statusMapForDt).length > 0) {
+              this.addErrorsToNode(map.statusMapForDt, 'DT');
             }
             this.isValidated = map.succeed;
 

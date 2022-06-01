@@ -263,6 +263,10 @@ export class AbieFlatNode extends BieFlatNodeImpl {
     }
     return this._hashPath;
   }
+
+  get expandable(): boolean {
+    return true;
+  }
 }
 
 export class AsbiepFlatNode extends AbieFlatNode {
@@ -328,6 +332,10 @@ export class AsbiepFlatNode extends AbieFlatNode {
   set derived(derived: boolean) {
     this._derived = derived;
     this._asbiePath = undefined;
+  }
+
+  get expandable(): boolean {
+    return true;
   }
 }
 
@@ -403,7 +411,7 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
 
   get bdtPath(): string {
     if (!this._bdtPath) {
-      this._bdtPath = [this.bbiepPath, 'BDT-' + this.bdtNode.manifestId].join('>');
+      this._bdtPath = [this.bbiepPath, 'DT-' + this.bdtNode.manifestId].join('>');
     }
     return this._bdtPath;
   }
@@ -449,7 +457,7 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
 
   get bbieScPath(): string {
     if (!this._bbieScPath) {
-      this._bbieScPath = [(this.parent as BieFlatNode).path, 'BDT_SC-' + this.bdtScNode.manifestId].join('>');
+      this._bbieScPath = [(this.parent as BieFlatNode).path, 'DT_SC-' + this.bdtScNode.manifestId].join('>');
     }
     return this._bbieScPath;
   }
@@ -1756,30 +1764,40 @@ export class VSBieFlatTreeControl<T extends BieFlatNode> extends VSFlatTreeContr
     this._hideUnused = hideUnused || false;
   }
 
+  children(node: BieFlatNode): BieFlatNode[] {
+    const nodes = [];
+    node.children.map(e => e as BieFlatNode).forEach(e => {
+      if (e.isGroup) {
+        nodes.push(...this.children(e));
+      } else {
+        nodes.push(e);
+      }
+    });
+    return nodes;
+  }
+
   expand(dataNode: T, reset?: boolean) {
     if (!dataNode || !this.isExpandable(dataNode) || this.isExpanded(dataNode)) {
       return;
     }
-    if (this.hideUnused && !dataNode.isGroup && !dataNode.used) {
-      return;
-    }
 
-    if (!!this.flattener && dataNode.type === 'BBIEP' && dataNode.children.length === 0) {
-      const node = dataNode as unknown as BbiepFlatNode;
-      const children = this.flattener.getChildren(node.bdtNode);
+    dataNode.expanded = true;
 
-      node.children = children.map(e => {
-        const bbieScNode = this.flattener.toBbieScNode(node.bccNode, e, node);
-        this.flattener.afterBbieScFlatNode(bbieScNode);
-        bbieScNode.changeListeners = node.changeListeners;
-        return bbieScNode;
-      });
+    if (!!this.flattener && dataNode.children.length === 0) {
+      this.flattener.expand(dataNode as BieFlatNode);
 
       const index = this.dataSource.cachedData.indexOf(dataNode);
-      this.dataSource.cachedData.splice(index + 1, 0, ...dataNode.children as T[]);
+      this.dataSource.cachedData.splice(index + 1, 0,
+        ...this.children(dataNode) as T[]);
     }
 
-    super.expand(dataNode, reset);
+    if (dataNode.parent) {
+      this.expand(dataNode.parent as T, false);
+    }
+
+    if (reset === undefined || reset) {
+      this.dataSource.resetData();
+    }
   }
 
   get hideUnused(): boolean {
@@ -1798,15 +1816,6 @@ export class VSBieFlatTreeDataSource<T extends BieFlatNode> extends VSFlatTreeDa
     super(treeControl, data);
   }
 
-  get cachedData(): T[] {
-    return ((this.treeControl as VSBieFlatTreeControl<T>).hideUnused) ?
-      super.cachedData.filter(e => e.used) : super.cachedData;
-  }
-
-  set cachedData(data: T[]) {
-    super.cachedData = data;
-  }
-
   dataFilter(node: T): boolean {
     if (node.level === 0) {
       return true;
@@ -1815,7 +1824,7 @@ export class VSBieFlatTreeDataSource<T extends BieFlatNode> extends VSFlatTreeDa
       return false;
     }
     const a = this.treeControl.isExpanded(node) || this.treeControl.isExpanded(node.parent as T);
-    const b = (this.treeControl as VSBieFlatTreeControl<T>).hideUnused ? node.used as boolean : true;
+    const b = (this.treeControl as VSBieFlatTreeControl<T>).hideUnused ? ((node.isGroup) ? true : node.used as boolean) : true;
     return a && b;
   }
 }
@@ -1945,42 +1954,46 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
     });
   }
 
-  flatten(excludeSCs?: boolean): BieFlatNode[] {
+  flatten(excludeSCs?: boolean, initialExpandDepth?: number): BieFlatNode[] {
     const node = this.toAbieNode('ASCCP-' + this._asccpManifestId);
     node.topLevelAsbiepId = this._topLevelAsbiepId;
     this.fireEvent(node);
 
     const nodes = [node,];
-    this._doFlatten(nodes, node, excludeSCs);
+    this._doFlatten(nodes, node, excludeSCs, initialExpandDepth);
     return nodes;
   }
 
-  _doFlatten(nodes: BieFlatNode[], node: BieFlatNode, excludeSCs?: boolean) {
+  _doFlatten(nodes: BieFlatNode[], node: BieFlatNode, excludeSCs?: boolean, depth?: number) {
     let children = [];
     if (node instanceof AbieFlatNode || node instanceof AsbiepFlatNode) {
-      children = this.getAssociations(node.accNode);
-      node.children = children.map((e: Association) => {
-        if (e.assocNode.type === 'ASCC') {
-          const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, node as AsbiepFlatNode);
-          this.afterAsbiepFlatNode(asbiepNode);
-          return asbiepNode;
-        } else {
-          const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, node as AsbiepFlatNode);
-          this.afterBbiepFlatNode(bbiepNode);
-          return bbiepNode;
-        }
-      });
+      if (depth === 0) {
+        return;
+      } else {
+        children = this.getAssociations(node.accNode);
+        node.children = children.map((e: Association) => {
+          if (e.assocNode.type === 'ASCC') {
+            const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, node as AsbiepFlatNode);
+            this.afterAsbiepFlatNode(asbiepNode);
+            return asbiepNode;
+          } else {
+            const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, node as AsbiepFlatNode);
+            this.afterBbiepFlatNode(bbiepNode);
+            return bbiepNode;
+          }
+        });
 
-      node.children.map(e => e as BieFlatNode).forEach(e => {
-        if (!e.isGroup) {
-          nodes.push(e);
-          this.fireEvent(e);
-        }
-        if (e.isCycle) {
-          return;
-        }
-        this._doFlatten(nodes, e, excludeSCs);
-      });
+        node.children.map(e => e as BieFlatNode).forEach(e => {
+          if (!e.isGroup) {
+            nodes.push(e);
+            this.fireEvent(e);
+          }
+          if (e.isCycle) {
+            return;
+          }
+          this._doFlatten(nodes, e, excludeSCs, (e.isGroup) ? depth : depth - 1);
+        });
+      }
     } else if (node instanceof BbiepFlatNode) {
       if (excludeSCs) {
         node.children = [];
@@ -2044,11 +2057,50 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
       case 'BCCP':
         return [nodes[targets[0]],];
 
-      case 'BDT':
+      case 'DT':
         return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0);
 
-      case 'BDT_SC':
+      case 'DT_SC':
         return [];
+    }
+  }
+
+  expand(node: BieFlatNode) {
+    let children = [];
+    if (node instanceof AbieFlatNode || node instanceof AsbiepFlatNode) {
+      children = this.getAssociations(node.accNode);
+      node.children = children.map((e: Association) => {
+        if (e.assocNode.type === 'ASCC') {
+          const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, node as AsbiepFlatNode);
+          this.afterAsbiepFlatNode(asbiepNode);
+          return asbiepNode;
+        } else {
+          const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, node as AsbiepFlatNode);
+          this.afterBbiepFlatNode(bbiepNode);
+          return bbiepNode;
+        }
+      });
+
+      node.children.map(e => e as BieFlatNode).forEach(e => {
+        if (!e.isGroup) {
+          this.fireEvent(e);
+        } else {
+          this.expand(e);
+        }
+      });
+    } else if (node instanceof BbiepFlatNode) {
+      children = this.getChildren(node.bdtNode);
+      node.children = children.map(e => {
+        const bbieScNode = this.toBbieScNode(node.bccNode, e, node);
+        this.afterBbieScFlatNode(bbieScNode);
+        return bbieScNode;
+      });
+
+      node.children.map(e => e as BieFlatNode)
+        .forEach(e => {
+          this.fireEvent(e);
+        });
+      node.expandable = node.children.length > 0;
     }
   }
 
@@ -2063,7 +2115,7 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
     }
 
     switch (node.type) {
-      case 'BDT':
+      case 'DT':
         return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).length > 0;
 
       default :

@@ -103,7 +103,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const userToken = this.authService.getUserToken();
-    this.isDeveloper = userToken.role === 'developer';
+    this.isDeveloper = userToken.roles.includes('developer');
 
     this.releaseService.getSimpleReleases().subscribe(resp => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));

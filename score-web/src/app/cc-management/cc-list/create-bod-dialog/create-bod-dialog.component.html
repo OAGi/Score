@@ -22,13 +22,13 @@
                 <mat-form-field>
                   <mat-label>State</mat-label>
                   <mat-select *ngIf="verbRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="verbRequest.states"
-                              floatlLabel="never" multiple>
+                              floatLabel="never" multiple>
                     <mat-option *ngFor="let state of workingStateList" [value]="state">
                       <span>{{ state | separate }}</span>
                     </mat-option>
                   </mat-select>
                   <mat-select *ngIf="verbRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="verbRequest.states"
-                              floatlLabel="never" multiple>
+                              floatLabel="never" multiple>
                     <mat-option *ngFor="let state of releaseStateList" [value]="state">
                       <span>{{ state | separate }}</span>
                     </mat-option>
@@ -39,9 +39,11 @@
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
                   <mat-select [(ngModel)]="verbRequest.updaterLoginIds" multiple>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    </mat-option>
                     <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                       {{loginId}}
                     </mat-option>
@@ -118,7 +120,12 @@
 
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef></th>
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (click)="masterToggle('verb', $event)"
+                            [checked]="verbSelection.selected.length === verbPaginator.length"
+                            [indeterminate]="!(verbSelection.selected.length === verbPaginator.length) && verbSelection.hasValue()">
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? toggle(row, 'verb') : null"
@@ -188,7 +195,7 @@
         </table>
         <mat-paginator #verbPaginator
           [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
+          (page)="onPageChange($event, 'verb')"
           showFirstLastButtons></mat-paginator>
       </div>
     </div>
@@ -202,13 +209,13 @@
                 <mat-form-field>
                   <mat-label>State</mat-label>
                   <mat-select *ngIf="nounRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="nounRequest.states"
-                              floatlLabel="never" multiple>
+                              floatLabel="never" multiple>
                     <mat-option *ngFor="let state of workingStateList" [value]="state">
                       <span>{{ state | separate }}</span>
                     </mat-option>
                   </mat-select>
                   <mat-select *ngIf="nounRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="nounRequest.states"
-                              floatlLabel="never" multiple>
+                              floatLabel="never" multiple>
                     <mat-option *ngFor="let state of releaseStateList" [value]="state">
                       <span>{{ state | separate }}</span>
                     </mat-option>
@@ -219,9 +226,11 @@
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
                   <mat-select [(ngModel)]="nounRequest.updaterLoginIds" multiple>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    </mat-option>
                     <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                       {{loginId}}
                     </mat-option>
@@ -299,7 +308,12 @@
 
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef></th>
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (click)="masterToggle('noun', $event)"
+                            [checked]="nounSelection.selected.length === nounPaginator.length"
+                            [indeterminate]="!(nounSelection.selected.length === nounPaginator.length) && nounSelection.hasValue()">
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? toggle(row, 'noun') : null"
@@ -370,7 +384,7 @@
 
         <mat-paginator #nounPaginator
           [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
+          (page)="onPageChange($event, 'noun')"
           showFirstLastButtons></mat-paginator>
       </div>
     </div>
@@ -389,7 +403,7 @@
               [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
               (click)="onClick()">
         <span *ngIf="BODName === ''">Create</span>
-        <span *ngIf="BODName !== ''">Create '{{BODName}}'</span>
+        <span *ngIf="BODName !== ''">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
       </button>
     </div>
   </div>

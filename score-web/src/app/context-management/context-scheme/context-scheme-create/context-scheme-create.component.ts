@@ -276,17 +276,17 @@ export class ContextSchemeCreateComponent implements OnInit {
   }
 
   convertCodeListValuesIntoContextSchemeValues(codeListValues: CodeListValue[]) {
-    if (!codeListValues || codeListValues.length === 0) {
-      return [];
-    }
-
-    return codeListValues.map(codeListValue => {
-      const contextSchemeValue = new ContextSchemeValue();
-      contextSchemeValue.meaning = codeListValue.meaning;
-      contextSchemeValue.value = codeListValue.value;
+    let contextSchemeValueList: ContextSchemeValue[];
+    contextSchemeValueList = [];
+    for (const codelistvalue of codeListValues) {
+      let contextSchemeValue: ContextSchemeValue;
+      contextSchemeValue = new ContextSchemeValue();
+      contextSchemeValue.meaning = codelistvalue.meaning;
+      contextSchemeValue.value = codelistvalue.value;
+      contextSchemeValueList.push(contextSchemeValue);
       this.selection.select(contextSchemeValue);
-      return contextSchemeValue;
-    });
+    }
+    return contextSchemeValueList;
   }
 
   openCodeListDialog() {
@@ -322,7 +322,7 @@ export class ContextSchemeCreateComponent implements OnInit {
     dialogRef.afterClosed().subscribe(codeList => {
       if (codeList) {
         this.contextScheme.schemeId = codeList.listId.toString();
-        this.contextScheme.schemeAgencyId = codeList.agencyId.toString();
+        this.contextScheme.schemeAgencyId = codeList.agencyIdListValueValue.toString();
         this.contextScheme.schemeVersionId = codeList.versionId.toString();
         this._updateDataSource([]);
         this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeList.codeListValues));

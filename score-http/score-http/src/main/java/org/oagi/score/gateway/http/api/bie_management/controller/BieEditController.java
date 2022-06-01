@@ -174,7 +174,7 @@ public class BieEditController {
         return service.availableAgencyIdListListByBdtScManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bdt/{manifestId}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/dt/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BdtNode getBdtDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,

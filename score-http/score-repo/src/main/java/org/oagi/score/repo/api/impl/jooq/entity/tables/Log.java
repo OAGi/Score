@@ -59,22 +59,30 @@ public class Log extends TableImpl<LogRecord> {
     public final TableField<LogRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>oagi.log.hash</code>. The unique hash to identify the log.
+     * The column <code>oagi.log.hash</code>. The unique hash to identify the
+     * log.
      */
     public final TableField<LogRecord, String> HASH = createField(DSL.name("hash"), SQLDataType.CHAR(40).nullable(false), this, "The unique hash to identify the log.");
 
     /**
-     * The column <code>oagi.log.revision_num</code>. This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.
+     * The column <code>oagi.log.revision_num</code>. This is an incremental
+     * integer. It tracks changes in each component. If a change is made to a
+     * component after it has been published, the component receives a new
+     * revision number. Revision number can be 1, 2, and so on.
      */
     public final TableField<LogRecord, UInteger> REVISION_NUM = createField(DSL.name("revision_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGERUNSIGNED)), this, "This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.");
 
     /**
-     * The column <code>oagi.log.revision_tracking_num</code>. This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.
+     * The column <code>oagi.log.revision_tracking_num</code>. This supports the
+     * ability to undo changes during a revision (life cycle of a revision is
+     * from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM
+     * can be 1, 2, and so on.
      */
     public final TableField<LogRecord, UInteger> REVISION_TRACKING_NUM = createField(DSL.name("revision_tracking_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGERUNSIGNED)), this, "This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.");
 
     /**
-     * The column <code>oagi.log.log_action</code>. This indicates the action associated with the record.
+     * The column <code>oagi.log.log_action</code>. This indicates the action
+     * associated with the record.
      */
     public final TableField<LogRecord, String> LOG_ACTION = createField(DSL.name("log_action"), SQLDataType.VARCHAR(20), this, "This indicates the action associated with the record.");
 
@@ -143,12 +151,12 @@ public class Log extends TableImpl<LogRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.LOG_REFERENCE);
+        return Arrays.asList(Indexes.LOG_REFERENCE);
     }
 
     @Override
@@ -162,19 +170,18 @@ public class Log extends TableImpl<LogRecord> {
     }
 
     @Override
-    public List<UniqueKey<LogRecord>> getKeys() {
-        return Arrays.<UniqueKey<LogRecord>>asList(Keys.KEY_LOG_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<LogRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<LogRecord, ?>>asList(Keys.LOG_PREV_LOG_ID_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_CREATED_BY_FK);
+        return Arrays.asList(Keys.LOG_PREV_LOG_ID_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_CREATED_BY_FK);
     }
 
     private transient Log _logPrevLogIdFk;
     private transient Log _logNextLogIdFk;
     private transient AppUser _appUser;
 
+    /**
+     * Get the implicit join path to the <code>oagi.log</code> table, via the
+     * <code>log_prev_log_id_fk</code> key.
+     */
     public Log logPrevLogIdFk() {
         if (_logPrevLogIdFk == null)
             _logPrevLogIdFk = new Log(this, Keys.LOG_PREV_LOG_ID_FK);
@@ -182,6 +189,10 @@ public class Log extends TableImpl<LogRecord> {
         return _logPrevLogIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.log</code> table, via the
+     * <code>log_next_log_id_fk</code> key.
+     */
     public Log logNextLogIdFk() {
         if (_logNextLogIdFk == null)
             _logNextLogIdFk = new Log(this, Keys.LOG_NEXT_LOG_ID_FK);
@@ -189,6 +200,9 @@ public class Log extends TableImpl<LogRecord> {
         return _logNextLogIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     */
     public AppUser appUser() {
         if (_appUser == null)
             _appUser = new AppUser(this, Keys.LOG_CREATED_BY_FK);

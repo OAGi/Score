@@ -85,7 +85,7 @@ export class ReuseBieDialogComponent implements OnInit {
 
   get isDeveloper() {
     const userToken = this.auth.getUserToken();
-    return userToken.role === 'developer';
+    return userToken.roles.includes('developer');
   }
 
   onPageChange(event: PageEvent) {

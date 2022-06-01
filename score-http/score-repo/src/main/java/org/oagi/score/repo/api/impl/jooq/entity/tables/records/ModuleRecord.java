@@ -16,7 +16,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Module;
 
 
 /**
- * The module table stores information about a physical file, into which CC 
+ * The module table stores information about a physical file, into which CC
  * components will be generated during the expression generation.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -25,56 +25,64 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.module.module_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.module.module_id</code>. Primary, internal database
+     * key.
      */
     public void setModuleId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.module.module_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.module.module_id</code>. Primary, internal database
+     * key.
      */
     public ULong getModuleId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.module.module_set_id</code>. This indicates a module set.
+     * Setter for <code>oagi.module.module_set_id</code>. This indicates a
+     * module set.
      */
     public void setModuleSetId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.module.module_set_id</code>. This indicates a module set.
+     * Getter for <code>oagi.module.module_set_id</code>. This indicates a
+     * module set.
      */
     public ULong getModuleSetId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.module.parent_module_id</code>. This indicates a parent module id. root module will be NULL.
+     * Setter for <code>oagi.module.parent_module_id</code>. This indicates a
+     * parent module id. root module will be NULL.
      */
     public void setParentModuleId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.module.parent_module_id</code>. This indicates a parent module id. root module will be NULL.
+     * Getter for <code>oagi.module.parent_module_id</code>. This indicates a
+     * parent module id. root module will be NULL.
      */
     public ULong getParentModuleId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.module.type</code>. This is a type column for indicates module is FILE or DIRECTORY.
+     * Setter for <code>oagi.module.type</code>. This is a type column for
+     * indicates module is FILE or DIRECTORY.
      */
     public void setType(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module.type</code>. This is a type column for indicates module is FILE or DIRECTORY.
+     * Getter for <code>oagi.module.type</code>. This is a type column for
+     * indicates module is FILE or DIRECTORY.
      */
     public String getType() {
         return (String) get(3);
@@ -95,116 +103,142 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.name</code>. The is the filename of the module. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, '.xsd' maybe added; or for JSON, '.json' maybe added as the file extension.
+     * Setter for <code>oagi.module.name</code>. The is the filename of the
+     * module. The reason to not including the extension is that the extension
+     * maybe dependent on the expression. For XML schema, '.xsd' maybe added; or
+     * for JSON, '.json' maybe added as the file extension.
      */
     public void setName(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.module.name</code>. The is the filename of the module. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, '.xsd' maybe added; or for JSON, '.json' maybe added as the file extension.
+     * Getter for <code>oagi.module.name</code>. The is the filename of the
+     * module. The reason to not including the extension is that the extension
+     * maybe dependent on the expression. For XML schema, '.xsd' maybe added; or
+     * for JSON, '.json' maybe added as the file extension.
      */
     public String getName() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.module.namespace_id</code>. Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release's namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.
+     * Setter for <code>oagi.module.namespace_id</code>. Note that a release
+     * record has a namespace associated. The NAMESPACE_ID, if specified here,
+     * overrides the release's namespace. However, the NAMESPACE_ID associated
+     * with the component takes the highest precedence.
      */
     public void setNamespaceId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.module.namespace_id</code>. Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release's namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.
+     * Getter for <code>oagi.module.namespace_id</code>. Note that a release
+     * record has a namespace associated. The NAMESPACE_ID, if specified here,
+     * overrides the release's namespace. However, the NAMESPACE_ID associated
+     * with the component takes the highest precedence.
      */
     public ULong getNamespaceId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.module.version_num</code>. This is the version number to be assigned to the schema module.
+     * Setter for <code>oagi.module.version_num</code>. This is the version
+     * number to be assigned to the schema module.
      */
     public void setVersionNum(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.module.version_num</code>. This is the version number to be assigned to the schema module.
+     * Getter for <code>oagi.module.version_num</code>. This is the version
+     * number to be assigned to the schema module.
      */
     public String getVersionNum() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.module.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this MODULE.
+     * Setter for <code>oagi.module.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this MODULE.
      */
     public void setCreatedBy(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.module.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this MODULE.
+     * Getter for <code>oagi.module.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this MODULE.
      */
     public ULong getCreatedBy() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.module.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record. 
-
-In the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).
+     * Setter for <code>oagi.module.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record. 
+     * 
+     * In the history record, this should always be the user who is editing the
+     * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.module.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record. 
-
-In the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).
+     * Getter for <code>oagi.module.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record. 
+     * 
+     * In the history record, this should always be the user who is editing the
+     * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.module.owner_user_id</code>. Foreign key to the APP_USER table identifying the user who can update or delete the record.
+     * Setter for <code>oagi.module.owner_user_id</code>. Foreign key to the
+     * APP_USER table identifying the user who can update or delete the record.
      */
     public void setOwnerUserId(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.module.owner_user_id</code>. Foreign key to the APP_USER table identifying the user who can update or delete the record.
+     * Getter for <code>oagi.module.owner_user_id</code>. Foreign key to the
+     * APP_USER table identifying the user who can update or delete the record.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(10);
     }
 
     /**
-     * Setter for <code>oagi.module.creation_timestamp</code>. The timestamp when the record was first created.
+     * Setter for <code>oagi.module.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.module.creation_timestamp</code>. The timestamp when the record was first created.
+     * Getter for <code>oagi.module.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>oagi.module.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Setter for <code>oagi.module.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.module.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Getter for <code>oagi.module.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(12);

@@ -165,11 +165,17 @@ export class CreateAsccpDialogComponent implements OnInit {
       this.confirmDialogService.open(dialogConfig).beforeClosed()
         .subscribe(result => {
           if (result) {
-            this.dialogRef.close(this.selection.selected[0].manifestId);
+            this.dialogRef.close({
+              manifestId: this.selection.selected[0].manifestId,
+              objectClassTerm: this.selection.selected[0].name
+            });
           }
         });
     } else {
-      this.dialogRef.close(this.selection.selected[0].manifestId);
+      this.dialogRef.close({
+        manifestId: this.selection.selected[0].manifestId,
+        objectClassTerm: this.selection.selected[0].name
+      });
     }
   }
 

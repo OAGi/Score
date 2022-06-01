@@ -23,6 +23,7 @@ export class AuthService implements OnInit, CanActivate {
   USER_INFO_KEY = 'X-SRT-UserInfo';
   ROLE_DEVELOPER = 'developer';
   ROLE_END_USER = 'end-user';
+  ROLE_ADMIN = 'admin';
 
   constructor(private http: HttpClient,
               private router: Router) {
@@ -36,10 +37,10 @@ export class AuthService implements OnInit, CanActivate {
     return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
       if (!!res) {
         this.storeUserInfo(res);
-        const role = res.role;
-        if (role === 'pending') {
+        const roles = res.roles;
+        if (roles.includes('pending')) {
           return this.router.parseUrl('/pending');
-        } else if (role === 'reject') {
+        } else if (roles.includes('reject')) {
           this.logout(getResolvedUrl(route));
           return false;
         }
@@ -89,14 +90,18 @@ export class AuthService implements OnInit, CanActivate {
 
   isAuthenticated() {
     const userToken = this.getUserToken();
-    let value;
-    try {
-      value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
-    } catch (ignore) {
-      value = new UserToken();
-      this.storeUserInfo(value);
+    if (!userToken.enabled) {
+      return false;
     }
-    return userToken.enabled && (userToken.role === this.ROLE_DEVELOPER || userToken.role === this.ROLE_END_USER);
+    return userToken.roles.includes(this.ROLE_DEVELOPER) || userToken.roles.includes(this.ROLE_END_USER);
+  }
+
+  isAdmin() {
+    const userToken = this.getUserToken();
+    if (!userToken.enabled) {
+      return false;
+    }
+    return userToken.roles.includes(this.ROLE_ADMIN);
   }
 
   logout(url?) {
@@ -188,15 +193,17 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
 
             case 400:
             case 403:
-              let errorMessageId = error.headers.get('x-error-message-id');
+            case 500:
+              const errorMessageId = error.headers.get('x-error-message-id');
+              const errorMessage = error.headers.get('x-error-message');
               if (!!errorMessageId) {
-                this.snackBar.open(error.headers.get('x-error-message'), 'View detail in Notifications', {
+                this.snackBar.open(((!!errorMessage) ? errorMessage : error.message), 'View detail in Notifications', {
                   duration: 10000,
                 }).onAction().subscribe(_ => {
                   return this.router.navigate(['/message/' + errorMessageId]);
                 });
               } else {
-                this.snackBar.open(error.headers.get('x-error-message'), '', {
+                this.snackBar.open(((!!errorMessage) ? errorMessage : error.message), '', {
                   duration: 3000,
                 });
               }
@@ -244,7 +251,27 @@ export class CanActivateDeveloper implements CanActivate {
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
     const userToken = this.authService.getUserToken();
-    if (userToken.role === this.authService.ROLE_DEVELOPER) {
+    if (userToken.roles.includes(this.authService.ROLE_DEVELOPER)) {
+      return true;
+    }
+
+    this.authService.logout(getResolvedUrl(route));
+    return false;
+  }
+
+}
+
+@Injectable()
+export class CanActivateAdmin implements CanActivate {
+
+  constructor(private authService: AuthService) {
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+
+    const userToken = this.authService.getUserToken();
+    if (userToken.roles.includes(this.authService.ROLE_ADMIN)) {
       return true;
     }
 

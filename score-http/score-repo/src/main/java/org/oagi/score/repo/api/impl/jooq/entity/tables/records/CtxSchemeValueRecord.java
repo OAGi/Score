@@ -14,7 +14,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
 
 
 /**
- * This table stores the context scheme values for a particular context scheme 
+ * This table stores the context scheme values for a particular context scheme
  * in the CTX_SCHEME table.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -23,70 +23,82 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>.
+     * Primary, internal database key.
      */
     public void setCtxSchemeValueId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>.
+     * Primary, internal database key.
      */
     public ULong getCtxSchemeValueId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.value</code>. A short value for the scheme value similar to the code list value.
+     * Setter for <code>oagi.ctx_scheme_value.value</code>. A short value for
+     * the scheme value similar to the code list value.
      */
     public void setValue(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme_value.value</code>. A short value for the scheme value similar to the code list value.
+     * Getter for <code>oagi.ctx_scheme_value.value</code>. A short value for
+     * the scheme value similar to the code list value.
      */
     public String getValue() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.meaning</code>. The description, explanatiion of the scheme value.
+     * Setter for <code>oagi.ctx_scheme_value.meaning</code>. The description,
+     * explanatiion of the scheme value.
      */
     public void setMeaning(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme_value.meaning</code>. The description, explanatiion of the scheme value.
+     * Getter for <code>oagi.ctx_scheme_value.meaning</code>. The description,
+     * explanatiion of the scheme value.
      */
     public String getMeaning() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>. Foreign key to the CTX_SCHEME table. It identifies the context scheme, to which this scheme value belongs.
+     * Setter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.
+     * Foreign key to the CTX_SCHEME table. It identifies the context scheme, to
+     * which this scheme value belongs.
      */
     public void setOwnerCtxSchemeId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>. Foreign key to the CTX_SCHEME table. It identifies the context scheme, to which this scheme value belongs.
+     * Getter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.
+     * Foreign key to the CTX_SCHEME table. It identifies the context scheme, to
+     * which this scheme value belongs.
      */
     public ULong getOwnerCtxSchemeId() {
         return (ULong) get(4);

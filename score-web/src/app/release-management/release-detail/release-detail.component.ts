@@ -92,7 +92,7 @@ export class ReleaseDetailComponent implements OnInit {
   }
 
   isDisabled() {
-    return this.userToken.role !== 'developer' || this.releaseDetail.state === 'Published';
+    return !this.userToken.roles.includes('developer') || this.releaseDetail.state === 'Published';
   }
 
   get isChanged() {

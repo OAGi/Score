@@ -56,7 +56,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     /**
      * The column <code>oagi.bcc_manifest.release_id</code>.
      */
-    public final TableField<BccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<BccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED, this, "");
 
     /**
      * The column <code>oagi.bcc_manifest.bcc_id</code>.
@@ -79,12 +79,14 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     public final TableField<BccManifestRecord, ULong> TO_BCCP_MANIFEST_ID = createField(DSL.name("to_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.bcc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * The column <code>oagi.bcc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public final TableField<BccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
-     * The column <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * The column <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public final TableField<BccManifestRecord, ULong> REPLACEMENT_BCC_MANIFEST_ID = createField(DSL.name("replacement_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
 
@@ -133,7 +135,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -147,13 +149,8 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<BccManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<BccManifestRecord>>asList(Keys.KEY_BCC_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<BccManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<BccManifestRecord, ?>>asList(Keys.BCC_MANIFEST_RELEASE_ID_FK, Keys.BCC_MANIFEST_BCC_ID_FK, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.BCC_MANIFEST_RELEASE_ID_FK, Keys.BCC_MANIFEST_BCC_ID_FK, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
     }
 
     private transient Release _release;
@@ -165,6 +162,9 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     private transient BccManifest _bccManifestPrevBccManifestIdFk;
     private transient BccManifest _bccManifestNextBccManifestIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
     public Release release() {
         if (_release == null)
             _release = new Release(this, Keys.BCC_MANIFEST_RELEASE_ID_FK);
@@ -172,6 +172,9 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _release;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bcc</code> table.
+     */
     public Bcc bcc() {
         if (_bcc == null)
             _bcc = new Bcc(this, Keys.BCC_MANIFEST_BCC_ID_FK);
@@ -179,6 +182,9 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _bcc;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table.
+     */
     public SeqKey seqKey() {
         if (_seqKey == null)
             _seqKey = new SeqKey(this, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK);
@@ -186,6 +192,9 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _seqKey;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     */
     public AccManifest accManifest() {
         if (_accManifest == null)
             _accManifest = new AccManifest(this, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
@@ -193,6 +202,9 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _accManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bccp_manifest</code> table.
+     */
     public BccpManifest bccpManifest() {
         if (_bccpManifest == null)
             _bccpManifest = new BccpManifest(this, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK);
@@ -200,6 +212,10 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _bccpManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
+     * via the <code>bcc_replacement_bcc_manifest_id_fk</code> key.
+     */
     public BccManifest bccReplacementBccManifestIdFk() {
         if (_bccReplacementBccManifestIdFk == null)
             _bccReplacementBccManifestIdFk = new BccManifest(this, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK);
@@ -207,6 +223,10 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _bccReplacementBccManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
+     * via the <code>bcc_manifest_prev_bcc_manifest_id_fk</code> key.
+     */
     public BccManifest bccManifestPrevBccManifestIdFk() {
         if (_bccManifestPrevBccManifestIdFk == null)
             _bccManifestPrevBccManifestIdFk = new BccManifest(this, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK);
@@ -214,6 +234,10 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _bccManifestPrevBccManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
+     * via the <code>bcc_manifest_next_bcc_manifest_id_fk</code> key.
+     */
     public BccManifest bccManifestNextBccManifestIdFk() {
         if (_bccManifestNextBccManifestIdFk == null)
             _bccManifestNextBccManifestIdFk = new BccManifest(this, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);

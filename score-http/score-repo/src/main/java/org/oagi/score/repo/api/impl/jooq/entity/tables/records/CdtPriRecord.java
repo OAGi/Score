@@ -22,28 +22,32 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary database key.
+     * Setter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
+     * database key.
      */
     public void setCdtPriId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary database key.
+     * Getter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
+     * database key.
      */
     public ULong getCdtPriId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.
+     * Setter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
+     * the CCTS datatype catalog, e.g., Decimal.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.
+     * Getter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
+     * the CCTS datatype catalog, e.g., Decimal.
      */
     public String getName() {
         return (String) get(1);

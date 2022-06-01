@@ -23,8 +23,8 @@ mat-chip-list:focus {
   width: 10%;
 }
 
-.w70 {
-  width: 70px;
+.mat-column-deprecated {
+  width: 100px;
 }
 
 .btn-comment {

@@ -11,4 +11,5 @@ public class CcTransferOwnerShipListRequest {
     private List<BigInteger> accManifestIds;
     private List<BigInteger> bccpManifestIds;
     private List<BigInteger> asccpManifestIds;
+    private List<BigInteger> dtManifestIds;
 }

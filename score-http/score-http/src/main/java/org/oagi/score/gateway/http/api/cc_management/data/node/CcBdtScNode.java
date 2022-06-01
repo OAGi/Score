@@ -10,7 +10,7 @@ import java.math.BigInteger;
 @EqualsAndHashCode(callSuper = true)
 public class CcBdtScNode extends CcNode {
 
-    private CcType type = CcType.BDT_SC;
+    private CcType type = CcType.DT_SC;
 
     private BigInteger bdtScId = BigInteger.ZERO;
     private BigInteger manifestId = BigInteger.ZERO;

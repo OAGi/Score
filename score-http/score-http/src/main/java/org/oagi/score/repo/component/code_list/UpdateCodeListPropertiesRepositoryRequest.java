@@ -11,7 +11,7 @@ public class UpdateCodeListPropertiesRepositoryRequest extends RepositoryRequest
     private final BigInteger codeListManifestId;
 
     private String codeListName;
-    private BigInteger agencyId;
+    private BigInteger agencyIdListValueManifestId;
     private String versionId;
     private String listId;
     private BigInteger namespaceId;
@@ -46,12 +46,12 @@ public class UpdateCodeListPropertiesRepositoryRequest extends RepositoryRequest
         this.codeListName = codeListName;
     }
 
-    public BigInteger getAgencyId() {
-        return agencyId;
+    public BigInteger getAgencyIdListValueManifestId() {
+        return agencyIdListValueManifestId;
     }
 
-    public void setAgencyId(BigInteger agencyId) {
-        this.agencyId = agencyId;
+    public void setAgencyIdListValueManifestId(BigInteger agencyIdListValueManifestId) {
+        this.agencyIdListValueManifestId = agencyIdListValueManifestId;
     }
 
     public String getVersionId() {

@@ -35,7 +35,7 @@ export class CreateBccpDialogComponent implements OnInit {
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'type', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
@@ -67,7 +67,7 @@ export class CreateBccpDialogComponent implements OnInit {
     this.request.commonlyUsed = [true];
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
-    this.request.types = ['BDT'];
+    this.request.types = ['DT'];
     this.request.dtTypes = [];
     this.request.states = ['Published'];
     this.request.excludes = this.data.excludes ? this.data.excludes : [];

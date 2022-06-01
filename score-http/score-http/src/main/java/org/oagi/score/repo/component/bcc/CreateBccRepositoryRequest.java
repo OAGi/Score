@@ -2,6 +2,7 @@ package org.oagi.score.repo.component.bcc;
 
 import org.oagi.score.data.RepositoryRequest;
 import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.log.model.LogAction;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.math.BigInteger;
@@ -13,6 +14,8 @@ public class CreateBccRepositoryRequest extends RepositoryRequest {
     private final BigInteger accManifestId;
     private final BigInteger bccpManifestId;
     private int pos = -1;
+    private String logHash;
+    private LogAction logAction;
 
     private CcState initialState = CcState.WIP;
 
@@ -63,5 +66,21 @@ public class CreateBccRepositoryRequest extends RepositoryRequest {
 
     public void setInitialState(CcState initialState) {
         this.initialState = initialState;
+    }
+
+    public String getLogHash() {
+        return logHash;
+    }
+
+    public void setLogHash(String logHash) {
+        this.logHash = logHash;
+    }
+
+    public LogAction getLogAction() {
+        return logAction;
+    }
+
+    public void setLogAction(LogAction logAction) {
+        this.logAction = logAction;
     }
 }

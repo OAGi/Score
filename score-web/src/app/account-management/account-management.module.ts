@@ -5,7 +5,7 @@ import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
 import {SettingsComponent} from './settings/settings.component';
-import {CanActivateDeveloper, CanActivateUser} from '../authentication/auth.service';
+import {CanActivateAdmin, CanActivateDeveloper, CanActivateUser} from '../authentication/auth.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
@@ -26,27 +26,27 @@ const routes: Routes = [
   {
     path: 'account',
     component: AccountListComponent,
-    canActivate: [CanActivateDeveloper]
+    canActivate: [CanActivateAdmin]
   },
   {
     path: 'account/create',
     component: AccountCreateComponent,
-    canActivate: [CanActivateDeveloper]
+    canActivate: [CanActivateAdmin]
   },
   {
     path: 'account/pending',
     component: PendingListComponent,
-    canActivate: [CanActivateDeveloper]
+    canActivate: [CanActivateAdmin]
   },
   {
     path: 'account/pending/:id',
     component: PendingDetailComponent,
-    canActivate: [CanActivateDeveloper]
+    canActivate: [CanActivateAdmin]
   },
   {
     path: 'account/:id',
     component: AccountDetailComponent,
-    canActivate: [CanActivateDeveloper]
+    canActivate: [CanActivateAdmin]
   },
 ];
 
@@ -76,6 +76,7 @@ const routes: Routes = [
     PendingListService,
     CanActivateUser,
     CanActivateDeveloper,
+    CanActivateAdmin,
   ]
 })
 export class AccountManagementModule {

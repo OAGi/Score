@@ -50,42 +50,51 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
     }
 
     /**
-     * The column <code>oagi.module_dt_manifest.module_dt_manifest_id</code>. Primary key.
+     * The column <code>oagi.module_dt_manifest.module_dt_manifest_id</code>.
+     * Primary key.
      */
     public final TableField<ModuleDtManifestRecord, ULong> MODULE_DT_MANIFEST_ID = createField(DSL.name("module_dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.module_set_release_id</code>. A foreign key of the module set release record.
+     * The column <code>oagi.module_dt_manifest.module_set_release_id</code>. A
+     * foreign key of the module set release record.
      */
     public final TableField<ModuleDtManifestRecord, ULong> MODULE_SET_RELEASE_ID = createField(DSL.name("module_set_release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the module set release record.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.dt_manifest_id</code>. A foreign key of the dt manifest record.
+     * The column <code>oagi.module_dt_manifest.dt_manifest_id</code>. A foreign
+     * key of the dt manifest record.
      */
     public final TableField<ModuleDtManifestRecord, ULong> DT_MANIFEST_ID = createField(DSL.name("dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the dt manifest record.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.module_id</code>. This indicates a module.
+     * The column <code>oagi.module_dt_manifest.module_id</code>. This indicates
+     * a module.
      */
     public final TableField<ModuleDtManifestRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this record.
+     * The column <code>oagi.module_dt_manifest.created_by</code>. Foreign key
+     * to the APP_USER table. It indicates the user who created this record.
      */
     public final TableField<ModuleDtManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this record.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record.
+     * The column <code>oagi.module_dt_manifest.last_updated_by</code>. Foreign
+     * key to the APP_USER table referring to the last user who updated the
+     * record.
      */
     public final TableField<ModuleDtManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.creation_timestamp</code>. The timestamp when the record was first created.
+     * The column <code>oagi.module_dt_manifest.creation_timestamp</code>. The
+     * timestamp when the record was first created.
      */
     public final TableField<ModuleDtManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.module_dt_manifest.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * The column <code>oagi.module_dt_manifest.last_update_timestamp</code>.
+     * The timestamp when the record was last updated.
      */
     public final TableField<ModuleDtManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
@@ -124,7 +133,7 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -138,13 +147,8 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<ModuleDtManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<ModuleDtManifestRecord>>asList(Keys.KEY_MODULE_DT_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<ModuleDtManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ModuleDtManifestRecord, ?>>asList(Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
     private transient ModuleSetRelease _moduleSetRelease;
@@ -153,6 +157,10 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
     private transient AppUser _moduleDtManifestCreatedByFk;
     private transient AppUser _moduleDtManifestLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
     public ModuleSetRelease moduleSetRelease() {
         if (_moduleSetRelease == null)
             _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
@@ -160,6 +168,9 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return _moduleSetRelease;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
+     */
     public DtManifest dtManifest() {
         if (_dtManifest == null)
             _dtManifest = new DtManifest(this, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK);
@@ -167,6 +178,9 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return _dtManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
     public Module module() {
         if (_module == null)
             _module = new Module(this, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK);
@@ -174,6 +188,10 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return _module;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_dt_manifest_created_by_fk</code> key.
+     */
     public AppUser moduleDtManifestCreatedByFk() {
         if (_moduleDtManifestCreatedByFk == null)
             _moduleDtManifestCreatedByFk = new AppUser(this, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK);
@@ -181,6 +199,10 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return _moduleDtManifestCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_dt_manifest_last_updated_by_fk</code> key.
+     */
     public AppUser moduleDtManifestLastUpdatedByFk() {
         if (_moduleDtManifestLastUpdatedByFk == null)
             _moduleDtManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);

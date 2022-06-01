@@ -37,7 +37,7 @@ export class ReleaseCreateComponent implements OnInit {
 
   ngOnInit() {
     const userToken = this.auth.getUserToken();
-    if (userToken.role !== 'developer') {
+    if (!userToken.roles.includes('developer')) {
       this.router.navigateByUrl('/');
     }
     this.namespaceService.getNamespaceList().subscribe(resp => {

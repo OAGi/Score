@@ -34,7 +34,7 @@ public class CodeList implements CoreComponent, Serializable {
 
     private String listId;
 
-    private BigInteger agencyId;
+    private BigInteger agencyIdListValueId;
 
     public String getAgencyName() {
         return agencyName;
@@ -78,12 +78,12 @@ public class CodeList implements CoreComponent, Serializable {
         this.versionId = versionId;
     }
 
-    public BigInteger getAgencyId() {
-        return agencyId;
+    public BigInteger getAgencyIdListValueId() {
+        return agencyIdListValueId;
     }
 
-    public void setAgencyId(BigInteger agencyId) {
-        this.agencyId = agencyId;
+    public void setAgencyIdListValueId(BigInteger agencyIdListValueId) {
+        this.agencyIdListValueId = agencyIdListValueId;
     }
 
     public BigInteger getPrevCodeListId() {

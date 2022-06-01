@@ -1,6 +1,5 @@
 package org.oagi.score.export.model;
 
-import org.oagi.score.common.util.Utility;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 
@@ -24,8 +23,7 @@ public class BCCP implements Component {
     }
 
     public String getTypeName() {
-        String bdtDen = bdt.getDen();
-        return Utility.denToName(bdtDen);
+        return ModelUtils.getTypeName(bdt);
     }
 
     public boolean isNillable() {

@@ -1,0 +1,290 @@
+<div class="row action-group m-0">
+  <div class="col-3 title-wrap p-0">
+    <span class="title">Select based DT to append Supplementary Component</span>
+  </div>
+</div>
+
+<mat-dialog-content class="pt-2 pb-2 mat-card-container">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card class="search-box" *ngIf="!loading">
+    <mat-card-content class="mat-card-container">
+      <div class="container-fluid" style="padding: 0;">
+        <div class="row">
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>State</mat-label>
+              <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
+                          floatLabel="never" multiple>
+                <mat-option *ngFor="let state of workingStateList" [value]="state">
+                  <span>{{ state | separate }}</span>
+                </mat-option>
+              </mat-select>
+              <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
+                          floatLabel="never" multiple>
+                <mat-option *ngFor="let state of releaseStateList" [value]="state">
+                  <span>{{ state | separate }}</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>Deprecated</mat-label>
+              <mat-select [(ngModel)]="request.deprecated" multiple>
+                <mat-option [value]="true">
+                  True
+                </mat-option>
+                <mat-option [value]="false">
+                  False
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="request.dtTypes" multiple>
+                <mat-option [value]="'Core'">
+                  Core
+                </mat-option>
+                <mat-option [value]="'Default'">
+                  Default
+                </mat-option>
+                <mat-option [value]="'Unqualified'">
+                  Unqualified
+                </mat-option>
+                <mat-option [value]="'Qualified'">
+                  Qualified
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid" style="padding: 0;">
+        <div class="row">
+
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>Owner</mat-label>
+              <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                  {{loginId}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>Updater</mat-label>
+              <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                  {{loginId}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2 col-sm-12 d-flex">
+            <mat-form-field>
+              <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                     [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                     (dateInput)="onDateEvent('startDate', $event)">
+              <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+              <mat-datepicker #dateStart></mat-datepicker>
+            </mat-form-field>
+            <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-flex">
+                <div class="mat-form-field-infix">
+                  <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-2 col-sm-12 d-flex">
+            <mat-form-field>
+              <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                     [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                     (dateInput)="onDateEvent('endDate', $event)">
+              <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+              <mat-datepicker #dateEnd></mat-datepicker>
+            </mat-form-field>
+            <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-flex">
+                <div class="mat-form-field-infix">
+                  <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid" style="padding: 0;">
+        <div class="row">
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <input matInput [(ngModel)]="request.filters.den" (keyup.enter)="onChange()"
+                     placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <input matInput [(ngModel)]="request.filters.definition" (keyup.enter)="onChange()"
+                     placeholder="Definition">
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <input matInput [(ngModel)]="request.filters.module" (keyup.enter)="onChange()"
+                     placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+        <mat-icon>search</mat-icon>
+        Search
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <div class="mat-elevation-z1">
+    <table mat-table multiTemplateDataRows
+           matSort matSortActive="lastUpdateTimestamp" matSortDirection="desc"
+           [dataSource]="dataSource">
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? toggle(row) : null"
+                        [checked]="isSelected(row)"
+                        matTooltip="CC is already selected."
+                        [matTooltipDisabled]="data.currentBdtId !== row.id"
+                        [disabled]="data.currentBdtId === row.id">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
+          <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="den">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="den ellipsis" style="margin-right: 10px;">
+            <span>{{ element.den }}</span>
+          </div>
+          <div class="description ellipsis">{{ element.guid }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type</th>
+        <td mat-cell *matCellDef="let element">{{ element.dtType }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="revision">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Revision</th>
+        <td mat-cell *matCellDef="let element">
+          <span>{{ element.revision }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="owner">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Owner</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="ellipsis">{{ element.owner }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="module">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Module</th>
+        <td mat-cell *matCellDef="let element">
+          <span [innerHTML]="element.module"></span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastUpdateTimestamp">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+          <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail"
+               *ngIf="element.definitionSource && element.definition"
+               [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+            <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
+              <mat-card style="margin-bottom: 12px;">
+                <mat-card-header *ngIf="element.definitionSource !== null"
+                                 style="background-color: #f5f5f5; margin-bottom: 12px;">
+                  <mat-card-subtitle
+                    style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
+                     *ngIf="element.definition !== null"></p>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
+          [class.expanded-row]="expandedElement === element"
+          (click)="expandedElement = expandedElement === element ? null : element; toggle(element);"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+          (click)="toggle(row);"></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons></mat-paginator>
+  </div>
+</mat-dialog-content>
+
+<div class="row action-group m-0">
+  <div class="col-12 actions-wrap p-0">
+    <div class="actions">
+      <button mat-raised-button color="warn" (click)="onNoClick()">
+        Cancel
+      </button>
+      <button mat-raised-button color="accent"
+              [disabled]="selection.selected.length === 0"
+              (click)="onClick()">
+        Append
+      </button>
+    </div>
+  </div>
+</div>

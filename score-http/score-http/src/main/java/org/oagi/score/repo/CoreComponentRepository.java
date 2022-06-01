@@ -137,7 +137,7 @@ public class CoreComponentRepository {
                 .fetch();
     }
 
-    public DtManifestRecord getBdtManifestByManifestId(ULong manifestId) {
+    public DtManifestRecord getDtManifestByManifestId(ULong manifestId) {
         if (manifestId == null || manifestId.longValue() <= 0L) {
             return null;
         }

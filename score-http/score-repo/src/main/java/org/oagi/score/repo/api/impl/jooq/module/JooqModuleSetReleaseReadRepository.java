@@ -11,6 +11,7 @@ import org.oagi.score.repo.api.module.ModuleSetReadRepository;
 import org.oagi.score.repo.api.module.ModuleSetReleaseReadRepository;
 import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.security.AccessControl;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import javax.print.DocFlavor;
@@ -26,8 +27,7 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 
 public class JooqModuleSetReleaseReadRepository
         extends JooqScoreRepository
@@ -41,16 +41,19 @@ public class JooqModuleSetReleaseReadRepository
         return dslContext().select(
                 MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID,
                 MODULE_SET_RELEASE.MODULE_SET_ID,
-                MODULE_SET.NAME,
+                MODULE_SET_RELEASE.NAME,
                 MODULE_SET_RELEASE.RELEASE_ID,
+                MODULE_SET.NAME,
                 RELEASE.RELEASE_NUM,
                 MODULE_SET_RELEASE.IS_DEFAULT,
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 MODULE_SET_RELEASE.CREATION_TIMESTAMP,
                 MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(MODULE_SET_RELEASE)
@@ -65,21 +68,38 @@ public class JooqModuleSetReleaseReadRepository
             ModuleSetRelease moduleSetRelease = new ModuleSetRelease();
             moduleSetRelease.setModuleSetReleaseId(record.get(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID).toBigInteger());
             moduleSetRelease.setModuleSetId(record.get(MODULE_SET_RELEASE.MODULE_SET_ID).toBigInteger());
+            moduleSetRelease.setModuleSetReleaseName(record.get(MODULE_SET_RELEASE.NAME));
             moduleSetRelease.setModuleSetName(record.get(MODULE_SET.NAME));
             moduleSetRelease.setReleaseId(record.get(MODULE_SET_RELEASE.RELEASE_ID).toBigInteger());
             moduleSetRelease.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
             moduleSetRelease.setDefault(record.get(MODULE_SET_RELEASE.IS_DEFAULT) == 1);
 
-            moduleSetRelease.setCreatedBy(new ScoreUser(
-                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
-            ));
-            moduleSetRelease.setLastUpdatedBy(new ScoreUser(
-                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
-            ));
+            ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
+            boolean isCreatorAdmin = (byte) 1 == record.get(APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"));
+            moduleSetRelease.setCreatedBy(
+                    (isCreatorAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    Arrays.asList(creatorRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    creatorRole));
+
+            ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
+            boolean isUpdaterAdmin = (byte) 1 == record.get(APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"));
+            moduleSetRelease.setLastUpdatedBy(
+                    (isUpdaterAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    Arrays.asList(updaterRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    updaterRole));
+
             moduleSetRelease.setCreationTimestamp(
                     Date.from(record.get(MODULE.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             moduleSetRelease.setLastUpdateTimestamp(
@@ -143,7 +163,15 @@ public class JooqModuleSetReleaseReadRepository
         List<Condition> conditions = new ArrayList();
 
         if (StringUtils.hasLength(request.getName())) {
-            conditions.addAll(contains(request.getName(), MODULE_SET.NAME));
+            conditions.addAll(contains(request.getName(), MODULE_SET_RELEASE.NAME));
+        }
+
+        if (request.getReleaseId() != null) {
+            conditions.add(MODULE_SET_RELEASE.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
+        }
+
+        if (request.getDefault() != null) {
+            conditions.add(MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) (request.getDefault() == true ? 1 : 0)));
         }
 
         if (!request.getUpdaterUsernameList().isEmpty()) {
@@ -202,10 +230,10 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_ACC_MANIFEST).on(
                         and(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID),
                             MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(ACC.STATE.eq(CcState.Published.name()),
-                            ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
-                            ACC.OBJECT_CLASS_TERM.notEqual("Any Structured Content"),
-                            MODULE_ACC_MANIFEST.MODULE_ACC_MANIFEST_ID.isNull()))
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
+                        ACC.OBJECT_CLASS_TERM.notEqual("Any Structured Content"),
+                        MODULE_ACC_MANIFEST.MODULE_ACC_MANIFEST_ID.isNull()))
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
@@ -260,7 +288,7 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_ASCCP_MANIFEST).on(
                         and(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID),
                                 MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(ASCCP.STATE.eq(CcState.Published.name()),
+                .where(and(
                         ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
                         ASCCP.PROPERTY_TERM.notEqual("Any Property"),
                         MODULE_ASCCP_MANIFEST.MODULE_ASCCP_MANIFEST_ID.isNull()))
@@ -325,7 +353,7 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_BCCP_MANIFEST).on(
                         and(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID),
                                 MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(BCCP.STATE.eq(CcState.Published.name()),
+                .where(and(
                         BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
                         BCCP_MANIFEST.BCCP_MANIFEST_ID.in(elementBccpManifestList),
                         MODULE_BCCP_MANIFEST.MODULE_BCCP_MANIFEST_ID.isNull()))
@@ -383,9 +411,9 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_DT_MANIFEST).on(
                         and(MODULE_DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID),
                                 MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(DT.STATE.eq(CcState.Published.name()),
+                .where(and(
                         DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
-                        DT.TYPE.notEqual(DtType.Core.name()),
+                        DT.BASED_DT_ID.isNotNull(),
                         MODULE_DT_MANIFEST.MODULE_DT_MANIFEST_ID.isNull()))
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
@@ -441,7 +469,7 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_CODE_LIST_MANIFEST).on(
                         and(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID),
                                 MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(CODE_LIST.STATE.eq(CcState.Published.name()),
+                .where(and(
                         CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
                         MODULE_CODE_LIST_MANIFEST.MODULE_CODE_LIST_MANIFEST_ID.isNull()))
                 .fetchStream().map(e -> {
@@ -498,7 +526,7 @@ public class JooqModuleSetReleaseReadRepository
                 .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(
                         and(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID),
                                 MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId()))))
-                .where(and(AGENCY_ID_LIST.STATE.eq(CcState.Published.name()),
+                .where(and(
                         AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())),
                         MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_AGENCY_ID_LIST_MANIFEST_ID.isNull()))
                 .fetchStream().map(e -> {

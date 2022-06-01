@@ -49,7 +49,7 @@ public class BieUpliftingController {
     }
 
     @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/uplifting", method = RequestMethod.POST)
-    public UpliftBieResponse updateBie(@AuthenticationPrincipal AuthenticatedPrincipal user,
+    public UpliftBieResponse upliftBie(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                        @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
                                        @RequestBody UpliftBieRequest request) {
 

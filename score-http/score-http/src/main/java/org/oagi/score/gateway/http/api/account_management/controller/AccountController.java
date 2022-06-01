@@ -21,8 +21,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.service.configuration.AppUserAuthority.*;
 
@@ -56,7 +59,7 @@ public class AccountController {
             AppUser appUser = accountListService.getAccountByUsername(userDetails.getUsername());
             resp.put("username", userDetails.getUsername());
             resp.put("authentication", "basic");
-            resp.put("role", userDetails.getAuthorities().stream().findFirst().get().toString());
+            resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
             resp.put("enabled", appUser.isEnabled());
         } else if (principal instanceof OAuth2User) {
             OAuth2User oAuth2User = (OAuth2User) principal;
@@ -67,15 +70,20 @@ public class AccountController {
                 AppUser appUser = accountListService.getAccountById(appOauth2User.getAppUserId().longValue());
                 resp.put("username", appUser.getLoginId());
                 resp.put("authentication", "oauth2");
-                resp.put("role", appUser.isDeveloper() ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY);
+                List<String> roles = new ArrayList();
+                if (appUser.isAdmin()) {
+                    roles.add(ADMIN_GRANTED_AUTHORITY);
+                }
+                roles.add(appUser.isDeveloper() ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY);
+                resp.put("roles", roles);
                 resp.put("enabled", appUser.isEnabled());
             } else {
                 resp.put("username", "unknown");
                 resp.put("authentication", "unknown");
                 if (appOauth2User == null) {
-                    resp.put("role", REJECT_GRANTED_AUTHORITY);
+                    resp.put("roles", REJECT_GRANTED_AUTHORITY);
                 } else {
-                    resp.put("role", PENDING_GRANTED_AUTHORITY);
+                    resp.put("roles", PENDING_GRANTED_AUTHORITY);
                 }
                 resp.put("enabled", false);
             }

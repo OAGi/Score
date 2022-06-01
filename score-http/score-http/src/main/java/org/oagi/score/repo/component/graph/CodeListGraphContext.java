@@ -45,9 +45,6 @@ public class CodeListGraphContext implements GraphContext {
         private String meaning;
         private String value;
         private String state;
-        private boolean used;
-        private boolean locked;
-        private boolean extension;
         private ULong releaseId;
     }
 
@@ -81,9 +78,6 @@ public class CodeListGraphContext implements GraphContext {
                 CODE_LIST_VALUE.MEANING,
                 CODE_LIST_VALUE.VALUE,
                 CODE_LIST.STATE,
-                CODE_LIST_VALUE.USED_INDICATOR,
-                CODE_LIST_VALUE.LOCKED_INDICATOR,
-                CODE_LIST_VALUE.EXTENSION_INDICATOR,
                 CODE_LIST_VALUE_MANIFEST.RELEASE_ID)
                 .from(CODE_LIST_VALUE_MANIFEST)
                 .join(CODE_LIST_VALUE)
@@ -98,9 +92,6 @@ public class CodeListGraphContext implements GraphContext {
                         record.get(CODE_LIST_VALUE.MEANING),
                         record.get(CODE_LIST_VALUE.VALUE),
                         record.get(CODE_LIST.STATE),
-                        record.get(CODE_LIST_VALUE.USED_INDICATOR) == (byte) 1,
-                        record.get(CODE_LIST_VALUE.LOCKED_INDICATOR) == (byte) 1,
-                        record.get(CODE_LIST_VALUE.EXTENSION_INDICATOR) == (byte) 1,
                         record.get(CODE_LIST_VALUE_MANIFEST.RELEASE_ID)
                 )).stream()
                 .collect(groupingBy(CodeListValueManifest::getCodeListManifestId));
@@ -160,9 +151,6 @@ public class CodeListGraphContext implements GraphContext {
         node.put("state", codeListValueManifest.getState());
         node.put("meaning", codeListValueManifest.getMeaning());
         node.put("value", codeListValueManifest.getValue());
-        node.put("used", codeListValueManifest.isUsed());
-        node.put("locked", codeListValueManifest.isLocked());
-        node.put("extension", codeListValueManifest.isExtension());
         return node;
     }
 }

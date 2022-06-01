@@ -40,7 +40,7 @@ public class BbieReadRepository {
     }
 
     public BbieNode getBbieNode(BigInteger topLevelAsbiepId, BigInteger bccManifestId, String hashPath) {
-        BccManifestRecord bccManifestRecord = bccReadRepository.getBccManifestByManifestId(bccManifestId);
+        BccManifestRecord bccManifestRecord = bccReadRepository.getBccManifestById(bccManifestId);
         BccRecord bccRecord = bccReadRepository.getBccByManifestId(bccManifestId);
         if (bccRecord == null) {
             return null;
@@ -60,8 +60,13 @@ public class BbieReadRepository {
         bcc.setDen(bccRecord.getDen());
         bcc.setDefinition(bccRecord.getDefinition());
         bcc.setState(CcState.valueOf(bccRecord.getState()));
-        bcc.setDefaultValue(bccRecord.getDefaultValue());
-        bcc.setFixedValue(bccRecord.getFixedValue());
+        if (bccRecord.getDefaultValue() != null || bccRecord.getFixedValue() != null) {
+            bcc.setDefaultValue(bccRecord.getDefaultValue());
+            bcc.setFixedValue(bccRecord.getFixedValue());
+        } else if (bccpRecord.getDefaultValue() != null || bccpRecord.getFixedValue() != null) {
+            bcc.setDefaultValue(bccpRecord.getDefaultValue());
+            bcc.setFixedValue(bccpRecord.getFixedValue());
+        }
         bcc.setDeprecated(bccRecord.getIsDeprecated() == 1);
         bcc.setNillable(bccRecord.getIsNillable() == 1);
 
@@ -72,8 +77,13 @@ public class BbieReadRepository {
             bbie.setBasedBccManifestId(bcc.getBccManifestId());
             bbie.setCardinalityMin(bccRecord.getCardinalityMin());
             bbie.setCardinalityMax(bccRecord.getCardinalityMax());
-            bbie.setDefaultValue(bccRecord.getDefaultValue());
-            bbie.setFixedValue(bccRecord.getFixedValue());
+            if (bccRecord.getDefaultValue() != null || bccRecord.getFixedValue() != null) {
+                bbie.setDefaultValue(bccRecord.getDefaultValue());
+                bbie.setFixedValue(bccRecord.getFixedValue());
+            } else if (bccpRecord.getDefaultValue() != null || bccpRecord.getFixedValue() != null) {
+                bbie.setDefaultValue(bccpRecord.getDefaultValue());
+                bbie.setFixedValue(bccpRecord.getFixedValue());
+            }
             bbie.setNillable(bccpRecord.getIsNillable() == 1);
             BigInteger defaultBdtPriRestriId = getDefaultBdtPriRestriIdByBdtId(
                     bccpManifestRecord.getBdtManifestId().toBigInteger());
@@ -162,7 +172,7 @@ public class BbieReadRepository {
     }
 
     public List<BieEditUsed> getUsedBbieList(BigInteger topLevelAsbiepId) {
-        return dslContext.select(BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID, BBIE.HASH_PATH)
+        return dslContext.select(BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID, BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(BBIE)
                 .join(BBIEP).on(and(
                         BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID),
@@ -178,6 +188,7 @@ public class BbieReadRepository {
                     bieEditUsed.setBieId(record.get(BBIE.BBIE_ID).toBigInteger());
                     bieEditUsed.setManifestId(record.get(BBIE.BASED_BCC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(BBIE.HASH_PATH));
+                    bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

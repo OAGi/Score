@@ -16,9 +16,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 
 
 /**
- * This table stores XML schema built-in types and OAGIS built-in types. OAGIS 
- * built-in types are those types defined in the XMLSchemaBuiltinType and 
- * the XMLSchemaBuiltinType Patterns schemas.
+ * This table stores XML schema built-in types and OAGIS built-in types. OAGIS
+ * built-in types are those types defined in the XMLSchemaBuiltinType and the
+ * XMLSchemaBuiltinType Patterns schemas.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record16<ULong, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> {
@@ -40,42 +40,52 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.xbt.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.xbt.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.xbt.name</code>. Human understandable name of the built-in type.
+     * Setter for <code>oagi.xbt.name</code>. Human understandable name of the
+     * built-in type.
      */
     public void setName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.name</code>. Human understandable name of the built-in type.
+     * Getter for <code>oagi.xbt.name</code>. Human understandable name of the
+     * built-in type.
      */
     public String getName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.
+     * Setter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
+     * appear in the XML schema including the namespace prefix. Namespace prefix
+     * for the XML schema namespace is assumed to be 'xsd' and a default prefix
+     * for the OAGIS built-int type.
      */
     public void setBuiltinType(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.
+     * Getter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
+     * appear in the XML schema including the namespace prefix. Namespace prefix
+     * for the XML schema namespace is assumed to be 'xsd' and a default prefix
+     * for the OAGIS built-int type.
      */
     public String getBuiltinType() {
         return (String) get(3);
@@ -110,14 +120,16 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.
+     * Setter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
+     * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public void setSubtypeOfXbtId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.
+     * Getter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
+     * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public ULong getSubtypeOfXbtId() {
         return (ULong) get(6);

@@ -15,8 +15,6 @@ import org.oagi.score.repo.component.graph.CodeListGraphContext;
 import org.oagi.score.repo.component.graph.CoreComponentGraphContext;
 import org.oagi.score.repo.component.graph.GraphContext;
 import org.oagi.score.repo.component.graph.GraphContextRepository;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -118,16 +116,16 @@ public class GraphService {
         return buildGraph(coreComponentGraphContext, coreComponentGraphContext.toNode(bccpManifest), false);
     }
 
-    public Graph getBdtGraph(BigInteger bdtManifestId) {
-        DtManifestRecord bdtManifest =
-                coreComponentRepository.getBdtManifestByManifestId(ULong.valueOf(bdtManifestId));
-        if (bdtManifest == null) {
+    public Graph getDtGraph(BigInteger dtManifestId) {
+        DtManifestRecord dtManifest =
+                coreComponentRepository.getDtManifestByManifestId(ULong.valueOf(dtManifestId));
+        if (dtManifest == null) {
             throw new IllegalArgumentException();
         }
 
         CoreComponentGraphContext coreComponentGraphContext =
-                graphContextRepository.buildGraphContext(bdtManifest);
-        return buildGraph(coreComponentGraphContext, coreComponentGraphContext.toNode(bdtManifest), false);
+                graphContextRepository.buildGraphContext(dtManifest);
+        return buildGraph(coreComponentGraphContext, coreComponentGraphContext.toNode(dtManifest), false);
     }
 
     public Graph getBieGraph(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
@@ -170,7 +168,7 @@ public class GraphService {
             }
 
             graph.addEdges(node, children);
-            if (Node.NodeType.BDT == node.getType()) {
+            if (Node.NodeType.DT == node.getType()) {
                 children.stream().forEach(e -> graph.addNode(e));
             } else {
                 manifestQueue.addAll(children);

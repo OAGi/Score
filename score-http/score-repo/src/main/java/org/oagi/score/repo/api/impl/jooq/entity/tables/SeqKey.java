@@ -115,12 +115,12 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SEQ_KEY_SEQ_KEY_ASCC_MANIFEST_ID, Indexes.SEQ_KEY_SEQ_KEY_BCC_MANIFEST_ID, Indexes.SEQ_KEY_SEQ_KEY_FROM_ACC_MANIFEST_ID);
+        return Arrays.asList(Indexes.SEQ_KEY_SEQ_KEY_ASCC_MANIFEST_ID, Indexes.SEQ_KEY_SEQ_KEY_BCC_MANIFEST_ID, Indexes.SEQ_KEY_SEQ_KEY_FROM_ACC_MANIFEST_ID);
     }
 
     @Override
@@ -134,13 +134,8 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
     }
 
     @Override
-    public List<UniqueKey<SeqKeyRecord>> getKeys() {
-        return Arrays.<UniqueKey<SeqKeyRecord>>asList(Keys.KEY_SEQ_KEY_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<SeqKeyRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<SeqKeyRecord, ?>>asList(Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
+        return Arrays.asList(Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
     }
 
     private transient AccManifest _accManifest;
@@ -149,6 +144,9 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
     private transient SeqKey _seqKeyPrevSeqKeyIdFk;
     private transient SeqKey _seqKeyNextSeqKeyIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     */
     public AccManifest accManifest() {
         if (_accManifest == null)
             _accManifest = new AccManifest(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK);
@@ -156,6 +154,9 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return _accManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table.
+     */
     public AsccManifest asccManifest() {
         if (_asccManifest == null)
             _asccManifest = new AsccManifest(this, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK);
@@ -163,6 +164,9 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return _asccManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table.
+     */
     public BccManifest bccManifest() {
         if (_bccManifest == null)
             _bccManifest = new BccManifest(this, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK);
@@ -170,6 +174,10 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return _bccManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table, via
+     * the <code>seq_key_prev_seq_key_id_fk</code> key.
+     */
     public SeqKey seqKeyPrevSeqKeyIdFk() {
         if (_seqKeyPrevSeqKeyIdFk == null)
             _seqKeyPrevSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK);
@@ -177,6 +185,10 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return _seqKeyPrevSeqKeyIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table, via
+     * the <code>seq_key_next_seq_key_id_fk</code> key.
+     */
     public SeqKey seqKeyNextSeqKeyIdFk() {
         if (_seqKeyNextSeqKeyIdFk == null)
             _seqKeyNextSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);

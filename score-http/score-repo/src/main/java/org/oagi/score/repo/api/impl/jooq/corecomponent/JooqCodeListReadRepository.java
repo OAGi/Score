@@ -37,7 +37,7 @@ public class JooqCodeListReadRepository
                         CODE_LIST.GUID,
                         CODE_LIST.NAME,
                         CODE_LIST.VERSION_ID,
-                        CODE_LIST.AGENCY_ID,
+                        CODE_LIST.AGENCY_ID_LIST_VALUE_ID,
                         CODE_LIST.PREV_CODE_LIST_ID,
                         CODE_LIST.NEXT_CODE_LIST_ID)
                 .from(CODE_LIST)

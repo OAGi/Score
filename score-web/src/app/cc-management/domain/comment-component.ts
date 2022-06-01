@@ -4,7 +4,7 @@ import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
   CcBccpNodeDetail,
-  CcBdtScNodeDetail,
+  CcBdtScNodeDetail, CcDtNodeDetail,
   CcNodeDetail,
   Comment
 } from './core-component-node';
@@ -49,8 +49,16 @@ export class CommentControl {
     return detail as CcBccpNodeDetail;
   }
 
+  isBdtDetail(detail: CcNodeDetail): boolean {
+    return (detail !== undefined) && (detail.type.toUpperCase() === 'DT');
+  }
+
+  asBdtDetail(detail: CcNodeDetail): CcDtNodeDetail {
+    return detail as CcDtNodeDetail;
+  }
+
   isBdtScDetail(detail: CcNodeDetail): boolean {
-    return (detail !== undefined) && (detail.type.toUpperCase() === 'BDT_SC');
+    return (detail !== undefined) && (detail.type.toUpperCase() === 'DT_SC');
   }
 
   asBdtScDetail(detail: CcNodeDetail): CcBdtScNodeDetail {
@@ -77,10 +85,10 @@ export class CommentControl {
       case 'BCCP':
         this.commentReference = type + '-' + this.asBccpDetail(detail).bccp.manifestId;
         break;
-      case 'BDT':
-        this.commentReference = type + '-' + this.asBccpDetail(detail).bdt.manifestId;
+      case 'DT':
+        this.commentReference = type + '-' + this.asBdtDetail(detail).manifestId;
         break;
-      case 'BDT_SC':
+      case 'DT_SC':
         this.commentReference = type + '-' + this.asBdtScDetail(detail).manifestId;
         break;
       default:

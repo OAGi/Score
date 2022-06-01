@@ -4,6 +4,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {OAuth2AppInfo} from '../../authentication/domain/auth';
 import {Observable} from 'rxjs';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'score-login',
@@ -22,6 +23,7 @@ export class LoginComponent implements AfterViewChecked {
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
 
   constructor(public auth: AuthService,
+              private snackBar: MatSnackBar,
               private http: HttpClient,
               private route: ActivatedRoute,
               private router: Router) {
@@ -39,7 +41,18 @@ export class LoginComponent implements AfterViewChecked {
   }
 
   login() {
-    this.auth.authenticate(this.credentials, _ => {
+    this.auth.authenticate(this.credentials, resp => {
+      const roles = resp.roles;
+      let message;
+      if (roles.includes('developer')) {
+        message = 'Signed in as \'' + this.credentials.username + '\' (developer)';
+      } else {
+        message = 'Signed in as \'' + this.credentials.username + '\' (end-user)';
+      }
+
+      this.snackBar.open(message, '', {
+        duration: 3000,
+      });
       this.router.navigateByUrl(this.next);
     }, err => {
       this.err = err;
@@ -78,7 +91,7 @@ export class LoginComponent implements AfterViewChecked {
     }, 0);
   }
 
-  get role(): string {
-    return this.auth.getUserToken().role;
+  get roles(): string[] {
+    return this.auth.getUserToken().roles;
   }
 }

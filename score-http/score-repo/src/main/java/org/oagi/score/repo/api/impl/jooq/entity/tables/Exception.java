@@ -52,12 +52,14 @@ public class Exception extends TableImpl<ExceptionRecord> {
     }
 
     /**
-     * The column <code>oagi.exception.exception_id</code>. Internal, primary database key.
+     * The column <code>oagi.exception.exception_id</code>. Internal, primary
+     * database key.
      */
     public final TableField<ExceptionRecord, ULong> EXCEPTION_ID = createField(DSL.name("exception_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
 
     /**
-     * The column <code>oagi.exception.tag</code>. A tag of the exception for the purpose of the searching facilitation
+     * The column <code>oagi.exception.tag</code>. A tag of the exception for
+     * the purpose of the searching facilitation
      */
     public final TableField<ExceptionRecord, String> TAG = createField(DSL.name("tag"), SQLDataType.VARCHAR(50), this, "A tag of the exception for the purpose of the searching facilitation");
 
@@ -67,17 +69,21 @@ public class Exception extends TableImpl<ExceptionRecord> {
     public final TableField<ExceptionRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB, this, "The exception message.");
 
     /**
-     * The column <code>oagi.exception.stacktrace</code>. The serialized stacktrace object.
+     * The column <code>oagi.exception.stacktrace</code>. The serialized
+     * stacktrace object.
      */
     public final TableField<ExceptionRecord, byte[]> STACKTRACE = createField(DSL.name("stacktrace"), SQLDataType.BLOB, this, "The serialized stacktrace object.");
 
     /**
-     * The column <code>oagi.exception.created_by</code>. Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.
+     * The column <code>oagi.exception.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who is working on when the
+     * exception occurs.
      */
     public final TableField<ExceptionRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.");
 
     /**
-     * The column <code>oagi.exception.creation_timestamp</code>. Timestamp when the exception was created.
+     * The column <code>oagi.exception.creation_timestamp</code>. Timestamp when
+     * the exception was created.
      */
     public final TableField<ExceptionRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the exception was created.");
 
@@ -116,12 +122,12 @@ public class Exception extends TableImpl<ExceptionRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EXCEPTION_EXCEPTION_TAG_IDX);
+        return Arrays.asList(Indexes.EXCEPTION_EXCEPTION_TAG_IDX);
     }
 
     @Override
@@ -135,17 +141,15 @@ public class Exception extends TableImpl<ExceptionRecord> {
     }
 
     @Override
-    public List<UniqueKey<ExceptionRecord>> getKeys() {
-        return Arrays.<UniqueKey<ExceptionRecord>>asList(Keys.KEY_EXCEPTION_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<ExceptionRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ExceptionRecord, ?>>asList(Keys.EXCEPTION_CREATED_BY_FK);
+        return Arrays.asList(Keys.EXCEPTION_CREATED_BY_FK);
     }
 
     private transient AppUser _appUser;
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     */
     public AppUser appUser() {
         if (_appUser == null)
             _appUser = new AppUser(this, Keys.EXCEPTION_CREATED_BY_FK);

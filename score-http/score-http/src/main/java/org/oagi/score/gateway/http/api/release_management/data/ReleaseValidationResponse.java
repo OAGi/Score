@@ -67,6 +67,7 @@ public class ReleaseValidationResponse {
     private Map<BigInteger, Set<ValidationMessage>> statusMapForBccp = new HashMap();
     private Map<BigInteger, Set<ValidationMessage>> statusMapForCodeList = new HashMap();
     private Map<BigInteger, Set<ValidationMessage>> statusMapForAgencyIdList = new HashMap();
+    private Map<BigInteger, Set<ValidationMessage>> statusMapForDt = new HashMap();
 
     public boolean isSucceed() {
         return (statusMapForAcc.isEmpty() || statusMapForAcc.values().stream().flatMap(e -> e.stream()).filter(e -> e.getLevel() == Error).count() == 0) &&
@@ -112,6 +113,10 @@ public class ReleaseValidationResponse {
 
     public void addMessageForAgencyIdList(BigInteger manifestId, ValidationMessageLevel level, String message, ValidationMessageCode code) {
         addMessage(statusMapForAgencyIdList, manifestId, level, message, code);
+    }
+
+    public void addMessageForDt(BigInteger manifestId, ValidationMessageLevel level, String message, ValidationMessageCode code) {
+        addMessage(statusMapForDt, manifestId, level, message, code);
     }
 
     private void addMessage(Map<BigInteger, Set<ValidationMessage>> statusMap,

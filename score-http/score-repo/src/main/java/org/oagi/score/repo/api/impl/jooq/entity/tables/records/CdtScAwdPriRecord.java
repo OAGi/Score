@@ -14,9 +14,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPri;
 
 
 /**
- * This table capture the CDT primitives allowed for a particular SC of a 
- * CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends 
- * its base (    such SC is not defined in the CCTS data type catalog specification).
+ * This table capture the CDT primitives allowed for a particular SC of a CDT.
+ * It also stores the CDT primitives allowed for a SC of a BDT that extends its
+ * base (such SC is not defined in the CCTS data type catalog specification).
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtScAwdPriRecord extends UpdatableRecordImpl<CdtScAwdPriRecord> implements Record4<ULong, ULong, ULong, Byte> {
@@ -24,56 +24,68 @@ public class CdtScAwdPriRecord extends UpdatableRecordImpl<CdtScAwdPriRecord> im
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_sc_awd_pri_id</code>. Internal, primary database key.
+     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_sc_awd_pri_id</code>. Internal,
+     * primary database key.
      */
     public void setCdtScAwdPriId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_sc_awd_pri_id</code>. Internal, primary database key.
+     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_sc_awd_pri_id</code>. Internal,
+     * primary database key.
      */
     public ULong getCdtScAwdPriId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_sc_id</code>. Foreign key pointing to the supplementary component (SC).
+     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_sc_id</code>. Foreign key
+     * pointing to the supplementary component (SC).
      */
     public void setCdtScId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_sc_id</code>. Foreign key pointing to the supplementary component (SC).
+     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_sc_id</code>. Foreign key
+     * pointing to the supplementary component (SC).
      */
     public ULong getCdtScId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_pri_id</code>. A foreign key pointing to the CDT_Pri table. It represents a CDT primitive allowed for the suppliement component identified in the CDT_SC_ID column.
+     * Setter for <code>oagi.cdt_sc_awd_pri.cdt_pri_id</code>. A foreign key
+     * pointing to the CDT_Pri table. It represents a CDT primitive allowed for
+     * the suppliement component identified in the CDT_SC_ID column.
      */
     public void setCdtPriId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_pri_id</code>. A foreign key pointing to the CDT_Pri table. It represents a CDT primitive allowed for the suppliement component identified in the CDT_SC_ID column.
+     * Getter for <code>oagi.cdt_sc_awd_pri.cdt_pri_id</code>. A foreign key
+     * pointing to the CDT_Pri table. It represents a CDT primitive allowed for
+     * the suppliement component identified in the CDT_SC_ID column.
      */
     public ULong getCdtPriId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri.is_default</code>. Indicating whether the primitive is the default primitive of the supplementary component.
+     * Setter for <code>oagi.cdt_sc_awd_pri.is_default</code>. Indicating
+     * whether the primitive is the default primitive of the supplementary
+     * component.
      */
     public void setIsDefault(Byte value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri.is_default</code>. Indicating whether the primitive is the default primitive of the supplementary component.
+     * Getter for <code>oagi.cdt_sc_awd_pri.is_default</code>. Indicating
+     * whether the primitive is the default primitive of the supplementary
+     * component.
      */
     public Byte getIsDefault() {
         return (Byte) get(3);

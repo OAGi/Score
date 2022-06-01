@@ -118,16 +118,16 @@ public class ReleaseService implements InitializingBean {
 
     public List<ReleaseList> getReleaseList(AuthenticatedPrincipal user) {
         List<ReleaseList> releaseLists = dslContext.select(
-                RELEASE.RELEASE_ID,
-                RELEASE.GUID,
-                RELEASE.RELEASE_NUM,
-                RELEASE.RELEASE_NOTE,
-                RELEASE.RELEASE_LICENSE,
-                RELEASE.STATE,
-                APP_USER.as("creator").LOGIN_ID.as("created_by"),
-                RELEASE.CREATION_TIMESTAMP,
-                APP_USER.as("updater").LOGIN_ID.as("last_updated_by"),
-                RELEASE.LAST_UPDATE_TIMESTAMP)
+                        RELEASE.RELEASE_ID,
+                        RELEASE.GUID,
+                        RELEASE.RELEASE_NUM,
+                        RELEASE.RELEASE_NOTE,
+                        RELEASE.RELEASE_LICENSE,
+                        RELEASE.STATE,
+                        APP_USER.as("creator").LOGIN_ID.as("created_by"),
+                        RELEASE.CREATION_TIMESTAMP,
+                        APP_USER.as("updater").LOGIN_ID.as("last_updated_by"),
+                        RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(RELEASE)
                 .join(APP_USER.as("creator"))
                 .on(RELEASE.CREATED_BY.eq(APP_USER.APP_USER_ID))
@@ -141,16 +141,16 @@ public class ReleaseService implements InitializingBean {
             ULong, String, String, String, String,
             String, String, LocalDateTime, String, LocalDateTime>> getSelectOnConditionStep() {
         return dslContext.select(
-                RELEASE.RELEASE_ID,
-                RELEASE.GUID,
-                RELEASE.RELEASE_NUM,
-                RELEASE.RELEASE_NOTE,
-                RELEASE.RELEASE_LICENSE,
-                RELEASE.STATE,
-                APP_USER.as("creator").LOGIN_ID.as("created_by"),
-                RELEASE.CREATION_TIMESTAMP,
-                APP_USER.as("updater").LOGIN_ID.as("last_updated_by"),
-                RELEASE.LAST_UPDATE_TIMESTAMP)
+                        RELEASE.RELEASE_ID,
+                        RELEASE.GUID,
+                        RELEASE.RELEASE_NUM,
+                        RELEASE.RELEASE_NOTE,
+                        RELEASE.RELEASE_LICENSE,
+                        RELEASE.STATE,
+                        APP_USER.as("creator").LOGIN_ID.as("created_by"),
+                        RELEASE.CREATION_TIMESTAMP,
+                        APP_USER.as("updater").LOGIN_ID.as("last_updated_by"),
+                        RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(RELEASE)
                 .join(APP_USER.as("creator"))
                 .on(RELEASE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
@@ -347,7 +347,8 @@ public class ReleaseService implements InitializingBean {
         validator.setAssignedAccComponentManifestIds(request.getAssignedAccComponentManifestIds());
         validator.setAssignedAsccpComponentManifestIds(request.getAssignedAsccpComponentManifestIds());
         validator.setAssignedBccpComponentManifestIds(request.getAssignedBccpComponentManifestIds());
-        validator.setAssignedCodeListComponentManifestIds(request.getAssignedBccpComponentManifestIds());
+        validator.setAssignedCodeListComponentManifestIds(request.getAssignedCodeListComponentManifestIds());
+        validator.setAssignedDtComponentManifestIds(request.getAssignedDtComponentManifestIds());
         return validator.validate();
     }
 
@@ -376,6 +377,7 @@ public class ReleaseService implements InitializingBean {
                     request.getAssignedAccComponentManifestIds(),
                     request.getAssignedAsccpComponentManifestIds(),
                     request.getAssignedBccpComponentManifestIds(),
+                    request.getAssignedDtComponentManifestIds(),
                     request.getAssignedCodeListComponentManifestIds(),
                     request.getAssignedAgencyIdListComponentManifestIds());
 
@@ -407,10 +409,8 @@ public class ReleaseService implements InitializingBean {
                     releaseCreateRequestEvent.getAccManifestIds(),
                     releaseCreateRequestEvent.getAsccpManifestIds(),
                     releaseCreateRequestEvent.getBccpManifestIds(),
+                    releaseCreateRequestEvent.getDtManifestIds(),
                     releaseCreateRequestEvent.getCodeListManifestIds(),
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    Collections.emptyList(),
                     releaseCreateRequestEvent.getAgencyIdListManifestIds()
             );
             repository.updateState(releaseCreateRequestEvent.getUserId(),

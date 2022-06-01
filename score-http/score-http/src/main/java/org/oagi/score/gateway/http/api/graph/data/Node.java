@@ -18,8 +18,8 @@ public class Node {
         ASCCP,
         BCC,
         BCCP,
-        BDT,
-        BDT_SC,
+        DT,
+        DT_SC,
 
         CODE_LIST,
         CODE_LIST_VALUE;
@@ -131,7 +131,7 @@ public class Node {
     }
 
     public boolean isAssociation() {
-        return getType() == NodeType.ASCC || getType() == NodeType.BCC || getType() == NodeType.BDT;
+        return getType() == NodeType.ASCC || getType() == NodeType.BCC || getType() == NodeType.DT;
     }
 
     @Override

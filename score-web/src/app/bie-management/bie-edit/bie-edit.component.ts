@@ -5,9 +5,8 @@ import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angul
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatDialog} from '@angular/material/dialog';
 import {PageRequest} from '../../basis/basis';
-import {BdtScFlatNode} from '../../cc-management/domain/cc-flat-tree';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {base64Decode, base64Encode, initFilter, UnboundedPipe} from '../../common/utility';
+import {base64Decode, UnboundedPipe} from '../../common/utility';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {ReuseBieDialogComponent} from './reuse-bie-dialog/reuse-bie-dialog.component';
@@ -134,7 +133,7 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
             (node as BbiepFlatNode).bccNode.manifestId, (node as BbiepFlatNode).bbiePath),
           this.service.getDetail(node.topLevelAsbiepId, 'BBIEP',
             (node as BbiepFlatNode).bccpNode.manifestId, (node as BbiepFlatNode).bbiepPath),
-          this.service.getDetail(node.topLevelAsbiepId, 'BDT',
+          this.service.getDetail(node.topLevelAsbiepId, 'DT',
             (node as BbiepFlatNode).bdtNode.manifestId, ''),
         ]).subscribe(([bbieDetail, bbiepDetail, bdtDetail]) => {
           const stored = (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
@@ -155,7 +154,7 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
         forkJoin([
           this.service.getDetail(node.topLevelAsbiepId, 'BBIE_SC',
             (node as BbieScFlatNode).bdtScNode.manifestId, (node as BbieScFlatNode).bbieScPath),
-          this.service.getDetail(node.topLevelAsbiepId, 'BDT',
+          this.service.getDetail(node.topLevelAsbiepId, 'DT',
             (node as BbieScFlatNode).bccNode.manifestId, ''),
         ]).subscribe(([bbieScDetail, bdtDetail]) => {
           const stored = (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
@@ -184,10 +183,10 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
 
 export class BieEditFlatNodeFlattener extends BieFlatNodeFlattener {
 
-  private _usedAsbieMap: {};
-  private _usedBbieMap: {};
-  private _usedBbieScMap: {};
-  private _refBieList: RefBie[];
+  private _usedAsbieMap = {};
+  private _usedBbieMap = {};
+  private _usedBbieScMap = {};
+  private _refBieList: RefBie[] = [];
 
   constructor(ccGraph: CcGraph, asccpManifestId: number, topLevelAsbiepId: number,
               usedBieList: UsedBie[], refBieList: RefBie[]) {
@@ -209,21 +208,29 @@ export class BieEditFlatNodeFlattener extends BieFlatNodeFlattener {
   }
 
   afterAsbiepFlatNode(node: AsbiepFlatNode) {
-    if (!node.used) {
-      let used = this._usedAsbieMap[node.asccNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
+    if (node.used === undefined) {
+      node.used = new Observable(subscriber => {
+        let used = this._usedAsbieMap[node.asccNode.manifestId];
+        if (!used || used.length === 0) {
+          subscriber.next(false);
+        } else {
           if (!node.locked && !(node.parent as BieFlatNode).used) {
             subscriber.next(false);
           } else {
-            used = used.filter(u => u.hashPath === node.asbieHashPath);
+            used = used.filter(u => {
+              if (node.derived) {
+                return u.ownerTopLevelAsbiepId === (node.parent as AbieFlatNode).topLevelAsbiepId &&
+                  u.hashPath === node.asbieHashPath;
+              } else {
+                return u.ownerTopLevelAsbiepId === node.topLevelAsbiepId &&
+                  u.hashPath === node.asbieHashPath;
+              }
+            });
             subscriber.next(!!used && used.length > 0 ? true : false);
           }
-          subscriber.complete();
-        });
-      }
+        }
+        subscriber.complete();
+      });
     }
 
     let derived = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
@@ -237,40 +244,40 @@ export class BieEditFlatNodeFlattener extends BieFlatNodeFlattener {
   }
 
   afterBbiepFlatNode(node: BbiepFlatNode) {
-    if (!node.used) {
-      let used = this._usedBbieMap[node.bccNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
+    if (node.used === undefined) {
+      node.used = new Observable(subscriber => {
+        let used = this._usedBbieMap[node.bccNode.manifestId];
+        if (!used || used.length === 0) {
+          subscriber.next(false);
+        } else {
           if (!node.locked && !(node.parent as BieFlatNode).used) {
             subscriber.next(false);
           } else {
-            used = used.filter(u => u.hashPath === node.bbieHashPath);
+            used = used.filter(u => u.ownerTopLevelAsbiepId === node.topLevelAsbiepId && u.hashPath === node.bbieHashPath);
             subscriber.next(!!used && used.length > 0 ? true : false);
           }
-          subscriber.complete();
-        });
-      }
+        }
+        subscriber.complete();
+      });
     }
   }
 
   afterBbieScFlatNode(node: BbieScFlatNode) {
-    if (!node.used) {
-      let used = this._usedBbieScMap[node.bdtScNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
+    if (node.used === undefined) {
+      node.used = new Observable(subscriber => {
+        let used = this._usedBbieScMap[node.bdtScNode.manifestId];
+        if (!used || used.length === 0) {
+          subscriber.next(false);
+        } else {
           if (!node.locked && !(node.parent as BieFlatNode).used) {
             subscriber.next(false);
           } else {
-            used = used.filter(u => u.hashPath === node.bbieScHashPath);
+            used = used.filter(u => u.ownerTopLevelAsbiepId === node.topLevelAsbiepId && u.hashPath === node.hashPath);
             subscriber.next(!!used && used.length > 0 ? true : false);
           }
-          subscriber.complete();
-        });
-      }
+        }
+        subscriber.complete();
+      });
     }
   }
 }
@@ -293,6 +300,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   treeControl: VSBieFlatTreeControl<BieFlatNode>;
   searcher: BieDataSourceSearcher;
   excludeSCs: boolean = true;
+  initialExpandDepth: number = 10;
 
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
@@ -386,7 +394,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       const flattener = new BieEditFlatNodeFlattener(
         ccGraph, rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
       setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs);
+        const nodes = flattener.flatten(this.excludeSCs, this.initialExpandDepth);
         this.treeControl = new VSBieFlatTreeControl<BieFlatNode>(undefined, undefined, undefined, this.excludeSCs ? flattener : undefined);
         this.dataSource = new VSBieEditTreeDataSource(this.treeControl, nodes, this.service, [this,]);
         this.loading = false;
@@ -395,7 +403,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
         this.searcher = new BieDataSourceSearcher(this.dataSource, this.excludeSCs);
         this.onClick(nodes[0]);
-        if(q != undefined) {
+        if (!!q) {
           this.selectedNode = nodes[0];
           this.searcher.inputKeyword = base64Decode(q);
           this.search(this.searcher.inputKeyword);
@@ -525,7 +533,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   get isDeveloper() {
     const userToken = this.auth.getUserToken();
-    return userToken.role === 'developer';
+    return userToken.roles.includes('developer');
   }
 
   canCreateBIEFromThis(node: BieFlatNode): boolean {
@@ -557,6 +565,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         ccGraph, this.rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
       setTimeout(() => {
         const nodes = flattener.flatten(this.excludeSCs);
+        this.treeControl = new VSBieFlatTreeControl<BieFlatNode>(undefined, undefined, undefined, this.excludeSCs ? flattener : undefined);
         this.dataSource = new VSBieEditTreeDataSource(this.treeControl, nodes, this.service, [this, ]);
         this.loading = false;
         nodes[0].used = true;

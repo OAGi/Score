@@ -14,10 +14,10 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
 
 
 /**
- * This is an intersection table. Per CCTS, a usage rule may be reused. This 
- * table allows m-m relationships between the usage rule and the DT content 
- * component and usage rules and DT supplementary component. In a particular 
- * record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not 
+ * This is an intersection table. Per CCTS, a usage rule may be reused. This
+ * table allows m-m relationships between the usage rule and the DT content
+ * component and usage rules and DT supplementary component. In a particular
+ * record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not
  * both.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -26,56 +26,68 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key of the table.
+     * Setter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
+     * of the table.
      */
     public void setDtUsageRuleId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key of the table.
+     * Getter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
+     * of the table.
      */
     public ULong getDtUsageRuleId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>. Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.
+     * Setter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>.
+     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
+     * the DT content component or DT_SC.
      */
     public void setAssignedUsageRuleId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>. Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.
+     * Getter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>.
+     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
+     * the DT content component or DT_SC.
      */
     public ULong getAssignedUsageRuleId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.
+     * Setter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to
+     * the DT_ID for assigning a usage rule to the corresponding DT content
+     * component.
      */
     public void setTargetDtId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.
+     * Getter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to
+     * the DT_ID for assigning a usage rule to the corresponding DT content
+     * component.
      */
     public ULong getTargetDtId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
+     * Setter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
+     * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
      */
     public void setTargetDtScId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
+     * Getter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
+     * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
      */
     public ULong getTargetDtScId() {
         return (ULong) get(3);

@@ -8,6 +8,6 @@ public class SameCodeListParams {
     private long releaseId;
     private Long codeListManifestId;
     private String listId;
-    private long agencyId;
+    private long agencyIdListValueManifestId;
     private String versionId;
 }

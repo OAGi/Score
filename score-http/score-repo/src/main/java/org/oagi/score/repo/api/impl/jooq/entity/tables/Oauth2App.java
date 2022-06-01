@@ -4,9 +4,6 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
@@ -173,7 +170,7 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -184,11 +181,6 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     @Override
     public UniqueKey<Oauth2AppRecord> getPrimaryKey() {
         return Keys.KEY_OAUTH2_APP_PRIMARY;
-    }
-
-    @Override
-    public List<UniqueKey<Oauth2AppRecord>> getKeys() {
-        return Arrays.<UniqueKey<Oauth2AppRecord>>asList(Keys.KEY_OAUTH2_APP_PRIMARY);
     }
 
     @Override

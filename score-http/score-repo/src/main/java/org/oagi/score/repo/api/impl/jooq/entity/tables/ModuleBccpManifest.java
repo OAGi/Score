@@ -50,42 +50,52 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
     }
 
     /**
-     * The column <code>oagi.module_bccp_manifest.module_bccp_manifest_id</code>. Primary key.
+     * The column
+     * <code>oagi.module_bccp_manifest.module_bccp_manifest_id</code>. Primary
+     * key.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> MODULE_BCCP_MANIFEST_ID = createField(DSL.name("module_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.module_set_release_id</code>. A foreign key of the module set release record.
+     * The column <code>oagi.module_bccp_manifest.module_set_release_id</code>.
+     * A foreign key of the module set release record.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> MODULE_SET_RELEASE_ID = createField(DSL.name("module_set_release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the module set release record.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.bccp_manifest_id</code>. A foreign key of the bccp manifest record.
+     * The column <code>oagi.module_bccp_manifest.bccp_manifest_id</code>. A
+     * foreign key of the bccp manifest record.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> BCCP_MANIFEST_ID = createField(DSL.name("bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the bccp manifest record.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.module_id</code>. This indicates a module.
+     * The column <code>oagi.module_bccp_manifest.module_id</code>. This
+     * indicates a module.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this record.
+     * The column <code>oagi.module_bccp_manifest.created_by</code>. Foreign key
+     * to the APP_USER table. It indicates the user who created this record.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this record.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record.
+     * The column <code>oagi.module_bccp_manifest.last_updated_by</code>.
+     * Foreign key to the APP_USER table referring to the last user who updated
+     * the record.
      */
     public final TableField<ModuleBccpManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.creation_timestamp</code>. The timestamp when the record was first created.
+     * The column <code>oagi.module_bccp_manifest.creation_timestamp</code>. The
+     * timestamp when the record was first created.
      */
     public final TableField<ModuleBccpManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.module_bccp_manifest.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * The column <code>oagi.module_bccp_manifest.last_update_timestamp</code>.
+     * The timestamp when the record was last updated.
      */
     public final TableField<ModuleBccpManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
@@ -124,7 +134,7 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -138,13 +148,8 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<ModuleBccpManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<ModuleBccpManifestRecord>>asList(Keys.KEY_MODULE_BCCP_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<ModuleBccpManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ModuleBccpManifestRecord, ?>>asList(Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
     private transient ModuleSetRelease _moduleSetRelease;
@@ -153,6 +158,10 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
     private transient AppUser _moduleBccpManifestCreatedByFk;
     private transient AppUser _moduleBccpManifestLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
     public ModuleSetRelease moduleSetRelease() {
         if (_moduleSetRelease == null)
             _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
@@ -160,6 +169,9 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return _moduleSetRelease;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.bccp_manifest</code> table.
+     */
     public BccpManifest bccpManifest() {
         if (_bccpManifest == null)
             _bccpManifest = new BccpManifest(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK);
@@ -167,6 +179,9 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return _bccpManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
     public Module module() {
         if (_module == null)
             _module = new Module(this, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK);
@@ -174,6 +189,10 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return _module;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_bccp_manifest_created_by_fk</code> key.
+     */
     public AppUser moduleBccpManifestCreatedByFk() {
         if (_moduleBccpManifestCreatedByFk == null)
             _moduleBccpManifestCreatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK);
@@ -181,6 +200,10 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return _moduleBccpManifestCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_bccp_manifest_last_updated_by_fk</code> key.
+     */
     public AppUser moduleBccpManifestLastUpdatedByFk() {
         if (_moduleBccpManifestLastUpdatedByFk == null)
             _moduleBccpManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);

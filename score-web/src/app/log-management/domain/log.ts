@@ -181,6 +181,60 @@ export class BccpSnapshot extends CcSnapshot {
   }
 }
 
+export class DtSnapshot extends CcSnapshot {
+  qualifier: string;
+  dataTypeTerm: string;
+  representationTerm: string;
+  namespaceUrl: string;
+  dtScList: DtScSnapshot[];
+
+  constructor(obj: any) {
+    super(obj);
+
+    this.qualifier = obj.qualifier;
+    this.dataTypeTerm = obj.dataTypeTerm;
+    this.representationTerm = obj.representationTerm;
+    this.namespaceUrl = getValueFromObj(obj, 'namespace->uri');
+    this.dtScList = [];
+    obj.supplementaryComponents.forEach(o => {
+      this.dtScList.push(new DtScSnapshot(o));
+    });
+  }
+}
+
+export class DtScSnapshot {
+  index: number;
+  color: string;
+  guid: string;
+  component: string;
+  propertyTerm: string;
+  representationTerm: string;
+  cardinalityMin: number;
+  cardinalityMax: number;
+  definition: string;
+  definitionSource: string;
+  defaultValue: string;
+  fixedValue: string;
+
+  constructor(obj: any) {
+    this.index = 0;
+    this.guid = obj.guid;
+    this.component = obj.component;
+    this.propertyTerm = obj.propertyTerm;
+    this.representationTerm = obj.representationTerm;
+    this.cardinalityMin = obj.cardinalityMin;
+    this.cardinalityMax = obj.cardinalityMax;
+    this.definition = obj.definition;
+    this.definitionSource = obj.definitionSource;
+    this.defaultValue = obj.defaultValue;
+    this.fixedValue = obj.fixedValue;
+  }
+
+  isEqual(other: DtScSnapshot): boolean {
+    return JSON.stringify(this) === JSON.stringify(other);
+  }
+}
+
 export class SnapshotPair {
   before: CcSnapshot;
   after: CcSnapshot;
@@ -201,7 +255,12 @@ export class SnapshotPair {
     } else if (before.component.toUpperCase() === 'BCCP') {
       this.before = new BccpSnapshot(before);
       this.after = new BccpSnapshot(after);
-    } else if (before.component.toUpperCase() === 'ASCC' || before.component.toUpperCase() === 'BCC') {
+    } else if (before.component.toUpperCase() === 'DT') {
+      this.before = new DtSnapshot(before);
+      this.after = new DtSnapshot(after);
+    } else if (before.component.toUpperCase() === 'ASCC' ||
+               before.component.toUpperCase() === 'BCC' ||
+               before.component.toUpperCase() === 'DTSC') {
       this.before = before;
       this.after = after;
     } else {
@@ -211,8 +270,8 @@ export class SnapshotPair {
 
     if (this.component.toUpperCase() === 'ACC') {
       // init index property for associations
-      const beforeAssociations = (this.before as AccSnapshot).associations;
-      const afterAssociations = (this.after as AccSnapshot).associations;
+      let beforeAssociations = (this.before as AccSnapshot).associations;
+      let afterAssociations = (this.after as AccSnapshot).associations;
 
       this.associations = [];
 
@@ -261,8 +320,60 @@ export class SnapshotPair {
         this.associations.splice(afterIndex++, 0,
           new SnapshotPair(emptyAssociation, afterAssociation));
       }
+    }
 
-      console.log(this.associations);
+    else if (this.component.toUpperCase() === 'DT') {
+      // init index property for associations
+      let beforeAssociations = (this.before as DtSnapshot).dtScList;
+      let afterAssociations = (this.after as DtSnapshot).dtScList;
+
+      this.associations = [];
+
+      let beforeIndex = 1;
+      for (const beforeAssociation of beforeAssociations) {
+        beforeAssociation.index = beforeIndex;
+
+        let afterIndex = beforeIndex;
+        let isExist = false;
+        for (const afterAssociation of afterAssociations) {
+          if (afterAssociation.index > 0) {
+            continue;
+          }
+
+          if (beforeAssociation.guid === afterAssociation.guid) {
+            isExist = true;
+            afterAssociation.index = afterIndex++;
+            this.associations.push(new SnapshotPair(beforeAssociation, afterAssociation));
+            break;
+          }
+
+          afterIndex++;
+        }
+
+        if (!isExist) {
+          const emptyAssociation = new DtScSnapshot({
+            component: beforeAssociation.component
+          });
+          this.associations.push(new SnapshotPair(beforeAssociation, emptyAssociation));
+        }
+
+        beforeIndex++;
+      }
+
+      let afterIndex = 0;
+      for (const afterAssociation of afterAssociations) {
+        if (afterAssociation.index > 0) {
+          afterIndex++;
+          continue;
+        }
+
+        const emptyAssociation = new DtScSnapshot({
+          component: afterAssociation.component
+        });
+
+        this.associations.splice(afterIndex++, 0,
+          new SnapshotPair(emptyAssociation, afterAssociation));
+      }
     }
   }
 

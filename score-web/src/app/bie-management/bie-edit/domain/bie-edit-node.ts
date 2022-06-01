@@ -256,14 +256,18 @@ export class BieDetailUpdateResponse {
 }
 
 export class UsedBie {
+  bieId: number;
   hashPath: string;
   type: string;
   manifestId: number;
+  ownerTopLevelAsbiepId: number;
 
   constructor(obj) {
+    this.bieId = obj && obj.bieId || 0;
     this.hashPath = obj && obj.hashPath || '';
     this.type = obj && obj.type || '';
     this.manifestId = obj && obj.manifestId || 0;
+    this.ownerTopLevelAsbiepId = obj && obj.ownerTopLevelAsbiepId || 0;
   }
 }
 

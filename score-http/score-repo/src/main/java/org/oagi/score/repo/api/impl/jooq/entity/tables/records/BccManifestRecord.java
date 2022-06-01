@@ -106,28 +106,32 @@ public class BccManifestRecord extends UpdatableRecordImpl<BccManifestRecord> im
     }
 
     /**
-     * Setter for <code>oagi.bcc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Setter for <code>oagi.bcc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public void setConflict(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.bcc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Getter for <code>oagi.bcc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public Byte getConflict() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * Setter for <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public void setReplacementBccManifestId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * Getter for <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public ULong getReplacementBccManifestId() {
         return (ULong) get(7);

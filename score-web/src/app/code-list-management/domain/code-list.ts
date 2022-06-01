@@ -108,6 +108,7 @@ export class CodeListForListRequest {
 
 export class CodeListForList {
   codeListManifestId: number;
+  codeListId: number;
   codeListName: string;
   definition: string;
   definitionSource: string;
@@ -116,8 +117,9 @@ export class CodeListForList {
   basedCodeListManifestId: number;
   basedCodeListName: string;
   listId: string;
-  agencyId: number;
-  agencyIdName: string;
+  agencyIdListValueManifestId: number;
+  agencyIdListValueValue: string;
+  agencyIdListValueName: string;
   versionId: string;
   lastUpdateTimestamp: Date;
   state: string;
@@ -132,8 +134,9 @@ export class CodeList {
   codeListName: string;
   basedCodeListManifestId: number;
   basedCodeListName: string;
-  agencyId: number;
-  agencyIdName: string;
+  agencyIdListValueManifestId: number;
+  agencyIdListValueValue: string;
+  agencyIdListValueName: string;
   versionId: string;
   namespaceId: number;
   namespaceUri: string;
@@ -149,6 +152,7 @@ export class CodeList {
   access: string;
 
   releaseNum: string;
+  releaseState: string;
   revisionNum: string;
   owner: string;
 
@@ -157,19 +161,33 @@ export class CodeList {
 
 export class CodeListValue {
   codeListValueManifestId: number;
+  basedCodeListValueManifestId: number;
   guid: string;
   value: string;
   meaning: string;
   definition: string;
   definitionSource: string;
 
-  used: boolean;
-  locked: boolean;
   deprecated: boolean;
   derived: boolean;
 }
 
+export class GetSimpleAgencyIdListValuesResponse {
+  agencyIdLists: SimpleAgencyIdList[];
+  agencyIdListValues: SimpleAgencyIdListValue[];
+}
+
+export class SimpleAgencyIdList {
+  agencyIdListManifestId: number;
+  agencyIdListId: number;
+  name: string;
+  state: string;
+}
+
 export class SimpleAgencyIdListValue {
+  agencyIdListValueManifestId: number;
+  agencyIdListManifestId: number;
   agencyIdListValueId: number;
+  value: string;
   name: string;
 }

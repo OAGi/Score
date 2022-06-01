@@ -4,8 +4,8 @@
   </mat-sidenav>
 
   <mat-sidenav-content (click)="sidenav.close();">
-    <div class="loading-container" *ngIf="loading">
-      <mat-spinner [diameter]="40"></mat-spinner>
+    <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing" *ngIf="loading">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
     <div class="context-section">
       <div class="row m-0">
@@ -23,7 +23,7 @@
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  (keyup.enter)="search(searcher.inputKeyword)">
                           <mat-hint matSuffix *ngIf="searcher.searchResult.length > 0"
-                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}</mat-hint>
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}+</mat-hint>
                           <mat-hint matSuffix *ngIf="searcher.searchResult.length === 0"
                                     align="end">0/0</mat-hint>
                         </mat-form-field>

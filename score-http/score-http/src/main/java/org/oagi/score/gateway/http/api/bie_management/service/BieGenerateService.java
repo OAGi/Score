@@ -9,6 +9,11 @@ import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateEx
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Zip;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxSchemeRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxSchemeValueRecord;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +126,7 @@ public class BieGenerateService {
 
         String filename;
         if (topLevelAsbiepList.size() == 1) {
-            filename = getFilenameByTopLevelAsbiep(topLevelAsbiepList.get(0));
+            filename = getFilenameByTopLevelAsbiep(topLevelAsbiepList.get(0), option);
         } else {
             filename = ScoreGuid.randomGuid();
         }
@@ -140,6 +146,7 @@ public class BieGenerateService {
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps, option);
 
+        Map<String, Integer> filenames = new HashMap();
         for (TopLevelAsbiep topLevelAsbiep : topLevelAsbieps) {
             try {
                 generateExpression.reset();
@@ -148,7 +155,13 @@ public class BieGenerateService {
             }
 
             generateExpression.generate(topLevelAsbiep, generationContext, option);
-            String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep);
+            String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option);
+            int numOfFilenames = filenames.getOrDefault(filename, 0);
+            filenames.put(filename, numOfFilenames + 1);
+
+            if (numOfFilenames > 0) {
+                filename = filename + " (" + numOfFilenames + ")";
+            }
 
             File schemaExpressionFile;
             try {
@@ -161,7 +174,12 @@ public class BieGenerateService {
         return targetFiles;
     }
 
-    private String getFilenameByTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
+    private String getFilenameByTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep, GenerateExpressionOption option) {
+        Map<BigInteger, String> filenames = option.getFilenames();
+        if (filenames != null && filenames.containsKey(topLevelAsbiep.getTopLevelAsbiepId())) {
+            return filenames.get(topLevelAsbiep.getTopLevelAsbiepId());
+        }
+
         /*
          * Issue 566
          */
@@ -184,7 +202,33 @@ public class BieGenerateService {
 
         String asbiepGuid = getGuidWithPrefix(result.get(ASBIEP.GUID));
 
-        return propertyTerm.replaceAll(" ", "-") + "-" + asbiepGuid;
+        /*
+         * Issue 1267
+         */
+        StringBuilder sb = new StringBuilder();
+        sb.append(propertyTerm.replaceAll(" ", "-"));
+
+        if (option.isIncludeBusinessContextInFilename()) {
+            BizCtxAssignmentRecord bizCtxAssignmentRecord = dslContext.selectFrom(BIZ_CTX_ASSIGNMENT)
+                    .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId())))
+                    .fetchAny();
+            BizCtxRecord bizCtxRecord = dslContext.selectFrom(BIZ_CTX)
+                    .where(BIZ_CTX.BIZ_CTX_ID.eq(bizCtxAssignmentRecord.getBizCtxId()))
+                    .fetchOne();
+
+            if (bizCtxRecord != null) {
+                sb.append('-').append(bizCtxRecord.getName().replaceAll(" ", "-"));
+            }
+        }
+        
+        if (option.isIncludeVersionInFilename()) {
+            String version = StringUtils.trim(topLevelAsbiep.getVersion());
+            if (StringUtils.hasLength(version)) {
+                sb.append('-').append(version.replaceAll(".", "_"));
+            }
+        }
+
+        return sb.toString();
     }
 
     private BieGenerateExpression createBieGenerateExpression(GenerateExpressionOption option) {

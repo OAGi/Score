@@ -17,33 +17,28 @@
       <mat-form-field>
         <mat-label>Meaning</mat-label>
         <input matInput required maxlength="100"
-               [disabled]="!isEditable || codeListValue.derived"
+               [disabled]="!isEditable"
                [(ngModel)]="codeListValue.meaning">
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition</mat-label>
         <textarea matInput rows="6" cols="30"
-                  [disabled]="!isEditable || codeListValue.derived"
+                  [disabled]="!isEditable"
                   [(ngModel)]="codeListValue.definition"></textarea>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition Source</mat-label>
         <input matInput maxlength="100"
-               [disabled]="!isEditable || codeListValue.derived"
+               [disabled]="!isEditable"
                [(ngModel)]="codeListValue.definitionSource">
       </mat-form-field>
 
       <div class="row">
         <div class="col-12">
-          <mat-checkbox color="warn" class="mr-2"
-                        [disabled]="!isEditable || (this.hasRevision && isUsedBefore)"
-                        [(ngModel)]="codeListValue.used">
-            <span>Used</span>
-          </mat-checkbox>
           <mat-checkbox color="warn"
-                        [disabled]="!isEditable || revisionDeprecated || actionName === 'Add' || !this.hasRevision"
+                        [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
                         [(ngModel)]="codeListValue.deprecated">
             <span>Deprecated</span>
           </mat-checkbox>
@@ -53,7 +48,7 @@
   </mat-card>
 </mat-dialog-content>
 
-<mat-dialog-actions *ngIf="isEditable && isAvailable(codeListValue)">
+<mat-dialog-actions *ngIf="isEditable">
   <button mat-raised-button color="primary"
           [disabled]="isDisabled()"
           [mat-dialog-close]="codeListValue">

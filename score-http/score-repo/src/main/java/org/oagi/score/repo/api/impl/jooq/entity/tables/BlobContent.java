@@ -4,9 +4,6 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
@@ -28,8 +25,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BlobContentRecord
 
 
 /**
- * This table stores schemas whose content is only imported as a whole and 
- * is represented in Blob.
+ * This table stores schemas whose content is only imported as a whole and is
+ * represented in Blob.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BlobContent extends TableImpl<BlobContentRecord> {
@@ -50,12 +47,14 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
     }
 
     /**
-     * The column <code>oagi.blob_content.blob_content_id</code>. Primary, internal database key.
+     * The column <code>oagi.blob_content.blob_content_id</code>. Primary,
+     * internal database key.
      */
     public final TableField<BlobContentRecord, ULong> BLOB_CONTENT_ID = createField(DSL.name("blob_content_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.blob_content.content</code>. The Blob content of the schema file.
+     * The column <code>oagi.blob_content.content</code>. The Blob content of
+     * the schema file.
      */
     public final TableField<BlobContentRecord, byte[]> CONTENT = createField(DSL.name("content"), SQLDataType.BLOB.nullable(false), this, "The Blob content of the schema file.");
 
@@ -94,7 +93,7 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -105,11 +104,6 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
     @Override
     public UniqueKey<BlobContentRecord> getPrimaryKey() {
         return Keys.KEY_BLOB_CONTENT_PRIMARY;
-    }
-
-    @Override
-    public List<UniqueKey<BlobContentRecord>> getKeys() {
-        return Arrays.<UniqueKey<BlobContentRecord>>asList(Keys.KEY_BLOB_CONTENT_PRIMARY);
     }
 
     @Override

@@ -99,6 +99,7 @@ export class ModuleService {
 
   createModuleSetRelease(moduleSetRelease: ModuleSetRelease, basedModuleSetReleaseId?: number): Observable<ModuleSetRelease> {
     const params = {
+      moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
       default: moduleSetRelease.default
@@ -117,8 +118,9 @@ export class ModuleService {
     });
   }
 
-  updateModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<any> {
+  updateModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<ModuleSetRelease> {
     return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId, {
+      moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
       default: moduleSetRelease.default
@@ -181,6 +183,12 @@ export class ModuleService {
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
+    }
+    if (request.releaseId) {
+      params = params.set('releaseId', request.releaseId);
+    }
+    if (request.isDefault) {
+      params = params.set('default', request.isDefault);
     }
     return this.http.get<PaginationResponse<ModuleSetRelease>>('/api/module_set_release_list', {params: params})
       .pipe(map((resp: PaginationResponse<ModuleSetRelease>) => {

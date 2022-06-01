@@ -1,6 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import * as CryptoJS from 'crypto-js';
-import {isString} from 'util';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {UserToken} from '../authentication/domain/auth';
@@ -23,6 +22,38 @@ export function sha1(str): string {
 
 export function sha256(str): string {
   return CryptoJS.SHA256(str).toString();
+}
+
+export function hashCode4Array(...objs): number {
+  let hash = 1;
+  for (const obj of objs) {
+    hash = 31 * hash + hashCode4Object(obj);
+    if (Math.abs(hash) >= 1000000000) {
+      hash = hashCode4String(hashCode(hash));
+    }
+  }
+  return hashCode4String(hashCode(hash));
+}
+
+export function hashCode4Object(obj: any): number {
+  if (!obj) {
+    return 0;
+  }
+
+  if (Array.isArray(obj)) {
+    return hashCode4Array(...obj);
+  }
+
+  switch (typeof obj) {
+    case 'string':
+      return hashCode4String(obj);
+    case 'boolean':
+      return (obj) ? 1231 : 1237;
+    case 'number':
+      return (obj) ? obj as number : 0;
+    default:
+      return (typeof obj.hashCode === 'number') ? obj.hashCode : hashCode4String(hashCode(obj));
+  }
 }
 
 export function hashCode4String(s: string): number {
@@ -105,7 +136,7 @@ export function toCamelCase(value: string): string {
   if (!value) {
     return value;
   }
-  if (value.length == 1) {
+  if (value.length === 1) {
     value = value.toUpperCase();
   } else {
     value = value.split(' ').map(e => e.trim()).filter(e => e.length > 0).map(e => {
@@ -124,6 +155,7 @@ export function emptyToUndefined(value: string): string {
   if (!value) {
     return undefined;
   }
+  value = value.trim();
   return value.length === 0 ? undefined : value;
 }
 
@@ -133,7 +165,7 @@ export class UnboundedPipe implements PipeTransform {
     if (!value || value === 'unbounded') {
       return value;
     }
-    if (isString(value)) {
+    if (typeof value === 'string') {
       value = value.trim();
     }
     return (value === -1 || value === '-1') ? 'unbounded' : '' + value;

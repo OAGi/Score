@@ -8,6 +8,7 @@ import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.security.AccessControl;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
@@ -20,8 +21,8 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.*;
+import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqBusinessContextReadRepository
         extends JooqScoreRepository
@@ -39,9 +40,11 @@ public class JooqBusinessContextReadRepository
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 BIZ_CTX.CREATION_TIMESTAMP,
                 BIZ_CTX.LAST_UPDATE_TIMESTAMP)
                 .from(BIZ_CTX)
@@ -58,16 +61,33 @@ public class JooqBusinessContextReadRepository
             businessContext.setUsed(dslContext().selectCount().from(BIZ_CTX_ASSIGNMENT)
                     .where(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(record.get(BIZ_CTX.BIZ_CTX_ID)))
                     .fetchOneInto(Integer.class) > 0);
-            businessContext.setCreatedBy(new ScoreUser(
-                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
-            ));
-            businessContext.setLastUpdatedBy(new ScoreUser(
-                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
-            ));
+
+            ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
+            boolean isCreatorAdmin = (byte) 1 == record.get(APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"));
+            businessContext.setCreatedBy(
+                    (isCreatorAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    Arrays.asList(creatorRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    creatorRole));
+
+            ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
+            boolean isUpdaterAdmin = (byte) 1 == record.get(APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"));
+            businessContext.setLastUpdatedBy(
+                    (isUpdaterAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    Arrays.asList(updaterRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    updaterRole));
+
             businessContext.setCreationTimestamp(
                     Date.from(record.get(BIZ_CTX.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             businessContext.setLastUpdateTimestamp(

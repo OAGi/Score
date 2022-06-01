@@ -11,7 +11,7 @@ import {
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail, CcBdtNodeDetail,
+  CcBccpNodeDetail, CcDtNodeDetail,
   CcBdtScNodeDetail,
   CcGraph,
   CcGraphNode,
@@ -33,6 +33,8 @@ export interface CcFlatNode extends FlatNode {
   isChanged: boolean;
   detail: CcNodeDetail;
   parents: CcFlatNode[];
+
+  inhibited: boolean;
 
   typeClass: string;
 
@@ -85,14 +87,6 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
       if (child instanceof AsccpFlatNode) {
         if (child.asccpNode.propertyTerm === 'Extension') {
           return true;
-        } else {
-          if (this._hasExtension(child.children[0] as CcFlatNode)) {
-            return true;
-          }
-        }
-      } else if (child instanceof AccFlatNode) {
-        if (this._hasExtension(child)) {
-          return true;
         }
       }
     }
@@ -136,6 +130,10 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
   }
 
   deprecated: boolean;
+
+  get inhibited() {
+    return false;
+  }
 }
 
 export class AccFlatNode extends CcFlatNodeImpl {
@@ -200,6 +198,7 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
     this.asccpNode = asccpNode;
     this.asccNode = asccNode;
     this.deprecated = asccpNode.deprecated || (!!asccNode && asccNode.deprecated);
+    this.expandable = true;
   }
 
   get type(): string {
@@ -327,17 +326,17 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   }
 }
 
-export class BdtFlatNode extends CcFlatNodeImpl {
-  bdtNode: CcGraphNode;
+export class DtFlatNode extends CcFlatNodeImpl {
+  dtNode: CcGraphNode;
 
-  constructor(bdtNode: CcGraphNode) {
+  constructor(dtNode: CcGraphNode) {
     super();
-    this.bdtNode = bdtNode;
-    this.deprecated = bdtNode.deprecated;
+    this.dtNode = dtNode;
+    this.deprecated = dtNode.deprecated;
   }
 
   get type(): string {
-    return 'BDT';
+    return 'DT';
   }
 
   get typeClass(): string {
@@ -345,40 +344,50 @@ export class BdtFlatNode extends CcFlatNodeImpl {
   }
 
   get guid(): string {
-    return this.bdtNode.guid;
+    return this.dtNode.guid;
   }
 
   get name(): string {
-    return this.bdtNode.den;
+    if (this.detail) {
+      return (this.detail as CcDtNodeDetail).den;
+    }
+    return this.dtNode.den;
   }
 
   set name(val: string) {
-    this.bdtNode.den = val;
+    if (this.detail) {
+      (this.detail as CcDtNodeDetail).den = val;
+    }
+    this.dtNode.den = val;
   }
 
   get manifestId(): number {
-    return this.bdtNode.manifestId;
+    return this.dtNode.manifestId;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcBdtNodeDetail).releaseId : undefined;
+    return this.detail ? (this.detail as CcDtNodeDetail).releaseId : undefined;
   }
 
   get den(): string {
-    return this.bdtNode.den;
+    return this.dtNode.den;
+  }
+
+  get basedManifestId(): number {
+    return this.detail ? (this.detail as CcDtNodeDetail).basedBdtManifestId : undefined;
   }
 }
 
-export class BdtScFlatNode extends CcFlatNodeImpl {
-  bdtScNode: CcGraphNode;
+export class DtScFlatNode extends CcFlatNodeImpl {
+  dtScNode: CcGraphNode;
 
-  constructor(bdtScNode: CcGraphNode) {
+  constructor(dtScNode: CcGraphNode) {
     super();
-    this.bdtScNode = bdtScNode;
+    this.dtScNode = dtScNode;
   }
 
   get type(): string {
-    return 'BDT_SC';
+    return 'DT_SC';
   }
 
   get typeClass(): string {
@@ -386,11 +395,19 @@ export class BdtScFlatNode extends CcFlatNodeImpl {
   }
 
   get guid(): string {
-    return this.bdtScNode.guid;
+    return this.dtScNode.guid;
   }
 
   get name(): string {
-    return this.bdtScNode.propertyTerm + ' ' + this.bdtScNode.representationTerm;
+    const propertyTerm = this.dtScNode.propertyTerm || '';
+    const middle = propertyTerm.replace(this.dtScNode.representationTerm, '').trim();
+    if (middle) {
+      return this.dtScNode.objectClassTerm + '. '
+        + middle + '. '
+        + this.dtScNode.representationTerm;
+    }
+    return this.dtScNode.objectClassTerm + '. '
+      + this.dtScNode.representationTerm;
   }
 
   set name(val: string) {
@@ -398,7 +415,7 @@ export class BdtScFlatNode extends CcFlatNodeImpl {
   }
 
   get den(): string {
-    return this.bdtScNode.propertyTerm + '. ' + this.bdtScNode.representationTerm;
+    return this.name;
   }
 
   set den(val: string) {
@@ -409,11 +426,19 @@ export class BdtScFlatNode extends CcFlatNodeImpl {
   }
 
   get manifestId(): number {
-    return this.bdtScNode.manifestId;
+    return this.dtScNode.manifestId;
   }
 
   get bdtScManifestId(): number {
     return this.manifestId;
+  }
+
+  get inhibited(): boolean {
+    return this.dtScNode.cardinalityMin === 0 && this.dtScNode.cardinalityMax === 0;
+  }
+
+  get removeAble(): boolean {
+    return !(this.dtScNode.basedDtScId > 0);
   }
 }
 
@@ -594,8 +619,8 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     return node;
   }
 
-  toBdtScNode(bdtScNode: CcGraphNode, parent: CcFlatNode) {
-    const node = new BdtScFlatNode(bdtScNode);
+  toDtScNode(bdtScNode: CcGraphNode, parent: CcFlatNode) {
+    const node = new DtScFlatNode(bdtScNode);
     node.deprecated = bdtScNode.deprecated;
     node.state = bdtScNode.state;
     node.level = parent.level + 1;
@@ -609,7 +634,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     });
   }
 
-  flatten(excludeSCs?: boolean): CcFlatNode[] {
+  flatten(excludeSCs?: boolean, initialExpandDepth?: number): CcFlatNode[] {
     let node;
     if (this._type === 'ACC') {
       const accNode = this._ccGraph.graph.nodes[this.key];
@@ -621,33 +646,39 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       const bccpNode = this._ccGraph.graph.nodes[this.key];
       const bdtNode = next(this._ccGraph, bccpNode);
       node = new BccpFlatNode(bccpNode, bdtNode);
-    } else if (this._type === 'BDT') {
+    } else if (this._type === 'DT') {
       const bdtNode = this._ccGraph.graph.nodes[this.key];
-      node = new BdtFlatNode(bdtNode);
+      node = new DtFlatNode(bdtNode);
     }
     node.level = 0;
     this.fireEvent(node);
 
     const nodes = [node,];
-    this._doFlatten(nodes, node, excludeSCs);
+    this._doFlatten(nodes, node, excludeSCs, initialExpandDepth);
     return nodes;
   }
 
-  _doFlatten(nodes: CcFlatNode[], node: CcFlatNode, excludeSCs?: boolean) {
+  _doFlatten(nodes: CcFlatNode[], node: CcFlatNode, excludeSCs?: boolean, depth?: number) {
     if (excludeSCs && node.type === 'BCCP') {
       node.children = [];
-      node.expandable = this.hasBdtScChildren((node as BccpFlatNode).bdtNode)
+      node.expandable = this.hasDtScChildren((node as BccpFlatNode).bdtNode);
     } else {
-      node.children = this.getChildren(node);
-      node.expandable = node.children.length > 0;
-      node.children.map(e => e as CcFlatNode).forEach(e => {
-        nodes.push(e);
-        this.fireEvent(e);
-        if (e instanceof AsccpFlatNode && e.isCycle) {
-          return;
-        }
-        this._doFlatten(nodes, e, excludeSCs);
-      });
+      const children = this.getChildren(node);
+      node.expandable = children.length > 0;
+
+      if (depth === 0) {
+        node.children = [];
+      } else {
+        node.children = children;
+        node.children.map(e => e as CcFlatNode).forEach(e => {
+          nodes.push(e);
+          this.fireEvent(e);
+          if (e instanceof AsccpFlatNode && e.isCycle) {
+            return;
+          }
+          this._doFlatten(nodes, e, excludeSCs, depth - 1);
+        });
+      }
     }
   }
 
@@ -690,9 +721,9 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
 
     let children = [];
 
-    if (node instanceof BdtFlatNode) {
+    if (node instanceof DtFlatNode) {
       targets.forEach(target => {
-        children.push(this.toBdtScNode(nodes[target], node));
+        children.push(this.toDtScNode(nodes[target], node));
       });
       return children;
     }
@@ -714,11 +745,11 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
         }
       } else if (target.startsWith('BCC-')) {
         children.push(this.toBccpNode(nodes[target], node));
-      } else if (target.startsWith('BDT-')) {
+      } else if (target.startsWith('DT-')) {
         const bdtScEdges = edges[target];
         if (bdtScEdges) {
           bdtScEdges.targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).forEach(e => {
-            children.push(this.toBdtScNode(e, node));
+            children.push(this.toDtScNode(e, node));
           });
         }
       }
@@ -726,7 +757,19 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     return children;
   }
 
-  hasBdtScChildren(node: CcGraphNode): boolean {
+  expand(node: CcFlatNode) {
+    node.children = this.getChildren(node);
+    node.expandable = node.children.length > 0;
+    node.children.map(e => e as CcFlatNode).forEach(e => {
+      this.fireEvent(e);
+      if (e instanceof AsccpFlatNode && e.isCycle) {
+        return;
+      }
+      e.expandable = this.getChildren(e).length > 0;
+    });
+  }
+
+  hasDtScChildren(node: CcGraphNode): boolean {
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -737,7 +780,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     }
 
     switch (node.type) {
-      case 'BDT':
+      case 'DT':
         return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).length > 0;
 
       default :

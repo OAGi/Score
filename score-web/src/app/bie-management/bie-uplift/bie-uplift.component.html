@@ -41,7 +41,7 @@
                 <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
                        (keyup.enter)="search('source')">
                 <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length > 0"
-                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}}</mat-hint>
+                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}}+</mat-hint>
                 <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length === 0"
                           align="end">0/0</mat-hint>
               </mat-form-field>
@@ -146,7 +146,7 @@
                 <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
                        (keyup.enter)="search('target')">
                 <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length > 0"
-                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}}</mat-hint>
+                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}}+</mat-hint>
                 <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length === 0"
                           align="end">0/0</mat-hint>
               </mat-form-field>

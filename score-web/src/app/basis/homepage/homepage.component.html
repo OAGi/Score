@@ -26,9 +26,11 @@
           <mat-form-field>
             <mat-label>Branch</mat-label>
             <mat-select [(ngModel)]="selectedRelease" (ngModelChange)="onChangeRelease()">
-              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              <mat-option>
+                <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              </mat-option>
               <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
                 {{ release.releaseNum }}
               </mat-option>
@@ -49,9 +51,11 @@
                       <mat-label>User</mat-label>
                       <mat-select [(ngModel)]="numberOfBiesByUsers_usernameModel" multiple
                                   (ngModelChange)="applyFilter(numberOfBiesByUsersAndStates, numberOfBiesByUsers_usernameModel)">
-                        <ngx-mat-select-search [formControl]="numberOfBiesByUsers_usernameListFilterCtrl"
-                                               [placeholderLabel]="'Search...'"
-                                               [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        <mat-option>
+                          <ngx-mat-select-search [formControl]="numberOfBiesByUsers_usernameListFilterCtrl"
+                                                 [placeholderLabel]="'Search...'"
+                                                 [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        </mat-option>
                         <mat-option *ngFor="let loginId of numberOfBiesByUsers_usernameFilteredList | async" [value]="loginId">
                           {{ loginId }}
                         </mat-option>
@@ -234,9 +238,11 @@
           <mat-form-field>
             <mat-label>Branch</mat-label>
             <mat-select [(ngModel)]="selectedRelease" (ngModelChange)="onChangeRelease()">
-              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              <mat-option>
+                <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              </mat-option>
               <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
                 {{ release.releaseNum }}
               </mat-option>
@@ -257,9 +263,11 @@
                       <mat-label>User</mat-label>
                       <mat-select [(ngModel)]="numberOfCcExtsByUsers_usernameModel" multiple
                                   (ngModelChange)="applyFilter(numberOfCcExtsByUsersAndStates, numberOfCcExtsByUsers_usernameModel)">
-                        <ngx-mat-select-search [formControl]="numberOfCcExtsByUsers_usernameListFilterCtrl"
-                                               [placeholderLabel]="'Search...'"
-                                               [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        <mat-option>
+                          <ngx-mat-select-search [formControl]="numberOfCcExtsByUsers_usernameListFilterCtrl"
+                                                 [placeholderLabel]="'Search...'"
+                                                 [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        </mat-option>
                         <mat-option *ngFor="let loginId of numberOfCcExtsByUsers_usernameFilteredList | async" [value]="loginId">
                           {{ loginId }}
                         </mat-option>

@@ -44,7 +44,7 @@
   "BDT_SC_DETAIL": {
     "TITLE": "Supplementary Component",
     "TITLE_CASE": "Supplementary Component Detail",
-    "MAX": "Cardinality Max (-1 for unbounded)",
+    "MAX": "Cardinality Max",
     "DEN": "DEN",
     "DEFAULT_VALUE": "Default Value",
     "FIXED_VALUE": "Fixed Value"

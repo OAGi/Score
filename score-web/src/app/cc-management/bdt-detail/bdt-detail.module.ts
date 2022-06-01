@@ -11,13 +11,12 @@ import {ContextMenuModule} from 'ngx-contextmenu';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
-import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
-import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {CreateDtscDialogComponent} from './create-dtsc-dialog/create-dtsc-dialog.component';
 
 const routes: Routes = [
   {
-    path: 'core_component/bdt',
+    path: 'core_component/dt',
     children: [
       {
         path: ':manifestId',
@@ -45,6 +44,7 @@ const routes: Routes = [
   ],
   declarations: [
     BdtDetailComponent,
+    CreateDtscDialogComponent
   ]
 })
 export class BdtDetailModule {

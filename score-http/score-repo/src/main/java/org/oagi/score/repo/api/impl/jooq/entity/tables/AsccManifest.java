@@ -56,7 +56,7 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     /**
      * The column <code>oagi.ascc_manifest.release_id</code>.
      */
-    public final TableField<AsccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<AsccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED, this, "");
 
     /**
      * The column <code>oagi.ascc_manifest.ascc_id</code>.
@@ -79,12 +79,14 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     public final TableField<AsccManifestRecord, ULong> TO_ASCCP_MANIFEST_ID = createField(DSL.name("to_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.ascc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * The column <code>oagi.ascc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public final TableField<AsccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
-     * The column <code>oagi.ascc_manifest.replacement_ascc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * The column <code>oagi.ascc_manifest.replacement_ascc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public final TableField<AsccManifestRecord, ULong> REPLACEMENT_ASCC_MANIFEST_ID = createField(DSL.name("replacement_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
 
@@ -133,7 +135,7 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -147,13 +149,8 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<AsccManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<AsccManifestRecord>>asList(Keys.KEY_ASCC_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<AsccManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AsccManifestRecord, ?>>asList(Keys.ASCC_MANIFEST_RELEASE_ID_FK, Keys.ASCC_MANIFEST_ASCC_ID_FK, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.ASCC_MANIFEST_RELEASE_ID_FK, Keys.ASCC_MANIFEST_ASCC_ID_FK, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
     }
 
     private transient Release _release;
@@ -165,6 +162,9 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     private transient AsccManifest _asccManifestPrevAsccManifestIdFk;
     private transient AsccManifest _asccManifestNextAsccManifestIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
     public Release release() {
         if (_release == null)
             _release = new Release(this, Keys.ASCC_MANIFEST_RELEASE_ID_FK);
@@ -172,6 +172,9 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _release;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ascc</code> table.
+     */
     public Ascc ascc() {
         if (_ascc == null)
             _ascc = new Ascc(this, Keys.ASCC_MANIFEST_ASCC_ID_FK);
@@ -179,6 +182,9 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _ascc;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table.
+     */
     public SeqKey seqKey() {
         if (_seqKey == null)
             _seqKey = new SeqKey(this, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK);
@@ -186,6 +192,9 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _seqKey;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     */
     public AccManifest accManifest() {
         if (_accManifest == null)
             _accManifest = new AccManifest(this, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
@@ -193,6 +202,9 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _accManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
+     */
     public AsccpManifest asccpManifest() {
         if (_asccpManifest == null)
             _asccpManifest = new AsccpManifest(this, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK);
@@ -200,6 +212,10 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _asccpManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
+     * via the <code>ascc_replacement_ascc_manifest_id_fk</code> key.
+     */
     public AsccManifest asccReplacementAsccManifestIdFk() {
         if (_asccReplacementAsccManifestIdFk == null)
             _asccReplacementAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK);
@@ -207,6 +223,10 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _asccReplacementAsccManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
+     * via the <code>ascc_manifest_prev_ascc_manifest_id_fk</code> key.
+     */
     public AsccManifest asccManifestPrevAsccManifestIdFk() {
         if (_asccManifestPrevAsccManifestIdFk == null)
             _asccManifestPrevAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK);
@@ -214,6 +234,10 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return _asccManifestPrevAsccManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
+     * via the <code>ascc_manifest_next_ascc_manifest_id_fk</code> key.
+     */
     public AsccManifest asccManifestNextAsccManifestIdFk() {
         if (_asccManifestNextAsccManifestIdFk == null)
             _asccManifestNextAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);

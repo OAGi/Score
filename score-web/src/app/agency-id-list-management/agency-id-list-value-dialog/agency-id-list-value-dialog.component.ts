@@ -15,6 +15,7 @@ export class AgencyIdListValueDialogComponent implements OnInit {
   actionName;
   agencyIdListValue: AgencyIdListValue;
   lastRevisionValue: AgencyIdListValue;
+  agencyId: number;
   isEditable = false;
 
   constructor(
@@ -23,21 +24,29 @@ export class AgencyIdListValueDialogComponent implements OnInit {
 
     this.agencyIdListValue = data.agencyIdListValue;
     this.lastRevisionValue = data.lastRevisionValue;
+    this.agencyId = data.agencyId;
     this.isEditable = data.isEditable;
 
     this._hashCode = hashCode(this.agencyIdListValue);
   }
 
   get hasRevision(): boolean {
-    return this.lastRevisionValue !== undefined;
+    return !!this.lastRevisionValue;
   }
 
-  get revisionDeprecated(): boolean {
+  get derived(): boolean {
+    return !!this.agencyIdListValue.basedAgencyIdListValueManifestId;
+  }
+
+  get wasDeprecated(): boolean {
     return (!!this.lastRevisionValue && this.lastRevisionValue.deprecated);
   }
 
-  get isUsedBefore(): boolean {
-    return (!!this.lastRevisionValue && this.lastRevisionValue.used);
+  get isDeprecatedChangeable(): boolean {
+    if (this.hasRevision && !this.wasDeprecated) {
+      return true;
+    }
+    return false;
   }
 
   onNoClick(): void {
@@ -45,7 +54,7 @@ export class AgencyIdListValueDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.isAvailable(this.agencyIdListValue)) {
+    if (!this.isEditable) {
       this.actionName = 'View';
       return;
     }
@@ -62,30 +71,6 @@ export class AgencyIdListValueDialogComponent implements OnInit {
     return (this.agencyIdListValue.value === undefined || this.agencyIdListValue.value === '') ||
       (this.agencyIdListValue.name === undefined || this.agencyIdListValue.name === '') ||
       !this.isDirty();
-  }
-
-  color(agencyIdListValue: AgencyIdListValue): string {
-    if (agencyIdListValue.locked) {
-      return 'bright-red';
-    }
-
-    if (agencyIdListValue.used) {
-      if (agencyIdListValue.extension) {
-        return 'green';
-      } else {
-        return 'blue';
-      }
-    }
-
-    return 'dull-red';
-  }
-
-  isDisabledColor(agencyIdListValue: AgencyIdListValue) {
-    return this.color(agencyIdListValue) !== 'green';
-  }
-
-  isAvailable(agencyIdListValue: AgencyIdListValue): boolean {
-    return this.color(agencyIdListValue) !== 'bright-red' || this.color(agencyIdListValue) !== 'dull-red';
   }
 
   isDirty(): boolean {

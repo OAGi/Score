@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.oagi.score.gateway.http.api.cc_management.data.CcType.*;
+
 @RestController
 public class CcNodeController {
 
@@ -52,11 +54,11 @@ public class CcNodeController {
         return service.getBccpNode(user, manifestId);
     }
 
-    @RequestMapping(value = "/core_component/bdt/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/core_component/dt/{manifestId:[\\d]+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcNode getBdtNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                              @PathVariable("manifestId") BigInteger manifestId) {
+                             @PathVariable("manifestId") BigInteger manifestId) {
         return service.getBdtNode(user, manifestId);
     }
 
@@ -87,7 +89,7 @@ public class CcNodeController {
                                                      @RequestBody CcUpdateManifestRequest ccUpdateManifestRequest) {
 
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.valueOf(type.toUpperCase()));
+        resp.setType(valueOf(type.toUpperCase()));
 
         switch (resp.getType()) {
             case ASCCP:
@@ -123,32 +125,61 @@ public class CcNodeController {
                                             @RequestBody CcUpdateStateRequest ccUpdateStateRequest) {
 
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.valueOf(type.toUpperCase()));
+        resp.setType(valueOf(type.toUpperCase()));
 
         switch (resp.getType()) {
             case ACC:
-                resp.setManifestId(
-                        service.updateAccState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
-                );
+                if ("Purge".equals(ccUpdateStateRequest.getState())) {
+                    service.purgeAcc(user, manifestId);
+                    resp.setManifestId(manifestId);
+                } else {
+                    resp.setManifestId(
+                            service.updateAccState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
+                    );
+                }
                 break;
             case ASCCP:
-                resp.setManifestId(
-                        service.updateAsccpState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
-                );
+                if ("Purge".equals(ccUpdateStateRequest.getState())) {
+                    service.purgeAsccp(user, manifestId);
+                    resp.setManifestId(manifestId);
+                } else {
+                    resp.setManifestId(
+                            service.updateAsccpState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
+                    );
+                }
                 break;
             case BCCP:
-                resp.setManifestId(
-                        service.updateBccpState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
-                );
+                if ("Purge".equals(ccUpdateStateRequest.getState())) {
+                    service.purgeBccp(user, manifestId);
+                    resp.setManifestId(manifestId);
+                } else {
+                    resp.setManifestId(
+                            service.updateBccpState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
+                    );
+                }
+                break;
+            case DT:
+                if ("Purge".equals(ccUpdateStateRequest.getState())) {
+                    service.purgeDt(user, manifestId);
+                    resp.setManifestId(manifestId);
+                } else {
+                    resp.setManifestId(
+                            service.updateDtState(user, manifestId, CcState.valueOf(ccUpdateStateRequest.getState()))
+                    );
+                }
                 break;
             default:
                 throw new UnsupportedOperationException();
         }
 
         resp.setState(ccUpdateStateRequest.getState());
-        resp.setAccess(
-                ((CcState.WIP == CcState.valueOf(resp.getState())) ? AccessPrivilege.CanEdit : AccessPrivilege.CanMove).name()
-        );
+        if ("Purge".equals(resp.getState())) {
+            resp.setAccess(AccessPrivilege.Prohibited.name());
+        } else {
+            resp.setAccess(
+                    ((CcState.WIP == CcState.valueOf(resp.getState())) ? AccessPrivilege.CanEdit : AccessPrivilege.CanMove).name()
+            );
+        }
 
         return resp;
     }
@@ -161,7 +192,7 @@ public class CcNodeController {
                                                 @PathVariable("manifestId") BigInteger manifestId) {
 
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.valueOf(type.toUpperCase()));
+        resp.setType(valueOf(type.toUpperCase()));
 
         switch (resp.getType()) {
             case ACC:
@@ -177,6 +208,11 @@ public class CcNodeController {
             case BCCP:
                 resp.setManifestId(
                         service.makeNewRevisionForBccp(user, manifestId)
+                );
+                break;
+            case DT:
+                resp.setManifestId(
+                        service.makeNewRevisionForDt(user, manifestId)
                 );
                 break;
             default:
@@ -195,7 +231,7 @@ public class CcNodeController {
     public ResponseEntity deleteCcNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                        @PathVariable("type") String type,
                                        @PathVariable("manifestId") BigInteger manifestId) {
-        switch (CcType.valueOf(type.toUpperCase())) {
+        switch (valueOf(type.toUpperCase())) {
             case ACC:
                 service.deleteAcc(user, manifestId);
                 break;
@@ -210,6 +246,12 @@ public class CcNodeController {
                 break;
             case BCC:
                 service.deleteBcc(user, manifestId);
+                break;
+            case DT:
+                service.deleteDt(user, manifestId);
+                break;
+            case DT_SC:
+                service.deleteDtSc(user, manifestId);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -236,7 +278,7 @@ public class CcNodeController {
     public CcNodeDetail getNodeDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                       @PathVariable("type") String type,
                                       @RequestParam("data") String data) {
-        switch (CcType.valueOf(type.toUpperCase())) {
+        switch (valueOf(type.toUpperCase())) {
             case ACC:
                 CcAccNode accNode = convertValue(data, CcAccNode.class);
                 return service.getAccNodeDetail(user, accNode);
@@ -246,10 +288,10 @@ public class CcNodeController {
             case BCCP:
                 CcBccpNode bccpNode = convertValue(data, CcBccpNode.class);
                 return service.getBccpNodeDetail(user, bccpNode);
-            case BDT:
+            case DT:
                 CcBdtNode bdtNode = convertValue(data, CcBdtNode.class);
                 return service.getBdtNodeDetail(user, bdtNode);
-            case BDT_SC:
+            case DT_SC:
                 CcBdtScNode bdtScNode = convertValue(data, CcBdtScNode.class);
                 return service.getBdtScNodeDetail(user, bdtScNode);
             default:
@@ -286,6 +328,44 @@ public class CcNodeController {
         return response;
     }
 
+    @RequestMapping(value = "/core_component/dt/{ownerDtManifestId:[\\d]+}/append_sc",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcCreateResponse appendScNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                         @PathVariable("ownerDtManifestId") BigInteger ownerDtManifestId) {
+
+        BigInteger manifestId = service.appendDtSc(user, ownerDtManifestId);
+
+        CcCreateResponse response = new CcCreateResponse();
+        response.setManifestId(manifestId);
+        return response;
+    }
+
+    @RequestMapping(value = "/core_component/dt/{ownerDtManifestId:[\\d]+}/restriction/add",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcBdtNodeDetail addRestriction(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                          @PathVariable("ownerDtManifestId") BigInteger ownerDtManifestId,
+                                          @RequestBody CcCreateRestrictionRequest restrictionRequest) {
+
+        CcBdtNode dtNode = new CcBdtNode();
+        dtNode.setManifestId(ownerDtManifestId);
+
+        service.addDtRestriction(user, restrictionRequest);
+
+        return service.getBdtNodeDetail(user, dtNode);
+    }
+
+    @RequestMapping(value = "/core_component/dt/{representationTerm}/primitive_values",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CcBdtScPriRestri> getDefaultPrimitiveValues(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                            @PathVariable("representationTerm") String representationTerm,
+                                                            @RequestParam(name = "bdtScManifestId") BigInteger bdtScManifestId) {
+
+        return service.getDefaultPrimitiveValues(user, representationTerm, bdtScManifestId);
+    }
+
     @RequestMapping(value = "/core_component/acc/{manifestId:[\\d]+}/base",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -293,7 +373,7 @@ public class CcNodeController {
                                              @PathVariable("manifestId") BigInteger manifestId,
                                              @RequestBody CcSetBaseAccRequest ccSetBaseAccRequest) {
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.ACC);
+        resp.setType(ACC);
         resp.setManifestId(
                 service.updateAccBasedAcc(user, manifestId, ccSetBaseAccRequest.getBasedAccManifestId())
         );
@@ -335,10 +415,10 @@ public class CcNodeController {
         return resp;
     }
 
-    @RequestMapping(value = "/core_component/bdt", method = RequestMethod.POST,
+    @RequestMapping(value = "/core_component/dt", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcCreateResponse createBdt(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                       @RequestBody CcBdtCreateRequest request) {
+                                      @RequestBody CcBdtCreateRequest request) {
         BigInteger manifestId = service.createBdt(user, request);
 
         CcCreateResponse resp = new CcCreateResponse();
@@ -349,7 +429,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/acc/extension", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcCreateResponse createAccExtensionComponent(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                          @RequestBody CcExtensionCreateRequest request) {
+                                                        @RequestBody CcExtensionCreateRequest request) {
         BigInteger manifestId = service.createAccExtension(user, request);
 
         CcCreateResponse resp = new CcCreateResponse();
@@ -362,14 +442,14 @@ public class CcNodeController {
     public CcRevisionResponse getCcNodeRevision(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                 @PathVariable("type") String type,
                                                 @PathVariable("manifestId") BigInteger manifestId) {
-        switch (CcType.valueOf(type.toUpperCase())) {
+        switch (valueOf(type.toUpperCase())) {
             case ACC:
                 return service.getAccNodeRevision(user, manifestId);
             case ASCCP:
                 return service.getAsccpNodeRevision(user, manifestId);
             case BCCP:
                 return service.getBccpNodeRevision(user, manifestId);
-            case BDT:
+            case DT:
                 return service.getBdtNodeRevision(user, manifestId);
             default:
                 throw new UnsupportedOperationException();
@@ -384,7 +464,7 @@ public class CcNodeController {
                                                @PathVariable("manifestId") BigInteger manifestId) {
 
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.valueOf(type.toUpperCase()));
+        resp.setType(valueOf(type.toUpperCase()));
 
         switch (resp.getType()) {
             case ACC:
@@ -395,6 +475,9 @@ public class CcNodeController {
                 break;
             case BCCP:
                 service.cancelRevisionBccp(user, manifestId);
+                break;
+            case DT:
+                service.cancelRevisionDt(user, manifestId);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -436,11 +519,11 @@ public class CcNodeController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcNodeUpdateResponse refactorAssociation(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                               @PathVariable("type") String type,
-                                               @RequestBody CcRefactorRequest request) {
+                                                    @PathVariable("type") String type,
+                                                    @RequestBody CcRefactorRequest request) {
 
         CcNodeUpdateResponse resp = new CcNodeUpdateResponse();
-        resp.setType(CcType.valueOf(type.toUpperCase()));
+        resp.setType(valueOf(type.toUpperCase()));
 
         switch (resp.getType()) {
             case BCC:
@@ -455,5 +538,44 @@ public class CcNodeController {
         return resp;
     }
 
+    @RequestMapping(value = "/core_component/{type}/refactor",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcRefactorValidationResponse refactorValidation(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                           @PathVariable("type") String type,
+                                                           @RequestParam("targetManifestId") BigInteger targetManifestId,
+                                                           @RequestParam("destinationManifestId") BigInteger destinationManifestId) {
 
+        CcRefactorRequest request = new CcRefactorRequest();
+        request.setDestinationManifestId(destinationManifestId);
+        request.setTargetManifestId(targetManifestId);
+        request.setType(type);
+
+        CcRefactorValidationResponse resp;
+
+        switch (valueOf(type)) {
+            case BCC:
+                resp = service.validateBccRefactoring(user, request.getTargetManifestId(), request.getDestinationManifestId());
+                break;
+            case ASCC:
+                resp = service.validateAsccRefactoring(user, request.getTargetManifestId(), request.getDestinationManifestId());
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        return resp;
+    }
+
+    @RequestMapping(value = "/core_component/acc/{manifestId:[\\d]+}/ungroup",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcUngroupResponse ungroup(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                     @PathVariable("manifestId") BigInteger accManifestId,
+                                     @RequestBody CcUngroupRequest ccUngroupRequest) {
+
+        ccUngroupRequest.setAccManifestId(accManifestId);
+
+        return service.ungroup(user, ccUngroupRequest);
+    }
 }

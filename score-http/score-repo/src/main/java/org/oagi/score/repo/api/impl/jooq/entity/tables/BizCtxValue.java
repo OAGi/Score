@@ -28,8 +28,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxValueRecord
 
 
 /**
- * This table represents business context values for business contexts. It 
- * provides the associations between a business context and a context scheme 
+ * This table represents business context values for business contexts. It
+ * provides the associations between a business context and a context scheme
  * value.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -51,17 +51,20 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     }
 
     /**
-     * The column <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary, internal database key.
+     * The column <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
+     * internal database key.
      */
     public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_VALUE_ID = createField(DSL.name("biz_ctx_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the biz_ctx table.
+     * The column <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
+     * biz_ctx table.
      */
     public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the biz_ctx table.");
 
     /**
-     * The column <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign key to the CTX_SCHEME_VALUE table.
+     * The column <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
+     * key to the CTX_SCHEME_VALUE table.
      */
     public final TableField<BizCtxValueRecord, ULong> CTX_SCHEME_VALUE_ID = createField(DSL.name("ctx_scheme_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CTX_SCHEME_VALUE table.");
 
@@ -100,7 +103,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -114,18 +117,16 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     }
 
     @Override
-    public List<UniqueKey<BizCtxValueRecord>> getKeys() {
-        return Arrays.<UniqueKey<BizCtxValueRecord>>asList(Keys.KEY_BIZ_CTX_VALUE_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<BizCtxValueRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<BizCtxValueRecord, ?>>asList(Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
+        return Arrays.asList(Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
     }
 
     private transient BizCtx _bizCtx;
     private transient CtxSchemeValue _ctxSchemeValue;
 
+    /**
+     * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
+     */
     public BizCtx bizCtx() {
         if (_bizCtx == null)
             _bizCtx = new BizCtx(this, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK);
@@ -133,6 +134,10 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         return _bizCtx;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.ctx_scheme_value</code>
+     * table.
+     */
     public CtxSchemeValue ctxSchemeValue() {
         if (_ctxSchemeValue == null)
             _ctxSchemeValue = new CtxSchemeValue(this, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);

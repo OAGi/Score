@@ -14,6 +14,7 @@ import {AssignableMap, AssignableNode} from '../../../release-management/domain/
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleElement, ModuleSetRelease, Tile} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
+import {MatPaginator} from '@angular/material/paginator';
 
 @Component({
   selector: 'score-module-set-assign',
@@ -23,8 +24,9 @@ import {ModuleService} from '../../domain/module.service';
 export class ModuleSetReleaseAssignComponent implements OnInit {
 
   title = 'Edit Module Set Release';
-  displayedColumns = ['checkbox', 'type', 'den', 'revision', 'timestamp'];
+  displayedColumns = ['checkbox', 'type', 'state', 'den', 'timestamp'];
   ccTypes = ['ACC', 'ASCCP', 'BCCP', 'DT', 'CODE_LIST', 'AGENCY_ID_LIST', 'XBT'];
+  workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   isUpdating: boolean;
   moduleSetRelease: ModuleSetRelease = new ModuleSetRelease();
 
@@ -34,14 +36,16 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
 
   leftDataSource = new MatTableDataSource();
   leftSelection = new SelectionModel<AssignableNode>(true, []);
-  leftFilteredValues = {types: [], den: ''};
+  leftFilteredValues = {types: [], states: [], den: ''};
 
   rightDataSource = new MatTableDataSource();
   rightSelection = new SelectionModel<AssignableNode>(true, []);
-  rightFilteredValues = {types: [], den: ''};
+  rightFilteredValues = {types: [], states: [], den: ''};
 
-  @ViewChild('leftSort') leftSort: MatSort;
-  @ViewChild('rightSort') rightSort: MatSort;
+  @ViewChild('leftSort', {static: true}) leftSort: MatSort;
+  @ViewChild('leftPaginator', {static: true}) leftPaginator: MatPaginator;
+  @ViewChild('rightSort', {static: true}) rightSort: MatSort;
+  @ViewChild('rightPaginator', {static: true}) rightPaginator: MatPaginator;
 
   constructor(private moduleService: ModuleService,
               private releaseService: ReleaseService,
@@ -57,11 +61,13 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
   ngOnInit(): void {
     this.leftDataSource = new MatTableDataSource<AssignableNode>();
     this.leftDataSource.sort = this.leftSort;
-    this.leftDataSource.filterPredicate = this.customFilterPredicate();
+    this.leftDataSource.paginator = this.leftPaginator;
+    this.leftDataSource.filterPredicate = this.customFilterPredicate;
 
     this.rightDataSource = new MatTableDataSource<AssignableNode>();
     this.rightDataSource.sort = this.rightSort;
-    this.rightDataSource.filterPredicate = this.customFilterPredicate();
+    this.rightDataSource.paginator = this.rightPaginator;
+    this.rightDataSource.filterPredicate = this.customFilterPredicate;
 
     this.isUpdating = true;
 
@@ -95,6 +101,36 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
 
   init(moduleSetRelease: ModuleSetRelease) {
     this.moduleSetRelease = moduleSetRelease;
+  }
+
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected(selection: SelectionModel<AssignableNode>, dataSource: MatTableDataSource<AssignableNode>) {
+    const numSelected = selection.selected.length;
+    const numRows = dataSource.filteredData.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle(selection: SelectionModel<AssignableNode>, dataSource: MatTableDataSource<AssignableNode>) {
+    this.isAllSelected(selection, dataSource) ?
+      selection.clear() :
+      dataSource.filteredData.forEach(row => this.select(row, selection));
+  }
+
+  select(row: AssignableNode, selection: SelectionModel<AssignableNode>) {
+    selection.select(row);
+  }
+
+  toggle(row: AssignableNode, selection: SelectionModel<AssignableNode>) {
+    if (this.isSelected(row, selection)) {
+      selection.deselect(row);
+    } else {
+      this.select(row, selection);
+    }
+  }
+
+  isSelected(row: AssignableNode, selection: SelectionModel<AssignableNode>) {
+    return selection.isSelected(row);
   }
 
   onClickElement(tile: Tile, element: ModuleElement) {
@@ -153,13 +189,11 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
   }
 
   mapToList(map: Map<number, AssignableNode>): AssignableNode[] {
-    const list = [];
-    for (const key of Array.from(Object.keys(map))) {
+    return Array.from(Object.keys(map)).map(key => {
       const node = map[key] as AssignableNode;
       node.visible = true;
-      list.push(node);
-    }
-    return list;
+      return node;
+    });
   }
 
   _sort(a: AssignableNode, b: AssignableNode): number {
@@ -187,6 +221,11 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     this.leftDataSource.filter = JSON.stringify(this.leftFilteredValues);
   }
 
+  updateLeftFilterStates(value) {
+    this.leftFilteredValues.states = value;
+    this.leftDataSource.filter = JSON.stringify(this.leftFilteredValues);
+  }
+
   updateLeftFilterDen(value) {
     this.leftFilteredValues.den = value;
     this.leftDataSource.filter = JSON.stringify(this.leftFilteredValues);
@@ -197,29 +236,36 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     this.rightDataSource.filter = JSON.stringify(this.rightFilteredValues);
   }
 
+  updateRightFilterStates(value) {
+    this.rightFilteredValues.states = value;
+    this.rightDataSource.filter = JSON.stringify(this.rightFilteredValues);
+  }
+
   updateRightFilterDen(value) {
     this.rightFilteredValues.den = value;
     this.rightDataSource.filter = JSON.stringify(this.rightFilteredValues);
   }
 
-  customFilterPredicate() {
-    const myFilterPredicate = (data: AssignableNode, filter: string): boolean => {
-      let denFiltered = true;
-      let typeFiltered = true;
-      const filterValue = JSON.parse(filter);
+  public customFilterPredicate = (data: AssignableNode, filter: string): boolean => {
+    let denFiltered = true;
+    let typeFiltered = true;
+    let stateFiltered = true;
+    const filterValue = JSON.parse(filter);
 
-      if (filterValue.den.length > 0) {
-        denFiltered = data.den.toLowerCase().indexOf(filterValue.den.trim().toLowerCase()) !== -1;
-      }
+    if (filterValue.den.length > 0) {
+      denFiltered = data.den.toLowerCase().indexOf(filterValue.den.trim().toLowerCase()) !== -1;
+    }
 
-      if (filterValue.types.length > 0) {
-        typeFiltered = filterValue.types.indexOf(data.type) !== -1;
-      }
+    if (filterValue.types.length > 0) {
+      typeFiltered = filterValue.types.indexOf(data.type) !== -1;
+    }
 
-      return denFiltered && typeFiltered;
-    };
-    return myFilterPredicate;
-  }
+    if (filterValue.states.length > 0) {
+      stateFiltered = filterValue.states.indexOf(data.state) !== -1;
+    }
+
+    return denFiltered && typeFiltered && stateFiltered;
+  };
 
   assign() {
     if (this.leftSelection.selected.length === 0 || this.selectedModuleElement === undefined) {

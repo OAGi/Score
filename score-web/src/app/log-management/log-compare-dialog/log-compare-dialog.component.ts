@@ -1,7 +1,15 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {OagisComponentTypes} from '../../cc-management/domain/core-component-node';
-import {AccSnapshot, AsccpSnapshot, AssociationSnapshot, BccpSnapshot, CcSnapshot, SnapshotPair} from '../domain/log';
+import {
+  AccSnapshot,
+  AsccpSnapshot,
+  AssociationSnapshot,
+  BccpSnapshot,
+  CcSnapshot, DtScSnapshot,
+  DtSnapshot,
+  SnapshotPair
+} from '../domain/log';
 import {LogService} from '../domain/log.service';
 import {forkJoin} from 'rxjs';
 
@@ -63,6 +71,14 @@ export class LogCompareDialogComponent implements OnInit {
 
   asBccp(snapshot: CcSnapshot): BccpSnapshot {
     return snapshot as BccpSnapshot;
+  }
+
+  asDt(snapshot: CcSnapshot): DtSnapshot {
+    return snapshot as DtSnapshot;
+  }
+
+  asDtSc(snapshot: CcSnapshot): DtScSnapshot {
+    return snapshot as unknown as DtScSnapshot;
   }
 
   close() {

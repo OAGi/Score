@@ -6,6 +6,7 @@ import org.jooq.Record8;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdService;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScManifestRecord;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.data.Release;
 import org.oagi.score.service.common.data.CcState;
@@ -197,10 +198,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
             List<BigInteger> accManifestIds,
             List<BigInteger> asccpManifestIds,
             List<BigInteger> bccpManifestIds,
-            List<BigInteger> codeListManifestIds,
             List<BigInteger> bdtManifestIds,
-            List<BigInteger> bdtScManifestIds,
-            List<BigInteger> xbtManifestIds,
+            List<BigInteger> codeListManifestIds,
             List<BigInteger> agencyIdListManifestIds) {
 
         ReleaseRecord releaseRecord = dslContext.selectFrom(RELEASE)
@@ -214,13 +213,19 @@ public class ReleaseRepository implements ScoreRepository<Release> {
             throw new IllegalStateException("Cannot find 'Working' release");
         }
 
+        List<BigInteger> xbtManifestIds = Collections.emptyList();
+
         try {
             // copying manifests from 'Working' release
-            copyAccManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
-                    workingReleaseRecord.getReleaseId().toBigInteger(), accManifestIds);
-
             copyDtManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
                     workingReleaseRecord.getReleaseId().toBigInteger(), bdtManifestIds);
+
+            copyDtScManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
+                    workingReleaseRecord.getReleaseId().toBigInteger(), bdtManifestIds);
+            updateBdtScDependencies(releaseRecord.getReleaseId().toBigInteger());
+
+            copyAccManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
+                    workingReleaseRecord.getReleaseId().toBigInteger(), accManifestIds);
 
             copyAsccpManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
                     workingReleaseRecord.getReleaseId().toBigInteger(), asccpManifestIds);
@@ -244,10 +249,6 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
             copySeqKeyRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger());
             updateSeqKeyPrevNext(releaseRecord.getReleaseId().toBigInteger());
-
-            copyDtScManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
-                    workingReleaseRecord.getReleaseId().toBigInteger(), bdtScManifestIds);
-            updateBdtScDependencies(releaseRecord.getReleaseId().toBigInteger());
 
             copyXbtManifestRecordsFromWorking(releaseRecord.getReleaseId().toBigInteger(),
                     workingReleaseRecord.getReleaseId().toBigInteger(), xbtManifestIds);
@@ -583,7 +584,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
     }
 
     private void copyDtScManifestRecordsFromWorking(BigInteger releaseId, BigInteger workingReleaseId,
-                                                    List<BigInteger> dtScManifestIds) {
+                                                    List<BigInteger> dtManifestIds) {
         dslContext.insertInto(DT_SC_MANIFEST,
                 DT_SC_MANIFEST.RELEASE_ID,
                 DT_SC_MANIFEST.DT_SC_ID,
@@ -599,7 +600,9 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID,
                         DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
                         .from(DT_SC_MANIFEST)
-                        .where(DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(workingReleaseId)))).execute();
+                        .where(and(DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                (or(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.isNotNull(),
+                                        DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
     }
 
     private void copyXbtManifestRecordsFromWorking(BigInteger releaseId, BigInteger workingReleaseId,
@@ -629,6 +632,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 CODE_LIST_MANIFEST.RELEASE_ID,
                 CODE_LIST_MANIFEST.CODE_LIST_ID,
                 CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
+                CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
                 CODE_LIST_MANIFEST.CONFLICT,
                 CODE_LIST_MANIFEST.LOG_ID,
                 CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID,
@@ -637,6 +641,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         CODE_LIST_MANIFEST.CODE_LIST_ID,
                         CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
                         CODE_LIST_MANIFEST.CONFLICT,
                         CODE_LIST_MANIFEST.LOG_ID,
                         CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID,
@@ -950,6 +955,16 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.as("value").AGENCY_ID_LIST_VALUE_MANIFEST_ID)
                 .where(and(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         AGENCY_ID_LIST_VALUE_MANIFEST.as("value").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .execute();
+
+        // To update `code_list_manifest`.`agency_id_list_value_manifest_id`
+        dslContext.update(CODE_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev")).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                        .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)))
+                .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .where(and(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
     }
 
@@ -1267,6 +1282,46 @@ public class ReleaseRepository implements ScoreRepository<Release> {
             }
         });
 
+        // DTs
+        map = dslContext.select(
+                        DT_MANIFEST.DT_MANIFEST_ID, DT.DEN, RELEASE.RELEASE_NUM,
+                        DT.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, DT.STATE,
+                        LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
+                .from(DT_MANIFEST)
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(APP_USER).on(DT.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .join(LOG).on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
+                .where(and(
+                        or(
+                                RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                RELEASE.RELEASE_NUM.eq("Working")
+                        ),
+                        DT.STATE.notEqual(CcState.Published.name())
+                ))
+                .fetchStream()
+                .collect(groupingBy(e -> e.value1()));
+
+        map.values().forEach(e -> {
+            AssignableNode node = new AssignableNode();
+            node.setManifestId(e.get(0).value1().toBigInteger());
+            node.setDen(e.get(0).value2());
+            node.setTimestamp(e.get(0).value4());
+            node.setOwnerUserId(e.get(0).value5());
+            node.setState(CcState.valueOf(e.get(0).value6()));
+            node.setRevision(e.get(0).value7().toBigInteger());
+            node.setType(CcType.DT);
+            if (e.size() == 2) { // manifest are located at both sides.
+                assignComponents.addUnassignableDtManifest(
+                        node.getManifestId(), node);
+            }
+            // manifest is only located at 'Working' release side.
+            else if (e.size() == 1 && "Working".equals(e.get(0).value3())) {
+                assignComponents.addAssignableDtManifest(
+                        node.getManifestId(), node);
+            }
+        });
+
         return assignComponents;
     }
 
@@ -1344,6 +1399,9 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 }
                 for (BigInteger agencyIdListManifestId : validationRequest.getAssignedAgencyIdListComponentManifestIds()) {
                     agencyIdService.updateAgencyIdListState(user, timestamp, agencyIdListManifestId, toCcState.name());
+                }
+                for (BigInteger dtManifestId : validationRequest.getAssignedDtComponentManifestIds()) {
+                    ccNodeService.updateDtState(user, dtManifestId, fromCcState, toCcState);
                 }
             } else if (toCcState == Candidate) {
                 updateCCStates(user, fromCcState, toCcState, timestamp);
@@ -1505,6 +1563,18 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ))
                 .fetchInto(BigInteger.class)) {
             agencyIdService.updateAgencyIdListState(user, timestamp, agencyIdListManifestId, toCcState.toString());
+        }
+
+        for (BigInteger dtManifestId : dslContext.select(DT_MANIFEST.DT_MANIFEST_ID)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(
+                        DT.STATE.eq(fromCcState.name()),
+                        RELEASE.RELEASE_NUM.eq("Working")
+                ))
+                .fetchInto(BigInteger.class)) {
+            ccNodeService.updateDtState(user, dtManifestId, fromCcState, toCcState);
         }
     }
 

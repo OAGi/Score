@@ -13,6 +13,7 @@ import {hashCode} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
+import {PageRequest} from "../../../basis/basis";
 
 @Component({
   selector: 'score-module-set-create',
@@ -115,9 +116,73 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
       return;
     }
 
+    /*
+     * #1280
+     * If there is another default module set release, it shows a dialog to get a confirmation from the user.
+     */
+    if (this.moduleSetRelease.default) {
+      const request = new ModuleSetReleaseListRequest();
+      request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+      request.releaseId = this.moduleSetRelease.releaseId;
+      request.isDefault = true;
+      this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
+        if (resp.length > 0) {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = 'Create default module set release?';
+          dialogConfig.data.content = [
+            'There is another default module set release, \'' + resp.results[0].moduleSetReleaseName + '\' for \'' +
+            resp.results[0].releaseNum + '\' branch.',
+            'Are you sure you want to create this module set release as a default?',
+          ];
+          dialogConfig.data.action = 'Create';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (result) {
+                this.doCreateModuleSetRelease();
+              }
+            });
+        }
+      });
+    } else {
+      this.doCreateModuleSetRelease();
+    }
+  }
+
+  doCreateModuleSetRelease() {
+    const request = new ModuleSetReleaseListRequest();
+    request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+    request.releaseId = this.moduleSetRelease.releaseId;
+    request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
+    this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
+      if (resp.length > 0 &&
+        resp.results[0].moduleSetReleaseName === this.moduleSetRelease.moduleSetReleaseName) {
+
+        const dialogConfig = this.confirmDialogService.newConfig();
+        dialogConfig.data.header = 'Create module set release?';
+        dialogConfig.data.content = [
+          'There is another same module set release, \'' + resp.results[0].moduleSetReleaseName + '\' for \'' +
+          resp.results[0].releaseNum + '\' branch.',
+          'Are you sure you want to create this module set release?',
+        ];
+        dialogConfig.data.action = 'Create';
+
+        this.confirmDialogService.open(dialogConfig).afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this._doCreateModuleSetRelease();
+            }
+          });
+      } else {
+        this._doCreateModuleSetRelease();
+      }
+    });
+  }
+
+  _doCreateModuleSetRelease() {
     this.isUpdating = true;
 
-    let basedModuleSetReleaseId = undefined;
+    let basedModuleSetReleaseId;
     if (this.copyFromOther && this.copyTargetModuleSetRelease) {
       basedModuleSetReleaseId = this.copyTargetModuleSetRelease.moduleSetReleaseId;
     }

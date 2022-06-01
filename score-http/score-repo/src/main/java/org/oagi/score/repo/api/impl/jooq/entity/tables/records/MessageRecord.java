@@ -38,28 +38,32 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.message.sender_id</code>. The user who created this record.
+     * Setter for <code>oagi.message.sender_id</code>. The user who created this
+     * record.
      */
     public void setSenderId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.message.sender_id</code>. The user who created this record.
+     * Getter for <code>oagi.message.sender_id</code>. The user who created this
+     * record.
      */
     public ULong getSenderId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.message.recipient_id</code>. The user who is a target to possess this record.
+     * Setter for <code>oagi.message.recipient_id</code>. The user who is a
+     * target to possess this record.
      */
     public void setRecipientId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.message.recipient_id</code>. The user who is a target to possess this record.
+     * Getter for <code>oagi.message.recipient_id</code>. The user who is a
+     * target to possess this record.
      */
     public ULong getRecipientId() {
         return (ULong) get(2);
@@ -94,42 +98,48 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.message.body_content_type</code>. A content type of the body
+     * Setter for <code>oagi.message.body_content_type</code>. A content type of
+     * the body
      */
     public void setBodyContentType(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.message.body_content_type</code>. A content type of the body
+     * Getter for <code>oagi.message.body_content_type</code>. A content type of
+     * the body
      */
     public String getBodyContentType() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.message.is_read</code>. An indicator whether this record is read or not.
+     * Setter for <code>oagi.message.is_read</code>. An indicator whether this
+     * record is read or not.
      */
     public void setIsRead(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.message.is_read</code>. An indicator whether this record is read or not.
+     * Getter for <code>oagi.message.is_read</code>. An indicator whether this
+     * record is read or not.
      */
     public Byte getIsRead() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>oagi.message.creation_timestamp</code>. The timestamp when the record was first created.
+     * Setter for <code>oagi.message.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.message.creation_timestamp</code>. The timestamp when the record was first created.
+     * Getter for <code>oagi.message.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);

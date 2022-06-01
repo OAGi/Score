@@ -91,7 +91,7 @@ export class CodeListUpliftComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.auth.getUserToken().role === 'developer') {
+    if (this.auth.getUserToken().roles.includes('developer')) {
       this.snackBar.open('Unauthorized access.', '', {
         duration: 3000,
       });
@@ -243,7 +243,7 @@ export class CodeListUpliftComponent implements OnInit {
 
   get showCreateCodeListBtn(): boolean {
     const userToken = this.auth.getUserToken();
-    if (userToken.role === 'developer') {
+    if (userToken.roles.includes('developer')) {
       if (this.request.release.releaseId !== WorkingRelease.releaseId) {
         return false;
       }

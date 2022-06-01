@@ -10,11 +10,18 @@
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName">
+        </mat-form-field>
+
+        <mat-form-field>
           <mat-label>Module Set</mat-label>
           <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
-            <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
-                                   [noEntriesFoundLabel]="'No matching release found.'"
-                                   [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
+                                     [noEntriesFoundLabel]="'No matching release found.'"
+                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            </mat-option>
             <mat-option *ngFor="let moduleSet of filteredModuleSetList | async" [value]="moduleSet.moduleSetId">
               {{ moduleSet.name }}
             </mat-option>
@@ -24,9 +31,11 @@
         <mat-form-field>
           <mat-label>Release</mat-label>
           <mat-select [(ngModel)]="moduleSetRelease.releaseId">
-            <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                   [noEntriesFoundLabel]="'No matching release found.'"
-                                   [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                     [noEntriesFoundLabel]="'No matching release found.'"
+                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            </mat-option>
             <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
               <div class="d-flex">
                 <span class="release-num">{{release.releaseNum}}</span>

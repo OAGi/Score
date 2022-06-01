@@ -6,12 +6,12 @@ export class ScoreUser {
 
 export class UserToken {
   username: string;
-  role: string;
+  roles: string[];
   authentication: string;
   enabled: boolean;
 
   constructor() {
-    this.role = '';
+    this.roles = ['',];
     this.authentication = '';
     this.username = 'unknown';
     this.enabled = false;

@@ -3,12 +3,13 @@ package org.oagi.score.gateway.http.api.cc_management.data;
 import lombok.Data;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 public class CreateOagisBodRequest {
 
-    private BigInteger verbManifestId;
+    private List<BigInteger> verbManifestIdList;
 
-    private BigInteger nounManifestId;
+    private List<BigInteger> nounManifestIdList;
 
 }

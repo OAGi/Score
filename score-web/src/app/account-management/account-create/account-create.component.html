@@ -50,13 +50,23 @@
           <input matInput data-id="user.organization" [(ngModel)]="account.organization" maxlength="255"/>
         </mat-form-field>
 
-        <div class="checkbox">
-          <mat-checkbox color="primary"
-                        data-id="user.developer"
-                        [disabled]="isLinkOauth2()"
-                        [(ngModel)]="account.developer">
-            OAGIS Developer
-          </mat-checkbox>
+        <div class="col-6">
+          <div class="checkbox">
+            <mat-checkbox color="primary"
+                          data-id="user.developer"
+                          [disabled]="isLinkOauth2()"
+                          [(ngModel)]="account.developer">
+              OAGIS Developer
+            </mat-checkbox>
+          </div>
+          <div class="checkbox">
+            <mat-checkbox color="primary"
+                          data-id="user.admin"
+                          [disabled]="isLinkOauth2()"
+                          [(ngModel)]="account.admin">
+              Admin
+            </mat-checkbox>
+          </div>
         </div>
 
         <mat-form-field *ngIf="!isLinkOauth2()">

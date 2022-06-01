@@ -12,17 +12,17 @@
         <mat-form-field>
           <mat-label>Name</mat-label>
           <input [(ngModel)]="moduleSet.name" data-id="moduleSet.name" matInput maxlength="100" required
-                 [disabled]="role !== 'developer'"/>
+                 [disabled]="!roles.includes('developer')"/>
         </mat-form-field>
 
         <mat-form-field>
-          <mat-label>Definition</mat-label>
+          <mat-label>Description</mat-label>
           <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
-                    rows="6" [disabled]="role !== 'developer'"></textarea>
+                    rows="6" [disabled]="!roles.includes('developer')"></textarea>
         </mat-form-field>
         <div class="row action-group m-0">
           <div class="col-12 actions-wrap">
-            <button (click)="updateModuleSet()" [disabled]="role !== 'developer' || !canUpdate"
+            <button (click)="updateModuleSet()" [disabled]="!roles.includes('developer') || !canUpdate"
                     class="float-right"
                     color="primary"
                     mat-raised-button>Update
@@ -51,12 +51,12 @@
                     <div class="float-left element-title">
                       <span>{{element.name}}</span>
                     </div>
-                    <mat-icon *ngIf="role === 'developer'"
+                    <mat-icon *ngIf="roles.includes('developer')"
                               (click)="openEditDialog(element, tile)" [inline]="true" class="element-edit-icon">edit
                     </mat-icon>
                   </div>
                 </div>
-                <div class="grid-element" *ngIf="role === 'developer'">
+                <div class="grid-element" *ngIf="roles.includes('developer')">
                   <div (click)="openAddDialog(tile)" class="grid-element-content">
                     <mat-icon class="float-left" inline=true>add</mat-icon>
                     <div class="float-left element-title">

@@ -77,9 +77,13 @@ export class NavbarComponent implements OnInit {
     return (userToken) ? userToken.username : undefined;
   }
 
-  get role(): string {
+  get roles(): string[] {
     const userToken = this.userToken;
-    return (userToken) ? userToken.role : undefined;
+    return (userToken) ? userToken.roles : [];
+  }
+
+  get isDeveloper(): boolean {
+    return this.roles.includes('developer');
   }
 
   logout() {

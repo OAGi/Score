@@ -98,7 +98,7 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -112,17 +112,15 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
     }
 
     @Override
-    public List<UniqueKey<Oauth2AppScopeRecord>> getKeys() {
-        return Arrays.<UniqueKey<Oauth2AppScopeRecord>>asList(Keys.KEY_OAUTH2_APP_SCOPE_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<Oauth2AppScopeRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<Oauth2AppScopeRecord, ?>>asList(Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
+        return Arrays.asList(Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
     }
 
     private transient Oauth2App _oauth2App;
 
+    /**
+     * Get the implicit join path to the <code>oagi.oauth2_app</code> table.
+     */
     public Oauth2App oauth2App() {
         if (_oauth2App == null)
             _oauth2App = new Oauth2App(this, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);

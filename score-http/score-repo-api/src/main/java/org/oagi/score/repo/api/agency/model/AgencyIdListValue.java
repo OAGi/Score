@@ -11,29 +11,15 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
 
     private BigInteger agencyIdListValueManifestId;
 
+    private BigInteger basedAgencyIdListValueManifestId;
+
     private String guid;
 
     private String value;
 
     private String name;
 
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
     private String definition;
-
-    public String getDefinitionSource() {
-        return definitionSource;
-    }
-
-    public void setDefinitionSource(String definitionSource) {
-        this.definitionSource = definitionSource;
-    }
 
     private String definitionSource;
 
@@ -42,6 +28,8 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
     private ScoreUser owner;
 
     private boolean deprecated;
+
+    private boolean used;
 
     private BigInteger prevAgencyIdListValueId;
 
@@ -58,6 +46,14 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
 
     public void setAgencyIdListValueManifestId(BigInteger agencyIdListValueManifestId) {
         this.agencyIdListValueManifestId = agencyIdListValueManifestId;
+    }
+
+    public BigInteger getBasedAgencyIdListValueManifestId() {
+        return basedAgencyIdListValueManifestId;
+    }
+
+    public void setBasedAgencyIdListValueManifestId(BigInteger basedAgencyIdListValueManifestId) {
+        this.basedAgencyIdListValueManifestId = basedAgencyIdListValueManifestId;
     }
 
     public String getGuid() {
@@ -84,6 +80,22 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
         this.name = name;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public BigInteger getOwnerAgencyIdListId() {
         return ownerAgencyIdListId;
     }
@@ -106,6 +118,14 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
     }
 
     public BigInteger getPrevAgencyIdListValueId() {

@@ -6,7 +6,6 @@ import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
-import {CodeList} from '../../code-list-management/domain/code-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
 import {AgencyIdList, AgencyIdListValue, SimpleAgencyIdListValue} from '../domain/agency-id-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
@@ -34,7 +33,7 @@ import {AgencyIdListCommentControl} from './agency-id-list-comment-component';
 })
 export class AgencyIdListDetailComponent implements OnInit {
 
-  title = 'Edit Agency Id List';
+  title = 'Edit Agency ID List';
   namespaces: SimpleNamespace[] = [];
   isUpdating: boolean;
   manifestId: number;
@@ -74,11 +73,11 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   ngOnInit() {
     this.commentControl = new AgencyIdListCommentControl(this.sidenav, this.service);
-    this.isUpdating = false;
+    this.isUpdating = true;
 
     this.agencyIdList = new AgencyIdList();
 
-    // load a agency id list by given manifest id
+    // load an agency ID list by given manifest id
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.manifestId = Number(params.get('manifestId'));
@@ -86,13 +85,11 @@ export class AgencyIdListDetailComponent implements OnInit {
           this.service.getAgencyIdList(this.manifestId),
           this.namespaceService.getSimpleNamespaces()
         ]);
-      })).pipe(
-      finalize(() => {
-        this.isUpdating = false;
       })
     ).subscribe(([agencyIdList, namespaces]) => {
       this.namespaces = namespaces;
       this.init(agencyIdList);
+      this.isUpdating = false;
     });
 
     this.dataSource.sort = this.sort;
@@ -129,13 +126,13 @@ export class AgencyIdListDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return (this.userRole === 'developer') ? e.standard : !e.standard;
+      return ('developer' in this.userRoles) ? e.standard : !e.standard;
     });
   }
 
-  get userRole(): string {
+  get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
-    return userToken.role;
+    return userToken.roles;
   }
 
   applyFilter(filterValue: string) {
@@ -173,6 +170,10 @@ export class AgencyIdListDetailComponent implements OnInit {
     );
   }
 
+  color(agencyIdListValue: AgencyIdListValue): string {
+    return 'blue';
+  }
+
   get isChanged(): boolean {
     return this.hashCode !== hashCode(this.agencyIdList);
   }
@@ -190,6 +191,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     dialogConfig.data = {};
     dialogConfig.data.agencyIdListValue = new AgencyIdListValue();
     dialogConfig.data.isEditable = this.isEditable();
+    dialogConfig.data.agencyId = this.agencyIdList.agencyIdListValueManifestId;
 
     if (agencyIdListValue) { // deep copy
       const copiedValue = JSON.parse(JSON.stringify(agencyIdListValue));
@@ -252,12 +254,15 @@ export class AgencyIdListDetailComponent implements OnInit {
   _updateDataSource(data: AgencyIdListValue[]) {
     this.dataSource.data = data;
     this.agencyIdList.values = data;
+
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => this.isAvailable(row)).length;
+    const numRows = this.dataSource.filteredData.filter(row => this.isAvailable(row)).length;
     return numSelected === numRows;
   }
 
@@ -265,7 +270,7 @@ export class AgencyIdListDetailComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
+      this.dataSource.filteredData.forEach(row => this.select(row));
   }
 
   select(row: AgencyIdListValue) {
@@ -287,13 +292,19 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   isAvailable(agencyIdListValue: AgencyIdListValue) {
+    if (agencyIdListValue.used) {
+      return false;
+    }
+    if (this.agencyIdList.agencyIdListValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
+      return false;
+    }
     return this.agencyIdList.state === 'WIP';
   }
 
   removeAgencyIdListValues() {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Remove Agency Id List Value?';
-    dialogConfig.data.content = ['Are you sure you want to remove the agency id list value?'];
+    dialogConfig.data.header = 'Remove Agency ID List Value?';
+    dialogConfig.data.content = ['Are you sure you want to remove the agency ID list value?'];
     dialogConfig.data.action = 'Remove';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -319,7 +330,9 @@ export class AgencyIdListDetailComponent implements OnInit {
   derive() {
     this.isUpdating = true;
     this.service.create(this.agencyIdList.releaseId, this.agencyIdList.agencyIdListManifestId)
-      .pipe(finalize(() => {this.isUpdating = false; }))
+      .pipe(finalize(() => {
+        this.isUpdating = false;
+      }))
       .subscribe(resp => {
         this.router.navigate(['/agency_id_list/' + resp.manifestId]);
       });
@@ -412,7 +425,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
     dialogConfig.data.content = [
-      'Another agency id list with the triplet (ListID, AgencyID, Version) already exist!'
+      'Another agency ID list with the triplet (ListID, AgencyID, Version) already exist!'
     ];
 
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
@@ -422,8 +435,8 @@ export class AgencyIdListDetailComponent implements OnInit {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Duplicated Properties';
     dialogConfig.data.content = [
-      'Another agency id list with the same name already exists.',
-      'Are you sure you want to update the agency id list?'
+      'Another agency ID list with the same name already exists.',
+      'Are you sure you want to update the agency ID list?'
     ];
     dialogConfig.data.action = 'Update anyway';
 
@@ -495,13 +508,13 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   makeNewRevision() {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this agency id list?' : 'Amend this agency id list?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this agency id list?' : 'Are you sure you want to amend this agency id list?'];
-    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+    dialogConfig.data.header = (isDeveloper) ? 'Revise this agency ID list?' : 'Amend this agency ID list?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to revise this agency ID list?' : 'Are you sure you want to amend this agency ID list?'];
+    dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-
       .subscribe(result => {
         if (result) {
           this.isUpdating = true;
@@ -510,7 +523,7 @@ export class AgencyIdListDetailComponent implements OnInit {
           })).subscribe(_ => {
             this.service.getAgencyIdList(this.manifestId).subscribe(agencyIdList => {
               this.init(agencyIdList);
-              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
@@ -525,8 +538,8 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   restore() {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Restore this agency id list?';
-    dialogConfig.data.content = ['Are you sure you want to restore this agency id list?'];
+    dialogConfig.data.header = 'Restore this agency ID list?';
+    dialogConfig.data.content = ['Are you sure you want to restore this agency ID list?'];
     dialogConfig.data.action = 'Restore';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -551,7 +564,8 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   openDialogAgencyIdListDelete() {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.content = ['Are you sure you want to delete this agency id list?'];
+    dialogConfig.data.header = 'Delete agency ID list?';
+    dialogConfig.data.content = ['Are you sure you want to delete this agency ID list?'];
     dialogConfig.data.action = 'Delete anyway';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -604,8 +618,16 @@ export class AgencyIdListDetailComponent implements OnInit {
     }
   }
 
+  get showDeprecateCheckbox(): boolean {
+    if (!this.agencyIdList.lastUpdatedBy || this.agencyIdList.lastUpdatedBy.roles.includes('developer') ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   get canExtensible(): boolean {
-    if (this.userRole !== 'developer') {
+    if (!this.userRoles.includes('developer')) {
       return false;
     }
 
@@ -614,9 +636,13 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   isRevisionValue(value: AgencyIdListValue): boolean {
     if (this.hasRevision) {
-      return this.agencyIdList.prev.values.find(e => e.guid === value.guid) !== undefined;
+      return !!this.agencyIdList.prev.values.find(e => e.guid === value.guid);
     }
     return false;
+  }
+
+  isDerived(value: AgencyIdListValue): boolean {
+    return !!value.basedAgencyIdListValueManifestId;
   }
 
   isEditable(): boolean {
@@ -624,9 +650,10 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   cancelRevision(): void {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
     dialogConfig.data.action = 'Okay';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -669,7 +696,7 @@ export class AgencyIdListDetailComponent implements OnInit {
       if (data.properties.actor !== this.currentUser) {
         let noti;
         if (data.action === 'UpdateDetail') {
-          noti = 'Agency Id List updated by ' + data.properties.actor;
+          noti = 'Agency ID List updated by ' + data.properties.actor;
         } else if (data.action === 'ChangeState') {
           noti = 'State changed to \'' + data.properties.State + '\' by ' + data.properties.actor;
         } else if (data.action === 'AddComment' && this.sidenav.opened) {

@@ -12,9 +12,10 @@ import {Release} from '../../../bie-management/bie-create/domain/bie-create-list
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {hashCode} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
-import {ModuleSet, ModuleSetRelease} from '../../domain/module';
+import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
+import {PageRequest} from "../../../basis/basis";
 
 @Component({
   selector: 'score-module-set-detail',
@@ -45,7 +46,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
               private dialog: MatDialog,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService) {
-    this.title = (this.role === 'developer') ? 'Edit Module Set Release' : 'View Module Set Release';
+    this.title = (this.roles.includes('developer')) ? 'Edit Module Set Release' : 'View Module Set Release';
   }
 
   get isChanged(): boolean {
@@ -77,9 +78,9 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
-  get role(): string {
+  get roles(): string[] {
     const userToken = this.userToken;
-    return (userToken) ? userToken.role : undefined;
+    return (userToken) ? userToken.roles : [];
   }
 
   init(moduleSetRelease: ModuleSetRelease) {
@@ -145,16 +146,85 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
       return;
     }
 
+    /*
+     * #1280
+     * If there is another default module set release, it shows a dialog to get a confirmation from the user.
+     */
+    if (this.moduleSetRelease.default) {
+      const request = new ModuleSetReleaseListRequest();
+      request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+      request.releaseId = this.moduleSetRelease.releaseId;
+      request.isDefault = true;
+      this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
+        const results = resp.results.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
+        if (results.length > 0) {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = 'Update default module set release?';
+          dialogConfig.data.content = [
+            'There is another default module set release, \'' + results[0].moduleSetReleaseName + '\' for \'' +
+            results[0].releaseNum + '\' branch.',
+            'Are you sure you want to update this module set release as a default?',
+          ];
+          dialogConfig.data.action = 'Update';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (result) {
+                this.doUpdateModuleSetRelease();
+              }
+            });
+        } else {
+          this.doUpdateModuleSetRelease();
+        }
+      });
+    } else {
+      this.doUpdateModuleSetRelease();
+    }
+  }
+
+  doUpdateModuleSetRelease() {
+    const request = new ModuleSetReleaseListRequest();
+    request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+    request.releaseId = this.moduleSetRelease.releaseId;
+    request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
+    this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
+      const results = resp.results.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
+      if (results.length > 0 &&
+        results[0].moduleSetReleaseName === this.moduleSetRelease.moduleSetReleaseName) {
+
+        const dialogConfig = this.confirmDialogService.newConfig();
+        dialogConfig.data.header = 'Update module set release?';
+        dialogConfig.data.content = [
+          'There is another same module set release, \'' + results[0].moduleSetReleaseName + '\' for \'' +
+          results[0].releaseNum + '\' branch.',
+          'Are you sure you want to update this module set release?',
+        ];
+        dialogConfig.data.action = 'Update';
+
+        this.confirmDialogService.open(dialogConfig).afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this._doUpdateModuleSetRelease();
+            }
+          });
+      } else {
+        this._doUpdateModuleSetRelease();
+      }
+    });
+  }
+
+  _doUpdateModuleSetRelease() {
     this.isUpdating = true;
 
     this.moduleService.updateModuleSetRelease(this.moduleSetRelease)
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))
-      .subscribe(moduleSet => {
+      .subscribe(moduleSetRelease => {
         this.snackBar.open('Updated', '', {
           duration: 3000,
         });
+        this.moduleSetRelease = moduleSetRelease;
         this.$hashCode = hashCode(this.moduleSetRelease);
       });
   }

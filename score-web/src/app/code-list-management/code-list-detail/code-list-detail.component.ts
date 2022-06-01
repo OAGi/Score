@@ -7,7 +7,12 @@ import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
-import {CodeList, CodeListValue, SimpleAgencyIdListValue} from '../domain/code-list';
+import {
+  CodeList,
+  CodeListValue,
+  GetSimpleAgencyIdListValuesResponse, SimpleAgencyIdList,
+  SimpleAgencyIdListValue
+} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -34,21 +39,32 @@ import {CodeListCommentControl} from './code-list-comment-component';
 export class CodeListDetailComponent implements OnInit {
 
   title = 'Edit Code List';
+
+  allAgencyIdListValues: SimpleAgencyIdListValue[];
+
+  agencyIdLists: SimpleAgencyIdList[];
   agencyIdListValues: SimpleAgencyIdListValue[];
+
   namespaces: SimpleNamespace[] = [];
   isUpdating: boolean;
+
   agencyListFilterCtrl: FormControl = new FormControl();
-  filteredAgencyLists: ReplaySubject<SimpleAgencyIdListValue[]> = new ReplaySubject<SimpleAgencyIdListValue[]>(1);
+  filteredAgencyLists: ReplaySubject<SimpleAgencyIdList[]> = new ReplaySubject<SimpleAgencyIdList[]>(1);
+
+  agencyListValueFilterCtrl: FormControl = new FormControl();
+  filteredAgencyListValues: ReplaySubject<SimpleAgencyIdListValue[]> = new ReplaySubject<SimpleAgencyIdListValue[]>(1);
+
   manifestId: number;
 
   codeList: CodeList;
+  agencyIdList: SimpleAgencyIdList;
   revision: CodeList;
   hashCode;
   valueSearch: string;
   workingRelease = WorkingRelease;
 
   displayedColumns: string[] = [
-    'select', 'value', 'meaning', 'used', 'deprecated', 'definition', 'definitionSource'
+    'select', 'value', 'meaning', 'deprecated', 'definition', 'definitionSource'
   ];
 
   dataSource = new MatTableDataSource<CodeListValue>();
@@ -80,6 +96,10 @@ export class CodeListDetailComponent implements OnInit {
       .subscribe(() => {
         this.filterAgencyList();
       });
+    this.agencyListValueFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterAgencyListValue();
+      });
 
     this.codeList = new CodeList();
 
@@ -97,13 +117,16 @@ export class CodeListDetailComponent implements OnInit {
         this.isUpdating = false;
       })
     ).subscribe(([codeList, revision, namespaces]) => {
-      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(agencyIdListValues => {
-        this.agencyIdListValues = agencyIdListValues;
-        this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
+        this.agencyIdLists = resp.agencyIdLists;
+        this.allAgencyIdListValues = resp.agencyIdListValues;
         this.namespaces = namespaces;
         this.revision = revision;
+
+        this.filteredAgencyLists.next(this.agencyIdLists.slice());
+
+        this.init(codeList);
       });
-      this.init(codeList);
     });
 
     this.dataSource.sort = this.sort;
@@ -141,13 +164,13 @@ export class CodeListDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return (this.userRole === 'developer') ? e.standard : !e.standard;
+      return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
     });
   }
 
-  get userRole(): string {
+  get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
-    return userToken.role;
+    return userToken.roles;
   }
 
   applyFilter(filterValue: string) {
@@ -163,34 +186,67 @@ export class CodeListDetailComponent implements OnInit {
 
   init(codeList: CodeList) {
     this.hashCode = hashCode(codeList);
+    if (!!codeList.agencyIdListValueManifestId) {
+      let matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.agencyIdListValueManifestId === codeList.agencyIdListValueManifestId);
+      if (matchedAgencyIdLists.length === 0) {
+        matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.name === codeList.agencyIdListValueName);
+      }
+
+      if (matchedAgencyIdLists.length > 0) {
+        const matchedAgencyIdListManifestId = matchedAgencyIdLists[0].agencyIdListManifestId;
+        this.agencyIdList = this.agencyIdLists.filter(e => e.agencyIdListManifestId === matchedAgencyIdListManifestId)[0];
+      }
+    }
+    this.onAgencyIdListChange();
     this.codeList = codeList;
 
     this._updateDataSource(this.codeList.codeListValues);
   }
 
+  get currentAgencyIdListValues(): SimpleAgencyIdListValue[] {
+    let agencyIdListValues;
+    if (!!this.agencyIdList) {
+      agencyIdListValues = this.allAgencyIdListValues.filter(
+        e => e.agencyIdListManifestId === this.agencyIdList.agencyIdListManifestId);
+    } else {
+      agencyIdListValues = [];
+    }
+    return agencyIdListValues;
+  }
+
+  onAgencyIdListChange() {
+    this.filteredAgencyListValues.next(this.currentAgencyIdListValues.slice());
+  }
+
   filterAgencyList() {
     let search = this.agencyListFilterCtrl.value;
     if (!search) {
-      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+      this.filteredAgencyLists.next(this.agencyIdLists.slice());
       return;
     } else {
       search = search.toLowerCase();
     }
     this.filteredAgencyLists.next(
-      this.agencyIdListValues.filter(agencyList => agencyList.name.toLowerCase().indexOf(search) > -1)
+      this.agencyIdLists.filter(agencyList => agencyList.name.toLowerCase().indexOf(search) > -1)
+    );
+  }
+
+  filterAgencyListValue() {
+    let search = this.agencyListValueFilterCtrl.value;
+    if (!search) {
+      this.filteredAgencyListValues.next(this.currentAgencyIdListValues.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredAgencyListValues.next(
+      this.currentAgencyIdListValues.filter(agencyIdListValue =>
+        (agencyIdListValue.name.toLowerCase() + ' (' + agencyIdListValue.value.toLowerCase() + ')').indexOf(search) > -1)
     );
   }
 
   color(codeListValue: CodeListValue): string {
-    if (codeListValue.locked) {
-      return 'bright-red';
-    }
-
-    if (codeListValue.used) {
-      return 'blue';
-    }
-
-    return 'dull-red';
+    return 'blue';
   }
 
   get isChanged(): boolean {
@@ -201,7 +257,7 @@ export class CodeListDetailComponent implements OnInit {
     return (this.isUpdating) ||
       (codeList.codeListName === undefined || codeList.codeListName === '') ||
       (codeList.listId === undefined || codeList.listId === '') ||
-      (codeList.agencyId === undefined || codeList.agencyId === 0) ||
+      (codeList.agencyIdListValueManifestId === undefined || codeList.agencyIdListValueManifestId === 0) ||
       (codeList.versionId === undefined || codeList.versionId === '');
   }
 
@@ -358,13 +414,16 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   _update() {
+    this.isUpdating = true;
     forkJoin([
       this.checkUniqueness(this.codeList),
       this.checkNameUniqueness(this.codeList)
     ]).subscribe(([isViolateUniqueness, isViolateNameUniqueness]) => {
       if (isViolateUniqueness) {
+        this.isUpdating = false;
         this.alertInvalidParameters();
       } else if (isViolateNameUniqueness) {
+        this.isUpdating = false;
         this.alertDuplicatedProperties();
       } else {
         this.doUpdate();
@@ -385,7 +444,7 @@ export class CodeListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.codeList.agencyId) {
+    if (!this.codeList.agencyIdListValueManifestId) {
       this.snackBar.open('Agency Id is required', '', {
         duration: 3000,
       });
@@ -413,10 +472,9 @@ export class CodeListDetailComponent implements OnInit {
       dialogConfig.data.action = 'Update Anyway';
 
       this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
-        if (!result) {
-          return;
+        if (result) {
+          this._update();
         }
-        this._update();
       });
     } else {
       this._update();
@@ -502,10 +560,11 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   makeNewRevision() {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this code list?' : 'Amend this code list?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this code list?' : 'Are you sure you want to amend this code list?'];
-    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+    dialogConfig.data.header = (isDeveloper) ? 'Revise this code list?' : 'Amend this code list?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to revise this code list?' : 'Are you sure you want to amend this code list?'];
+    dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
 
@@ -521,7 +580,7 @@ export class CodeListDetailComponent implements OnInit {
             ]).subscribe(([codeList, revision]) => {
               this.init(codeList);
               this.revision = revision;
-              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
@@ -562,6 +621,7 @@ export class CodeListDetailComponent implements OnInit {
 
   openDialogCodeListDelete() {
     const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Delete code list?';
     dialogConfig.data.content = ['Are you sure you want to delete this code list?'];
     dialogConfig.data.action = 'Delete anyway';
 
@@ -627,9 +687,10 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   cancelRevision(): void {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
     dialogConfig.data.action = 'Okay';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()

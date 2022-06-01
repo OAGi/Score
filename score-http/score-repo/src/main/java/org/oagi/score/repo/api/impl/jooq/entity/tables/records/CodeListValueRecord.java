@@ -8,295 +8,321 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record19;
-import org.jooq.Row19;
+import org.jooq.Record17;
+import org.jooq.Row17;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue;
 
 
 /**
- * Each record in this table stores a code list value of a code list. A code 
- * list value may be inherited from another code list on which it is based. 
- * However, inherited value may be restricted (    i.e., disabled and cannot be 
-     * used) in this code list, i.e., the USED_INDICATOR = false. If the value 
- * cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, 
- * because the USED_INDICATOR of such code list value is FALSE by default 
- * and can no longer be changed.
+ * Each record in this table stores a code list value of a code list. A code
+ * list value may be inherited from another code list on which it is based.
+ * However, inherited value may be restricted (i.e., disabled and cannot be
+ * used) in this code list, i.e., the USED_INDICATOR = false. If the value
+ * cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE,
+ * because the USED_INDICATOR of such code list value is FALSE by default and
+ * can no longer be changed.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord> implements Record19<ULong, String, ULong, String, String, String, String, Byte, Byte, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> {
+public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord> implements Record17<ULong, String, ULong, ULong, String, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.code_list_value.code_list_value_id</code>. Internal, primary database key.
+     * Setter for <code>oagi.code_list_value.code_list_value_id</code>.
+     * Internal, primary database key.
      */
     public void setCodeListValueId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.code_list_value_id</code>. Internal, primary database key.
+     * Getter for <code>oagi.code_list_value.code_list_value_id</code>.
+     * Internal, primary database key.
      */
     public ULong getCodeListValueId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.code_list_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.code_list_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.code_list_id</code>. Foreign key to the CODE_LIST table. It indicates the code list this code value belonging to.
+     * Setter for <code>oagi.code_list_value.code_list_id</code>. Foreign key to
+     * the CODE_LIST table. It indicates the code list this code value belonging
+     * to.
      */
     public void setCodeListId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.code_list_id</code>. Foreign key to the CODE_LIST table. It indicates the code list this code value belonging to.
+     * Getter for <code>oagi.code_list_value.code_list_id</code>. Foreign key to
+     * the CODE_LIST table. It indicates the code list this code value belonging
+     * to.
      */
     public ULong getCodeListId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.value</code>. The code list value used in the instance data, e.g., EA, US-EN.
+     * Setter for <code>oagi.code_list_value.based_code_list_value_id</code>.
+     * Foreign key to the CODE_LIST_VALUE table itself. This column is used when
+     * the CODE_LIST is derived from the based CODE_LIST.
      */
-    public void setValue(String value) {
+    public void setBasedCodeListValueId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.value</code>. The code list value used in the instance data, e.g., EA, US-EN.
+     * Getter for <code>oagi.code_list_value.based_code_list_value_id</code>.
+     * Foreign key to the CODE_LIST_VALUE table itself. This column is used when
+     * the CODE_LIST is derived from the based CODE_LIST.
      */
-    public String getValue() {
-        return (String) get(3);
+    public ULong getBasedCodeListValueId() {
+        return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.meaning</code>. The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.
+     * Setter for <code>oagi.code_list_value.value</code>. The code list value
+     * used in the instance data, e.g., EA, US-EN.
      */
-    public void setMeaning(String value) {
+    public void setValue(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.meaning</code>. The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.
+     * Getter for <code>oagi.code_list_value.value</code>. The code list value
+     * used in the instance data, e.g., EA, US-EN.
      */
-    public String getMeaning() {
+    public String getValue() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.definition</code>. Long description or explannation of the code list value, e.g., 'EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals'.
+     * Setter for <code>oagi.code_list_value.meaning</code>. The description or
+     * explanation of the code list value, e.g., 'Each' for EA, 'English' for
+     * EN.
      */
-    public void setDefinition(String value) {
+    public void setMeaning(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.definition</code>. Long description or explannation of the code list value, e.g., 'EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals'.
+     * Getter for <code>oagi.code_list_value.meaning</code>. The description or
+     * explanation of the code list value, e.g., 'Each' for EA, 'English' for
+     * EN.
      */
-    public String getDefinition() {
+    public String getMeaning() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.definition_source</code>. This is typically a URL identifying the source of the DEFINITION column.
+     * Setter for <code>oagi.code_list_value.definition</code>. Long description
+     * or explannation of the code list value, e.g., 'EA is a discrete quantity
+     * for counting each unit of an item, such as, 2 shampoo bottles, 3 box of
+     * cereals'.
      */
-    public void setDefinitionSource(String value) {
+    public void setDefinition(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.definition_source</code>. This is typically a URL identifying the source of the DEFINITION column.
+     * Getter for <code>oagi.code_list_value.definition</code>. Long description
+     * or explannation of the code list value, e.g., 'EA is a discrete quantity
+     * for counting each unit of an item, such as, 2 shampoo bottles, 3 box of
+     * cereals'.
      */
-    public String getDefinitionSource() {
+    public String getDefinition() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.used_indicator</code>. This indicates whether the code value is allowed to be used or not in that code list context. In other words, this flag allows a user to enable or disable a code list value.
+     * Setter for <code>oagi.code_list_value.definition_source</code>. This is
+     * typically a URL identifying the source of the DEFINITION column.
      */
-    public void setUsedIndicator(Byte value) {
+    public void setDefinitionSource(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.used_indicator</code>. This indicates whether the code value is allowed to be used or not in that code list context. In other words, this flag allows a user to enable or disable a code list value.
+     * Getter for <code>oagi.code_list_value.definition_source</code>. This is
+     * typically a URL identifying the source of the DEFINITION column.
      */
-    public Byte getUsedIndicator() {
-        return (Byte) get(7);
+    public String getDefinitionSource() {
+        return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.locked_indicator</code>. This indicates whether the USED_INDICATOR can be changed from False to True. In other words, if the code value is derived from its base code list and the USED_INDICATOR of the code value in the base is False, then the USED_iNDICATOR cannot be changed from False to True for this code value; and this is indicated using this LOCKED_INDICATOR flag in the derived code list.
+     * Setter for <code>oagi.code_list_value.is_deprecated</code>. Indicates
+     * whether the code list value is deprecated and should not be reused (i.e.,
+     * no new reference to this record should be allowed).
      */
-    public void setLockedIndicator(Byte value) {
+    public void setIsDeprecated(Byte value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.locked_indicator</code>. This indicates whether the USED_INDICATOR can be changed from False to True. In other words, if the code value is derived from its base code list and the USED_INDICATOR of the code value in the base is False, then the USED_iNDICATOR cannot be changed from False to True for this code value; and this is indicated using this LOCKED_INDICATOR flag in the derived code list.
+     * Getter for <code>oagi.code_list_value.is_deprecated</code>. Indicates
+     * whether the code list value is deprecated and should not be reused (i.e.,
+     * no new reference to this record should be allowed).
      */
-    public Byte getLockedIndicator() {
+    public Byte getIsDeprecated() {
         return (Byte) get(8);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.extension_Indicator</code>. This indicates whether this code value has just been added in this code list. It is used particularly in the derived code list. If the code value has only been added to the derived code list, then it can be deleted; otherwise, it cannot be deleted.
+     * Setter for
+     * <code>oagi.code_list_value.replacement_code_list_value_id</code>. This
+     * refers to a replacement if the record is deprecated.
      */
-    public void setExtensionIndicator(Byte value) {
+    public void setReplacementCodeListValueId(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.extension_Indicator</code>. This indicates whether this code value has just been added in this code list. It is used particularly in the derived code list. If the code value has only been added to the derived code list, then it can be deleted; otherwise, it cannot be deleted.
+     * Getter for
+     * <code>oagi.code_list_value.replacement_code_list_value_id</code>. This
+     * refers to a replacement if the record is deprecated.
      */
-    public Byte getExtensionIndicator() {
-        return (Byte) get(9);
+    public ULong getReplacementCodeListValueId() {
+        return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.is_deprecated</code>. Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).
+     * Setter for <code>oagi.code_list_value.created_by</code>. Foreign key to
+     * the APP_USER table. It indicates the user who created the code list.
      */
-    public void setIsDeprecated(Byte value) {
+    public void setCreatedBy(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.is_deprecated</code>. Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).
+     * Getter for <code>oagi.code_list_value.created_by</code>. Foreign key to
+     * the APP_USER table. It indicates the user who created the code list.
      */
-    public Byte getIsDeprecated() {
-        return (Byte) get(10);
+    public ULong getCreatedBy() {
+        return (ULong) get(10);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.replacement_code_list_value_id</code>. This refers to a replacement if the record is deprecated.
+     * Setter for <code>oagi.code_list_value.owner_user_id</code>. Foreign key
+     * to the APP_USER table. This is the user who owns the entity, is allowed
+     * to edit the entity, and who can transfer the ownership to another user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public void setReplacementCodeListValueId(ULong value) {
+    public void setOwnerUserId(ULong value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.replacement_code_list_value_id</code>. This refers to a replacement if the record is deprecated.
+     * Getter for <code>oagi.code_list_value.owner_user_id</code>. Foreign key
+     * to the APP_USER table. This is the user who owns the entity, is allowed
+     * to edit the entity, and who can transfer the ownership to another user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public ULong getReplacementCodeListValueId() {
+    public ULong getOwnerUserId() {
         return (ULong) get(11);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created the code list.
+     * Setter for <code>oagi.code_list_value.last_updated_by</code>. Foreign key
+     * to the APP_USER table. It identifies the user who last updated the code
+     * list.
      */
-    public void setCreatedBy(ULong value) {
+    public void setLastUpdatedBy(ULong value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created the code list.
+     * Getter for <code>oagi.code_list_value.last_updated_by</code>. Foreign key
+     * to the APP_USER table. It identifies the user who last updated the code
+     * list.
      */
-    public ULong getCreatedBy() {
+    public ULong getLastUpdatedBy() {
         return (ULong) get(12);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.owner_user_id</code>. Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.
-
-The ownership can change throughout the history, but undoing shouldn't rollback the ownership.
+     * Setter for <code>oagi.code_list_value.creation_timestamp</code>.
+     * Timestamp when the code list was created.
      */
-    public void setOwnerUserId(ULong value) {
+    public void setCreationTimestamp(LocalDateTime value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.owner_user_id</code>. Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.
-
-The ownership can change throughout the history, but undoing shouldn't rollback the ownership.
+     * Getter for <code>oagi.code_list_value.creation_timestamp</code>.
+     * Timestamp when the code list was created.
      */
-    public ULong getOwnerUserId() {
-        return (ULong) get(13);
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(13);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.last_updated_by</code>. Foreign key to the APP_USER table. It identifies the user who last updated the code list.
+     * Setter for <code>oagi.code_list_value.last_update_timestamp</code>.
+     * Timestamp when the code list was last updated.
      */
-    public void setLastUpdatedBy(ULong value) {
+    public void setLastUpdateTimestamp(LocalDateTime value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.last_updated_by</code>. Foreign key to the APP_USER table. It identifies the user who last updated the code list.
+     * Getter for <code>oagi.code_list_value.last_update_timestamp</code>.
+     * Timestamp when the code list was last updated.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(14);
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(14);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.creation_timestamp</code>. Timestamp when the code list was created.
+     * Setter for <code>oagi.code_list_value.prev_code_list_value_id</code>. A
+     * self-foreign key to indicate the previous history record.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
+    public void setPrevCodeListValueId(ULong value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.creation_timestamp</code>. Timestamp when the code list was created.
+     * Getter for <code>oagi.code_list_value.prev_code_list_value_id</code>. A
+     * self-foreign key to indicate the previous history record.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(15);
+    public ULong getPrevCodeListValueId() {
+        return (ULong) get(15);
     }
 
     /**
-     * Setter for <code>oagi.code_list_value.last_update_timestamp</code>. Timestamp when the code list was last updated.
+     * Setter for <code>oagi.code_list_value.next_code_list_value_id</code>. A
+     * self-foreign key to indicate the next history record.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
+    public void setNextCodeListValueId(ULong value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>oagi.code_list_value.last_update_timestamp</code>. Timestamp when the code list was last updated.
-     */
-    public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(16);
-    }
-
-    /**
-     * Setter for <code>oagi.code_list_value.prev_code_list_value_id</code>. A self-foreign key to indicate the previous history record.
-     */
-    public void setPrevCodeListValueId(ULong value) {
-        set(17, value);
-    }
-
-    /**
-     * Getter for <code>oagi.code_list_value.prev_code_list_value_id</code>. A self-foreign key to indicate the previous history record.
-     */
-    public ULong getPrevCodeListValueId() {
-        return (ULong) get(17);
-    }
-
-    /**
-     * Setter for <code>oagi.code_list_value.next_code_list_value_id</code>. A self-foreign key to indicate the next history record.
-     */
-    public void setNextCodeListValueId(ULong value) {
-        set(18, value);
-    }
-
-    /**
-     * Getter for <code>oagi.code_list_value.next_code_list_value_id</code>. A self-foreign key to indicate the next history record.
+     * Getter for <code>oagi.code_list_value.next_code_list_value_id</code>. A
+     * self-foreign key to indicate the next history record.
      */
     public ULong getNextCodeListValueId() {
-        return (ULong) get(18);
+        return (ULong) get(16);
     }
 
     // -------------------------------------------------------------------------
@@ -309,17 +335,17 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     // -------------------------------------------------------------------------
-    // Record19 type implementation
+    // Record17 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row19<ULong, String, ULong, String, String, String, String, Byte, Byte, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
-        return (Row19) super.fieldsRow();
+    public Row17<ULong, String, ULong, ULong, String, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 
     @Override
-    public Row19<ULong, String, ULong, String, String, String, String, Byte, Byte, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> valuesRow() {
-        return (Row19) super.valuesRow();
+    public Row17<ULong, String, ULong, ULong, String, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> valuesRow() {
+        return (Row17) super.valuesRow();
     }
 
     @Override
@@ -338,82 +364,72 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     @Override
-    public Field<String> field4() {
-        return CodeListValue.CODE_LIST_VALUE.VALUE;
+    public Field<ULong> field4() {
+        return CodeListValue.CODE_LIST_VALUE.BASED_CODE_LIST_VALUE_ID;
     }
 
     @Override
     public Field<String> field5() {
-        return CodeListValue.CODE_LIST_VALUE.MEANING;
+        return CodeListValue.CODE_LIST_VALUE.VALUE;
     }
 
     @Override
     public Field<String> field6() {
-        return CodeListValue.CODE_LIST_VALUE.DEFINITION;
+        return CodeListValue.CODE_LIST_VALUE.MEANING;
     }
 
     @Override
     public Field<String> field7() {
+        return CodeListValue.CODE_LIST_VALUE.DEFINITION;
+    }
+
+    @Override
+    public Field<String> field8() {
         return CodeListValue.CODE_LIST_VALUE.DEFINITION_SOURCE;
     }
 
     @Override
-    public Field<Byte> field8() {
-        return CodeListValue.CODE_LIST_VALUE.USED_INDICATOR;
-    }
-
-    @Override
     public Field<Byte> field9() {
-        return CodeListValue.CODE_LIST_VALUE.LOCKED_INDICATOR;
-    }
-
-    @Override
-    public Field<Byte> field10() {
-        return CodeListValue.CODE_LIST_VALUE.EXTENSION_INDICATOR;
-    }
-
-    @Override
-    public Field<Byte> field11() {
         return CodeListValue.CODE_LIST_VALUE.IS_DEPRECATED;
     }
 
     @Override
-    public Field<ULong> field12() {
+    public Field<ULong> field10() {
         return CodeListValue.CODE_LIST_VALUE.REPLACEMENT_CODE_LIST_VALUE_ID;
     }
 
     @Override
-    public Field<ULong> field13() {
+    public Field<ULong> field11() {
         return CodeListValue.CODE_LIST_VALUE.CREATED_BY;
     }
 
     @Override
-    public Field<ULong> field14() {
+    public Field<ULong> field12() {
         return CodeListValue.CODE_LIST_VALUE.OWNER_USER_ID;
     }
 
     @Override
-    public Field<ULong> field15() {
+    public Field<ULong> field13() {
         return CodeListValue.CODE_LIST_VALUE.LAST_UPDATED_BY;
     }
 
     @Override
-    public Field<LocalDateTime> field16() {
+    public Field<LocalDateTime> field14() {
         return CodeListValue.CODE_LIST_VALUE.CREATION_TIMESTAMP;
     }
 
     @Override
-    public Field<LocalDateTime> field17() {
+    public Field<LocalDateTime> field15() {
         return CodeListValue.CODE_LIST_VALUE.LAST_UPDATE_TIMESTAMP;
     }
 
     @Override
-    public Field<ULong> field18() {
+    public Field<ULong> field16() {
         return CodeListValue.CODE_LIST_VALUE.PREV_CODE_LIST_VALUE_ID;
     }
 
     @Override
-    public Field<ULong> field19() {
+    public Field<ULong> field17() {
         return CodeListValue.CODE_LIST_VALUE.NEXT_CODE_LIST_VALUE_ID;
     }
 
@@ -433,82 +449,72 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     @Override
-    public String component4() {
-        return getValue();
+    public ULong component4() {
+        return getBasedCodeListValueId();
     }
 
     @Override
     public String component5() {
-        return getMeaning();
+        return getValue();
     }
 
     @Override
     public String component6() {
-        return getDefinition();
+        return getMeaning();
     }
 
     @Override
     public String component7() {
+        return getDefinition();
+    }
+
+    @Override
+    public String component8() {
         return getDefinitionSource();
     }
 
     @Override
-    public Byte component8() {
-        return getUsedIndicator();
-    }
-
-    @Override
     public Byte component9() {
-        return getLockedIndicator();
-    }
-
-    @Override
-    public Byte component10() {
-        return getExtensionIndicator();
-    }
-
-    @Override
-    public Byte component11() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong component12() {
+    public ULong component10() {
         return getReplacementCodeListValueId();
     }
 
     @Override
-    public ULong component13() {
+    public ULong component11() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong component14() {
+    public ULong component12() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong component15() {
+    public ULong component13() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime component16() {
+    public LocalDateTime component14() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime component17() {
+    public LocalDateTime component15() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public ULong component18() {
+    public ULong component16() {
         return getPrevCodeListValueId();
     }
 
     @Override
-    public ULong component19() {
+    public ULong component17() {
         return getNextCodeListValueId();
     }
 
@@ -528,82 +534,72 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     @Override
-    public String value4() {
-        return getValue();
+    public ULong value4() {
+        return getBasedCodeListValueId();
     }
 
     @Override
     public String value5() {
-        return getMeaning();
+        return getValue();
     }
 
     @Override
     public String value6() {
-        return getDefinition();
+        return getMeaning();
     }
 
     @Override
     public String value7() {
+        return getDefinition();
+    }
+
+    @Override
+    public String value8() {
         return getDefinitionSource();
     }
 
     @Override
-    public Byte value8() {
-        return getUsedIndicator();
-    }
-
-    @Override
     public Byte value9() {
-        return getLockedIndicator();
-    }
-
-    @Override
-    public Byte value10() {
-        return getExtensionIndicator();
-    }
-
-    @Override
-    public Byte value11() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong value12() {
+    public ULong value10() {
         return getReplacementCodeListValueId();
     }
 
     @Override
-    public ULong value13() {
+    public ULong value11() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong value14() {
+    public ULong value12() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong value15() {
+    public ULong value13() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime value16() {
+    public LocalDateTime value14() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime value17() {
+    public LocalDateTime value15() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public ULong value18() {
+    public ULong value16() {
         return getPrevCodeListValueId();
     }
 
     @Override
-    public ULong value19() {
+    public ULong value17() {
         return getNextCodeListValueId();
     }
 
@@ -626,103 +622,91 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     @Override
-    public CodeListValueRecord value4(String value) {
-        setValue(value);
+    public CodeListValueRecord value4(ULong value) {
+        setBasedCodeListValueId(value);
         return this;
     }
 
     @Override
     public CodeListValueRecord value5(String value) {
-        setMeaning(value);
+        setValue(value);
         return this;
     }
 
     @Override
     public CodeListValueRecord value6(String value) {
-        setDefinition(value);
+        setMeaning(value);
         return this;
     }
 
     @Override
     public CodeListValueRecord value7(String value) {
+        setDefinition(value);
+        return this;
+    }
+
+    @Override
+    public CodeListValueRecord value8(String value) {
         setDefinitionSource(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value8(Byte value) {
-        setUsedIndicator(value);
-        return this;
-    }
-
-    @Override
     public CodeListValueRecord value9(Byte value) {
-        setLockedIndicator(value);
-        return this;
-    }
-
-    @Override
-    public CodeListValueRecord value10(Byte value) {
-        setExtensionIndicator(value);
-        return this;
-    }
-
-    @Override
-    public CodeListValueRecord value11(Byte value) {
         setIsDeprecated(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value12(ULong value) {
+    public CodeListValueRecord value10(ULong value) {
         setReplacementCodeListValueId(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value13(ULong value) {
+    public CodeListValueRecord value11(ULong value) {
         setCreatedBy(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value14(ULong value) {
+    public CodeListValueRecord value12(ULong value) {
         setOwnerUserId(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value15(ULong value) {
+    public CodeListValueRecord value13(ULong value) {
         setLastUpdatedBy(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value16(LocalDateTime value) {
+    public CodeListValueRecord value14(LocalDateTime value) {
         setCreationTimestamp(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value17(LocalDateTime value) {
+    public CodeListValueRecord value15(LocalDateTime value) {
         setLastUpdateTimestamp(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value18(ULong value) {
+    public CodeListValueRecord value16(ULong value) {
         setPrevCodeListValueId(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord value19(ULong value) {
+    public CodeListValueRecord value17(ULong value) {
         setNextCodeListValueId(value);
         return this;
     }
 
     @Override
-    public CodeListValueRecord values(ULong value1, String value2, ULong value3, String value4, String value5, String value6, String value7, Byte value8, Byte value9, Byte value10, Byte value11, ULong value12, ULong value13, ULong value14, ULong value15, LocalDateTime value16, LocalDateTime value17, ULong value18, ULong value19) {
+    public CodeListValueRecord values(ULong value1, String value2, ULong value3, ULong value4, String value5, String value6, String value7, String value8, Byte value9, ULong value10, ULong value11, ULong value12, ULong value13, LocalDateTime value14, LocalDateTime value15, ULong value16, ULong value17) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -740,8 +724,6 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         value15(value15);
         value16(value16);
         value17(value17);
-        value18(value18);
-        value19(value19);
         return this;
     }
 
@@ -759,19 +741,17 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     /**
      * Create a detached, initialised CodeListValueRecord
      */
-    public CodeListValueRecord(ULong codeListValueId, String guid, ULong codeListId, String value, String meaning, String definition, String definitionSource, Byte usedIndicator, Byte lockedIndicator, Byte extensionIndicator, Byte isDeprecated, ULong replacementCodeListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevCodeListValueId, ULong nextCodeListValueId) {
+    public CodeListValueRecord(ULong codeListValueId, String guid, ULong codeListId, ULong basedCodeListValueId, String value, String meaning, String definition, String definitionSource, Byte isDeprecated, ULong replacementCodeListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevCodeListValueId, ULong nextCodeListValueId) {
         super(CodeListValue.CODE_LIST_VALUE);
 
         setCodeListValueId(codeListValueId);
         setGuid(guid);
         setCodeListId(codeListId);
+        setBasedCodeListValueId(basedCodeListValueId);
         setValue(value);
         setMeaning(meaning);
         setDefinition(definition);
         setDefinitionSource(definitionSource);
-        setUsedIndicator(usedIndicator);
-        setLockedIndicator(lockedIndicator);
-        setExtensionIndicator(extensionIndicator);
         setIsDeprecated(isDeprecated);
         setReplacementCodeListValueId(replacementCodeListValueId);
         setCreatedBy(createdBy);

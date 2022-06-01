@@ -1,7 +1,13 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {CodeList, CodeListForList, CodeListForListRequest, SimpleAgencyIdListValue} from './code-list';
+import {
+  CodeList,
+  CodeListForList,
+  CodeListForListRequest,
+  GetSimpleAgencyIdListValuesResponse,
+  SimpleAgencyIdListValue
+} from './code-list';
 import {PageResponse} from '../../basis/basis';
 import {CcCreateResponse, Comment} from '../../cc-management/domain/core-component-node';
 
@@ -62,18 +68,19 @@ export class CodeListService {
     return this.http.get<CodeList>('/api/code_list/' + manifestId + '/revision');
   }
 
-  getCodeLists(): Observable<PageResponse<CodeList>> {
+  getSimpleCodeLists(releaseId: number): Observable<PageResponse<CodeListForList>> {
     const params = new HttpParams()
+      .set('releaseId', releaseId.toString())
       .set('sortActive', '')
       .set('sortDirection', '')
       .set('pageIndex', '-1')
       .set('pageSize', '-1');
 
-    return this.http.get<PageResponse<CodeList>>('/api/code_list', {params});
+    return this.http.get<PageResponse<CodeListForList>>('/api/code_list', {params});
   }
 
-  getSimpleAgencyIdListValues(releaseId: number): Observable<SimpleAgencyIdListValue[]> {
-    return this.http.get<SimpleAgencyIdListValue[]>('/api/simple_agency_id_list_values/' + releaseId);
+  getSimpleAgencyIdListValues(releaseId: number): Observable<GetSimpleAgencyIdListValuesResponse> {
+    return this.http.get<GetSimpleAgencyIdListValuesResponse>('/api/simple_agency_id_list_values/' + releaseId);
   }
 
   create(releaseId: number, basedCodeListManifestId?: number): Observable<CcCreateResponse> {
@@ -96,7 +103,7 @@ export class CodeListService {
         basedCodeListManifestId: codeList.basedCodeListManifestId,
         codeListName: codeList.codeListName,
         listId: codeList.listId,
-        agencyId: codeList.agencyId,
+        agencyIdListValueManifestId: codeList.agencyIdListValueManifestId,
         versionId: codeList.versionId,
         namespaceId: codeList.namespaceId,
         definition: codeList.definition,
@@ -134,7 +141,7 @@ export class CodeListService {
     let params = new HttpParams()
       .set('releaseId', '' + codeList.releaseId)
       .set('listId', codeList.listId)
-      .set('agencyId', '' + codeList.agencyId)
+      .set('agencyIdListValueManifestId', '' + codeList.agencyIdListValueManifestId)
       .set('versionId', codeList.versionId);
     if (codeList.codeListManifestId) {
       params = params.set('codeListManifestId', '' + codeList.codeListManifestId);

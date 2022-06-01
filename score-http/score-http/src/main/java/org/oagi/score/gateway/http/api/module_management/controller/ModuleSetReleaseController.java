@@ -41,6 +41,8 @@ public class ModuleSetReleaseController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetModuleSetReleaseListResponse getModuleSetReleaseList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                                    @RequestParam(name = "name", required = false) String name,
+                                                                   @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
+                                                                   @RequestParam(name = "default", required = false) Boolean isDefault,
                                                                    @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
                                                                    @RequestParam(name = "updateStart", required = false) String updateStart,
                                                                    @RequestParam(name = "updateEnd", required = false) String updateEnd,
@@ -52,6 +54,8 @@ public class ModuleSetReleaseController {
         GetModuleSetReleaseListRequest request = new GetModuleSetReleaseListRequest(sessionService.asScoreUser(user));
 
         request.setName(name);
+        request.setReleaseId(releaseId);
+        request.setDefault(isDefault);
         request.setUpdaterUsernameList(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(","))
                         .stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e))
@@ -103,6 +107,7 @@ public class ModuleSetReleaseController {
         request.setModuleSetReleaseId(moduleSetReleaseId);
         request.setModuleSetId(moduleSetRelease.getModuleSetId());
         request.setReleaseId(moduleSetRelease.getReleaseId());
+        request.setModuleSetReleaseName(moduleSetRelease.getModuleSetReleaseName());
         request.setDefault(moduleSetRelease.isDefault());
         UpdateModuleSetReleaseResponse response = service.updateModuleSetRelease(request);
         return response.getModuleSetRelease();

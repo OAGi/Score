@@ -14,8 +14,9 @@ import java.util.stream.Stream;
 public class DatabaseStartupConfiguration {
 
     static {
-        // Turn off the jooq logo.
+        // Turn off the jooq logo and tips
         System.setProperty("org.jooq.no-logo", "true");
+        System.setProperty("org.jooq.no-tips", "true");
     }
 
     @Bean

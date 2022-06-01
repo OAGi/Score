@@ -45,14 +45,6 @@ public class JooqModuleWriteRepository
             throw new IllegalArgumentException("Duplicate module name exist.");
         }
 
-        // If a `namespaceId` parameter does not define in the request, overrides it by releases' one.
-        if (request.getNamespaceId() == null) {
-            BigInteger namespaceId = dslContext().select(NAMESPACE.NAMESPACE_ID).from(NAMESPACE)
-                    .where(NAMESPACE.IS_STD_NMSP.eq((byte) 1)).limit(1).fetchOneInto(BigInteger.class);
-            request.setNamespaceId(namespaceId);
-
-        }
-
         ModuleRecord parent = dslContext().selectFrom(MODULE)
                 .where(MODULE.MODULE_ID.eq(ULong.valueOf(request.getParentModuleId()))).fetchOne();
 
@@ -64,7 +56,7 @@ public class JooqModuleWriteRepository
                 .set(MODULE.TYPE, request.getModuleType().name())
                 .set(MODULE.NAME, request.getName())
                 .set(MODULE.MODULE_SET_ID, ULong.valueOf(request.getModuleSetId()))
-                .set(MODULE.NAMESPACE_ID, ULong.valueOf(request.getNamespaceId()))
+                .set(MODULE.NAMESPACE_ID, (request.getNamespaceId() != null) ? ULong.valueOf(request.getNamespaceId()) : null)
                 .set(MODULE.VERSION_NUM, request.getVersionNum())
                 .set(MODULE.CREATED_BY, requesterUserId)
                 .set(MODULE.OWNER_USER_ID, requesterUserId)
@@ -79,7 +71,9 @@ public class JooqModuleWriteRepository
         module.setParentModuleId(moduleRecord.getParentModuleId().toBigInteger());
         module.setName(moduleRecord.getName());
         module.setVersionNum(moduleRecord.getVersionNum());
-        module.setNamespaceId(moduleRecord.getNamespaceId().toBigInteger());
+        if (moduleRecord.getNamespaceId() != null) {
+            module.setNamespaceId(moduleRecord.getNamespaceId().toBigInteger());
+        }
         module.setCreatedBy(requester);
         module.setCreationTimestamp(
                 Date.from(moduleRecord.getCreationTimestamp().atZone(ZoneId.systemDefault()).toInstant()));
@@ -102,11 +96,13 @@ public class JooqModuleWriteRepository
                 .fetchOne();
 
         if (moduleRecord == null) {
-            throw new IllegalArgumentException("Can not found Module");
+            throw new IllegalArgumentException("Cannot found a module record [moduleId=" + request.getModuleId() + "]");
         }
 
         if (request.getNamespaceId() != null) {
             moduleRecord.setNamespaceId(ULong.valueOf(request.getNamespaceId()));
+        } else {
+            moduleRecord.setNamespaceId(null);
         }
 
         if (StringUtils.hasLength(request.getVersionNum())) {
@@ -129,8 +125,6 @@ public class JooqModuleWriteRepository
             moduleRecord.setPath(String.join(MODULE_PATH_SEPARATOR, tokens));
             nameChanged = true;
         }
-
-
 
         if (moduleRecord.changed()) {
             moduleRecord.setLastUpdatedBy(requesterUserId);

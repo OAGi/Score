@@ -1,7 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {AgencyIdList, CodeListForList, AgencyIdListForListRequest, SimpleAgencyIdListValue} from './agency-id-list';
+import {AgencyIdList, AgencyIdListForListRequest} from './agency-id-list';
 import {PageResponse, PaginationResponse} from '../../basis/basis';
 import {CcCreateResponse, Comment} from '../../cc-management/domain/core-component-node';
 
@@ -61,14 +61,15 @@ export class AgencyIdListService {
     return this.http.get<AgencyIdList>('/api/agency_id_list/' + manifestId);
   }
 
-  getAgencyIdLists(): Observable<PageResponse<AgencyIdList>> {
+  getSimpleAgencyIdLists(releaseId: number): Observable<any> {
     const params = new HttpParams()
+      .set('releaseId', releaseId.toString())
       .set('sortActive', '')
-      .set('sortDirection', '')
+      .set('sortDirection', 'ASC')
       .set('pageIndex', '-1')
       .set('pageSize', '-1');
 
-    return this.http.get<PageResponse<AgencyIdList>>('/api/agency_id_list', {params});
+    return this.http.get<any>('/api/agency_id_list', {params});
   }
 
   create(releaseId: number, basedAgencyIdListManifestId?: number): Observable<CcCreateResponse> {
@@ -134,8 +135,8 @@ export class AgencyIdListService {
       .set('releaseId', '' + agencyIdList.releaseId)
       .set('listId', agencyIdList.listId)
       .set('versionId', agencyIdList.versionId);
-    if (agencyIdList.agencyId) {
-      params.append('agencyId', '' + agencyIdList.agencyId);
+    if (agencyIdList.agencyIdListValueManifestId) {
+      params = params.set('agencyIdListValueManifestId', '' + agencyIdList.agencyIdListValueManifestId);
     }
 
     if (agencyIdList.agencyIdListManifestId) {

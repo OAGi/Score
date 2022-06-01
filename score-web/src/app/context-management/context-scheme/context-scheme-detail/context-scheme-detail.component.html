@@ -7,9 +7,11 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-select placeholder="Context Category" required [(ngModel)]="contextScheme.contextCategoryId">
-            <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
-                                   [placeholderLabel]="'Search...'"
-                                   [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+            </mat-option>
             <mat-option *ngFor="let contextCategory of filteredCtxCategories | async" [value]="contextCategory.contextCategoryId">
               {{contextCategory.name}}
             </mat-option>

@@ -3,11 +3,7 @@ package org.oagi.score.gateway.http.api.agency_id_management.service;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.export.model.AgencyId;
-import org.oagi.score.gateway.http.api.agency_id_management.data.CreateAgencyIdListRequest;
-import org.oagi.score.gateway.http.api.agency_id_management.data.SameAgencyIdListParams;
-import org.oagi.score.gateway.http.api.agency_id_management.data.SameNameAgencyIdListParams;
-import org.oagi.score.gateway.http.api.agency_id_management.data.SimpleAgencyIdListValue;
+import org.oagi.score.gateway.http.api.agency_id_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.agency.model.AgencyIdList;
@@ -15,7 +11,8 @@ import org.oagi.score.repo.api.agency.model.GetAgencyIdListListRequest;
 import org.oagi.score.repo.api.agency.model.GetAgencyIdListListResponse;
 
 import org.oagi.score.repo.api.corecomponent.model.CcState;
-import org.oagi.score.repo.api.impl.jooq.entity.Tables;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AgencyIdListValueRecord;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.log.LogRepository;
@@ -26,13 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.AGENCY_ID_LIST;
+import static org.jooq.impl.DSL.or;
+import static org.oagi.score.repo.api.corecomponent.model.CcState.Production;
+import static org.oagi.score.repo.api.corecomponent.model.CcState.Published;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST;
 
 @Service
@@ -51,16 +49,72 @@ public class AgencyIdService {
     @Autowired
     private LogRepository logRepository;
 
-    public List<SimpleAgencyIdListValue> getSimpleAgencyIdListValues(BigInteger releaseId) {
-        return dslContext.select(Tables.AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID,
-                Tables.AGENCY_ID_LIST_VALUE.NAME)
-                .from(Tables.AGENCY_ID_LIST_VALUE)
-                .join(Tables.AGENCY_ID_LIST_VALUE_MANIFEST).on(and(Tables.AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(Tables.AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID),
-                        Tables.AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                .join(Tables.APP_USER).on(and(Tables.AGENCY_ID_LIST_VALUE.OWNER_USER_ID.eq(Tables.APP_USER.APP_USER_ID), Tables.APP_USER.IS_DEVELOPER.eq((byte) 1)))
+    public GetSimpleAgencyIdListValuesResponse getSimpleAgencyIdListValues(ScoreUser user, BigInteger releaseId) {
+        List<SimpleAgencyIdList> simpleAgencyIdLists;
+        if (user.hasAnyRole(ScoreRole.END_USER)) {
+            simpleAgencyIdLists = dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                            AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
+                            AGENCY_ID_LIST.NAME,
+                            AGENCY_ID_LIST.STATE)
+                    .from(AGENCY_ID_LIST_MANIFEST)
+                    .join(AGENCY_ID_LIST)
+                    .on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                    .join(RELEASE)
+                    .on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .where(and(
+                            RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                            RELEASE.STATE.in(Published.name(), Production.name()),
+                            or(
+                                    AGENCY_ID_LIST.STATE.in(Published.name(), Production.name()),
+                                    AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID.isNotNull()
+                            )
+                    ))
+                    .fetchInto(SimpleAgencyIdList.class);
+        } else {
+            simpleAgencyIdLists = dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                            AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
+                            AGENCY_ID_LIST.NAME,
+                            AGENCY_ID_LIST.STATE)
+                    .from(AGENCY_ID_LIST_MANIFEST)
+                    .join(AGENCY_ID_LIST)
+                    .on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                    .join(RELEASE)
+                    .on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .join(APP_USER)
+                    .on(AGENCY_ID_LIST.LAST_UPDATED_BY.eq(APP_USER.APP_USER_ID))
+                    .where(and(
+                            RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                            RELEASE.STATE.in(Published.name(), Production.name()),
+                            or(
+                                    AGENCY_ID_LIST.STATE.in(Published.name(), Production.name()),
+                                    AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID.isNotNull()
+                            ),
+                            APP_USER.IS_DEVELOPER.eq((byte) 1)
+                    ))
+                    .fetchInto(SimpleAgencyIdList.class);
+        }
+
+        List<SimpleAgencyIdListValue> simpleAgencyIdListValues = dslContext.select(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID,
+                        AGENCY_ID_LIST_VALUE.VALUE,
+                        AGENCY_ID_LIST_VALUE.NAME)
+                .from(AGENCY_ID_LIST_VALUE)
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .on(and(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID),
+                        AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(
+                        simpleAgencyIdLists.stream().map(e -> ULong.valueOf(e.getAgencyIdListManifestId())).collect(Collectors.toList())
+                ))
                 .fetchStreamInto(SimpleAgencyIdListValue.class)
                 .sorted(Comparator.comparing(SimpleAgencyIdListValue::getName))
                 .collect(Collectors.toList());
+
+        GetSimpleAgencyIdListValuesResponse response = new GetSimpleAgencyIdListValuesResponse();
+        response.setAgencyIdLists(simpleAgencyIdLists);
+        response.setAgencyIdListValues(simpleAgencyIdListValues);
+        return response;
     }
 
     public AgencyIdList getAgencyIdListDetail(ScoreUser user, BigInteger manifestId) {
@@ -104,7 +158,7 @@ public class AgencyIdService {
 
     @Transactional
     public void transferOwnership(ScoreUser user, BigInteger agencyIdListManifestId, String targetLoginId) {
-        scoreRepositoryFactory.createAgencyIdListWriteRepository().transferOwnerShipAgencyIdList(user, agencyIdListManifestId, targetLoginId);
+        scoreRepositoryFactory.createAgencyIdListWriteRepository().transferOwnershipAgencyIdList(user, agencyIdListManifestId, targetLoginId);
     }
 
     @Transactional
@@ -123,21 +177,40 @@ public class AgencyIdService {
                 AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(params.getReleaseId())),
                 AGENCY_ID_LIST.STATE.notEqual(CcState.Deleted.name())
         ));
-
         if (params.getAgencyIdListManifestId() != null) {
             conditions.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.ne(ULong.valueOf(params.getAgencyIdListManifestId())));
         }
-        conditions.add(and(
-                AGENCY_ID_LIST.LIST_ID.eq(params.getListId()),
-                params.getAgencyId() == null ? AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID.isNull() :
-                AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID.eq(ULong.valueOf(params.getAgencyId())),
-                AGENCY_ID_LIST.VERSION_ID.eq(params.getVersionId())
-        ));
+        if (params.getAgencyIdListValueManifestId() == null) {
+            conditions.add(and(
+                    AGENCY_ID_LIST.LIST_ID.eq(params.getListId()),
+                    AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID.isNull(),
+                    AGENCY_ID_LIST.VERSION_ID.eq(params.getVersionId())
+            ));
+            return dslContext.selectCount()
+                    .from(AGENCY_ID_LIST_MANIFEST)
+                    .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                    .where(conditions).fetchOneInto(Integer.class) > 0;
+        } else {
+            AgencyIdListValueRecord valueRecord = dslContext.select(AGENCY_ID_LIST_VALUE.fields())
+                    .from(AGENCY_ID_LIST_VALUE_MANIFEST)
+                    .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(ULong.valueOf(params.getAgencyIdListValueManifestId())))
+                    .fetchOneInto(AgencyIdListValueRecord.class);
 
-        return dslContext.selectCount()
-                .from(AGENCY_ID_LIST_MANIFEST)
-                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(conditions).fetchOneInto(Integer.class) > 0;
+            conditions.add(and(
+                    AGENCY_ID_LIST.LIST_ID.eq(params.getListId()),
+                    AGENCY_ID_LIST.VERSION_ID.eq(params.getVersionId()),
+                    AGENCY_ID_LIST_VALUE.NAME.eq(valueRecord.getName()),
+                    AGENCY_ID_LIST_VALUE.VALUE.eq(valueRecord.getValue())
+            ));
+
+            return dslContext.selectCount()
+                    .from(AGENCY_ID_LIST_MANIFEST)
+                    .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                    .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                    .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                    .where(conditions).fetchOneInto(Integer.class) > 0;
+        }
     }
 
     public boolean hasSameNameAgencyIdList(SameNameAgencyIdListParams params) {
