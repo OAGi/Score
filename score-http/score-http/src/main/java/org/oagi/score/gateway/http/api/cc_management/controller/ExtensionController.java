@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.controller;
 
 import org.oagi.score.gateway.http.api.cc_management.data.CcActionRequest;
+import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateResponse;
@@ -72,8 +73,13 @@ public class ExtensionController {
     public ResponseEntity updateExtensionState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                @PathVariable("manifestId") BigInteger manifestId,
                                                @RequestBody Map<String, Object> body) {
-        CcState state = CcState.valueOf((String) body.get("state"));
-        service.updateState(user, manifestId, state);
+        String strState = (String) body.get("state");
+        if ("Purge".equals(strState)) {
+            service.purgeExtension(user, manifestId);
+        } else {
+            CcState state = CcState.valueOf((String) body.get("state"));
+            service.updateState(user, manifestId, state);
+        }
 
         return ResponseEntity.accepted().build();
     }

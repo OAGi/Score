@@ -2,6 +2,8 @@ package org.oagi.score.repo.component.ascc;
 
 import org.oagi.score.data.RepositoryRequest;
 import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.log.model.LogAction;
+import org.oagi.score.service.log.model.LogUtils;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.math.BigInteger;
@@ -17,6 +19,8 @@ public class CreateAsccRepositoryRequest extends RepositoryRequest {
     private CcState initialState = CcState.WIP;
     private int cardinalityMin = 0;
     private int cardinalityMax = -1;
+    private String logHash;
+    private LogAction logAction;
 
     public CreateAsccRepositoryRequest(AuthenticatedPrincipal user,
                                        BigInteger releaseId,
@@ -81,5 +85,21 @@ public class CreateAsccRepositoryRequest extends RepositoryRequest {
 
     public void setCardinalityMax(int cardinalityMax) {
         this.cardinalityMax = cardinalityMax;
+    }
+
+    public String getLogHash() {
+        return logHash;
+    }
+
+    public void setLogHash(String logHash) {
+        this.logHash = logHash;
+    }
+
+    public LogAction getLogAction() {
+        return logAction;
+    }
+
+    public void setLogAction(LogAction logAction) {
+        this.logAction = logAction;
     }
 }

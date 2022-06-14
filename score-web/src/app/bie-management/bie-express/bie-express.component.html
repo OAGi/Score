@@ -46,9 +46,11 @@
               <mat-form-field>
                 <mat-label>Owner</mat-label>
                 <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
@@ -60,9 +62,11 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
@@ -180,24 +184,15 @@
           <ng-container matColumnDef="businessContexts">
             <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
             <td mat-cell *matCellDef="let element">
-              <mat-chip-list class="ellipsis" *ngIf="element.businessContexts.length > 0" selectable="false">
-                <a target="_blank" rel="noopener noreferrer" *ngIf="element.businessContexts.length > 0"
-                   href="/context_management/business_context/{{ element.businessContexts[0].businessContextId }}">
-                  <mat-chip [matTooltip]="element.businessContexts[0].name"
-                            [matTooltipDisabled]="element.businessContexts[0].name.length <= 30">
-                    {{ element.businessContexts[0].name | truncate: 30 }}
-                  </mat-chip>
-                </a>
-                <a target="_blank" rel="noopener noreferrer"
-                   routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
-                  <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }}
-                    more...
-                  </mat-chip>
-                </a>
-              </mat-chip-list>
+              <mat-select [(ngModel)]="businessContextSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+                <mat-option *ngFor="let businessContext of element.businessContexts" [value]="businessContext">
+                  <span>
+                    {{ businessContext.name }}
+                  </span>
+                </mat-option>
+              </mat-select>
             </td>
           </ng-container>
-
 
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
@@ -304,7 +299,7 @@
           </div>
 
           <div class="col-md-4 col-sm-12">
-            <span class="option-header">Select an Expression</span>
+            <span class="option-header">Select an expression</span>
             <div class="option-body">
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
                                (change)="expressionOptionChange()">
@@ -406,7 +401,7 @@
           </div>
 
           <div class="col-md-4 col-sm-12">
-            <span class="option-header">Schema Package Option</span>
+            <span class="option-header">Schema File Option</span>
             <div class="option-body">
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
                 <mat-radio-button class="option-radio-button" value="ALL"
@@ -417,6 +412,15 @@
                   Put each schema in an individual file
                 </mat-radio-button>
               </mat-radio-group>
+
+              <div class="filename-option">
+                <div class="generate-option">
+                  <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">Include a business context in the filename</mat-checkbox>
+                </div>
+                <div class="generate-option">
+                  <mat-checkbox [(ngModel)]="option.includeVersionInFilename">Include a version in the filename</mat-checkbox>
+                </div>
+              </div>
 
               <div class="actions mt-4">
                 <button mat-raised-button color="primary" (click)="generate()"

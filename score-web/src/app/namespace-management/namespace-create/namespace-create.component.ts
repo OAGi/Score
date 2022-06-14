@@ -39,7 +39,7 @@ export class NamespaceCreateComponent implements OnInit {
   }
 
   get isDeveloper(): boolean {
-    return this.auth.getUserToken().role === 'developer';
+    return this.auth.getUserToken().roles.includes('developer');
   }
 
   back() {

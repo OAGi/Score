@@ -4,16 +4,18 @@ import org.jooq.DSLContext;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import static org.oagi.score.service.configuration.AppUserAuthority.DEVELOPER_GRANTED_AUTHORITY;
-import static org.oagi.score.service.configuration.AppUserAuthority.END_USER_GRANTED_AUTHORITY;
+import static org.oagi.score.service.configuration.AppUserAuthority.*;
 
 @Component
 public class AppUserDetailsService implements UserDetailsService {
@@ -33,8 +35,13 @@ public class AppUserDetailsService implements UserDetailsService {
         username = appUserRecord.getLoginId();
         String password = appUserRecord.getPassword();
         boolean isDeveloper = appUserRecord.getIsDeveloper() == 1;
+        boolean isAdmin = appUserRecord.getIsAdmin() == 1;
 
-        return new ScoreUser(username, password,
-                Arrays.asList(new SimpleGrantedAuthority((isDeveloper) ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY)));
+        List<GrantedAuthority> authorities = new ArrayList();
+        authorities.add(new SimpleGrantedAuthority((isDeveloper) ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY));
+        if (isAdmin) {
+            authorities.add(new SimpleGrantedAuthority(ADMIN_GRANTED_AUTHORITY));
+        }
+        return new ScoreUser(username, password, authorities);
     }
 }

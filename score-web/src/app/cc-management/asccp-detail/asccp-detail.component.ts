@@ -68,6 +68,7 @@ export class AsccpDetailComponent implements OnInit {
   commentControl: CommentControl;
 
   excludeSCs: boolean;
+  initialExpandDepth: number = 10;
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
@@ -144,7 +145,7 @@ export class AsccpDetailComponent implements OnInit {
 
       const flattener = new CcFlatNodeFlattener(ccGraph, 'ASCCP', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs);
+        const nodes = flattener.flatten(this.excludeSCs, this.initialExpandDepth);
         this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
@@ -182,7 +183,7 @@ export class AsccpDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return (this.userRole === 'developer') ? e.standard : !e.standard;
+      return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
     });
   }
 
@@ -330,7 +331,7 @@ export class AsccpDetailComponent implements OnInit {
     if (!node) {
       node = this.selectedNode;
     }
-    return (node !== undefined) && (node.type.toUpperCase() === 'BDT_SC');
+    return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
   asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
@@ -441,7 +442,7 @@ export class AsccpDetailComponent implements OnInit {
     if (!this.hasRevision()) {
       return true;
     } else {
-      return this.userRole === 'developer';
+      return this.userRoles.includes('developer');
     }
   }
 
@@ -460,11 +461,11 @@ export class AsccpDetailComponent implements OnInit {
       maxHeight: '100%',
       autoFocus: false
     });
-    dialogRef.afterClosed().subscribe(accManifestId => {
-      if (!accManifestId) {
+    dialogRef.afterClosed().subscribe(accManifest => {
+      if (!accManifest) {
         return;
       }
-      this.service.updateAsccpManifest(this.rootNode.manifestId, accManifestId).subscribe(asccp => {
+      this.service.updateAsccpManifest(this.rootNode.manifestId, accManifest.manifestId).subscribe(asccp => {
         this.getGraph((nodes: CcFlatNode[]) => {
           this.dataSource.removeNodes(0);
           const targetNodes = this.dataSource.getNodesByLevelAndIndex(nodes, 0);
@@ -538,10 +539,11 @@ export class AsccpDetailComponent implements OnInit {
   }
 
   makeNewRevision() {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this ASCCP?' : 'Amend this ASCCP?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this ASCCP?' : 'Are you sure you want to amend this ASCCP?'];
-    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+    dialogConfig.data.header = (isDeveloper) ? 'Revise this ASCCP?' : 'Amend this ASCCP?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to revise this ASCCP?' : 'Are you sure you want to amend this ASCCP?'];
+    dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
@@ -559,7 +561,7 @@ export class AsccpDetailComponent implements OnInit {
             this.afterStateChanged(resp.state, resp.access);
             this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
               this.lastRevision = revision;
-              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
@@ -568,9 +570,9 @@ export class AsccpDetailComponent implements OnInit {
       });
   }
 
-  get userRole(): string {
+  get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
-    return userToken.role;
+    return userToken.roles;
   }
 
   get currentUser(): string {
@@ -606,6 +608,34 @@ export class AsccpDetailComponent implements OnInit {
           .subscribe(_ => {
             this.router.navigateByUrl('/core_component');
           }, error => {
+          });
+      });
+  }
+
+  purgeNode(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Purge this core component?';
+    dialogConfig.data.content = ['Are you sure you want to purge this core component?'];
+    dialogConfig.data.action = 'Purge';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.isUpdating = true;
+        const state = 'Purge';
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
+          .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+          )
+          .subscribe(resp => {
+            this.snackBar.open('Purged', '', {duration: 3000});
+            this.location.back();
+            this.router.navigateByUrl('/core_component');
+          }, err => {
           });
       });
   }
@@ -709,9 +739,10 @@ export class AsccpDetailComponent implements OnInit {
   }
 
   cancelRevision(): void {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
     dialogConfig.data.action = 'Okay';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()

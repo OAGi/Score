@@ -1,6 +1,6 @@
 <mat-card style="box-shadow: none; padding: 0;">
   <mat-card-header>
-    <mat-card-title>{{ actionName }} Agency Id List Value</mat-card-title>
+    <mat-card-title>{{ actionName }} Agency ID List Value</mat-card-title>
   </mat-card-header>
 </mat-card>
 
@@ -10,35 +10,35 @@
       <mat-form-field>
         <mat-label>Value</mat-label>
         <input matInput required maxlength="255"
-               [disabled]="!isEditable || agencyIdListValue.derived || hasRevision"
+               [disabled]="!isEditable || derived || hasRevision"
                [(ngModel)]="agencyIdListValue.value">
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Meaning</mat-label>
         <input matInput required maxlength="100"
-               [disabled]="!isEditable || agencyIdListValue.derived"
+               [disabled]="!isEditable"
                [(ngModel)]="agencyIdListValue.name">
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition</mat-label>
         <textarea matInput rows="6" cols="30"
-                  [disabled]="!isEditable || agencyIdListValue.derived"
+                  [disabled]="!isEditable"
                   [(ngModel)]="agencyIdListValue.definition"></textarea>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition Source</mat-label>
         <input matInput maxlength="100"
-               [disabled]="!isEditable || agencyIdListValue.derived"
+               [disabled]="!isEditable"
                [(ngModel)]="agencyIdListValue.definitionSource">
       </mat-form-field>
 
       <div class="row">
         <div class="col-12">
           <mat-checkbox color="warn"
-                        [disabled]="!isEditable || revisionDeprecated || actionName === 'Add' || !this.hasRevision"
+                        [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
                         [(ngModel)]="agencyIdListValue.deprecated">
             <span>Deprecated</span>
           </mat-checkbox>
@@ -48,7 +48,7 @@
   </mat-card>
 </mat-dialog-content>
 
-<mat-dialog-actions *ngIf="isEditable && isAvailable(agencyIdListValue)">
+<mat-dialog-actions *ngIf="isEditable">
   <button mat-raised-button color="primary"
           [disabled]="isDisabled()"
           [mat-dialog-close]="agencyIdListValue">

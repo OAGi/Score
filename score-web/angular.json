@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": false
+  },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
@@ -34,7 +37,7 @@
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.js",
               "node_modules/crypto-js/crypto-js.js",
-              "node_modules/marked/lib/marked.js"
+              "node_modules/marked/marked.min.js"
             ],
             "optimization": false,
             "outputHashing": "none",

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
+import static org.oagi.score.repo.api.corecomponent.model.CcState.Deleted;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.LOG;
 
@@ -89,13 +90,6 @@ public class JooqAgencyIdListWriteRepository
                 .set(agencyIdListManifestRecord).returning()
                 .fetchOne();
 
-        LogRecord logRecord = insertAgencyIdListLog(agencyIdListManifestRecord, agencyIdListRecord, null, LogAction.Added, ULong.valueOf(user.getUserId()), timestamp);
-
-        dslContext().update(AGENCY_ID_LIST_MANIFEST)
-                .set(AGENCY_ID_LIST_MANIFEST.LOG_ID, logRecord.getLogId())
-                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestRecord.getAgencyIdListManifestId()))
-                .execute();
-
         if (basedAgencyIdListManifest != null) {
             List<AgencyIdListValueManifestRecord> basedAgencyIdListValueManifestList =
                     dslContext().selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
@@ -112,6 +106,7 @@ public class JooqAgencyIdListWriteRepository
                 AgencyIdListValueRecord agencyIdListValueRecord = basedAgencyIdListValue.copy();
                 agencyIdListValueRecord.setOwnerListId(agencyIdListRecord.getAgencyIdListId());
                 agencyIdListValueRecord.setGuid(ScoreGuidUtils.randomGuid());
+                agencyIdListValueRecord.setBasedAgencyIdListValueId(basedAgencyIdListValue.getAgencyIdListValueId());
                 agencyIdListValueRecord.setCreatedBy(userId);
                 agencyIdListValueRecord.setLastUpdatedBy(userId);
                 agencyIdListValueRecord.setOwnerUserId(userId);
@@ -130,6 +125,7 @@ public class JooqAgencyIdListWriteRepository
                 agencyIdListValueManifestRecord.setReleaseId(basedAgencyIdListValueManifest.getReleaseId());
                 agencyIdListValueManifestRecord.setAgencyIdListValueId(agencyIdListValueRecord.getAgencyIdListValueId());
                 agencyIdListValueManifestRecord.setAgencyIdListManifestId(agencyIdListManifestRecord.getAgencyIdListManifestId());
+                agencyIdListValueManifestRecord.setBasedAgencyIdListValueManifestId(basedAgencyIdListValueManifest.getAgencyIdListValueManifestId());
                 agencyIdListValueManifestRecord.setPrevAgencyIdListValueManifestId(null);
                 agencyIdListValueManifestRecord.setNextAgencyIdListValueManifestId(null);
 
@@ -147,6 +143,13 @@ public class JooqAgencyIdListWriteRepository
                 }
             }
         }
+
+        LogRecord logRecord = insertAgencyIdListLog(agencyIdListManifestRecord, agencyIdListRecord, null, LogAction.Added, ULong.valueOf(user.getUserId()), timestamp);
+
+        dslContext().update(AGENCY_ID_LIST_MANIFEST)
+                .set(AGENCY_ID_LIST_MANIFEST.LOG_ID, logRecord.getLogId())
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestRecord.getAgencyIdListManifestId()))
+                .execute();
 
         return agencyIdListManifestRecord.getAgencyIdListManifestId().toBigInteger();
     }
@@ -181,22 +184,21 @@ public class JooqAgencyIdListWriteRepository
                         .fetch();
 
         ModifyAgencyIdListValuesRepositoryRequest valueRequest = new ModifyAgencyIdListValuesRepositoryRequest();
+        valueRequest.setAgencyIdListManifestId(agencyIdList.getAgencyIdListManifestId());
         valueRequest.setAgencyIdListValueList(agencyIdList.getValues().stream().map(e -> {
             ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue agencyIdListValue =
                     new ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue();
 
+            agencyIdListValue.setAgencyIdListValueManifestId(e.getAgencyIdListValueManifestId());
             agencyIdListValue.setName(e.getName());
             agencyIdListValue.setValue(e.getValue());
             agencyIdListValue.setDefinition(e.getDefinition());
             agencyIdListValue.setDefinitionSource(e.getDefinitionSource());
             agencyIdListValue.setDeprecated(e.isDeprecated());
 
-            if (agencyIdListValue.isLocked()) {
-                agencyIdListValue.setUsed(false);
-            }
-
             return agencyIdListValue;
         }).collect(Collectors.toList()));
+
         // add
         addAgencyIdListValues(user, userId, timestamp,
                 agencyIdListManifestRecord, agencyIdListRecord,
@@ -263,7 +265,7 @@ public class JooqAgencyIdListWriteRepository
     }
 
     @Override
-    public void transferOwnerShipAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId, String targetLoginId) throws ScoreDataAccessException {
+    public void transferOwnershipAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId, String targetLoginId) throws ScoreDataAccessException {
         ULong userId = ULong.valueOf(user.getUserId());
         LocalDateTime timestamp = LocalDateTime.now();
         ULong targetUserId = dslContext().selectFrom(APP_USER).where(APP_USER.LOGIN_ID.eq(targetLoginId)).fetchOne().getAppUserId();
@@ -336,8 +338,27 @@ public class JooqAgencyIdListWriteRepository
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
-        if (!agencyIdListRecord.getOwnerUserId().equals(userId) && !prevState.canForceMove(nextState)) {
-            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        if (prevState == Deleted) {
+            boolean isOwnerDeveloper = dslContext().select(APP_USER.IS_DEVELOPER)
+                    .from(APP_USER)
+                    .where(APP_USER.APP_USER_ID.eq(agencyIdListRecord.getOwnerUserId()))
+                    .fetchOneInto(Byte.class) == (byte) 1;
+            boolean isRequesterDeveloper = dslContext().select(APP_USER.IS_DEVELOPER)
+                    .from(APP_USER)
+                    .where(APP_USER.APP_USER_ID.eq(userId))
+                    .fetchOneInto(Byte.class) == (byte) 1;
+
+            if (isOwnerDeveloper != isRequesterDeveloper) {
+                if (isOwnerDeveloper) {
+                    throw new IllegalArgumentException("Only developers can restore this component.");
+                } else {
+                    throw new IllegalArgumentException("Only end-users can restore this component.");
+                }
+            }
+        } else {
+            if (!agencyIdListRecord.getOwnerUserId().equals(userId) && !prevState.canForceMove(nextState)) {
+                throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+            }
         }
 
         // update agencyIdList state.
@@ -346,11 +367,16 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListRecord.setLastUpdatedBy(userId);
             agencyIdListRecord.setLastUpdateTimestamp(timestamp);
         }
+        if (prevState == Deleted) {
+            agencyIdListRecord.setOwnerUserId(userId);
+        }
         agencyIdListRecord.update(AGENCY_ID_LIST.STATE,
-                AGENCY_ID_LIST.LAST_UPDATED_BY, AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP);
+                AGENCY_ID_LIST.LAST_UPDATED_BY,
+                AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP,
+                AGENCY_ID_LIST.OWNER_USER_ID);
 
         // creates new revision for updated record.
-        LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
+        LogAction logAction = (Deleted == prevState && CcState.WIP == nextState)
                 ? LogAction.Restored : LogAction.Modified;
         LogRecord logRecord =
                 insertAgencyIdListLog(
@@ -361,7 +387,6 @@ public class JooqAgencyIdListWriteRepository
 
         agencyIdListManifestRecord.setLogId(logRecord.getLogId());
         agencyIdListManifestRecord.update(AGENCY_ID_LIST_MANIFEST.LOG_ID);
-
     }
 
     @Override
@@ -796,6 +821,11 @@ public class JooqAgencyIdListWriteRepository
                         )
                         .fetch();
 
+        // delete
+        deleteAgencyIdListValues(request.getRequester(), userId, timestamp,
+                agencyIdListManifestRecord, agencyIdListRecord,
+                request, agencyIdListValueManifestRecordList, agencyIdListValueRecordList);
+
         // add
         addAgencyIdListValues(request.getRequester(), userId, timestamp,
                 agencyIdListManifestRecord, agencyIdListRecord,
@@ -803,11 +833,6 @@ public class JooqAgencyIdListWriteRepository
 
         // update
         updateAgencyIdListValues(request.getRequester(), userId, timestamp,
-                agencyIdListManifestRecord, agencyIdListRecord,
-                request, agencyIdListValueManifestRecordList, agencyIdListValueRecordList);
-
-        // delete
-        deleteAgencyIdListValues(request.getRequester(), userId, timestamp,
                 agencyIdListManifestRecord, agencyIdListRecord,
                 request, agencyIdListValueManifestRecordList, agencyIdListValueRecordList);
 
@@ -821,12 +846,8 @@ public class JooqAgencyIdListWriteRepository
             List<AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordList,
             List<AgencyIdListValueRecord> agencyIdListValueRecordList
     ) {
-        Map<String, AgencyIdListValueRecord> agencyIdListValueRecordMapByValue =
-                agencyIdListValueRecordList.stream()
-                        .collect(Collectors.toMap(AgencyIdListValueRecord::getValue, Function.identity()));
-
         for (ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue agencyIdListValue : request.getAgencyIdListValueList()) {
-            if (agencyIdListValueRecordMapByValue.containsKey(agencyIdListValue.getValue())) {
+            if (agencyIdListValue.getAgencyIdListValueManifestId() != null) {
                 continue;
             }
 
@@ -843,7 +864,7 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValueRecord.setLastUpdatedBy(userId);
             agencyIdListValueRecord.setCreationTimestamp(timestamp);
             agencyIdListValueRecord.setLastUpdateTimestamp(timestamp);
-            agencyIdListValueRecord.setIsDeprecated((byte) (0));
+            agencyIdListValueRecord.setIsDeprecated((byte) 0);
 
             agencyIdListValueRecord.setAgencyIdListValueId(
                     dslContext().insertInto(AGENCY_ID_LIST_VALUE)
@@ -874,17 +895,24 @@ public class JooqAgencyIdListWriteRepository
             List<AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordList,
             List<AgencyIdListValueRecord> agencyIdListValueRecordList
     ) {
-        Map<String, AgencyIdListValueRecord> agencyIdListValueRecordMapByValue =
+        Map<ULong, AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordMap =
+                agencyIdListValueManifestRecordList.stream()
+                        .collect(Collectors.toMap(AgencyIdListValueManifestRecord::getAgencyIdListValueManifestId, Function.identity()));
+        Map<ULong, AgencyIdListValueRecord> agencyIdListValueRecordMap =
                 agencyIdListValueRecordList.stream()
-                        .collect(Collectors.toMap(AgencyIdListValueRecord::getValue, Function.identity()));
+                        .collect(Collectors.toMap(AgencyIdListValueRecord::getAgencyIdListValueId, Function.identity()));
 
         for (ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue agencyIdListValue : request.getAgencyIdListValueList()) {
-            if (!agencyIdListValueRecordMapByValue.containsKey(agencyIdListValue.getValue())) {
+            if (agencyIdListValue.getAgencyIdListValueManifestId() == null) {
                 continue;
             }
 
-            AgencyIdListValueRecord agencyIdListValueRecord = agencyIdListValueRecordMapByValue.get(agencyIdListValue.getValue());
+            AgencyIdListValueManifestRecord agencyIdListValueManifestRecord =
+                    agencyIdListValueManifestRecordMap.get(ULong.valueOf(agencyIdListValue.getAgencyIdListValueManifestId()));
+            AgencyIdListValueRecord agencyIdListValueRecord =
+                    agencyIdListValueRecordMap.get(agencyIdListValueManifestRecord.getAgencyIdListValueId());
 
+            agencyIdListValueRecord.setValue(agencyIdListValue.getValue());
             agencyIdListValueRecord.setName(agencyIdListValue.getName());
             agencyIdListValueRecord.setDefinition(agencyIdListValue.getDefinition());
             agencyIdListValueRecord.setDefinitionSource(agencyIdListValue.getDefinitionSource());
@@ -892,7 +920,7 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValueRecord.setLastUpdatedBy(userId);
             agencyIdListValueRecord.setLastUpdateTimestamp(timestamp);
 
-            agencyIdListValueRecord.update(
+            agencyIdListValueRecord.update(AGENCY_ID_LIST_VALUE.VALUE,
                     AGENCY_ID_LIST_VALUE.NAME, AGENCY_ID_LIST_VALUE.IS_DEPRECATED,
                     AGENCY_ID_LIST_VALUE.DEFINITION, AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
                     AGENCY_ID_LIST_VALUE.LAST_UPDATED_BY, AGENCY_ID_LIST_VALUE.LAST_UPDATE_TIMESTAMP);
@@ -906,27 +934,35 @@ public class JooqAgencyIdListWriteRepository
             List<AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordList,
             List<AgencyIdListValueRecord> agencyIdListValueRecordList
     ) {
-        Map<String, AgencyIdListValueRecord> agencyIdListValueRecordMapByValue =
-                agencyIdListValueRecordList.stream()
-                        .collect(Collectors.toMap(AgencyIdListValueRecord::getValue, Function.identity()));
+        List<ULong> agencyIdListValueManifestIdListInRequest = request.getAgencyIdListValueList()
+                .stream().filter(e -> e.getAgencyIdListValueManifestId() != null)
+                .map(e -> ULong.valueOf(e.getAgencyIdListValueManifestId())).collect(Collectors.toList());
 
-        for (ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue agencyIdListValue : request.getAgencyIdListValueList()) {
-            agencyIdListValueRecordMapByValue.remove(agencyIdListValue.getValue());
+        List<AgencyIdListValueManifestRecord> deletedAgencyIdListValueManifestList = agencyIdListValueManifestRecordList
+                .stream().filter(e -> !agencyIdListValueManifestIdListInRequest.contains(e.getAgencyIdListValueManifestId())).collect(Collectors.toList());
+
+        if (!deletedAgencyIdListValueManifestList.isEmpty()) {
+            dslContext().deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(deletedAgencyIdListValueManifestList.stream().map(e -> e.getAgencyIdListValueManifestId()).collect(Collectors.toList())))
+                    .execute();
+
+            dslContext().deleteFrom(AGENCY_ID_LIST_VALUE)
+                    .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.in(deletedAgencyIdListValueManifestList.stream().map(e -> e.getAgencyIdListValueId()).collect(Collectors.toList())))
+                    .execute();
         }
+    }
 
-        Map<ULong, AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordMapById =
-                agencyIdListValueManifestRecordList.stream()
-                        .collect(Collectors.toMap(AgencyIdListValueManifestRecord::getAgencyIdListValueId, Function.identity()));
-
-        for (AgencyIdListValueRecord agencyIdListValueRecord : agencyIdListValueRecordMapByValue.values()) {
-            if (agencyIdListRecord.getAgencyIdListValueId().equals(agencyIdListValueRecord.getAgencyIdListValueId())) {
-                throw new IllegalArgumentException("The agency id list value in use can not be delete.");
-            }
-            agencyIdListValueManifestRecordMapById.get(
-                    agencyIdListValueRecord.getAgencyIdListValueId()
-            ).delete();
-            agencyIdListValueRecord.delete();
-        }
+    private void updateCodeListAgencyIdListValueId(BigInteger releaseId, BigInteger prevAgencyIdListValueId, BigInteger nextAgencyIdListValueId) {
+        dslContext().update(CODE_LIST)
+                .set(CODE_LIST.AGENCY_ID_LIST_VALUE_ID, ULong.valueOf(nextAgencyIdListValueId))
+                .where(CODE_LIST.CODE_LIST_ID.in(
+                        dslContext().select(CODE_LIST.CODE_LIST_ID)
+                                .from(CODE_LIST)
+                                .join(CODE_LIST_MANIFEST)
+                                .on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                                .where(and(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                        CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(ULong.valueOf(prevAgencyIdListValueId))))))
+                .execute();
     }
 
     private void updateBIEAgencyIdListId(BigInteger releaseId, BigInteger prevAgencyIdListId, BigInteger nextAgencyIdListId) {
@@ -954,7 +990,8 @@ public class JooqAgencyIdListWriteRepository
 
     }
 
-    private void discardLogAgencyIdListValues(AgencyIdListManifestRecord agencyIdListManifestRecord, AgencyIdListRecord agencyIdListRecord) {
+    private void discardLogAgencyIdListValues(AgencyIdListManifestRecord agencyIdListManifestRecord,
+                                              AgencyIdListRecord agencyIdListRecord) {
         List<AgencyIdListValueManifestRecord> agencyIdListValueManifests = dslContext().selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
                 .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestRecord.getAgencyIdListManifestId()))
                 .fetch();
@@ -965,14 +1002,19 @@ public class JooqAgencyIdListWriteRepository
                     .fetchOne();
 
             if (agencyIdListValue.getPrevAgencyIdListValueId() == null) {
-                //delete code list value and code list manifest which added this revision
+                // delete code list value and code list manifest which added this revision
                 agencyIdListValueManifest.delete();
                 agencyIdListValue.delete();
             } else {
-                //delete code list value and update code list value manifest
+                // delete code list value and update code list value manifest
                 AgencyIdListValueRecord prevAgencyIdListValue = dslContext().selectFrom(AGENCY_ID_LIST_VALUE)
                         .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(agencyIdListValue.getPrevAgencyIdListValueId()))
                         .fetchOne();
+
+                updateCodeListAgencyIdListValueId(agencyIdListManifestRecord.getReleaseId().toBigInteger(),
+                        agencyIdListValue.getAgencyIdListValueId().toBigInteger(),
+                        prevAgencyIdListValue.getAgencyIdListValueId().toBigInteger());
+
                 prevAgencyIdListValue.setNextAgencyIdListValueId(null);
                 prevAgencyIdListValue.update(AGENCY_ID_LIST_VALUE.NEXT_AGENCY_ID_LIST_VALUE_ID);
                 agencyIdListValueManifest.setAgencyIdListValueId(prevAgencyIdListValue.getAgencyIdListValueId());
@@ -1020,6 +1062,10 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValueManifestRecord.setAgencyIdListManifestId(manifestRecord.getAgencyIdListManifestId());
             agencyIdListValueManifestRecord.update(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID,
                     AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
+
+            updateCodeListAgencyIdListValueId(manifestRecord.getReleaseId().toBigInteger(),
+                    prevAgencyIdListValueRecord.getAgencyIdListValueId().toBigInteger(),
+                    nextAgencyIdListValueRecord.getAgencyIdListValueId().toBigInteger());
         }
     }
 }

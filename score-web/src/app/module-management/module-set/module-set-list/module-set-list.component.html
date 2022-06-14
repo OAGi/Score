@@ -3,7 +3,7 @@
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
-      <button *ngIf="role === 'developer'"
+      <button *ngIf="roles.includes('developer')"
               (click)="create()" class="ml-2" color="primary" mat-raised-button style="margin-right: 10px;">
         New Module Set
       </button>
@@ -19,9 +19,11 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                         [noEntriesFoundLabel]="'No matching updater found.'"
-                                         [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"
+                                           [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>

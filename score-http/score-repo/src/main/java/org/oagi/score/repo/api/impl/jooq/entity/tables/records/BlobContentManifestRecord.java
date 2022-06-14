@@ -22,14 +22,16 @@ public class BlobContentManifestRecord extends UpdatableRecordImpl<BlobContentMa
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.blob_content_manifest.blob_content_manifest_id</code>.
+     * Setter for
+     * <code>oagi.blob_content_manifest.blob_content_manifest_id</code>.
      */
     public void setBlobContentManifestId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content_manifest.blob_content_manifest_id</code>.
+     * Getter for
+     * <code>oagi.blob_content_manifest.blob_content_manifest_id</code>.
      */
     public ULong getBlobContentManifestId() {
         return (ULong) get(0);
@@ -64,42 +66,48 @@ public class BlobContentManifestRecord extends UpdatableRecordImpl<BlobContentMa
     }
 
     /**
-     * Setter for <code>oagi.blob_content_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Setter for <code>oagi.blob_content_manifest.conflict</code>. This
+     * indicates that there is a conflict between self and relationship.
      */
     public void setConflict(Byte value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Getter for <code>oagi.blob_content_manifest.conflict</code>. This
+     * indicates that there is a conflict between self and relationship.
      */
     public Byte getConflict() {
         return (Byte) get(3);
     }
 
     /**
-     * Setter for <code>oagi.blob_content_manifest.prev_blob_content_manifest_id</code>.
+     * Setter for
+     * <code>oagi.blob_content_manifest.prev_blob_content_manifest_id</code>.
      */
     public void setPrevBlobContentManifestId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content_manifest.prev_blob_content_manifest_id</code>.
+     * Getter for
+     * <code>oagi.blob_content_manifest.prev_blob_content_manifest_id</code>.
      */
     public ULong getPrevBlobContentManifestId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.blob_content_manifest.next_blob_content_manifest_id</code>.
+     * Setter for
+     * <code>oagi.blob_content_manifest.next_blob_content_manifest_id</code>.
      */
     public void setNextBlobContentManifestId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content_manifest.next_blob_content_manifest_id</code>.
+     * Getter for
+     * <code>oagi.blob_content_manifest.next_blob_content_manifest_id</code>.
      */
     public ULong getNextBlobContentManifestId() {
         return (ULong) get(5);

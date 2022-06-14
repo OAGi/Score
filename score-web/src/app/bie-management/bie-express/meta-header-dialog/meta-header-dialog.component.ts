@@ -54,7 +54,7 @@ export class MetaHeaderDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
+    this.request = new BieListRequest(undefined,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.propertyTerm = 'Meta Header';
     this.request.access = 'CanView';

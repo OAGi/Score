@@ -9,6 +9,7 @@ import java.util.Date;
 public class Xbt {
 
     private BigInteger xbtId = BigInteger.ZERO;
+    private BigInteger manifestId = BigInteger.ZERO;
     private String name;
     private String builtinType;
     private String jbtDraft05Map;

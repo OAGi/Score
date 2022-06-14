@@ -19,8 +19,8 @@ export class PendingActivate implements CanActivate {
     return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
       if (!!res) {
         this.auth.storeUserInfo(res);
-        const role = res.role;
-        if (role === 'pending') {
+        const roles = res.roles;
+        if (roles.includes('pending')) {
           return true;
         } else {
           return this.router.parseUrl('/');

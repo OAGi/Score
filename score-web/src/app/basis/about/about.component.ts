@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AboutService} from './domain/about.service';
 import {ProductInfo} from './domain/about';
 // @ts-ignore
-import * as pkg from '../../../../package.json';
+import pkg from '../../../../package.json';
 
 @Component({
   selector: 'score-about',

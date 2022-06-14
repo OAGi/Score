@@ -10,7 +10,6 @@ import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.service.common.data.BCCEntityType;
-import org.oagi.score.service.common.data.DTType;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -107,7 +106,7 @@ public class LogSerializer {
 
     private Map<String, Object> toMetadata(Record record) {
         if (record == null) {
-            return Collections.emptyMap();
+            return new HashMap();
         }
         Map<String, Object> properties = new HashMap();
         for (Field field : record.fields()) {
@@ -320,14 +319,13 @@ public class LogSerializer {
 
         properties.put("component", "dt");
         properties.put("guid", dtRecord.getGuid());
-        properties.put("type", DTType.valueOf(dtRecord.getType()).name());
-        properties.put("versionNum", dtRecord.getVersionNum());
+        properties.put("representationTerm", dtRecord.getRepresentationTerm());
         properties.put("dataTypeTerm", dtRecord.getDataTypeTerm());
-        properties.put("qualifier", dtRecord.getQualifier());
+        properties.put("qualifier", dtRecord.getQualifier_());
         properties.put("definition", dtRecord.getDefinition());
         properties.put("definitionSource", dtRecord.getDefinitionSource());
         properties.put("contentComponentDefinition", dtRecord.getContentComponentDefinition());
-        properties.put("revisionDoc", dtRecord.getRevisionDoc());
+        properties.put("sixDigitId", dtRecord.getSixDigitId());
         properties.put("state", dtRecord.getState());
         properties.put("deprecated", (byte) 1 == dtRecord.getIsDeprecated());
 
@@ -403,7 +401,7 @@ public class LogSerializer {
         properties.put("guid", codeListRecord.getGuid());
         properties.put("name", codeListRecord.getName());
         properties.put("listId", codeListRecord.getListId());
-        properties.put("agencyId", resolver.getAgencyIdListValue(codeListRecord.getAgencyId()));
+        properties.put("agencyId", resolver.getAgencyIdListValue(codeListRecord.getAgencyIdListValueId()));
         properties.put("versionId", codeListRecord.getVersionId());
         properties.put("remark", codeListRecord.getRemark());
         properties.put("definition", codeListRecord.getDefinition());
@@ -468,9 +466,6 @@ public class LogSerializer {
         properties.put("definition", codeListValueRecord.getDefinition());
         properties.put("definitionSource", codeListValueRecord.getDefinitionSource());
         properties.put("deprecated", (byte) 1 == codeListValueRecord.getIsDeprecated());
-        properties.put("used", (byte) 1 == codeListValueRecord.getUsedIndicator());
-        properties.put("locked", (byte) 1 == codeListValueRecord.getLockedIndicator());
-        properties.put("extension", (byte) 1 == codeListValueRecord.getExtensionIndicator());
 
         return properties;
     }

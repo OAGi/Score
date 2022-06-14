@@ -5,7 +5,7 @@ import {map} from 'rxjs/operators';
 import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
-import {OagisComponentType} from '../../domain/core-component-node';
+import {CcDtNodeDetail, CcXbt, OagisComponentType, XbtForList} from '../../domain/core-component-node';
 import {base64Encode} from '../../../common/utility';
 import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
 
@@ -89,7 +89,11 @@ export class CcListService {
       params = params.set('isBIEUsable', '' + request.isBIEUsable);
     }
 
-    return this.http.get<PageResponse<CcList>>('/api/core_component', {params});
+    if (request.fuzzySearch) {
+      return this.http.get<PageResponse<CcList>>('/api/core_component_search', {params});
+    } else {
+      return this.http.get<PageResponse<CcList>>('/api/core_component', {params});
+    }
   }
 
   getAsccp(id): Observable<Asccp> {
@@ -155,6 +159,7 @@ export class CcListService {
     const accManifestIds = [];
     const asccpManifestIds = [];
     const bccpManifestIds = [];
+    const dtManifestIds = [];
 
     for (const item of ccLists) {
       switch (item.type.toUpperCase()) {
@@ -166,6 +171,9 @@ export class CcListService {
           break;
         case 'BCCP':
           bccpManifestIds.push(item.manifestId);
+          break;
+        case 'DT':
+          dtManifestIds.push(item.manifestId);
           break;
       }
     }
@@ -174,6 +182,7 @@ export class CcListService {
       accManifestIds,
       asccpManifestIds,
       bccpManifestIds,
+      dtManifestIds
     });
   }
 
@@ -181,6 +190,7 @@ export class CcListService {
     const accManifestIds = [];
     const asccpManifestIds = [];
     const bccpManifestIds = [];
+    const dtManifestIds = [];
 
     for (const item of ccLists) {
       switch (item.type.toUpperCase()) {
@@ -192,6 +202,9 @@ export class CcListService {
           break;
         case 'BCCP':
           bccpManifestIds.push(item.manifestId);
+          break;
+        case 'DT':
+          dtManifestIds.push(item.manifestId);
           break;
       }
     }
@@ -202,7 +215,38 @@ export class CcListService {
       accManifestIds,
       asccpManifestIds,
       bccpManifestIds,
+      dtManifestIds
     });
   }
 
+  getSimpleXbtList(releaseId: number): Observable<XbtForList[]> {
+    return this.http.get<XbtForList[]>('/api/xbt/simple_list/' + releaseId);
+  }
+
+  createPrimitiveRestriction(releaseId: number, dtManifestId: number, type: string, primitiveXbtMapList: any[]): Observable<CcDtNodeDetail> {
+    return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
+      releaseId: releaseId,
+      dtManifestId: dtManifestId,
+      restrictionType: type,
+      primitiveXbtMapList: primitiveXbtMapList,
+    });
+  }
+
+  createCodeListRestriction(releaseId: number, dtManifestId: number, type: string, codeListManifestId: number): Observable<CcDtNodeDetail> {
+    return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
+      releaseId: releaseId,
+      dtManifestId: dtManifestId,
+      restrictionType: type,
+      codeListManifestId: codeListManifestId,
+    });
+  }
+
+  createAgencyIdListRestriction(releaseId: number, dtManifestId: number, type: string, agencyIdListManifestId: number): Observable<CcDtNodeDetail> {
+    return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
+      releaseId: releaseId,
+      dtManifestId: dtManifestId,
+      restrictionType: type,
+      agencyIdListManifestId: agencyIdListManifestId,
+    });
+  }
 }

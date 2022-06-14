@@ -42,8 +42,8 @@ export class AccountListService implements OnInit {
     if (request.filters.status) {
       params = params.set('status', request.filters.status.join(','));
     }
-    if (request.filters.role) {
-      params = params.set('role', request.filters.role);
+    if (request.filters.roles) {
+      params = params.set('roles', request.filters.roles.join(','));
     }
     if (request.filters.excludeSSO) {
       params = params.set('excludeSSO', 'true');
@@ -84,6 +84,7 @@ export class AccountListService implements OnInit {
         'name': account.name,
         'organization': account.organization,
         'developer': account.developer,
+        'admin': account.admin,
         'appOauth2UserId': pending.appOauth2UserId,
         'sub': pending.sub
       });
@@ -93,7 +94,8 @@ export class AccountListService implements OnInit {
         'password': newPassword,
         'name': account.name,
         'organization': account.organization,
-        'developer': account.developer
+        'developer': account.developer,
+        'admin': account.admin
       });
     }
   }

@@ -3,10 +3,13 @@ package org.oagi.score.gateway.http.api.bie_management.data.expression;
 import lombok.Data;
 
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Map;
 
 @Data
 public class GenerateExpressionOption {
 
+    private Map<BigInteger, String> filenames = Collections.emptyMap();
     private boolean bieDefinition = true;
     private boolean bieGuid;
     private boolean bieCctsMetaData;
@@ -18,6 +21,9 @@ public class GenerateExpressionOption {
 
     private String expressionOption;
     private String packageOption;
+
+    private boolean includeBusinessContextInFilename;
+    private boolean includeVersionInFilename;
 
     private boolean arrayForJsonExpression;
     private boolean includeMetaHeaderForJson;

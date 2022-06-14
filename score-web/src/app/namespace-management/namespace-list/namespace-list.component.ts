@@ -223,7 +223,7 @@ export class NamespaceListComponent implements OnInit {
     }
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {

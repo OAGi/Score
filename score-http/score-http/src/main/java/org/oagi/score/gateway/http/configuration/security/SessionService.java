@@ -86,8 +86,9 @@ public class SessionService {
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
-                APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.ORGANIZATION,
+                APP_USER.IS_DEVELOPER.as("developer"),
+                APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled")
             ).from(APP_USER)
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(username))
@@ -99,8 +100,9 @@ public class SessionService {
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
-                APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.ORGANIZATION,
+                APP_USER.IS_DEVELOPER.as("developer"),
+                APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled")
         ).from(APP_USER)
                 .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(appUserId)))
@@ -117,8 +119,10 @@ public class SessionService {
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
+                APP_USER.ORGANIZATION,
                 APP_USER.IS_DEVELOPER.as("developer"),
-                APP_USER.ORGANIZATION)
+                APP_USER.IS_ADMIN.as("admin"),
+                APP_USER.IS_ENABLED.as("enabled"))
                 .from(APP_USER)
                 .join(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID))
                 .where(APP_OAUTH2_USER.SUB.equalIgnoreCase(sub))

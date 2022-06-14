@@ -13,14 +13,16 @@ import org.oagi.score.repo.api.release.model.GetReleaseRequest;
 import org.oagi.score.repo.api.release.model.GetReleaseResponse;
 import org.oagi.score.repo.api.release.model.Release;
 import org.oagi.score.repo.api.security.AccessControl;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.*;
+import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqReleaseReadRepository
         extends JooqScoreRepository
@@ -40,9 +42,11 @@ public class JooqReleaseReadRepository
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 RELEASE.CREATION_TIMESTAMP,
                 RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(RELEASE)
@@ -58,16 +62,33 @@ public class JooqReleaseReadRepository
             release.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
             release.setReleaseNote(record.get(RELEASE.RELEASE_NOTE));
             release.setReleaseLicense(record.get(RELEASE.RELEASE_LICENSE));
-            release.setCreatedBy(new ScoreUser(
-                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
-            ));
-            release.setLastUpdatedBy(new ScoreUser(
-                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
-            ));
+
+            ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
+            boolean isCreatorAdmin = (byte) 1 == record.get(APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"));
+            release.setCreatedBy(
+                    (isCreatorAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    Arrays.asList(creatorRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    creatorRole));
+
+            ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
+            boolean isUpdaterAdmin = (byte) 1 == record.get(APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"));
+            release.setLastUpdatedBy(
+                    (isUpdaterAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    Arrays.asList(updaterRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    updaterRole));
+
             release.setCreationTimestamp(
                     Date.from(record.get(RELEASE.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             release.setLastUpdateTimestamp(

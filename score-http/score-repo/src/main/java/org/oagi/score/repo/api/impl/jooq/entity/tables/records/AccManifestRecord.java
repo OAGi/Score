@@ -78,42 +78,48 @@ public class AccManifestRecord extends UpdatableRecordImpl<AccManifestRecord> im
     }
 
     /**
-     * Setter for <code>oagi.acc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Setter for <code>oagi.acc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public void setConflict(Byte value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.acc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * Getter for <code>oagi.acc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public Byte getConflict() {
         return (Byte) get(4);
     }
 
     /**
-     * Setter for <code>oagi.acc_manifest.log_id</code>. A foreign key pointed to a log for the current record.
+     * Setter for <code>oagi.acc_manifest.log_id</code>. A foreign key pointed
+     * to a log for the current record.
      */
     public void setLogId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.acc_manifest.log_id</code>. A foreign key pointed to a log for the current record.
+     * Getter for <code>oagi.acc_manifest.log_id</code>. A foreign key pointed
+     * to a log for the current record.
      */
     public ULong getLogId() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.acc_manifest.replacement_acc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * Setter for <code>oagi.acc_manifest.replacement_acc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public void setReplacementAccManifestId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.acc_manifest.replacement_acc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * Getter for <code>oagi.acc_manifest.replacement_acc_manifest_id</code>.
+     * This refers to a replacement manifest if the record is deprecated.
      */
     public ULong getReplacementAccManifestId() {
         return (ULong) get(6);

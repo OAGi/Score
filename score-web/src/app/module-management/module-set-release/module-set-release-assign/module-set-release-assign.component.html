@@ -5,7 +5,7 @@
 
   <mat-card class="mt-4">
     <mat-card-header>
-      <mat-card-title>Edit Modules</mat-card-title>
+      <mat-card-title>Core Component Assignment</mat-card-title>
     </mat-card-header>
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
@@ -39,29 +39,82 @@
 
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
-        <div class="assign-cc-wrapper">
-          <div class="assign-cc-table-wrapper">
-            <h4>Unassigned</h4>
-            <div class="assign-cc-table-filter">
-              <div class="assign-cc-table-filter-type">
-                <mat-form-field>
-                  <mat-label>Type</mat-label>
-                  <mat-select (ngModelChange)="updateLeftFilterTypes($event)" [(ngModel)]="leftFilteredValues.types" multiple>
-                    <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="assign-cc-table-filter-den">
-                <mat-form-field>
-                  <mat-label>Den</mat-label>
-                  <input (keyup)="updateLeftFilterDen(leftFilteredValues.den)" [(ngModel)]="leftFilteredValues.den" matInput>
-                </mat-form-field>
+        <div class="d-flex">
+          <div style="width: 47%;">
+            <div class="assign-cc-table-header">
+              <h4>Unassigned</h4>
+              <div class="assign-cc-table-filter">
+                <div class="assign-cc-table-filter-type">
+                  <mat-form-field>
+                    <mat-label>Type</mat-label>
+                    <mat-select (ngModelChange)="updateLeftFilterTypes($event)" [(ngModel)]="leftFilteredValues.types" multiple>
+                      <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="assign-cc-table-filter-state">
+                  <mat-form-field>
+                    <mat-label>State</mat-label>
+                    <mat-select (ngModelChange)="updateLeftFilterStates($event)" [(ngModel)]="leftFilteredValues.states" multiple>
+                      <mat-option *ngFor="let state of workingStateList" [value]="state">
+                        <span>{{ state | separate }}</span>
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="assign-cc-table-filter-den">
+                  <mat-form-field>
+                    <mat-label>Den</mat-label>
+                    <input (keyup)="updateLeftFilterDen(leftFilteredValues.den)" [(ngModel)]="leftFilteredValues.den" matInput>
+                  </mat-form-field>
+                </div>
               </div>
             </div>
+          </div>
+          <div style="width: 6%;"></div>
+          <div style="width: 47%;">
+            <div class="assign-cc-table-header">
+              <h4>Assigned <span *ngIf="selectedModuleElement">"{{selectedModuleElement.name}}"</span></h4>
+              <div class="assign-cc-table-filter">
+                <div class="assign-cc-table-filter-type">
+                  <mat-form-field>
+                    <mat-label>Type</mat-label>
+                    <mat-select (ngModelChange)="updateRightFilterTypes($event)" [(ngModel)]="rightFilteredValues.types" multiple>
+                      <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="assign-cc-table-filter-state">
+                  <mat-form-field>
+                    <mat-label>State</mat-label>
+                    <mat-select (ngModelChange)="updateRightFilterStates($event)" [(ngModel)]="rightFilteredValues.states" multiple>
+                      <mat-option *ngFor="let state of workingStateList" [value]="state">
+                        <span>{{ state | separate }}</span>
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="assign-cc-table-filter-den">
+                  <mat-form-field>
+                    <mat-label>Den</mat-label>
+                    <input (keyup)="updateRightFilterDen(rightFilteredValues.den)" [(ngModel)]="rightFilteredValues.den" matInput>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="assign-cc-wrapper">
+          <div class="assign-cc-table-wrapper">
             <table #leftSort="matSort" [dataSource]="leftDataSource" class="assign-cc-table-border" mat-table
                    matSort>
               <ng-container matColumnDef="checkbox">
-                <th *matHeaderCellDef mat-header-cell></th>
+                <th *matHeaderCellDef mat-header-cell>
+                  <mat-checkbox (change)="$event ? masterToggle(leftSelection, leftDataSource) : null"
+                                [checked]="leftSelection.hasValue() && isAllSelected(leftSelection, leftDataSource)"
+                                [indeterminate]="leftSelection.hasValue() && !isAllSelected(leftSelection, leftDataSource)">
+                  </mat-checkbox>
+                </th>
                 <td *matCellDef="let element" mat-cell>
                   <mat-checkbox (change)="$event ? leftSelection.toggle(element) : null"
                                 (click)="$event.stopPropagation()"
@@ -72,6 +125,14 @@
               <ng-container matColumnDef="type">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Type</th>
                 <td *matCellDef="let element" mat-cell> {{element.type}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
+                  <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="den">
@@ -85,11 +146,6 @@
                   <span
                     *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
                 </td>
-              </ng-container>
-
-              <ng-container matColumnDef="revision">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Revision</th>
-                <td *matCellDef="let element" mat-cell> {{element.revision}} </td>
               </ng-container>
 
               <ng-container matColumnDef="timestamp">
@@ -106,6 +162,10 @@
                   class="pointer"
                   mat-row></tr>
             </table>
+
+            <mat-paginator #leftPaginator
+                           [pageSizeOptions]="[10, 25, 50]"
+                           showFirstLastButtons></mat-paginator>
           </div>
           <div class="assign-cc-middle">
             <button (click)="assign()" class="mb-3" mat-stroked-button matTooltip="Assign">
@@ -117,27 +177,15 @@
             </button>
           </div>
           <div class="assign-cc-table-wrapper">
-            <h4>Assigned <span *ngIf="selectedModuleElement">"{{selectedModuleElement.name}}"</span></h4>
-            <div class="assign-cc-table-filter">
-              <div class="assign-cc-table-filter-type">
-                <mat-form-field>
-                  <mat-label>Type</mat-label>
-                  <mat-select (ngModelChange)="updateRightFilterTypes($event)" [(ngModel)]="rightFilteredValues.types" multiple>
-                    <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="assign-cc-table-filter-den">
-                <mat-form-field>
-                  <mat-label>Den</mat-label>
-                  <input (keyup)="updateRightFilterDen(rightFilteredValues.den)" [(ngModel)]="rightFilteredValues.den" matInput>
-                </mat-form-field>
-              </div>
-            </div>
             <table #rightSort="matSort" [dataSource]="rightDataSource" class="assign-cc-table-border" mat-table
                    matSort>
               <ng-container matColumnDef="checkbox">
-                <th *matHeaderCellDef mat-header-cell></th>
+                <th *matHeaderCellDef mat-header-cell>
+                  <mat-checkbox (change)="$event ? masterToggle(rightSelection, rightDataSource) : null"
+                                [checked]="rightSelection.hasValue() && isAllSelected(rightSelection, rightDataSource)"
+                                [indeterminate]="rightSelection.hasValue() && !isAllSelected(rightSelection, rightDataSource)">
+                  </mat-checkbox>
+                </th>
                 <td *matCellDef="let element" mat-cell>
                   <mat-checkbox (change)="$event ? rightSelection.toggle(element) : null"
                                 (click)="$event.stopPropagation()"
@@ -150,22 +198,25 @@
                 <td *matCellDef="let element" mat-cell> {{element.type}} </td>
               </ng-container>
 
+              <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
+                  <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+                </td>
+              </ng-container>
+
               <ng-container matColumnDef="den">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
                 <td *matCellDef="let element" mat-cell>
-                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den"
+                  <a *ngIf="['ACC', 'ASCCP', 'BCCP', 'DT'].indexOf(element.type) !== -1" class="den"
                      routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
                   <a *ngIf="element.type === 'CODE_LIST'" class="den" routerLink="/code_list/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
                   <span
-                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
+                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'DT'].indexOf(element.type) === -1">{{element.den}}</span>
                 </td>
-              </ng-container>
-
-              <ng-container matColumnDef="revision">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Revision</th>
-                <td *matCellDef="let element" mat-cell> {{element.revision}} </td>
               </ng-container>
 
               <ng-container matColumnDef="timestamp">
@@ -182,6 +233,10 @@
                   class="pointer"
                   mat-row></tr>
             </table>
+
+            <mat-paginator #rightPaginator
+              [pageSizeOptions]="[10, 25, 50]"
+              showFirstLastButtons></mat-paginator>
           </div>
         </div>
       </mat-card-content>

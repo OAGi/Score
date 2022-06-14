@@ -48,6 +48,10 @@
   display: flex;
 }
 
+.filename-option {
+  padding-top: 5px;
+}
+
 tr.detail-row {
   height: 0;
 }

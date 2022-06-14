@@ -100,11 +100,11 @@ export class VSFlatTreeControl<T extends FlatNode> extends FlatTreeControl<T> {
 
     dataNode.expanded = true;
 
-    if (!!this.ccFlattener && dataNode.type === 'BCCP' && dataNode.children.length === 0) {
-      const node = dataNode as unknown as BccpFlatNode;
-      node.children = this.ccFlattener.getChildren(node);
+    if (!!this.ccFlattener && dataNode.children.length === 0) {
+      this.ccFlattener.expand(dataNode as unknown as CcFlatNode);
+
       const index = this.dataSource.cachedData.indexOf(dataNode);
-      this.dataSource.cachedData.splice(index + 1, 0, ...node.children as T[]);
+      this.dataSource.cachedData.splice(index + 1, 0, ...dataNode.children as T[]);
     }
 
     if (dataNode.parent) {
@@ -193,6 +193,10 @@ export class VSFlatTreeDataSource<T extends FlatNode> implements DataSource<T> {
     return this._data;
   }
 
+  set data(data: T[]) {
+    this._data = data;
+  }
+
   dataFilter(node: T): boolean {
     if (node.level === 0) {
       return true;
@@ -227,7 +231,7 @@ export class VSFlatTreeDataSource<T extends FlatNode> implements DataSource<T> {
   }
 
   resetData() {
-    this._data = undefined;
+    this.data = undefined;
     this._dataStream.next(this.data);
   }
 }

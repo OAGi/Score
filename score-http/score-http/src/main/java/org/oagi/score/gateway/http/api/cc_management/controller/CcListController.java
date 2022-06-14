@@ -14,14 +14,39 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RestController
 public class CcListController {
 
+    static private final Object FUZZINESS_DISTANCE = "AUTO";
+    static private final int NUMBER_OF_TOP_TERMS = 10;
+
     @Autowired
     private CcListService service;
+
+    private Date getDateFromString(String timeString) {
+        DateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        try {
+            return dtFormat.parse(timeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    String camelToSnake(String str) {
+        String regex = "([a-z])([A-Z]+)";
+        String replacement = "$1_$2";
+
+        str = str.replaceAll(regex, replacement).toLowerCase();
+        return str;
+    }
 
     @RequestMapping(value = "/core_component", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -88,6 +113,17 @@ public class CcListController {
         request.setComponentTypes(componentTypes);
         request.setDtTypes(!StringUtils.hasLength(dtTypes) ? Collections.emptyList() :
                 Arrays.asList(dtTypes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+        if ((request.getTypes().isCdt() || request.getTypes().isBdt()) && request.getDtTypes().isEmpty()) {
+            List<String> dtTypeList = new ArrayList();
+            if (request.getTypes().isCdt()) {
+                dtTypeList.add("CDT");
+            }
+            if (request.getTypes().isBdt()) {
+                dtTypeList.add("BDT");
+            }
+            request.setDtTypes(dtTypeList);
+        }
+
         request.setAsccpTypes(!StringUtils.hasLength(asccpTypes) ? Collections.emptyList() :
                 Arrays.asList(asccpTypes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setExcludes(!StringUtils.hasLength(excludes) ? Collections.emptyList() :
@@ -138,11 +174,13 @@ public class CcListController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateCcState(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                            @RequestBody CcUpdateStateListRequest request) {
+                                        @RequestBody CcUpdateStateListRequest request) {
         if (request.getAction().equals("Restore")) {
             service.restoreCcs(user, request);
         } else if (request.getAction().equals("Delete")) {
             service.deleteCcs(user, request);
+        } else if (request.getAction().equals("Purge")) {
+            service.purgeCcs(user, request);
         } else {
             service.updateStateCcs(user, request);
         }

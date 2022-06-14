@@ -259,7 +259,7 @@ export class BieCreateAsccpComponent implements OnInit {
 
   get isDeveloper(): boolean {
     const userToken = this.auth.getUserToken();
-    return userToken.role === 'developer';
+    return userToken.roles.includes('developer');
   }
 
 }

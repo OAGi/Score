@@ -6,8 +6,6 @@ import org.oagi.score.gateway.http.api.graph.data.Graph;
 import org.oagi.score.gateway.http.api.graph.service.GraphService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -63,8 +61,8 @@ public class GraphController {
                 graph = graphService.getBccpGraph(id);
                 break;
 
-            case "bdt":
-                graph = graphService.getBdtGraph(id);
+            case "dt":
+                graph = graphService.getDtGraph(id);
                 break;
 
             case "top_level_asbiep":

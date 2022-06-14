@@ -66,14 +66,19 @@
   margin-right: 3px;
 }
 
+.assign-cc-table-header {
+  position: sticky;
+  top: 0;
+}
+
 .assign-cc-wrapper {
   display: flex;
-  height: 800px;
+  max-height: 800px;
 }
 
 .assign-cc-table-wrapper {
   width: 47%;
-  height: 800px;
+  max-height: 800px;
   overflow-y: auto;
 }
 
@@ -82,7 +87,7 @@
   display: flex;
 }
 
-.assign-cc-table-filter-type {
+.assign-cc-table-filter-type, .assign-cc-table-filter-state {
   width: 40%;
   padding-left: 20px;
 }
@@ -99,9 +104,9 @@
 
 .assign-cc-middle {
   width: 6%;
-  height: 800px;
+  max-height: 800px;
   text-align: center;
-  padding-top: 300px;
+  transform: translateY(+25%);
 }
 
 .mat-column-checkbox {
@@ -109,7 +114,11 @@
 }
 
 .mat-column-type {
-  width: 140px;
+  width: 80px;
+}
+
+.mat-column-state {
+  width: 100px;
 }
 
 .mat-column-revision {

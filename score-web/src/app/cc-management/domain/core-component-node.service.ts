@@ -1,17 +1,17 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, DtFlatNode, DtScFlatNode, CcFlatNode} from './cc-flat-tree';
 import {
   CcAccNode, CcAccNodeDetail,
   CcAsccpNode,
   CcAsccpNodeDetail,
   CcBccpNode,
-  CcBccpNodeDetail, CcBdtNode, CcBdtNodeDetail,
+  CcBccpNodeDetail, CcBdtNode, CcDtNodeDetail,
   CcBdtScNodeDetail,
   CcCreateResponse,
+  BodCreateResponse,
   CcGraph,
-  CcNode,
   CcNodeDetail,
   CcNodeUpdateResponse,
   CcRevisionResponse,
@@ -42,7 +42,7 @@ export class CcNodeService {
     });
   }
 
-  createAsccp(releaseId: number, accManifestId: number, asccpType?: string, initialPropertyTerm?: string): Observable<CcCreateResponse> {
+  createAsccp(releaseId: number, accManifestId: number, initialPropertyTerm: string, asccpType?: string): Observable<CcCreateResponse> {
     return this.http.post<CcCreateResponse>('/api/core_component/asccp', {
       releaseId,
       roleOfAccManifestId: accManifestId,
@@ -58,17 +58,18 @@ export class CcNodeService {
     });
   }
 
-  createBdt(releaseId: number, bdtManifestId: number): Observable<CcCreateResponse> {
-    return this.http.post<CcCreateResponse>('/api/core_component/bdt', {
+  createBdt(releaseId: number, bdtManifestId: number, specId: number): Observable<CcCreateResponse> {
+    return this.http.post<CcCreateResponse>('/api/core_component/dt', {
       releaseId,
       bdtManifestId,
+      specId,
     });
   }
 
-  createBOD(verbManifestId: number, nounManifestId: number): Observable<CcCreateResponse> {
-    return this.http.post<CcCreateResponse>('/api/core_component/oagis/bod', {
-      verbManifestId,
-      nounManifestId
+  createBOD(verbManifestIdList: number[], nounManifestIdList: number[]): Observable<BodCreateResponse> {
+    return this.http.post<BodCreateResponse>('/api/core_component/oagis/bod', {
+      verbManifestIdList,
+      nounManifestIdList
     });
   }
 
@@ -105,7 +106,7 @@ export class CcNodeService {
   }
 
   getBdtNode(manifestId: number): Observable<CcBdtNode> {
-    return this.http.get<CcBdtNode>('/api/core_component/bdt/' + manifestId);
+    return this.http.get<CcBdtNode>('/api/core_component/dt/' + manifestId);
   }
 
   getGraphNode(type: string, manifestId: number): Observable<CcGraph> {
@@ -125,11 +126,11 @@ export class CcNodeService {
         case 'BCCP':
           node.detail = new CcBccpNodeDetail(node as BccpFlatNode, detail);
           break;
-        case 'BDT':
-          node.detail = new CcBdtNodeDetail(node as BdtFlatNode, detail);
+        case 'DT':
+          node.detail = new CcDtNodeDetail(node as DtFlatNode, detail);
           break;
-        case 'BDT_SC':
-          node.detail = new CcBdtScNodeDetail(node as BdtScFlatNode, detail);
+        case 'DT_SC':
+          node.detail = new CcBdtScNodeDetail(node as DtScFlatNode, detail);
           break;
       }
       return node.detail;
@@ -152,10 +153,10 @@ export class CcNodeService {
       }
       params = params.set('manifestId', String((node as BccpFlatNode).bccpManifestId));
       params = params.set('bdtManifestId', String((node as BccpFlatNode).bdtManifestId));
-    } else if (node.type.toUpperCase() === 'BDT') {
-      params = params.set('manifestId', String((node as BdtFlatNode).manifestId));
-    } else if (node.type.toUpperCase() === 'BDT_SC') {
-      params = params.set('manifestId', String((node as BdtScFlatNode).bdtScManifestId));
+    } else if (node.type.toUpperCase() === 'DT') {
+      params = params.set('manifestId', String((node as DtFlatNode).manifestId));
+    } else if (node.type.toUpperCase() === 'DT_SC') {
+      params = params.set('manifestId', String((node as DtScFlatNode).bdtScManifestId));
     }
 
     const data = base64Encode(params.toString());
@@ -192,9 +193,9 @@ export class CcNodeService {
       accNodeDetails: [],
       asccpNodeDetails: [],
       bccpNodeDetails: [],
-      bdtScNodeDetails: []
+      dtScNodeDetails: [],
+      dtNodeDetails: []
     };
-
     for (const node of nodes) {
       const detail = node.detail;
       switch (node.type.toUpperCase()) {
@@ -212,6 +213,12 @@ export class CcNodeService {
             'asccp': (detail as CcAsccpNodeDetail).asccp.json,
             'ascc': (detail as CcAsccpNodeDetail).ascc ? (detail as CcAsccpNodeDetail).ascc.json : null,
           });
+          break;
+        case 'DT':
+          body.dtNodeDetails.push((detail as CcDtNodeDetail).json);
+          break;
+        case 'DT_SC':
+          body.dtScNodeDetails.push((detail as CcBdtScNodeDetail).json);
           break;
       }
     }
@@ -286,12 +293,28 @@ export class CcNodeService {
     return this.http.post('/api/core_component/acc/' + manifestId + '/seq_key', changes);
   }
 
-  refactorAscc(type: string, targeteManifestId: number, destinationManifestId: number): Observable<any> {
-    return this.http.post('/api/core_component/' + type + '/refactor', {
-      type: type,
-      targetManifestId: targeteManifestId,
-      destinationManifestId: destinationManifestId
-    })
+  appendDtSc(ownerDtManifestId: number): Observable<any> {
+    return this.http.post('/api/core_component/dt/' + ownerDtManifestId + '/append_sc', {});
   }
 
+  discardDtSc(dtScManifestId: number): Observable<any> {
+    return this.http.delete('/api/core_component/dt_sc/' + dtScManifestId, {});
+  }
+
+  ungroup(sourceAccManifestId: number, targetAsccManifestId: number, pos: number): Observable<any> {
+    return this.http.post('/api/core_component/acc/' + sourceAccManifestId + '/ungroup', {
+      asccManifestId: targetAsccManifestId,
+      pos
+    });
+  }
+
+  getPrimitiveListByRepresentationTerm(representationTerm: string, bdtScManifestId?: number): Observable<any> {
+    let params = new HttpParams();
+    if (!!bdtScManifestId) {
+      params = params.set('bdtScManifestId', bdtScManifestId);
+    }
+    return this.http.get('/api/core_component/dt/' + representationTerm + '/primitive_values', {
+      params
+    });
+  }
 }

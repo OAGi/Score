@@ -50,57 +50,73 @@ public class Release extends TableImpl<ReleaseRecord> {
     }
 
     /**
-     * The column <code>oagi.release.release_id</code>. RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.
+     * The column <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
+     * interpreted to be released later than the other.
      */
     public final TableField<ReleaseRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.");
 
     /**
-     * The column <code>oagi.release.guid</code>. A globally unique identifier (GUID).
+     * The column <code>oagi.release.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public final TableField<ReleaseRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.release.release_num</code>. Release number such has 10.0, 10.1, etc. 
+     * The column <code>oagi.release.release_num</code>. Release number such has
+     * 10.0, 10.1, etc. 
      */
     public final TableField<ReleaseRecord, String> RELEASE_NUM = createField(DSL.name("release_num"), SQLDataType.VARCHAR(45), this, "Release number such has 10.0, 10.1, etc. ");
 
     /**
-     * The column <code>oagi.release.release_note</code>. Description or note associated with the release.
+     * The column <code>oagi.release.release_note</code>. Description or note
+     * associated with the release.
      */
     public final TableField<ReleaseRecord, String> RELEASE_NOTE = createField(DSL.name("release_note"), SQLDataType.CLOB, this, "Description or note associated with the release.");
 
     /**
-     * The column <code>oagi.release.release_license</code>. License associated with the release.
+     * The column <code>oagi.release.release_license</code>. License associated
+     * with the release.
      */
     public final TableField<ReleaseRecord, String> RELEASE_LICENSE = createField(DSL.name("release_license"), SQLDataType.CLOB, this, "License associated with the release.");
 
     /**
-     * The column <code>oagi.release.namespace_id</code>. Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.
+     * The column <code>oagi.release.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. It identifies the namespace used with the release. It is
+     * particularly useful for a library that uses a single namespace such like
+     * the OAGIS 10.x. A library that uses multiple namespace but has a main
+     * namespace may also use this column as a specific namespace can be
+     * override at the module level.
      */
     public final TableField<ReleaseRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.");
 
     /**
-     * The column <code>oagi.release.created_by</code>. Foreign key to the APP_USER table identifying user who created the namespace.
+     * The column <code>oagi.release.created_by</code>. Foreign key to the
+     * APP_USER table identifying user who created the namespace.
      */
     public final TableField<ReleaseRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying user who created the namespace.");
 
     /**
-     * The column <code>oagi.release.last_updated_by</code>. Foreign key to the APP_USER table identifying the user who last updated the record.
+     * The column <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public final TableField<ReleaseRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying the user who last updated the record.");
 
     /**
-     * The column <code>oagi.release.creation_timestamp</code>. The timestamp when the record was first created.
+     * The column <code>oagi.release.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public final TableField<ReleaseRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.release.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * The column <code>oagi.release.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public final TableField<ReleaseRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     /**
-     * The column <code>oagi.release.state</code>. This indicates the revision life cycle state of the Release.
+     * The column <code>oagi.release.state</code>. This indicates the revision
+     * life cycle state of the Release.
      */
     public final TableField<ReleaseRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.inline("Initialized", SQLDataType.VARCHAR)), this, "This indicates the revision life cycle state of the Release.");
 
@@ -139,7 +155,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -153,19 +169,17 @@ public class Release extends TableImpl<ReleaseRecord> {
     }
 
     @Override
-    public List<UniqueKey<ReleaseRecord>> getKeys() {
-        return Arrays.<UniqueKey<ReleaseRecord>>asList(Keys.KEY_RELEASE_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<ReleaseRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ReleaseRecord, ?>>asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
     }
 
     private transient Namespace _namespace;
     private transient AppUser _releaseCreatedByFk;
     private transient AppUser _releaseLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
     public Namespace namespace() {
         if (_namespace == null)
             _namespace = new Namespace(this, Keys.RELEASE_NAMESPACE_ID_FK);
@@ -173,6 +187,10 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _namespace;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>release_created_by_fk</code> key.
+     */
     public AppUser releaseCreatedByFk() {
         if (_releaseCreatedByFk == null)
             _releaseCreatedByFk = new AppUser(this, Keys.RELEASE_CREATED_BY_FK);
@@ -180,6 +198,10 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _releaseCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>release_last_updated_by_fk</code> key.
+     */
     public AppUser releaseLastUpdatedByFk() {
         if (_releaseLastUpdatedByFk == null)
             _releaseLastUpdatedByFk = new AppUser(this, Keys.RELEASE_LAST_UPDATED_BY_FK);

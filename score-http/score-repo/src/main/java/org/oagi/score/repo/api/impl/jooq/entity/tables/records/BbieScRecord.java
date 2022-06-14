@@ -13,9 +13,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc;
 
 
 /**
- * Because there is no single table that is a contextualized counterpart of 
- * the DT table (    which stores both CDT and BDT), The context specific constraints 
- * associated with the DT are stored in the BBIE table, while this table stores 
+ * Because there is no single table that is a contextualized counterpart of the
+ * DT table (which stores both CDT and BDT), The context specific constraints
+ * associated with the DT are stored in the BBIE table, while this table stores
  * the constraints associated with the DT's SCs. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -24,42 +24,50 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bbie_sc.bbie_sc_id</code>. A internal, primary database key of a BBIE_SC.
+     * Setter for <code>oagi.bbie_sc.bbie_sc_id</code>. A internal, primary
+     * database key of a BBIE_SC.
      */
     public void setBbieScId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.bbie_sc_id</code>. A internal, primary database key of a BBIE_SC.
+     * Getter for <code>oagi.bbie_sc.bbie_sc_id</code>. A internal, primary
+     * database key of a BBIE_SC.
      */
     public ULong getBbieScId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.bbie_sc.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.bbie_sc.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.based_dt_sc_manifest_id</code>. Foreign key to the DT_SC_MANIFEST table. This should correspond to the DT_SC of the BDT of the based BCC and BCCP.
+     * Setter for <code>oagi.bbie_sc.based_dt_sc_manifest_id</code>. Foreign key
+     * to the DT_SC_MANIFEST table. This should correspond to the DT_SC of the
+     * BDT of the based BCC and BCCP.
      */
     public void setBasedDtScManifestId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.based_dt_sc_manifest_id</code>. Foreign key to the DT_SC_MANIFEST table. This should correspond to the DT_SC of the BDT of the based BCC and BCCP.
+     * Getter for <code>oagi.bbie_sc.based_dt_sc_manifest_id</code>. Foreign key
+     * to the DT_SC_MANIFEST table. This should correspond to the DT_SC of the
+     * BDT of the based BCC and BCCP.
      */
     public ULong getBasedDtScManifestId() {
         return (ULong) get(2);
@@ -80,156 +88,224 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.hash_path</code>. hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.
+     * Setter for <code>oagi.bbie_sc.hash_path</code>. hash_path generated from
+     * the path of the component graph using hash function, so that it is unique
+     * in the graph.
      */
     public void setHashPath(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.hash_path</code>. hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.
+     * Getter for <code>oagi.bbie_sc.hash_path</code>. hash_path generated from
+     * the path of the component graph using hash function, so that it is unique
+     * in the graph.
      */
     public String getHashPath() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.bbie_id</code>. The BBIE this BBIE_SC applies to.
+     * Setter for <code>oagi.bbie_sc.bbie_id</code>. The BBIE this BBIE_SC
+     * applies to.
      */
     public void setBbieId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.bbie_id</code>. The BBIE this BBIE_SC applies to.
+     * Getter for <code>oagi.bbie_sc.bbie_id</code>. The BBIE this BBIE_SC
+     * applies to.
      */
     public ULong getBbieId() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be one of the allowed primitive/code list as specified in the corresponding SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
-
-It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.
-
-This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.
+     * Setter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be
+     * one of the allowed primitive/code list as specified in the corresponding
+     * SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
+     * 
+     * It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the
+     * primitive assigned to the BBIE (or also can be viewed as assigned to the
+     * BBIEP for this specific association). This is assigned by the user who
+     * authors the BIE. The assignment would override the default from the CC
+     * side.
+     * 
+     * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
+     * have a value at the same time.
      */
     public void setDtScPriRestriId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be one of the allowed primitive/code list as specified in the corresponding SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
-
-It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.
-
-This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.
+     * Getter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be
+     * one of the allowed primitive/code list as specified in the corresponding
+     * SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
+     * 
+     * It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the
+     * primitive assigned to the BBIE (or also can be viewed as assigned to the
+     * BBIEP for this specific association). This is assigned by the user who
+     * authors the BIE. The assignment would override the default from the CC
+     * side.
+     * 
+     * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
+     * have a value at the same time.
      */
     public ULong getDtScPriRestriId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.code_list_id</code>. This is a foreign key to the CODE_LIST table. If a code list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.
-
-This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.
+     * Setter for <code>oagi.bbie_sc.code_list_id</code>. This is a foreign key
+     * to the CODE_LIST table. If a code list is assigned to the BBIE SC (or
+     * also can be viewed as assigned to the BBIEP SC for this association),
+     * then this column stores the assigned code list. It should be noted that
+     * one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID
+     * column may also be a code list. So this column is typically used when the
+     * user wants to assign another code list different from the one permissible
+     * by the CC model.
+     * 
+     * This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID
+     * column cannot have a value at the same time.
      */
     public void setCodeListId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.code_list_id</code>. This is a foreign key to the CODE_LIST table. If a code list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.
-
-This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.
+     * Getter for <code>oagi.bbie_sc.code_list_id</code>. This is a foreign key
+     * to the CODE_LIST table. If a code list is assigned to the BBIE SC (or
+     * also can be viewed as assigned to the BBIEP SC for this association),
+     * then this column stores the assigned code list. It should be noted that
+     * one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID
+     * column may also be a code list. So this column is typically used when the
+     * user wants to assign another code list different from the one permissible
+     * by the CC model.
+     * 
+     * This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID
+     * column cannot have a value at the same time.
      */
     public ULong getCodeListId() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.agency_id_list_id</code>. This is a foreign key to the AGENCY_ID_LIST table. If a agency ID list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned Agency ID list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this column is typically used only when the user wants to assign another Agency ID list different from the one permissible by the CC model.
-
-This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column cannot have a value at the same time.
+     * Setter for <code>oagi.bbie_sc.agency_id_list_id</code>. This is a foreign
+     * key to the AGENCY_ID_LIST table. If a agency ID list is assigned to the
+     * BBIE SC (or also can be viewed as assigned to the BBIEP SC for this
+     * association), then this column stores the assigned Agency ID list. It
+     * should be noted that one of the possible primitives assignable to the
+     * DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this column
+     * is typically used only when the user wants to assign another Agency ID
+     * list different from the one permissible by the CC model.
+     * 
+     * This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column
+     * cannot have a value at the same time.
      */
     public void setAgencyIdListId(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.agency_id_list_id</code>. This is a foreign key to the AGENCY_ID_LIST table. If a agency ID list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned Agency ID list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this column is typically used only when the user wants to assign another Agency ID list different from the one permissible by the CC model.
-
-This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column cannot have a value at the same time.
+     * Getter for <code>oagi.bbie_sc.agency_id_list_id</code>. This is a foreign
+     * key to the AGENCY_ID_LIST table. If a agency ID list is assigned to the
+     * BBIE SC (or also can be viewed as assigned to the BBIEP SC for this
+     * association), then this column stores the assigned Agency ID list. It
+     * should be noted that one of the possible primitives assignable to the
+     * DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this column
+     * is typically used only when the user wants to assign another Agency ID
+     * list different from the one permissible by the CC model.
+     * 
+     * This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column
+     * cannot have a value at the same time.
      */
     public ULong getAgencyIdListId() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.cardinality_min</code>. The minimum occurrence constraint for the BBIE SC. A valid value is 0 or 1.
+     * Setter for <code>oagi.bbie_sc.cardinality_min</code>. The minimum
+     * occurrence constraint for the BBIE SC. A valid value is 0 or 1.
      */
     public void setCardinalityMin(Integer value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.cardinality_min</code>. The minimum occurrence constraint for the BBIE SC. A valid value is 0 or 1.
+     * Getter for <code>oagi.bbie_sc.cardinality_min</code>. The minimum
+     * occurrence constraint for the BBIE SC. A valid value is 0 or 1.
      */
     public Integer getCardinalityMin() {
         return (Integer) get(9);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.cardinality_max</code>. Maximum occurence constraint of the BBIE SC. A valid value is 0 or 1.
+     * Setter for <code>oagi.bbie_sc.cardinality_max</code>. Maximum occurence
+     * constraint of the BBIE SC. A valid value is 0 or 1.
      */
     public void setCardinalityMax(Integer value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.cardinality_max</code>. Maximum occurence constraint of the BBIE SC. A valid value is 0 or 1.
+     * Getter for <code>oagi.bbie_sc.cardinality_max</code>. Maximum occurence
+     * constraint of the BBIE SC. A valid value is 0 or 1.
      */
     public Integer getCardinalityMax() {
         return (Integer) get(10);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.default_value</code>. This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.
+     * Setter for <code>oagi.bbie_sc.default_value</code>. This column specifies
+     * the default value constraint. Default and fixed value constraints cannot
+     * be used at the same time.
      */
     public void setDefaultValue(String value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.default_value</code>. This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.
+     * Getter for <code>oagi.bbie_sc.default_value</code>. This column specifies
+     * the default value constraint. Default and fixed value constraints cannot
+     * be used at the same time.
      */
     public String getDefaultValue() {
         return (String) get(11);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.fixed_value</code>. This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.
+     * Setter for <code>oagi.bbie_sc.fixed_value</code>. This column captures
+     * the fixed value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
     public void setFixedValue(String value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.fixed_value</code>. This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.
+     * Getter for <code>oagi.bbie_sc.fixed_value</code>. This column captures
+     * the fixed value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
     public String getFixedValue() {
         return (String) get(12);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.definition</code>. Description to override the BDT SC definition. If NULL, it means that the definition should be inherited from the based BDT SC.
+     * Setter for <code>oagi.bbie_sc.definition</code>. Description to override
+     * the BDT SC definition. If NULL, it means that the definition should be
+     * inherited from the based BDT SC.
      */
     public void setDefinition(String value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.definition</code>. Description to override the BDT SC definition. If NULL, it means that the definition should be inherited from the based BDT SC.
+     * Getter for <code>oagi.bbie_sc.definition</code>. Description to override
+     * the BDT SC definition. If NULL, it means that the definition should be
+     * inherited from the based BDT SC.
      */
     public String getDefinition() {
         return (String) get(13);
@@ -250,112 +326,140 @@ This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column cannot have
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.remark</code>. This column allows the user to specify a very context-specific usage of the BBIE SC. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. 
+     * Setter for <code>oagi.bbie_sc.remark</code>. This column allows the user
+     * to specify a very context-specific usage of the BBIE SC. It is different
+     * from the Definition column in that the Definition column is a description
+     * conveying the meaning of the associated concept. Remarks may be a very
+     * implementation specific instruction or others. 
      */
     public void setRemark(String value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.remark</code>. This column allows the user to specify a very context-specific usage of the BBIE SC. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. 
+     * Getter for <code>oagi.bbie_sc.remark</code>. This column allows the user
+     * to specify a very context-specific usage of the BBIE SC. It is different
+     * from the Definition column in that the Definition column is a description
+     * conveying the meaning of the associated concept. Remarks may be a very
+     * implementation specific instruction or others. 
      */
     public String getRemark() {
         return (String) get(15);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.biz_term</code>. Business term to indicate what the BBIE SC is called in a particular business context. With this current design, only one business term is allowed per business context.
+     * Setter for <code>oagi.bbie_sc.biz_term</code>. Business term to indicate
+     * what the BBIE SC is called in a particular business context. With this
+     * current design, only one business term is allowed per business context.
      */
     public void setBizTerm(String value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.biz_term</code>. Business term to indicate what the BBIE SC is called in a particular business context. With this current design, only one business term is allowed per business context.
+     * Getter for <code>oagi.bbie_sc.biz_term</code>. Business term to indicate
+     * what the BBIE SC is called in a particular business context. With this
+     * current design, only one business term is allowed per business context.
      */
     public String getBizTerm() {
         return (String) get(16);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.
+     * Setter for <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether
+     * the field/component is used in the content model. It indicates whether
+     * the field/component should be generated.
      */
     public void setIsUsed(Byte value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.
+     * Getter for <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether
+     * the field/component is used in the content model. It indicates whether
+     * the field/component should be generated.
      */
     public Byte getIsUsed() {
         return (Byte) get(17);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.created_by</code>. A foreign key referring to the user who creates the BBIE_SC. The creator of the BBIE_SC is also its owner by default.
+     * Setter for <code>oagi.bbie_sc.created_by</code>. A foreign key referring
+     * to the user who creates the BBIE_SC. The creator of the BBIE_SC is also
+     * its owner by default.
      */
     public void setCreatedBy(ULong value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.created_by</code>. A foreign key referring to the user who creates the BBIE_SC. The creator of the BBIE_SC is also its owner by default.
+     * Getter for <code>oagi.bbie_sc.created_by</code>. A foreign key referring
+     * to the user who creates the BBIE_SC. The creator of the BBIE_SC is also
+     * its owner by default.
      */
     public ULong getCreatedBy() {
         return (ULong) get(18);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.last_updated_by</code>. A foreign key referring to the user who has last updated the BBIE_SC record.
+     * Setter for <code>oagi.bbie_sc.last_updated_by</code>. A foreign key
+     * referring to the user who has last updated the BBIE_SC record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.last_updated_by</code>. A foreign key referring to the user who has last updated the BBIE_SC record.
+     * Getter for <code>oagi.bbie_sc.last_updated_by</code>. A foreign key
+     * referring to the user who has last updated the BBIE_SC record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(19);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.creation_timestamp</code>. Timestamp when the BBIE_SC record was first created.
+     * Setter for <code>oagi.bbie_sc.creation_timestamp</code>. Timestamp when
+     * the BBIE_SC record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.creation_timestamp</code>. Timestamp when the BBIE_SC record was first created.
+     * Getter for <code>oagi.bbie_sc.creation_timestamp</code>. Timestamp when
+     * the BBIE_SC record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(20);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.last_update_timestamp</code>. The timestamp when the BBIE_SC was last updated.
+     * Setter for <code>oagi.bbie_sc.last_update_timestamp</code>. The timestamp
+     * when the BBIE_SC was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(21, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.last_update_timestamp</code>. The timestamp when the BBIE_SC was last updated.
+     * Getter for <code>oagi.bbie_sc.last_update_timestamp</code>. The timestamp
+     * when the BBIE_SC was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(21);
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.owner_top_level_asbiep_id</code>. This is a foreign key to the top-level ASBIEP.
+     * Setter for <code>oagi.bbie_sc.owner_top_level_asbiep_id</code>. This is a
+     * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
         set(22, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.owner_top_level_asbiep_id</code>. This is a foreign key to the top-level ASBIEP.
+     * Getter for <code>oagi.bbie_sc.owner_top_level_asbiep_id</code>. This is a
+     * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
         return (ULong) get(22);

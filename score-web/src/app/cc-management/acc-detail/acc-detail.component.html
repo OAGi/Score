@@ -56,8 +56,8 @@
   </mat-sidenav>
 
   <mat-sidenav-content (click)="sidenav.close();">
-    <div class="loading-container" *ngIf="isUpdating">
-      <mat-spinner [diameter]="40"></mat-spinner>
+    <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing" *ngIf="isUpdating">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
     <div class="context-section">
       <div class="row m-0">
@@ -75,7 +75,7 @@
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  (keyup.enter)="search(searcher.inputKeyword)">
                           <mat-hint matSuffix *ngIf="searcher.searchResult.length > 0"
-                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}</mat-hint>
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}+</mat-hint>
                           <mat-hint matSuffix *ngIf="searcher.searchResult.length === 0"
                                     align="end">0/0</mat-hint>
                         </mat-form-field>
@@ -136,14 +136,18 @@
                         Move to Candidate
                       </button>
                       <button mat-raised-button color="warn" (click)="makeNewRevision()"
-                              *ngIf="state === 'Published' && userRole === 'developer' && (access === 'CanMove' || access === 'CanEdit')"
+                              *ngIf="state === 'Published' && userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit')"
                               [disabled]="isUpdating">
-                        {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                        {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
                       </button>
                       <button mat-raised-button color="warn" (click)="deleteNode()"
                               *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
                               [disabled]="isUpdating || isChanged">
                         Delete
+                      </button>
+                      <button mat-raised-button color="warn" (click)="purgeNode()"
+                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
+                        Purge
                       </button>
                       <button mat-raised-button color="primary" (click)="restoreNode()"
                               *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
@@ -178,7 +182,7 @@
                       <button mat-raised-button color="warn" (click)="makeNewRevision()"
                               *ngIf="(state === 'Published' || state === 'Production') && (access === 'CanMove' || access === 'CanEdit')"
                               [disabled]="isUpdating">
-                        {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                        {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
                       </button>
                       <button mat-raised-button color="warn" (click)="deleteNode()"
                               *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
@@ -309,7 +313,7 @@
                                  contextMenuItem (execute)="createAsccp()">
                       <span class="context-menu-item">Create ASCCP from this</span>
                     </ng-template>
-                    <ng-template *ngIf="isExtendable() && userRole === 'developer'"
+                    <ng-template *ngIf="isExtendable() && userRoles.includes('developer')"
                                  contextMenuItem (execute)="createExtensionComponent()">
                       <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Extension Component</span>
                     </ng-template>
@@ -384,14 +388,13 @@
                                  (execute)="appendAssociation($event.item, pos($event.item) + 1)">
                       <span class="context-menu-item">Insert Property After</span>
                     </ng-template>
-                    <ng-template contextMenuItem *ngIf="isEditable()" divider="true"></ng-template>
-                    <ng-template contextMenuItem
-                                 *ngIf="isEditable()"
-                                 (execute)="refactor($event.item)">
-                      <span class="context-menu-item">Refactor</span>
+                    <ng-template contextMenuItem *ngIf="isEditable()" [visible]="doesRefactorAllow" divider="true"></ng-template>
+                    <ng-template contextMenuItem *ngIf="isEditable()" [visible]="doesRefactorAllow" [subMenu]="refactorSubMenu">
+                      Refactor
                     </ng-template>
                     <ng-template contextMenuItem
                                  *ngIf="isEditable()"
+                                 [visible]="doesRefactorAllow"
                                  (execute)="onClickDiscard($event.item)">
                       <span class="context-menu-item">Remove</span>
                     </ng-template>
@@ -429,11 +432,15 @@
                                  (execute)="appendAssociation($event.item, pos($event.item) + 1)">
                       <span class="context-menu-item">Insert Property After</span>
                     </ng-template>
-                    <ng-template contextMenuItem *ngIf="isEditable()" divider="true"></ng-template>
+                    <ng-template contextMenuItem *ngIf="isEditable()" [visible]="doesRefactorAllow" divider="true"></ng-template>
+                    <ng-template contextMenuItem *ngIf="isEditable()" [visible]="doesRefactorAllow" [subMenu]="refactorSubMenu">
+                      Refactor
+                    </ng-template>
                     <ng-template contextMenuItem
                                  *ngIf="isEditable()"
-                                 (execute)="refactor($event.item)">
-                      <span class="context-menu-item">Refactor</span>
+                                 [visible]="doesRefactorAllow"
+                                 (execute)="onClickDiscard($event.item)">
+                      <span class="context-menu-item">Remove</span>
                     </ng-template>
                     <ng-template contextMenuItem divider="true"></ng-template>
                     <ng-template contextMenuItem (execute)="openCoreComponent($event.item)">
@@ -444,6 +451,19 @@
                     </ng-template>
                     <ng-template contextMenuItem (execute)="findUsages($event.item)" [visible]="visibleFindUsages">
                       <span class="context-menu-item">Where Used</span>
+                    </ng-template>
+                  </context-menu>
+
+                  <context-menu #refactorSubMenu>
+                    <ng-template contextMenuItem
+                                 *ngIf="isEditable()"
+                                 (execute)="refactor($event.item)">
+                      <span class="context-menu-item">Refactor to Base</span>
+                    </ng-template>
+                    <ng-template contextMenuItem
+                                 *ngIf="isEditable()"
+                                 (execute)="ungroup($event.item, pos($event.item) + 1)" [visible]="visibleUngroup">
+                      <span class="context-menu-item">Ungroup</span>
                     </ng-template>
                   </context-menu>
 
@@ -1255,7 +1275,7 @@
                           </mat-form-field>
                         </div>
                         <div class="col-1">
-                          <button mat-icon-button (click)="openComments('BDT')">
+                          <button mat-icon-button (click)="openComments('DT')">
                             <mat-icon>comments</mat-icon>
                           </button>
                         </div>
@@ -1354,7 +1374,7 @@
                           </mat-form-field>
                         </div>
                         <div class="col-1">
-                          <button mat-icon-button (click)="openComments('BDT_SC')">
+                          <button mat-icon-button (click)="openComments('DT_SC')">
                             <mat-icon>comments</mat-icon>
                           </button>
                         </div>

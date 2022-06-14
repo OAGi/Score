@@ -24,28 +24,32 @@ public class ExceptionRecord extends UpdatableRecordImpl<ExceptionRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.exception.exception_id</code>. Internal, primary database key.
+     * Setter for <code>oagi.exception.exception_id</code>. Internal, primary
+     * database key.
      */
     public void setExceptionId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.exception.exception_id</code>. Internal, primary database key.
+     * Getter for <code>oagi.exception.exception_id</code>. Internal, primary
+     * database key.
      */
     public ULong getExceptionId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.exception.tag</code>. A tag of the exception for the purpose of the searching facilitation
+     * Setter for <code>oagi.exception.tag</code>. A tag of the exception for
+     * the purpose of the searching facilitation
      */
     public void setTag(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.exception.tag</code>. A tag of the exception for the purpose of the searching facilitation
+     * Getter for <code>oagi.exception.tag</code>. A tag of the exception for
+     * the purpose of the searching facilitation
      */
     public String getTag() {
         return (String) get(1);
@@ -66,42 +70,50 @@ public class ExceptionRecord extends UpdatableRecordImpl<ExceptionRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.exception.stacktrace</code>. The serialized stacktrace object.
+     * Setter for <code>oagi.exception.stacktrace</code>. The serialized
+     * stacktrace object.
      */
     public void setStacktrace(byte[] value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.exception.stacktrace</code>. The serialized stacktrace object.
+     * Getter for <code>oagi.exception.stacktrace</code>. The serialized
+     * stacktrace object.
      */
     public byte[] getStacktrace() {
         return (byte[]) get(3);
     }
 
     /**
-     * Setter for <code>oagi.exception.created_by</code>. Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.
+     * Setter for <code>oagi.exception.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who is working on when the
+     * exception occurs.
      */
     public void setCreatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.exception.created_by</code>. Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.
+     * Getter for <code>oagi.exception.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who is working on when the
+     * exception occurs.
      */
     public ULong getCreatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.exception.creation_timestamp</code>. Timestamp when the exception was created.
+     * Setter for <code>oagi.exception.creation_timestamp</code>. Timestamp when
+     * the exception was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.exception.creation_timestamp</code>. Timestamp when the exception was created.
+     * Getter for <code>oagi.exception.creation_timestamp</code>. Timestamp when
+     * the exception was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(5);

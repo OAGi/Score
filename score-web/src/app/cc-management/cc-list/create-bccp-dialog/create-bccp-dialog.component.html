@@ -17,13 +17,13 @@
             <mat-form-field>
               <mat-label>State</mat-label>
               <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
-                          floatlLabel="never" multiple>
+                          floatLabel="never" multiple>
                 <mat-option *ngFor="let state of workingStateList" [value]="state">
                   <span>{{ state | separate }}</span>
                 </mat-option>
               </mat-select>
               <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
-                          floatlLabel="never" multiple>
+                          floatLabel="never" multiple>
                 <mat-option *ngFor="let state of releaseStateList" [value]="state">
                   <span>{{ state | separate }}</span>
                 </mat-option>
@@ -39,22 +39,6 @@
                 </mat-option>
                 <mat-option [value]="false">
                   False
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          <div class="col-md-2 col-sm-12">
-            <mat-form-field>
-              <mat-label>Type</mat-label>
-              <mat-select [(ngModel)]="request.dtTypes" multiple>
-                <mat-option [value]="'Default'">
-                  Default
-                </mat-option>
-                <mat-option [value]="'Unqualified'">
-                  Unqualified
-                </mat-option>
-                <mat-option [value]="'Qualified'">
-                  Qualified
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -82,9 +66,11 @@
             <mat-form-field>
               <mat-label>Owner</mat-label>
               <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                       [placeholderLabel]="'Search...'"
-                                       [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                <mat-option>
+                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                </mat-option>
                 <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                   {{loginId}}
                 </mat-option>
@@ -96,9 +82,11 @@
             <mat-form-field>
               <mat-label>Updater</mat-label>
               <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                       [placeholderLabel]="'Search...'"
-                                       [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                <mat-option>
+                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                </mat-option>
                 <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                   {{loginId}}
                 </mat-option>

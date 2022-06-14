@@ -29,8 +29,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxCategoryRecord
 
 
 /**
- * This table captures the context category. Examples of context categories 
- * as described in the CCTS are business process, industry, etc.
+ * This table captures the context category. Examples of context categories as
+ * described in the CCTS are business process, industry, etc.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CtxCategory extends TableImpl<CtxCategoryRecord> {
@@ -51,42 +51,51 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
     }
 
     /**
-     * The column <code>oagi.ctx_category.ctx_category_id</code>. Internal, primary, database key.
+     * The column <code>oagi.ctx_category.ctx_category_id</code>. Internal,
+     * primary, database key.
      */
     public final TableField<CtxCategoryRecord, ULong> CTX_CATEGORY_ID = createField(DSL.name("ctx_category_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary, database key.");
 
     /**
-     * The column <code>oagi.ctx_category.guid</code>. A globally unique identifier (GUID).
+     * The column <code>oagi.ctx_category.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public final TableField<CtxCategoryRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.ctx_category.name</code>. Short name of the context category.
+     * The column <code>oagi.ctx_category.name</code>. Short name of the context
+     * category.
      */
     public final TableField<CtxCategoryRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45), this, "Short name of the context category.");
 
     /**
-     * The column <code>oagi.ctx_category.description</code>. Explanation of what the context category is.
+     * The column <code>oagi.ctx_category.description</code>. Explanation of
+     * what the context category is.
      */
     public final TableField<CtxCategoryRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Explanation of what the context category is.");
 
     /**
-     * The column <code>oagi.ctx_category.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created the context category.
+     * The column <code>oagi.ctx_category.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created the context category.
      */
     public final TableField<CtxCategoryRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created the context category.");
 
     /**
-     * The column <code>oagi.ctx_category.last_updated_by</code>. Foreign key to the APP_USER table. It identifies the user who last updated the context category.
+     * The column <code>oagi.ctx_category.last_updated_by</code>. Foreign key to
+     * the APP_USER table. It identifies the user who last updated the context
+     * category.
      */
     public final TableField<CtxCategoryRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It identifies the user who last updated the context category.");
 
     /**
-     * The column <code>oagi.ctx_category.creation_timestamp</code>. Timestamp when the context category was created.
+     * The column <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
+     * when the context category was created.
      */
     public final TableField<CtxCategoryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was created.");
 
     /**
-     * The column <code>oagi.ctx_category.last_update_timestamp</code>. Timestamp when the context category was last updated.
+     * The column <code>oagi.ctx_category.last_update_timestamp</code>.
+     * Timestamp when the context category was last updated.
      */
     public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
 
@@ -125,7 +134,7 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -139,18 +148,22 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
     }
 
     @Override
-    public List<UniqueKey<CtxCategoryRecord>> getKeys() {
-        return Arrays.<UniqueKey<CtxCategoryRecord>>asList(Keys.KEY_CTX_CATEGORY_PRIMARY, Keys.KEY_CTX_CATEGORY_CTX_CATEGORY_UK1);
+    public List<UniqueKey<CtxCategoryRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_CTX_CATEGORY_CTX_CATEGORY_UK1);
     }
 
     @Override
     public List<ForeignKey<CtxCategoryRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CtxCategoryRecord, ?>>asList(Keys.CTX_CATEGORY_CREATED_BY_FK, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.CTX_CATEGORY_CREATED_BY_FK, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
     }
 
     private transient AppUser _ctxCategoryCreatedByFk;
     private transient AppUser _ctxCategoryLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>ctx_category_created_by_fk</code> key.
+     */
     public AppUser ctxCategoryCreatedByFk() {
         if (_ctxCategoryCreatedByFk == null)
             _ctxCategoryCreatedByFk = new AppUser(this, Keys.CTX_CATEGORY_CREATED_BY_FK);
@@ -158,6 +171,10 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
         return _ctxCategoryCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>ctx_category_last_updated_by_fk</code> key.
+     */
     public AppUser ctxCategoryLastUpdatedByFk() {
         if (_ctxCategoryLastUpdatedByFk == null)
             _ctxCategoryLastUpdatedByFk = new AppUser(this, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);

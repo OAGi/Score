@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAUTH2_APP;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AppOauth2User.APP_OAUTH2_USER;
@@ -50,11 +51,11 @@ public class ScoreAuthenticationSuccessHandler
         if (principal instanceof UserDetails) {
             clearAuthenticationAttributes(request);
 
-            Map<String, String> resp = new HashMap();
+            Map<String, Object> resp = new HashMap();
             UserDetails userDetails = (UserDetails) principal;
             resp.put("username", userDetails.getUsername());
             resp.put("authentication", "basic");
-            resp.put("role", userDetails.getAuthorities().stream().findFirst().get().toString());
+            resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
 
             ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
             objectMapper.writeValue(response.getOutputStream(), resp);

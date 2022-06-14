@@ -50,42 +50,57 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     }
 
     /**
-     * The column <code>oagi.module_code_list_manifest.module_code_list_manifest_id</code>. Primary key.
+     * The column
+     * <code>oagi.module_code_list_manifest.module_code_list_manifest_id</code>.
+     * Primary key.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> MODULE_CODE_LIST_MANIFEST_ID = createField(DSL.name("module_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.module_set_release_id</code>. A foreign key of the module set release record.
+     * The column
+     * <code>oagi.module_code_list_manifest.module_set_release_id</code>. A
+     * foreign key of the module set release record.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> MODULE_SET_RELEASE_ID = createField(DSL.name("module_set_release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the module set release record.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.code_list_manifest_id</code>. A foreign key of the code list manifest record.
+     * The column
+     * <code>oagi.module_code_list_manifest.code_list_manifest_id</code>. A
+     * foreign key of the code list manifest record.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key of the code list manifest record.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.module_id</code>. This indicates a module.
+     * The column <code>oagi.module_code_list_manifest.module_id</code>. This
+     * indicates a module.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this record.
+     * The column <code>oagi.module_code_list_manifest.created_by</code>.
+     * Foreign key to the APP_USER table. It indicates the user who created this
+     * record.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this record.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record.
+     * The column <code>oagi.module_code_list_manifest.last_updated_by</code>.
+     * Foreign key to the APP_USER table referring to the last user who updated
+     * the record.
      */
     public final TableField<ModuleCodeListManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.creation_timestamp</code>. The timestamp when the record was first created.
+     * The column
+     * <code>oagi.module_code_list_manifest.creation_timestamp</code>. The
+     * timestamp when the record was first created.
      */
     public final TableField<ModuleCodeListManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.module_code_list_manifest.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * The column
+     * <code>oagi.module_code_list_manifest.last_update_timestamp</code>. The
+     * timestamp when the record was last updated.
      */
     public final TableField<ModuleCodeListManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
@@ -98,14 +113,16 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     }
 
     /**
-     * Create an aliased <code>oagi.module_code_list_manifest</code> table reference
+     * Create an aliased <code>oagi.module_code_list_manifest</code> table
+     * reference
      */
     public ModuleCodeListManifest(String alias) {
         this(DSL.name(alias), MODULE_CODE_LIST_MANIFEST);
     }
 
     /**
-     * Create an aliased <code>oagi.module_code_list_manifest</code> table reference
+     * Create an aliased <code>oagi.module_code_list_manifest</code> table
+     * reference
      */
     public ModuleCodeListManifest(Name alias) {
         this(alias, MODULE_CODE_LIST_MANIFEST);
@@ -124,7 +141,7 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -138,13 +155,8 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     }
 
     @Override
-    public List<UniqueKey<ModuleCodeListManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<ModuleCodeListManifestRecord>>asList(Keys.KEY_MODULE_CODE_LIST_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<ModuleCodeListManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ModuleCodeListManifestRecord, ?>>asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
     private transient ModuleSetRelease _moduleSetRelease;
@@ -153,6 +165,10 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     private transient AppUser _moduleCodeListManifestCreatedByFk;
     private transient AppUser _moduleCodeListManifestLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
     public ModuleSetRelease moduleSetRelease() {
         if (_moduleSetRelease == null)
             _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
@@ -160,6 +176,10 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return _moduleSetRelease;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
+     * table.
+     */
     public CodeListManifest codeListManifest() {
         if (_codeListManifest == null)
             _codeListManifest = new CodeListManifest(this, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK);
@@ -167,6 +187,9 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return _codeListManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
     public Module module() {
         if (_module == null)
             _module = new Module(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK);
@@ -174,6 +197,10 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return _module;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_code_list_manifest_created_by_fk</code> key.
+     */
     public AppUser moduleCodeListManifestCreatedByFk() {
         if (_moduleCodeListManifestCreatedByFk == null)
             _moduleCodeListManifestCreatedByFk = new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK);
@@ -181,6 +208,10 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return _moduleCodeListManifestCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>module_code_list_manifest_last_updated_by_fk</code> key.
+     */
     public AppUser moduleCodeListManifestLastUpdatedByFk() {
         if (_moduleCodeListManifestLastUpdatedByFk == null)
             _moduleCodeListManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);

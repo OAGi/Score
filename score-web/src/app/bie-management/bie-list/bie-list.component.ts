@@ -118,9 +118,9 @@ export class BieListComponent implements OnInit {
     return (userToken) ? userToken.username : undefined;
   }
 
-  get role(): string {
+  get roles(): string[] {
     const userToken = this.userToken;
-    return (userToken) ? userToken.role : undefined;
+    return (userToken) ? userToken.roles : [];
   }
 
   get userToken(): UserToken {
@@ -275,7 +275,7 @@ export class BieListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {

@@ -13,5 +13,5 @@ public interface AgencyIdListWriteRepository {
     void updateAgencyIdListState(ScoreUser user, BigInteger agencyIdListManifestId, CcState toState) throws ScoreDataAccessException;
     void reviseAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
     void cancelAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
-    void transferOwnerShipAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId, String targetLoginId) throws ScoreDataAccessException;
+    void transferOwnershipAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId, String targetLoginId) throws ScoreDataAccessException;
 }

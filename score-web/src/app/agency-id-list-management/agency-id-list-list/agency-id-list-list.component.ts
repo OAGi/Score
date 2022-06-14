@@ -40,7 +40,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 })
 export class AgencyIdListListComponent implements OnInit {
 
-  title = 'Agency Id List';
+  title = 'Agency ID List';
   workingRelease = WorkingRelease;
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -105,12 +105,12 @@ export class AgencyIdListListComponent implements OnInit {
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases);
       if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'AgencyIdList');
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
         if (savedReleaseId) {
           this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
           if (!this.request.release) {
             this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'AgencyIdList', this.request.release.releaseId);
+            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
           }
         } else {
           this.request.release = this.releases[0];
@@ -140,7 +140,7 @@ export class AgencyIdListListComponent implements OnInit {
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'AgencyIdList', source.releaseId);
+      saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
 
     this.paginator.pageIndex = 0;
@@ -243,7 +243,7 @@ export class AgencyIdListListComponent implements OnInit {
 
   get showCreateAgencyIdListBtn(): boolean {
     const userToken = this.auth.getUserToken();
-    if (userToken.role === 'developer') {
+    if (userToken.roles.includes('developer')) {
       return false;
     } else {
       if (this.request.release.releaseId === WorkingRelease.releaseId) {
@@ -328,7 +328,7 @@ export class AgencyIdListListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
@@ -349,8 +349,8 @@ export class AgencyIdListListComponent implements OnInit {
     }
 
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Delete agency id list?';
-    dialogConfig.data.content = ['Are you sure you want to delete this agency id list?'];
+    dialogConfig.data.header = 'Delete agency ID list?';
+    dialogConfig.data.content = ['Are you sure you want to delete this agency ID list?'];
     dialogConfig.data.action = 'Delete anyway';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -409,9 +409,9 @@ export class AgencyIdListListComponent implements OnInit {
   openDialogCcListRestore(item: AgencyIdList) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Restore agency id list';
+    dialogConfig.data.header = 'Restore agency ID list';
     dialogConfig.data.content = [
-      'Are you sure you want to Restore agency id list?'
+      'Are you sure you want to Restore agency ID list?'
     ];
     dialogConfig.data.action = 'Restore';
 

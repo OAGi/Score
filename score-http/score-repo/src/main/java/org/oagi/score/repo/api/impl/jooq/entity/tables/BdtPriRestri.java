@@ -28,13 +28,13 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BdtPriRestriRecor
 
 
 /**
- * This table captures the allowed primitives for a BDT. The allowed primitives 
- * are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, 
- * and AGENCY_ID_LIST_ID. The first column specifies the primitive by the 
- * built-in type of an expression language such as the XML Schema built-in 
- * type. The second specifies the primitive, which is a code list, while the 
- * last one specifies the primitive which is an agency identification list. 
- * Only one column among the three can have a value in a particular record.
+ * This table captures the allowed primitives for a BDT. The allowed primitives
+ * are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID,
+ * and AGENCY_ID_LIST_ID. The first column specifies the primitive by the
+ * built-in type of an expression language such as the XML Schema built-in type.
+ * The second specifies the primitive, which is a code list, while the last one
+ * specifies the primitive which is an agency identification list. Only one
+ * column among the three can have a value in a particular record.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
@@ -55,32 +55,43 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     }
 
     /**
-     * The column <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary, internal database key.
+     * The column <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary,
+     * internal database key.
      */
     public final TableField<BdtPriRestriRecord, ULong> BDT_PRI_RESTRI_ID = createField(DSL.name("bdt_pri_restri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).
+     * The column <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
+     * table. It shall point to only DT that is a BDT (not a CDT).
      */
     public final TableField<BdtPriRestriRecord, ULong> BDT_ID = createField(DSL.name("bdt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>. This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.
+     * The column <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
+     * This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows
+     * for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
     public final TableField<BdtPriRestriRecord, ULong> CDT_AWD_PRI_XPS_TYPE_MAP_ID = createField(DSL.name("cdt_awd_pri_xps_type_map_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to the CODE_LIST table.
+     * The column <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
+     * the CODE_LIST table.
      */
     public final TableField<BdtPriRestriRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the CODE_LIST table.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.
+     * The column <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
+     * BDT content can be restricted to an agency identification.
      */
     public final TableField<BdtPriRestriRecord, ULong> AGENCY_ID_LIST_ID = createField(DSL.name("agency_id_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.is_default</code>. This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.
+     * The column <code>oagi.bdt_pri_restri.is_default</code>. This allows
+     * overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP
+     * table. It typically indicates the most generic primtive for the data
+     * type.
      */
     public final TableField<BdtPriRestriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.");
 
@@ -119,7 +130,7 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -133,13 +144,8 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     }
 
     @Override
-    public List<UniqueKey<BdtPriRestriRecord>> getKeys() {
-        return Arrays.<UniqueKey<BdtPriRestriRecord>>asList(Keys.KEY_BDT_PRI_RESTRI_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<BdtPriRestriRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<BdtPriRestriRecord, ?>>asList(Keys.BDT_PRI_RESTRI_BDT_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+        return Arrays.asList(Keys.BDT_PRI_RESTRI_BDT_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
     }
 
     private transient Dt _dt;
@@ -147,6 +153,9 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     private transient CodeList _codeList;
     private transient AgencyIdList _agencyIdList;
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt</code> table.
+     */
     public Dt dt() {
         if (_dt == null)
             _dt = new Dt(this, Keys.BDT_PRI_RESTRI_BDT_ID_FK);
@@ -154,6 +163,10 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return _dt;
     }
 
+    /**
+     * Get the implicit join path to the
+     * <code>oagi.cdt_awd_pri_xps_type_map</code> table.
+     */
     public CdtAwdPriXpsTypeMap cdtAwdPriXpsTypeMap() {
         if (_cdtAwdPriXpsTypeMap == null)
             _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMap(this, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK);
@@ -161,6 +174,9 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return _cdtAwdPriXpsTypeMap;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.code_list</code> table.
+     */
     public CodeList codeList() {
         if (_codeList == null)
             _codeList = new CodeList(this, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK);
@@ -168,6 +184,9 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return _codeList;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
+     */
     public AgencyIdList agencyIdList() {
         if (_agencyIdList == null)
             _agencyIdList = new AgencyIdList(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);

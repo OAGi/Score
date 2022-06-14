@@ -10,20 +10,26 @@ import java.util.List;
 @Data
 public class CcBdtScNodeDetail implements CcNodeDetail {
 
-    private CcType type = CcType.BDT_SC;
+    private CcType type = CcType.DT_SC;
     private BigInteger manifestId = BigInteger.ZERO;
     private BigInteger bdtScId = BigInteger.ZERO;
     private String guid;
     private String den;
     private int cardinalityMin;
     private int cardinalityMax;
+    private BigInteger prevCardinalityMin;
+    private BigInteger prevCardinalityMax;
+    private BigInteger baseCardinalityMin;
+    private BigInteger baseCardinalityMax;
     private String definition;
     private String definitionSource;
     private String defaultValue;
     private String fixedValue;
 
+    private String objectClassTerm;
     private String propertyTerm;
     private String representationTerm;
+    private Boolean deprecated;
 
     private CcState state;
     private String owner;
@@ -32,6 +38,9 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private BigInteger logId;
     private int revisionNum;
     private int revisionTrackingNum;
+    private String spec;
+    private BigInteger basedDtManifestId;
+    private BigInteger basedDtScId;
 
-    private List<CcBdtScPriResri> bdtScPriRestriList;
+    private List<CcBdtScPriRestri> bdtScPriRestriList;
 }

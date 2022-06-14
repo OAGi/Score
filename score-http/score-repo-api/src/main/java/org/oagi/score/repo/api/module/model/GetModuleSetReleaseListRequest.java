@@ -16,6 +16,8 @@ public class GetModuleSetReleaseListRequest extends PaginationRequest<ModuleSetR
     private String name;
     private String description;
     private BigInteger releaseId;
+
+    private Boolean isDefault;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -66,5 +68,13 @@ public class GetModuleSetReleaseListRequest extends PaginationRequest<ModuleSetR
 
     public void setReleaseId(BigInteger releaseId) {
         this.releaseId = releaseId;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
     }
 }

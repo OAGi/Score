@@ -24,9 +24,11 @@
           <mat-select [(ngModel)]="selectedNamespace" (ngModelChange)="onChangeNamespace()"
                       [required]="true"
                       [disabled]="isDisabled()">
-            <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                   [placeholderLabel]="'Search...'"
-                                   [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            </mat-option>
             <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace">
               {{ namespace.uri }}
             </mat-option>
@@ -48,7 +50,7 @@
     </mat-card>
   </mat-card>
 
-  <div class="row action-group m-0" *ngIf="userToken.role === 'developer'">
+  <div class="row action-group m-0" *ngIf="userToken.roles.includes('developer')">
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary"

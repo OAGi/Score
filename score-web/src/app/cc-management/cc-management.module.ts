@@ -15,7 +15,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {CcListModule} from './cc-list/cc-list.module';
 import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
-import {RefactorAsccDialogModule} from './refactor-ascc-dialog/refactor-ascc-dialog.module';
+import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
 
 @NgModule({
   imports: [
@@ -30,7 +30,7 @@ import {RefactorAsccDialogModule} from './refactor-ascc-dialog/refactor-ascc-dia
     ExtensionDetailModule,
     TransferOwnershipDialogModule,
     FindUsagesDialogModule,
-    RefactorAsccDialogModule,
+    RefactorDialogModule,
     TranslateModule,
     CommonModule,
     ContextMenuModule,

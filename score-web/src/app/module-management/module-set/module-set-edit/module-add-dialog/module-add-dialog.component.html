@@ -24,6 +24,7 @@
         <mat-form-field>
           <mat-label>Namespace</mat-label>
           <mat-select [(ngModel)]="module.namespaceId">
+            <mat-option [value]="">-</mat-option>
             <mat-option *ngFor="let namespace of namespaceList" [value]="namespace.namespaceId">
               {{namespace.uri}}
             </mat-option>

@@ -39,7 +39,7 @@ export class ModuleSetEditComponent implements OnInit {
               private dialog: MatDialog,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService) {
-    this.title = (this.role === 'developer') ? 'Edit Module Set' : 'View Module Set';
+    this.title = (this.roles.includes('developer')) ? 'Edit Module Set' : 'View Module Set';
   }
 
   get canUpdate(): boolean {
@@ -71,9 +71,9 @@ export class ModuleSetEditComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
-  get role(): string {
+  get roles(): string[] {
     const userToken = this.userToken;
-    return (userToken) ? userToken.role : undefined;
+    return (userToken) ? userToken.roles : [];
   }
 
   init(moduleSet: ModuleSet) {

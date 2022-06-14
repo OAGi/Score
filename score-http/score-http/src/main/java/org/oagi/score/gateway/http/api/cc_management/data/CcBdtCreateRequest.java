@@ -9,5 +9,6 @@ public class CcBdtCreateRequest {
 
     private BigInteger releaseId;
     private BigInteger bdtManifestId;
+    private BigInteger specId;
 
 }

@@ -50,14 +50,16 @@ public class BizCtxAssignmentRecord extends UpdatableRecordImpl<BizCtxAssignment
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This is a foreign key to the top-level ASBIEP.
+     * Setter for <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public void setTopLevelAsbiepId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This is a foreign key to the top-level ASBIEP.
+     * Getter for <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public ULong getTopLevelAsbiepId() {
         return (ULong) get(2);

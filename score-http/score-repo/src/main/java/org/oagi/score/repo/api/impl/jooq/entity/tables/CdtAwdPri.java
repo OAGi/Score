@@ -28,9 +28,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtAwdPriRecord;
 
 
 /**
- * This table capture allowed primitives of the CDT?s Content Component.  
- * The information in this table is captured from the Allowed Primitive column 
- * in each of the CDT Content Component section/table in CCTS DTC3.
+ * This table capture allowed primitives of the CDT?s Content Component.  The
+ * information in this table is captured from the Allowed Primitive column in
+ * each of the CDT Content Component section/table in CCTS DTC3.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
@@ -51,22 +51,28 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
     }
 
     /**
-     * The column <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary, internal database key.
+     * The column <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary,
+     * internal database key.
      */
     public final TableField<CdtAwdPriRecord, ULong> CDT_AWD_PRI_ID = createField(DSL.name("cdt_awd_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to a CDT in the DT table.
+     * The column <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to
+     * a CDT in the DT table.
      */
     public final TableField<CdtAwdPriRecord, ULong> CDT_ID = createField(DSL.name("cdt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key pointing to a CDT in the DT table.");
 
     /**
-     * The column <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. 
+     * The column <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the
+     * CDT_PRI table. It indicates the primative allowed for the CDT identified
+     * in the CDT_ID column. 
      */
     public final TableField<CdtAwdPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. ");
 
     /**
-     * The column <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default primitive for the CDT?s Content Component. True for a default primitive; False otherwise.
+     * The column <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default
+     * primitive for the CDT?s Content Component. True for a default primitive;
+     * False otherwise.
      */
     public final TableField<CdtAwdPriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false), this, "Indicating a default primitive for the CDT?s Content Component. True for a default primitive; False otherwise.");
 
@@ -105,7 +111,7 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -119,18 +125,16 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
     }
 
     @Override
-    public List<UniqueKey<CdtAwdPriRecord>> getKeys() {
-        return Arrays.<UniqueKey<CdtAwdPriRecord>>asList(Keys.KEY_CDT_AWD_PRI_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<CdtAwdPriRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CdtAwdPriRecord, ?>>asList(Keys.CDT_AWD_PRI_CDT_ID_FK, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);
+        return Arrays.asList(Keys.CDT_AWD_PRI_CDT_ID_FK, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);
     }
 
     private transient Dt _dt;
     private transient CdtPri _cdtPri;
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt</code> table.
+     */
     public Dt dt() {
         if (_dt == null)
             _dt = new Dt(this, Keys.CDT_AWD_PRI_CDT_ID_FK);
@@ -138,6 +142,9 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
         return _dt;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.cdt_pri</code> table.
+     */
     public CdtPri cdtPri() {
         if (_cdtPri == null)
             _cdtPri = new CdtPri(this, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);

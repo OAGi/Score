@@ -1,21 +1,15 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
-import com.sun.xml.xsom.impl.scd.Iterators;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.repo.component.dt.BdtWriteRepository;
-import org.oagi.score.repo.component.dt.CreateBdtRepositoryRequest;
-import org.oagi.score.repo.component.dt.CreateBdtRepositoryResponse;
-import org.oagi.score.repo.component.dt.CreatedBdtEvent;
-import org.oagi.score.service.common.data.AppUser;
-import org.oagi.score.service.common.data.BCCEntityType;
-import org.oagi.score.service.common.data.CcState;
-import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.data.Release;
+import org.oagi.score.data.Xbt;
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
+import org.oagi.score.gateway.http.api.graph.data.Node;
+import org.oagi.score.gateway.http.api.graph.service.GraphService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventHandler;
 import org.oagi.score.repo.CoreComponentRepository;
@@ -24,8 +18,28 @@ import org.oagi.score.repo.component.acc.*;
 import org.oagi.score.repo.component.ascc.*;
 import org.oagi.score.repo.component.asccp.*;
 import org.oagi.score.repo.component.bcc.*;
+import org.oagi.score.repo.component.bccp.DeleteBccpRepositoryRequest;
+import org.oagi.score.repo.component.bccp.DeleteBccpRepositoryResponse;
+import org.oagi.score.repo.component.bccp.DeletedBccpEvent;
+import org.oagi.score.repo.component.bccp.UpdateBccpBdtRepositoryRequest;
+import org.oagi.score.repo.component.bccp.UpdateBccpBdtRepositoryResponse;
+import org.oagi.score.repo.component.bccp.UpdateBccpOwnerRepositoryRequest;
+import org.oagi.score.repo.component.bccp.UpdateBccpPropertiesRepositoryRequest;
+import org.oagi.score.repo.component.bccp.UpdateBccpPropertiesRepositoryResponse;
+import org.oagi.score.repo.component.bccp.UpdatedBccpOwnerEvent;
+import org.oagi.score.repo.component.bccp.UpdatedBccpPropertiesEvent;
 import org.oagi.score.repo.component.bccp.*;
+import org.oagi.score.repo.component.dt.*;
+import org.oagi.score.repo.component.dt_sc.*;
+import org.oagi.score.repo.component.graph.CoreComponentGraphContext;
+import org.oagi.score.repo.component.graph.GraphContextRepository;
 import org.oagi.score.repo.component.release.ReleaseRepository;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.BCCEntityType;
+import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.common.data.OagisComponentType;
+import org.oagi.score.service.log.model.LogAction;
+import org.oagi.score.service.log.model.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -38,8 +52,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ACC;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ACC_MANIFEST;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -67,10 +80,19 @@ public class CcNodeService extends EventHandler {
     private BccpWriteRepository bccpWriteRepository;
 
     @Autowired
-    private BdtWriteRepository bdtWriteRepository;
+    private DtWriteRepository dtWriteRepository;
+
+    @Autowired
+    private DtScWriteRepository dtScWriteRepository;
+
+    @Autowired
+    private AsccReadRepository asccReadRepository;
 
     @Autowired
     private AsccWriteRepository asccWriteRepository;
+
+    @Autowired
+    private BccReadRepository bccReadRepository;
 
     @Autowired
     private BccWriteRepository bccWriteRepository;
@@ -83,6 +105,12 @@ public class CcNodeService extends EventHandler {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private GraphService graphService;
+
+    @Autowired
+    private GraphContextRepository graphContextRepository;
 
     public CcAccNode getAccNode(AuthenticatedPrincipal user, BigInteger manifestId) {
         return repository.getAccNodeByAccManifestId(user, manifestId);
@@ -98,6 +126,10 @@ public class CcNodeService extends EventHandler {
 
     public CcBdtNode getBdtNode(AuthenticatedPrincipal user, BigInteger manifestId) {
         return repository.getBdtNodeByBdtManifestId(user, manifestId);
+    }
+
+    public CcBdtScNode getDtScNode(AuthenticatedPrincipal user, BigInteger manifestId) {
+        return repository.getDtScNodeByManifestId(user, manifestId);
     }
 
     @Transactional
@@ -134,9 +166,23 @@ public class CcNodeService extends EventHandler {
     }
 
     @Transactional
+    public void deleteAscc(AuthenticatedPrincipal user, BigInteger asccManifestId, boolean ignoreState) {
+        deleteAscc(user, asccManifestId, LogUtils.generateHash(), LogAction.Modified, ignoreState);
+    }
+
+    @Transactional
     public void deleteAscc(AuthenticatedPrincipal user, BigInteger asccManifestId) {
+        deleteAscc(user, asccManifestId, LogUtils.generateHash(), LogAction.Modified, false);
+    }
+
+    @Transactional
+    public void deleteAscc(AuthenticatedPrincipal user, BigInteger asccManifestId, String logHash, LogAction action, boolean ignoreState) {
         DeleteAsccRepositoryRequest request =
                 new DeleteAsccRepositoryRequest(user, asccManifestId);
+
+        request.setIgnoreState(ignoreState);
+        request.setLogHash(logHash);
+        request.setLogAction(action);
 
         asccWriteRepository.deleteAscc(request);
 
@@ -151,6 +197,76 @@ public class CcNodeService extends EventHandler {
         bccWriteRepository.deleteBcc(request);
 
         fireEvent(new DeletedBccEvent());
+    }
+
+    @Transactional
+    public void deleteDt(AuthenticatedPrincipal user, BigInteger dtManifestId) {
+        DeleteDtRepositoryRequest request =
+                new DeleteDtRepositoryRequest(user, dtManifestId);
+
+        dtWriteRepository.deleteDt(request);
+
+        fireEvent(new DeletedDtEvent());
+    }
+
+    @Transactional
+    public void deleteDtSc(AuthenticatedPrincipal user, BigInteger dtScManifestId) {
+        DeleteDtScRepositoryRequest request =
+                new DeleteDtScRepositoryRequest(user, dtScManifestId);
+
+        dtScWriteRepository.deleteDtSc(request);
+
+        fireEvent(new DeletedDtScEvent());
+    }
+
+    @Transactional
+    public void purgeAcc(AuthenticatedPrincipal user, BigInteger manifestId) {
+        PurgeAccRepositoryRequest repositoryRequest =
+                new PurgeAccRepositoryRequest(user, manifestId);
+
+        PurgeAccRepositoryResponse repositoryResponse =
+                accWriteRepository.purgeAcc(repositoryRequest);
+
+        fireEvent(new DeletedAccEvent());
+    }
+
+    @Transactional
+    public void purgeAsccp(AuthenticatedPrincipal user, BigInteger manifestId) {
+        purgeAsccp(user, manifestId, false);
+    }
+
+    @Transactional
+    public void purgeAsccp(AuthenticatedPrincipal user, BigInteger manifestId, boolean ignoreState) {
+        PurgeAsccpRepositoryRequest repositoryRequest =
+                new PurgeAsccpRepositoryRequest(user, manifestId);
+
+        repositoryRequest.setIgnoreState(ignoreState);
+
+        PurgeAsccpRepositoryResponse repositoryResponse =
+                asccpWriteRepository.purgeAsccp(repositoryRequest);
+
+        fireEvent(new DeletedAsccpEvent());
+    }
+
+    @Transactional
+    public void purgeBccp(AuthenticatedPrincipal user, BigInteger manifestId) {
+        PurgeBccpRepositoryRequest repositoryRequest =
+                new PurgeBccpRepositoryRequest(user, manifestId);
+
+        PurgeBccpRepositoryResponse repositoryResponse =
+                bccpWriteRepository.purgeBccp(repositoryRequest);
+
+        fireEvent(new DeletedBccpEvent());
+    }
+
+    @Transactional
+    public void purgeDt(AuthenticatedPrincipal user, BigInteger dtManifestId) {
+        PurgeDtRepositoryRequest request =
+                new PurgeDtRepositoryRequest(user, dtManifestId);
+
+        dtWriteRepository.purgeDt(request);
+
+        fireEvent(new DeletedDtEvent());
     }
 
     public CcAccNodeDetail getAccNodeDetail(AuthenticatedPrincipal user, CcAccNode accNode) {
@@ -234,10 +350,10 @@ public class CcNodeService extends EventHandler {
         isPublishedRelease(request.getReleaseId());
         CreateBdtRepositoryRequest repositoryRequest =
                 new CreateBdtRepositoryRequest(user,
-                        request.getBdtManifestId(), request.getReleaseId());
+                        request.getBdtManifestId(), request.getReleaseId(), request.getSpecId());
 
         CreateBdtRepositoryResponse repositoryResponse =
-                bdtWriteRepository.createBdt(repositoryRequest);
+                dtWriteRepository.createBdt(repositoryRequest);
 
         fireEvent(new CreatedBdtEvent());
 
@@ -421,6 +537,10 @@ public class CcNodeService extends EventHandler {
                 updateAsccp(user, ccUpdateRequest.getAsccpNodeDetails()));
         ccUpdateResponse.setBccpNodeResults(
                 updateBccpDetail(user, ccUpdateRequest.getBccpNodeDetails()));
+        ccUpdateResponse.setDtNodeResults(
+                updateDtDetail(user, ccUpdateRequest.getDtNodeDetails()));
+        ccUpdateResponse.setBdtScNodeResults(
+                updateDtScDetail(user, ccUpdateRequest.getDtScNodeDetails()));
 
         return ccUpdateResponse;
     }
@@ -496,6 +616,30 @@ public class CcNodeService extends EventHandler {
             updatedBccpNodeDetails.add(getBccpNodeDetail(user, ccBccpNode));
         }
         return updatedBccpNodeDetails;
+    }
+
+    @Transactional
+    public List<CcBdtNodeDetail> updateDtDetail(AuthenticatedPrincipal user, List<CcBdtNodeDetail> dtNodeDetails) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        List<CcBdtNodeDetail> updatedDtNodeDetails = new ArrayList<>();
+        for (CcBdtNodeDetail detail : dtNodeDetails) {
+            updateDtDetail(user, timestamp, detail);
+            CcBdtNode ccDtNode = getBdtNode(user, detail.getManifestId());
+            updatedDtNodeDetails.add(getBdtNodeDetail(user, ccDtNode));
+        }
+        return updatedDtNodeDetails;
+    }
+
+    @Transactional
+    public List<CcBdtScNodeDetail> updateDtScDetail(AuthenticatedPrincipal user, List<CcBdtScNodeDetail> dtScNodeDetails) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        List<CcBdtScNodeDetail> updatedDtScNodeDetails = new ArrayList<>();
+        for (CcBdtScNodeDetail detail : dtScNodeDetails) {
+            updateDtScDetail(user, timestamp, detail);
+            CcBdtScNode ccDtScNode = getDtScNode(user, detail.getManifestId());
+            updatedDtScNodeDetails.add(getBdtScNodeDetail(user, ccDtScNode));
+        }
+        return updatedDtScNodeDetails;
     }
 
     private CcAccNode updateAccDetail(AuthenticatedPrincipal user, LocalDateTime timestamp, CcAccNodeDetail detail) {
@@ -602,14 +746,67 @@ public class CcNodeService extends EventHandler {
         return repository.getBccpNodeByBccpManifestId(user, response.getBccpManifestId());
     }
 
+    private CcBdtNode updateDtDetail(AuthenticatedPrincipal user, LocalDateTime timestamp, CcBdtNodeDetail detail) {
+        UpdateDtPropertiesRepositoryRequest request =
+                new UpdateDtPropertiesRepositoryRequest(user, timestamp, detail.getManifestId());
+
+        request.setQualifier(detail.getQualifier());
+        request.setSixDigitId(detail.getSixDigitId());
+        request.setContentComponentDefinition(detail.getContentComponentDefinition());
+        request.setDefinition(detail.getDefinition());
+        request.setDefinitionSource(detail.getDefinitionSource());
+        request.setDeprecated(detail.isDeprecated());
+        request.setNamespaceId(detail.getNamespaceId());
+        request.setBdtPriRestriList(detail.getBdtPriRestriList());
+
+        UpdateDtPropertiesRepositoryResponse response =
+                dtWriteRepository.updateDtProperties(request);
+
+        fireEvent(new UpdatedDtPropertiesEvent());
+
+        return repository.getBdtNodeByBdtManifestId(user, response.getDtManifestId());
+    }
+
+    private CcBdtScNode updateDtScDetail(AuthenticatedPrincipal user, LocalDateTime timestamp, CcBdtScNodeDetail detail) {
+        UpdateDtScPropertiesRepositoryRequest request =
+                new UpdateDtScPropertiesRepositoryRequest(user, timestamp, detail.getManifestId());
+
+        request.setPropertyTerm(detail.getPropertyTerm());
+        request.setDefaultValue(detail.getDefaultValue());
+        request.setFixedValue(detail.getFixedValue());
+        request.setDefinition(detail.getDefinition());
+        request.setCardinalityMax(detail.getCardinalityMax());
+        request.setCardinalityMin(detail.getCardinalityMin());
+        request.setDefinitionSource(detail.getDefinitionSource());
+        request.setDeprecated(detail.getDeprecated());
+        request.setCcBdtScPriResriList(detail.getBdtScPriRestriList());
+        request.setRepresentationTerm(detail.getRepresentationTerm());
+
+        UpdateDtScPropertiesRepositoryResponse response =
+                dtScWriteRepository.updateDtScProperties(request);
+
+        fireEvent(new UpdatedDtScPropertiesEvent());
+
+        return repository.getDtScNodeByManifestId(user, response.getDtScManifestId());
+    }
+
     @Transactional
     public BigInteger appendAsccp(AuthenticatedPrincipal user, BigInteger releaseId,
                                   BigInteger accManifestId, BigInteger asccpManifestId,
                                   int pos) {
+        return appendAsccp(user, releaseId, accManifestId, asccpManifestId, pos, LogUtils.generateHash(), LogAction.Modified);
+    }
+
+    @Transactional
+    public BigInteger appendAsccp(AuthenticatedPrincipal user, BigInteger releaseId,
+                                  BigInteger accManifestId, BigInteger asccpManifestId,
+                                  int pos, String logHash, LogAction action) {
         LocalDateTime timestamp = LocalDateTime.now();
         CreateAsccRepositoryRequest request =
                 new CreateAsccRepositoryRequest(user, timestamp, releaseId, accManifestId, asccpManifestId);
         request.setPos(pos);
+        request.setLogHash(logHash);
+        request.setLogAction(action);
 
         CreateAsccRepositoryResponse response = asccWriteRepository.createAscc(request);
         fireEvent(new CreatedAsccEvent());
@@ -620,14 +817,75 @@ public class CcNodeService extends EventHandler {
     public BigInteger appendBccp(AuthenticatedPrincipal user, BigInteger releaseId,
                                  BigInteger accManifestId, BigInteger bccpManifestId,
                                  int pos) {
+        return appendBccp(user, releaseId, accManifestId, bccpManifestId, pos, LogUtils.generateHash(), LogAction.Modified);
+    }
+
+    @Transactional
+    public BigInteger appendBccp(AuthenticatedPrincipal user, BigInteger releaseId,
+                                 BigInteger accManifestId, BigInteger bccpManifestId,
+                                 int pos, String logHash, LogAction action) {
         LocalDateTime timestamp = LocalDateTime.now();
         CreateBccRepositoryRequest request =
                 new CreateBccRepositoryRequest(user, timestamp, releaseId, accManifestId, bccpManifestId);
         request.setPos(pos);
+        request.setLogHash(logHash);
+        request.setLogAction(action);
 
         CreateBccRepositoryResponse response = bccWriteRepository.createBcc(request);
         fireEvent(new CreatedBccEvent());
         return response.getBccManifestId();
+    }
+
+    @Transactional
+    public BigInteger appendDtSc(AuthenticatedPrincipal user, BigInteger ownerDtManifestId) {
+        CreateDtScRepositoryRequest request =
+                new CreateDtScRepositoryRequest(user, ownerDtManifestId);
+
+        CreateDtScRepositoryResponse response = dtWriteRepository.createDtSc(request);
+        fireEvent(new CreatedDtScEvent());
+        return response.getDtScManifestId();
+    }
+
+    @Transactional
+    public void addDtRestriction(AuthenticatedPrincipal user, CcCreateRestrictionRequest createRestrictionRequest) {
+
+        if (createRestrictionRequest.getRestrictionType().equals(PrimitiveRestriType.Primitive.name())) {
+
+            createRestrictionRequest.getPrimitiveXbtMapList().forEach(e -> {
+                CreatePrimitiveRestrictionRepositoryRequest request =
+                        new CreatePrimitiveRestrictionRepositoryRequest(user, createRestrictionRequest.getDtManifestId(), createRestrictionRequest.getReleaseId());
+
+                request.setPrimitive(e.getPrimitive());
+                request.setXbtManifestIdList(e.getXbtList().stream().map(Xbt::getManifestId).collect(Collectors.toList()));
+                dtWriteRepository.addDtPrimitiveRestriction(request);
+            });
+
+        } else if (createRestrictionRequest.getRestrictionType().equals(PrimitiveRestriType.CodeList.name())) {
+            CreateCodeListRestrictionRepositoryRequest request =
+                    new CreateCodeListRestrictionRepositoryRequest(user, createRestrictionRequest.getDtManifestId(), createRestrictionRequest.getReleaseId());
+
+            request.setCodeListManifestId(createRestrictionRequest.getCodeListManifestId());
+            dtWriteRepository.addDtCodeListRestriction(request);
+        } else if (createRestrictionRequest.getRestrictionType().equals(PrimitiveRestriType.AgencyIdList.name())) {
+            CreateAgencyIdListRestrictionRepositoryRequest request =
+                    new CreateAgencyIdListRestrictionRepositoryRequest(user, createRestrictionRequest.getDtManifestId(), createRestrictionRequest.getReleaseId());
+
+            request.setAgencyIdListManifestId(createRestrictionRequest.getAgencyIdListManifestId());
+            dtWriteRepository.addDtAgencyIdListRestriction(request);
+        }
+
+        fireEvent(new UpdatedDtEvent());
+    }
+
+    public List<CcBdtScPriRestri> getDefaultPrimitiveValues(AuthenticatedPrincipal user,
+                                                            String representationTerm, BigInteger bdtScManifestId) {
+        if (repository.bdtScHasRepresentationTermSameAs(representationTerm, bdtScManifestId)) {
+            CcBdtScNode bdtScNode = new CcBdtScNode();
+            bdtScNode.setManifestId(bdtScManifestId);
+            CcBdtScNodeDetail bdtScNodeDetail = getBdtScNodeDetail(user, bdtScNode);
+            return bdtScNodeDetail.getBdtScPriRestriList();
+        }
+        return repository.getDefaultPrimitiveValues(representationTerm);
     }
 
     @Transactional
@@ -727,6 +985,25 @@ public class CcNodeService extends EventHandler {
     }
 
     @Transactional
+    public BigInteger updateDtState(AuthenticatedPrincipal user, BigInteger dtManifestId, CcState toState) {
+        CcState fromState = repository.getDtState(dtManifestId);
+        return updateDtState(user, dtManifestId, fromState, toState);
+    }
+
+    @Transactional
+    public BigInteger updateDtState(AuthenticatedPrincipal user, BigInteger dtManifestId, CcState fromState, CcState toState) {
+        UpdateDtStateRepositoryRequest repositoryRequest =
+                new UpdateDtStateRepositoryRequest(user, dtManifestId, fromState, toState);
+
+        UpdateDtStateRepositoryResponse repositoryResponse =
+                dtWriteRepository.updateDtState(repositoryRequest);
+
+        fireEvent(new UpdatedDtStateEvent());
+
+        return repositoryResponse.getDtManifestId();
+    }
+
+    @Transactional
     public BigInteger makeNewRevisionForAcc(AuthenticatedPrincipal user, BigInteger accManifestId) {
         ReviseAccRepositoryRequest repositoryRequest =
                 new ReviseAccRepositoryRequest(user, accManifestId);
@@ -763,6 +1040,19 @@ public class CcNodeService extends EventHandler {
         fireEvent(new RevisedBccpEvent());
 
         return repositoryResponse.getBccpManifestId();
+    }
+
+    @Transactional
+    public BigInteger makeNewRevisionForDt(AuthenticatedPrincipal user, BigInteger dtManifestId) {
+        ReviseDtRepositoryRequest repositoryRequest =
+                new ReviseDtRepositoryRequest(user, dtManifestId);
+
+        ReviseDtRepositoryResponse repositoryResponse =
+                dtWriteRepository.reviseDt(repositoryRequest);
+
+        fireEvent(new RevisedDtEvent());
+
+        return repositoryResponse.getDtManifestId();
     }
 
     public CcRevisionResponse getAccNodeRevision(AuthenticatedPrincipal user, BigInteger manifestId) {
@@ -831,7 +1121,7 @@ public class CcNodeService extends EventHandler {
 
     public CcRevisionResponse getBdtNodeRevision(AuthenticatedPrincipal user, BigInteger manifestId) {
         CcBdtNode bdtNode = getBdtNode(user, manifestId);
-        BigInteger lastPublishedCcId = getLastPublishedCcId(bdtNode.getId(), CcType.BDT);
+        BigInteger lastPublishedCcId = getLastPublishedCcId(bdtNode.getId(), CcType.DT);
         CcRevisionResponse ccRevisionResponse = new CcRevisionResponse();
         if (lastPublishedCcId != null) {
             DtRecord bdtRecord = ccRepository.getBdtById(ULong.valueOf(lastPublishedCcId));
@@ -917,7 +1207,7 @@ public class CcNodeService extends EventHandler {
                 }
                 return getLastPublishedCcId(bccpRecord.getPrevBccpId().toBigInteger(), CcType.BCCP);
 
-            case BDT:
+            case DT:
                 DtRecord bdtRecord = ccRepository.getBdtById(ULong.valueOf(ccId));
                 if (bdtRecord.getState().equals(CcState.Published.name()) ||
                         bdtRecord.getState().equals(CcState.Production.name())) {
@@ -926,9 +1216,9 @@ public class CcNodeService extends EventHandler {
                 if (bdtRecord.getPrevDtId() == null) {
                     return null;
                 }
-                return getLastPublishedCcId(bdtRecord.getPrevDtId().toBigInteger(), CcType.BDT);
+                return getLastPublishedCcId(bdtRecord.getPrevDtId().toBigInteger(), CcType.DT);
 
-            case BDT_SC:
+            case DT_SC:
                 return null;
 
             case XBT:
@@ -964,6 +1254,14 @@ public class CcNodeService extends EventHandler {
         fireEvent(new UpdatedBccpOwnerEvent());
     }
 
+    public void updateDtOwnerUserId(AuthenticatedPrincipal user, BigInteger dtManifestId, BigInteger ownerUserId) {
+        UpdateDtOwnerRepositoryRequest request =
+                new UpdateDtOwnerRepositoryRequest(user, dtManifestId, ownerUserId);
+        dtWriteRepository.updateDtOwner(request);
+
+        fireEvent(new UpdatedDtOwnerEvent());
+    }
+
     @Transactional
     public void cancelRevisionBccp(AuthenticatedPrincipal user, BigInteger bccpManifestId) {
         CancelRevisionBccpRepositoryRequest request
@@ -971,6 +1269,15 @@ public class CcNodeService extends EventHandler {
         bccpWriteRepository.cancelRevisionBccp(request);
 
         fireEvent(new CancelRevisionBccpEvent());
+    }
+
+    @Transactional
+    public void cancelRevisionDt(AuthenticatedPrincipal user, BigInteger dtManifestId) {
+        CancelRevisionDtRepositoryRequest request
+                = new CancelRevisionDtRepositoryRequest(user, dtManifestId);
+        dtWriteRepository.cancelRevisionDt(request);
+
+        fireEvent(new CancelRevisionDtEvent());
     }
 
     @Transactional
@@ -998,92 +1305,97 @@ public class CcNodeService extends EventHandler {
 
         CreateOagisBodResponse response = new CreateOagisBodResponse();
 
-        BigInteger bodManifestId = _createOagisBod(user, request);
-        response.setManifestId(bodManifestId);
+        List<BigInteger> bodManifestIdList = _createOagisBod(user, request);
+        response.setManifestIdList(bodManifestIdList);
 
         return response;
     }
 
-    private BigInteger _createOagisBod(AuthenticatedPrincipal user, CreateOagisBodRequest request) {
+    private List<BigInteger> _createOagisBod(AuthenticatedPrincipal user, CreateOagisBodRequest request) {
         AppUser requester = sessionService.getAppUser(user);
         if (!requester.isDeveloper()) {
             throw new IllegalArgumentException();
         }
 
-        AsccpManifestRecord verbManifestRecord = asccpReadRepository.getAsccpManifestById(request.getVerbManifestId());
-        BigInteger releaseId = verbManifestRecord.getReleaseId().toBigInteger();
-        AsccpRecord verb = asccpReadRepository.getAsccpByManifestId(request.getVerbManifestId());
-        AsccpRecord noun = asccpReadRepository.getAsccpByManifestId(request.getNounManifestId());
+        List<BigInteger> bodManifestIdList = new ArrayList();
+        for (BigInteger verbManifestId : request.getVerbManifestIdList()) {
+            for (BigInteger nounManifestId : request.getNounManifestIdList()) {
+                AsccpManifestRecord verbManifestRecord = asccpReadRepository.getAsccpManifestById(verbManifestId);
+                BigInteger releaseId = verbManifestRecord.getReleaseId().toBigInteger();
+                AsccpRecord verb = asccpReadRepository.getAsccpByManifestId(verbManifestId);
+                AsccpRecord noun = asccpReadRepository.getAsccpByManifestId(nounManifestId);
 
-        if(verb.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + verb.getPropertyTerm() + "' dose not have Namespace Id.");
-        }
+                if (verb.getNamespaceId() == null) {
+                    throw new IllegalArgumentException("'" + verb.getPropertyTerm() + "' dose not have a namespace.");
+                }
 
-        if(noun.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + noun.getPropertyTerm() + "' dose not have Namespace Id.");
-        }
+                if (noun.getNamespaceId() == null) {
+                    throw new IllegalArgumentException("'" + noun.getPropertyTerm() + "' dose not have a namespace.");
+                }
 
-        BigInteger namespaceId = verb.getNamespaceId().toBigInteger();
+                BigInteger namespaceId = verb.getNamespaceId().toBigInteger();
 
-        CreateAccRepositoryRequest dataAreaAccRequest = new CreateAccRepositoryRequest(user, releaseId);
-        dataAreaAccRequest.setInitialComponentType(OagisComponentType.Semantics);
-        dataAreaAccRequest.setInitialObjectClassTerm(String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm(), "Data Area")));
-        dataAreaAccRequest.setNamespaceId(namespaceId);
-        BigInteger dataAreaAccManifestId = accWriteRepository.createAcc(dataAreaAccRequest).getAccManifestId();
+                CreateAccRepositoryRequest dataAreaAccRequest = new CreateAccRepositoryRequest(user, releaseId);
+                dataAreaAccRequest.setInitialComponentType(OagisComponentType.Semantics);
+                dataAreaAccRequest.setInitialObjectClassTerm(String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm(), "Data Area")));
+                dataAreaAccRequest.setNamespaceId(namespaceId);
+                BigInteger dataAreaAccManifestId = accWriteRepository.createAcc(dataAreaAccRequest).getAccManifestId();
 
-        CreateAsccRepositoryRequest verbAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
-                dataAreaAccManifestId, request.getVerbManifestId());
-        verbAsccRequest.setCardinalityMin(1);
-        verbAsccRequest.setCardinalityMax(1);
-        asccWriteRepository.createAscc(verbAsccRequest);
+                CreateAsccRepositoryRequest verbAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
+                        dataAreaAccManifestId, verbManifestId);
+                verbAsccRequest.setCardinalityMin(1);
+                verbAsccRequest.setCardinalityMax(1);
+                asccWriteRepository.createAscc(verbAsccRequest);
 
-        CreateAsccRepositoryRequest nounAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
-                dataAreaAccManifestId, request.getNounManifestId());
-        nounAsccRequest.setCardinalityMin(1);
-        nounAsccRequest.setCardinalityMax(-1);
-        asccWriteRepository.createAscc(nounAsccRequest);
+                CreateAsccRepositoryRequest nounAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
+                        dataAreaAccManifestId, nounManifestId);
+                nounAsccRequest.setCardinalityMin(1);
+                nounAsccRequest.setCardinalityMax(-1);
+                asccWriteRepository.createAscc(nounAsccRequest);
 
-        CreateAsccpRepositoryRequest dataAreaAsccpRequest = new CreateAsccpRepositoryRequest(user, dataAreaAccManifestId, releaseId);
-        dataAreaAsccpRequest.setInitialPropertyTerm("Data Area");
-        dataAreaAsccpRequest.setNamespaceId(namespaceId);
-        dataAreaAsccpRequest.setReusable(false);
-        String name = String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm()))
-                .replaceAll(" ", "");
-        dataAreaAsccpRequest.setDefinition("Is where the information that the BOD message carries is provided, in this case " + name + ". The information consists of a Verb and one or more Nouns. The verb (" + verb.getPropertyTerm().replaceAll(" ", "") + ") indicates the action to be performed on the Noun (" + noun.getPropertyTerm().replaceAll(" ", "") + ").");
-        dataAreaAsccpRequest.setDefinitionSource("http://www.openapplications.org/oagis/10");
-        BigInteger dataAreaAsccpManifestId = asccpWriteRepository.createAsccp(dataAreaAsccpRequest).getAsccpManifestId();
+                CreateAsccpRepositoryRequest dataAreaAsccpRequest = new CreateAsccpRepositoryRequest(user, dataAreaAccManifestId, releaseId);
+                dataAreaAsccpRequest.setInitialPropertyTerm("Data Area");
+                dataAreaAsccpRequest.setNamespaceId(namespaceId);
+                dataAreaAsccpRequest.setReusable(false);
+                String name = String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm()))
+                        .replaceAll(" ", "");
+                dataAreaAsccpRequest.setDefinition("Is where the information that the BOD message carries is provided, in this case " + name + ". The information consists of a Verb and one or more Nouns. The verb (" + verb.getPropertyTerm().replaceAll(" ", "") + ") indicates the action to be performed on the Noun (" + noun.getPropertyTerm().replaceAll(" ", "") + ").");
+                dataAreaAsccpRequest.setDefinitionSource("http://www.openapplications.org/oagis/10");
+                BigInteger dataAreaAsccpManifestId = asccpWriteRepository.createAsccp(dataAreaAsccpRequest).getAsccpManifestId();
 
+                ULong bodBasedAccManifestId = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                        .from(ACC_MANIFEST)
+                        .join(ACC).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                        .where(and(
+                                ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                ACC.OBJECT_CLASS_TERM.eq("Business Object Document")
+                        ))
+                        .fetchOneInto(ULong.class);
 
-        ULong bodBasedAccManifestId = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
-                .from(ACC_MANIFEST)
-                .join(ACC).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
-                .where(and(
-                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                        ACC.OBJECT_CLASS_TERM.eq("Business Object Document")
-                ))
-                .fetchOneInto(ULong.class);
+                CreateAccRepositoryRequest bodAccRequest = new CreateAccRepositoryRequest(user, releaseId);
+                bodAccRequest.setBasedAccManifestId(bodBasedAccManifestId.toBigInteger());
+                bodAccRequest.setInitialComponentType(OagisComponentType.Semantics);
+                bodAccRequest.setInitialObjectClassTerm(String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm())));
+                bodAccRequest.setNamespaceId(namespaceId);
+                BigInteger bodAccManifestId = accWriteRepository.createAcc(bodAccRequest).getAccManifestId();
 
-        CreateAccRepositoryRequest bodAccRequest = new CreateAccRepositoryRequest(user, releaseId);
-        bodAccRequest.setBasedAccManifestId(bodBasedAccManifestId.toBigInteger());
-        bodAccRequest.setInitialComponentType(OagisComponentType.Semantics);
-        bodAccRequest.setInitialObjectClassTerm(String.join(" ", Arrays.asList(verb.getPropertyTerm(), noun.getPropertyTerm())));
-        bodAccRequest.setNamespaceId(namespaceId);
-        BigInteger bodAccManifestId = accWriteRepository.createAcc(bodAccRequest).getAccManifestId();
-
-        CreateAsccRepositoryRequest dataAreaAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
-                bodAccManifestId, dataAreaAsccpManifestId);
-        dataAreaAsccRequest.setCardinalityMin(1);
-        dataAreaAsccRequest.setCardinalityMax(1);
+                CreateAsccRepositoryRequest dataAreaAsccRequest = new CreateAsccRepositoryRequest(user, releaseId,
+                        bodAccManifestId, dataAreaAsccpManifestId);
+                dataAreaAsccRequest.setCardinalityMin(1);
+                dataAreaAsccRequest.setCardinalityMax(1);
 //        dataAreaAsccRequest.setDefinition(dataAreaAsccpRequest.getDefinition());
 //        dataAreaAsccRequest.setDefinitionSource(dataAreaAsccpRequest.getDefinitionSoruce());
-        asccWriteRepository.createAscc(dataAreaAsccRequest);
+                asccWriteRepository.createAscc(dataAreaAsccRequest);
 
-        CreateAsccpRepositoryRequest bodAsccpRequest = new CreateAsccpRepositoryRequest(user, bodAccManifestId, releaseId);
-        bodAsccpRequest.setInitialPropertyTerm(bodAccRequest.getInitialObjectClassTerm());
-        bodAsccpRequest.setNamespaceId(namespaceId);
-        BigInteger bodAsccpManifestId = asccpWriteRepository.createAsccp(bodAsccpRequest).getAsccpManifestId();
+                CreateAsccpRepositoryRequest bodAsccpRequest = new CreateAsccpRepositoryRequest(user, bodAccManifestId, releaseId);
+                bodAsccpRequest.setInitialPropertyTerm(bodAccRequest.getInitialObjectClassTerm());
+                bodAsccpRequest.setNamespaceId(namespaceId);
+                BigInteger bodAsccpManifestId = asccpWriteRepository.createAsccp(bodAsccpRequest).getAsccpManifestId();
+                bodManifestIdList.add(bodAsccpManifestId);
+            }
+        }
 
-        return bodAsccpManifestId;
+        return bodManifestIdList;
     }
 
     @Transactional
@@ -1157,10 +1469,88 @@ public class CcNodeService extends EventHandler {
         fireEvent(new RefactorBccEvent());
     }
 
+    public CcRefactorValidationResponse validateBccRefactoring(AuthenticatedPrincipal user, BigInteger bccManifestId, BigInteger destinationAccManifestId) {
+        AppUser requester = sessionService.getAppUser(user);
+
+        return bccReadRepository.validateBccRefactoring(requester, bccManifestId, destinationAccManifestId);
+    }
+
+    public CcRefactorValidationResponse validateAsccRefactoring(AuthenticatedPrincipal user, BigInteger asccManifestId, BigInteger destinationAccManifestId) {
+        AppUser requester = sessionService.getAppUser(user);
+
+        return asccReadRepository.validateAsccRefactoring(requester, asccManifestId, destinationAccManifestId);
+    }
+
     public List<CcList> getBaseAccList(AuthenticatedPrincipal user, BigInteger accManifestId) {
 
         AccManifestRecord accManifestRecord = accReadRepository.getAccManifest(accManifestId);
         return accReadRepository.getBaseAccList(accManifestRecord.getAccManifestId().toBigInteger(), accManifestRecord.getReleaseId().toBigInteger());
     }
-}
 
+    @Transactional
+    public CcUngroupResponse ungroup(AuthenticatedPrincipal user, CcUngroupRequest request) {
+        AccManifestRecord accManifestRecord = accReadRepository.getAccManifest(request.getAccManifestId());
+        AccRecord accRecord = accReadRepository.getAccByManifestId(request.getAccManifestId());
+        if (accRecord == null) {
+            throw new IllegalArgumentException("'accManifestId' parameter must not be null.");
+        }
+
+        AsccManifestRecord asccManifestRecord = asccReadRepository.getAsccManifestById(request.getAsccManifestId());
+        AsccRecord asccRecord = asccReadRepository.getAsccByManifestId(request.getAsccManifestId());
+        if (asccRecord == null) {
+            throw new IllegalArgumentException("'asccManifestId' parameter must not be null.");
+        }
+
+        AsccpManifestRecord asccpManifestRecord =
+                asccpReadRepository.getAsccpManifestById(asccManifestRecord.getToAsccpManifestId().toBigInteger());
+        AccManifestRecord roleOfAccManifestRecord =
+                accReadRepository.getAccManifest(asccpManifestRecord.getRoleOfAccManifestId().toBigInteger());
+
+        Stack<AccManifestRecord> accManifestRecordStack = new Stack();
+        accManifestRecordStack.add(roleOfAccManifestRecord);
+
+        while (roleOfAccManifestRecord.getBasedAccManifestId() != null) {
+            roleOfAccManifestRecord = accReadRepository.getAccManifest(
+                    roleOfAccManifestRecord.getBasedAccManifestId().toBigInteger());
+            accManifestRecordStack.add(roleOfAccManifestRecord);
+        }
+
+        String logHash = LogUtils.generateHash();
+
+        while (!accManifestRecordStack.isEmpty()) {
+            roleOfAccManifestRecord = accManifestRecordStack.pop();
+
+            CoreComponentGraphContext coreComponentGraphContext =
+                    graphContextRepository.buildGraphContext(roleOfAccManifestRecord);
+            List<Node> children = coreComponentGraphContext.findChildren(
+                    coreComponentGraphContext.toNode(roleOfAccManifestRecord), true);
+
+            int pos = request.getPos();
+            for (Node child : children) {
+                if (child.getType() == Node.NodeType.ASCC) {
+                    AsccManifestRecord asccChild =
+                            asccReadRepository.getAsccManifestById(child.getManifestId().toBigInteger());
+
+                    appendAsccp(user, accManifestRecord.getReleaseId().toBigInteger(),
+                            accManifestRecord.getAccManifestId().toBigInteger(),
+                            asccChild.getToAsccpManifestId().toBigInteger(), pos, logHash, LogAction.IGNORE);
+                } else if (child.getType() == Node.NodeType.BCC) {
+                    BccManifestRecord bccChild =
+                            bccReadRepository.getBccManifestById(child.getManifestId().toBigInteger());
+
+                    appendBccp(user, accManifestRecord.getReleaseId().toBigInteger(),
+                            accManifestRecord.getAccManifestId().toBigInteger(),
+                            bccChild.getToBccpManifestId().toBigInteger(), pos, logHash, LogAction.IGNORE);
+                }
+
+                pos++;
+            }
+        }
+
+        deleteAscc(user, asccManifestRecord.getAsccManifestId().toBigInteger(), logHash, LogAction.Ungrouped, false);
+
+        CcUngroupResponse response = new CcUngroupResponse();
+        response.setAccManifestId(accManifestRecord.getAccManifestId().toBigInteger());
+        return response;
+    }
+}

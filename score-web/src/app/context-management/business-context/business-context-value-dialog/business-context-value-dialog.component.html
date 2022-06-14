@@ -10,9 +10,11 @@
       <mat-form-field>
         <mat-label>Context Category</mat-label>
         <mat-select [(ngModel)]="businessContextValue.contextCategoryId" (selectionChange)="onCtxCategoryChange()">
-          <ngx-mat-select-search [formControl]="contextCategoryListFilterCtrl"
-                                 [placeholderLabel]="'Search...'"
-                                 [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+          <mat-option>
+            <ngx-mat-select-search [formControl]="contextCategoryListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+          </mat-option>
           <mat-option *ngFor="let contextCategory of filteredContextCategoryList | async" [value]="contextCategory.contextCategoryId">
             {{ contextCategory.name }}
           </mat-option>
@@ -30,9 +32,11 @@
         <mat-label>Context Scheme</mat-label>
         <mat-select [disabled]="businessContextValue.contextCategoryId === undefined" placeholder="Context Scheme" required
                     [(ngModel)]="businessContextValue.contextSchemeId" (selectionChange)="onCtxSchemeChange()">
-          <ngx-mat-select-search [formControl]="contextSchemeListFilterCtrl"
-                                 [placeholderLabel]="'Search...'"
-                                 [noEntriesFoundLabel]="'No matching context scheme found.'"></ngx-mat-select-search>
+          <mat-option>
+            <ngx-mat-select-search [formControl]="contextSchemeListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching context scheme found.'"></ngx-mat-select-search>
+          </mat-option>
           <mat-option *ngFor="let contextScheme of filteredContextSchemeList | async" [value]="contextScheme.contextSchemeId">
             {{ contextScheme.schemeName }}
           </mat-option>
@@ -70,9 +74,11 @@
         <mat-label>Context Scheme Value</mat-label>
         <mat-select [disabled]="businessContextValue.contextSchemeId === undefined" placeholder="Context Scheme Value" required
                     [(ngModel)]="businessContextValue.contextSchemeValueId" (selectionChange)="onCtxSchemeValueChange()">
-          <ngx-mat-select-search [formControl]="contextSchemeValueListFilterCtrl"
-                                 [placeholderLabel]="'Search...'"
-                                 [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
+          <mat-option>
+            <ngx-mat-select-search [formControl]="contextSchemeValueListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
+          </mat-option>
           <mat-option *ngFor="let contextSchemeValue of filteredContextSchemeValueList | async" [value]="contextSchemeValue.contextSchemeValueId">
             {{ contextSchemeValue.value }}
           </mat-option>

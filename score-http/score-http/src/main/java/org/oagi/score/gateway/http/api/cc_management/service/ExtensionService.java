@@ -354,6 +354,28 @@ public class ExtensionService {
     }
 
     @Transactional
+    public void purgeExtension(AuthenticatedPrincipal user, BigInteger manifestId) {
+
+        AccManifestRecord extensionAccManifestRecord = dslContext.selectFrom(ACC_MANIFEST)
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
+                .fetchOne();
+
+        AsccpManifestRecord groupAsccpManifestRecord = dslContext.selectFrom(ASCCP_MANIFEST)
+                .where(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(extensionAccManifestRecord.getAccManifestId()))
+                .fetchOne();
+
+        AsccManifestRecord asccManifestRecord = dslContext.selectFrom(ASCC_MANIFEST)
+                .where(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(groupAsccpManifestRecord.getAsccpManifestId()))
+                .fetchOne();
+
+        ccNodeService.deleteAscc(user, asccManifestRecord.getAsccManifestId().toBigInteger(), true);
+
+        ccNodeService.purgeAsccp(user, groupAsccpManifestRecord.getAsccpManifestId().toBigInteger(), true);
+
+        ccNodeService.purgeAcc(user, manifestId);
+    }
+
+    @Transactional
     public ExtensionUpdateResponse updateDetails(AuthenticatedPrincipal user, ExtensionUpdateRequest request) {
         ExtensionUpdateResponse response = new ExtensionUpdateResponse();
 

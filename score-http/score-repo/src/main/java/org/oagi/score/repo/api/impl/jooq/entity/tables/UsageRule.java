@@ -4,9 +4,6 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
@@ -28,10 +25,10 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UsageRuleRecord;
 
 
 /**
- * This table captures a usage rule information. A usage rule may be expressed 
- * in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION 
- * table. To capture a description of a usage rule, create a usage rule expression 
- * with the unstructured constraint type.
+ * This table captures a usage rule information. A usage rule may be expressed
+ * in multiple expressions. Each expression is captured in the
+ * USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create
+ * a usage rule expression with the unstructured constraint type.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsageRule extends TableImpl<UsageRuleRecord> {
@@ -52,17 +49,21 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     }
 
     /**
-     * The column <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the usage rule.
+     * The column <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * usage rule.
      */
     public final TableField<UsageRuleRecord, ULong> USAGE_RULE_ID = createField(DSL.name("usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the usage rule.");
 
     /**
-     * The column <code>oagi.usage_rule.name</code>. Short nmenomic name of the usage rule.
+     * The column <code>oagi.usage_rule.name</code>. Short nmenomic name of the
+     * usage rule.
      */
     public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB, this, "Short nmenomic name of the usage rule.");
 
     /**
-     * The column <code>oagi.usage_rule.condition_type</code>. Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.
+     * The column <code>oagi.usage_rule.condition_type</code>. Condition type
+     * according to the CC specification. It is a value list column. 0 =
+     * pre-condition, 1 = post-condition, 2 = invariant.
      */
     public final TableField<UsageRuleRecord, Integer> CONDITION_TYPE = createField(DSL.name("condition_type"), SQLDataType.INTEGER.nullable(false), this, "Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.");
 
@@ -101,7 +102,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -112,11 +113,6 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     @Override
     public UniqueKey<UsageRuleRecord> getPrimaryKey() {
         return Keys.KEY_USAGE_RULE_PRIMARY;
-    }
-
-    @Override
-    public List<UniqueKey<UsageRuleRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsageRuleRecord>>asList(Keys.KEY_USAGE_RULE_PRIMARY);
     }
 
     @Override

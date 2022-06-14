@@ -9,6 +9,7 @@ import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 import org.oagi.score.repo.api.user.model.GetScoreUserRequest;
 import org.oagi.score.repo.api.user.model.GetScoreUserResponse;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
@@ -19,8 +20,7 @@ import java.util.List;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 
 public class JooqScoreUserReadRepository
         extends JooqScoreRepository
@@ -32,19 +32,26 @@ public class JooqScoreUserReadRepository
 
     private SelectJoinStep select() {
         return dslContext().select(
-                APP_USER.APP_USER_ID,
-                APP_USER.LOGIN_ID,
-                APP_USER.IS_DEVELOPER)
+                        APP_USER.APP_USER_ID,
+                        APP_USER.LOGIN_ID,
+                        APP_USER.IS_DEVELOPER,
+                        APP_USER.IS_ADMIN)
                 .from(APP_USER)
                 .leftJoin(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID));
     }
 
     private RecordMapper<Record, ScoreUser> mapper() {
         return record -> {
-            ScoreUser user = new ScoreUser(
+            ScoreRole userRole = (byte) 1 == record.get(APP_USER.IS_DEVELOPER) ? DEVELOPER : END_USER;
+            boolean isAdmin = (byte) 1 == record.get(APP_USER.IS_ADMIN);
+            ScoreUser user = (isAdmin) ? new ScoreUser(
                     record.get(APP_USER.APP_USER_ID).toBigInteger(),
                     record.get(APP_USER.LOGIN_ID),
-                    Arrays.asList((byte) 1 == record.get(APP_USER.IS_DEVELOPER) ? DEVELOPER : END_USER)
+                    Arrays.asList(userRole, ADMINISTRATOR)
+            ) : new ScoreUser(
+                    record.get(APP_USER.APP_USER_ID).toBigInteger(),
+                    record.get(APP_USER.LOGIN_ID),
+                    Arrays.asList(userRole)
             );
             return user;
         };

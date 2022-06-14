@@ -54,7 +54,7 @@ export class ModuleSetListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
-    this.displayedColumns = (this.role === 'developer') ? [
+    this.displayedColumns = (this.roles.includes('developer')) ? [
       'name', 'description', 'lastUpdateTimestamp', 'more'
     ] : [
       'name', 'description', 'lastUpdateTimestamp'
@@ -89,9 +89,9 @@ export class ModuleSetListComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
-  get role(): string {
+  get roles(): string[] {
     const userToken = this.userToken;
-    return (userToken) ? userToken.role : undefined;
+    return (userToken) ? userToken.roles : [];
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

@@ -10,22 +10,16 @@ public class CreateBdtRepositoryRequest extends RepositoryRequest {
 
     private final BigInteger basedDdtManifestId;
     private final BigInteger releaseId;
+    private final BigInteger specId;
 
     private String initialPropertyTerm = "Property Term";
 
     public CreateBdtRepositoryRequest(AuthenticatedPrincipal user,
-                                      BigInteger basedDdtManifestId, BigInteger releaseId) {
+                                      BigInteger basedDdtManifestId, BigInteger releaseId, BigInteger specId) {
         super(user);
         this.basedDdtManifestId = basedDdtManifestId;
         this.releaseId = releaseId;
-    }
-
-    public CreateBdtRepositoryRequest(AuthenticatedPrincipal user,
-                                      LocalDateTime localDateTime,
-                                      BigInteger basedDdtManifestId, BigInteger releaseId) {
-        super(user, localDateTime);
-        this.basedDdtManifestId = basedDdtManifestId;
-        this.releaseId = releaseId;
+        this.specId = specId;
     }
 
     public BigInteger getBasedDdtManifestId() {
@@ -34,6 +28,10 @@ public class CreateBdtRepositoryRequest extends RepositoryRequest {
 
     public BigInteger getReleaseId() {
         return releaseId;
+    }
+
+    public BigInteger getSpecId() {
+        return specId;
     }
 
     public String getInitialPropertyTerm() {

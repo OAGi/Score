@@ -9,7 +9,7 @@ export class AccountListRequest {
     name: string;
     organization: string;
     status: string[];
-    role: string;
+    roles: string[];
     excludeSSO: boolean;
   };
   page: PageRequest = new PageRequest();
@@ -42,7 +42,7 @@ export class AccountListRequest {
       name: params.get('name') || '',
       organization: params.get('organization') || '',
       status: (params.get('status')) ? Array.from(params.get('status').split(',')) : [],
-      role: params.get('role') || '',
+      roles: (params.get('roles')) ? Array.from(params.get('roles').split(',')) : [],
       excludeSSO: false
     };
   }
@@ -66,8 +66,8 @@ export class AccountListRequest {
     if (this.filters.status && this.filters.status.length > 0) {
       params = params.set('status', this.filters.status.join(','));
     }
-    if (this.filters.role && this.filters.role.length > 0) {
-      params = params.set('role', '' + this.filters.role);
+    if (this.filters.roles && this.filters.roles.length > 0) {
+      params = params.set('roles', '' + this.filters.roles);
     }
     if (this.filters.excludeSSO) {
       params = params.set('excludeSSO', '' + this.filters.excludeSSO);
@@ -85,6 +85,7 @@ export class AccountList {
   organization: string;
   enabled: boolean;
   developer: boolean;
+  admin: boolean;
   appOauth2UserId: number;
 }
 

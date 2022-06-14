@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
-import org.oagi.score.gateway.http.api.cc_management.data.CcId;
 import org.oagi.score.gateway.http.api.cc_management.data.CcList;
 import org.oagi.score.gateway.http.api.cc_management.data.CcListRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
@@ -64,8 +63,8 @@ public class CcListRepository {
         if (request.getTypes().isBcc()) {
             select = (select != null) ? select.union(getBccList(request, release, defaultModuleSetReleaseId)) : getBccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isBdt()) {
-            select = (select != null) ? select.union(getBdtList(request, release, defaultModuleSetReleaseId)) : getBdtList(request, release, defaultModuleSetReleaseId);
+        if (request.getTypes().isDt()) {
+            select = (select != null) ? select.union(getDtList(request, release, defaultModuleSetReleaseId)) : getDtList(request, release, defaultModuleSetReleaseId);
         }
 
         if (select == null) {
@@ -96,7 +95,7 @@ public class CcListRepository {
                 field = field("owner");
                 break;
             case "module":
-                field = field(MODULE.PATH);
+                field = field("module_path");
                 break;
             case "lastUpdateTimestamp":
                 field = field("last_update_timestamp");
@@ -128,7 +127,7 @@ public class CcListRepository {
             }
         }
 
-        List<CcList> result = ((offsetStep != null) ? offsetStep.fetch() : select.fetch()).map(row -> {
+        List<CcList> result = ((offsetStep != null) ? offsetStep.fetch() : select.fetch()).map((RecordMapper<Record, CcList>) row -> {
             CcList ccList = new CcList();
             ccList.setType(CcType.valueOf(row.getValue("type", String.class)));
             ccList.setManifestId(row.getValue("manifest_id", ULong.class).toBigInteger());
@@ -141,9 +140,8 @@ public class CcListRepository {
             ccList.setName(row.getValue("term", String.class));
             Integer componentType = row.getValue("oagis_component_type", Integer.class);
             if (componentType != null) {
-                ccList.setOagisComponentType(OagisComponentType.valueOf(componentType));
+                ccList.setOagisComponentType(valueOf(componentType));
             }
-            ccList.setDtType(row.getValue("dt_type", String.class));
             ccList.setState(CcState.valueOf(row.getValue("state", String.class)));
             ccList.setDeprecated(row.getValue("is_deprecated", Byte.class) == 1);
             ccList.setLastUpdateTimestamp(Date.from(row.getValue("last_update_timestamp", LocalDateTime.class)
@@ -153,6 +151,15 @@ public class CcListRepository {
             ccList.setLastUpdateUser((String) row.getValue("last_update_user"));
             ccList.setRevision(row.getValue(LOG.REVISION_NUM).toString());
             ccList.setReleaseNum(row.getValue(RELEASE.RELEASE_NUM));
+            ULong basedManifestId = row.getValue("based_manifest_id", ULong.class);
+            if (basedManifestId != null) {
+                ccList.setBasedManifestId(basedManifestId.toBigInteger());
+                ccList.setDtType(ccList.getType() == CcType.DT ? "BDT" : "");
+            } else {
+                ccList.setDtType(ccList.getType() == CcType.DT ? "CDT" : "");
+            }
+            ccList.setSixDigitId(row.getValue("six_digit_id", String.class));
+            ccList.setDefaultValueDomain(row.getValue("default_value_domain", String.class));
             return ccList;
         });
 
@@ -295,7 +302,6 @@ public class CcListRepository {
                 ACC.DEFINITION_SOURCE,
                 ACC.OBJECT_CLASS_TERM.as("term"),
                 ACC.OAGIS_COMPONENT_TYPE.as("oagis_component_type"),
-                val((String) null).as("dt_type"),
                 ACC.STATE,
                 ACC.IS_DEPRECATED,
                 ACC.LAST_UPDATE_TIMESTAMP,
@@ -305,7 +311,10 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                ACC_MANIFEST.BASED_ACC_MANIFEST_ID.as("based_manifest_id"),
+                val((String) null).as("six_digit_id"),
+                val((String) null).as("default_value_domain"))
                 .from(ACC)
                 .join(ACC_MANIFEST)
                 .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID).and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -374,7 +383,6 @@ public class CcListRepository {
                 ASCC.DEFINITION_SOURCE,
                 val((String) null).as("term"),
                 val((Integer) null).as("oagis_component_type"),
-                val((String) null).as("dt_type"),
                 ACC.STATE,
                 ASCC.IS_DEPRECATED,
                 ASCC.LAST_UPDATE_TIMESTAMP,
@@ -384,7 +392,10 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                val((Integer) null).as("based_manifest_id"),
+                val((String) null).as("six_digit_id"),
+                val((String) null).as("default_value_domain"))
                 .from(ASCC)
                 .join(ASCC_MANIFEST)
                 .on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID).and(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -459,7 +470,6 @@ public class CcListRepository {
                 BCC.DEFINITION_SOURCE,
                 val((String) null).as("term"),
                 val((Integer) null).as("oagis_component_type"),
-                val((String) null).as("dt_type"),
                 ACC.STATE,
                 BCC.IS_DEPRECATED,
                 BCC.LAST_UPDATE_TIMESTAMP,
@@ -469,7 +479,10 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                val((Integer) null).as("based_manifest_id"),
+                val((String) null).as("six_digit_id"),
+                val((String) null).as("default_value_domain"))
                 .from(BCC)
                 .join(BCC_MANIFEST)
                 .on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID).and(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -550,7 +563,6 @@ public class CcListRepository {
                 ASCCP.DEFINITION_SOURCE,
                 ASCCP.PROPERTY_TERM.as("term"),
                 val((Integer) null).as("oagis_component_type"),
-                val((String) null).as("dt_type"),
                 ASCCP.STATE,
                 ASCCP.IS_DEPRECATED,
                 ASCCP.LAST_UPDATE_TIMESTAMP,
@@ -560,7 +572,10 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                val((Integer) null).as("based_manifest_id"),
+                val((String) null).as("six_digit_id"),
+                val((String) null).as("default_value_domain"))
                 .from(ASCCP)
                 .join(ASCCP_MANIFEST)
                 .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID).and(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -632,7 +647,6 @@ public class CcListRepository {
                 BCCP.DEFINITION_SOURCE,
                 BCCP.PROPERTY_TERM.as("term"),
                 val((Integer) null).as("oagis_component_type"),
-                val((String) null).as("dt_type"),
                 BCCP.STATE,
                 BCCP.IS_DEPRECATED,
                 BCCP.LAST_UPDATE_TIMESTAMP,
@@ -642,7 +656,10 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                val((Integer) null).as("based_manifest_id"),
+                val((String) null).as("six_digit_id"),
+                val((String) null).as("default_value_domain"))
                 .from(BCCP)
                 .join(BCCP_MANIFEST)
                 .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID).and(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -661,12 +678,29 @@ public class CcListRepository {
                 .where(conditions);
     }
 
-    public SelectOrderByStep getBdtList(CcListRequest request, Release release, ULong defaultModuleSetReleaseId) {
+    public SelectOrderByStep getDtList(CcListRequest request, Release release, ULong defaultModuleSetReleaseId) {
         AppUser appUserOwner = APP_USER.as("owner");
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
         conditions.add(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
+        if (request.getDtTypes() != null && !request.getDtTypes().isEmpty()) {
+            List<String> dtTypes = request.getDtTypes().stream()
+                    .filter(e -> "CDT".equals(e) || "BDT".equals(e))
+                    .collect(Collectors.toList());
+
+            if (dtTypes.size() == 1) {
+                String dtType = dtTypes.get(0);
+                switch (dtType) {
+                    case "CDT":
+                        conditions.add(DT.BASED_DT_ID.isNull());
+                        break;
+                    case "BDT":
+                        conditions.add(DT.BASED_DT_ID.isNotNull());
+                        break;
+                }
+            }
+        }
         if (request.getDeprecated() != null) {
             conditions.add(DT.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
@@ -692,15 +726,6 @@ public class CcListRepository {
         if (StringUtils.hasLength(request.getModule())) {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
-        if (!request.getDtTypes().isEmpty()) {
-            if (request.getDtTypes().size() == 1) {
-                conditions.add(DT.TYPE.eq(request.getDtTypes().get(0)));
-            } else {
-                conditions.add(DT.TYPE.in(request.getDtTypes()));
-            }
-        } else {
-            conditions.add(DT.TYPE.notEqual(DTType.Core.toString()));
-        }
         if (request.getCommonlyUsed() != null) {
             conditions.add(DT.COMMONLY_USED.eq((byte) (request.getCommonlyUsed() ? 1 : 0)));
         }
@@ -712,7 +737,7 @@ public class CcListRepository {
         }
 
         return dslContext.select(
-                inline("BDT").as("type"),
+                inline("DT").as("type"),
                 DT_MANIFEST.DT_MANIFEST_ID.as("manifest_id"),
                 DT.DT_ID.as("id"),
                 DT.GUID,
@@ -721,7 +746,6 @@ public class CcListRepository {
                 DT.DEFINITION_SOURCE,
                 DT.DATA_TYPE_TERM.as("term"),
                 val((Integer) null).as("oagis_component_type"),
-                DT.TYPE.as("dt_type"),
                 DT.STATE,
                 DT.IS_DEPRECATED,
                 DT.LAST_UPDATE_TIMESTAMP,
@@ -731,7 +755,13 @@ public class CcListRepository {
                 appUserUpdater.LOGIN_ID.as("last_update_user"),
                 LOG.REVISION_NUM,
                 LOG.REVISION_TRACKING_NUM,
-                RELEASE.RELEASE_NUM)
+                RELEASE.RELEASE_NUM,
+                DT_MANIFEST.BASED_DT_MANIFEST_ID.as("based_manifest_id"),
+                DT.SIX_DIGIT_ID,
+                concat(ifnull(CDT_PRI.NAME, ""),
+                ifnull(CODE_LIST.NAME, ""),
+                ifnull(AGENCY_ID_LIST.NAME, ""),
+                ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain"))
                 .from(DT)
                 .join(DT_MANIFEST)
                 .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID).and(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -747,6 +777,14 @@ public class CcListRepository {
                 .on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID), MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_DT_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
+                .leftJoin(BDT_PRI_RESTRI).on(and(DT.DT_ID.eq(BDT_PRI_RESTRI.BDT_ID), BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)))
+                .leftJoin(CODE_LIST).on(BDT_PRI_RESTRI.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .leftJoin(AGENCY_ID_LIST).on(BDT_PRI_RESTRI.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP).on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
+                .leftJoin(CDT_AWD_PRI).on(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI.CDT_AWD_PRI_ID))
+                .leftJoin(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .leftJoin(CDT_AWD_PRI.as("awd_pri_for_cdt")).on(and(DT.DT_ID.eq(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_ID), CDT_AWD_PRI.as("awd_pri_for_cdt").IS_DEFAULT.eq((byte) 1)))
+                .leftJoin(CDT_PRI.as("pri_for_cdt")).on(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_PRI_ID.eq(CDT_PRI.as("pri_for_cdt").CDT_PRI_ID))
                 .where(conditions);
     }
 }

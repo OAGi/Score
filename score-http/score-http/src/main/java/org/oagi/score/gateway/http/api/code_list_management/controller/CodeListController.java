@@ -181,14 +181,14 @@ public class CodeListController {
             @RequestParam(name = "releaseId") long releaseId,
             @RequestParam(name = "codeListManifestId", required = false) Long codeListManifestId,
             @RequestParam(name = "listId") String listId,
-            @RequestParam(name = "agencyId") Long agencyId,
+            @RequestParam(name = "agencyIdListValueManifestId") Long agencyIdListValueManifestId,
             @RequestParam(name = "versionId") String versionId) {
 
         SameCodeListParams params = new SameCodeListParams();
         params.setReleaseId(releaseId);
         params.setCodeListManifestId(codeListManifestId);
         params.setListId(listId);
-        params.setAgencyId(agencyId);
+        params.setAgencyIdListValueManifestId(agencyIdListValueManifestId);
         params.setVersionId(versionId);
 
         return service.hasSameCodeList(params);

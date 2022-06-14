@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-gateway</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <packaging>pom</packaging>
 
     <name>score-gateway</name>
@@ -16,7 +16,6 @@
         <module>score-repo</module>
         <module>score-service</module>
         <module>score-http</module>
-        <module>score-export</module>
     </modules>
 
     <properties>

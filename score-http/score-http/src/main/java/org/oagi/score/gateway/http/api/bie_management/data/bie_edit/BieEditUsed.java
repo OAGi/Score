@@ -11,5 +11,6 @@ public class BieEditUsed {
     private BigInteger bieId;
     private BigInteger manifestId;
     private String type;
+    private BigInteger ownerTopLevelAsbiepId;
 
 }

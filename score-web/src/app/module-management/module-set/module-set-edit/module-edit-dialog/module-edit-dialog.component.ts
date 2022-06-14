@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {sha256} from '../../../../common/utility';
+import {hashCode, sha256} from '../../../../common/utility';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
 import {ModuleElement} from '../../../domain/module';
@@ -37,7 +37,7 @@ export class ModuleEditDialogComponent implements OnInit {
     this.$hashCode = sha256(JSON.stringify({
       'name': this.element.name,
       'versionNum': this.element.versionNum,
-      'namespaceId': this.element.namespaceId,
+      'namespaceId': (!!this.element.namespaceId) ? this.element.namespaceId : undefined
     }));
 
     this.namespaceService.getSimpleNamespaces().subscribe(resp => {
@@ -61,8 +61,7 @@ export class ModuleEditDialogComponent implements OnInit {
     if (this.element.name.length === 0) {
       return false;
     }
-    return !(!this.element.directory && !this.element.namespaceId);
-
+    return true;
   }
 
   cancel() {
@@ -73,12 +72,11 @@ export class ModuleEditDialogComponent implements OnInit {
     return this.$hashCode !== sha256(JSON.stringify({
       'name': this.element.name,
       'versionNum': this.element.versionNum,
-      'namespaceId': this.element.namespaceId,
-    }))
+      'namespaceId': (!!this.element.namespaceId) ? this.element.namespaceId : undefined,
+    }));
   }
 
   deleteModule() {
-
     if (this.element.directory) {
       const dialogConfig = this.confirmDialogService.newConfig();
       dialogConfig.data.header = 'Discard directory';

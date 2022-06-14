@@ -29,7 +29,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
 
 
 /**
- * This table represents a business context. A business context is a combination 
+ * This table represents a business context. A business context is a combination
  * of one or more business context values.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -51,37 +51,45 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     }
 
     /**
-     * The column <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal database key.
+     * The column <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal
+     * database key.
      */
     public final TableField<BizCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.biz_ctx.guid</code>. A globally unique identifier (GUID).
+     * The column <code>oagi.biz_ctx.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public final TableField<BizCtxRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.biz_ctx.name</code>. Short, descriptive name of the business context.
+     * The column <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
+     * business context.
      */
     public final TableField<BizCtxRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Short, descriptive name of the business context.");
 
     /**
-     * The column <code>oagi.biz_ctx.created_by</code>. Foreign key to the APP_USER table referring to the user who creates the entity. 
+     * The column <code>oagi.biz_ctx.created_by</code>. Foreign key to the
+     * APP_USER table referring to the user who creates the entity. 
      */
     public final TableField<BizCtxRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the entity. ");
 
     /**
-     * The column <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the APP_USER table  referring to the last user who has updated the business context.
+     * The column <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the
+     * APP_USER table  referring to the last user who has updated the business
+     * context.
      */
     public final TableField<BizCtxRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table  referring to the last user who has updated the business context.");
 
     /**
-     * The column <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when the business context record was first created. 
+     * The column <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when
+     * the business context record was first created. 
      */
     public final TableField<BizCtxRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the business context record was first created. ");
 
     /**
-     * The column <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp when the business context was last updated.
+     * The column <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp
+     * when the business context was last updated.
      */
     public final TableField<BizCtxRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the business context was last updated.");
 
@@ -120,7 +128,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -134,18 +142,22 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     }
 
     @Override
-    public List<UniqueKey<BizCtxRecord>> getKeys() {
-        return Arrays.<UniqueKey<BizCtxRecord>>asList(Keys.KEY_BIZ_CTX_PRIMARY, Keys.KEY_BIZ_CTX_BIZ_CTX_UK1);
+    public List<UniqueKey<BizCtxRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_BIZ_CTX_BIZ_CTX_UK1);
     }
 
     @Override
     public List<ForeignKey<BizCtxRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<BizCtxRecord, ?>>asList(Keys.BIZ_CTX_CREATED_BY_FK, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.BIZ_CTX_CREATED_BY_FK, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
     }
 
     private transient AppUser _bizCtxCreatedByFk;
     private transient AppUser _bizCtxLastUpdatedByFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>biz_ctx_created_by_fk</code> key.
+     */
     public AppUser bizCtxCreatedByFk() {
         if (_bizCtxCreatedByFk == null)
             _bizCtxCreatedByFk = new AppUser(this, Keys.BIZ_CTX_CREATED_BY_FK);
@@ -153,6 +165,10 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         return _bizCtxCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>biz_ctx_last_updated_by_fk</code> key.
+     */
     public AppUser bizCtxLastUpdatedByFk() {
         if (_bizCtxLastUpdatedByFk == null)
             _bizCtxLastUpdatedByFk = new AppUser(this, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);

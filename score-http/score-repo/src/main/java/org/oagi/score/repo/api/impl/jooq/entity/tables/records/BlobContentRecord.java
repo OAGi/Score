@@ -14,8 +14,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContent;
 
 
 /**
- * This table stores schemas whose content is only imported as a whole and 
- * is represented in Blob.
+ * This table stores schemas whose content is only imported as a whole and is
+ * represented in Blob.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> implements Record2<ULong, byte[]> {
@@ -23,28 +23,32 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.blob_content.blob_content_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.blob_content.blob_content_id</code>. Primary,
+     * internal database key.
      */
     public void setBlobContentId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content.blob_content_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.blob_content.blob_content_id</code>. Primary,
+     * internal database key.
      */
     public ULong getBlobContentId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.blob_content.content</code>. The Blob content of the schema file.
+     * Setter for <code>oagi.blob_content.content</code>. The Blob content of
+     * the schema file.
      */
     public void setContent(byte[] value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content.content</code>. The Blob content of the schema file.
+     * Getter for <code>oagi.blob_content.content</code>. The Blob content of
+     * the schema file.
      */
     public byte[] getContent() {
         return (byte[]) get(1);

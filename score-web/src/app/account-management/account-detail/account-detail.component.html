@@ -15,13 +15,22 @@
                  [(ngModel)]="account.loginId" disabled maxlength="255"/>
         </mat-form-field>
 
-        <div class="checkbox">
-          <mat-checkbox color="primary"
-                        data-id="user.developer"
-                        [disabled]="true"
-                        [(ngModel)]="account.developer">
-            OAGIS Developer
-          </mat-checkbox>
+        <div class="col-6">
+          <div class="checkbox">
+            <mat-checkbox color="primary"
+                          data-id="user.developer"
+                          [disabled]="true"
+                          [(ngModel)]="account.developer">
+              OAGIS Developer
+            </mat-checkbox>
+          </div>
+          <div class="checkbox">
+            <mat-checkbox color="primary"
+                          data-id="user.admin"
+                          [(ngModel)]="account.admin">
+              Admin
+            </mat-checkbox>
+          </div>
         </div>
 
         <mat-form-field>

@@ -32,7 +32,7 @@
                 [routerLink]="['/code_list']"
                 [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
         >View/Edit Code List</button>
-        <button mat-menu-item routerLink="code_list/uplift" [disabled]="role === 'developer'">Uplift Code List</button>
+        <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer')">Uplift Code List</button>
       </ng-template>
     </mat-menu>
 
@@ -51,26 +51,25 @@
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
         <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
         <!-- TODO: temporary hide AgencyIdList -->
-<!--        <button mat-menu-item routerLink="agency_id_list">View/Edit Agency Id List</button>-->
+        <button mat-menu-item routerLink="agency_id_list">View/Edit Agency ID List</button>
         <button mat-menu-item routerLink="release">View/Edit Release</button>
         <button mat-menu-item routerLink="namespace">View/Edit Namespace</button>
       </ng-template>
     </mat-menu>
 
-    <!-- TODO: temporary hide Module -->
-<!--    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>-->
+    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
     <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="module_management/module_set">
-          {{ (role === 'developer') ? 'View/Edit Module Set' : 'View Module Set' }}
+          {{ (roles.includes('developer')) ? 'View/Edit Module Set' : 'View Module Set' }}
         </button>
         <button mat-menu-item routerLink="module_management/module_set_release">
-          {{ (role === 'developer') ? 'View/Edit Module Set Release' : 'View Module Set Release' }}
+          {{ (roles.includes('developer')) ? 'View/Edit Module Set Release' : 'View Module Set Release' }}
         </button>
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="role === 'developer'">Admin</button>
+    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="roles.includes('admin')">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
@@ -99,7 +98,7 @@
                 matTooltipPosition="below">{{ notiMatIcon }}</mat-icon>
     </button>
 
-    <button mat-button [matMenuTriggerFor]="settingMenu">{{ username }}</button>
+    <button mat-button [matMenuTriggerFor]="settingMenu">{{ username }} ({{ isDeveloper ? 'developer' : 'end-user' }})</button>
     <mat-menu #settingMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item class="disabled" disabled="disabled">Signed in as {{ username }}</button>
@@ -115,7 +114,7 @@
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="settings" *ngIf="userToken.role">Settings</button>
+        <button mat-menu-item routerLink="settings" *ngIf="roles.length > 0">Settings</button>
         <button mat-menu-item (click)="logout()">Logout</button>
       </ng-template>
     </mat-menu>

@@ -204,6 +204,8 @@ export class ModuleSetModule {
 export class ModuleSetRelease {
   moduleSetReleaseId: number;
 
+  moduleSetReleaseName: string;
+
   moduleSetId: number;
   /* moduleSet */
   moduleSetName: string;
@@ -223,6 +225,8 @@ export class ModuleSetReleaseListRequest {
   filters: {
     name: string;
   };
+  releaseId: number;
+  isDefault: boolean;
   updaterLoginIds: string[] = [];
   updatedDate: {
     start: Date,
@@ -257,6 +261,12 @@ export class ModuleSetReleaseListRequest {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
+    if (params.get('releaseId')) {
+      this.releaseId = Number(params.get('releaseId'));
+    }
+    if (params.get('isDefault')) {
+      this.isDefault = 'true' === params.get('isDefault');
+    }
     this.filters = {
       name: params.get('name') || '',
     };
@@ -280,6 +290,12 @@ export class ModuleSetReleaseListRequest {
     }
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);
+    }
+    if (this.releaseId) {
+      params.set('releaseId', '' + this.releaseId);
+    }
+    if (this.isDefault !== undefined) {
+      params.set('isDefault', (this.isDefault) ? 'true' : 'false');
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

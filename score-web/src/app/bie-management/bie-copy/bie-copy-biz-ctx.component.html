@@ -13,9 +13,11 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
-                  <ngx-mat-select-search [formControl]="updaterUsernameListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterUsernameListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredUpdaterUsernameList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>

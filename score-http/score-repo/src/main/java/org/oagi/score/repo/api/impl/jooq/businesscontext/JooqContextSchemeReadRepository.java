@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.impl.jooq.businesscontext;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -8,6 +9,7 @@ import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.security.AccessControl;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
@@ -23,8 +25,8 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.*;
+import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqContextSchemeReadRepository
         extends JooqScoreRepository
@@ -50,9 +52,11 @@ public class JooqContextSchemeReadRepository
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 CTX_SCHEME.CREATION_TIMESTAMP,
                 CTX_SCHEME.LAST_UPDATE_TIMESTAMP)
                 .from(CTX_SCHEME)
@@ -80,16 +84,33 @@ public class JooqContextSchemeReadRepository
                 contextScheme.setCodeListId(codeListId.toBigInteger());
                 contextScheme.setCodeListName(record.get(CODE_LIST.NAME.as("code_list_name")));
             }
-            contextScheme.setCreatedBy(new ScoreUser(
-                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
-            ));
-            contextScheme.setLastUpdatedBy(new ScoreUser(
-                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
-                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
-                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
-            ));
+
+            ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
+            boolean isCreatorAdmin = (byte) 1 == record.get(APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"));
+            contextScheme.setCreatedBy(
+                    (isCreatorAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    Arrays.asList(creatorRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    creatorRole));
+
+            ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
+            boolean isUpdaterAdmin = (byte) 1 == record.get(APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"));
+            contextScheme.setLastUpdatedBy(
+                    (isUpdaterAdmin) ?
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    Arrays.asList(updaterRole, ADMINISTRATOR)) :
+                            new ScoreUser(
+                                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    updaterRole));
+
             contextScheme.setCreationTimestamp(
                     Date.from(record.get(CTX_CATEGORY.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             contextScheme.setLastUpdateTimestamp(
@@ -98,18 +119,23 @@ public class JooqContextSchemeReadRepository
         };
     }
 
-    private SelectConditionStep selectForValues(BigInteger contextSchemeId) {
+    private SelectHavingStep selectForValues(BigInteger contextSchemeId) {
         return dslContext().select(
                 CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID,
                 CTX_SCHEME_VALUE.GUID,
                 CTX_SCHEME_VALUE.VALUE,
                 CTX_SCHEME_VALUE.MEANING,
                 CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID,
-                BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID)
+                count(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID).as("used_cnt"))
                 .from(CTX_SCHEME_VALUE)
                 .leftJoin(BIZ_CTX_VALUE)
                 .on(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID.eq(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID))
-                .where(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID.eq(ULong.valueOf(contextSchemeId)));
+                .where(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID.eq(ULong.valueOf(contextSchemeId)))
+                .groupBy(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID,
+                        CTX_SCHEME_VALUE.GUID,
+                        CTX_SCHEME_VALUE.VALUE,
+                        CTX_SCHEME_VALUE.MEANING,
+                        CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID);
     }
 
     private RecordMapper<Record, ContextSchemeValue> mapperForValue() {
@@ -120,7 +146,8 @@ public class JooqContextSchemeReadRepository
             contextSchemeValue.setGuid(record.get(CTX_SCHEME_VALUE.GUID));
             contextSchemeValue.setValue(record.get(CTX_SCHEME_VALUE.VALUE));
             contextSchemeValue.setMeaning(record.get(CTX_SCHEME_VALUE.MEANING));
-            contextSchemeValue.setUsed(record.get(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID) != null);
+            Integer usedCnt = record.get("used_cnt", Integer.class);
+            contextSchemeValue.setUsed(usedCnt != null && usedCnt > 0);
             contextSchemeValue.setOwnerContextSchemeId(record.get(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID).toBigInteger());
             return contextSchemeValue;
         };
@@ -340,7 +367,7 @@ public class JooqContextSchemeReadRepository
         }
 
         return new GetContextSchemeValueListResponse(
-                finalStep.fetch(record -> {
+                finalStep.fetch((RecordMapper<Record, ContextSchemeValue>) record -> {
                     ContextSchemeValue contextSchemeValue = new ContextSchemeValue();
                     contextSchemeValue.setContextSchemeValueId(record.get(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID).toBigInteger());
                     contextSchemeValue.setGuid(record.get(CTX_SCHEME_VALUE.GUID));

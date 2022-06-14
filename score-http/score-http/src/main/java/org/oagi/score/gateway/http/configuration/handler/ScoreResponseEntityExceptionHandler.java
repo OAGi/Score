@@ -49,6 +49,16 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity handleIllegalStateException(
+            IllegalStateException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(DataAccessForbiddenException.class)
     public ResponseEntity handleDataAccessForbiddenException(
             DataAccessForbiddenException ex, WebRequest webRequest) {

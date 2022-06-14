@@ -473,6 +473,66 @@ public class BccpWriteRepository {
         return new DeleteBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger());
     }
 
+    public PurgeBccpRepositoryResponse purgeBccp(PurgeBccpRepositoryRequest request) {
+        AppUser user = sessionService.getAppUser(request.getUser());
+        ULong userId = ULong.valueOf(user.getAppUserId());
+        LocalDateTime timestamp = request.getLocalDateTime();
+
+        BccpManifestRecord bccpManifestRecord = dslContext.selectFrom(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(
+                        ULong.valueOf(request.getBccpManifestId())
+                ))
+                .fetchOne();
+
+        BccpRecord bccpRecord = dslContext.selectFrom(BCCP)
+                .where(BCCP.BCCP_ID.eq(bccpManifestRecord.getBccpId()))
+                .fetchOne();
+
+        if (!CcState.Deleted.equals(CcState.valueOf(bccpRecord.getState()))) {
+            throw new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+        }
+
+        List<BccManifestRecord> bccManifestRecords = dslContext.selectFrom(BCC_MANIFEST)
+                .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .fetch();
+        if (!bccManifestRecords.isEmpty()) {
+            throw new IllegalArgumentException("Please purge deleted BCCs used the BCCP '" + bccpRecord.getDen() + "'.");
+        }
+
+        // discard Log
+        ULong logId = bccpManifestRecord.getLogId();
+        dslContext.update(BCCP_MANIFEST)
+                .setNull(BCCP_MANIFEST.LOG_ID)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .execute();
+
+        dslContext.update(LOG)
+                .setNull(LOG.PREV_LOG_ID)
+                .setNull(LOG.NEXT_LOG_ID)
+                .where(LOG.REFERENCE.eq(bccpRecord.getGuid()))
+                .execute();
+
+        dslContext.deleteFrom(LOG)
+                .where(LOG.REFERENCE.eq(bccpRecord.getGuid()))
+                .execute();
+
+        // discard assigned BCCP in modules
+        dslContext.deleteFrom(MODULE_BCCP_MANIFEST)
+                .where(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .execute();
+
+        // discard BCCP
+        dslContext.deleteFrom(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .execute();
+
+        dslContext.deleteFrom(BCCP)
+                .where(BCCP.BCCP_ID.eq(bccpRecord.getBccpId()))
+                .execute();
+
+        return new PurgeBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger());
+    }
+
     public UpdateBccpOwnerRepositoryResponse updateBccpOwner(UpdateBccpOwnerRepositoryRequest request) {
         AppUser user = sessionService.getAppUser(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());

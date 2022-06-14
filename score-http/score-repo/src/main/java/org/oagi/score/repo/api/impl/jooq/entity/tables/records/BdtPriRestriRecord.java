@@ -14,13 +14,13 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri;
 
 
 /**
- * This table captures the allowed primitives for a BDT. The allowed primitives 
- * are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, 
- * and AGENCY_ID_LIST_ID. The first column specifies the primitive by the 
- * built-in type of an expression language such as the XML Schema built-in 
- * type. The second specifies the primitive, which is a code list, while the 
- * last one specifies the primitive which is an agency identification list. 
- * Only one column among the three can have a value in a particular record.
+ * This table captures the allowed primitives for a BDT. The allowed primitives
+ * are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID,
+ * and AGENCY_ID_LIST_ID. The first column specifies the primitive by the
+ * built-in type of an expression language such as the XML Schema built-in type.
+ * The second specifies the primitive, which is a code list, while the last one
+ * specifies the primitive which is an agency identification list. Only one
+ * column among the three can have a value in a particular record.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> implements Record6<ULong, ULong, ULong, ULong, ULong, Byte> {
@@ -28,84 +28,106 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary,
+     * internal database key.
      */
     public void setBdtPriRestriId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary,
+     * internal database key.
      */
     public ULong getBdtPriRestriId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).
+     * Setter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
+     * table. It shall point to only DT that is a BDT (not a CDT).
      */
     public void setBdtId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).
+     * Getter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
+     * table. It shall point to only DT that is a BDT (not a CDT).
      */
     public ULong getBdtId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>. This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.
+     * Setter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
+     * This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows
+     * for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
     public void setCdtAwdPriXpsTypeMapId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>. This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.
+     * Getter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
+     * This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows
+     * for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
     public ULong getCdtAwdPriXpsTypeMapId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to the CODE_LIST table.
+     * Setter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
+     * the CODE_LIST table.
      */
     public void setCodeListId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to the CODE_LIST table.
+     * Getter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
+     * the CODE_LIST table.
      */
     public ULong getCodeListId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.
+     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
+     * BDT content can be restricted to an agency identification.
      */
     public void setAgencyIdListId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.
+     * Getter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
+     * BDT content can be restricted to an agency identification.
      */
     public ULong getAgencyIdListId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.is_default</code>. This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.
+     * Setter for <code>oagi.bdt_pri_restri.is_default</code>. This allows
+     * overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP
+     * table. It typically indicates the most generic primtive for the data
+     * type.
      */
     public void setIsDefault(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.is_default</code>. This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.
+     * Getter for <code>oagi.bdt_pri_restri.is_default</code>. This allows
+     * overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP
+     * table. It typically indicates the most generic primtive for the data
+     * type.
      */
     public Byte getIsDefault() {
         return (Byte) get(5);

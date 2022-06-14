@@ -32,12 +32,19 @@ export class CodeListValueDialogComponent implements OnInit {
     return this.lastRevisionValue !== undefined;
   }
 
-  get revisionDeprecated(): boolean {
+  get derived(): boolean {
+    return !!this.codeListValue.basedCodeListValueManifestId;
+  }
+
+  get wasDeprecated(): boolean {
     return (!!this.lastRevisionValue && this.lastRevisionValue.deprecated);
   }
 
-  get isUsedBefore(): boolean {
-    return (!!this.lastRevisionValue && this.lastRevisionValue.used);
+  get isDeprecatedChangeable(): boolean {
+    if (this.hasRevision && !this.wasDeprecated) {
+      return true;
+    }
+    return false;
   }
 
   onNoClick(): void {
@@ -45,7 +52,7 @@ export class CodeListValueDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.isAvailable(this.codeListValue)) {
+    if (!this.isEditable) {
       this.actionName = 'View';
       return;
     }
@@ -65,15 +72,7 @@ export class CodeListValueDialogComponent implements OnInit {
   }
 
   color(codeListValue: CodeListValue): string {
-    if (codeListValue.locked) {
-      return 'bright-red';
-    }
-
-    if (codeListValue.used) {
-      return 'blue';
-    }
-
-    return 'dull-red';
+    return 'blue';
   }
 
   isDisabledColor(codeListValue: CodeListValue) {

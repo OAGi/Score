@@ -1,6 +1,6 @@
-<div [style.padding-top]="paddingTop">
+<div class="auth-box">
   <div class="auth-form" #authForm (window:resize)="onResize($event)">
-    <form role="form" (submit)="login()" *ngIf="role !== 'pending' && role !== 'reject'">
+    <form role="form" (submit)="login()" *ngIf="!roles.includes('pending') && !roles.includes('reject')">
       <div class="auth-form-header">
         <h1>Sign in to NIST/OAGi Score</h1>
       </div>

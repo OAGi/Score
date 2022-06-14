@@ -14,20 +14,21 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri;
 
 
 /**
- * This table is similar to the BDT_PRI_RESTRI table but it is for the BDT 
- * SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, 
- * CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive 
- * by the built-in type of an expression language such as the XML Schema built-in 
- * type. The second specifies the primitive, which is a code list, while the 
- * last one specifies the primitive which is an agency identification list. 
- * Only one column among the three can have a value in a particular record.
+ * This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC.
+ * The allowed primitives are captured by three columns the
+ * CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first
+ * column specifies the primitive by the built-in type of an expression language
+ * such as the XML Schema built-in type. The second specifies the primitive,
+ * which is a code list, while the last one specifies the primitive which is an
+ * agency identification list. Only one column among the three can have a value
+ * in a particular record.
  * 
- * It should be noted that the table does not store the fact about primitive 
- * restriction hierarchical relationships. In other words, if a BDT SC is 
- * derived from another BDT SC and the derivative BDT SC applies some primitive 
- * restrictions, that relationship will not be explicitly stored. The derivative 
- * BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than 
- * the BDT_SC_PRI_RESTRI key.
+ * It should be noted that the table does not store the fact about primitive
+ * restriction hierarchical relationships. In other words, if a BDT SC is
+ * derived from another BDT SC and the derivative BDT SC applies some primitive
+ * restrictions, that relationship will not be explicitly stored. The derivative
+ * BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the
+ * BDT_SC_PRI_RESTRI key.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriRecord> implements Record6<ULong, ULong, ULong, ULong, ULong, Byte> {
@@ -35,84 +36,110 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>.
+     * Primary, internal database key.
      */
     public void setBdtScPriRestriId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>.
+     * Primary, internal database key.
      */
     public ULong getBdtScPriRestriId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_id</code>. Foreign key to the DT_SC table. This column should only refers to a DT_SC that belongs to a BDT (not CDT).
+     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_id</code>. Foreign key to
+     * the DT_SC table. This column should only refers to a DT_SC that belongs
+     * to a BDT (not CDT).
      */
     public void setBdtScId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.bdt_sc_id</code>. Foreign key to the DT_SC table. This column should only refers to a DT_SC that belongs to a BDT (not CDT).
+     * Getter for <code>oagi.bdt_sc_pri_restri.bdt_sc_id</code>. Foreign key to
+     * the DT_SC table. This column should only refers to a DT_SC that belongs
+     * to a BDT (not CDT).
      */
     public ULong getBdtScId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It allows for a primitive restriction based on a built-in type of schema expressions.
+     * Setter for
+     * <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This
+     * column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It
+     * allows for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
     public void setCdtScAwdPriXpsTypeMapId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It allows for a primitive restriction based on a built-in type of schema expressions.
+     * Getter for
+     * <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This
+     * column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It
+     * allows for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
     public ULong getCdtScAwdPriXpsTypeMapId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.code_list_id</code>. Foreign key to identify a code list. It allows for a primitive restriction based on a code list.
+     * Setter for <code>oagi.bdt_sc_pri_restri.code_list_id</code>. Foreign key
+     * to identify a code list. It allows for a primitive restriction based on a
+     * code list.
      */
     public void setCodeListId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.code_list_id</code>. Foreign key to identify a code list. It allows for a primitive restriction based on a code list.
+     * Getter for <code>oagi.bdt_sc_pri_restri.code_list_id</code>. Foreign key
+     * to identify a code list. It allows for a primitive restriction based on a
+     * code list.
      */
     public ULong getCodeListId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.agency_id_list_id</code>. Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.
+     * Setter for <code>oagi.bdt_sc_pri_restri.agency_id_list_id</code>. Foreign
+     * key to identify an agency identification list. It allows for a primitive
+     * restriction based on such list of values.
      */
     public void setAgencyIdListId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.agency_id_list_id</code>. Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.
+     * Getter for <code>oagi.bdt_sc_pri_restri.agency_id_list_id</code>. Foreign
+     * key to identify an agency identification list. It allows for a primitive
+     * restriction based on such list of values.
      */
     public ULong getAgencyIdListId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column specifies the default primitive for a BDT. It is typically the most generic primitive allowed for the BDT.
+     * Setter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column
+     * specifies the default primitive for a BDT. It is typically the most
+     * generic primitive allowed for the BDT.
      */
     public void setIsDefault(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column specifies the default primitive for a BDT. It is typically the most generic primitive allowed for the BDT.
+     * Getter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column
+     * specifies the default primitive for a BDT. It is typically the most
+     * generic primitive allowed for the BDT.
      */
     public Byte getIsDefault() {
         return (Byte) get(5);

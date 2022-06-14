@@ -87,6 +87,7 @@ export class ExtensionDetailComponent implements OnInit {
   commentControl: CommentControl;
 
   excludeSCs: boolean;
+  initialExpandDepth: number = 10;
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
@@ -164,7 +165,7 @@ export class ExtensionDetailComponent implements OnInit {
 
       const flattener = new CcFlatNodeFlattener(ccGraph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs);
+        const nodes = flattener.flatten(this.excludeSCs, this.initialExpandDepth);
         this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
@@ -202,7 +203,7 @@ export class ExtensionDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return (this.userRole === 'developer') ? e.standard : !e.standard;
+      return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
     });
   }
 
@@ -382,7 +383,7 @@ export class ExtensionDetailComponent implements OnInit {
     if (!node) {
       node = this.selectedNode;
     }
-    return (node !== undefined) && (node.type.toUpperCase() === 'BDT_SC');
+    return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
   asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
@@ -635,10 +636,11 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   makeNewRevision() {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this ACC?' : 'Amend this ACC?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this ACC?' : 'Are you sure you want to amend this ACC?'];
-    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+    dialogConfig.data.header = (isDeveloper) ? 'Revise this ACC?' : 'Amend this ACC?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to revise this ACC?' : 'Are you sure you want to amend this ACC?'];
+    dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
@@ -656,7 +658,7 @@ export class ExtensionDetailComponent implements OnInit {
             this.afterStateChanged(resp.state, resp.access);
             this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
               this.lastRevision = revision;
-              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
@@ -683,9 +685,9 @@ export class ExtensionDetailComponent implements OnInit {
     return !(this.hasRevision() && this.lastRevision.associations[this.getKey(node)]);
   }
 
-  get userRole(): string {
+  get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
-    return userToken.role;
+    return userToken.roles;
   }
 
   get currentUser(): string {
@@ -740,7 +742,7 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   componentTypeAble(componentType: number) {
-    if (this.userRole === 'developer') {
+    if (this.userRoles.includes('developer')) {
       if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
         return false;
       }
@@ -1022,6 +1024,34 @@ export class ExtensionDetailComponent implements OnInit {
       });
   }
 
+  purgeNode(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Purge this core component?';
+    dialogConfig.data.content = ['Are you sure you want to purge this core component?'];
+    dialogConfig.data.action = 'Purge';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.isUpdating = true;
+        const state = 'Purge';
+        this.service.updateState('extension', this.rootNode.manifestId, state)
+          .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+          )
+          .subscribe(resp => {
+            this.snackBar.open('Purged', '', {duration: 3000});
+            this.location.back();
+            this.router.navigateByUrl('/core_component');
+          }, err => {
+          });
+      });
+  }
+
   restoreNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore this core component?';
@@ -1197,9 +1227,10 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   cancelRevision(): void {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
     dialogConfig.data.action = 'Okay';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()

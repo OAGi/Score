@@ -40,6 +40,7 @@ export class BieExpressComponent implements OnInit {
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
+  businessContextSelection = {};
   loading = false;
 
   loginIdList: string[] = [];
@@ -173,11 +174,16 @@ export class BieExpressComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.dataSource.data.forEach((elm: BieList) => {
+        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
+      });
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
       this.dataSource.data = [];
+      this.businessContextSelection = {};
     });
   }
 
@@ -200,6 +206,12 @@ export class BieExpressComponent implements OnInit {
   generate() {
     const selectedTopLevelAsbiepIds = this.selection.selected;
 
+    this.option.filenames = {};
+    for (const selectedTopLevelAsbiepId of selectedTopLevelAsbiepIds) {
+      const filename = this.getFilename(Number(selectedTopLevelAsbiepId));
+      this.option.filenames[Number(selectedTopLevelAsbiepId)] = filename;
+    }
+
     this.loading = true;
     this.service.generate(selectedTopLevelAsbiepIds, this.option).subscribe(resp => {
 
@@ -210,6 +222,27 @@ export class BieExpressComponent implements OnInit {
     }, err => {
       this.loading = false;
     });
+  }
+
+  getFilename(topLevelAsbiepId: number): string {
+    const topLevelAsbiep = this.dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
+    const separator = '';
+
+    let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
+    if (this.option.includeBusinessContextInFilename) {
+      const selectedBusinessContext = this.businessContextSelection[topLevelAsbiepId];
+      if (!!selectedBusinessContext) {
+        filename += '-' + selectedBusinessContext.name.trim().split(' ').join(separator);
+      }
+    }
+    if (this.option.includeVersionInFilename) {
+      if (!!topLevelAsbiep.version) {
+        const versionSeparator = '_';
+        filename += '-' + topLevelAsbiep.version.trim().split(' ').join(versionSeparator)
+          .split('.').join(versionSeparator);
+      }
+    }
+    return filename;
   }
 
   _getFilenameFromContentDisposition(resp) {

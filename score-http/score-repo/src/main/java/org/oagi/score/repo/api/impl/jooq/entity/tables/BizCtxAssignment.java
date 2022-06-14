@@ -61,7 +61,8 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
     public final TableField<BizCtxAssignmentRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This is a foreign key to the top-level ASBIEP.
+     * The column <code>oagi.biz_ctx_assignment.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public final TableField<BizCtxAssignmentRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
@@ -100,12 +101,12 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID);
+        return Arrays.asList(Indexes.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID);
     }
 
     @Override
@@ -119,18 +120,21 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
     }
 
     @Override
-    public List<UniqueKey<BizCtxAssignmentRecord>> getKeys() {
-        return Arrays.<UniqueKey<BizCtxAssignmentRecord>>asList(Keys.KEY_BIZ_CTX_ASSIGNMENT_PRIMARY, Keys.KEY_BIZ_CTX_ASSIGNMENT_BIZ_CTX_ASSIGNMENT_UK);
+    public List<UniqueKey<BizCtxAssignmentRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_BIZ_CTX_ASSIGNMENT_BIZ_CTX_ASSIGNMENT_UK);
     }
 
     @Override
     public List<ForeignKey<BizCtxAssignmentRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<BizCtxAssignmentRecord, ?>>asList(Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient BizCtx _bizCtx;
     private transient TopLevelAsbiep _topLevelAsbiep;
 
+    /**
+     * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
+     */
     public BizCtx bizCtx() {
         if (_bizCtx == null)
             _bizCtx = new BizCtx(this, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK);
@@ -138,6 +142,10 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
         return _bizCtx;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table.
+     */
     public TopLevelAsbiep topLevelAsbiep() {
         if (_topLevelAsbiep == null)
             _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);

@@ -32,6 +32,7 @@ import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
+import {AboutService} from '../../basis/about/domain/about.service';
 
 @Component({
   selector: 'score-cc-list',
@@ -49,21 +50,21 @@ export class CcListComponent implements OnInit {
 
   title = 'Core Component';
 
-  // TODO: temporary hide DT
-  // typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'BDT', 'ASCC', 'BCC'];
-  typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'ASCC', 'BCC'];
+  typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT', 'ASCC', 'BCC'];
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
 
   displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp'
+    'select', 'type', 'state', 'den', 'valueDomain', 'sixDigitId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
   loading = false;
+
+  isElasticsearchOn = false;
 
   releases: Release[] = [];
   loginIdList: string[] = [];
@@ -82,6 +83,7 @@ export class CcListComponent implements OnInit {
               private releaseService: ReleaseService,
               private accountService: AccountListService,
               private auth: AuthService,
+              private aboutService: AboutService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
@@ -110,17 +112,25 @@ export class CcListComponent implements OnInit {
     this.loading = true;
     forkJoin([
       this.releaseService.getSimpleReleases(['Draft', 'Published']),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.aboutService.getProductInfo()
+    ]).subscribe(([releases, loginIds, productInfos]) => {
+      for (const productInfo of productInfos) {
+        if (productInfo.productName === 'Elasticsearch' && productInfo.productVersion !== '0.0.0.0') {
+          this.isElasticsearchOn = true;
+        }
+      }
+      this.request.fuzzySearch = this.isElasticsearchOn;
+
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         if (this.request.release.releaseId === 0) {
-          const savedReleaseId = loadBranch(this.auth.getUserToken(), 'CC');
+          const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
           if (savedReleaseId) {
             this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
             if (!this.request.release) {
               this.request.release = this.releases[0];
-              saveBranch(this.auth.getUserToken(), 'CC', this.request.release.releaseId);
+              saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
             }
           } else {
             this.request.release = this.releases[0];
@@ -188,9 +198,18 @@ export class CcListComponent implements OnInit {
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'CC', source.releaseId);
+      saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
 
+    if (property === 'fuzzySearch') {
+      if (this.request.fuzzySearch) {
+        this.sort.active = '';
+        this.sort.direction = '';
+      } else {
+        this.sort.active = 'lastUpdateTimestamp';
+        this.sort.direction = 'desc';
+      }
+    }
     this.paginator.pageIndex = 0;
     this.loadCcList();
   }
@@ -231,8 +250,8 @@ export class CcListComponent implements OnInit {
       case 'BCCP':
         return 'bccp/' + ccList.manifestId;
 
-      case 'BDT':
-        return 'bdt/' + ccList.manifestId;
+      case 'DT':
+        return 'dt/' + ccList.manifestId;
 
       default:
         return window.location.pathname;
@@ -265,7 +284,7 @@ export class CcListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
@@ -287,7 +306,7 @@ export class CcListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
@@ -303,68 +322,78 @@ export class CcListComponent implements OnInit {
   }
 
   multipleUpdate(action: string) {
-  if (this.selection.selected.length === 0) {
-    return;
-  }
-  const dialogConfig = this.confirmDialogService.newConfig();
-  let notiMsg = 'Updated';
-  let toState = action;
-  let actionType = 'Update';
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+    const dialogConfig = this.confirmDialogService.newConfig();
+    let notiMsg = 'Updated';
+    let toState = action;
+    let actionType = 'Update';
 
-  switch (action) {
-    case 'WIP':
-    case 'Draft':
-    case 'QA':
-    case 'Candidate':
-    case 'Production':
-      dialogConfig.data.header = 'Update state to \'' + action + '\'?';
-      dialogConfig.data.content = ['Are you sure you want to update the state to \'' + action + '\'?'];
-      dialogConfig.data.action = 'Update';
-      break;
-    case 'Delete':
-      toState = 'Deleted';
-      notiMsg = 'Deleted';
-      actionType = 'Delete';
-      dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
-      dialogConfig.data.content = [
-        'Are you sure you want to ' + action + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
-      ];
-      dialogConfig.data.action = action;
-      break;
-    case 'Restore':
-      toState = 'WIP';
-      notiMsg = 'Restored';
-      actionType = 'Restore';
-      dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
-      dialogConfig.data.content = [
-        'Are you sure you want to ' + action + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
-      ];
-      dialogConfig.data.action = action;
-      break;
-    default :
-      return false;
-  }
+    switch (action) {
+      case 'WIP':
+      case 'Draft':
+      case 'QA':
+      case 'Candidate':
+      case 'Production':
+        dialogConfig.data.header = 'Update state to \'' + action + '\'?';
+        dialogConfig.data.content = ['Are you sure you want to update the state to \'' + action + '\'?'];
+        dialogConfig.data.action = 'Update';
+        break;
+      case 'Delete':
+        toState = 'Deleted';
+        notiMsg = 'Deleted';
+        actionType = 'Delete';
+        dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
+        dialogConfig.data.content = [
+          'Are you sure you want to ' + action.toLowerCase() + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
+        ];
+        dialogConfig.data.action = action;
+        break;
+      case 'Restore':
+        toState = 'WIP';
+        notiMsg = 'Restored';
+        actionType = 'Restore';
+        dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
+        dialogConfig.data.content = [
+          'Are you sure you want to ' + action.toLowerCase() + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
+        ];
+        dialogConfig.data.action = action;
+        break;
+      case 'Purge':
+        toState = 'Purge';
+        notiMsg = 'Purged';
+        actionType = 'Purge';
+        dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
+        dialogConfig.data.content = [
+          'Are you sure you want to ' + action.toLowerCase() + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
+        ];
+        dialogConfig.data.action = action;
+        break;
+      default:
+        return false;
+    }
 
-  this.confirmDialogService.open(dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (!result) {
           return;
         }
         this.loading = true;
         this.service.updateStateOnList(actionType, toState, this.selection.selected)
-            .pipe(
-                finalize(() => {
-                  this.loading = false;
-                })
-            )
-            .subscribe(_ => {
-              this.loadCcList();
-              this.snackBar.open(notiMsg, '', {
-                duration: 3000
-              });
-              this.selection.clear();
-            }, error => {
+          .pipe(
+            finalize(() => {
+              this.loading = false;
+            })
+          )
+          .subscribe(_ => {
+            this.loadCcList();
+            this.snackBar.open(notiMsg, '', {
+              duration: 3000
             });
+            this.selection.clear();
+          }, error => {
+          });
       });
   }
 
@@ -373,7 +402,7 @@ export class CcListComponent implements OnInit {
     if (this.request.release.state !== 'Published') {
       return false;
     }
-    if (userToken.role === 'developer') {
+    if (userToken.roles.includes('developer')) {
       if (this.request.release.releaseId !== WorkingRelease.releaseId) {
         return false;
       }
@@ -418,15 +447,17 @@ export class CcListComponent implements OnInit {
 
     dialogRef.afterClosed().pipe(finalize(() => {
       this.loading = false;
-    })).subscribe(accManifestId => {
-      if (!accManifestId) {
+    })).subscribe(roleOfAcc => {
+      if (!roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
         return;
       }
 
       this.loading = true;
-      this.nodeService.createAsccp(this.request.release.releaseId, accManifestId, asccpType).pipe(finalize(() => {
-        this.loading = false;
-      })).subscribe(resp => {
+      const initialPropertyTerm = roleOfAcc.objectClassTerm;
+      this.nodeService.createAsccp(this.request.release.releaseId, roleOfAcc.manifestId, initialPropertyTerm, asccpType)
+        .pipe(finalize(() => {
+          this.loading = false;
+        })).subscribe(resp => {
         return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
       });
     });
@@ -484,16 +515,16 @@ export class CcListComponent implements OnInit {
 
     dialogRef.afterClosed().pipe(finalize(() => {
       this.loading = false;
-    })).subscribe(bdtManifestId => {
-      if (!bdtManifestId) {
+    })).subscribe(data => {
+      if (!data) {
         return;
       }
 
       this.loading = true;
-      this.nodeService.createBdt(this.request.release.releaseId, bdtManifestId).pipe(finalize(() => {
+      this.nodeService.createBdt(this.request.release.releaseId, data.manifestId, data.specId).pipe(finalize(() => {
         this.loading = false;
       })).subscribe(resp => {
-        return this.router.navigateByUrl('/core_component/bdt/' + resp.manifestId);
+        return this.router.navigateByUrl('/core_component/dt/' + resp.manifestId);
       });
     });
   }
@@ -522,10 +553,20 @@ export class CcListComponent implements OnInit {
         return;
       }
       this.loading = true;
-      this.nodeService.createBOD(pair.verbManifestId, pair.nounManifestId).pipe(finalize(() => {
+      this.nodeService.createBOD(pair.verbManifestIdList, pair.nounManifestIdList).pipe(finalize(() => {
         this.loading = false;
       })).subscribe(resp => {
-        return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
+        if (resp.manifestIdList.length === 1) {
+          this.snackBar.open('A new BOD created.', '', {
+            duration: 3000,
+          });
+        } else {
+          this.snackBar.open(resp.manifestIdList.length + ' new BODs created.', '', {
+            duration: 3000,
+          });
+        }
+
+        this.loadCcList();
       });
     });
   }
@@ -643,8 +684,18 @@ export class CcListComponent implements OnInit {
             return e;
           }
         }).length === this.selection.selected.length;
+      case 'Purge':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'Deleted') {
+            return e;
+          }
+        }).length === this.selection.selected.length;
       default :
         return false;
     }
+  }
+
+  displayType(elem: CcList): string {
+    return (elem.type.toUpperCase() === 'DT') ? elem.dtType : elem.type;
   }
 }

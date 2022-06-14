@@ -35,7 +35,7 @@ export class CreateBdtDialogComponent implements OnInit {
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'type', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
+    'select', 'type', 'state', 'den', 'valueDomain', 'sixDigitId', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
@@ -50,6 +50,8 @@ export class CreateBdtDialogComponent implements OnInit {
   request: CcListRequest;
   action: string;
 
+  refSpec: number;
+
   workingRelease = WorkingRelease;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -63,12 +65,12 @@ export class CreateBdtDialogComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.refSpec = 1;
     this.request = new CcListRequest();
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
-    this.request.types = ['BDT'];
-    this.request.dtTypes = ["Core", "Default", "Unqualified", "Qualified"];
-    this.request.states = ['Published'];
+    this.request.types = ['DT'];
+    this.request.dtTypes = ['Core', 'Default', 'Unqualified', 'Qualified'];
     this.request.excludes = this.data.excludes ? this.data.excludes : [];
     this.request.states = [];
 
@@ -164,11 +166,17 @@ export class CreateBdtDialogComponent implements OnInit {
       this.confirmDialogService.open(dialogConfig).beforeClosed()
         .subscribe(result => {
           if (result) {
-            this.dialogRef.close(this.selection.selected[0].manifestId);
+            this.dialogRef.close({
+              manifestId: this.selection.selected[0].manifestId,
+              specId: this.refSpec
+            });
           }
         });
     } else {
-      this.dialogRef.close(this.selection.selected[0].manifestId);
+      this.dialogRef.close({
+        manifestId: this.selection.selected[0].manifestId,
+        specId: this.refSpec
+      });
     }
   }
 
@@ -188,4 +196,10 @@ export class CreateBdtDialogComponent implements OnInit {
     return this.selection.isSelected(row);
   }
 
+  isSelectedCDT(): boolean {
+    if (this.selection.selected.length === 0) {
+      return false;
+    }
+    return this.selection.selected[0].dtType === 'CDT';
+  }
 }

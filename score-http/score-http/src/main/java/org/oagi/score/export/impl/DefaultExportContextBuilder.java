@@ -44,7 +44,7 @@ public class DefaultExportContextBuilder {
         createAgencyIdList(moduleMap);
         createCodeLists(moduleMap);
         createXBTs(moduleMap);
-        createBDT(moduleMap);
+        createCDT(moduleMap);
         createBCCP(moduleMap);
         createACC(moduleMap);
         createASCCP(moduleMap);
@@ -58,7 +58,7 @@ public class DefaultExportContextBuilder {
         if (source.equals(target)) {
             return;
         }
-        if (source.getNamespace().equals(target.getNamespace())) {
+        if (source.getNamespaceId().equals(target.getNamespaceId())) {
             source.addInclude(target);
         } else {
             source.addImport(target);
@@ -78,14 +78,17 @@ public class DefaultExportContextBuilder {
     }
 
     private void createAgencyIdList(Map<ULong, SchemaModule> moduleMap) {
-        importedDataProvider.findAgencyIdList().forEach(agencyIdList -> {
+        for (AgencyIdListRecord agencyIdList : importedDataProvider.findAgencyIdList()) {
             List<AgencyIdListValueRecord> agencyIdListValues =
                     importedDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
 
             ModuleCCID moduleCCID = importedDataProvider.findModuleAgencyIdList(agencyIdList.getAgencyIdListId());
+            if (moduleCCID == null) {
+                throw new IllegalStateException("Did you assign the agency ID list ''" + agencyIdList.getName() + "'?");
+            }
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
             schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
-        });
+        }
     }
 
     private void createCodeLists(Map<ULong, SchemaModule> moduleMap) {
@@ -142,10 +145,10 @@ public class DefaultExportContextBuilder {
         });
     }
 
-    private void createBDT(Map<ULong, SchemaModule> moduleMap) {
-        List<DtRecord> bdtList = importedDataProvider.findDT().stream()
-                .filter(e -> !e.getType().equals("Core")).collect(Collectors.toList());
-        bdtList.forEach(bdt->{
+    private void createCDT(Map<ULong, SchemaModule> moduleMap) {
+        List<DtRecord> cdtList = importedDataProvider.findDT().stream()
+                .filter(e -> e.getBasedDtId() != null).collect(Collectors.toList());
+        cdtList.forEach(bdt->{
             if (bdt.getBasedDtId() == null) {
                 throw new IllegalStateException();
             }
@@ -168,7 +171,7 @@ public class DefaultExportContextBuilder {
                     importedDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
                             .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
 
-            boolean isDefaultBDT = bdt.getType().equals("Default");
+            boolean isDefaultBDT = schemaModule.getPath().contains("BusinessDataType_1");
             BDTSimple bdtSimple;
             if (dtScList.isEmpty()) {
                 ULong bdtId = bdt.getDtId();

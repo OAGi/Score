@@ -50,52 +50,63 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
     }
 
     /**
-     * The column <code>oagi.app_oauth2_user.app_oauth2_user_id</code>. Primary key.
+     * The column <code>oagi.app_oauth2_user.app_oauth2_user_id</code>. Primary
+     * key.
      */
     public final TableField<AppOauth2UserRecord, ULong> APP_OAUTH2_USER_ID = createField(DSL.name("app_oauth2_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.app_user_id</code>. A reference to the record in `app_user`. If it is not set, this is treated as a pending record.
+     * The column <code>oagi.app_oauth2_user.app_user_id</code>. A reference to
+     * the record in `app_user`. If it is not set, this is treated as a pending
+     * record.
      */
     public final TableField<AppOauth2UserRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference to the record in `app_user`. If it is not set, this is treated as a pending record.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.oauth2_app_id</code>. A reference to the record in `oauth2_app`.
+     * The column <code>oagi.app_oauth2_user.oauth2_app_id</code>. A reference
+     * to the record in `oauth2_app`.
      */
     public final TableField<AppOauth2UserRecord, ULong> OAUTH2_APP_ID = createField(DSL.name("oauth2_app_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference to the record in `oauth2_app`.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.sub</code>. `sub` claim defined in OIDC spec. This is a unique identifier of the subject in the provider.
+     * The column <code>oagi.app_oauth2_user.sub</code>. `sub` claim defined in
+     * OIDC spec. This is a unique identifier of the subject in the provider.
      */
     public final TableField<AppOauth2UserRecord, String> SUB = createField(DSL.name("sub"), SQLDataType.VARCHAR(100).nullable(false), this, "`sub` claim defined in OIDC spec. This is a unique identifier of the subject in the provider.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.name</code>. `name` claim defined in OIDC spec.
+     * The column <code>oagi.app_oauth2_user.name</code>. `name` claim defined
+     * in OIDC spec.
      */
     public final TableField<AppOauth2UserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(200), this, "`name` claim defined in OIDC spec.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.email</code>. `email` claim defined in OIDC spec.
+     * The column <code>oagi.app_oauth2_user.email</code>. `email` claim defined
+     * in OIDC spec.
      */
     public final TableField<AppOauth2UserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200), this, "`email` claim defined in OIDC spec.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.nickname</code>. `nickname` claim defined in OIDC spec.
+     * The column <code>oagi.app_oauth2_user.nickname</code>. `nickname` claim
+     * defined in OIDC spec.
      */
     public final TableField<AppOauth2UserRecord, String> NICKNAME = createField(DSL.name("nickname"), SQLDataType.VARCHAR(200), this, "`nickname` claim defined in OIDC spec.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.preferred_username</code>. `preferred_username` claim defined in OIDC spec.
+     * The column <code>oagi.app_oauth2_user.preferred_username</code>.
+     * `preferred_username` claim defined in OIDC spec.
      */
     public final TableField<AppOauth2UserRecord, String> PREFERRED_USERNAME = createField(DSL.name("preferred_username"), SQLDataType.VARCHAR(200), this, "`preferred_username` claim defined in OIDC spec.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.phone_number</code>. `phone_number` claim defined in OIDC spec.
+     * The column <code>oagi.app_oauth2_user.phone_number</code>. `phone_number`
+     * claim defined in OIDC spec.
      */
     public final TableField<AppOauth2UserRecord, String> PHONE_NUMBER = createField(DSL.name("phone_number"), SQLDataType.VARCHAR(200), this, "`phone_number` claim defined in OIDC spec.");
 
     /**
-     * The column <code>oagi.app_oauth2_user.creation_timestamp</code>. Timestamp when this record is created.
+     * The column <code>oagi.app_oauth2_user.creation_timestamp</code>.
+     * Timestamp when this record is created.
      */
     public final TableField<AppOauth2UserRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record is created.");
 
@@ -134,7 +145,7 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -148,18 +159,21 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
     }
 
     @Override
-    public List<UniqueKey<AppOauth2UserRecord>> getKeys() {
-        return Arrays.<UniqueKey<AppOauth2UserRecord>>asList(Keys.KEY_APP_OAUTH2_USER_PRIMARY, Keys.KEY_APP_OAUTH2_USER_APP_OAUTH2_USER_UK1);
+    public List<UniqueKey<AppOauth2UserRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_APP_OAUTH2_USER_APP_OAUTH2_USER_UK1);
     }
 
     @Override
     public List<ForeignKey<AppOauth2UserRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AppOauth2UserRecord, ?>>asList(Keys.APP_OAUTH2_USER_APP_USER_ID_FK, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);
+        return Arrays.asList(Keys.APP_OAUTH2_USER_APP_USER_ID_FK, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);
     }
 
     private transient AppUser _appUser;
     private transient Oauth2App _oauth2App;
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     */
     public AppUser appUser() {
         if (_appUser == null)
             _appUser = new AppUser(this, Keys.APP_OAUTH2_USER_APP_USER_ID_FK);
@@ -167,6 +181,9 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
         return _appUser;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.oauth2_app</code> table.
+     */
     public Oauth2App oauth2App() {
         if (_oauth2App == null)
             _oauth2App = new Oauth2App(this, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);

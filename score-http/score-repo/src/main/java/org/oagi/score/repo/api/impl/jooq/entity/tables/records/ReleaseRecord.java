@@ -24,154 +24,186 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.
+     * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
+     * interpreted to be released later than the other.
      */
     public void setReleaseId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_id</code>. RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.
+     * Getter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
+     * interpreted to be released later than the other.
      */
     public ULong getReleaseId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.release.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.release.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.release.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.release.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.release.release_num</code>. Release number such has 10.0, 10.1, etc. 
+     * Setter for <code>oagi.release.release_num</code>. Release number such has
+     * 10.0, 10.1, etc. 
      */
     public void setReleaseNum(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_num</code>. Release number such has 10.0, 10.1, etc. 
+     * Getter for <code>oagi.release.release_num</code>. Release number such has
+     * 10.0, 10.1, etc. 
      */
     public String getReleaseNum() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.release.release_note</code>. Description or note associated with the release.
+     * Setter for <code>oagi.release.release_note</code>. Description or note
+     * associated with the release.
      */
     public void setReleaseNote(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_note</code>. Description or note associated with the release.
+     * Getter for <code>oagi.release.release_note</code>. Description or note
+     * associated with the release.
      */
     public String getReleaseNote() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.release.release_license</code>. License associated with the release.
+     * Setter for <code>oagi.release.release_license</code>. License associated
+     * with the release.
      */
     public void setReleaseLicense(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_license</code>. License associated with the release.
+     * Getter for <code>oagi.release.release_license</code>. License associated
+     * with the release.
      */
     public String getReleaseLicense() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.release.namespace_id</code>. Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.
+     * Setter for <code>oagi.release.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. It identifies the namespace used with the release. It is
+     * particularly useful for a library that uses a single namespace such like
+     * the OAGIS 10.x. A library that uses multiple namespace but has a main
+     * namespace may also use this column as a specific namespace can be
+     * override at the module level.
      */
     public void setNamespaceId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.release.namespace_id</code>. Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.
+     * Getter for <code>oagi.release.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. It identifies the namespace used with the release. It is
+     * particularly useful for a library that uses a single namespace such like
+     * the OAGIS 10.x. A library that uses multiple namespace but has a main
+     * namespace may also use this column as a specific namespace can be
+     * override at the module level.
      */
     public ULong getNamespaceId() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.release.created_by</code>. Foreign key to the APP_USER table identifying user who created the namespace.
+     * Setter for <code>oagi.release.created_by</code>. Foreign key to the
+     * APP_USER table identifying user who created the namespace.
      */
     public void setCreatedBy(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.release.created_by</code>. Foreign key to the APP_USER table identifying user who created the namespace.
+     * Getter for <code>oagi.release.created_by</code>. Foreign key to the
+     * APP_USER table identifying user who created the namespace.
      */
     public ULong getCreatedBy() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.release.last_updated_by</code>. Foreign key to the APP_USER table identifying the user who last updated the record.
+     * Setter for <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.release.last_updated_by</code>. Foreign key to the APP_USER table identifying the user who last updated the record.
+     * Getter for <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oagi.release.creation_timestamp</code>. The timestamp when the record was first created.
+     * Setter for <code>oagi.release.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.release.creation_timestamp</code>. The timestamp when the record was first created.
+     * Getter for <code>oagi.release.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(8);
     }
 
     /**
-     * Setter for <code>oagi.release.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Setter for <code>oagi.release.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.release.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Getter for <code>oagi.release.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>oagi.release.state</code>. This indicates the revision life cycle state of the Release.
+     * Setter for <code>oagi.release.state</code>. This indicates the revision
+     * life cycle state of the Release.
      */
     public void setState(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.release.state</code>. This indicates the revision life cycle state of the Release.
+     * Getter for <code>oagi.release.state</code>. This indicates the revision
+     * life cycle state of the Release.
      */
     public String getState() {
         return (String) get(10);

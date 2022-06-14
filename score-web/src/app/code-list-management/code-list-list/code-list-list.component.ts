@@ -244,7 +244,7 @@ export class CodeListListComponent implements OnInit {
 
   get showCreateCodeListBtn(): boolean {
     const userToken = this.auth.getUserToken();
-    if (userToken.role === 'developer') {
+    if (userToken.roles.includes('developer')) {
       if (this.request.release.releaseId !== WorkingRelease.releaseId) {
         return false;
       }
@@ -331,7 +331,7 @@ export class CodeListListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {role: this.auth.getUserToken().role};
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {

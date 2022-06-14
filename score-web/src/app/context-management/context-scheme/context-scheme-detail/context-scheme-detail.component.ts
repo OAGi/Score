@@ -262,7 +262,6 @@ export class ContextSchemeDetailComponent implements OnInit {
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
-      this.router.navigateByUrl('/context_management/context_scheme');
     });
   }
 
@@ -270,7 +269,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     this.service.getCodeList(event.value).subscribe(val => {
       this.currCodeList = val;
       this.contextScheme.schemeId = this.currCodeList.listId.toString();
-      this.contextScheme.schemeAgencyId = this.currCodeList.agencyId.toString();
+      this.contextScheme.schemeAgencyId = this.currCodeList.agencyIdListValueManifestId.toString();
       this.contextScheme.schemeVersionId = this.currCodeList.versionId.toString();
       this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(this.currCodeList.codeListValues));
     });
@@ -393,7 +392,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe(codeList => {
       if (codeList) {
         this.contextScheme.schemeId = codeList.listId.toString();
-        this.contextScheme.schemeAgencyId = codeList.agencyId.toString();
+        this.contextScheme.schemeAgencyId = codeList.agencyIdListValueValue.toString();
         this.contextScheme.schemeVersionId = codeList.versionId.toString();
         this._updateDataSource([]);
         this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeList.codeListValues));

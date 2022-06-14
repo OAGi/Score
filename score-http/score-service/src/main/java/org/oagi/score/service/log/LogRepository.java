@@ -9,6 +9,7 @@ import org.jooq.DSLContext;
 import org.jooq.JSON;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.corecomponent.model.CcType;
 import org.oagi.score.service.common.data.CcAction;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.jsonValue;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
@@ -100,14 +103,27 @@ public class LogRepository {
         ).toString();
     }
 
-    public List<LogRecord> getSortedLogListByReference(String reference, SortDirection sortDirection) {
-        List<LogRecord> logRecordList =
-                dslContext.select(LOG.LOG_ID, LOG.HASH, LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM,
-                        LOG.LOG_ACTION, LOG.REFERENCE, LOG.PREV_LOG_ID, LOG.NEXT_LOG_ID,
-                        LOG.CREATED_BY, LOG.CREATION_TIMESTAMP)
-                        .from(LOG)
-                        .where(LOG.REFERENCE.eq(reference))
-                        .fetchInto(LogRecord.class);
+    public List<LogRecord> getSortedLogListByReference(String reference, SortDirection sortDirection, CcType ccType) {
+        List<LogRecord> logRecordList;
+
+        if (ccType.equals(CcType.CODE_LIST) || ccType.equals(CcType.AGENCY_ID_LIST)) {
+            logRecordList =
+                    dslContext.select(LOG.LOG_ID, LOG.HASH, LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM,
+                            LOG.LOG_ACTION, LOG.REFERENCE, LOG.PREV_LOG_ID, LOG.NEXT_LOG_ID,
+                            LOG.CREATED_BY, LOG.CREATION_TIMESTAMP)
+                            .from(LOG)
+                            .where(LOG.REFERENCE.eq(reference))
+                            .fetchInto(LogRecord.class);
+        } else {
+            logRecordList =
+                    dslContext.select(LOG.LOG_ID, LOG.HASH, LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM,
+                            LOG.LOG_ACTION, LOG.REFERENCE, LOG.PREV_LOG_ID, LOG.NEXT_LOG_ID,
+                            LOG.CREATED_BY, LOG.CREATION_TIMESTAMP)
+                            .from(LOG)
+                            .where(and(LOG.REFERENCE.eq(reference),
+                                    jsonValue(LOG.SNAPSHOT, "$.component").eq(JSON.valueOf(ccType.name().toLowerCase()))))
+                            .fetchInto(LogRecord.class);
+        }
 
         List<LogRecord> sortedLogRecordList = new ArrayList(logRecordList.size());
         if (logRecordList.size() > 0) {
@@ -141,8 +157,8 @@ public class LogRepository {
         return sortedLogRecordList;
     }
 
-    public LogRecord revertToStableStateByReference(String reference) {
-        List<LogRecord> logRecordList = getSortedLogListByReference(reference, SortDirection.DESC);
+    public LogRecord revertToStableStateByReference(String reference, CcType ccType) {
+        List<LogRecord> logRecordList = getSortedLogListByReference(reference, SortDirection.DESC, ccType);
 
         LogRecord logRecordInStableState = null;
         List<ULong> deleteTargetLogIdList = new ArrayList();
@@ -203,7 +219,7 @@ public class LogRepository {
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .execute();
 
-        LogRecord logRecord = revertToStableStateByReference(reference);
+        LogRecord logRecord = revertToStableStateByReference(reference, CcType.ACC);
         accManifestRecord.setLogId(logRecord.getLogId());
         dslContext.update(ACC_MANIFEST)
                 .set(ACC_MANIFEST.LOG_ID, logRecord.getLogId())
@@ -224,7 +240,7 @@ public class LogRepository {
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                 .execute();
 
-        LogRecord logRecord = revertToStableStateByReference(reference);
+        LogRecord logRecord = revertToStableStateByReference(reference, CcType.ASCCP);
         asccpManifestRecord.setLogId(logRecord.getLogId());
         dslContext.update(ASCCP_MANIFEST)
                 .set(ASCCP_MANIFEST.LOG_ID, logRecord.getLogId())
@@ -245,11 +261,32 @@ public class LogRepository {
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .execute();
 
-        LogRecord logRecord = revertToStableStateByReference(reference);
+        LogRecord logRecord = revertToStableStateByReference(reference, CcType.BCCP);
         bccpManifestRecord.setLogId(logRecord.getLogId());
         dslContext.update(BCCP_MANIFEST)
                 .set(BCCP_MANIFEST.LOG_ID, logRecord.getLogId())
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .execute();
+
+        return logRecord;
+    }
+
+    public LogRecord revertToStableState(DtManifestRecord dtManifestRecord) {
+        String reference = dslContext.select(LOG.REFERENCE)
+                .from(LOG)
+                .where(LOG.LOG_ID.eq(dtManifestRecord.getLogId()))
+                .fetchOneInto(String.class);
+
+        dslContext.update(DT_MANIFEST)
+                .setNull(DT_MANIFEST.LOG_ID)
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
+                .execute();
+
+        LogRecord logRecord = revertToStableStateByReference(reference, CcType.DT);
+        dtManifestRecord.setLogId(logRecord.getLogId());
+        dslContext.update(DT_MANIFEST)
+                .set(DT_MANIFEST.LOG_ID, logRecord.getLogId())
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .execute();
 
         return logRecord;
@@ -266,7 +303,7 @@ public class LogRepository {
                 .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))
                 .execute();
 
-        LogRecord logRecord = revertToStableStateByReference(reference);
+        LogRecord logRecord = revertToStableStateByReference(reference, CcType.CODE_LIST);
         codeListManifestRecord.setLogId(logRecord.getLogId());
         dslContext.update(CODE_LIST_MANIFEST)
                 .set(CODE_LIST_MANIFEST.LOG_ID, logRecord.getLogId())
@@ -507,6 +544,16 @@ public class LogRepository {
                                   LogAction logAction,
                                   ULong requesterId,
                                   LocalDateTime timestamp) {
+        return insertAccLog(accManifestRecord, accRecord, prevLogId, logAction, requesterId, timestamp, LogUtils.generateHash());
+    }
+
+    public LogRecord insertAccLog(AccManifestRecord accManifestRecord,
+                                  AccRecord accRecord,
+                                  ULong prevLogId,
+                                  LogAction logAction,
+                                  ULong requesterId,
+                                  LocalDateTime timestamp,
+                                  String hash) {
 
         LogRecord prevLogRecord = null;
         if (prevLogId != null) {
@@ -516,7 +563,7 @@ public class LogRepository {
         }
 
         LogRecord logRecord = new LogRecord();
-        logRecord.setHash(LogUtils.generateHash());
+        logRecord.setHash(hash);
         if (LogAction.Revised.equals(logAction)) {
             assert (prevLogRecord != null);
             logRecord.setRevisionNum(prevLogRecord.getRevisionNum().add(1));

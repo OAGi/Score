@@ -174,6 +174,8 @@ export class BieUpliftComponent implements OnInit {
   sourceSelectedNode: BieUpliftSourceFlatNode;
   targetSelectedNode: BieUpliftTargetFlatNode;
 
+  initialExpandDepth: number = 10;
+
   paddingPixel = 12;
   innerY: number = window.innerHeight;
 
@@ -229,18 +231,18 @@ export class BieUpliftComponent implements OnInit {
           this.sourceReleaseNum = sourceRootNode.releaseNum;
           return new BieUpliftSourceFlatNodeFlattener(
             sourceCcGraph, sourceRootNode.asccpManifestId, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList)
-            .flatten();
+            .flatten(false, this.initialExpandDepth);
         })),
         this.ccNodeService.getGraphNode('ASCCP', this.targetAsccpManifestId).pipe(map(targetCcGraph => {
           return new BieFlatNodeFlattener(
-            targetCcGraph, this.targetAsccpManifestId).flatten();
+            targetCcGraph, this.targetAsccpManifestId).flatten(false, this.initialExpandDepth);
         }))
       ).subscribe(nodes => {
         if ((nodes[0] as AbieFlatNode).asccpNode.manifestId === this.targetAsccpManifestId) {
           this.targetDataSource = new VSBieFlatTreeDataSource(this.targetTreeControl, nodes.map(e => new BieUpliftTargetFlatNode(e)));
           this.targetSearcher = new BieDataSourceSearcher(this.targetDataSource);
         } else {
-          this.sourceDataSource = new VSBieUpliftSourceFlatTreeDataSource(this.sourceTreeControl, nodes.map(e => new BieUpliftSourceFlatNode(e)));
+          this.sourceDataSource = new VSBieUpliftSourceFlatTreeDataSource(this.sourceTreeControl, nodes.filter(e => e.used).map(e => new BieUpliftSourceFlatNode(e)));
           this.sourceSearcher = new BieDataSourceSearcher(this.sourceDataSource);
         }
       }, () => {
@@ -536,6 +538,7 @@ export class BieUpliftComponent implements OnInit {
     if (!this.canMatch(node)) {
       return;
     }
+
     if (node.source) {
       node.source = undefined;
       node.reusedTolevelAsbiepId = undefined;
@@ -555,12 +558,13 @@ export class BieUpliftComponent implements OnInit {
     this.loading = true;
     const source = this.sourceDataSource.cachedData.filter(e => {
       if (e.derived) {
-        return true
+        return true;
       }
       if (!e.fixed) {
         return !e.locked;
       }
     });
+
     const matched = [];
     source.forEach(e => {
       let upliftNode;
@@ -683,7 +687,7 @@ export class BieUpliftComponent implements OnInit {
       if (uplift) {
         this.createUpliftBIE();
       }
-    })
+    });
   }
 
   expandSourceNode(node: BieUpliftSourceFlatNode) {

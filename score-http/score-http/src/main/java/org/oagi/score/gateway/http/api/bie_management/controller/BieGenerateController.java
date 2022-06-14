@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,7 +57,24 @@ public class BieGenerateController {
         Map<String, Object> params = new HashMap();
         Arrays.stream(new String(Base64.getDecoder().decode(data)).split("&")).forEach(e -> {
             String[] keyValue = e.split("=");
-            params.put(keyValue[0], keyValue[1]);
+            if (keyValue[0].startsWith("filenames")) {
+                if (!params.containsKey("filenames")) {
+                    params.put("filenames", new HashMap());
+                }
+                Map<BigInteger, String> filenames =
+                        (Map<BigInteger, String>) params.get("filenames");
+
+                try {
+                    keyValue[0] = URLDecoder.decode(keyValue[0], "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
+                BigInteger topLevelAsbiepId =
+                        new BigInteger(keyValue[0].substring(keyValue[0].indexOf('[') + 1, keyValue[0].indexOf(']')));
+                filenames.put(topLevelAsbiepId, keyValue[1]);
+            } else {
+                params.put(keyValue[0], keyValue[1]);
+            }
         });
         return params;
     }

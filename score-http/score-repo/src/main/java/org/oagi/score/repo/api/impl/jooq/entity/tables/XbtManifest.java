@@ -64,12 +64,14 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     public final TableField<XbtManifestRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.xbt_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * The column <code>oagi.xbt_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public final TableField<XbtManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
-     * The column <code>oagi.xbt_manifest.log_id</code>. A foreign key pointed to a log for the current record.
+     * The column <code>oagi.xbt_manifest.log_id</code>. A foreign key pointed
+     * to a log for the current record.
      */
     public final TableField<XbtManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
 
@@ -118,7 +120,7 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -132,13 +134,8 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<XbtManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<XbtManifestRecord>>asList(Keys.KEY_XBT_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<XbtManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<XbtManifestRecord, ?>>asList(Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
     }
 
     private transient Release _release;
@@ -147,6 +144,9 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     private transient XbtManifest _xbtManifestPrevXbtManifestIdFk;
     private transient XbtManifest _xbtManifestNextXbtManifestIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
     public Release release() {
         if (_release == null)
             _release = new Release(this, Keys.XBT_MANIFEST_RELEASE_ID_FK);
@@ -154,6 +154,9 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return _release;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.xbt</code> table.
+     */
     public Xbt xbt() {
         if (_xbt == null)
             _xbt = new Xbt(this, Keys.XBT_MANIFEST_XBT_ID_FK);
@@ -161,6 +164,9 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return _xbt;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.log</code> table.
+     */
     public Log log() {
         if (_log == null)
             _log = new Log(this, Keys.XBT_MANIFEST_LOG_ID_FK);
@@ -168,6 +174,10 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return _log;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
+     * via the <code>xbt_manifest_prev_xbt_manifest_id_fk</code> key.
+     */
     public XbtManifest xbtManifestPrevXbtManifestIdFk() {
         if (_xbtManifestPrevXbtManifestIdFk == null)
             _xbtManifestPrevXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK);
@@ -175,6 +185,10 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return _xbtManifestPrevXbtManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
+     * via the <code>xbt_manifest_next_xbt_manifest_id_fk</code> key.
+     */
     public XbtManifest xbtManifestNextXbtManifestIdFk() {
         if (_xbtManifestNextXbtManifestIdFk == null)
             _xbtManifestNextXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);

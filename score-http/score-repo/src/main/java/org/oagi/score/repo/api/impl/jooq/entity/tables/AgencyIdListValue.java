@@ -13,7 +13,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -50,84 +50,120 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
     }
 
     /**
-     * The column <code>oagi.agency_id_list_value.agency_id_list_value_id</code>. Primary key column.
+     * The column
+     * <code>oagi.agency_id_list_value.agency_id_list_value_id</code>. Primary
+     * key column.
      */
     public final TableField<AgencyIdListValueRecord, ULong> AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.guid</code>. A globally unique identifier (GUID).
+     * The column <code>oagi.agency_id_list_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public final TableField<AgencyIdListValueRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.agency_id_list_value.value</code>. A value in the agency identification list.
+     * The column <code>oagi.agency_id_list_value.value</code>. A value in the
+     * agency identification list.
      */
     public final TableField<AgencyIdListValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(150).nullable(false), this, "A value in the agency identification list.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.name</code>. Descriptive or short name of the value.
+     * The column <code>oagi.agency_id_list_value.name</code>. Descriptive or
+     * short name of the value.
      */
     public final TableField<AgencyIdListValueRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(150), this, "Descriptive or short name of the value.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.definition</code>. The meaning of the value.
+     * The column <code>oagi.agency_id_list_value.definition</code>. The meaning
+     * of the value.
      */
     public final TableField<AgencyIdListValueRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "The meaning of the value.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.definition_source</code>. This is typically a URL which indicates the source of the agency id list value DEFINITION.
+     * The column <code>oagi.agency_id_list_value.definition_source</code>. This
+     * is typically a URL which indicates the source of the agency id list value
+     * DEFINITION.
      */
     public final TableField<AgencyIdListValueRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL which indicates the source of the agency id list value DEFINITION.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.owner_list_id</code>. Foreign key to the agency identification list in the AGENCY_ID_LIST table this value belongs to.
+     * The column <code>oagi.agency_id_list_value.owner_list_id</code>. Foreign
+     * key to the agency identification list in the AGENCY_ID_LIST table this
+     * value belongs to.
      */
     public final TableField<AgencyIdListValueRecord, ULong> OWNER_LIST_ID = createField(DSL.name("owner_list_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the agency identification list in the AGENCY_ID_LIST table this value belongs to.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.is_deprecated</code>. Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).
+     * The column
+     * <code>oagi.agency_id_list_value.based_agency_id_list_value_id</code>.
+     * Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used
+     * when the AGENCY_ID_LIST_VALUE is derived from the based
+     * AGENCY_ID_LIST_VALUE.
+     */
+    public final TableField<AgencyIdListValueRecord, ULong> BASED_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("based_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used when the AGENCY_ID_LIST_VALUE is derived from the based AGENCY_ID_LIST_VALUE.");
+
+    /**
+     * The column <code>oagi.agency_id_list_value.is_deprecated</code>.
+     * Indicates whether the code list value is deprecated and should not be
+     * reused (i.e., no new reference to this record should be allowed).
      */
     public final TableField<AgencyIdListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
-     * The column <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>. This refers to a replacement if the record is deprecated.
+     * The column
+     * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
+     * This refers to a replacement if the record is deprecated.
      */
     public final TableField<AgencyIdListValueRecord, ULong> REPLACEMENT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("replacement_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created the code list.
+     * The column <code>oagi.agency_id_list_value.created_by</code>. Foreign key
+     * to the APP_USER table. It indicates the user who created the code list.
      */
     public final TableField<AgencyIdListValueRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created the code list.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.owner_user_id</code>. Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.
-
-The ownership can change throughout the history, but undoing shouldn't rollback the ownership.
+     * The column <code>oagi.agency_id_list_value.owner_user_id</code>. Foreign
+     * key to the APP_USER table. This is the user who owns the entity, is
+     * allowed to edit the entity, and who can transfer the ownership to another
+     * user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
     public final TableField<AgencyIdListValueRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.last_updated_by</code>. Foreign key to the APP_USER table. It identifies the user who last updated the code list.
+     * The column <code>oagi.agency_id_list_value.last_updated_by</code>.
+     * Foreign key to the APP_USER table. It identifies the user who last
+     * updated the code list.
      */
     public final TableField<AgencyIdListValueRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It identifies the user who last updated the code list.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.creation_timestamp</code>. Timestamp when the code list was created.
+     * The column <code>oagi.agency_id_list_value.creation_timestamp</code>.
+     * Timestamp when the code list was created.
      */
     public final TableField<AgencyIdListValueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.last_update_timestamp</code>. Timestamp when the code list was last updated.
+     * The column <code>oagi.agency_id_list_value.last_update_timestamp</code>.
+     * Timestamp when the code list was last updated.
      */
     public final TableField<AgencyIdListValueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.prev_agency_id_list_value_id</code>. A self-foreign key to indicate the previous history record.
+     * The column
+     * <code>oagi.agency_id_list_value.prev_agency_id_list_value_id</code>. A
+     * self-foreign key to indicate the previous history record.
      */
     public final TableField<AgencyIdListValueRecord, ULong> PREV_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("prev_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
 
     /**
-     * The column <code>oagi.agency_id_list_value.next_agency_id_list_value_id</code>. A self-foreign key to indicate the next history record.
+     * The column
+     * <code>oagi.agency_id_list_value.next_agency_id_list_value_id</code>. A
+     * self-foreign key to indicate the next history record.
      */
     public final TableField<AgencyIdListValueRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("next_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
 
@@ -166,7 +202,7 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -180,16 +216,12 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     @Override
-    public List<UniqueKey<AgencyIdListValueRecord>> getKeys() {
-        return Arrays.<UniqueKey<AgencyIdListValueRecord>>asList(Keys.KEY_AGENCY_ID_LIST_VALUE_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<AgencyIdListValueRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AgencyIdListValueRecord, ?>>asList(Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
+        return Arrays.asList(Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_BASED_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
     }
 
     private transient AgencyIdList _agencyIdList;
+    private transient AgencyIdListValue _agencyIdListValueBasedAgencyIdListValueIdFk;
     private transient AgencyIdListValue _agencyIdListValueReplacementAgencyIdListValueIdFk;
     private transient AppUser _agencyIdListValueCreatedByFk;
     private transient AppUser _agencyIdListValueOwnerUserIdFk;
@@ -197,6 +229,9 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     private transient AgencyIdListValue _agencyIdListValuePrevAgencyIdListValueIdFk;
     private transient AgencyIdListValue _agencyIdListValueNextAgencyIdListValueIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
+     */
     public AgencyIdList agencyIdList() {
         if (_agencyIdList == null)
             _agencyIdList = new AgencyIdList(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK);
@@ -204,6 +239,24 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdList;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
+     * table, via the
+     * <code>agency_id_list_value_based_agency_id_list_value_id_fk</code> key.
+     */
+    public AgencyIdListValue agencyIdListValueBasedAgencyIdListValueIdFk() {
+        if (_agencyIdListValueBasedAgencyIdListValueIdFk == null)
+            _agencyIdListValueBasedAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_BASED_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValueBasedAgencyIdListValueIdFk;
+    }
+
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
+     * table, via the
+     * <code>agency_id_list_value_replacement_agency_id_list_value_id_fk</code>
+     * key.
+     */
     public AgencyIdListValue agencyIdListValueReplacementAgencyIdListValueIdFk() {
         if (_agencyIdListValueReplacementAgencyIdListValueIdFk == null)
             _agencyIdListValueReplacementAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK);
@@ -211,6 +264,10 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdListValueReplacementAgencyIdListValueIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>agency_id_list_value_created_by_fk</code> key.
+     */
     public AppUser agencyIdListValueCreatedByFk() {
         if (_agencyIdListValueCreatedByFk == null)
             _agencyIdListValueCreatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK);
@@ -218,6 +275,10 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdListValueCreatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>agency_id_list_value_owner_user_id_fk</code> key.
+     */
     public AppUser agencyIdListValueOwnerUserIdFk() {
         if (_agencyIdListValueOwnerUserIdFk == null)
             _agencyIdListValueOwnerUserIdFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK);
@@ -225,6 +286,10 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdListValueOwnerUserIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>agency_id_list_value_last_updated_by_fk</code> key.
+     */
     public AppUser agencyIdListValueLastUpdatedByFk() {
         if (_agencyIdListValueLastUpdatedByFk == null)
             _agencyIdListValueLastUpdatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK);
@@ -232,6 +297,11 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdListValueLastUpdatedByFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
+     * table, via the
+     * <code>agency_id_list_value_prev_agency_id_list_value_id_fk</code> key.
+     */
     public AgencyIdListValue agencyIdListValuePrevAgencyIdListValueIdFk() {
         if (_agencyIdListValuePrevAgencyIdListValueIdFk == null)
             _agencyIdListValuePrevAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK);
@@ -239,6 +309,11 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return _agencyIdListValuePrevAgencyIdListValueIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
+     * table, via the
+     * <code>agency_id_list_value_next_agency_id_list_value_id_fk</code> key.
+     */
     public AgencyIdListValue agencyIdListValueNextAgencyIdListValueIdFk() {
         if (_agencyIdListValueNextAgencyIdListValueIdFk == null)
             _agencyIdListValueNextAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
@@ -273,11 +348,11 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<ULong, String, String, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<ULong, String, String, String, String, String, ULong, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 }

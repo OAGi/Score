@@ -49,12 +49,14 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     }
 
     /**
-     * The column <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary database key.
+     * The column <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
+     * database key.
      */
     public final TableField<CdtPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
 
     /**
-     * The column <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.
+     * The column <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
+     * the CCTS datatype catalog, e.g., Decimal.
      */
     public final TableField<CdtPriRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).nullable(false), this, "Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.");
 
@@ -93,7 +95,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -107,8 +109,8 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     }
 
     @Override
-    public List<UniqueKey<CdtPriRecord>> getKeys() {
-        return Arrays.<UniqueKey<CdtPriRecord>>asList(Keys.KEY_CDT_PRI_PRIMARY, Keys.KEY_CDT_PRI_CDT_PRI_UK1);
+    public List<UniqueKey<CdtPriRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_CDT_PRI_CDT_PRI_UK1);
     }
 
     @Override

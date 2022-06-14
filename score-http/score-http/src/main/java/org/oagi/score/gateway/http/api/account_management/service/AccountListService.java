@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.account_management.service;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
 
@@ -46,6 +48,7 @@ public class AccountListService {
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
                 APP_USER.IS_DEVELOPER.as("developer"),
+                APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled"),
                 APP_USER.ORGANIZATION,
                 APP_OAUTH2_USER.APP_OAUTH2_USER_ID
@@ -65,14 +68,25 @@ public class AccountListService {
         if (request.getEnabled() != null) {
             conditions.add(APP_USER.IS_ENABLED.eq((byte) (request.getEnabled() ? 1 : 0)));
         }
-        if (StringUtils.hasLength(request.getRole())) {
-            switch (request.getRole()) {
+        List<Condition> roleConditions = new ArrayList();
+        for (String role : request.getRoles()) {
+            switch (role) {
                 case "developer":
-                    conditions.add(APP_USER.IS_DEVELOPER.eq((byte) 1));
+                    roleConditions.add(APP_USER.IS_DEVELOPER.eq((byte) 1));
                     break;
                 case "end-user":
-                    conditions.add(APP_USER.IS_DEVELOPER.eq((byte) 0));
+                    roleConditions.add(APP_USER.IS_DEVELOPER.eq((byte) 0));
                     break;
+                case "admin":
+                    roleConditions.add(APP_USER.IS_ADMIN.eq((byte) 1));
+                    break;
+            }
+        }
+        if (!roleConditions.isEmpty()) {
+            if (roleConditions.size() == 1) {
+                conditions.add(roleConditions.get(0));
+            } else {
+                conditions.add(or(roleConditions));
             }
         }
         if (request.isExcludeSSO()) {
@@ -164,6 +178,7 @@ public class AccountListService {
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
                 APP_USER.IS_DEVELOPER.as("developer"),
+                APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled"),
                 APP_USER.ORGANIZATION,
                 APP_OAUTH2_USER.APP_OAUTH2_USER_ID)
@@ -188,7 +203,12 @@ public class AccountListService {
     }
 
     @Transactional
-    public void insert(AppUser account) {
+    public void insert(AuthenticatedPrincipal user, AppUser account) {
+        org.oagi.score.service.common.data.AppUser appUser = sessionService.getAppUser(user);
+        if (!appUser.isAdmin()) {
+            throw new DataAccessForbiddenException("Only admin user can create a new account.");
+        }
+
         AppUserRecord record = new AppUserRecord();
         record.setLoginId(account.getLoginId());
         if (account.getAppOauth2UserId() == 0) {
@@ -197,6 +217,7 @@ public class AccountListService {
         record.setName(account.getName());
         record.setOrganization(account.getOrganization());
         record.setIsDeveloper((byte) (account.isDeveloper() ? 1 : 0));
+        record.setIsAdmin((byte) (account.isAdmin() ? 1 : 0));
         record.setIsEnabled((byte) 1);
 
         ULong appUserId = dslContext.insertInto(APP_USER)

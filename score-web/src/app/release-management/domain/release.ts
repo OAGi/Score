@@ -184,6 +184,7 @@ export class ReleaseValidationRequest {
   assignedBccpComponentManifestIds: number[] = [];
   assignedCodeListComponentManifestIds: number[] = [];
   assignedAgencyIdListComponentManifestIds: number[] = [];
+  assignedDtComponentManifestIds: number[] = [];
 }
 
 export class ValidationMessage {
@@ -199,4 +200,5 @@ export class ReleaseValidationResponse {
   statusMapForBccp: Map<number, ValidationMessage[]>;
   statusMapForCodeList: Map<number, ValidationMessage[]>;
   statusMapForAgencyIdList: Map<number, ValidationMessage[]>;
+  statusMapForDt: Map<number, ValidationMessage[]>;
 }

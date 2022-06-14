@@ -38,98 +38,112 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.module_set.guid</code>. A globally unique identifier (GUID).
+     * Setter for <code>oagi.module_set.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.guid</code>. A globally unique identifier (GUID).
+     * Getter for <code>oagi.module_set.guid</code>. A globally unique
+     * identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.module_set.name</code>. This is the name of the module set.
+     * Setter for <code>oagi.module_set.name</code>. This is the name of the
+     * module set.
      */
     public void setName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.name</code>. This is the name of the module set.
+     * Getter for <code>oagi.module_set.name</code>. This is the name of the
+     * module set.
      */
     public String getName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.module_set.description</code>. Description or explanation about the module set or use of the module set.
+     * Setter for <code>oagi.module_set.description</code>. Description or
+     * explanation about the module set or use of the module set.
      */
     public void setDescription(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.description</code>. Description or explanation about the module set or use of the module set.
+     * Getter for <code>oagi.module_set.description</code>. Description or
+     * explanation about the module set or use of the module set.
      */
     public String getDescription() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.module_set.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this MODULE_SET.
+     * Setter for <code>oagi.module_set.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this MODULE_SET.
      */
     public void setCreatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.created_by</code>. Foreign key to the APP_USER table. It indicates the user who created this MODULE_SET.
+     * Getter for <code>oagi.module_set.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this MODULE_SET.
      */
     public ULong getCreatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.module_set.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record.
+     * Setter for <code>oagi.module_set.last_updated_by</code>. Foreign key to
+     * the APP_USER table referring to the last user who updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.last_updated_by</code>. Foreign key to the APP_USER table referring to the last user who updated the record.
+     * Getter for <code>oagi.module_set.last_updated_by</code>. Foreign key to
+     * the APP_USER table referring to the last user who updated the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.module_set.creation_timestamp</code>. The timestamp when the record was first created.
+     * Setter for <code>oagi.module_set.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.creation_timestamp</code>. The timestamp when the record was first created.
+     * Getter for <code>oagi.module_set.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>oagi.module_set.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Setter for <code>oagi.module_set.last_update_timestamp</code>. The
+     * timestamp when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.module_set.last_update_timestamp</code>. The timestamp when the record was last updated.
+     * Getter for <code>oagi.module_set.last_update_timestamp</code>. The
+     * timestamp when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(7);

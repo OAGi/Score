@@ -23,6 +23,7 @@ export class AgencyIdListForListRequest {
     end: Date,
   };
   ownedByDeveloper: boolean;
+  cookieType: string;
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
@@ -63,6 +64,7 @@ export class AgencyIdListForListRequest {
       definition: params.get('definition') || '',
       module: params.get('module') || ''
     };
+    this.cookieType = params.get('cookieType') || 'CC';
   }
 
   toQuery(): string {
@@ -110,27 +112,6 @@ export class AgencyIdListForListRequest {
   }
 }
 
-export class CodeListForList {
-  codeListManifestId: number;
-  codeListName: string;
-  definition: string;
-  definitionSource: string;
-  modulePath: string;
-  guid: string;
-  basedCodeListManifestId: number;
-  basedCodeListName: string;
-  listId: string;
-  agencyId: number;
-  agencyIdName: string;
-  versionId: string;
-  lastUpdateTimestamp: Date;
-  extensible: boolean;
-  state: string;
-  owner: string;
-  access: string;
-  revision: string;
-}
-
 export class AgencyIdList {
   releaseId: number;
   agencyIdListManifestId: number;
@@ -139,6 +120,7 @@ export class AgencyIdList {
   basedAgencyIdListManifestId: number;
   basedAgencyIdListName: string;
   agencyId: number;
+  agencyIdListId: number;
   versionId: string;
   namespaceId: number;
   namespaceUri: string;
@@ -154,6 +136,7 @@ export class AgencyIdList {
   access: string;
 
   releaseNum: string;
+  releaseState: string;
   revisionNum: string;
   owner: ScoreUser;
   lastUpdatedBy: ScoreUser;
@@ -168,17 +151,19 @@ export class AgencyIdList {
 
 export class AgencyIdListValue {
   agencyIdListValueManifestId: number;
+  basedAgencyIdListValueManifestId: number;
   guid: string;
   value: string;
   name: string;
   definition: string;
   definitionSource: string;
 
-  used: boolean;
-  locked: boolean;
-  extension: boolean;
   deprecated: boolean;
-  derived: boolean;
+  used: boolean;
+
+  get derived(): boolean {
+    return !!this.basedAgencyIdListValueManifestId;
+  }
 }
 
 export class SimpleAgencyIdListValue {

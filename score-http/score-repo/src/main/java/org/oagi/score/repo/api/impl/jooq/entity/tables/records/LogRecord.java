@@ -40,56 +40,72 @@ public class LogRecord extends UpdatableRecordImpl<LogRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.log.hash</code>. The unique hash to identify the log.
+     * Setter for <code>oagi.log.hash</code>. The unique hash to identify the
+     * log.
      */
     public void setHash(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.log.hash</code>. The unique hash to identify the log.
+     * Getter for <code>oagi.log.hash</code>. The unique hash to identify the
+     * log.
      */
     public String getHash() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.log.revision_num</code>. This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.
+     * Setter for <code>oagi.log.revision_num</code>. This is an incremental
+     * integer. It tracks changes in each component. If a change is made to a
+     * component after it has been published, the component receives a new
+     * revision number. Revision number can be 1, 2, and so on.
      */
     public void setRevisionNum(UInteger value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.log.revision_num</code>. This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.
+     * Getter for <code>oagi.log.revision_num</code>. This is an incremental
+     * integer. It tracks changes in each component. If a change is made to a
+     * component after it has been published, the component receives a new
+     * revision number. Revision number can be 1, 2, and so on.
      */
     public UInteger getRevisionNum() {
         return (UInteger) get(2);
     }
 
     /**
-     * Setter for <code>oagi.log.revision_tracking_num</code>. This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.
+     * Setter for <code>oagi.log.revision_tracking_num</code>. This supports the
+     * ability to undo changes during a revision (life cycle of a revision is
+     * from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM
+     * can be 1, 2, and so on.
      */
     public void setRevisionTrackingNum(UInteger value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.log.revision_tracking_num</code>. This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.
+     * Getter for <code>oagi.log.revision_tracking_num</code>. This supports the
+     * ability to undo changes during a revision (life cycle of a revision is
+     * from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM
+     * can be 1, 2, and so on.
      */
     public UInteger getRevisionTrackingNum() {
         return (UInteger) get(3);
     }
 
     /**
-     * Setter for <code>oagi.log.log_action</code>. This indicates the action associated with the record.
+     * Setter for <code>oagi.log.log_action</code>. This indicates the action
+     * associated with the record.
      */
     public void setLogAction(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.log.log_action</code>. This indicates the action associated with the record.
+     * Getter for <code>oagi.log.log_action</code>. This indicates the action
+     * associated with the record.
      */
     public String getLogAction() {
         return (String) get(4);

@@ -14,10 +14,10 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 
 
 /**
- * This table captures a usage rule information. A usage rule may be expressed 
- * in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION 
- * table. To capture a description of a usage rule, create a usage rule expression 
- * with the unstructured constraint type.
+ * This table captures a usage rule information. A usage rule may be expressed
+ * in multiple expressions. Each expression is captured in the
+ * USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create
+ * a usage rule expression with the unstructured constraint type.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implements Record3<ULong, String, Integer> {
@@ -25,42 +25,50 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the usage rule.
+     * Setter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * usage rule.
      */
     public void setUsageRuleId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the usage rule.
+     * Getter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * usage rule.
      */
     public ULong getUsageRuleId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the usage rule.
+     * Setter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
+     * usage rule.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the usage rule.
+     * Getter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
+     * usage rule.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.condition_type</code>. Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.
+     * Setter for <code>oagi.usage_rule.condition_type</code>. Condition type
+     * according to the CC specification. It is a value list column. 0 =
+     * pre-condition, 1 = post-condition, 2 = invariant.
      */
     public void setConditionType(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.condition_type</code>. Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.
+     * Getter for <code>oagi.usage_rule.condition_type</code>. Condition type
+     * according to the CC specification. It is a value list column. 0 =
+     * pre-condition, 1 = post-condition, 2 = invariant.
      */
     public Integer getConditionType() {
         return (Integer) get(2);

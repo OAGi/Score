@@ -5,7 +5,7 @@ import {
   AccFlatNode,
   AsccpFlatNode,
   BccpFlatNode,
-  BdtFlatNode,
+  DtFlatNode,
   CcFlatNode,
   CcFlatNodeFlattener,
   VSCcTreeDataSource
@@ -63,9 +63,9 @@ class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
 
     let children = [];
 
-    if (node instanceof BdtFlatNode) {
+    if (node instanceof DtFlatNode) {
       targets.forEach(target => {
-        children.push(this.toBdtScNode(nodes[target], node));
+        children.push(this.toDtScNode(nodes[target], node));
       });
       return children;
     }
@@ -87,11 +87,11 @@ class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
         }
       } else if (target.startsWith('BCCP-')) {
         children.push(this.toBccpNode(nodes[target], node));
-      } else if (target.startsWith('BDT-')) {
+      } else if (target.startsWith('DT-')) {
         const bdtScEdges = edges[target];
         if (bdtScEdges) {
           bdtScEdges.targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).forEach(e => {
-            children.push(this.toBdtScNode(e, node));
+            children.push(this.toDtScNode(e, node));
           });
         }
       }
@@ -149,10 +149,11 @@ export class FindUsagesDialogComponent implements OnInit {
       }
 
       const ccGraph = new CcGraph();
-      ccGraph.accManifestId = this.data.manifestId;
       ccGraph.graph = findUsagesResp.graph;
 
-      const flattener = new FindUsagesCcFlatNodeFlattener(ccGraph, this.data.type, this.data.manifestId);
+      const keys = findUsagesResp.rootNodeKey.split('-');
+
+      const flattener = new FindUsagesCcFlatNodeFlattener(ccGraph, keys[0], Number(keys[1]));
       setTimeout(() => {
         const nodes = flattener.flatten();
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.ccNodeService, []);

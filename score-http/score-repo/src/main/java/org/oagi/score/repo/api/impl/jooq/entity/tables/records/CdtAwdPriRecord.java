@@ -14,9 +14,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri;
 
 
 /**
- * This table capture allowed primitives of the CDT?s Content Component.  
- * The information in this table is captured from the Allowed Primitive column 
- * in each of the CDT Content Component section/table in CCTS DTC3.
+ * This table capture allowed primitives of the CDT?s Content Component.  The
+ * information in this table is captured from the Allowed Primitive column in
+ * each of the CDT Content Component section/table in CCTS DTC3.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> implements Record4<ULong, ULong, ULong, Byte> {
@@ -24,56 +24,68 @@ public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary, internal database key.
+     * Setter for <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary,
+     * internal database key.
      */
     public void setCdtAwdPriId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary, internal database key.
+     * Getter for <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary,
+     * internal database key.
      */
     public ULong getCdtAwdPriId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to a CDT in the DT table.
+     * Setter for <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to
+     * a CDT in the DT table.
      */
     public void setCdtId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to a CDT in the DT table.
+     * Getter for <code>oagi.cdt_awd_pri.cdt_id</code>. Foreign key pointing to
+     * a CDT in the DT table.
      */
     public ULong getCdtId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. 
+     * Setter for <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the
+     * CDT_PRI table. It indicates the primative allowed for the CDT identified
+     * in the CDT_ID column. 
      */
     public void setCdtPriId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. 
+     * Getter for <code>oagi.cdt_awd_pri.cdt_pri_id</code>. Foreign key from the
+     * CDT_PRI table. It indicates the primative allowed for the CDT identified
+     * in the CDT_ID column. 
      */
     public ULong getCdtPriId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default primitive for the CDT?s Content Component. True for a default primitive; False otherwise.
+     * Setter for <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default
+     * primitive for the CDT?s Content Component. True for a default primitive;
+     * False otherwise.
      */
     public void setIsDefault(Byte value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default primitive for the CDT?s Content Component. True for a default primitive; False otherwise.
+     * Getter for <code>oagi.cdt_awd_pri.is_default</code>. Indicating a default
+     * primitive for the CDT?s Content Component. True for a default primitive;
+     * False otherwise.
      */
     public Byte getIsDefault() {
         return (Byte) get(3);

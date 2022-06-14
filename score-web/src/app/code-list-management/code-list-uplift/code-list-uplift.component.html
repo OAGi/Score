@@ -79,9 +79,11 @@
               <mat-form-field>
                 <mat-label>Owner</mat-label>
                 <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
@@ -93,9 +95,11 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>

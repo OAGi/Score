@@ -37,7 +37,7 @@ import {
 } from '../domain/core-component-node';
 import {UnboundedPipe} from '../../common/utility';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {RefactorAsccDialogComponent} from '../refactor-ascc-dialog/refactor-ascc-dialog.component';
+import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
@@ -90,6 +90,7 @@ export class AccDetailComponent implements OnInit {
 
   hasBasedAcc: boolean;
   excludeSCs: boolean;
+  initialExpandDepth: number = 10;
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
@@ -168,7 +169,7 @@ export class AccDetailComponent implements OnInit {
 
       const flattener = new CcFlatNodeFlattener(ccGraph, 'ACC', this.manifestId);
       setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs);
+        const nodes = flattener.flatten(this.excludeSCs, this.initialExpandDepth);
         this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
         this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
         this.isUpdating = false;
@@ -209,7 +210,7 @@ export class AccDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return (this.userRole === 'developer') ? e.standard : !e.standard;
+      return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
     });
   }
 
@@ -286,6 +287,16 @@ export class AccDetailComponent implements OnInit {
     return this.rootNode  && this.rootNode.accNode.componentType === 'Extension';
   }
 
+  public doesRefactorAllow = (node: CcFlatNode): boolean => {
+    if (this.userRoles.includes('developer')) {
+      return true;
+    }
+    if (!this.hasRevision()) {
+      return true;
+    }
+    return !this.hasRevisionAssociation(node);
+  };
+
   onClick(node: CcFlatNode, $event?: MouseEvent) {
     if (!!$event) {
       $event.preventDefault();
@@ -308,16 +319,18 @@ export class AccDetailComponent implements OnInit {
     this.treeControl.toggle(node);
   }
 
-  hasRevisionAssociation() {
-    const key = this.getKey(this.selectedNode);
+  hasRevisionAssociation(node?: CcFlatNode) {
+    node = node || this.selectedNode;
+    const key = this.getKey(node);
     if (key.length > 0 && this.lastRevision.associations && this.lastRevision.associations[key]) {
       return this.lastRevision.associations[key] !== undefined;
     }
     return false;
   }
 
-  isDeprecateAble() {
-    const key = this.getKey(this.selectedNode);
+  isDeprecateAble(node?: CcFlatNode) {
+    node = node || this.selectedNode;
+    const key = this.getKey(node);
     if (key.length > 0) {
       if (this.lastRevision.associations && this.lastRevision.associations[key]) {
         return !this.lastRevision.associations[key].deprecated;
@@ -390,7 +403,7 @@ export class AccDetailComponent implements OnInit {
     if (!node) {
       node = this.selectedNode;
     }
-    return (node !== undefined) && (node.type.toUpperCase() === 'BDT_SC');
+    return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
   asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
@@ -566,7 +579,7 @@ export class AccDetailComponent implements OnInit {
         this.rootNode.manifestId,
         association.manifestId,
         association.type,
-        pos !== -1 && this.hasBasedAcc ? pos -1 : pos).subscribe(_ => {
+        pos !== -1 && this.hasBasedAcc ? pos - 1 : pos).subscribe(_ => {
           this.reload((pos === -1) ? 'Appended' : 'Inserted');
           this.isUpdating = false;
       }, err => {
@@ -615,7 +628,7 @@ export class AccDetailComponent implements OnInit {
         }
 
         const initialPropertyTerm = (this.rootNode.detail as CcAccNodeDetail).objectClassTerm;
-        this.service.createAsccp(this.rootNode.releaseId, this.rootNode.manifestId, null, initialPropertyTerm)
+        this.service.createAsccp(this.rootNode.releaseId, this.rootNode.manifestId, initialPropertyTerm, null)
           .pipe(finalize(() => {
             this.isUpdating = false;
           })).subscribe(resp => {
@@ -760,10 +773,11 @@ export class AccDetailComponent implements OnInit {
   }
 
   makeNewRevision() {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this ACC?' : 'Amend this ACC?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this ACC?' : 'Are you sure you want to amend this ACC?'];
-    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+    dialogConfig.data.header = (isDeveloper) ? 'Revise this ACC?' : 'Amend this ACC?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to revise this ACC?' : 'Are you sure you want to amend this ACC?'];
+    dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
@@ -781,7 +795,7 @@ export class AccDetailComponent implements OnInit {
             this.afterStateChanged(resp.state, resp.access);
             this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
               this.lastRevision = revision;
-              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
@@ -821,9 +835,9 @@ export class AccDetailComponent implements OnInit {
     return (this.rootNode.detail as CcAccNodeDetail).oagisComponentType === Semantics.value;
   }
 
-  get userRole(): string {
+  get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
-    return userToken.role;
+    return userToken.roles;
   }
 
   get currentUser(): string {
@@ -846,7 +860,7 @@ export class AccDetailComponent implements OnInit {
         switch (type) {
           case 'ASCCP':
             this.isUpdating = true;
-            this.service.deleteNode('ascc', (node as AsccpFlatNode).asccManifestId).pipe(
+            this.service.deleteNode('ASCC', (node as AsccpFlatNode).asccManifestId).pipe(
               finalize(() => {
                 this.isUpdating = false;
               })
@@ -878,7 +892,7 @@ export class AccDetailComponent implements OnInit {
   }
 
   componentTypeAble(componentType: number) {
-    if (this.userRole === 'developer') {
+    if (this.userRoles.includes('developer')) {
       if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
         return false;
       }
@@ -1160,6 +1174,34 @@ export class AccDetailComponent implements OnInit {
       });
   }
 
+  purgeNode(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Purge this core component?';
+    dialogConfig.data.content = ['Are you sure you want to purge this core component?'];
+    dialogConfig.data.action = 'Purge';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.isUpdating = true;
+        const state = 'Purge';
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
+          .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+          )
+          .subscribe(resp => {
+            this.snackBar.open('Purged', '', {duration: 3000});
+            this.location.back();
+            this.router.navigateByUrl('/core_component');
+          }, err => {
+          });
+      });
+  }
+
   restoreNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore this core component?';
@@ -1197,6 +1239,10 @@ export class AccDetailComponent implements OnInit {
 
   visibleFindUsages(node: CcFlatNode): boolean {
     return node.type.toUpperCase() === 'ACC' || node.type.toUpperCase() === 'ASCCP' || node.type.toUpperCase() === 'BCCP';
+  }
+
+  visibleUngroup(node: CcFlatNode): boolean {
+    return node.type.toUpperCase() === 'ASCCP' && ((node.children[0] as AccFlatNode).accNode.componentType === 'SemanticGroup');
   }
 
   findUsages(node: CcFlatNode) {
@@ -1335,9 +1381,10 @@ export class AccDetailComponent implements OnInit {
   }
 
   cancelRevision(): void {
+    const isDeveloper = this.userRoles.includes('developer');
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
     dialogConfig.data.action = 'Okay';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -1384,8 +1431,13 @@ export class AccDetailComponent implements OnInit {
 
     if (node.parent && (node.parent as AccFlatNode).accManifestId) {
       parentAccManifestId = (node.parent as AccFlatNode).accManifestId;
-      const dialogRef = this.dialog.open(RefactorAsccDialogComponent, {
-        data: {accManifestId: parentAccManifestId, title: node.name},
+      const dialogRef = this.dialog.open(RefactorDialogComponent, {
+        data: {
+          accManifestId: parentAccManifestId,
+          title: node.name,
+          type: associationType,
+          targetManifestId: targetManifestId
+        },
         width: '100%',
         maxWidth: '100%',
         height: '100%',
@@ -1395,12 +1447,45 @@ export class AccDetailComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(accManifestId => {
         if (accManifestId) {
-          this.service.refactorAscc(associationType, targetManifestId, accManifestId).subscribe(_ => {
-            this.reload("Refactored.")
-          });
+            this.reload("Refactored.");
         }
       });
     }
+  }
+
+  ungroup(node: CcFlatNode, pos: number): void {
+    if (pos === 0) {
+      if (this.hasRevision()) {
+        pos = Object.getOwnPropertyNames(this.lastRevision.associations).length;
+      }
+      if (this.hasBasedAcc) {
+        pos += 1;
+      }
+    }
+
+    const sourceAccManifestId = this.rootNode.accManifestId;
+    const targetAsccManifestId = (node as AsccpFlatNode).asccManifestId;
+
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Ungroup ASCC?';
+    dialogConfig.data.content = ['Are you sure you want to ungroup this ASCC?'];
+    dialogConfig.data.action = 'Ungroup anyway';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.isUpdating = true;
+        this.service.ungroup(sourceAccManifestId, targetAsccManifestId, pos !== -1 && this.hasBasedAcc ? pos - 1 : pos)
+          .subscribe(resp => {
+            this.reload('Ungrouped');
+          }, err => {
+            this.isUpdating = false;
+          });
+      });
   }
 
   changeExcludeSCs(): void{

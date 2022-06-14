@@ -1,7 +1,6 @@
 package org.oagi.score.export.model;
 
 import org.jooq.types.ULong;
-import org.oagi.score.common.util.Utility;
 import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScRecord;
@@ -60,7 +59,7 @@ public class BDTSimpleContent extends AbstractBDTSimple {
     }
 
     public String getName() {
-        return Utility.denToName(dataType.getDen());
+        return ModelUtils.getTypeName(dataType);
     }
 
     public String getGuid() {
@@ -68,7 +67,7 @@ public class BDTSimpleContent extends AbstractBDTSimple {
     }
 
     public String getBaseDTName() {
-        return Utility.denToName(baseDataType.getDen());
+        return ModelUtils.getTypeName(baseDataType);
     }
 
     public List<BDTSC> getDtScList() {

@@ -47,6 +47,12 @@ public class ManifestRepository {
                 .fetchOne();
     }
 
+    public DtManifestRecord getDtManifestById(ULong manifestId) {
+        return dslContext.selectFrom(DT_MANIFEST)
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(manifestId))
+                .fetchOne();
+    }
+
     public List<BccManifestRecord> getBccManifestByFromAccManifestId(ULong fromAccManifestId) {
         return dslContext.select(BCC_MANIFEST.fields())
                 .from(BCC_MANIFEST)

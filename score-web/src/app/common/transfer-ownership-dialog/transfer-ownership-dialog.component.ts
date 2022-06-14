@@ -69,8 +69,8 @@ export class TransferOwnershipDialogComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-    if (this.data && this.data.role) {
-      this.request.filters.role = this.data.role;
+    if (this.data && this.data.roles) {
+      this.request.filters.roles = this.data.roles;
     }
     this.accountService.getAccountsList(this.request, true).subscribe(resp => {
       this.paginator.length = resp.length;

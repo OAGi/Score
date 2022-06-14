@@ -90,7 +90,7 @@ public class BieUpliftingCustomMappingTable {
 
         targetDtScMappingMap = mappingList.stream()
                 .filter(e -> hasLength(e.getSourcePath()))
-                .filter(e -> getLastTag(e.getSourcePath()).contains("BDT_SC"))
+                .filter(e -> getLastTag(e.getSourcePath()).contains("DT_SC"))
                 .collect(Collectors.toMap(BieUpliftingMapping::getSourcePath, Function.identity(), (a1, a2) -> a2));
     }
 

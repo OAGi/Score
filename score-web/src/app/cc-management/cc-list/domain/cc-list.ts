@@ -33,6 +33,8 @@ export class CcListRequest {
     module: string;
   };
   isBIEUsable: boolean;
+  fuzzySearch = false;
+  cookieType: string;
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
@@ -58,12 +60,10 @@ export class CcListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
-    // TODO: temporary hide DT
-    // this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP', 'BDT'];
-    this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP'];
+    this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
-    this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')) ? true : false)] : undefined;
-    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')) ? true : false)] : [];
+    this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')))] : undefined;
+    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')))] : undefined;
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
@@ -77,6 +77,7 @@ export class CcListRequest {
       definition: params.get('definition') || '',
       module: params.get('module') || '',
     };
+    this.cookieType = params.get('cookieType') || 'CC';
     this.excludes = [];
     this.findUsages = {
       type: '',
@@ -102,7 +103,8 @@ export class CcListRequest {
     if (this.deprecated !== undefined) {
       params = params.set('deprecated', (this.deprecated) ? 'true' : 'false');
     }
-    if (this.commonlyUsed !== undefined) {
+
+    if (this.commonlyUsed !== undefined && this.commonlyUsed !== []) {
       params = params.set('commonlyUsed', (this.commonlyUsed) ? 'true' : 'false');
     }
     if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
@@ -164,6 +166,9 @@ export class CcList {
   lastUpdateTimestamp: Date;
   id: number;
   ownedByDeveloper: boolean;
+  sixDigitId: string;
+  basedManifestId: number;
+  defaultValueDomain: number;
 }
 
 export class CcUpdateStateListRequest {

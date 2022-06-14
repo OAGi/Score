@@ -39,6 +39,10 @@
   background-color: #ececec;
 }
 
+.mat-tree-node .inhibited {
+  opacity: 0.7;
+}
+
 .mat-tree-node .acc, .mat-tree-node .acc-group {
   color: #bd2c00 !important;
   font-weight: bold !important;
@@ -62,9 +66,22 @@
   text-shadow: inherit !important;
 }
 
-.mat-tree-node .bdt_sc {
+.mat-tree-node .dt_sc {
   color: #bd2c00 !important;
   text-shadow: inherit !important;
+}
+
+.mat-tree-node .dt {
+  color: #796f00 !important;
+  text-shadow: inherit !important;
+}
+
+.mat-column-type {
+  width: 20%;
+}
+
+.mat-column-xbt {
+  width: 30%;
 }
 
 .checklist-leaf-node {
@@ -238,10 +255,21 @@
 
 button:focus, button:active:focus, button.active:focus {
   outline: none !important;
-  outline-style: none !important;
 }
 
 .exclude-scs {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.mat-expansion-panel .mat-expansion-panel-header-title,
+.mat-expansion-panel .mat-expansion-panel-header-description {
+  flex-basis: 0;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hide-prohibited {
   vertical-align: middle;
   margin-right: 5px;
 }

@@ -131,12 +131,12 @@ public class Comment extends TableImpl<CommentRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.COMMENT_REFERENCE);
+        return Arrays.asList(Indexes.COMMENT_REFERENCE);
     }
 
     @Override
@@ -150,18 +150,16 @@ public class Comment extends TableImpl<CommentRecord> {
     }
 
     @Override
-    public List<UniqueKey<CommentRecord>> getKeys() {
-        return Arrays.<UniqueKey<CommentRecord>>asList(Keys.KEY_COMMENT_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<CommentRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CommentRecord, ?>>asList(Keys.COMMENT_PREV_COMMENT_ID_FK, Keys.COMMENT_CREATED_BY_FK);
+        return Arrays.asList(Keys.COMMENT_PREV_COMMENT_ID_FK, Keys.COMMENT_CREATED_BY_FK);
     }
 
     private transient Comment _comment;
     private transient AppUser _appUser;
 
+    /**
+     * Get the implicit join path to the <code>oagi.comment</code> table.
+     */
     public Comment comment() {
         if (_comment == null)
             _comment = new Comment(this, Keys.COMMENT_PREV_COMMENT_ID_FK);
@@ -169,6 +167,9 @@ public class Comment extends TableImpl<CommentRecord> {
         return _comment;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     */
     public AppUser appUser() {
         if (_appUser == null)
             _appUser = new AppUser(this, Keys.COMMENT_CREATED_BY_FK);

@@ -14,10 +14,10 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
 
 
 /**
- * The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, 
- * but it is for the supplementary component (    SC). It allows for the concrete 
- * mapping between the CDT Primitives and types in a particular expression 
- * such as XML Schema, JSON. 
+ * The purpose of this table is the same as that of the
+ * CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It
+ * allows for the concrete mapping between the CDT Primitives and types in a
+ * particular expression such as XML Schema, JSON. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> implements Record3<ULong, ULong, ULong> {
@@ -25,42 +25,54 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>. Internal, primary database key.
+     * Setter for
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>.
+     * Internal, primary database key.
      */
     public void setCdtScAwdPriXpsTypeMapId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>. Internal, primary database key.
+     * Getter for
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>.
+     * Internal, primary database key.
      */
     public ULong getCdtScAwdPriXpsTypeMapId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign key to the CDT_SC_AWD_PRI table.
+     * Setter for
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign
+     * key to the CDT_SC_AWD_PRI table.
      */
     public void setCdtScAwdPriId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign key to the CDT_SC_AWD_PRI table.
+     * Getter for
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign
+     * key to the CDT_SC_AWD_PRI table.
      */
     public ULong getCdtScAwdPriId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign key to the Xbt table. It identifies an XML schema built-in type that maps to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
+     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign
+     * key to the Xbt table. It identifies an XML schema built-in type that maps
+     * to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
      */
     public void setXbtId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign key to the Xbt table. It identifies an XML schema built-in type that maps to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
+     * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign
+     * key to the Xbt table. It identifies an XML schema built-in type that maps
+     * to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
      */
     public ULong getXbtId() {
         return (ULong) get(2);

@@ -100,6 +100,7 @@ public class ModuleSetReleaseService {
         moduleSetReleaseRequest.setModuleSetReleaseId(request.getModuleSetReleaseId());
         GetModuleSetReleaseResponse moduleSetReleaseResponse = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getModuleSetRelease(moduleSetReleaseRequest);
         request.setReleaseId(moduleSetReleaseResponse.getModuleSetRelease().getReleaseId());
+
         List<AssignableNode> accList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableACCByModuleSetReleaseId(request);
         List<AssignableNode> asccpList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableASCCPByModuleSetReleaseId(request);
         List<AssignableNode> bccpList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableBCCPByModuleSetReleaseId(request);
@@ -107,6 +108,7 @@ public class ModuleSetReleaseService {
         List<AssignableNode> codeListList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableCodeListByModuleSetReleaseId(request);
         List<AssignableNode> agencyIdListList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableAgencyIdListByModuleSetReleaseId(request);
         List<AssignableNode> xbtList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignableXBTByModuleSetReleaseId(request);
+
         assignComponents.setAssignableAccManifestMap(accList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));
         assignComponents.setAssignableAsccpManifestMap(asccpList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));
         assignComponents.setAssignableBccpManifestMap(bccpList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));

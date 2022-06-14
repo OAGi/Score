@@ -15,6 +15,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.AppUser;
@@ -108,10 +109,18 @@ public class CcListService {
             case BCCP:
                 BccpManifestRecord bccpManifest = manifestRepository.getBccpManifestById(ULong.valueOf(manifestId));
                 if (bccpManifest == null) {
-                    throw new IllegalArgumentException("Not found a target ASCCP.");
+                    throw new IllegalArgumentException("Not found a target BCCP.");
                 }
 
                 ccNodeService.updateBccpOwnerUserId(user, manifestId, targetUser.getAppUserId());
+                break;
+            case DT:
+                DtManifestRecord dtManifest = manifestRepository.getDtManifestById(ULong.valueOf(manifestId));
+                if (dtManifest == null) {
+                    throw new IllegalArgumentException("Not found a target DT.");
+                }
+
+                ccNodeService.updateDtOwnerUserId(user, manifestId, targetUser.getAppUserId());
                 break;
 
             default:
@@ -250,6 +259,25 @@ public class CcListService {
         request.getBccpManifestIds().forEach(e -> {
             ccNodeService.deleteBccp(user, e);
         });
+        request.getDtManifestIds().forEach(e -> {
+            ccNodeService.deleteDt(user, e);
+        });
+    }
+
+    @Transactional
+    public void purgeCcs(AuthenticatedPrincipal user, CcUpdateStateListRequest request) {
+        request.getAccManifestIds().forEach(e -> {
+            ccNodeService.purgeAcc(user, e);
+        });
+        request.getAsccpManifestIds().forEach(e -> {
+            ccNodeService.purgeAsccp(user, e);
+        });
+        request.getBccpManifestIds().forEach(e -> {
+            ccNodeService.purgeBccp(user, e);
+        });
+        request.getDtManifestIds().forEach(e -> {
+            ccNodeService.purgeDt(user, e);
+        });
     }
 
     @Transactional
@@ -262,6 +290,9 @@ public class CcListService {
         });
         request.getBccpManifestIds().forEach(e -> {
             ccNodeService.updateBccpState(user, e, CcState.WIP);
+        });
+        request.getDtManifestIds().forEach(e -> {
+            ccNodeService.updateDtState(user, e, CcState.WIP);
         });
     }
 
@@ -276,6 +307,9 @@ public class CcListService {
         request.getBccpManifestIds().forEach(e -> {
             ccNodeService.updateBccpState(user, e, CcState.valueOf(request.getToState()));
         });
+        request.getDtManifestIds().forEach(e -> {
+            ccNodeService.updateDtState(user, e, CcState.valueOf(request.getToState()));
+        });
     }
 
     @Transactional
@@ -288,6 +322,9 @@ public class CcListService {
         });
         request.getBccpManifestIds().forEach(e -> {
             transferOwnership(user, "BCCP", e, request.getTargetLoginId());
+        });
+        request.getDtManifestIds().forEach(e -> {
+            transferOwnership(user, "DT", e, request.getTargetLoginId());
         });
     }
 }

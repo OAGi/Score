@@ -1,4 +1,6 @@
 export class BieExpressOption {
+  filenames = {};
+
   bieDefinition: boolean;
   businessContext: boolean;
 
@@ -13,6 +15,9 @@ export class BieExpressOption {
 
   expressionOption: string;
   packageOption: string;
+
+  includeBusinessContextInFilename: boolean;
+  includeVersionInFilename: boolean;
 
   arrayForJsonExpression: boolean;
   includeMetaHeaderForJson: boolean;

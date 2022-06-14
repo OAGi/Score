@@ -12,7 +12,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row9;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -69,12 +69,20 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     public final TableField<DtScManifestRecord, ULong> OWNER_DT_MANIFEST_ID = createField(DSL.name("owner_dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.dt_sc_manifest.conflict</code>. This indicates that there is a conflict between self and relationship.
+     * The column <code>oagi.dt_sc_manifest.based_dt_sc_manifest_id</code>.
+     */
+    public final TableField<DtScManifestRecord, ULong> BASED_DT_SC_MANIFEST_ID = createField(DSL.name("based_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+
+    /**
+     * The column <code>oagi.dt_sc_manifest.conflict</code>. This indicates that
+     * there is a conflict between self and relationship.
      */
     public final TableField<DtScManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
-     * The column <code>oagi.dt_sc_manifest.replacement_dt_sc_manifest_id</code>. This refers to a replacement manifest if the record is deprecated.
+     * The column
+     * <code>oagi.dt_sc_manifest.replacement_dt_sc_manifest_id</code>. This
+     * refers to a replacement manifest if the record is deprecated.
      */
     public final TableField<DtScManifestRecord, ULong> REPLACEMENT_DT_SC_MANIFEST_ID = createField(DSL.name("replacement_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
 
@@ -123,7 +131,7 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
 
     @Override
     public Schema getSchema() {
-        return Oagi.OAGI;
+        return aliased() ? null : Oagi.OAGI;
     }
 
     @Override
@@ -137,22 +145,21 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     }
 
     @Override
-    public List<UniqueKey<DtScManifestRecord>> getKeys() {
-        return Arrays.<UniqueKey<DtScManifestRecord>>asList(Keys.KEY_DT_SC_MANIFEST_PRIMARY);
-    }
-
-    @Override
     public List<ForeignKey<DtScManifestRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<DtScManifestRecord, ?>>asList(Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.BASED_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
     }
 
     private transient Release _release;
     private transient DtSc _dtSc;
     private transient DtManifest _dtManifest;
+    private transient DtScManifest _basedDtScManifestIdFk;
     private transient DtScManifest _dtScReplacementDtScManifestIdFk;
     private transient DtScManifest _dtScPrevDtScManifestIdFk;
     private transient DtScManifest _dtScNextDtScManifestIdFk;
 
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
     public Release release() {
         if (_release == null)
             _release = new Release(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK);
@@ -160,6 +167,9 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _release;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc</code> table.
+     */
     public DtSc dtSc() {
         if (_dtSc == null)
             _dtSc = new DtSc(this, Keys.DT_SC_MANIFEST_DT_SC_ID_FK);
@@ -167,6 +177,9 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtSc;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
+     */
     public DtManifest dtManifest() {
         if (_dtManifest == null)
             _dtManifest = new DtManifest(this, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK);
@@ -174,6 +187,21 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtManifest;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
+     * via the <code>based_dt_sc_manifest_id_fk</code> key.
+     */
+    public DtScManifest basedDtScManifestIdFk() {
+        if (_basedDtScManifestIdFk == null)
+            _basedDtScManifestIdFk = new DtScManifest(this, Keys.BASED_DT_SC_MANIFEST_ID_FK);
+
+        return _basedDtScManifestIdFk;
+    }
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
+     * via the <code>dt_sc_replacement_dt_sc_manifest_id_fk</code> key.
+     */
     public DtScManifest dtScReplacementDtScManifestIdFk() {
         if (_dtScReplacementDtScManifestIdFk == null)
             _dtScReplacementDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK);
@@ -181,6 +209,10 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtScReplacementDtScManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
+     * via the <code>dt_sc_prev_dt_sc_manifest_id_fk</code> key.
+     */
     public DtScManifest dtScPrevDtScManifestIdFk() {
         if (_dtScPrevDtScManifestIdFk == null)
             _dtScPrevDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK);
@@ -188,6 +220,10 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtScPrevDtScManifestIdFk;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
+     * via the <code>dt_sc_next_dt_sc_manifest_id_fk</code> key.
+     */
     public DtScManifest dtScNextDtScManifestIdFk() {
         if (_dtScNextDtScManifestIdFk == null)
             _dtScNextDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
@@ -222,11 +258,11 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row9 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row9<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
+        return (Row9) super.fieldsRow();
     }
 }

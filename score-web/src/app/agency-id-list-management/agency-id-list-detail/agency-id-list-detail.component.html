@@ -89,9 +89,9 @@
                 Move to Candidate
               </button>
               <button mat-raised-button color="warn" (click)="makeNewRevision()"
-                      *ngIf="(state === 'Published' && userRole === 'developer') && access === 'CanMove'"
+                      *ngIf="(state === 'Published' && userRoles.includes('developer')) && access === 'CanMove'"
                       [disabled]="isUpdating">
-                {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
               </button>
               <button mat-raised-button color="warn" (click)="delete()"
                       *ngIf="state === 'WIP' && !hasRevision && access === 'CanEdit'"
@@ -109,8 +109,10 @@
             </div>
             <div class="col-12 actions-wrap" *ngIf="!isWorkingRelease()">
               <button mat-raised-button color="accent" (click)="derive()"
-                      *ngIf="agencyIdList.state === 'Published' && userRole !== 'developer'">
-                Derive Agency Id List based on this
+                      *ngIf="agencyIdList.state === 'Published' &&
+                             agencyIdList.releaseState === 'Published' &&
+                             !userRoles.includes('developer')">
+                Derive Agency ID List based on this
               </button>
               <button mat-raised-button color="primary" (click)="update()"
                       *ngIf="state === 'WIP' && access === 'CanEdit'"
@@ -135,7 +137,7 @@
               <button mat-raised-button color="warn" (click)="makeNewRevision()"
                       *ngIf="(state === 'Published' || state === 'Production') && access === 'CanMove'"
                       [disabled]="isUpdating">
-                {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+                {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
               </button>
               <button mat-raised-button color="warn" (click)="delete()"
                       *ngIf="state === 'WIP' && !hasRevision && access === 'CanEdit'"
@@ -158,9 +160,9 @@
           <mat-card-content class="mat-card-container">
             <div class="row">
               <div class="col-2">
-                <mat-form-field matTooltip="Agency Id List">
+                <mat-form-field matTooltip="Agency ID List">
                   <mat-label>Core Component</mat-label>
-                  <input matInput value="Agency Id List" [disabled]="true">
+                  <input matInput value="Agency ID List" [disabled]="true">
                 </mat-form-field>
               </div>
               <div class="col-2">
@@ -200,7 +202,7 @@
             </div>
 
             <mat-form-field *ngIf="agencyIdList.basedAgencyIdListManifestId !== undefined && agencyIdList.basedAgencyIdListManifestId > 0">
-              <mat-label>Based Agency Id List</mat-label>
+              <mat-label>Based Agency ID List</mat-label>
               <input matInput required data-id="agencyIdList.basedAgencyIdList" [(ngModel)]="agencyIdList.basedAgencyIdListName"
                      maxlength="100" [disabled]="true"/>
             </mat-form-field>
@@ -221,9 +223,11 @@
               <mat-label>Agency ID</mat-label>
               <mat-select data-id="agencyIdList.agencyIdListValueId" [(ngModel)]="agencyIdList.agencyIdListValueManifestId"
                           [disabled]="access !== 'CanEdit' || hasRevision">
-                <ngx-mat-select-search [formControl]="valueFilterCtrl"
-                                       [placeholderLabel]="'Search...'"
-                                       [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                <mat-option>
+                  <ngx-mat-select-search [formControl]="valueFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                </mat-option>
                 <mat-option *ngFor="let value of valueFilteredList | async" [value]="value.agencyIdListValueManifestId">
                   {{ value.name }}
                 </mat-option>
@@ -257,14 +261,14 @@
                      [disabled]="access !== 'CanEdit'"/>
             </mat-form-field>
 
-            <mat-form-field *ngIf="userRole !== 'developer'">
+            <mat-form-field *ngIf="!userRoles.includes('developer')">
               <mat-label>Remark</mat-label>
               <input matInput data-id="agencyIdList.remark" [(ngModel)]="agencyIdList.remark" maxlength="225"
                      [disabled]="access !== 'CanEdit'"/>
             </mat-form-field>
 
-            <div class="row" style="padding: 14px 0 22px 0;">
-              <div class="col-12">
+            <div *ngIf="showDeprecateCheckbox" class="row" style="padding: 14px 0 22px 0;">
+              <div class="col-12" >
                 <mat-checkbox color="primary"
                               data-id="agencyIdList.deprecated" [(ngModel)]="agencyIdList.deprecated"
                               [disabled]="access !== 'CanEdit' || !canDeprecate">
@@ -278,7 +282,7 @@
 
       <mat-card>
         <mat-card-header>
-          <mat-card-title>Agency Id List Values</mat-card-title>
+          <mat-card-title>Agency ID List Values</mat-card-title>
         </mat-card-header>
 
         <mat-card>
@@ -321,7 +325,7 @@
                 <ng-container matColumnDef="value">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Value</th>
                   <td mat-cell *matCellDef="let element">
-                    <span>{{ element.value }}</span>
+                    <span class="{{ color(element) }}">{{ element.value }}</span>
                   </td>
                 </ng-container>
 
@@ -331,7 +335,7 @@
                 </ng-container>
 
                 <ng-container matColumnDef="deprecated">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="w70"> Deprecated</th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Deprecated</th>
                   <td mat-cell *matCellDef="let element">
                     <mat-icon *ngIf="element.deprecated">done</mat-icon>
                   </td>

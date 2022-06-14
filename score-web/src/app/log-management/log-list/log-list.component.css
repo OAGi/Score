@@ -2,7 +2,7 @@
   color: darkgreen;
 }
 
-.Modified {
+.Modified, .Refactored, .Ungrouped {
   color: cornflowerblue;
 }
 

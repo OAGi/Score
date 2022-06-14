@@ -76,16 +76,19 @@ public class SettingsService {
 
     private void updateFromLogin(AppUser account, String newPassword) {
         dslContext.update(APP_USER)
-                .set(row(APP_USER.PASSWORD, APP_USER.ORGANIZATION, APP_USER.NAME),
-                        row(passwordEncoder.encode(newPassword), account.getOrganization(), account.getName()))
+                .set(APP_USER.PASSWORD, passwordEncoder.encode(newPassword))
+                .set(APP_USER.ORGANIZATION, account.getOrganization())
+                .set(APP_USER.NAME, account.getName())
+                .set(APP_USER.IS_ADMIN, (byte) (account.isAdmin() ? 1 : 0))
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(account.getLoginId()))
                 .execute();
     }
 
     private void updateInformationFromLogin(AppUser account) {
         dslContext.update(APP_USER)
-                .set(row(APP_USER.ORGANIZATION, APP_USER.NAME),
-                        row(account.getOrganization(), account.getName()))
+                .set(APP_USER.ORGANIZATION, account.getOrganization())
+                .set(APP_USER.NAME, account.getName())
+                .set(APP_USER.IS_ADMIN, (byte) (account.isAdmin() ? 1 : 0))
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(account.getLoginId()))
                 .execute();
     }

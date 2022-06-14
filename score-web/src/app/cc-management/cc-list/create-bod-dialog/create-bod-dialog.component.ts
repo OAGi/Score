@@ -40,8 +40,8 @@ export class CreateBodDialogComponent implements OnInit {
   nounDataSource = new MatTableDataSource<CcList>();
   verbDataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
-  nounSelection = new SelectionModel<CcList>(false, []);
-  verbSelection = new SelectionModel<CcList>(false, []);
+  nounSelection = new SelectionModel<CcList>(true, []);
+  verbSelection = new SelectionModel<CcList>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -105,11 +105,13 @@ export class CreateBodDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.onChange('verb');
+    this.onChange('noun');
   }
 
-  onPageChange(event: PageEvent) {
-    this.onChange();
+  onPageChange(event: PageEvent, type: string) {
+    this.onChange(type);
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -134,7 +136,7 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
-  onChange(type?: string) {
+  onChange(type: string) {
     this.loading = true;
 
     if (!type || 'verb' === type) {
@@ -143,9 +145,6 @@ export class CreateBodDialogComponent implements OnInit {
         this.verbPaginator.pageIndex, this.verbPaginator.pageSize);
 
       this.ccListService.getCcList(this.verbRequest).subscribe(resp => {
-        this.verbPaginator.length = resp.length;
-        this.verbPaginator.pageIndex = resp.page;
-
         const list = resp.list.map((elm: CcList) => {
           elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
           if (this.verbRequest.filters.module.length > 0) {
@@ -162,6 +161,19 @@ export class CreateBodDialogComponent implements OnInit {
         });
 
         this.verbDataSource.data = list;
+        this.verbPaginator.length = resp.length;
+        this.verbPaginator.pageIndex = resp.page;
+
+        // clean up the selection
+        if (this.verbSelection.selected.length > 0) {
+          const selectedMap = new Map(this.verbSelection.selected.map(e => [e.id, e]));
+          this.verbDataSource.data.forEach(e => {
+            if (selectedMap.has(e.id)) {
+              this.verbSelection.deselect(selectedMap.get(e.id));
+              this.verbSelection.select(e);
+            }
+          });
+        }
         this.loading = false;
       });
     }
@@ -172,9 +184,6 @@ export class CreateBodDialogComponent implements OnInit {
         this.nounPaginator.pageIndex, this.nounPaginator.pageSize);
 
       this.ccListService.getCcList(this.nounRequest).subscribe(resp => {
-        this.nounPaginator.length = resp.length;
-        this.nounPaginator.pageIndex = resp.page;
-
         const list = resp.list.map((elm: CcList) => {
           elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
           if (this.nounRequest.filters.module.length > 0) {
@@ -191,6 +200,19 @@ export class CreateBodDialogComponent implements OnInit {
         });
 
         this.nounDataSource.data = list;
+        this.nounPaginator.length = resp.length;
+        this.nounPaginator.pageIndex = resp.page;
+
+        // clean up the selection
+        if (this.nounSelection.selected.length > 0) {
+          const selectedMap = new Map(this.nounSelection.selected.map(e => [e.id, e]));
+          this.nounDataSource.data.forEach(e => {
+            if (selectedMap.has(e.id)) {
+              this.nounSelection.deselect(selectedMap.get(e.id));
+              this.nounSelection.select(e);
+            }
+          });
+        }
         this.loading = false;
       });
     }
@@ -205,27 +227,76 @@ export class CreateBodDialogComponent implements OnInit {
       return;
     }
 
-    if (this.nounSelection.selected[0].deprecated || this.verbSelection.selected[0].deprecated) {
+    const numOfDeprecatedComponents =
+      this.nounSelection.selected.filter(e => e.deprecated).length +
+      this.verbSelection.selected.filter(e => e.deprecated).length;
+
+    const numOfDeletedComponents =
+      this.nounSelection.selected.filter(e => e.state === 'Deleted').length +
+      this.verbSelection.selected.filter(e => e.state === 'Deleted').length;
+
+    if (numOfDeprecatedComponents > 0 || numOfDeletedComponents > 0) {
       const dialogConfig = this.confirmDialogService.newConfig();
       dialogConfig.data.header = 'Confirmation required';
-      dialogConfig.data.content = ['The selected component is deprecated', 'Are you sure you want to proceed with it?'];
+      dialogConfig.data.content = [
+        (numOfDeprecatedComponents > 0) ?
+          'There ' + ((numOfDeprecatedComponents === 1) ? 'is a deprecate component' : 'are deprecate components') + ' in the selected list.' :
+          'There ' + ((numOfDeletedComponents === 1) ? 'is a deleted component' : 'are deleted components') + ' in the selected list.',
+        'Are you sure you want to proceed with it?'];
       dialogConfig.data.action = 'Proceed anyway';
 
       this.confirmDialogService.open(dialogConfig).beforeClosed()
         .subscribe(result => {
           if (result) {
             this.dialogRef.close({
-              verbManifestId: this.verbSelection.selected[0].manifestId,
-              nounManifestId: this.nounSelection.selected[0].manifestId
+              verbManifestIdList: this.verbSelection.selected.map(e => e.manifestId),
+              nounManifestIdList: this.nounSelection.selected.map(e => e.manifestId)
             });
           }
         });
     } else {
       this.dialogRef.close({
-        verbManifestId: this.verbSelection.selected[0].manifestId,
-        nounManifestId: this.nounSelection.selected[0].manifestId
+        verbManifestIdList: this.verbSelection.selected.map(e => e.manifestId),
+        nounManifestIdList: this.nounSelection.selected.map(e => e.manifestId)
       });
     }
+  }
+
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected(type: string) {
+    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
+    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
+
+    const selectedIdList = selection.selected.map(e => e.manifestId).slice().sort();
+    const rowIdList = dataSource.data.map(e => e.manifestId).slice().sort();
+    return selectedIdList.length === rowIdList.length &&
+      selectedIdList.every(val => rowIdList.includes(val));
+  }
+
+  numOfSelected(type: string): number {
+    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
+    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
+
+    const selectedIdList = selection.selected.map(e => e.manifestId).slice().sort();
+    const rowIdList = dataSource.data.map(e => e.manifestId).slice().sort();
+    const numOfSelected = selectedIdList.filter(val => rowIdList.includes(val)).length;
+    return numOfSelected;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle(type: string, event) {
+    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
+    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
+    const paginator = (type === 'verb') ? this.verbPaginator : this.nounPaginator;
+
+    (selection.selected.length === paginator.length) ?
+      selection.clear() :
+      ((this.numOfSelected(type) > 0) ?
+        dataSource.data.forEach(row => this.deselect(row, type)) :
+        dataSource.data.forEach(row => this.select(row, type)));
+
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   select(row: CcList, type: string) {
@@ -236,19 +307,19 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
-  toggle(row: CcList, type: string) {
+  deselect(row: CcList, type: string) {
     if (type === 'verb') {
-      if (this.isSelected(row, type)) {
-        this.verbSelection.deselect(row);
-      } else {
-        this.select(row, type);
-      }
+      this.verbSelection.deselect(row);
     } else {
-      if (this.isSelected(row, type)) {
-        this.nounSelection.deselect(row);
-      } else {
-        this.select(row, type);
-      }
+      this.nounSelection.deselect(row);
+    }
+  }
+
+  toggle(row: CcList, type: string) {
+    if (this.isSelected(row, type)) {
+      this.deselect(row, type);
+    } else {
+      this.select(row, type);
     }
   }
 
@@ -260,8 +331,16 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
+  get totalNumberOfBODs(): number {
+    const numOfNounSelection = this.nounSelection.selected.length;
+    const numOfVerbSelection = this.verbSelection.selected.length;
+    return numOfNounSelection * numOfVerbSelection;
+  }
+
   get BODName(): string {
-    if (this.nounSelection.selected.length === 0 || this.verbSelection.selected.length === 0) {
+    const numOfNounSelection = this.nounSelection.selected.length;
+    const numOfVerbSelection = this.verbSelection.selected.length;
+    if (numOfNounSelection === 0 || numOfVerbSelection === 0) {
       return '';
     }
     return this.verbSelection.selected[0].name + ' ' + this.nounSelection.selected[0].name;

@@ -2,6 +2,8 @@ span.cl-state {
   font-size: 13px;
   padding: .30em 4px;
   border-radius: 4px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 span.release-state {
