@@ -1,5 +1,7 @@
 # Test Suite 24
 
+> End user BIE Management
+
 Test Case 6.2 and Test Case 6.3 cover other end user’s BIE functions.
 
 ## Test Case 24.1

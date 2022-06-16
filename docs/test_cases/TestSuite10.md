@@ -1,5 +1,7 @@
 # Test Suite 10
 
+> Working branch Core Component Management Behaviors for Developer
+
 We did think about using the concept of project (which like a branch). In that case, users need to create a CC Release Project first. Users can create multiple CC Release Projects at the same time. Each release project is like a branch so the project has a snapshot from a release. This would allow users to create a bug fix release from any prior release. But this would mean we have to create a merging feature. Also, typically, OAGi does not go back and create a fix for prior release. So, we can say that the current tool design only allows linear management of core component releases.
 
 If we do however let the user work on BIEs based on any prior release and user extension to those BIEs can be created within those releases. Then, it is sort of like a branch. And we would like to create a sort of a merge functionality. It is not a merge per se because it is more like an alignment, i.e., the core components (the standard) always win.

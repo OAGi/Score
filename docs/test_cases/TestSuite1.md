@@ -1,5 +1,7 @@
 # Test Suite 1
 
+> OAGIS developer Authentication and Authorized Functions
+
 
 ## Test Case 1.1
 

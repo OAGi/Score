@@ -1,5 +1,7 @@
 # Test Suite 20
 
+> Namespace Management
+
 Namespaces have no state. It has an owner which is the creator. Ownership transfer functionality should be available to transfer to the same kind of user. Namespace details are visible to anybody. A namespace cannot be discarded if it is used. If the namespace is created by a developer, it is considered a standard namespace; otherwise, it gets the is_std_nmsp value false. Details of namespaces should be visible within one table and expose the following columns GUID, Owner, URI, Prefix, Description, Standard (flag), Updated (date time). The table should allow the user to sort by those columns. The user should be able to filter namespaces using GUID, URI, Prefix, Owner, and Standard flag. Namespace Management menu item should be under the Core Component menu.
 
 ## Test Case 20.1

@@ -1,5 +1,7 @@
 # Test Suite 7
 
+> UI terminology
+
 
 ## Test Case 7.1
 

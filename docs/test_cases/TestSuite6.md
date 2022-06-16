@@ -1,5 +1,7 @@
 # Test Suite 6
 
+> End user access right to Score core functions
+
 Test cases in here should be similar to those in Test Suite 5. However, I'm thinking we don't have to test as comprehensive as Test Suite 5 when the behaviors are expected to be the same regardless of the user role. This test suite should make sure that the end user can see and do and cannot see and do as appropriate to the user role.
 
 ## Test Case 6.1

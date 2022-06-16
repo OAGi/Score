@@ -1,5 +1,7 @@
 # Test Suite 3
 
+> End user authorized functions
+
 
 ## Test Case 3.1
 

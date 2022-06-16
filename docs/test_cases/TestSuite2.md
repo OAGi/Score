@@ -1,5 +1,7 @@
 # Test Suite 2
 
+> OAGIS developer can manage users
+
 
 ## Test Case 2.1
 

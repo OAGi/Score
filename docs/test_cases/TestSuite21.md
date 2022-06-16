@@ -1,5 +1,7 @@
 # Test Suite 21
 
+> Module Management
+
 Module Management has three major functions Manage Module-Release Assignment, Manage CC-Module Assignment, and Manage Module Dependency. The data associated with these two functions are used for serializing the model into files. Data can be managed only by developers. End users cannot access to Module Management.
 
 Add Module Management menu item under the Core Component menu. It has three submenus including Module-Release Assignment, CC-Module Assignment, and Module Dependency.

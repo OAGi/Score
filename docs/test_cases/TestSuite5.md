@@ -1,5 +1,7 @@
 # Test Suite 5
 
+> OAGIS developer access right to Score core functions
+
 
 ## Test Case 5.1
 
