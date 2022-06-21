@@ -22,7 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <mysql-connector-java.version>8.0.27</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <jOOQ.version>3.16.5</jOOQ.version>
         <gson.version>2.9.0</gson.version>
 
