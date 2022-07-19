@@ -1,12 +1,10 @@
 # Test Suite 8
 
-> Core component search and view function
+**Core component search and view function**
 
-For now, we don’t have to test for separate user roles b/c we only want to cover the search and view function and both user roles have the same right.
+> For now, we don’t have to test for separate user roles b/c we only want to cover the search and view function and both user roles have the same right.
 
 ## Test Case 8.1
-
-> 
 
 Pre-condition: N/A
 

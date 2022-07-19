@@ -1,11 +1,11 @@
 # Test Suite 2
 
-> OAGIS developer can manage users
+**OAGIS developer can manage users**
 
 
 ## Test Case 2.1
 
-> OAGIS developer can manage OAGIS developer accounts
+**OAGIS developer can manage OAGIS developer accounts**
 
 Pre-condition: N/A
 
@@ -98,7 +98,7 @@ An OAGIS developer can approve or reject a single sign on request by another OAG
 
 ## Test Case 2.2
 
-> OAGIS developer can manage end user accounts
+**OAGIS developer can manage end user accounts**
 
 Pre-condition: N/A
 

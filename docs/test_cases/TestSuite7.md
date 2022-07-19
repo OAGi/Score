@@ -1,11 +1,11 @@
 # Test Suite 7
 
-> UI terminology
+**UI terminology**
 
 
 ## Test Case 7.1
 
-> OAGi Navigation Menu
+**OAGi Navigation Menu**
 
 Pre-condition: N/A
 
@@ -42,7 +42,7 @@ The Core Component menu should have a title element with the content “Manage M
 
 ## Test Case 7.2
 
-> OAGi Terminology View/Edit BIE Page
+**OAGi Terminology View/Edit BIE Page**
 
 Pre-condition: N/A
 
@@ -64,7 +64,7 @@ The name of the page should be “BIEs (Profiled Components, Nouns, BODs)”.
 
 ## Test Case 7.3
 
-> OAGi Terminology Create BIE Page
+**OAGi Terminology Create BIE Page**
 
 Pre-condition: OAGi terminology has been selected
 
@@ -91,7 +91,7 @@ The second page used in creating a BIE, namely the page where a top level concep
 
 ## Test Case 7.4
 
-> OAGi Terminology Copy BIE Page
+**OAGi Terminology Copy BIE Page**
 
 Pre-condition: N/A
 
@@ -118,7 +118,7 @@ The subtitle of the second step/page of creating a BIE should be “Select BIE (
 
 ## Test Case 7.5
 
-> OAGi Terminology Append an Association Dialog
+**OAGi Terminology Append an Association Dialog**
 
 Pre-condition: N/A
 
@@ -155,7 +155,7 @@ The Module field filter of the dialog where you append a BCCP while editing an e
 
 ## Test Case 7.6
 
-> OAGi Terminology Core Component
+**OAGi Terminology Core Component**
 
 Pre-condition: N/A
 

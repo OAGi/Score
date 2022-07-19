@@ -1,11 +1,9 @@
 # Test Suite 29
 
-> BIE Uplifting
+**BIE Uplifting**
 
 
 ## Test Case 29.1
-
-> 
 
 Pre-condition: There should exist at least two published releases. There should also be some BIEs in a non-latest release. Some of them should reuse a BIE and have an extension (UEGACC).
 

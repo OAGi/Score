@@ -1,11 +1,11 @@
 # Test Suite 33
 
-> Code List Uplifting
+**Code List Uplifting**
 
 
 ## Test Case 33.1
 
-> Developer Code List Uplifting
+**Developer Code List Uplifting**
 
 Pre-condition: N/A
 
@@ -23,7 +23,7 @@ The developer cannot use this functionality.
 
 ## Test Case 33.2
 
-> End User Code List Uplifting
+**End User Code List Uplifting**
 
 Pre-condition: N/A
 

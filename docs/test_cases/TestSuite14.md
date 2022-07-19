@@ -1,11 +1,11 @@
 # Test Suite 14
 
-> Working Branch Core Component Management Behaviors for End User
+**Working Branch Core Component Management Behaviors for End User**
 
 
 ## Test Case 14.1
 
-> Access to Core component viewing, editing, and commenting
+**Access to Core component viewing, editing, and commenting**
 
 Pre-condition: A working release is selected.
 

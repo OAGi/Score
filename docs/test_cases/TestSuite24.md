@@ -1,15 +1,16 @@
 # Test Suite 24
 
-> End user BIE Management
+**End user BIE Management**
 
-Test Case 6.2 and Test Case 6.3 cover other end user’s BIE functions.
+> Test Case 6.2 and Test Case 6.3 cover other end user’s BIE functions.
 
 ## Test Case 24.1
 
-> Reuse a BIE
+**Reuse a BIE**
+
+> BIE reuse allows for top-level BIEs to be reused under another top-level BIE.
 
 Pre-condition: In a latest release, there are existing top-level BIEs in Production, QA, and WIP state that reference the same CC as a BIE under another top-level BIE being edited (we will call these “BIEs to be reused”). There are also some other top-level BIEs in Production state that do not reference that same CC. There are BIEs with the same DENs as “BIEs to be reused” in an older release.
-BIE reuse allows for top-level BIEs to be reused under another top-level BIE.
 
 
 ### Test Assertion:
@@ -77,10 +78,11 @@ The end user can express a reusing BIE that reuses a BIE in WIP state and owned 
 
 ## Test Case 24.2
 
-> Create a Top-level BIE from a BIE node
+**Create a Top-level BIE from a BIE node**
+
+> This functionality allows the user to create a top-level BIE from a descendant BIE node within a top-level BIE. The created top-level BIE may be reused within another top-level BIE afterward.
 
 Pre-condition: N/A
-This functionality allows the user to create a top-level BIE from a descendant BIE node within a top-level BIE. The created top-level BIE may be reused within another top-level BIE afterward.
 
 
 ### Test Assertion:

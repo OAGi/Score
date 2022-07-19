@@ -1,12 +1,12 @@
 # Test Suite 12
 
-> Working Branch Code List Management for End User
+**Working Branch Code List Management for End User**
 
-Basically, the end user cannot do any editing but only view the code list.
+> Basically, the end user cannot do any editing but only view the code list.
 
 ## Test Case 12.1
 
-> Code list access
+**Code list access**
 
 Pre-condition: Working branch code list is selected.
 

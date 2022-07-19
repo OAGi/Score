@@ -1,11 +1,11 @@
 # Test Suite 18
 
-> Draft Release Branch Core Component and Code List Access by Developers and End Users
+**Draft Release Branch Core Component and Code List Access by Developers and End Users**
 
 
 ## Test Case 18.1
 
-> Core Component Access
+**Core Component Access**
 
 Pre-condition: The draft release branch is selected on the View/Edit Core Component page.
 
@@ -46,7 +46,7 @@ Position of an association changes.
 
 ## Test Case 18.2
 
-> Code List Access
+**Code List Access**
 
 Pre-condition: The draft release branch is selected on the View/Edit Core List page.
 

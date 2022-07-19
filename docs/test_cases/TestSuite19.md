@@ -1,12 +1,12 @@
 # Test Suite 19
 
-> Release Management
+**Release Management**
 
-Only developers can access release management. There isn’t a release owner, but only developers manage a release. End users can see what is going on.
+> Only developers can access release management. There isn’t a release owner, but only developers manage a release. End users can see what is going on.
 
 ## Test Case 19.1
 
-> Release management
+**Release management**
 
 Pre-condition: N/A
 

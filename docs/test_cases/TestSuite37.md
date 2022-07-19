@@ -1,12 +1,12 @@
 # Test Suite 37
 
-> Release Branch Agency ID List Management for End User
+**Release Branch Agency ID List Management for End User**
 
-Generally, the end user can add/edit an end user Agency ID list with base and without base.
+> Generally, the end user can add/edit an end user Agency ID list with base and without base.
 
 ## Test Case 37.1
 
-> Agency ID access
+**Agency ID access**
 
 Pre-condition: A release branch is selected.
 
@@ -39,7 +39,7 @@ Developer users CAN view but CANNOT edit end user’s agency ID lists in any sta
 
 ## Test Case 37.2
 
-> Creating a brand-new end user Agency ID list
+**Creating a brand-new end user Agency ID list**
 
 Pre-condition: A release branch is selected.
 
@@ -78,7 +78,7 @@ The value in the Agency ID field must be one of the IDs in the list.
 
 ## Test Case 37.3
 
-> Editing a brand-new end user Agency ID list
+**Editing a brand-new end user Agency ID list**
 
 Pre-condition: The brand-new Agency ID list is created by the end user and is in the WIP state. The end user accesses these functionalities by opening the brand-new Agency ID list from the Agency ID list View/Edit page on a particular release branch or after creating a brand-new end user Agency ID list.
 
@@ -131,7 +131,7 @@ When the end user tries to discard an Agency ID in the list and it is used in th
 
 ## Test Case 37.4
 
-> Amend an end user Agency ID list
+**Amend an end user Agency ID list**
 
 Pre-condition: The end user has selected a particular release branch.
 
@@ -177,10 +177,11 @@ The end user can cancel the amendment. In this case, the system rollbacks the wh
 
 ## Test Case 37.5
 
-> End user Agency ID list state management
+**End user Agency ID list state management**
+
+> All these state changes need a confirmation dialog box “Do you want to change state of the Agency ID list to XYZ?”.
 
 Pre-condition: The end user is on the Code List detail page, which he owns.
-All these state changes need a confirmation dialog box “Do you want to change state of the Agency ID list to XYZ?”.
 
 
 ### Test Assertion:
@@ -210,10 +211,11 @@ The end user cannot change the Agency ID list state from WIP directly to Product
 
 ## Test Case 37.6
 
-> Deleting an Agency ID list
+**Deleting an Agency ID list**
+
+> Delete an Agency ID list means that it is marked as “Deleted” and it is still displayed in the Agency ID list page (Core Component -> View/Edit Agency ID list) when the release branch the Agency ID list belongs to is selected. If an Agency ID list is “Deleted” any other end user can restore it.
 
 Pre-condition: N/A
-Delete an Agency ID list means that it is marked as “Deleted” and it is still displayed in the Agency ID list page (Core Component -> View/Edit Agency ID list) when the release branch the Agency ID list belongs to is selected. If an Agency ID list is “Deleted” any other end user can restore it.
 
 
 ### Test Assertion:
@@ -232,7 +234,7 @@ End user Agency ID list whose revision number is more than 1 in any state cannot
 
 ## Test Case 37.7
 
-> Restoring end user Agency ID list
+**Restoring end user Agency ID list**
 
 Pre-condition: The end user is on the Agency ID list View/Edit page with a release branch selected. Deleted end user Agency ID lists are shown in the list (e.g., “Deleted” state is selected in the state filter box).
 

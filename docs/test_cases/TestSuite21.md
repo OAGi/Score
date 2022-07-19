@@ -1,19 +1,20 @@
 # Test Suite 21
 
-> Module Management
+**Module Management**
 
-Module Management has three major functions Manage Module-Release Assignment, Manage CC-Module Assignment, and Manage Module Dependency. The data associated with these two functions are used for serializing the model into files. Data can be managed only by developers. End users cannot access to Module Management.
+> Module Management has three major functions Manage Module-Release Assignment, Manage CC-Module Assignment, and Manage Module Dependency. The data associated with these two functions are used for serializing the model into files. Data can be managed only by developers. End users cannot access to Module Management.
 
-Add Module Management menu item under the Core Component menu. It has three submenus including Module-Release Assignment, CC-Module Assignment, and Module Dependency.
+> Add Module Management menu item under the Core Component menu. It has three submenus including Module-Release Assignment, CC-Module Assignment, and Module Dependency.
 
-Note: Because entities related module management have no ownership. Multiple developers may edit them at the same time. Two-phase commit needs to be implemented to manage the concurrent edits of these entities.
+> Note: Because entities related module management have no ownership. Multiple developers may edit them at the same time. Two-phase commit needs to be implemented to manage the concurrent edits of these entities.
 
 ## Test Case 21.1
 
-> Manage Module Set
+**Manage Module Set**
+
+> This functionality allows the developer to create and assign modules to a module set.
 
 Pre-condition: N/A
-This functionality allows the developer to create and assign modules to a module set.
 
 
 ### Test Assertion:
@@ -76,10 +77,11 @@ The developer can view any existing module set. He can also edit its details (i.
 
 ## Test Case 21.2
 
-> Manage Release Module Set
+**Manage Release Module Set**
+
+> Release module set is an entity that refers to module set the developer would like to use for a release.
 
 Pre-condition: N/A
-Release module set is an entity that refers to module set the developer would like to use for a release.
 
 
 ### Test Assertion:
@@ -120,10 +122,11 @@ The developer can move the Release to Draft state again. In this case, the Relea
 
 ## Test Case 21.3
 
-> Manage CC-Module Assignment
+**Manage CC-Module Assignment**
+
+> CC-Module assignment allows developers to assign CCs to the modules in a module set. CCs must be in the same release as the module set.
 
 Pre-condition: The developer is on the CC-Module Assignment page. At least two releases are available in the database. Each release has at least two module sets assigned.
-CC-Module assignment allows developers to assign CCs to the modules in a module set. CCs must be in the same release as the module set.
 
 
 ### Test Assertion:
@@ -161,11 +164,11 @@ The end user can view CC-Module assignment but cannot make any change.
 
 ## Test Case 21.4
 
-> Manage module dependency
+**Manage module dependency**
+
+> This functionality allows the developer to add/discard dependencies between modules about, e.g., include or import. The assumption is that the module dependency does not change for a module set used in different releases.
 
 Pre-condition: N/A
-This functionality allows the developer to add/discard dependencies between modules about, e.g., include or import.
-The assumption is that the module dependency does not change for a module set used in different releases.
 
 
 ### Test Assertion:

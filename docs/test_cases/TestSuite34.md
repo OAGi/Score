@@ -1,11 +1,11 @@
 # Test Suite 34
 
-> Working Branch Agency ID List Management for Developer
+**Working Branch Agency ID List Management for Developer**
 
 
 ## Test Case 34.1
 
-> Agency ID access
+**Agency ID access**
 
 Pre-condition: A working branch is selected.
 
@@ -68,7 +68,7 @@ The developer can search for Agency ID Lists based only on their Module.
 
 ## Test Case 34.2
 
-> Creating a brand-new developer Agency ID List
+**Creating a brand-new developer Agency ID List**
 
 Pre-condition: N/A
 
@@ -86,7 +86,7 @@ The developer cannot create a brand-new Agency ID List.
 
 ## Test Case 34.3
 
-> Creating a new revision of a developer Agency ID List
+**Creating a new revision of a developer Agency ID List**
 
 Pre-condition: N/A
 
@@ -104,7 +104,7 @@ On the Agency ID List Detail page of the working branch, the developer can creat
 
 ## Test Case 34.4
 
-> Editing a revision of a developer Agency ID List
+**Editing a revision of a developer Agency ID List**
 
 Pre-condition: The Agency ID List under test has revision number greater than 1 and is in WIP state.
 
@@ -144,10 +144,11 @@ The developer can cancel the revision. In this case, the system rollbacks the Ag
 
 ## Test Case 34.5
 
-> Developer Agency ID List state management
+**Developer Agency ID List state management**
+
+> All these state changes need a confirmation dialog box “Do you want to change state of the Agency ID List to XYZ?”.
 
 Pre-condition: The developer is on the Agency ID List detail page, which he owns.
-All these state changes need a confirmation dialog box “Do you want to change state of the Agency ID List to XYZ?”.
 
 
 ### Test Assertion:
@@ -172,7 +173,7 @@ The developer can change the Agency ID List state from Candidate back to WIP.
 
 ## Test Case 34.6
 
-> Deleting an Agency ID List
+**Deleting an Agency ID List**
 
 Pre-condition: N/A
 

@@ -1,11 +1,11 @@
 # Test Suite 38
 
-> Working Branch Data Type Management for Developer
+**Working Branch Data Type Management for Developer**
 
 
 ## Test Case 38.1
 
-> DT access
+**DT access**
 
 Pre-condition: A working branch is selected.
 
@@ -70,7 +70,7 @@ The developer cannot move states of several DTs in one shot if all selected DTs 
 
 ## Test Case 38.2
 
-> Creating a brand-new DT
+**Creating a brand-new DT**
 
 Pre-condition: N/A
 
@@ -91,7 +91,7 @@ The developer cannot create a brand-new developer DT when a release branch is se
 
 ## Test Case 38.3
 
-> Editing a brand-new developer DT
+**Editing a brand-new developer DT**
 
 Pre-condition: The brand-new DT is created by the developer and is in the WIP state. The developer accesses these functionalities by opening the brand-new DT from the CC list page or after creating a brand-new DT according to the Test Case 38.2.
 
@@ -127,7 +127,7 @@ Once the Update button is clicked, the changes, except Definition and Definition
 
 ## Test Case 38.4
 
-> Add a brand-new SC
+**Add a brand-new SC**
 
 Pre-condition: A DT in WIP state is open.
 
@@ -168,7 +168,7 @@ The added SC is propagated to all DTs derived from the DT in which the SC is add
 
 ## Test Case 38.5
 
-> Remove a brand-new SC
+**Remove a brand-new SC**
 
 Pre-condition: N/A
 
@@ -189,7 +189,7 @@ The developer can remove a brand-new SC of a DT that is a base of another DT. In
 
 ## Test Case 38.6
 
-> Editing a brand-new SC
+**Editing a brand-new SC**
 
 Pre-condition: A DT in WIP state is open and there exists a brand-new SC (locally/uninherited) added in the DT revision (first revision or a subsequent revision).
 
@@ -225,7 +225,7 @@ Once the Update button is clicked, the changes, except Definition and Definition
 
 ## Test Case 38.7
 
-> Editing an inherited SC in a brand-new DT or revised DT
+**Editing an inherited SC in a brand-new DT or revised DT**
 
 Pre-condition: A DT in WIP state is open and there exists some SCs inherited from its based DT.
 
@@ -264,7 +264,7 @@ Once the Update button is clicked, the changes, except Definition and Definition
 
 ## Test Case 38.8
 
-> Editing Value Domains
+**Editing Value Domains**
 
 Pre-condition: The DT is in WIP state. This Test Case applies to value domain editing of both the DT content component and supplementary components, so each assertion needs to be tested for both the cases of content component and supplementary component.
 
@@ -297,7 +297,7 @@ The user can change Default value domain. (Changing default value domain does ef
 
 ## Test Case 38.9
 
-> Creating a new revision of a developer DT
+**Creating a new revision of a developer DT**
 
 Pre-condition: N/A
 
@@ -318,7 +318,7 @@ A new revision CANNOT be made on an DT in non-Published state.
 
 ## Test Case 38.10
 
-> Editing a revision of a developer DT
+**Editing a revision of a developer DT**
 
 Pre-condition: The DT under test has revision number greater than 1 and is in WIP state.
 
@@ -348,7 +348,7 @@ Once the Update button is clicked, all changes, except Definition, Definition So
 
 ## Test Case 38.11
 
-> Editing existing supplementary components of a revision of a developer DT
+**Editing existing supplementary components of a revision of a developer DT**
 
 Pre-condition: The DT revision (> 1) is created by the developer and is in the WIP state. The developer accesses these functionalities by opening an DT revision (> 1) from the CC list page.
 
@@ -387,10 +387,11 @@ Once the Update button is clicked, the changes, except Definition and Definition
 
 ## Test Case 38.12
 
-> Developer DT state management
+**Developer DT state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages.
 
 Pre-condition: The user is on the DT detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages.
 
 
 ### Test Assertion:
@@ -415,10 +416,11 @@ The developer can change the DT state from Draft back to WIP.
 
 ## Test Case 38.13
 
-> Deleting developer DT
+**Deleting developer DT**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the DT table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the DT table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
 
 
 ### Test Assertion:
@@ -440,7 +442,7 @@ DT whose revision number is more than 1 and is in any state cannot be deleted.
 
 ## Test Case 38.14
 
-> Restoring developer DT
+**Restoring developer DT**
 
 Pre-condition: The developer is on the CC View page with the Working branch open. Deleted DTs are shown in the list.
 

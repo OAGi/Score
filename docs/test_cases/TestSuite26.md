@@ -1,11 +1,11 @@
 # Test Suite 26
 
-> User Guide
+**User Guide**
 
 
 ## Test Case 26.1
 
-> The User Guide is accessible
+**The User Guide is accessible**
 
 Pre-condition: N/A
 

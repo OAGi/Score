@@ -1,12 +1,12 @@
 # Test Suite 11
 
-> Working Branch Code List Management for Developer
+**Working Branch Code List Management for Developer**
 
-Note: A developer code list is also viewed as a kind of CC in Score. Unless otherwise, specifically indicated, a statement about CC is also applied to a code list.
+> Note: A developer code list is also viewed as a kind of CC in Score. Unless otherwise, specifically indicated, a statement about CC is also applied to a code list.
 
 ## Test Case 11.1
 
-> Code list access
+**Code list access**
 
 Pre-condition: A working branch is selected.
 
@@ -69,7 +69,7 @@ The developer can search for CLs based only on their Module.
 
 ## Test Case 11.2
 
-> Creating a brand-new developer code list
+**Creating a brand-new developer code list**
 
 Pre-condition: N/A
 
@@ -105,7 +105,7 @@ Brand new Code List values should not be able to be Unused – the flag should b
 
 ## Test Case 11.3
 
-> Editing a brand-new developer code list
+**Editing a brand-new developer code list**
 
 Pre-condition: The brand-new CL is created by the developer and is in the WIP state. The developer accesses these functionalities by opening the brand-new CL from the CL View/Edit page or after creating a brand-new CL according to Test Assertion #1 of the Test Case 11.2.
 
@@ -148,7 +148,7 @@ Code List Values shall be unique within the code list.
 
 ## Test Case 11.4
 
-> Creating a new revision of a developer code list
+**Creating a new revision of a developer code list**
 
 Pre-condition: N/A
 
@@ -166,7 +166,7 @@ On the CL Detail page of the working branch, the developer can create a new revi
 
 ## Test Case 11.5
 
-> Editing a revision of a developer code list
+**Editing a revision of a developer code list**
 
 Pre-condition: The CL under test has revision number greater than 1 and is in WIP state.
 
@@ -210,10 +210,11 @@ The developer can cancel the revision. In this case, the system rollbacks the CL
 
 ## Test Case 11.6
 
-> Developer code list state management
+**Developer code list state management**
+
+> All these state changes need a confirmation dialog box “Do you want to change state of the Code List to XYZ?”.
 
 Pre-condition: The developer is on the Code List detail page, which he owns.
-All these state changes need a confirmation dialog box “Do you want to change state of the Code List to XYZ?”.
 
 
 ### Test Assertion:
@@ -238,10 +239,11 @@ The developer can change the CL state from Candidate back to WIP.
 
 ## Test Case 11.7
 
-> Deleting a Code List
+**Deleting a Code List**
+
+> Delete a CL means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CL is “Deleted” any other developer can restore it. Generally, when the developer opens an entity containing a deleted entity at any level of the tree, the system shall flag the opened entity as in an invalid state and the deleted entity as in the deleted state.
 
 Pre-condition: N/A
-Delete a CL means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CL is “Deleted” any other developer can restore it. Generally, when the developer opens an entity containing a deleted entity at any level of the tree, the system shall flag the opened entity as in an invalid state and the deleted entity as in the deleted state.
 
 
 ### Test Assertion:
@@ -266,7 +268,7 @@ CL whose revision number is more than 1 in any state cannot be deleted.
 
 ## Test Case 11.8
 
-> Restoring developer code list
+**Restoring developer code list**
 
 Pre-condition: The developer is on the CL View/Edit page with the Working branch selected. Deleted CLs are shown in the list (e.g., “Deleted” state is selected in the state filter box).
 

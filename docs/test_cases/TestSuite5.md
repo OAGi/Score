@@ -1,11 +1,11 @@
 # Test Suite 5
 
-> OAGIS developer access right to Score core functions
+**OAGIS developer access right to Score core functions**
 
 
 ## Test Case 5.1
 
-> OAGIS developer's authorized management of context categories
+**OAGIS developer's authorized management of context categories**
 
 Pre-condition: N/A
 
@@ -97,7 +97,7 @@ The developer can select a Context Category from the Context Category List page,
 
 ## Test Case 5.2
 
-> OAGi developer's authorized management of context schemes
+**OAGi developer's authorized management of context schemes**
 
 Pre-condition: N/A
 
@@ -300,7 +300,7 @@ The developer can select a Context Scheme from the Context Scheme List page, nav
 
 ## Test Case 5.3
 
-> OAGi developer's authorized management of business contexts
+**OAGi developer's authorized management of business contexts**
 
 Pre-condition: N/A
 
@@ -445,10 +445,11 @@ In the dialog used for adding a business context value, verify that all the deta
 
 ## Test Case 5.4
 
-> Retired in 2.0-OAGi developer authorized access to code list management functions.
+**Retired in 2.0 - OAGi developer authorized access to code list management functions.**
+
+> There is an entire code list management test suite that replaces this test case.
 
 Pre-condition: N/A
-There is an entire code list management test suite that replaces this test case.
 
 
 ### Test Assertion:
@@ -771,7 +772,7 @@ The developer can select a Code List Value from a Code List, navigate thought di
 
 ## Test Case 5.5
 
-> OAGi ­­­­developer authorized management of BIE
+**OAGi developer authorized management of BIE**
 
 Pre-condition: N/A
 
@@ -1222,7 +1223,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 5.6
 
-> OAGi developer authorized access to BIE Expression generation
+**OAGi developer authorized access to BIE Expression generation**
 
 Pre-condition: N/A
 

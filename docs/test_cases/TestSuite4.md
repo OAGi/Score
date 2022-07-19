@@ -1,11 +1,11 @@
 # Test Suite 4
 
-> End user's profile management
+**End user's profile management**
 
 
 ## Test Case 4.1
 
-> End user's profile management
+**End user's profile management**
 
 Pre-condition: N/A
 

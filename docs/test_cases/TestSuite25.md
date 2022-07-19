@@ -1,12 +1,12 @@
 # Test Suite 25
 
-> Developer BIE Management
+**Developer BIE Management**
 
-Test Case 5.5 and Test Case 5.6 covers developer BIE functions.
+> Test Case 5.5 and Test Case 5.6 covers developer BIE functions.
 
 ## Test Case 25.1
 
-> Reuse a BIE
+**Reuse a BIE**
 
 Pre-condition: N/A
 
@@ -77,10 +77,11 @@ The developer can express a reusing BIE that reuses a BIE in WIP state and owned
 
 ## Test Case 25.2
 
-> Create a Top-level BIE from a BIE node
+**Create a Top-level BIE from a BIE node**
+
+> This functionality allows the user to create a top-level BIE from a descendant BIE node within a top-level BIE. The created top-level BIE may be reused within another top-level BIE afterward.
 
 Pre-condition: N/A
-This functionality allows the user to create a top-level BIE from a descendant BIE node within a top-level BIE. The created top-level BIE may be reused within another top-level BIE afterward.
 
 
 ### Test Assertion:

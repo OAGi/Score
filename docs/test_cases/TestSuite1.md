@@ -1,11 +1,11 @@
 # Test Suite 1
 
-> OAGIS developer Authentication and Authorized Functions
+**OAGIS developer Authentication and Authorized Functions**
 
 
 ## Test Case 1.1
 
-> Built-in OAGIS developer account exists
+**Built-in OAGIS developer account exists**
 
 Pre-condition: N/A
 
@@ -39,10 +39,11 @@ Built-in OAGIS developer account cannot login with an invalid password.
 
 ## Test Case 1.2
 
-> OAGIS developer's authorized functionalities
+**OAGIS developer's authorized functionalities**
+
+> An OAGIS developer can access functionalities (menus) in the test assertion.
 
 Pre-condition: N/A
-An OAGIS developer can access functionalities (menus) in the test assertion.
 
 
 ### Test Assertion:

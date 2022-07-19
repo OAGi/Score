@@ -1,12 +1,12 @@
 # Test Suite 17
 
-> Release Branch Code List Management for End User
+**Release Branch Code List Management for End User**
 
-Generally, the end user can add/edit an end user code list with base and without base.
+> Generally, the end user can add/edit an end user code list with base and without base.
 
 ## Test Case 17.1
 
-> Code list access
+**Code list access**
 
 Pre-condition: A release branch is selected.
 
@@ -36,7 +36,7 @@ The end user can view details of any developer code list in the selected release
 
 ## Test Case 17.2
 
-> Creating a brand-new end user code list
+**Creating a brand-new end user code list**
 
 Pre-condition: A release branch is selected.
 
@@ -72,7 +72,7 @@ There is a developer code list that has different revisions in two releases, one
 
 ## Test Case 17.3
 
-> Editing a brand-new end user code list
+**Editing a brand-new end user code list**
 
 Pre-condition: The brand-new CL is created by the end user and is in the WIP state. The end user accesses these functionalities by opening the brand-new CL from the CL View/Edit page on a particular release branch or after creating a brand-new end user CL.
 
@@ -120,7 +120,7 @@ The end user can select an end user Agency ID list in Production state under the
 
 ## Test Case 17.4
 
-> Amend an end user code list
+**Amend an end user code list**
 
 Pre-condition: The end user has selected a particular release branch.
 
@@ -169,10 +169,11 @@ Test expressing BIE that uses an amended end user code list and make sure that i
 
 ## Test Case 17.5
 
-> End user code list state management
+**End user code list state management**
+
+> All these state changes need a confirmation dialog box “Do you want to change state of the Code List to XYZ?”.
 
 Pre-condition: The end user is on the Code List detail page, which he owns.
-All these state changes need a confirmation dialog box “Do you want to change state of the Code List to XYZ?”.
 
 
 ### Test Assertion:
@@ -202,10 +203,11 @@ The end user cannot change the CL state from WIP directly to Production.
 
 ## Test Case 17.6
 
-> Deleting a Code List
+**Deleting a Code List**
+
+> Delete a CL means that it is marked as “Deleted” and it is still displayed in the CC list when the release branch the code list belongs to is selected. If a CL is “Deleted” any other end user can restore it.
 
 Pre-condition: N/A
-Delete a CL means that it is marked as “Deleted” and it is still displayed in the CC list when the release branch the code list belongs to is selected. If a CL is “Deleted” any other end user can restore it.
 
 
 ### Test Assertion:
@@ -227,7 +229,7 @@ End user CL whose revision number is more than 1 in any state cannot be deleted,
 
 ## Test Case 17.7
 
-> Restoring end user code list
+**Restoring end user code list**
 
 Pre-condition: The end user is on the CL View/Edit page with a release branch selected. Deleted end user CLs are shown in the list (e.g., “Deleted” state is selected in the state filter box).
 

@@ -1,14 +1,15 @@
 # Test Suite 13
 
-> Release Branch Core Component Management Behavior for OAGIS Developer
+**Release Branch Core Component Management Behavior for OAGIS Developer**
 
 
 ## Test Case 13.1
 
-> Access to Core component viewing, editing and commenting
+**Access to Core component viewing, editing and commenting**
+
+> (As it is now) individual ASCC page is not provided. Generally, the developer cannot make add or change content of released developer CCs and end user CCs. He can only see the detail.
 
 Pre-condition: A release branch, i.e., one of the release branches, is selected.
-(As it is now) individual ASCC page is not provided. Generally, the developer cannot make add or change content of released developer CCs and end user CCs. He can only see the detail.
 
 
 ### Test Assertion:

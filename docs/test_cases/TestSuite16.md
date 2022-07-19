@@ -1,12 +1,12 @@
 # Test Suite 16
 
-> Release Branch Code List Management for Developer
+**Release Branch Code List Management for Developer**
 
-Generally, the developer cannot do anything but viewing code lists.
+> Generally, the developer cannot do anything but viewing code lists.
 
 ## Test Case 16.1
 
-> Code list access
+**Code list access**
 
 Pre-condition: The developer is on the View/Edit Code List page with a particular release branch selected.
 

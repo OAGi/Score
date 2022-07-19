@@ -1,14 +1,15 @@
 # Test Suite 3
 
-> End user authorized functions
+**End user authorized functions**
 
 
 ## Test Case 3.1
 
-> End user's authorized functionalities
+**End user's authorized functionalities**
+
+> A Score end user can access functionalities (menus) in the test assertion.
 
 Pre-condition: N/A
-A Score end user can access functionalities (menus) in the test assertion.
 
 
 ### Test Assertion:

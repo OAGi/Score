@@ -1,11 +1,11 @@
 # Test Suite 40
 
-> Working Branch Data Type Management for End User
+**Working Branch Data Type Management for End User**
 
 
 ## Test Case 40.1
 
-> Access to DT viewing, editing, and commenting
+**Access to DT viewing, editing, and commenting**
 
 Pre-condition: A working release is selected.
 

@@ -1,11 +1,11 @@
 # Test Suite 39
 
-> Release Branch Data Type Management for Developer
+**Release Branch Data Type Management for Developer**
 
 
 ## Test Case 39.1
 
-> Access to DT viewing, editing and commenting
+**Access to DT viewing, editing and commenting**
 
 Pre-condition: A release branch, i.e., one of the release branches, is selected.
 

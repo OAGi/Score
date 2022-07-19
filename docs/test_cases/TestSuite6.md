@@ -1,12 +1,12 @@
 # Test Suite 6
 
-> End user access right to Score core functions
+**End user access right to Score core functions**
 
-Test cases in here should be similar to those in Test Suite 5. However, I'm thinking we don't have to test as comprehensive as Test Suite 5 when the behaviors are expected to be the same regardless of the user role. This test suite should make sure that the end user can see and do and cannot see and do as appropriate to the user role.
+> Test cases in here should be similar to those in Test Suite 5. However, I'm thinking we don't have to test as comprehensive as Test Suite 5 when the behaviors are expected to be the same regardless of the user role. This test suite should make sure that the end user can see and do and cannot see and do as appropriate to the user role.
 
 ## Test Case 6.1
 
-> End user's authorized management of context schemes
+**End user's authorized management of context schemes**
 
 Pre-condition: N/A
 
@@ -46,7 +46,7 @@ The end user can select a Context Scheme from the Context Scheme List page, navi
 
 ## Test Case 6.2
 
-> End user authorized management of BIE
+**End user authorized management of BIE**
 
 Pre-condition: N/A
 
@@ -139,7 +139,7 @@ If any child or descendant properties are from group and the group is not in Pro
 
 ## Test Case 6.3
 
-> End user authorized access to BIE Expression generation
+**End user authorized access to BIE Expression generation**
 
 Pre-condition: N/A
 

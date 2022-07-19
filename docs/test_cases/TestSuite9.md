@@ -1,11 +1,11 @@
 # Test Suite 9
 
-> Data retention
+**Data retention**
 
 
 ## Test Case 9.1
 
-> No user account can be deleted
+**No user account can be deleted**
 
 Pre-condition: N/A
 

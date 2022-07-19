@@ -1,11 +1,9 @@
 # Test Suite 27
 
-> About Page
+**About Page**
 
 
 ## Test Case 27.1
-
-> 
 
 Pre-condition: N/A
 

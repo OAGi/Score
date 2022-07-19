@@ -1,17 +1,18 @@
 # Test Suite 10
 
-> Working branch Core Component Management Behaviors for Developer
+**Working branch Core Component Management Behaviors for Developer**
 
-We did think about using the concept of project (which like a branch). In that case, users need to create a CC Release Project first. Users can create multiple CC Release Projects at the same time. Each release project is like a branch so the project has a snapshot from a release. This would allow users to create a bug fix release from any prior release. But this would mean we have to create a merging feature. Also, typically, OAGi does not go back and create a fix for prior release. So, we can say that the current tool design only allows linear management of core component releases.
+> We did think about using the concept of project (which like a branch). In that case, users need to create a CC Release Project first. Users can create multiple CC Release Projects at the same time. Each release project is like a branch so the project has a snapshot from a release. This would allow users to create a bug fix release from any prior release. But this would mean we have to create a merging feature. Also, typically, OAGi does not go back and create a fix for prior release. So, we can say that the current tool design only allows linear management of core component releases.
 
-If we do however let the user work on BIEs based on any prior release and user extension to those BIEs can be created within those releases. Then, it is sort of like a branch. And we would like to create a sort of a merge functionality. It is not a merge per se because it is more like an alignment, i.e., the core components (the standard) always win.
+> If we do however let the user work on BIEs based on any prior release and user extension to those BIEs can be created within those releases. Then, it is sort of like a branch. And we would like to create a sort of a merge functionality. It is not a merge per se because it is more like an alignment, i.e., the core components (the standard) always win.
 
 ## Test Case 10.1
 
-> Core component access
+**Core component access**
+
+> (As it is now) individual ASCC page is not provided.
 
 Pre-condition: A working branch is selected.
-(As it is now) individual ASCC page is not provided.
 
 
 ### Test Assertion:
@@ -153,7 +154,7 @@ If an ACC is selected to view wherein it is used, then the ACCs which are based 
 
 ## Test Case 10.2
 
-> Creating a brand-new developer ACC
+**Creating a brand-new developer ACC**
 
 Pre-condition: N/A
 
@@ -181,7 +182,7 @@ The developer cannot create a brand-new developer ACC when a release branch is s
 
 ## Test Case 10.3
 
-> Editing a brand-new developer ACC
+**Editing a brand-new developer ACC**
 
 Pre-condition: The brand-new ACC is created by the developer and is in the WIP state. The developer accesses these functionalities by opening the brand-new ACC from the CC list page or after creating a brand-new ACC according to Test Assertion #1 of the Test Case 10.2.
 
@@ -259,7 +260,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 10.4
 
-> Editing associations of a brand-new developer ACC
+**Editing associations of a brand-new developer ACC**
 
 Pre-condition: The brand-new ACC is created by the developer and is in the WIP state. The developer accesses these functionalities by opening the brand-new ACC from the CC list page or after creating a brand-new ACC according to Test Assertion #1 of the Test Case 10.2.
 
@@ -480,7 +481,7 @@ The developer can cancel the revision of an ACC that had the base ACC as its bas
 
 ## Test Case 10.5
 
-> Creating a new revision of a developer ACC
+**Creating a new revision of a developer ACC**
 
 Pre-condition: N/A
 
@@ -506,7 +507,7 @@ A new revision CANNOT be made on an ACC in non-Published state.
 
 ## Test Case 10.6
 
-> Editing a revision of a developer ACC
+**Editing a revision of a developer ACC**
 
 Pre-condition: The ACC under test has revision number greater than 1 and is in WIP state.
 
@@ -570,10 +571,11 @@ Definition and Definition Source can be changed. However, a warning should be gi
 
 ## Test Case 10.7
 
-> Editing associations of a revision of a developer ACC
+**Editing associations of a revision of a developer ACC**
+
+> Note: Association revision number of a new association changes to the same as ACC revision number when the ACC enters the published state.
 
 Pre-condition: The ACC revision (> 1) is created by the developer and is in the WIP state. The developer accesses these functionalities by opening an ACC revision (> 1) from the CC list page or after creating a ACC revision according to Test Assertion #1 of the Test Case 10.5.
-Note: Association revision number of a new association changes to the same as ACC revision number when the ACC enters the published state.
 
 
 ### Test Assertion:
@@ -721,10 +723,11 @@ The developer can move an existing association (i.e., ASCCP, BCCP) of the revise
 
 ## Test Case 10.8
 
-> Developer ACC state management
+**Developer ACC state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages.
 
 Pre-condition: The user is on the ACC detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages.
 
 
 ### Test Assertion:
@@ -788,10 +791,11 @@ The developer can change the ACC state from Draft back to WIP. The system shall 
 
 ## Test Case 10.9
 
-> Deleting developer ACC
+**Deleting developer ACC**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the ACC table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the ACC table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
 
 
 ### Test Assertion:
@@ -901,7 +905,7 @@ ACC whose revision number is more than 1 and is in any state cannot be deleted.
 
 ## Test Case 10.10
 
-> Restoring developer ACC
+**Restoring developer ACC**
 
 Pre-condition: The developer is on the CC View page with the Working branch open. Deleted CCs are shown in the list.
 
@@ -934,7 +938,7 @@ The developer user can open an ACC and restore it. All of its associations shall
 
 ## Test Case 10.11
 
-> Creating a brand-new developer ASCCP
+**Creating a brand-new developer ASCCP**
 
 Pre-condition: N/A
 
@@ -988,7 +992,7 @@ The developer can create an ASCCP from an ACC in WIP state using the function �
 
 ## Test Case 10.12
 
-> Editing a brand-new developer ASCCP
+**Editing a brand-new developer ASCCP**
 
 Pre-condition: The brand-new ASCCP is created by the developer and it is in the WIP state. The developer accesses these functionalities by opening the brand-new ASCCP from the CC list page or after creating a brand-new ASCCP according to Test Assertion #1 in Test Case 10.9.
 
@@ -1081,7 +1085,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 10.13
 
-> Creating a new revision of a developer ASCCP
+**Creating a new revision of a developer ASCCP**
 
 Pre-condition: N/A
 
@@ -1104,7 +1108,7 @@ On the CC Detail page of a published working branch of an ASCCP (whose revision 
 
 ## Test Case 10.14
 
-> Editing a revision of a developer ASCCP
+**Editing a revision of a developer ASCCP**
 
 Pre-condition: The ASCCP under test has revision number greater than 1 and is in WIP state.
 
@@ -1176,10 +1180,11 @@ The developer can cancel the revision. In this case, the system rollbacks the AS
 
 ## Test Case 10.15
 
-> Developer ASCCP state management
+**Developer ASCCP state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages. Changing to the Draft state only need a confirmation. Retracting a Candidate ASCCP to WIP needs a confirmation.
 
 Pre-condition: The user is on the ASCCP detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages. Changing to the Draft state only need a confirmation. Retracting a Candidate ASCCP to WIP needs a confirmation.
 
 
 ### Test Assertion:
@@ -1230,10 +1235,11 @@ The developer can retract an ASCCP which is in Candidate state back to the WIP s
 
 ## Test Case 10.16
 
-> Deleting a developer ASCCP
+**Deleting a developer ASCCP**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it.
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it.
 
 
 ### Test Assertion:
@@ -1289,7 +1295,7 @@ ASCCP whose revision number is more than 1 and is in any state cannot be deleted
 
 ## Test Case 10.17
 
-> Restoring a developer ASCCP
+**Restoring a developer ASCCP**
 
 Pre-condition: The developer is on the CC View page with the working branch open. Some Deleted CCs are shown in the list may be with “Deleted” state is selected in the state filter box. The developer opens the ASCCP to see its detail.
 
@@ -1325,7 +1331,7 @@ The developer user can restore a deleted ASCCP whose ACC is deleted. The UI shal
 
 ## Test Case 10.18
 
-> Creating a brand-new developer BCCP
+**Creating a brand-new developer BCCP**
 
 Pre-condition: N/A
 
@@ -1354,7 +1360,7 @@ The developer cannot create a brand-new BCCP when a release branch is selected.
 
 ## Test Case 10.19
 
-> Editing a brand-new developer BCCP
+**Editing a brand-new developer BCCP**
 
 Pre-condition: The brand-new BCCP is created by the developer and it is in the WIP state. The developer accesses these functionalities by opening the brand-new BCCP from the CC list page or after creating a brand-new BCCP according to Test Assertion #1 of the Test Case 10.18.
 
@@ -1427,7 +1433,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 10.20
 
-> Creating a new revision of a developer BCCP
+**Creating a new revision of a developer BCCP**
 
 Pre-condition: N/A
 
@@ -1450,7 +1456,7 @@ On the CC Detail page of a published BCCP in working branch, the developer can c
 
 ## Test Case 10.21
 
-> Editing a revision of a developer BCCP
+**Editing a revision of a developer BCCP**
 
 Pre-condition: The BCCP under test has revision number greater than 1 and is in WIP state.
 
@@ -1505,10 +1511,11 @@ The developer can cancel the revision. In this case, the system rollbacks the BC
 
 ## Test Case 10.22
 
-> Developer BCCP state management
+**Developer BCCP state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages.
 
 Pre-condition: The user is on the BCCP detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages.
 
 
 ### Test Assertion:
@@ -1544,10 +1551,11 @@ The developer can change the BCCP state from Candidate back to WIP.
 
 ## Test Case 10.23
 
-> Deleting developer BCCP
+**Deleting developer BCCP**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. Its detail can also be viewed. If a CC is “Deleted” any other developer can restore it as described in the following Test Case 10.24.
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. Its detail can also be viewed. If a CC is “Deleted” any other developer can restore it as described in the following Test Case 10.24.
 
 
 ### Test Assertion:
@@ -1600,7 +1608,7 @@ BCCP whose revision number is more than 1 in any state cannot be deleted.
 
 ## Test Case 10.24
 
-> Restoring developer BCCP
+**Restoring developer BCCP**
 
 Pre-condition: N/A
 

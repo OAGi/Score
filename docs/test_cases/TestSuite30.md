@@ -1,11 +1,11 @@
 # Test Suite 30
 
-> Search within tree
+**Search within tree**
 
 
 ## Test Case 30.1
 
-> Search within BIE
+**Search within BIE**
 
 Pre-condition: N/A
 
@@ -22,7 +22,7 @@ Pre-condition: N/A
 
 ## Test Case 30.2
 
-> Search within CC
+**Search within CC**
 
 Pre-condition: N/A
 

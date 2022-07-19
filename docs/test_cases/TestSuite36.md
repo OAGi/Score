@@ -1,12 +1,12 @@
 # Test Suite 36
 
-> Release Branch Agency ID List Management for Developer
+**Release Branch Agency ID List Management for Developer**
 
-Generally, the developer cannot do anything but viewing Agency ID lists.
+> Generally, the developer cannot do anything but viewing Agency ID lists.
 
 ## Test Case 36.1
 
-> Agency ID access
+**Agency ID access**
 
 Pre-condition: The developer is on the View/Edit Agency ID List page with a particular release branch selected.
 

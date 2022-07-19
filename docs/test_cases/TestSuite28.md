@@ -1,11 +1,11 @@
 # Test Suite 28
 
-> Home Page
+**Home Page**
 
 
 ## Test Case 28.1
 
-> BIEs Tab
+**BIEs Tab**
 
 Pre-condition: N/A
 
@@ -82,7 +82,7 @@ In the “My recent BIEs” panel, the developer can click on a BIE to view it i
 
 ## Test Case 28.2
 
-> User Extensions Tab for Developers
+**User Extensions Tab for Developers**
 
 Pre-condition: N/A
 
@@ -148,7 +148,7 @@ In the “User Extensions by users and states” panel, the developer can click 
 
 ## Test Case 28.3
 
-> User Extensions Tab for End Users
+**User Extensions Tab for End Users**
 
 Pre-condition: N/A
 

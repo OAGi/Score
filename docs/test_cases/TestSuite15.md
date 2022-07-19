@@ -1,11 +1,11 @@
 # Test Suite 15
 
-> Release Branch Core Component Management Behavior for End User
+**Release Branch Core Component Management Behavior for End User**
 
 
 ## Test Case 15.1
 
-> Access to core component viewing, editing, and commenting
+**Access to core component viewing, editing, and commenting**
 
 Pre-condition: N/A
 
@@ -53,7 +53,7 @@ If an ACC is selected to view wherein it is used, then the ACCs which are based 
 
 ## Test Case 15.2
 
-> Creating a brand-new end user ACC
+**Creating a brand-new end user ACC**
 
 Pre-condition: N/A
 
@@ -74,7 +74,7 @@ On the CC list page with a particular, release branch selected, the end user can
 
 ## Test Case 15.3
 
-> Editing a brand-new end user ACC
+**Editing a brand-new end user ACC**
 
 Pre-condition: The brand-new ACC is created by the end user and is in the WIP state. The end user accesses these functionalities by opening the brand-new ACC from the CC list page or after creating a brand-new ACC.
 
@@ -119,10 +119,11 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 15.4
 
-> Amend an end user ACC
+**Amend an end user ACC**
+
+> Generally, only backwardly compatible changes can be made.
 
 Pre-condition: The end user has selected a particular release branch.
-Generally, only backwardly compatible changes can be made.
 
 
 ### Test Assertion:
@@ -161,10 +162,11 @@ Place holder for testing about undoing changes to the ACC in the future or about
 
 ## Test Case 15.5
 
-> End user ACC state management
+**End user ACC state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages. Changing to the QA state only need a confirmation. Retracting a QA ACC to WIP needs a confirmation. Amending a Production ACC which set its state to WIP needs a confirmation.
 
 Pre-condition: The end user is on the ACC detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages. Changing to the QA state only need a confirmation. Retracting a QA ACC to WIP needs a confirmation. Amending a Production ACC which set its state to WIP needs a confirmation.
 
 
 ### Test Assertion:
@@ -186,10 +188,11 @@ The end user can change the ACC state from QA to Production. State of the associ
 
 ## Test Case 15.6
 
-> Deleting an end user ACC
+**Deleting an end user ACC**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the branch it belongs to is selected. If a CC is “Deleted” any other end user can restore it.
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the branch it belongs to is selected. If a CC is “Deleted” any other end user can restore it.
 
 
 ### Test Assertion:
@@ -223,7 +226,7 @@ ACC whose revision number is more than 1 and is in any state cannot be deleted.
 
 ## Test Case 15.7
 
-> Restoring end user ACC
+**Restoring end user ACC**
 
 Pre-condition: The end user is on the CC View/Edit page with a release branch open. Deleted CCs are shown in the list.
 
@@ -241,7 +244,7 @@ The end user can open an ACC and restore it. All of its associations shall be re
 
 ## Test Case 15.8
 
-> Editing associations of a brand-new end user ACC
+**Editing associations of a brand-new end user ACC**
 
 Pre-condition: The revision number of ACC under test is 1 and it is in WIP state.
 
@@ -353,7 +356,7 @@ The end user can transfer the ownership of an ACC, which is in WIP states and he
 
 ## Test Case 15.9
 
-> Editing associations during an end-user ACC amendment
+**Editing associations during an end-user ACC amendment**
 
 Pre-condition: An end-user ACC is opened and its revision is higher than 1.
 
@@ -483,7 +486,7 @@ The end user can cancel the amendment. In such case, all changes to the ACC duri
 
 ## Test Case 15.10
 
-> Creating a brand-new end user ASCCP
+**Creating a brand-new end user ASCCP**
 
 Pre-condition: N/A
 
@@ -510,7 +513,7 @@ The end user can create an ASCCP from an ACC in WIP state using the function “
 
 ## Test Case 15.11
 
-> Editing a brand-new end user ASCCP
+**Editing a brand-new end user ASCCP**
 
 Pre-condition: N/A
 
@@ -564,10 +567,11 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 15.12
 
-> Amend an end user ASCCP
+**Amend an end user ASCCP**
+
+> Generally, only backwardly compatible changes can be made.
 
 Pre-condition: The end user has selected a particular release branch.
-Generally, only backwardly compatible changes can be made.
 
 
 ### Test Assertion:
@@ -615,10 +619,11 @@ The end user can cancel the amendment, in which case, the system rollbacks all c
 
 ## Test Case 15.13
 
-> End user ASCCP state management
+**End user ASCCP state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages.
 
 Pre-condition: The user is on the ASCCP detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages.
 
 
 ### Test Assertion:
@@ -640,7 +645,7 @@ The end user can change the state of ASCCP he owns from QA to Production.
 
 ## Test Case 15.14
 
-> Creating a brand-new end user BCCP
+**Creating a brand-new end user BCCP**
 
 Pre-condition: N/A
 
@@ -661,7 +666,7 @@ The end user cannot create a brand-new BCCP when the working branch is selected.
 
 ## Test Case 15.15
 
-> Editing a brand-new end user BCCP
+**Editing a brand-new end user BCCP**
 
 Pre-condition: The brand-new BCCP is created by the end user and it is in the WIP state. The end user accesses these functionalities by opening the brand-new BCCP from the CC list page or after creating a brand-new BCCP.
 
@@ -713,10 +718,11 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 
 ## Test Case 15.16
 
-> Amend an end user BCCP
+**Amend an end user BCCP**
+
+> Generally, only backwardly compatible changes can be made.
 
 Pre-condition: N/A
-Generally, only backwardly compatible changes can be made.
 
 
 ### Test Assertion:
@@ -764,10 +770,11 @@ Place holder for testing about undoing changes to the BCCP or cancel the amendme
 
 ## Test Case 15.17
 
-> End user BCCP state management
+**End user BCCP state management**
+
+> All these state changes need a confirmation dialog box with slightly different messages.
 
 Pre-condition: The user is on the BCCP detail page, which he owns.
-All these state changes need a confirmation dialog box with slightly different messages.
 
 
 ### Test Assertion:
@@ -789,10 +796,11 @@ The end user can change the BCCP state from QA to Production, only if he is the 
 
 ## Test Case 15.18
 
-> Deleting an ender user BCCP
+**Deleting an ender user BCCP**
+
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the associated release branch is selected. If a CC is “Deleted” another end user can restore it. A confirmation dialog is needed for all deleting actions. “Do you really want to delete the core component?”
 
 Pre-condition: N/A
-Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the associated release branch is selected. If a CC is “Deleted” another end user can restore it. A confirmation dialog is needed for all deleting actions. “Do you really want to delete the core component?”
 
 
 ### Test Assertion:
@@ -817,7 +825,7 @@ BCCP whose revision number is more than 1 in any state cannot be deleted.
 
 ## Test Case 15.19
 
-> Restoring end user BCCP
+**Restoring end user BCCP**
 
 Pre-condition: The end user is on the CC View/Edit page with the release branch open. Deleted CCs are shown in the list (“Deleted” state is selected in the state filter box). The end user opens a deleted BCCP to view its detail.
 

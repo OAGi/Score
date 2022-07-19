@@ -1,12 +1,12 @@
 # Test Suite 35
 
-> Working Branch Agency ID List Management for End User
+**Working Branch Agency ID List Management for End User**
 
-Basically, the end user cannot do any editing but only view the Agency ID lists.
+> Basically, the end user cannot do any editing but only view the Agency ID lists.
 
 ## Test Case 35.1
 
-> Agency ID list access
+**Agency ID list access**
 
 Pre-condition: Working branch code list is selected.
 
