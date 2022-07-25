@@ -8,6 +8,7 @@
   - Overview of code structure
   - How to initialize database with OAGIS data (for development testing and acceptance testing).
   - Overview of test case document
+  - Overview of test script development and execution
   - Read user guide or at least read its content.
 - How to contribute  
   - Fork the current Score repo to developer's private repo.
