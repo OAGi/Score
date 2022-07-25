@@ -6,7 +6,7 @@
   - [Read installation guide and component architecture](https://github.com/OAGi/Score/wiki/Basic-Installation-Guide-using-Docker-for-Score-Application-Release-1.1.2-and-up)
   - Overview of database structure
   - Overview of code structure
-  - How to initialize database with OAGIS data.
+  - How to initialize database with OAGIS data (for development testing and acceptance testing).
   - Overview of test case document
   - Read user guide or at least read its content.
 - How to contribute  
