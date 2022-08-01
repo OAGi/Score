@@ -4,10 +4,10 @@
 - [Development environment requirement](https://github.com/OAGi/Score/wiki/Getting-Score-develop-environments-with-Docker,-Node.js,-and-JDK.)
 - Learn about Score
   - [Read installation guide and component architecture](https://github.com/OAGi/Score/wiki/Basic-Installation-Guide-using-Docker-for-Score-Application-Release-1.1.2-and-up)
-  - Overview of database structure
-  - Overview of code structure
+  - [Overview of database structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4403363841/Overview+of+Score+Database+Structure)
+  - [Overview of code structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4417093633/Overview+of+Code+Structure)
+  - [Overview of test case document](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4419911764/Overview+of+Test+Case+Document)
   - How to initialize database with OAGIS data (for development testing and acceptance testing).
-  - Overview of test case document
   - Overview of test script development and execution
   - Read user guide or at least read its content.
 - How to contribute  
