@@ -7,9 +7,9 @@
   - [Overview of database structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4403363841/Overview+of+Score+Database+Structure)
   - [Overview of code structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4417093633/Overview+of+Code+Structure)
   - [Overview of test case document](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4419911764/Overview+of+Test+Case+Document)
-  - How to initialize database with OAGIS data (for development testing and acceptance testing).
   - Overview of test script development and execution
-  - Read user guide or at least read its content.
+  - How to initialize database with OAGIS data (for development testing and acceptance testing).
+  - [Read user guide or at least read its content.](https://github.com/OAGi/Score/blob/kbserm-start-of-contribution-guide/docs/user_guide/index.rst)
 - How to contribute  
   - Fork the current Score repo to developer's private repo.
   - Create an issue if one does not exist
