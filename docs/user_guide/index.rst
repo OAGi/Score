@@ -8471,8 +8471,8 @@ context. Similar to an ASCC, it consists of the Associating ABIE based
 on an ASCC, the ASBIE Property (ASBIEP) based on an ASCCP and so it can
 be reusable (see also `Make a BIE reusable <#make-a-bie-reusable>`__).
 
-Developer can reuse a BIE owned by another developer only, while end
-users can reuse a BIE owned either by a developer or an end user.
+*Developer can reuse a BIE owned by another developer only, while end
+user BIE can reuse a BIE owned either by a developer or an end user. Developer BIEs won't show up for reuse selection when BIE being edited is an end user BIE.*
 
 To reuse a BIE under another top-level BIE:
 
