@@ -1013,9 +1013,9 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 #### Test Assertion #5.5.56
 The developer can see the cardinalities of nodes in the BIE tree.
 
-#### Test Assertion #5.5.56a
+##### Test Assertion #5.5.56.a
 The developer can hide and display the cardinalities of the nodes in the BIE tree.
-#### Test Assertion #5.5.56b
+##### Test Assertion #5.5.56.b
 Changed cardinalities of the node must be correctly shown in the BIE tree.
 
 ### Test Step Pre-condition:
