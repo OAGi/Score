@@ -24,10 +24,9 @@ copyright = u'2022, NIST'
 author = u'NIST'
 
 # The short X.Y version
-version = u'2.3'
+version = u'2.4'
 # The full version, including alpha/beta/rc tags
-release = u'2.3'
-release = u'2.3'
+release = u'2.4'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +39,8 @@ release = u'2.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,8 +51,8 @@ html_static_path = ['_static']
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',  # override wide tables in RTD theme
-        ],
-     }
+    ],
+}
      
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -68,7 +68,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -120,10 +120,10 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 html_sidebars = {'**': [
-        'about.html',
-        'navigation.html',
-        'searchbox.html',
-    ]}
+    'about.html',
+    'navigation.html',
+    'searchbox.html',
+]}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
