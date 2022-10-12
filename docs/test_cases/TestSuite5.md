@@ -1010,6 +1010,14 @@ If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excludi
 ##### Test Assertion #5.5.55.b
 If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
 
+#### Test Assertion #5.5.56
+The developer can see the cardinalities of nodes in the BIE tree.
+
+#### Test Assertion #5.5.56a
+The developer can hide and display the cardinalities of the nodes in the BIE tree.
+#### Test Assertion #5.5.56b
+Changed cardinalities of the node must be correctly shown in the BIE tree.
+
 ### Test Step Pre-condition:
 
 1. There are BIEs already created and owned by various end users, say BIEa, BIEb, BIEc, which are in editing, candidate and published state respectively.
@@ -1126,11 +1134,11 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 103. The developer ensures that a few nodes in the same hierarchy are enabled (e.g., if the top-level BIE is a BOD, the developer enables Application Area, Sender, and Type Code underneath).
 104. Verify that the fields of the unused nodes cannot be changed. (Assertion [#21](#test-assertion-5521))
 105. The developer opens BIE7 clicks the Hide unused checkbox.
-106. Verify that only the nodes that are enabled/used are displayed when expanding the BIE7’s tree structure. (Assertion [#22](#test-assertion-5522))
+106. Verify that only the nodes that are enabled/used are displayed when expanding the BIE7’s tree structure. (Assertion [#24](#test-assertion-5524))
 107. The developer clicks Hide unused checkbox.
-108. Verify that at least a few of unused nodes of BIE7 are visible. (Assertion [#22](#test-assertion-5522))
+108. Verify that at least a few of unused nodes of BIE7 are visible. (Assertion [#24](#test-assertion-5524))
 109. The developer makes a change. For instance, he enables the “System Environment Code”, change the “Business Term” field and clicks the Hide unused checkbox.
-110. Verify that the changes has successfully recorder and they have not been lost. (Assertion [#22](#test-assertion-5522))
+110. Verify that the changes has successfully recorder and they have not been lost. (Assertion [#24](#test-assertion-5524))
 111. The developer goes to Copy BIE page.
 112. Verify that the BIEa is not displayed in the list. (Assertion [#23](#test-assertion-5523))
 113. He chooses a Business Context and in the next page chooses the BIE7.
@@ -1220,6 +1228,14 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excl
 197. Verify that the node is enabled by default and that it cannot be disabled. Also, verify that some of its parent nodes are disabled. (Assertion [#40](#test-assertion-5540))
 198. The developer visits the BIE List page, he selects a BIE (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
 199. Verify that the checkbox of the selected BIE is checked. (Assertion [#41](#test-assertion-5541))
+200. The developer opens BIE9, verify that the cardinalities of the nodes in the BIE tree are existed. (Assertion [#56](#test-assertion-5556))
+201. The developer checks the Hide cardinality checkbox.
+201. Verify that the cardinalities of the nodes in the BIE tree are disappeared. (Assertion [#56a](#test-assertion-5556a))
+202. The developer clicks the Hide cardinality checkbox to uncheck it.
+203. Verify that the cardinalities of the nodes in the BIE tree are appeared. (Assertion [#56a](#test-assertion-5556a))
+204. Click "Version Identifier", and verify that displayed cardinalities of the node in the tree is "0..1". (Assertion [#56b](#test-assertion-5556b))
+205. Set the Cardinality Min to 1, and verify that displayed cardinalities of the node in the tree is changed to "1..1". (Assertion [#56b](#test-assertion-5556b))
+206. Refresh the page, and verify that displayed cardinalities of "Version Identifier" node in the tree is still "1..1". (Assertion [#56b](#test-assertion-5556b))
 
 ## Test Case 5.6
 
