@@ -1228,14 +1228,16 @@ Changed cardinalities of the node must be correctly shown in the BIE tree.
 197. Verify that the node is enabled by default and that it cannot be disabled. Also, verify that some of its parent nodes are disabled. (Assertion [#40](#test-assertion-5540))
 198. The developer visits the BIE List page, he selects a BIE (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
 199. Verify that the checkbox of the selected BIE is checked. (Assertion [#41](#test-assertion-5541))
-200. The developer opens BIE9, verify that the cardinalities of the nodes in the BIE tree are existed. (Assertion [#56](#test-assertion-5556))
-201. The developer checks the Hide cardinality checkbox.
-201. Verify that the cardinalities of the nodes in the BIE tree are disappeared. (Assertion [#56a](#test-assertion-5556a))
-202. The developer clicks the Hide cardinality checkbox to uncheck it.
-203. Verify that the cardinalities of the nodes in the BIE tree are appeared. (Assertion [#56a](#test-assertion-5556a))
-204. Click "Version Identifier", and verify that displayed cardinalities of the node in the tree is "0..1". (Assertion [#56b](#test-assertion-5556b))
-205. Set the Cardinality Min to 1, and verify that displayed cardinalities of the node in the tree is changed to "1..1". (Assertion [#56b](#test-assertion-5556b))
-206. Refresh the page, and verify that displayed cardinalities of "Version Identifier" node in the tree is still "1..1". (Assertion [#56b](#test-assertion-5556b))
+200. The developer opens BIE9, "Change Acknowledge Match Document", opens the context menu on the root node, and clicks "Expand 3" menu.
+201. Verify that all cardinality labels for each node in the BIE tree are existed. (Assertion [#56](#test-assertion-5556))
+201. Check "Hide cardinality" checkbox, and verify that the displayed cardinality labels in the BIE tree are disappeared. (Assertion [#56a](#test-assertion-5556a))
+202. Click "Hide cardinality" checkbox to uncheck it, and verify that the displayed cardinality labels in the BIE tree are appeared. (Assertion [#56a](#test-assertion-5556a))
+203. Click "Version Identifier" at the second level of the BIE tree, and verify that the displayed cardinality label of the node in the tree is "0..1". (Assertion [#56b](#test-assertion-5556b))
+204. Check "Used" checkbox for "Version Identifier" node, set the Cardinality Min to 1, hit the "Update" button, and verify that the displayed cardinality label of the node in the tree is changed to "1..1". (Assertion [#56b](#test-assertion-5556b))
+205. Refresh the page, expands the root node, and verify that the displayed cardinality label of "Version Identifier" node in the tree is still "1..1". (Assertion [#56b](#test-assertion-5556b))
+206. Expand "Application Area" node at the second level of the BIE tree, click "Receiver" child node of "Application Area" node, and verify that the displayed cardinality label of the node in the tree is "0..∞". (Assertion [#56b](#test-assertion-5556b))
+207. Check "Used" checkbox for "Receiver" node, set the Cardinality Max to 10, and verify that the displayed cardinality label of the node in the tree is changed to "0..10". (Assertion [#56b](#test-assertion-5556b))
+208. Refresh the page, expands the root node and "Application Area" node sequentially, and verify that the displayed cardinality label of "Receiver" node in the tree is still "0..10". (Assertion [#56b](#test-assertion-5556b))
 
 ## Test Case 5.6
 
