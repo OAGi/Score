@@ -145,7 +145,7 @@ Component Type cannot be changed.
 ##### Test Assertion #15.4.4.b
 Abstract can only be changed from True to False, except when the Component Type is base where it should be locked as True.
 ##### Test Assertion #15.4.4.c
-“Namespace” and “Object Class Term” cannot be changed.
+"Object Class Term" can be changed, but "Namespace" cannot be changed.
 ##### Test Assertion #15.4.4.d
 If the Deprecated was already True in the previous revision, the field along with the Replaced By field should be locked. If it was False in the previous revision the checkbox shall be enabled. When Deprecated is changed to True, the end user must be able to select a replacement ACC in the same release that is not already deprecated from a drop-down list or search dialog in the Replaced By field – but the field is optional. If the Deprecated is changed to False, the Replaced By field shall be Null and optionally disappears from the UI.
 ##### Test Assertion #15.4.4.e
