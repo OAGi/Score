@@ -101,14 +101,6 @@ End user cannot create a new BIE from an ASCCP whose ACC has a group component t
 #### Test Assertion #6.2.10
 The end user can click the Detail Reset button of a specific BIE node to initial the values of the BIE node. These values are based on the corresponding CC of the BIE node. A confirmation dialog should be also returned in order for the end user to confirm his intension of resetting the BIE node values.
 
-#### Test Assertion #6.2.11
-The end user can Exclude SCs or not from the Searching Field by checking or unchecking the “Exclude SCs” checkbox accordingly.
-
-##### Test Assertion #6.2.11.a
-If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excluding from the searching field
-##### Test Assertion #6.2.11.b
-If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
-
 #### Test Assertion #6.2.12
 The end user can create a BIE from an end user ASCCP providing that it is in Production state. Check that the end user can create BIEs from both ASCCP that he owns or not.
 
