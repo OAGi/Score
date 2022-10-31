@@ -1,6 +1,7 @@
 package org.oagi.score.repo.component.top_level_asbiep;
 
 import org.jooq.DSLContext;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.ULong;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -22,7 +23,7 @@ public class TopLevelAsbiepWriteRepository {
 
     public void updateTopLevelAsbiep(UpdateTopLevelAsbiepRequest request) {
 
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong requesterId = ULong.valueOf(user.getAppUserId());
 
         TopLevelAsbiepRecord record = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
@@ -45,10 +46,14 @@ public class TopLevelAsbiepWriteRepository {
             record.setVersion(emptyToNull(request.getVersion()));
         }
 
-        dslContext.update(TOP_LEVEL_ASBIEP)
+        UpdateSetMoreStep moreStep = dslContext.update(TOP_LEVEL_ASBIEP)
                 .set(TOP_LEVEL_ASBIEP.STATUS, record.getStatus())
-                .set(TOP_LEVEL_ASBIEP.VERSION, record.getVersion())
-                .set(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP, request.getLocalDateTime())
+                .set(TOP_LEVEL_ASBIEP.VERSION, record.getVersion());
+        if (request.getInverseMode() != null) {
+            moreStep = moreStep.set(TOP_LEVEL_ASBIEP.INVERSE_MODE, (byte) (request.getInverseMode() ? 1 : 0));
+        }
+
+        moreStep.set(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP, request.getLocalDateTime())
                 .set(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY, requesterId)
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(record.getTopLevelAsbiepId()))
                 .execute();

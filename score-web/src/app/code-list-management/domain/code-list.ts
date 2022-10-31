@@ -108,7 +108,6 @@ export class CodeListForListRequest {
 
 export class CodeListForList {
   codeListManifestId: number;
-  codeListId: number;
   codeListName: string;
   definition: string;
   definitionSource: string;
@@ -179,7 +178,6 @@ export class GetSimpleAgencyIdListValuesResponse {
 
 export class SimpleAgencyIdList {
   agencyIdListManifestId: number;
-  agencyIdListId: number;
   name: string;
   state: string;
 }

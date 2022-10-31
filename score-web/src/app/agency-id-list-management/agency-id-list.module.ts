@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {AgencyIdListListComponent} from './agency-id-list-list/agency-id-list-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../authentication/auth.service';
@@ -38,8 +37,7 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     CommonModule,
-    ScoreCommonModule,
-    ContextMenuModule
+    ScoreCommonModule
   ],
   declarations: [
     AgencyIdListListComponent,

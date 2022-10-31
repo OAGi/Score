@@ -18,7 +18,7 @@ public abstract class AbstractBDTSimple implements BDTSimple {
 
     private BdtPriRestriRecord getDefaultBdtPriRestri() {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                importedDataProvider.findBdtPriRestriListByDtId(getBdtId());
+                importedDataProvider.findBdtPriRestriListByDtManifestId(getBdtManifestId());
 
         List<BdtPriRestriRecord> defaultBdtPriRestri = bdtPriRestriList.stream()
                 .filter(e -> e.getIsDefault() == 1)

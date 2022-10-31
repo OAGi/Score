@@ -382,6 +382,11 @@ public class Dt extends TableImpl<DtRecord> {
         return new Dt(alias, this);
     }
 
+    @Override
+    public Dt as(Table<?> alias) {
+        return new Dt(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -396,5 +401,13 @@ public class Dt extends TableImpl<DtRecord> {
     @Override
     public Dt rename(Name name) {
         return new Dt(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Dt rename(Table<?> name) {
+        return new Dt(name.getQualifiedName(), null);
     }
 }

@@ -1312,7 +1312,7 @@ public class CcNodeService extends EventHandler {
     }
 
     private List<BigInteger> _createOagisBod(AuthenticatedPrincipal user, CreateOagisBodRequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         if (!requester.isDeveloper()) {
             throw new IllegalArgumentException();
         }
@@ -1413,7 +1413,7 @@ public class CcNodeService extends EventHandler {
     private BigInteger _createOagisVerb(AuthenticatedPrincipal user,
                                         CreateOagisVerbRequest request) {
 
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         if (!requester.isDeveloper()) {
             throw new IllegalArgumentException();
         }
@@ -1470,13 +1470,13 @@ public class CcNodeService extends EventHandler {
     }
 
     public CcRefactorValidationResponse validateBccRefactoring(AuthenticatedPrincipal user, BigInteger bccManifestId, BigInteger destinationAccManifestId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         return bccReadRepository.validateBccRefactoring(requester, bccManifestId, destinationAccManifestId);
     }
 
     public CcRefactorValidationResponse validateAsccRefactoring(AuthenticatedPrincipal user, BigInteger asccManifestId, BigInteger destinationAccManifestId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         return asccReadRepository.validateAsccRefactoring(requester, asccManifestId, destinationAccManifestId);
     }

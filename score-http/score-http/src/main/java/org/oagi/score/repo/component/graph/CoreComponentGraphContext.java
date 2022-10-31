@@ -19,6 +19,7 @@ import org.oagi.score.service.corecomponent.seqkey.SeqKeySupportable;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -491,7 +492,25 @@ public class CoreComponentGraphContext implements GraphContext {
                 return dtScManifestMap.getOrDefault(node.getManifestId(),
                         dtScManifestMap.getOrDefault(node.getPrevManifestId(), Collections.emptyList()))
                         .stream()
-                        .map(e -> toNode(e)).collect(Collectors.toList());
+                        .map(e -> toNode(e)).sorted((o1, o2) -> {
+                            String t1 = (String) o1.getProperties().get("objectClassTerm");
+                            String t2 = (String) o2.getProperties().get("objectClassTerm");
+                            int compare = t1.compareTo(t2);
+                            if (compare != 0) {
+                                return compare;
+                            }
+
+                            t1 = (String) o1.getProperties().get("propertyTerm");
+                            t2 = (String) o2.getProperties().get("propertyTerm");
+                            compare = t1.compareTo(t2);
+                            if (compare != 0) {
+                                return compare;
+                            }
+
+                            t1 = (String) o1.getProperties().get("representationTerm");
+                            t2 = (String) o2.getProperties().get("representationTerm");
+                            return t1.compareTo(t2);
+                        }).collect(Collectors.toList());
 
             case DT_SC:
             default:

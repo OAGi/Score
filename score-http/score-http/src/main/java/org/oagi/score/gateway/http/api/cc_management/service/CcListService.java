@@ -82,7 +82,7 @@ public class CcListService {
 
     @Transactional
     public void transferOwnership(AuthenticatedPrincipal user, String type, BigInteger manifestId, String targetLoginId) {
-        AppUser targetUser = sessionService.getAppUser(targetLoginId);
+        AppUser targetUser = sessionService.getAppUserByUsername(targetLoginId);
         if (targetUser == null) {
             throw new IllegalArgumentException("Not found a target user.");
         }

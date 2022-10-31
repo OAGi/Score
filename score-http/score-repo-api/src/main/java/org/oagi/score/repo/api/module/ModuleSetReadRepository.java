@@ -12,6 +12,9 @@ public interface ModuleSetReadRepository {
     GetModuleSetResponse getModuleSet(
             GetModuleSetRequest request) throws ScoreDataAccessException;
 
+    GetModuleSetMetadataResponse getModuleSetMetadata(
+            GetModuleSetMetadataRequest request) throws ScoreDataAccessException;
+
     GetModuleSetListResponse getModuleSetList(
             GetModuleSetListRequest request) throws ScoreDataAccessException;
 

@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.impl.jooq.user;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -19,7 +20,6 @@ import java.util.List;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 
 public class JooqScoreUserReadRepository

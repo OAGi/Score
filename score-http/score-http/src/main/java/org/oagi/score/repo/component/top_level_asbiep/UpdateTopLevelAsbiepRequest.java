@@ -11,13 +11,16 @@ public class UpdateTopLevelAsbiepRequest extends RepositoryRequest {
     private final BigInteger topLevelAsbiepId;
     private final String status;
     private final String version;
+    private final Boolean inverseMode;
 
     public UpdateTopLevelAsbiepRequest(AuthenticatedPrincipal user, LocalDateTime localDateTime,
-                                       BigInteger topLevelAsbiepId, String status, String version) {
+                                       BigInteger topLevelAsbiepId, String status, String version,
+                                       Boolean inverseMode) {
         super(user, localDateTime);
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.status = status;
         this.version = version;
+        this.inverseMode = inverseMode;
     }
 
     public BigInteger getTopLevelAsbiepId() {
@@ -30,5 +33,9 @@ public class UpdateTopLevelAsbiepRequest extends RepositoryRequest {
 
     public String getVersion() {
         return version;
+    }
+
+    public Boolean getInverseMode() {
+        return inverseMode;
     }
 }

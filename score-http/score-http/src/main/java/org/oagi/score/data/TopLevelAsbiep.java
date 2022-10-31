@@ -19,4 +19,6 @@ public class TopLevelAsbiep {
     private BigInteger lastUpdatedBy = BigInteger.ZERO;
     private Date lastUpdateTimestamp;
 
+    private boolean inverseMode;
+
 }

@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {CodeListListComponent} from './code-list-list/code-list-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../authentication/auth.service';
@@ -12,7 +11,7 @@ import {CodeListDetailComponent} from './code-list-detail/code-list-detail.compo
 import {CodeListForDerivingComponent} from './code-list-for-deriving/code-list-for-deriving.component';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
-import { CodeListUpliftComponent } from './code-list-uplift/code-list-uplift.component';
+import {CodeListUpliftComponent} from './code-list-uplift/code-list-uplift.component';
 
 const routes: Routes = [
   {
@@ -55,8 +54,7 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     CommonModule,
-    ScoreCommonModule,
-    ContextMenuModule
+    ScoreCommonModule
   ],
   declarations: [
     CodeListListComponent,

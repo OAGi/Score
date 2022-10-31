@@ -9,7 +9,6 @@ import {CanActivateAdmin, CanActivateDeveloper, CanActivateUser} from '../authen
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {SettingsService} from './settings/domain/settings.service';
 import {AccountListComponent} from './account-list/account-list.component';
 import {AccountListService} from './domain/account-list.service';
@@ -56,9 +55,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    ContextMenuModule.forRoot({
-      useBootstrap4: true,
-    }),
     CommonModule
   ],
   declarations: [

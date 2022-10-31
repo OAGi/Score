@@ -112,23 +112,23 @@ public class Bbie extends TableImpl<BbieRecord> {
     public final TableField<BbieRecord, ULong> BDT_PRI_RESTRI_ID = createField(DSL.name("bdt_pri_restri_id"), SQLDataType.BIGINTUNSIGNED, this, "This is the foreign key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.");
 
     /**
-     * The column <code>oagi.bbie.code_list_id</code>. This is a foreign key to
-     * the CODE_LIST table. If a code list is assigned to the BBIE (or also can
-     * be viewed as assigned to the BBIEP for this association), then this
-     * column stores the assigned code list. It should be noted that one of the
-     * possible primitives assignable to the BDT_PRI_RESTRI_ID column may also
-     * be a code list. So this column is typically used when the user wants to
-     * assign another code list different from the one permissible by the CC
-     * model.
+     * The column <code>oagi.bbie.code_list_manifest_id</code>. This is a
+     * foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned
+     * to the BBIE (or also can be viewed as assigned to the BBIEP for this
+     * association), then this column stores the assigned code list. It should
+     * be noted that one of the possible primitives assignable to the
+     * BDT_PRI_RESTRI_ID column may also be a code list. So this column is
+     * typically used when the user wants to assign another code list different
+     * from the one permissible by the CC model.
      */
-    public final TableField<BbieRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the CODE_LIST table. If a code list is assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the BDT_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.");
+    public final TableField<BbieRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the BDT_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.");
 
     /**
-     * The column <code>oagi.bbie.agency_id_list_id</code>. This is a foreign
-     * key to the AGENCY_ID_LIST table. It is used in the case that the BDT
-     * content can be restricted to an agency identification.
+     * The column <code>oagi.bbie.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
+     * that the BDT content can be restricted to an agency identification.
      */
-    public final TableField<BbieRecord, ULong> AGENCY_ID_LIST_ID = createField(DSL.name("agency_id_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.");
+    public final TableField<BbieRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case that the BDT content can be restricted to an agency identification.");
 
     /**
      * The column <code>oagi.bbie.cardinality_min</code>. The minimum occurrence
@@ -142,6 +142,24 @@ public class Bbie extends TableImpl<BbieRecord> {
      * up. Specifically, -1 means unbounded. 0 means prohibited or not to use.
      */
     public final TableField<BbieRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER, this, "Maximum occurence constraint of the TO_BBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.");
+
+    /**
+     * The column <code>oagi.bbie.facet_min_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public final TableField<BbieRecord, ULong> FACET_MIN_LENGTH = createField(DSL.name("facet_min_length"), SQLDataType.BIGINTUNSIGNED, this, "Defines the minimum number of units of length.");
+
+    /**
+     * The column <code>oagi.bbie.facet_max_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public final TableField<BbieRecord, ULong> FACET_MAX_LENGTH = createField(DSL.name("facet_max_length"), SQLDataType.BIGINTUNSIGNED, this, "Defines the minimum number of units of length.");
+
+    /**
+     * The column <code>oagi.bbie.facet_pattern</code>. Defines a constraint on
+     * the lexical space of a datatype to literals in a specific pattern.
+     */
+    public final TableField<BbieRecord, String> FACET_PATTERN = createField(DSL.name("facet_pattern"), SQLDataType.CLOB, this, "Defines a constraint on the lexical space of a datatype to literals in a specific pattern.");
 
     /**
      * The column <code>oagi.bbie.default_value</code>. This column specifies
@@ -302,15 +320,15 @@ public class Bbie extends TableImpl<BbieRecord> {
 
     @Override
     public List<ForeignKey<BbieRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, Keys.BBIE_FROM_ABIE_ID_FK, Keys.BBIE_TO_BBIEP_ID_FK, Keys.BBIE_BDT_PRI_RESTRI_ID_FK, Keys.BBIE_CODE_LIST_ID_FK, Keys.BBIE_AGENCY_ID_LIST_ID_FK, Keys.BBIE_CREATED_BY_FK, Keys.BBIE_LAST_UPDATED_BY_FK, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, Keys.BBIE_FROM_ABIE_ID_FK, Keys.BBIE_TO_BBIEP_ID_FK, Keys.BBIE_BDT_PRI_RESTRI_ID_FK, Keys.BBIE_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_CREATED_BY_FK, Keys.BBIE_LAST_UPDATED_BY_FK, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient BccManifest _bccManifest;
     private transient Abie _abie;
     private transient Bbiep _bbiep;
     private transient BdtPriRestri _bdtPriRestri;
-    private transient CodeList _codeList;
-    private transient AgencyIdList _agencyIdList;
+    private transient CodeListManifest _codeListManifest;
+    private transient AgencyIdListManifest _agencyIdListManifest;
     private transient AppUser _bbieCreatedByFk;
     private transient AppUser _bbieLastUpdatedByFk;
     private transient TopLevelAsbiep _topLevelAsbiep;
@@ -356,23 +374,25 @@ public class Bbie extends TableImpl<BbieRecord> {
     }
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table.
+     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
+     * table.
      */
-    public CodeList codeList() {
-        if (_codeList == null)
-            _codeList = new CodeList(this, Keys.BBIE_CODE_LIST_ID_FK);
+    public CodeListManifest codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifest(this, Keys.BBIE_CODE_LIST_MANIFEST_ID_FK);
 
-        return _codeList;
+        return _codeListManifest;
     }
 
     /**
-     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
+     * Get the implicit join path to the
+     * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdList agencyIdList() {
-        if (_agencyIdList == null)
-            _agencyIdList = new AgencyIdList(this, Keys.BBIE_AGENCY_ID_LIST_ID_FK);
+    public AgencyIdListManifest agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.BBIE_AGENCY_ID_LIST_MANIFEST_ID_FK);
 
-        return _agencyIdList;
+        return _agencyIdListManifest;
     }
 
     /**
@@ -418,6 +438,11 @@ public class Bbie extends TableImpl<BbieRecord> {
         return new Bbie(alias, this);
     }
 
+    @Override
+    public Bbie as(Table<?> alias) {
+        return new Bbie(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -432,5 +457,13 @@ public class Bbie extends TableImpl<BbieRecord> {
     @Override
     public Bbie rename(Name name) {
         return new Bbie(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Bbie rename(Table<?> name) {
+        return new Bbie(name.getQualifiedName(), null);
     }
 }

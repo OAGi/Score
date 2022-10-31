@@ -7,11 +7,11 @@ import java.math.BigInteger;
 
 public class CodeListManifest implements CcManifest, Serializable {
 
-    private BigInteger CodeListManifestId;
+    private BigInteger codeListManifestId;
 
     private BigInteger releaseId;
 
-    private BigInteger CodeListId;
+    private BigInteger codeListId;
 
     private BigInteger basedCodeListManifestId;
 
@@ -19,16 +19,16 @@ public class CodeListManifest implements CcManifest, Serializable {
 
     private BigInteger logId;
 
-    private BigInteger prevBccpManifestId;
+    private BigInteger prevCodeListManifestId;
 
-    private BigInteger nextBccpManifestId;
+    private BigInteger nextCodeListManifestId;
 
     public BigInteger getCodeListManifestId() {
-        return CodeListManifestId;
+        return codeListManifestId;
     }
 
     public void setCodeListManifestId(BigInteger codeListManifestId) {
-        CodeListManifestId = codeListManifestId;
+        this.codeListManifestId = codeListManifestId;
     }
 
     @Override
@@ -41,11 +41,11 @@ public class CodeListManifest implements CcManifest, Serializable {
     }
 
     public BigInteger getCodeListId() {
-        return CodeListId;
+        return codeListId;
     }
 
     public void setCodeListId(BigInteger codeListId) {
-        CodeListId = codeListId;
+        this.codeListId = codeListId;
     }
 
     public BigInteger getBasedCodeListManifestId() {
@@ -72,20 +72,20 @@ public class CodeListManifest implements CcManifest, Serializable {
         this.logId = logId;
     }
 
-    public BigInteger getPrevBccpManifestId() {
-        return prevBccpManifestId;
+    public BigInteger getPrevCodeListManifestId() {
+        return prevCodeListManifestId;
     }
 
-    public void setPrevBccpManifestId(BigInteger prevBccpManifestId) {
-        this.prevBccpManifestId = prevBccpManifestId;
+    public void setPrevCodeListManifestId(BigInteger prevCodeListManifestId) {
+        this.prevCodeListManifestId = prevCodeListManifestId;
     }
 
-    public BigInteger getNextBccpManifestId() {
-        return nextBccpManifestId;
+    public BigInteger getNextCodeListManifestId() {
+        return nextCodeListManifestId;
     }
 
-    public void setNextBccpManifestId(BigInteger nextBccpManifestId) {
-        this.nextBccpManifestId = nextBccpManifestId;
+    public void setNextCodeListManifestId(BigInteger nextCodeListManifestId) {
+        this.nextCodeListManifestId = nextCodeListManifestId;
     }
 
     @Override

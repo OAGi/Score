@@ -33,11 +33,12 @@ public class JooqCodeListReadRepository
     @Override
     public Map<BigInteger, CodeList> getCodeListMap(BigInteger ReleaseId) throws ScoreDataAccessException {
         List<CodeList> codeListRecords = dslContext()
-                .select(CODE_LIST.CODE_LIST_ID,
+                .select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                        CODE_LIST.CODE_LIST_ID,
                         CODE_LIST.GUID,
                         CODE_LIST.NAME,
                         CODE_LIST.VERSION_ID,
-                        CODE_LIST.AGENCY_ID_LIST_VALUE_ID,
+                        CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
                         CODE_LIST.PREV_CODE_LIST_ID,
                         CODE_LIST.NEXT_CODE_LIST_ID)
                 .from(CODE_LIST)

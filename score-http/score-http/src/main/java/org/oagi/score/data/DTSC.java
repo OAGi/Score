@@ -17,9 +17,13 @@ public class DTSC implements Serializable {
     private String representationTerm;
     private String definition;
     private String definitionSource;
+    private String defaultValue;
+    private String fixedValue;
+    private BigInteger ownerDtManifestId = BigInteger.ZERO;
     private BigInteger ownerDtId = BigInteger.ZERO;
     private int cardinalityMin;
     private int cardinalityMax;
+    private BigInteger basedDtScManifestId = BigInteger.ZERO;
     private BigInteger basedDtScId = BigInteger.ZERO;
     private int revisionNum;
 

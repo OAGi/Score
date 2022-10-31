@@ -28,6 +28,10 @@ public class ModuleSetService {
         return scoreRepositoryFactory.createModuleSetReadRepository().getModuleSet(request);
     }
 
+    public GetModuleSetMetadataResponse getModuleSetMetadata(GetModuleSetMetadataRequest request) {
+        return scoreRepositoryFactory.createModuleSetReadRepository().getModuleSetMetadata(request);
+    }
+
     @Transactional
     public CreateModuleSetResponse createModuleSet(CreateModuleSetRequest request) {
         CreateModuleSetResponse response = scoreRepositoryFactory.createModuleSetWriteRepository().createModuleSet(request);

@@ -6,7 +6,8 @@ export const environment = {
   production: false,
   loginPath: 'login',
   logoutPath: 'logout',
-  statePath: 'state'
+  statePath: 'state',
+  stompBrokerUrl: 'ws://[::1]:9000/messages'
 };
 
 /*

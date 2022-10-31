@@ -15,14 +15,15 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
 
@@ -35,7 +36,7 @@ export class BieListComponent implements OnInit {
   title = 'BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner',
+    'select', 'state', 'den', 'owner',
     'transferOwnership', 'businessContexts', 'version',
     'status', 'bizTerm', 'remark', 'lastUpdateTimestamp', 'more'
   ];
@@ -52,9 +53,9 @@ export class BieListComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
 
+  contextMenuItem: BieList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
   constructor(private service: BieListService,
               private accountService: AccountListService,
@@ -63,7 +64,6 @@ export class BieListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -215,31 +215,26 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieList): boolean {
+    if (!row) {
+      return false;
+    }
     return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
-  isEditable(element: BieList) {
+  isEditable(element: BieList): boolean {
+    if (!element) {
+      return false;
+    }
     return element.owner === this.username && element.state === 'WIP';
-  }
-
-  onContextMenu($event: MouseEvent, item: BieList): void {
-    this.contextMenuService.show.next({
-      contextMenu: this.contextMenu,
-      event: $event,
-      item: item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
   }
 
   discardAllSelected() {
     this.openDialogBieDiscard(this.selection.selected);
   }
 
-  discard(bieList: BieList, $event) {
-    this.openDialogBieDiscard([bieList.topLevelAsbiepId,]);
+  discard(bieList: BieList) {
+    this.openDialogBieDiscard([bieList.topLevelAsbiepId, ]);
   }
 
   openDialogBieDiscard(topLevelAsbiepIds: number[]) {
@@ -268,7 +263,7 @@ export class BieListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(bieList: BieList, $event) {
+  openTransferDialog(bieList: BieList) {
     if (!this.isEditable(bieList)) {
       return;
     }
@@ -294,13 +289,13 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  openBieListDialog(bie: BieList, $event) {
+  openBieListDialog(bie: BieList) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
       topLevelAsbiepId: bie.topLevelAsbiepId,
       releaseNum: bie.releaseNum,
-      propertyTerm: bie.propertyTerm
+      den: bie.den
     };
     const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }

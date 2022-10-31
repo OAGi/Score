@@ -73,31 +73,38 @@
                           <mat-placeholder *ngIf="!selectedNode">Search</mat-placeholder>
                           <mat-placeholder *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-placeholder>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                                 [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
-                          <mat-hint matSuffix *ngIf="searcher.searchResult.length > 0"
-                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}+</mat-hint>
-                          <mat-hint matSuffix *ngIf="searcher.searchResult.length === 0"
-                                    align="end">0/0</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.searchResult.length > 0"
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results</mat-hint>
                         </mat-form-field>
                       </div>
                       <div class="col-3 buttons">
                         <button mat-icon-button
-                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(-1)">
                           <mat-icon>keyboard_arrow_up</mat-icon>
                         </button>
                         <button mat-icon-button
-                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(1)">
                           <mat-icon>keyboard_arrow_down</mat-icon>
                         </button>
                         <button mat-icon-button
+                                [hidden]="searcher.fullSearched"
+                                [disabled]="searcher.isSearching"
+                                [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                                 (click)="search(searcher.inputKeyword, false, true)">
-                          <mat-icon>search</mat-icon>
+                          <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                         </button>
                         <button mat-icon-button
+                                [disabled]="searcher.isSearching"
                                 [hidden]="!searcher.inputKeyword"
-                                (click)="searcher.resetSearch()">
+                                (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
                           <mat-icon>close</mat-icon>
                         </button>
                         <div style="height: 19px;">
@@ -109,10 +116,10 @@
                   </div>
                   <div class="col-7 actions-wrap">
                     <div class="actions ml-auto" *ngIf="isWorkingRelease()">
-                      <mat-checkbox class="hide-prohibited"
-                                    [(ngModel)]="treeControl.hideProhibited">
-                        <span>Hide Prohibited SCs</span>
-                      </mat-checkbox>
+                      <button mat-icon-button [id]="'cc-settings'"
+                              [matMenuTriggerFor]="settingsContextMenu">
+                        <mat-icon>settings</mat-icon>
+                      </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP' && access === 'CanEdit'"
                               [disabled]="!isChanged">
@@ -157,10 +164,10 @@
                       </button>
                     </div>
                     <div class="actions ml-auto" *ngIf="!isWorkingRelease()">
-                      <mat-checkbox class="hide-prohibited"
-                                    [(ngModel)]="treeControl.hideProhibited">
-                        <span>Hide Prohibited</span>
-                      </mat-checkbox>
+                      <button mat-icon-button [id]="'cc-settings'"
+                              [matMenuTriggerFor]="settingsContextMenu">
+                        <mat-icon>settings</mat-icon>
+                      </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP' && access === 'CanEdit'"
                               [disabled]="!isChanged">
@@ -202,6 +209,18 @@
                     </div>
                   </div>
                 </div>
+                <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+                  <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
+                    <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideCardinality">
+                      <span>Hide cardinality</span>
+                    </mat-checkbox>
+                  </button>
+                  <button mat-menu-item [id]="'bie-settings-hide-unused'">
+                    <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideProhibited">
+                      <span>Hide Prohibited SCs</span>
+                    </mat-checkbox>
+                  </button>
+                </mat-menu>
                 <div class="row">
                   <div class="tree-breadcrumbs-wrap" id="cc-tree-breadcrumbs-wrap" *ngIf="selectedNode">
                     <div class="tree-breadcrumb"
@@ -227,7 +246,8 @@
                 <mat-card-content class="mat-card-container">
                   <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                                [style.height.px]="innerHeight" #virtualScroll>
-                    <div *cdkVirtualFor="let node of dataSource" class="example-item">
+                    <div *cdkVirtualFor="let node of dataSource" class="example-item"
+                         (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
                       <div class="mat-tree-node d-flex pointer"
                            tabIndex="0"
                            [class]="{'tree-node-selected': cursorNode === node}"
@@ -236,12 +256,12 @@
                            [matTooltip]="'Circular reference detected.'"
                            [matTooltipDisabled]="!node.isCycle"
                            [style.padding-left]="node.level * paddingPixel + 'px'">
-                        <button *ngIf="treeControl.isExpandable(node); else disabledRef;"
+                        <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                                 (click)="toggle(node, $event)"
                                 class="align-self-center"
                                 mat-icon-button>
-                          <mat-icon class="mat-icon-rtl-mirror" *ngIf="treeControl.isExpandable(node)">
-                            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                          <mat-icon class="mat-icon-rtl-mirror" *ngIf="dataSource.isExpandable(node)">
+                            {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                           </mat-icon>
                         </button>
                         <ng-template #disabledRef>
@@ -257,74 +277,52 @@
                               [matTooltip]="node.state === 'Deleted' ? 'Deleted' : ''"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
-                        <mat-icon class="align-self-center ml-auto"
-                                  *ngIf="!node.isCycle"
-                                  (click)="onContextMenu($event, node)">more_vert
-                        </mat-icon>
+
+                        <span [class]="['pl-2', 'align-self-center']"
+                              *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+
+                        <div class="ml-auto align-self-center mr-2">
+                          <mat-icon [hidden]="!node.showCopyLinkIcon"
+                                    matTooltip="Copy Link"
+                                    (click)="copyLink(node, $event)">
+                            link
+                          </mat-icon>
+                          <mat-icon [style.visibility]="!node.isCycle ? '' : 'hidden'"
+                                    [matMenuTriggerFor]="contextMenu"
+                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                          </mat-icon>
+                        </div>
                       </div>
                     </div>
                   </cdk-virtual-scroll-viewport>
 
-                  <context-menu #defaultContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
+                  <mat-menu class="context-menu" #contextMenu="matMenu">
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
                       <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
+                    </button>
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true"></ng-template>
-                    <ng-template contextMenuItem (execute)="openHistory($event.item)">
-                      <span class="context-menu-item">Show History</span>
-                    </ng-template>
-                  </context-menu>
-
-                  <context-menu #dtContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
-                      <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
-                      <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template *ngIf="isEditable()"
-                                 contextMenuItem divider="true"></ng-template>
-                    <ng-template *ngIf="isEditable()"
-                                 contextMenuItem (execute)="appendSc($event.item)">
+                    </button>
+                    <mat-divider *ngIf="!!contextMenuItem && isEditable()"></mat-divider>
+                    <button mat-menu-item (click)="appendSc(contextMenuItem)"
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable()">
                       <span class="context-menu-item">Add Supplementary Component</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true"></ng-template>
-                    <ng-template contextMenuItem (execute)="openHistory($event.item)">
-                      <span class="context-menu-item">Show History</span>
-                    </ng-template>
-                  </context-menu>
-
-                  <context-menu #dtScContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
-                      <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
-                      <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template *ngIf="isEditable()"
-                                 contextMenuItem divider="true"></ng-template>
-                    <ng-template *ngIf="isEditable()"
-                                 contextMenuItem (execute)="discardSc($event.item)">
+                    </button>
+                    <button mat-menu-item (click)="discardSc(contextMenuItem)"
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 1 && isEditable() && canDiscard(contextMenuItem)">
                       <span class="context-menu-item">Remove</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true"></ng-template>
-                    <ng-template contextMenuItem (execute)="openHistory($event.item)">
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
+                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0">
+                      <span class="context-menu-item">Open in new tab</span>
+                    </button>
+                    <button mat-menu-item (click)="openHistory(contextMenuItem)">
                       <span class="context-menu-item">Show History</span>
-                    </ng-template>
-                  </context-menu>
-
+                    </button>
+                  </mat-menu>
                 </mat-card-content>
               </mat-card>
             </as-split-area>
@@ -864,7 +862,6 @@
                                   <mat-form-field *ngIf="element.type === 'AgencyIdList'">
                                     <mat-select [(ngModel)]="element.bdtScPriRestri.selectedAgencyIdList"
                                                 [required]="true"
-                                                [disabled]="!isEditable() || element.bdtScPriRestri.inherited"
                                                 (ngModelChange)="onChangeValueDomain(asBdtScDetail())">
                                       <mat-option *ngFor="let agencyIdList of filteredAgencyIdLists(element)" [value]="agencyIdList"
                                                   [disabled]="!isEditable() || element.bdtScPriRestri.inherited">
@@ -893,11 +890,10 @@
                               <mat-toolbar-row>
                                 <mat-form-field class="pt-2 w-50 pl-2">
                                   <mat-label>Default</mat-label>
-                                  <mat-select [(ngModel)]="asBdtScDetail().defaultValueDomain"
-                                              [disabled]="!isEditable()">
+                                  <mat-select [(ngModel)]="asBdtScDetail().defaultValueDomain">
                                     <mat-optgroup *ngFor="let valueDomain of asBdtScDetail().bdtScPriRestriListByGroup"
                                                   [label]="valueDomain.label">
-                                      <mat-option *ngFor="let item of valueDomain.list" [value]="item">
+                                      <mat-option *ngFor="let item of valueDomain.list" [value]="item" [disabled]="!isEditable()">
                                         {{ (item.type === 'Primitive') ? item.self.primitiveName + ' - ' + item.name : item.name }}
                                       </mat-option>
                                     </mat-optgroup>

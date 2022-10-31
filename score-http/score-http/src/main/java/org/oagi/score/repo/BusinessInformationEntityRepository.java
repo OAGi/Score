@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.or;
+import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.field;
 import static org.oagi.score.gateway.http.helper.Utility.sha256;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 import static org.oagi.score.repo.api.bie.model.BieState.*;
@@ -39,6 +39,8 @@ public class BusinessInformationEntityRepository {
         private BieState bieState = WIP;
         private String version;
         private String status;
+
+        private boolean inverseMode;
         private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
 
         public InsertTopLevelAsbiepArguments setReleaseId(BigInteger releaseId) {
@@ -62,6 +64,11 @@ public class BusinessInformationEntityRepository {
 
         public InsertTopLevelAsbiepArguments setStatus(String status) {
             this.status = status;
+            return this;
+        }
+
+        public InsertTopLevelAsbiepArguments setInverseMode(boolean inverseMode) {
+            this.inverseMode = inverseMode;
             return this;
         }
 
@@ -103,6 +110,10 @@ public class BusinessInformationEntityRepository {
             return status;
         }
 
+        public boolean isInverseMode() {
+            return inverseMode;
+        }
+
         public ULong getUserId() {
             return userId;
         }
@@ -127,6 +138,7 @@ public class BusinessInformationEntityRepository {
         record.setState(arguments.getBieState().name());
         record.setVersion(arguments.getVersion());
         record.setStatus(arguments.getStatus());
+        record.setInverseMode((byte) (arguments.isInverseMode() ? 1 : 0));
         record.setLastUpdatedBy(arguments.getUserId());
         record.setLastUpdateTimestamp(arguments.getTimestamp());
 
@@ -439,6 +451,16 @@ public class BusinessInformationEntityRepository {
         private int offset = -1;
         private int numberOfRows = -1;
 
+        private String den;
+        private String type;
+
+        public SelectBieListArguments setDen(String den) {
+            if (StringUtils.hasLength(den)) {
+                conditions.addAll(contains(den, ASCCP.DEN));
+            }
+            return this;
+        }
+
         public SelectBieListArguments setPropertyTerm(String propertyTerm) {
             if (StringUtils.hasLength(propertyTerm)) {
                 conditions.addAll(contains(propertyTerm, ASCCP.PROPERTY_TERM));
@@ -489,6 +511,11 @@ public class BusinessInformationEntityRepository {
             if (!states.isEmpty()) {
                 conditions.add(TOP_LEVEL_ASBIEP.STATE.in(states.stream().map(e -> e.name()).collect(Collectors.toList())));
             }
+            return this;
+        }
+
+        public SelectBieListArguments setType(String type) {
+            this.type = type;
             return this;
         }
 
@@ -563,13 +590,21 @@ public class BusinessInformationEntityRepository {
 
                         break;
 
-                    case "propertyTerm":
+                    case "topLevelAsccpPropertyTerm":
                         if ("asc".equals(direction)) {
                             this.sortField = ASCCP.PROPERTY_TERM.asc();
                         } else if ("desc".equals(direction)) {
                             this.sortField = ASCCP.PROPERTY_TERM.desc();
                         }
 
+                        break;
+
+                    case "den":
+                        if ("asc".equals(direction)) {
+                            this.sortField = ASCCP.DEN.asc();
+                        } else if ("desc".equals(direction)) {
+                            this.sortField = ASCCP.DEN.desc();
+                        }
                         break;
 
                     case "releaseNum":
@@ -640,15 +675,16 @@ public class BusinessInformationEntityRepository {
         return new SelectBieListArguments();
     }
 
-    private SelectOnConditionStep<Record13<
+    private SelectOnConditionStep<Record14<
             ULong, String, String, String, String,
-            String, ULong, String, String, String,
-            LocalDateTime, String, String>> getSelectOnConditionStep() {
+            String, String, ULong, String, String,
+            String, LocalDateTime, String, String>> getSelectOnConditionStep() {
         return dslContext.selectDistinct(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.VERSION,
                 TOP_LEVEL_ASBIEP.STATUS,
                 ABIE.GUID,
+                ASCCP.DEN,
                 ASCCP.PROPERTY_TERM,
                 RELEASE.RELEASE_NUM,
                 TOP_LEVEL_ASBIEP.OWNER_USER_ID,
@@ -674,23 +710,23 @@ public class BusinessInformationEntityRepository {
     }
 
     private <E> PaginationResponse<E> selectBieList(SelectBieListArguments arguments, Class<? extends E> type) {
-        SelectOnConditionStep<Record13<
+        SelectOnConditionStep<Record14<
                 ULong, String, String, String, String,
-                String, ULong, String, String, String,
-                LocalDateTime, String, String>> step = getSelectOnConditionStep();
+                String, String, ULong, String, String,
+                String, LocalDateTime, String, String>> step = getSelectOnConditionStep();
 
-        SelectConnectByStep<Record13<
+        SelectConnectByStep<Record14<
                 ULong, String, String, String, String,
-                String, ULong, String, String, String,
-                LocalDateTime, String, String>> conditionStep = step.where(arguments.getConditions());
+                String, String, ULong, String, String,
+                String, LocalDateTime, String, String>> conditionStep = step.where(arguments.getConditions());
 
         int pageCount = dslContext.fetchCount(conditionStep);
 
         SortField sortField = arguments.getSortField();
-        SelectWithTiesAfterOffsetStep<Record13<
+        SelectWithTiesAfterOffsetStep<Record14<
                 ULong, String, String, String, String,
-                String, ULong, String, String, String,
-                LocalDateTime, String, String>> offsetStep = null;
+                String, String, ULong, String, String,
+                String, LocalDateTime, String, String>> offsetStep = null;
         if (sortField != null) {
             if (arguments.getOffset() >= 0 && arguments.getNumberOfRows() >= 0) {
                 offsetStep = conditionStep.orderBy(sortField)

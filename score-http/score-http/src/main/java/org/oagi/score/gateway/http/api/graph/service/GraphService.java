@@ -129,7 +129,7 @@ public class GraphService {
     }
 
     public Graph getBieGraph(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
-        boolean excludeUEG = sessionService.getAppUser(user).isDeveloper();
+        boolean excludeUEG = sessionService.getAppUserByUsername(user).isDeveloper();
         BigInteger asccpManifestId = bieRepository.getAsccpManifestIdByTopLevelAsbiepId(topLevelAsbiepId);
         return getAsccpGraph(asccpManifestId, excludeUEG);
     }

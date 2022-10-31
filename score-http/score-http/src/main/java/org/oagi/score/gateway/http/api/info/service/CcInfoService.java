@@ -32,7 +32,7 @@ public class CcInfoService {
     private SessionService sessionService;
 
     public SummaryCcExtInfo getSummaryCcExtInfo(AuthenticatedPrincipal user, BigInteger releaseId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         if (user == null || requester == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }

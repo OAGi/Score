@@ -83,7 +83,8 @@ public class CodeListService extends EventHandler {
                 .join(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .leftJoin(CODE_LIST_MANIFEST.as("based")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based").CODE_LIST_MANIFEST_ID))
                 .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
-                .leftJoin(AGENCY_ID_LIST_VALUE).on(CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                 .leftJoin(MODULE_CODE_LIST_MANIFEST)
                 .on(and(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID), MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
@@ -121,7 +122,7 @@ public class CodeListService extends EventHandler {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getAccess() != null) {
-            AppUser requester = sessionService.getAppUser(user);
+            AppUser requester = sessionService.getAppUserByUsername(user);
             switch (request.getAccess()) {
                 case CanEdit:
                     conditions.add(CODE_LIST.OWNER_USER_ID.eq(ULong.valueOf(requester.getAppUserId())));
@@ -222,10 +223,10 @@ public class CodeListService extends EventHandler {
                 .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId()))).fetchOneInto(String.class);
         boolean isWorkingRelease = releaseNum.equals("Working");
 
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         result.stream().forEach(e -> {
             e.setAccess(
-                    AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUser(e.getOwnerId()),
+                    AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUsername(e.getOwnerId()),
                             CcState.valueOf(e.getState()), isWorkingRelease)
             );
             e.setOwnerId(null); // hide sensitive information
@@ -243,7 +244,8 @@ public class CodeListService extends EventHandler {
                 .join(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .leftJoin(CODE_LIST_MANIFEST.as("based")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based").CODE_LIST_MANIFEST_ID))
                 .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
-                .leftJoin(AGENCY_ID_LIST_VALUE).on(CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                 .leftJoin(MODULE_CODE_LIST_MANIFEST)
                 .on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                 .leftJoin(MODULE)
@@ -289,7 +291,8 @@ public class CodeListService extends EventHandler {
                 .join(APP_USER.as("owner")).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .leftJoin(CODE_LIST_MANIFEST.as("based")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based").CODE_LIST_MANIFEST_ID))
                 .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
-                .leftJoin(AGENCY_ID_LIST_VALUE).on(CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                 .leftJoin(NAMESPACE).on(CODE_LIST.NAMESPACE_ID.eq(NAMESPACE.NAMESPACE_ID))
                 .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOptionalInto(CodeList.class).orElse(null);
@@ -302,9 +305,9 @@ public class CodeListService extends EventHandler {
                 .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(codeList.getReleaseId()))).fetchOneInto(String.class);
         boolean isWorkingRelease = releaseNum.equals("Working");
 
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         codeList.setAccess(
-                AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUser(codeList.getOwnerId()),
+                AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUsername(codeList.getOwnerId()),
                         CcState.valueOf(codeList.getState()), isWorkingRelease)
         );
         codeList.setOwnerId(null); // hide sensitive information
@@ -430,12 +433,12 @@ public class CodeListService extends EventHandler {
         return response.getCodeListManifestId();
     }
 
-    public CodeList getCodeListRevision(AuthenticatedPrincipal user, BigInteger manifestId) {
+    public CodeList getCodeListRevision(AuthenticatedPrincipal user, BigInteger codeListManifestId) {
         CodeListManifestRecord codeListManifestRecord = dslContext.selectFrom(CODE_LIST_MANIFEST)
-                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(ULong.valueOf(codeListManifestId)))
                 .fetchOne();
         if (codeListManifestRecord == null) {
-            throw new IllegalArgumentException("Unknown CodeList: " + manifestId);
+            throw new IllegalArgumentException("Unknown CodeList: " + codeListManifestId);
         }
 
         CodeListRecord codeListRecord = dslContext.selectFrom(CODE_LIST)
@@ -448,9 +451,8 @@ public class CodeListService extends EventHandler {
             return null;
         }
         CodeList codeList = dslContext.select(
+                CODE_LIST.CODE_LIST_ID,
                 CODE_LIST.NAME.as("code_list_name"),
-                CODE_LIST.AGENCY_ID_LIST_VALUE_ID,
-                AGENCY_ID_LIST_VALUE.NAME.as("agency_id_name"),
                 CODE_LIST.VERSION_ID,
                 CODE_LIST.GUID,
                 CODE_LIST.LIST_ID,
@@ -463,7 +465,6 @@ public class CodeListService extends EventHandler {
                 CODE_LIST.IS_DEPRECATED.as("deprecated"))
                 .from(CODE_LIST)
                 .join(APP_USER.as("owner")).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
-                .leftJoin(AGENCY_ID_LIST_VALUE).on(CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                 .where(CODE_LIST.CODE_LIST_ID.eq(lastPublishedCodeListId))
                 .fetchOptionalInto(CodeList.class).orElse(null);
 
@@ -759,7 +760,7 @@ public class CodeListService extends EventHandler {
 
     @Transactional
     public void transferOwnership(AuthenticatedPrincipal user, BigInteger manifestId, String targetLoginId) {
-        AppUser targetUser = sessionService.getAppUser(targetLoginId);
+        AppUser targetUser = sessionService.getAppUserByUsername(targetLoginId);
         if (targetUser == null) {
             throw new IllegalArgumentException("Not found a target user.");
         }

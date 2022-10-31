@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.ImmutableMap;
+import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.OpenAPIExpressionFormat;
@@ -21,10 +22,14 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
 import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -67,7 +72,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
         if (mergedTopLevelAsbieps.size() == 0) {
-            throw new IllegalArgumentException("Can not found BIEs.");
+            throw new IllegalArgumentException("Cannot found BIEs.");
         }
         BigInteger releaseId = mergedTopLevelAsbieps.get(0).getReleaseId();
         /*
@@ -130,136 +135,215 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         return this.option.isOpenAPICodeGenerationFriendly();
     }
 
-    private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
-        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId());
-        ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+    private String getPathName(TopLevelAsbiep topLevelAsbiep) {
+        // Issue #1308
+        StringBuilder pathName = new StringBuilder();
+        pathName.append("/");
 
-        Map<String, Object> paths;
-        Map<String, Object> schemas = new LinkedHashMap();
-        if (root == null) {
-            root = new LinkedHashMap();
-            root.put("openapi", OPEN_API_VERSION);
-            root.put("info", ImmutableMap.<String, Object>builder()
-                    .put("title", "")
-                    .put("description", "")
-                    .put("contact", ImmutableMap.<String, Object>builder()
-                            .put("name", "")
-                            .put("url", "")
-                            .put("email", "example@example.org")
-                            .build())
-                    .put("version", "")
-                    .build());
+        BigInteger bizCtxId = option.getBizCtxIds().get(topLevelAsbiep.getTopLevelAsbiepId());
+        BizCtx bizCtx = generationContext.findBusinessContexts(topLevelAsbiep).stream()
+                .filter(e -> e.getBizCtxId().equals(bizCtxId))
+                .findAny().orElse(null);
 
-            paths = new LinkedHashMap();
-            root.put("paths", paths);
-            root.put("components", ImmutableMap.<String, Object>builder()
-                    .put("schemas", schemas)
-                    .build()
-            );
-        } else {
-            paths = (Map<String, Object>) root.get("paths");
-            schemas = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("schemas");
+        String bizCtxName = bizCtx.getName();
+        // RESTful Web API Design V2 document
+        // [R85] For URI path segments, consisting of more than a single word, a hyphen character "-"
+        // SHOULD be used to separate the words.
+        String delimiter = "-";
+        bizCtxName = bizCtxName.toLowerCase()
+                .replaceAll("\\s", delimiter)
+                .replaceAll("[^A-Za-z0-9]", delimiter);
+        pathName.append(bizCtxName).append("/");
+
+        String version = topLevelAsbiep.getVersion();
+        if (StringUtils.hasLength(version)) {
+            version = version.toLowerCase()
+                    .replaceAll("\\s", "")
+                    .replaceAll("[^A-Za-z0-9]", delimiter);
+            pathName.append(version).append("/");
         }
 
-        Map<String, Object> path = new LinkedHashMap();
+        String bieName = getBieName(topLevelAsbiep, s -> convertIdentifierToId(s
+                .replaceAll("\\s", delimiter)
+                .replaceAll("[^A-Za-z0-9]", delimiter)));
+        pathName.append(bieName);
+
+        // RESTful Web API Design V2 document
+        // [R87] For the URI path, lower case letters SHOULD be used.
+        return pathName.toString().toLowerCase();
+    }
+
+    private String getBieName(TopLevelAsbiep topLevelAsbiep) {
+        return getBieName(topLevelAsbiep, s -> convertIdentifierToId(camelCase(s)));
+    }
+
+    private String getBieName(TopLevelAsbiep topLevelAsbiep, Function<String, String> replacer) {
+        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
-        String bieName = camelCase(basedAsccp.getPropertyTerm());
-        String pathName = "/" + bieName;
-        paths.put(pathName, path);
+        return replacer.apply(basedAsccp.getPropertyTerm());
+    }
 
-        path.put("summary", "");
-        path.put("description", "");
+    private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
+        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
+        generationContext.referenceCounter().increase(asbiep);
+        try {
+            ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+            Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
 
-        if (option.isOpenAPI30GetTemplate()) {
-            String schemaName;
-            if (isFriendly()) {
-                schemaName = "get-" + bieName;
-            } else {
-                schemaName = "get-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
-            }
-            path.put("get", ImmutableMap.<String, Object>builder()
-                    .put("summary", "")
-                    .put("description", "")
-                    .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                    .put("parameters", Arrays.asList(
-                            ImmutableMap.<String, Object>builder()
-                                    .put("name", "id")
-                                    .put("in", "query")
-                                    .put("description", "")
-                                    .put("required", false)
-                                    .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
-                                            .put("type", "integer")
-                                            .build() : ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/integer")
-                                            .build())
-                                    .build()
-                    ))
-                    .put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + schemaName)
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build())
-                    .build());
-
-            if (!isFriendly() && !schemas.containsKey("integer")) {
-                schemas.put("integer", ImmutableMap.<String, Object>builder()
-                        .put("type", "integer")
+            Map<String, Object> paths;
+            Map<String, Object> schemas = new LinkedHashMap();
+            if (root == null) {
+                root = new LinkedHashMap();
+                root.put("openapi", OPEN_API_VERSION);
+                root.put("info", ImmutableMap.<String, Object>builder()
+                        .put("title", "")
+                        .put("description", "")
+                        .put("contact", ImmutableMap.<String, Object>builder()
+                                .put("name", "")
+                                .put("url", "")
+                                .put("email", "example@example.org")
+                                .build())
+                        .put("version", "")
+                        .put("x-oagis-release", release.getReleaseNum())
+                        .put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()))
+                        .put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "")
                         .build());
-            }
 
-            Map<String, Object> properties = new LinkedHashMap();
-            properties.put("required", new ArrayList());
-            properties.put("additionalProperties", false);
-
-            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-            schemas.put(schemaName, properties);
-        }
-
-        if (option.isOpenAPI30PostTemplate()) {
-            String schemaName;
-            if (isFriendly()) {
-                schemaName = "post-" + bieName;
+                paths = new LinkedHashMap();
+                root.put("paths", paths);
+                root.put("components", ImmutableMap.<String, Object>builder()
+                        .put("schemas", schemas)
+                        .build()
+                );
             } else {
-                schemaName = "post-" + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                paths = (Map<String, Object>) root.get("paths");
+                schemas = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("schemas");
             }
-            path.put("post", ImmutableMap.<String, Object>builder()
-                    .put("summary", "")
-                    .put("description", "")
-                    .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                    .put("requestBody", ImmutableMap.<String, Object>builder()
-                            .put("description", "")
-                            .put("content", ImmutableMap.<String, Object>builder()
-                                    .put("application/json", ImmutableMap.<String, Object>builder()
-                                            .put("schema", ImmutableMap.<String, Object>builder()
-                                                    .put("$ref", "#/components/schemas/" + schemaName)
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build())
-                    .put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build())
-                    .build());
 
-            Map<String, Object> properties = new LinkedHashMap();
-            properties.put("required", new ArrayList());
-            properties.put("additionalProperties", false);
+            Map<String, Object> path = new LinkedHashMap();
+            ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
+            String bieName = getBieName(topLevelAsbiep);
+            String pathName = getPathName(topLevelAsbiep);
+            paths.put(pathName, path);
 
-            fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-            schemas.put(schemaName, properties);
+            path.put("summary", "");
+            path.put("description", "");
+
+            if (option.isOpenAPI30GetTemplate()) {
+                String schemaName;
+                String prefix = "";
+                // Issue #1302
+                if (option.hasOpenAPI30GetTemplateOptions() || option.hasOpenAPI30PostTemplateOptions()) {
+                    prefix = "get-";
+                }
+                if (isFriendly()) {
+                    schemaName = prefix + bieName;
+                } else {
+                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                }
+                path.put("get", ImmutableMap.<String, Object>builder()
+                        .put("summary", "")
+                        .put("description", "")
+                        .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
+                        .put("parameters", Arrays.asList(
+                                ImmutableMap.<String, Object>builder()
+                                        .put("name", "id")
+                                        .put("in", "query")
+                                        .put("description", "")
+                                        .put("required", false)
+                                        .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
+                                                .put("type", "integer")
+                                                .build() : ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/integer")
+                                                .build())
+                                        .build()
+                        ))
+                        .put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + schemaName)
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build());
+
+                if (!isFriendly() && !schemas.containsKey("integer")) {
+                    schemas.put("integer", ImmutableMap.<String, Object>builder()
+                            .put("type", "integer")
+                            .build());
+                }
+
+                if (!schemas.containsKey(schemaName)) {
+                    Map<String, Object> properties = new LinkedHashMap();
+                    // Issue #1148
+                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
+                    properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
+                    properties.put("required", new ArrayList());
+                    properties.put("additionalProperties", false);
+
+                    fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                    schemas.put(schemaName, properties);
+                }
+            }
+
+            if (option.isOpenAPI30PostTemplate()) {
+                String schemaName;
+                String prefix = "";
+                // Issue #1302
+                if (option.hasOpenAPI30GetTemplateOptions() || option.hasOpenAPI30PostTemplateOptions()) {
+                    prefix = "post-";
+                }
+                if (isFriendly()) {
+                    schemaName = prefix + bieName;
+                } else {
+                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                }
+                path.put("post", ImmutableMap.<String, Object>builder()
+                        .put("summary", "")
+                        .put("description", "")
+                        .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
+                        .put("requestBody", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + schemaName)
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build());
+
+                if (!schemas.containsKey(schemaName)) {
+                    Map<String, Object> properties = new LinkedHashMap();
+                    // Issue #1148
+                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
+                    properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
+                    properties.put("required", new ArrayList());
+                    properties.put("additionalProperties", false);
+
+                    fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                    schemas.put(schemaName, properties);
+                }
+            }
+        } finally {
+            generationContext.referenceCounter().decrease(asbiep);
         }
     }
 
@@ -302,38 +386,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 option.isArrayForJsonExpressionForOpenAPI30PostTemplate(), generationContext);
     }
 
-    private String _camelCase(String term) {
-        return Arrays.stream(term.split(" ")).filter(e -> StringUtils.hasLength(e))
-                .map(e -> {
-                    if (e.length() > 1) {
-                        return Character.toUpperCase(e.charAt(0)) + e.substring(1).toLowerCase();
-                    } else {
-                        return e.toUpperCase();
-                    }
-                }).collect(Collectors.joining());
-    }
-
-    private String camelCase(String... terms) {
-        String term = Arrays.stream(terms).collect(Collectors.joining());
-        if (terms.length == 1) {
-            term = _camelCase(terms[0]);
-        } else if (term.contains(" ")) {
-            term = Arrays.stream(terms).map(e -> _camelCase(e)).collect(Collectors.joining());
-        }
-
-        if (!StringUtils.hasLength(term)) {
-            throw new IllegalArgumentException();
-        }
-
-        return Character.toLowerCase(term.charAt(0)) + term.substring(1);
-    }
-
     private void fillProperties(Map<String, Object> parent, Map<String, Object> schemas,
                                 TopLevelAsbiep topLevelAsbiep,
                                 GenerationContext generationContext) {
 
-        ABIE abie = generationContext.findAbie(topLevelAsbiep.getAsbiepId());
-        ASBIEP asbiep = generationContext.receiveASBIEP(abie);
+        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
         fillProperties(parent, schemas, asbiep, typeAbie, false, generationContext);
@@ -344,7 +401,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 ASBIE asbie,
                                 GenerationContext generationContext) {
         ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
-        ABIE typeAbie = generationContext.queryTargetABIE2(asbiep);
+        ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
         ASCC ascc = generationContext.queryBasedASCC(asbie);
 
@@ -355,7 +412,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         boolean isNillable = asbie.isNillable();
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = camelCase(asccp.getPropertyTerm());
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
         if (minVal > 0) {
             List<String> parentRequired = (List<String>) parent.get("required");
             if (parentRequired == null) {
@@ -383,7 +440,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
         fillProperties(properties, schemas, typeAbie, generationContext);
 
-        if (((List) properties.get("required")).isEmpty()) {
+        if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
             properties.remove("required");
         }
 
@@ -419,7 +476,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 GenerationContext generationContext) {
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = camelCase(asccp.getPropertyTerm());
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
 
         List<String> parentRequired = (List<String>) parent.get("required");
         parentRequired.add(name);
@@ -447,7 +504,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
         fillProperties(properties, schemas, abie, generationContext);
 
-        if (((List) properties.get("required")).isEmpty()) {
+        if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
             properties.remove("required");
         }
 
@@ -479,6 +536,27 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     }
 
     private String fillSchemas(Map<String, Object> schemas,
+                               Xbt xbt, FacetRestrictionsAware facetRestri) {
+        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
+        String name = "type_" + guid;
+
+        Map<String, Object> content = toProperties(xbt);
+        if (facetRestri.getMinLength() != null) {
+            content.put("minLength", facetRestri.getMinLength().longValue());
+        }
+        if (facetRestri.getMaxLength() != null) {
+            content.put("maxLength", facetRestri.getMaxLength().longValue());
+        }
+        if (StringUtils.hasLength(facetRestri.getPattern())) {
+            content.put("pattern", facetRestri.getPattern());
+        }
+
+        schemas.put(name, content);
+
+        return "#/components/schemas/" + name;
+    }
+
+    private String fillSchemas(Map<String, Object> schemas,
                                Xbt xbt) {
         String builtInType = xbt.getBuiltinType();
         if (builtInType.startsWith("xsd:")) {
@@ -494,12 +572,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
     private String fillSchemas(Map<String, Object> schemas,
                                BBIE bbie, CodeList codeList) {
-        DT bdt = generationContext.queryAssocBDT(bbie);
         BdtPriRestri bdtPriRestri =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                generationContext.findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
 
         Map<String, Object> properties;
-        if (bdtPriRestri.getCodeListId() != null) {
+        if (bdtPriRestri.getCodeListManifestId() != null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -514,12 +591,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
     private String fillSchemas(Map<String, Object> schemas,
                                BBIESC bbieSc, CodeList codeList) {
-        DTSC dtSc = generationContext.findDtSc(bbieSc.getBasedDtScManifestId());
         BdtScPriRestri bdtScPriRestri =
-                generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
+                generationContext.findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc);
 
         Map<String, Object> properties;
-        if (bdtScPriRestri.getCodeListId() != null) {
+        if (bdtScPriRestri.getCodeListManifestId() != null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -536,12 +612,13 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                Map<String, Object> schemas,
                                CodeList codeList) {
 
-        String codeListName = Helper.getCodeListTypeName(codeList);
+        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+        String codeListName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
         /*
          * Issue #589
          */
         codeListName = Stream.of(codeListName.split("_"))
-                .map(e -> camelCase(e)).collect(Collectors.joining("_"));
+                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
 
         if (!schemas.containsKey(codeListName)) {
             List<CodeListValue> codeListValues = generationContext.getCodeListValues(codeList);
@@ -565,7 +642,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
          * Issue #589
          */
         agencyListTypeName = Stream.of(agencyListTypeName.split("_"))
-                .map(e -> camelCase(e)).collect(Collectors.joining("_"));
+                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
         if (!schemas.containsKey(agencyListTypeName)) {
             Map<String, Object> properties = new LinkedHashMap();
             properties.put("type", "string");
@@ -589,17 +666,52 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 GenerationContext generationContext) {
 
         List<BIE> children = generationContext.queryChildBIEs(abie);
-        for (BIE bie : children) {
-            if (bie instanceof BBIE) {
-                BBIE bbie = (BBIE) bie;
-                fillProperties(parent, schemas, bbie, generationContext);
-            } else {
-                ASBIE asbie = (ASBIE) bie;
-                if (Helper.isAnyProperty(asbie, generationContext)) {
-                    parent.put("additionalProperties", true);
-                } else {
-                    fillProperties(parent, schemas, asbie, generationContext);
+        ACC acc = generationContext.findACC(abie.getBasedAccManifestId());
+        if (OagisComponentType.Choice.getValue() == acc.getOagisComponentType()) {
+            List<Object> oneOf = new ArrayList();
+
+            for (BIE bie : children) {
+                Map<String, Object> item = new LinkedHashMap();
+                item.put("type", "object");
+                item.put("required", new ArrayList());
+                item.put("additionalProperties", false);
+                item.put("properties", new LinkedHashMap<String, Object>());
+
+                fillProperties(item, schemas, bie, generationContext);
+
+                if (item.containsKey("required") && ((List) item.get("required")).isEmpty()) {
+                    item.remove("required");
                 }
+                oneOf.add(item);
+            }
+
+            parent.clear();
+            parent.put("oneOf", oneOf);
+        } else {
+            for (BIE bie : children) {
+                fillProperties(parent, schemas, bie, generationContext);
+            }
+        }
+    }
+
+    private void fillProperties(Map<String, Object> parent,
+                                Map<String, Object> schemas,
+                                BIE bie,
+                                GenerationContext generationContext) {
+        if (bie instanceof BBIE) {
+            BBIE bbie = (BBIE) bie;
+            fillProperties(parent, schemas, bbie, generationContext);
+        } else {
+            ASBIE asbie = (ASBIE) bie;
+            if (Helper.isAnyProperty(asbie, generationContext)) {
+                parent.put("additionalProperties", true);
+            } else {
+                ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
+
+                generationContext.referenceCounter().increase(asbiep)
+                        .ifNotCircularReference(asbiep,
+                                () -> fillProperties(parent, schemas, asbie, generationContext))
+                        .decrease(asbiep);
             }
         }
     }
@@ -627,7 +739,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         boolean isArray = (maxVal < 0 || maxVal > 1);
         boolean isNillable = bbie.isNillable();
 
-        String name = camelCase(bccp.getPropertyTerm());
+        String name = convertIdentifierToId(camelCase(bccp.getPropertyTerm()));
 
         Map<String, Object> properties = new LinkedHashMap();
         if (!parent.containsKey("properties")) {
@@ -758,7 +870,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     private Xbt getXbt(BBIE bbie, DT bdt) {
         if (bbie.getBdtPriRestriId() == null) {
             BdtPriRestri bdtPriRestri =
-                    generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                    generationContext.findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
             return Helper.getXbt(generationContext, bdtPriRestri);
         } else {
             BdtPriRestri bdtPriRestri =
@@ -778,7 +890,10 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (!isFriendly()) {
+                if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+                    Xbt xbt = getXbt(bbie, bdt);
+                    ref = fillSchemas(schemas, xbt, bbie);
+                } else if (!isFriendly()) {
                     Xbt xbt = getXbt(bbie, bdt);
                     ref = fillSchemas(schemas, xbt);
                 } else {
@@ -793,7 +908,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     private Xbt getXbt(BBIESC bbieSc, DTSC dtSc) {
         if (bbieSc.getDtScPriRestriId() == null) {
             BdtScPriRestri bdtScPriRestri =
-                    generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
+                    generationContext.findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc);
             CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
                     generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
             return generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
@@ -817,12 +932,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         DTSC dtSc = generationContext.findDtSc(bbieSc.getBasedDtScManifestId());
-        String name = toName(dtSc.getPropertyTerm(), dtSc.getRepresentationTerm(), rt -> {
+        String name = convertIdentifierToId(toName(dtSc.getPropertyTerm(), dtSc.getRepresentationTerm(), rt -> {
             if ("Text".equals(rt)) {
                 return "";
             }
             return rt;
-        }, true);
+        }, true));
         Map<String, Object> properties = new LinkedHashMap();
 
         if (option.isBieDefinition()) {
@@ -858,7 +973,10 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (!isFriendly()) {
+                if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
+                    Xbt xbt = getXbt(bbieSc, dtSc);
+                    ref = fillSchemas(schemas, xbt, bbieSc);
+                } else if (!isFriendly()) {
                     Xbt xbt = getXbt(bbieSc, dtSc);
                     ref = fillSchemas(schemas, xbt);
                 } else {

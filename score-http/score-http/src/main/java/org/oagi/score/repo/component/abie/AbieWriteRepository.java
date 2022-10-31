@@ -36,7 +36,7 @@ public class AbieWriteRepository {
                 ))
                 .fetchOptional().orElse(null);
 
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong requesterId = ULong.valueOf(user.getAppUserId());
 
         if (abieRecord == null) {

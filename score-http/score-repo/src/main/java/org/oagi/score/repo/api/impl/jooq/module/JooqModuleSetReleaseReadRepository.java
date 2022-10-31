@@ -1,27 +1,24 @@
 package org.oagi.score.repo.api.impl.jooq.module;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.model.CcState;
-import org.oagi.score.repo.api.corecomponent.model.DtType;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.repo.api.module.ModuleSetReadRepository;
 import org.oagi.score.repo.api.module.ModuleSetReleaseReadRepository;
 import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
-import javax.print.DocFlavor;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
@@ -42,6 +39,7 @@ public class JooqModuleSetReleaseReadRepository
                 MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID,
                 MODULE_SET_RELEASE.MODULE_SET_ID,
                 MODULE_SET_RELEASE.NAME,
+                MODULE_SET_RELEASE.DESCRIPTION,
                 MODULE_SET_RELEASE.RELEASE_ID,
                 MODULE_SET.NAME,
                 RELEASE.RELEASE_NUM,
@@ -69,6 +67,7 @@ public class JooqModuleSetReleaseReadRepository
             moduleSetRelease.setModuleSetReleaseId(record.get(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID).toBigInteger());
             moduleSetRelease.setModuleSetId(record.get(MODULE_SET_RELEASE.MODULE_SET_ID).toBigInteger());
             moduleSetRelease.setModuleSetReleaseName(record.get(MODULE_SET_RELEASE.NAME));
+            moduleSetRelease.setModuleSetReleaseDescription(record.get(MODULE_SET_RELEASE.DESCRIPTION));
             moduleSetRelease.setModuleSetName(record.get(MODULE_SET.NAME));
             moduleSetRelease.setReleaseId(record.get(MODULE_SET_RELEASE.RELEASE_ID).toBigInteger());
             moduleSetRelease.setReleaseNum(record.get(RELEASE.RELEASE_NUM));

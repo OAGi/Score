@@ -6,6 +6,8 @@ import java.util.*;
 
 public final class ScoreUser implements Serializable {
 
+    public static final BigInteger SYSTEM_USER_ID = BigInteger.ZERO;
+
     private BigInteger userId;
 
     private String username;

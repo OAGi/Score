@@ -19,5 +19,6 @@ public class BieEditAbieNode extends BieEditNode {
     private String loginId;
     private String releaseNum;
     private AccessPrivilege access;
+    private boolean inverseMode;
 
 }

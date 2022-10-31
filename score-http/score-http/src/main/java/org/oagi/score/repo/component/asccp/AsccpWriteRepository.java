@@ -112,7 +112,7 @@ public class AsccpWriteRepository {
     }
 
     public ReviseAsccpRepositoryResponse reviseAsccp(ReviseAsccpRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -211,7 +211,7 @@ public class AsccpWriteRepository {
     }
 
     public UpdateAsccpPropertiesRepositoryResponse updateAsccpProperties(UpdateAsccpPropertiesRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -311,7 +311,7 @@ public class AsccpWriteRepository {
     }
 
     public UpdateAsccpPropertiesRepositoryResponse updateAsccpNamespace(UpdateAsccpPropertiesRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -362,7 +362,7 @@ public class AsccpWriteRepository {
     }
 
     public UpdateAsccpRoleOfAccRepositoryResponse updateAsccpBdt(UpdateAsccpRoleOfAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -415,7 +415,7 @@ public class AsccpWriteRepository {
     }
 
     public UpdateAsccpStateRepositoryResponse updateAsccpState(UpdateAsccpStateRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -476,7 +476,7 @@ public class AsccpWriteRepository {
     }
 
     public DeleteAsccpRepositoryResponse deleteAsccp(DeleteAsccpRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -520,7 +520,7 @@ public class AsccpWriteRepository {
     }
 
     public PurgeAsccpRepositoryResponse purgeAsccp(PurgeAsccpRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -582,7 +582,7 @@ public class AsccpWriteRepository {
     }
 
     public DeleteAsccpRepositoryResponse removeAsccp(DeleteAsccpRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -622,7 +622,7 @@ public class AsccpWriteRepository {
     }
 
     public UpdateAsccpOwnerRepositoryResponse updateAsccpOwner(UpdateAsccpOwnerRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 

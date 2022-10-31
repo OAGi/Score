@@ -6,9 +6,10 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {AccountList} from '../../account-management/domain/accounts';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -63,13 +64,9 @@ export class CodeListListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
 
+  contextMenuItem: CodeListForList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('contextMenuDefault', {static: true}) public contextMenuDefault: ContextMenuComponent;
-  @ViewChild('contextMenuDeleted', {static: true}) public contextMenuDeleted: ContextMenuComponent;
-  @ViewChild('contextMenuEditable', {static: true}) public contextMenuEditable: ContextMenuComponent;
-  @ViewChild('contextMenuEditableRevised', {static: true}) public contextMenuEditableRevised: ContextMenuComponent;
-  @ViewChild('createContextMenu', {static: true}) public createContextMenu: ContextMenuComponent;
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
@@ -77,7 +74,6 @@ export class CodeListListComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -316,15 +312,21 @@ export class CodeListListComponent implements OnInit {
       });
   }
 
-  hasRevision(codeList: CodeListForList): boolean{
-    return codeList.revision  !== '1';
+  hasRevision(codeList: CodeListForList): boolean {
+    if (!codeList) {
+      return false;
+    }
+    return codeList.revision !== '1';
   }
 
   isEditable(item: CodeListForList) {
+    if (!item) {
+      return false;
+    }
     return item.access === 'CanEdit';
   }
 
-  openTransferDialog(item: CodeListForList, $event) {
+  openTransferDialog(item: CodeListForList) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -346,7 +348,7 @@ export class CodeListListComponent implements OnInit {
     });
   }
 
-  delete(item: CodeListForList, $event) {
+  delete(item: CodeListForList) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -377,34 +379,7 @@ export class CodeListListComponent implements OnInit {
       });
   }
 
-  onContextMenu($event: MouseEvent, item: CodeListForList): void {
-    let contextMenu;
-    contextMenu = this.contextMenuDefault;
-    if (item.owner === this.currentUser && item.state === 'Deleted') {
-      contextMenu = this.contextMenuDeleted;
-    } else if (this.isEditable(item)) {
-      if (item.revision === '1') {
-        contextMenu = this.contextMenuEditable;
-      } else {
-        contextMenu = this.contextMenuEditableRevised;
-      }
-    }
-
-    this.contextMenuService.show.next({
-      contextMenu,
-      event: $event,
-      item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  openDetail(item: CodeListForList, $event?) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
+  openDetail(item: CodeListForList) {
     this.router.navigateByUrl('/code_list/' + item.codeListManifestId);
     return;
   }

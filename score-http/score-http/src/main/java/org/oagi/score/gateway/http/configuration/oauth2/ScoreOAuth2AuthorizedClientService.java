@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.jackson2.OAuth2ClientJackson2Module;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -57,7 +59,8 @@ public class ScoreOAuth2AuthorizedClientService implements OAuth2AuthorizedClien
         this.clientRegistrationRepository = clientRegistrationRepository;
 
         this.mapper = new ObjectMapper();
-        this.mapper.registerModule(new ScoreOAuth2ClientJackson2Module());
+        this.mapper.registerModule(new CoreJackson2Module());
+        this.mapper.registerModule(new OAuth2ClientJackson2Module());
     }
 
     private String getKey(String clientRegistrationId, String principalName) {

@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function9;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row9;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -241,6 +245,11 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return new DtManifest(alias, this);
     }
 
+    @Override
+    public DtManifest as(Table<?> alias) {
+        return new DtManifest(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -257,6 +266,14 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return new DtManifest(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public DtManifest rename(Table<?> name) {
+        return new DtManifest(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row9 type methods
     // -------------------------------------------------------------------------
@@ -264,5 +281,20 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
     @Override
     public Row9<ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
         return (Row9) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

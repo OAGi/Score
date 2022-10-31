@@ -4,13 +4,18 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
+import java.util.function.Function;
+
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function19;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row18;
+import org.jooq.Records;
+import org.jooq.Row19;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -84,6 +89,11 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
      * The column <code>oagi.oauth2_app.redirect_uri</code>.
      */
     public final TableField<Oauth2AppRecord, String> REDIRECT_URI = createField(DSL.name("redirect_uri"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+
+    /**
+     * The column <code>oagi.oauth2_app.end_session_endpoint</code>.
+     */
+    public final TableField<Oauth2AppRecord, String> END_SESSION_ENDPOINT = createField(DSL.name("end_session_endpoint"), SQLDataType.VARCHAR(200), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.client_id</code>.
@@ -193,6 +203,11 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
         return new Oauth2App(alias, this);
     }
 
+    @Override
+    public Oauth2App as(Table<?> alias) {
+        return new Oauth2App(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -209,12 +224,35 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
         return new Oauth2App(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public Oauth2App rename(Table<?> name) {
+        return new Oauth2App(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
-    // Row18 type methods
+    // Row19 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row18<ULong, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, Integer, Byte> fieldsRow() {
-        return (Row18) super.fieldsRow();
+    public Row19<ULong, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, Integer, Byte> fieldsRow() {
+        return (Row19) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function19<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? super Byte, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function19<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? super Byte, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

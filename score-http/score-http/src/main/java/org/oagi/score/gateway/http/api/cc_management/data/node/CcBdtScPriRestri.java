@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.cc_management.data.node;
 import lombok.Data;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @Data
 public class CcBdtScPriRestri {
@@ -17,10 +16,10 @@ public class CcBdtScPriRestri {
     private BigInteger xbtId;
     private String xbtName;
 
-    private BigInteger codeListId;
+    private BigInteger codeListManifestId;
     private String codeListName;
 
-    private BigInteger agencyIdListId;
+    private BigInteger agencyIdListManifestId;
     private String agencyIdListName;
 
     private boolean isDefault;

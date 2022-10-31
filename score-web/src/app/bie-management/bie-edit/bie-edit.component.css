@@ -180,16 +180,12 @@
   padding-top: 4px;
 }
 
-.tree-search-box button {
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
+.tree-search-box button, .actions-wrap .mat-icon-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  margin-right: 0.5rem;
   outline: none;
-}
-
-.tree-search-box button mat-icon {
-  font-size: 16px;
-  margin: 0;
 }
 
 .tree-search-box .mat-form-field {
@@ -201,11 +197,9 @@
   padding-bottom: 0;
 }
 
-.tree-search-box .mat-icon {
-  width: 16px;
-  height: 16px;
-  font-size: 16px;
-  margin: 12px 4px;
+.tree-search-box .mat-icon, .actions-wrap .mat-icon-button {
+  width: 24px;
+  height: 24px;
   cursor: pointer;
 }
 
@@ -280,11 +274,6 @@
   -webkit-box-shadow: 1px 1px 2px 1px #ccc;
   box-shadow: 1px 1px 2px 1px #ccc;
   margin-bottom: 15px;
-}
-
-.hide-unused, .exclude-scs {
-  vertical-align: middle;
-  margin-right: 5px;
 }
 
 .f12 {

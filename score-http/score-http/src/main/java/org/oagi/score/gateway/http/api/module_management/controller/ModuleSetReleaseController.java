@@ -108,6 +108,7 @@ public class ModuleSetReleaseController {
         request.setModuleSetId(moduleSetRelease.getModuleSetId());
         request.setReleaseId(moduleSetRelease.getReleaseId());
         request.setModuleSetReleaseName(moduleSetRelease.getModuleSetReleaseName());
+        request.setModuleSetReleaseDescription(moduleSetRelease.getModuleSetReleaseDescription());
         request.setDefault(moduleSetRelease.isDefault());
         UpdateModuleSetReleaseResponse response = service.updateModuleSetRelease(request);
         return response.getModuleSetRelease();

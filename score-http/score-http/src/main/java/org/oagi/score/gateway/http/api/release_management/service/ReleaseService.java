@@ -33,7 +33,6 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
@@ -76,7 +75,7 @@ public class ReleaseService implements InitializingBean {
     }
 
     public List<SimpleRelease> getSimpleReleases(SimpleReleasesRequest request) {
-        AppUser requester = sessionService.getAppUser(request.getUser());
+        AppUser requester = sessionService.getAppUserByUsername(request.getUser());
 
         List<Condition> conditions = new ArrayList();
         if (!request.getStates().isEmpty()) {

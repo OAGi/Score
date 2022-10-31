@@ -13,7 +13,7 @@ import {hashCode} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
-import {PageRequest} from "../../../basis/basis";
+import {PageRequest} from '../../../basis/basis';
 
 @Component({
   selector: 'score-module-set-create',

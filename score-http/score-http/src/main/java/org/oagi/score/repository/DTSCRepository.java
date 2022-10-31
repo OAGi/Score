@@ -17,8 +17,10 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectOnConditionStep<Record12<ULong, ULong, String, String, String, String, String, ULong, Integer,
-            Integer, ULong, UInteger>> getSelectJoinStep() {
+    private SelectOnConditionStep<Record16<ULong, ULong, String, String, String,
+            String, String, String, String, ULong,
+            ULong, Integer, Integer, ULong, ULong,
+            UInteger>> getSelectJoinStep() {
         return dslContext.select(
                 Tables.DT_SC_MANIFEST.DT_SC_MANIFEST_ID,
                 Tables.DT_SC.DT_SC_ID,
@@ -27,9 +29,13 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
                 Tables.DT_SC.REPRESENTATION_TERM,
                 Tables.DT_SC.DEFINITION,
                 Tables.DT_SC.DEFINITION_SOURCE,
+                Tables.DT_SC.DEFAULT_VALUE,
+                Tables.DT_SC.FIXED_VALUE,
+                Tables.DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID,
                 Tables.DT_SC.OWNER_DT_ID,
                 Tables.DT_SC.CARDINALITY_MIN,
                 Tables.DT_SC.CARDINALITY_MAX,
+                Tables.DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID,
                 Tables.DT_SC.BASED_DT_SC_ID,
                 Tables.LOG.REVISION_NUM)
                 .from(Tables.DT_SC)

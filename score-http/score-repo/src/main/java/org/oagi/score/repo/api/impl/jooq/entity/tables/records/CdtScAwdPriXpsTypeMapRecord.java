@@ -6,8 +6,8 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Row3;
+import org.jooq.Record4;
+import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
@@ -20,7 +20,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
  * particular expression such as XML Schema, JSON. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> implements Record3<ULong, ULong, ULong> {
+public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> implements Record4<ULong, ULong, ULong, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,6 +78,22 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
         return (ULong) get(2);
     }
 
+    /**
+     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.is_default</code>.
+     * Indicating a default value domain mapping.
+     */
+    public void setIsDefault(Byte value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.is_default</code>.
+     * Indicating a default value domain mapping.
+     */
+    public Byte getIsDefault() {
+        return (Byte) get(3);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -88,17 +104,17 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     // -------------------------------------------------------------------------
-    // Record3 type implementation
+    // Record4 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 
     @Override
-    public Row3<ULong, ULong, ULong> valuesRow() {
-        return (Row3) super.valuesRow();
+    public Row4<ULong, ULong, ULong, Byte> valuesRow() {
+        return (Row4) super.valuesRow();
     }
 
     @Override
@@ -117,6 +133,11 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     @Override
+    public Field<Byte> field4() {
+        return CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT;
+    }
+
+    @Override
     public ULong component1() {
         return getCdtScAwdPriXpsTypeMapId();
     }
@@ -132,6 +153,11 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     @Override
+    public Byte component4() {
+        return getIsDefault();
+    }
+
+    @Override
     public ULong value1() {
         return getCdtScAwdPriXpsTypeMapId();
     }
@@ -144,6 +170,11 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     @Override
     public ULong value3() {
         return getXbtId();
+    }
+
+    @Override
+    public Byte value4() {
+        return getIsDefault();
     }
 
     @Override
@@ -165,10 +196,17 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     @Override
-    public CdtScAwdPriXpsTypeMapRecord values(ULong value1, ULong value2, ULong value3) {
+    public CdtScAwdPriXpsTypeMapRecord value4(Byte value) {
+        setIsDefault(value);
+        return this;
+    }
+
+    @Override
+    public CdtScAwdPriXpsTypeMapRecord values(ULong value1, ULong value2, ULong value3, Byte value4) {
         value1(value1);
         value2(value2);
         value3(value3);
+        value4(value4);
         return this;
     }
 
@@ -186,11 +224,12 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     /**
      * Create a detached, initialised CdtScAwdPriXpsTypeMapRecord
      */
-    public CdtScAwdPriXpsTypeMapRecord(ULong cdtScAwdPriXpsTypeMapId, ULong cdtScAwdPriId, ULong xbtId) {
+    public CdtScAwdPriXpsTypeMapRecord(ULong cdtScAwdPriXpsTypeMapId, ULong cdtScAwdPriId, ULong xbtId, Byte isDefault) {
         super(CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP);
 
         setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
         setCdtScAwdPriId(cdtScAwdPriId);
         setXbtId(xbtId);
+        setIsDefault(isDefault);
     }
 }

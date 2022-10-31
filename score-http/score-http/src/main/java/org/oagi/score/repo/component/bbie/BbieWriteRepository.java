@@ -51,7 +51,7 @@ public class BbieWriteRepository {
                 ))
                 .fetchOptional().orElse(null);
 
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong requesterId = ULong.valueOf(user.getAppUserId());
 
         if (bbieRecord == null) {
@@ -104,7 +104,31 @@ public class BbieWriteRepository {
             if (bbieRecord.getCardinalityMax() > 0 && bbieRecord.getCardinalityMin() > bbieRecord.getCardinalityMax()) {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
-            
+
+            if (bbie.getMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            } else {
+                bbieRecord.setFacetMinLength(null);
+            }
+            if (bbie.getMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            } else {
+                bbieRecord.setFacetMaxLength(null);
+            }
+            if (bbieRecord.getFacetMinLength() != null && bbieRecord.getFacetMaxLength() != null) {
+                if (bbieRecord.getFacetMinLength().intValue() < 0) {
+                    throw new IllegalArgumentException("Minimum Length must be greater than or equals to 0.");
+                }
+                if (bbieRecord.getFacetMinLength().compareTo(bbieRecord.getFacetMaxLength()) > 0) {
+                    throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
+                }
+            }
+            if (StringUtils.hasLength(bbie.getPattern())) {
+                bbieRecord.setFacetPattern(bbie.getPattern());
+            } else {
+                bbieRecord.setFacetPattern(null);
+            }
+
             bbieRecord.setExample(bbie.getExample());
             bbieRecord.setRemark(bbie.getRemark());
 
@@ -129,16 +153,16 @@ public class BbieWriteRepository {
             } else {
                 if (bbie.getBdtPriRestriId() != null) {
                     bbieRecord.setBdtPriRestriId(ULong.valueOf(bbie.getBdtPriRestriId()));
-                    bbieRecord.setCodeListId(null);
-                    bbieRecord.setAgencyIdListId(null);
-                } else if (bbie.getCodeListId() != null) {
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (bbie.getCodeListManifestId() != null) {
                     bbieRecord.setBdtPriRestriId(null);
-                    bbieRecord.setCodeListId(ULong.valueOf(bbie.getCodeListId()));
-                    bbieRecord.setAgencyIdListId(null);
-                } else if (bbie.getAgencyIdListId() != null) {
+                    bbieRecord.setCodeListManifestId(ULong.valueOf(bbie.getCodeListManifestId()));
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (bbie.getAgencyIdListManifestId() != null) {
                     bbieRecord.setBdtPriRestriId(null);
-                    bbieRecord.setCodeListId(null);
-                    bbieRecord.setAgencyIdListId(ULong.valueOf(bbie.getAgencyIdListId()));
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(ULong.valueOf(bbie.getAgencyIdListManifestId()));
                 }
             }
 
@@ -182,6 +206,30 @@ public class BbieWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
+            if (bbie.getMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            } else {
+                bbieRecord.setFacetMinLength(null);
+            }
+            if (bbie.getMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            } else {
+                bbieRecord.setFacetMaxLength(null);
+            }
+            if (bbieRecord.getFacetMinLength() != null && bbieRecord.getFacetMaxLength() != null) {
+                if (bbieRecord.getFacetMinLength().intValue() < 0) {
+                    throw new IllegalArgumentException("Minimum Length must be greater than or equals to 0.");
+                }
+                if (bbieRecord.getFacetMinLength().compareTo(bbieRecord.getFacetMaxLength()) > 0) {
+                    throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
+                }
+            }
+            if (StringUtils.hasLength(bbie.getPattern())) {
+                bbieRecord.setFacetPattern(bbie.getPattern());
+            } else {
+                bbieRecord.setFacetPattern(null);
+            }
+
             if (bbie.getExample() != null) {
                 bbieRecord.setExample(emptyToNull(bbie.getExample()));
             }
@@ -201,16 +249,16 @@ public class BbieWriteRepository {
             if (!bbie.isEmptyPrimitive()) {
                 if (bbie.getBdtPriRestriId() != null) {
                     bbieRecord.setBdtPriRestriId(ULong.valueOf(bbie.getBdtPriRestriId()));
-                    bbieRecord.setCodeListId(null);
-                    bbieRecord.setAgencyIdListId(null);
-                } else if (bbie.getCodeListId() != null) {
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (bbie.getCodeListManifestId() != null) {
                     bbieRecord.setBdtPriRestriId(null);
-                    bbieRecord.setCodeListId(ULong.valueOf(bbie.getCodeListId()));
-                    bbieRecord.setAgencyIdListId(null);
-                } else if (bbie.getAgencyIdListId() != null) {
+                    bbieRecord.setCodeListManifestId(ULong.valueOf(bbie.getCodeListManifestId()));
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (bbie.getAgencyIdListManifestId() != null) {
                     bbieRecord.setBdtPriRestriId(null);
-                    bbieRecord.setCodeListId(null);
-                    bbieRecord.setAgencyIdListId(ULong.valueOf(bbie.getAgencyIdListId()));
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(ULong.valueOf(bbie.getAgencyIdListManifestId()));
                 }
             }
 
@@ -224,13 +272,16 @@ public class BbieWriteRepository {
                         BBIE.DEFINITION,
                         BBIE.CARDINALITY_MIN,
                         BBIE.CARDINALITY_MAX,
+                        BBIE.FACET_MIN_LENGTH,
+                        BBIE.FACET_MAX_LENGTH,
+                        BBIE.FACET_PATTERN,
                         BBIE.EXAMPLE,
                         BBIE.REMARK,
                         BBIE.DEFAULT_VALUE,
                         BBIE.FIXED_VALUE,
                         BBIE.BDT_PRI_RESTRI_ID,
-                        BBIE.CODE_LIST_ID,
-                        BBIE.AGENCY_ID_LIST_ID,
+                        BBIE.CODE_LIST_MANIFEST_ID,
+                        BBIE.AGENCY_ID_LIST_MANIFEST_ID,
                         BBIE.LAST_UPDATED_BY,
                         BBIE.LAST_UPDATE_TIMESTAMP
                 );

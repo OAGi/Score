@@ -404,6 +404,11 @@ public class Bcc extends TableImpl<BccRecord> {
         return new Bcc(alias, this);
     }
 
+    @Override
+    public Bcc as(Table<?> alias) {
+        return new Bcc(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -418,5 +423,13 @@ public class Bcc extends TableImpl<BccRecord> {
     @Override
     public Bcc rename(Name name) {
         return new Bcc(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Bcc rename(Table<?> name) {
+        return new Bcc(name.getQualifiedName(), null);
     }
 }

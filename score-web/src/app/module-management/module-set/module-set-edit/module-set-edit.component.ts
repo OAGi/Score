@@ -9,11 +9,12 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {hashCode} from '../../../common/utility';
-import {ModuleElement, ModuleSet, Tile} from '../../domain/module';
+import {ModuleElement, ModuleSet, ModuleSetMetadata, Tile} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {ModuleAddDialogComponent} from './module-add-dialog/module-add-dialog.component';
 import {ModuleEditDialogComponent} from './module-edit-dialog/module-edit-dialog.component';
 import {UserToken} from '../../../authentication/domain/auth';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-module-set-edit',
@@ -25,6 +26,7 @@ export class ModuleSetEditComponent implements OnInit {
   title;
   isUpdating: boolean;
   moduleSet: ModuleSet = new ModuleSet();
+  moduleSetMetadata: ModuleSetMetadata = new ModuleSetMetadata();
   tiles: Tile[] = [];
   rootElement: ModuleElement;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -53,9 +55,12 @@ export class ModuleSetEditComponent implements OnInit {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const moduleSetId = Number(params.get('moduleSetId'));
-        return this.service.getModuleSet(moduleSetId);
+        return forkJoin([
+          this.service.getModuleSet(moduleSetId),
+          this.service.getModuleSetMetadata(moduleSetId)
+        ]);
       }))
-      .subscribe(moduleSet => {
+      .subscribe(([moduleSet, moduleSetMetadata]) => {
         this.init(moduleSet);
         this.service.getModules(this.moduleSet.moduleSetId).subscribe(resp => {
           this.rootElement = resp as ModuleElement;
@@ -64,6 +69,7 @@ export class ModuleSetEditComponent implements OnInit {
             this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
           }
         });
+        this.moduleSetMetadata = moduleSetMetadata;
       });
   }
 
@@ -102,7 +108,7 @@ export class ModuleSetEditComponent implements OnInit {
 
   onClickElement(tile: Tile, element: ModuleElement) {
     tile.current = element;
-    let tileIndex = this.tiles.indexOf(tile) + 1;
+    const tileIndex = this.tiles.indexOf(tile) + 1;
     if (this.tiles.length > tileIndex) {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
@@ -128,17 +134,23 @@ export class ModuleSetEditComponent implements OnInit {
     };
     const dialogRef = this.dialog.open(ModuleAddDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(resp => {
-      if (resp) {
-        if (resp === true) {
-          this.service.getModules(this.moduleSet.moduleSetId).subscribe(modules => {
-            this.rootElement = modules as ModuleElement;
-            this.tiles = [];
-            this.tiles.push({elements: this.rootElement.child, current: undefined});
-          });
-        } else {
-          tile.elements.push(resp);
-          this.onClickElement(tile, resp);
-        }
+      if (!resp) {
+        return;
+      }
+
+      this.service.getModuleSetMetadata(this.moduleSet.moduleSetId).subscribe(moduleSetMetadata => {
+        this.moduleSetMetadata = moduleSetMetadata;
+      });
+
+      if (resp === true) {
+        this.service.getModules(this.moduleSet.moduleSetId).subscribe(modules => {
+          this.rootElement = modules as ModuleElement;
+          this.tiles = [];
+          this.tiles.push({elements: this.rootElement.child, current: undefined});
+        });
+      } else {
+        tile.elements.push(resp);
+        this.onClickElement(tile, resp);
       }
     });
 
@@ -150,16 +162,20 @@ export class ModuleSetEditComponent implements OnInit {
     element.moduleSetId = this.moduleSet.moduleSetId;
     dialogConfig.data = element;
     const buf = {
-      'name': element.name,
-      'versionNum': element.versionNum,
-      'namespaceUri': element.namespaceUri,
-      'namespaceId': element.namespaceId,
+      name: element.name,
+      versionNum: element.versionNum,
+      namespaceUri: element.namespaceUri,
+      namespaceId: element.namespaceId,
     };
     const dialogRef = this.dialog.open(ModuleEditDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(action => {
       switch (action) {
         case 'Discarded':
         case 'Unassigned':
+          this.service.getModuleSetMetadata(this.moduleSet.moduleSetId).subscribe(moduleSetMetadata => {
+            this.moduleSetMetadata = moduleSetMetadata;
+          });
+
           const tileIndex = this.tiles.indexOf(tile);
           if (tileIndex > 0) {
             const child = this.tiles[tileIndex - 1].current.child;
@@ -186,10 +202,10 @@ export class ModuleSetEditComponent implements OnInit {
           });
           break;
         default:
-          element.name = buf['name'];
-          element.versionNum = buf['versionNum'];
-          element.namespaceUri = buf['namespaceUri'];
-          element.namespaceId = buf['namespaceId'];
+          element.name = buf.name;
+          element.versionNum = buf.versionNum;
+          element.namespaceUri = buf.namespaceUri;
+          element.namespaceId = buf.namespaceId;
           break;
       }
     });

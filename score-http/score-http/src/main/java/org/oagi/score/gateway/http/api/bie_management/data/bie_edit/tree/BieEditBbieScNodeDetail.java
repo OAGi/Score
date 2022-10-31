@@ -27,8 +27,8 @@ public class BieEditBbieScNodeDetail extends BieEditBbieScNode implements BieEdi
     private String remark;
 
     private BigInteger dtScPriRestriId = BigInteger.ZERO;
-    private BigInteger codeListId = BigInteger.ZERO;
-    private BigInteger agencyIdListId = BigInteger.ZERO;
+    private BigInteger codeListManifestId = BigInteger.ZERO;
+    private BigInteger agencyIdListManifestId = BigInteger.ZERO;
 
     private List<BieEditXbt> xbtList = Collections.emptyList();
     private List<BieEditCodeList> codeLists = Collections.emptyList();

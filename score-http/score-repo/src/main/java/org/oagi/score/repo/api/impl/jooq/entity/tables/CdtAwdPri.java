@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function4;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row4;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -162,6 +166,11 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
         return new CdtAwdPri(alias, this);
     }
 
+    @Override
+    public CdtAwdPri as(Table<?> alias) {
+        return new CdtAwdPri(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -178,6 +187,14 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
         return new CdtAwdPri(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public CdtAwdPri rename(Table<?> name) {
+        return new CdtAwdPri(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row4 type methods
     // -------------------------------------------------------------------------
@@ -185,5 +202,20 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
     @Override
     public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
         return (Row4) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

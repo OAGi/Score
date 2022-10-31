@@ -72,6 +72,21 @@ public class BieGenerateController {
                 BigInteger topLevelAsbiepId =
                         new BigInteger(keyValue[0].substring(keyValue[0].indexOf('[') + 1, keyValue[0].indexOf(']')));
                 filenames.put(topLevelAsbiepId, keyValue[1]);
+            } else if (keyValue[0].startsWith("bizCtxIds")) {
+                if (!params.containsKey("bizCtxIds")) {
+                    params.put("bizCtxIds", new HashMap());
+                }
+                Map<BigInteger, BigInteger> bizCtxIds =
+                        (Map<BigInteger, BigInteger>) params.get("bizCtxIds");
+
+                try {
+                    keyValue[0] = URLDecoder.decode(keyValue[0], "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
+                BigInteger topLevelAsbiepId =
+                        new BigInteger(keyValue[0].substring(keyValue[0].indexOf('[') + 1, keyValue[0].indexOf(']')));
+                bizCtxIds.put(topLevelAsbiepId, new BigInteger(keyValue[1]));
             } else {
                 params.put(keyValue[0], keyValue[1]);
             }

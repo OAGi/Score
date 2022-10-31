@@ -8,12 +8,13 @@ import java.util.Date;
 @Data
 public class CodeList {
 
+    private BigInteger codeListManifestId = BigInteger.ZERO;
     private BigInteger codeListId = BigInteger.ZERO;
     private String guid;
     private String enumTypeGuid;
     private String name;
     private String listId;
-    private BigInteger agencyId = BigInteger.ZERO;
+    private BigInteger agencyIdListValueId = BigInteger.ZERO;
     private String versionId;
     private String definition;
     private String remark;

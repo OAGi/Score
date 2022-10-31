@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record9;
-import org.jooq.Row9;
+import org.jooq.Record10;
+import org.jooq.Row10;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
@@ -21,7 +21,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
  * be retrieved all at once speeding up the profile BOD transactions.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record9<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String> {
+public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -177,6 +177,24 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         return (String) get(8);
     }
 
+    /**
+     * Setter for <code>oagi.top_level_asbiep.inverse_mode</code>. If this is
+     * true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be
+     * treated as used BIEs.
+     */
+    public void setInverseMode(Byte value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.inverse_mode</code>. If this is
+     * true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be
+     * treated as used BIEs.
+     */
+    public Byte getInverseMode() {
+        return (Byte) get(9);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -187,17 +205,17 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     // -------------------------------------------------------------------------
-    // Record9 type implementation
+    // Record10 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> fieldsRow() {
+        return (Row10) super.fieldsRow();
     }
 
     @Override
-    public Row9<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String> valuesRow() {
-        return (Row9) super.valuesRow();
+    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> valuesRow() {
+        return (Row10) super.valuesRow();
     }
 
     @Override
@@ -246,6 +264,11 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
+    public Field<Byte> field10() {
+        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.INVERSE_MODE;
+    }
+
+    @Override
     public ULong component1() {
         return getTopLevelAsbiepId();
     }
@@ -291,6 +314,11 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
+    public Byte component10() {
+        return getInverseMode();
+    }
+
+    @Override
     public ULong value1() {
         return getTopLevelAsbiepId();
     }
@@ -333,6 +361,11 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     @Override
     public String value9() {
         return getState();
+    }
+
+    @Override
+    public Byte value10() {
+        return getInverseMode();
     }
 
     @Override
@@ -390,7 +423,13 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
-    public TopLevelAsbiepRecord values(ULong value1, ULong value2, ULong value3, LocalDateTime value4, ULong value5, ULong value6, String value7, String value8, String value9) {
+    public TopLevelAsbiepRecord value10(Byte value) {
+        setInverseMode(value);
+        return this;
+    }
+
+    @Override
+    public TopLevelAsbiepRecord values(ULong value1, ULong value2, ULong value3, LocalDateTime value4, ULong value5, ULong value6, String value7, String value8, String value9, Byte value10) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -400,6 +439,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         value7(value7);
         value8(value8);
         value9(value9);
+        value10(value10);
         return this;
     }
 
@@ -417,7 +457,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     /**
      * Create a detached, initialised TopLevelAsbiepRecord
      */
-    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state) {
+    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state, Byte inverseMode) {
         super(TopLevelAsbiep.TOP_LEVEL_ASBIEP);
 
         setTopLevelAsbiepId(topLevelAsbiepId);
@@ -429,5 +469,6 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         setVersion(version);
         setStatus(status);
         setState(state);
+        setInverseMode(inverseMode);
     }
 }

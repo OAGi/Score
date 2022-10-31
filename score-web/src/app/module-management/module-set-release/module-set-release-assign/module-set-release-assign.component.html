@@ -168,11 +168,13 @@
                            showFirstLastButtons></mat-paginator>
           </div>
           <div class="assign-cc-middle">
-            <button (click)="assign()" class="mb-3" mat-stroked-button matTooltip="Assign">
+            <button (click)="assign()" *ngIf="roles.includes('developer')"
+                    class="mb-3" mat-stroked-button matTooltip="Assign">
               <mat-icon>arrow_forward</mat-icon>
             </button>
 
-            <button (click)="unassign()" mat-stroked-button matTooltip="Unassign">
+            <button (click)="unassign()" *ngIf="roles.includes('developer')"
+                    mat-stroked-button matTooltip="Unassign">
               <mat-icon>arrow_back</mat-icon>
             </button>
           </div>

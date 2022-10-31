@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.impl.jooq.agency;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.agency.AgencyIdListReadRepository;

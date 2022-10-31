@@ -13,6 +13,8 @@ public class CreateModuleSetReleaseRequest extends Request {
 
     private String moduleSetReleaseName;
 
+    private String moduleSetReleaseDescription;
+
     private boolean isDefault;
 
     private BigInteger baseModuleSetReleaseId;
@@ -39,6 +41,14 @@ public class CreateModuleSetReleaseRequest extends Request {
 
     public void setModuleSetReleaseName(String moduleSetReleaseName) {
         this.moduleSetReleaseName = moduleSetReleaseName;
+    }
+
+    public String getModuleSetReleaseDescription() {
+        return moduleSetReleaseDescription;
+    }
+
+    public void setModuleSetReleaseDescription(String moduleSetReleaseDescription) {
+        this.moduleSetReleaseDescription = moduleSetReleaseDescription;
     }
 
     public boolean isDefault() {

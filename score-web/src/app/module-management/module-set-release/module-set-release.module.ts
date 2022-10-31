@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {AuthService} from '../../authentication/auth.service';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {MaterialModule} from '../../material.module';
@@ -46,7 +45,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    ContextMenuModule,
     ScoreCommonModule,
     DragDropModule
   ],

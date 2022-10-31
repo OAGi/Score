@@ -16,7 +16,9 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -28,11 +30,11 @@ import {initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {finalize} from 'rxjs/operators';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {AboutService} from '../../basis/about/domain/about.service';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'score-cc-list',
@@ -74,9 +76,9 @@ export class CcListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
+  contextMenuItem: CcList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('createContextMenu', {static: true}) public createContextMenu: ContextMenuComponent;
 
   constructor(private service: CcListService,
               private nodeService: CcNodeService,
@@ -87,7 +89,6 @@ export class CcListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -264,17 +265,6 @@ export class CcListComponent implements OnInit {
 
   isAssociation(element: CcList) {
     return element.type.toUpperCase() === 'ASCC' || element.type.toUpperCase() === 'BCC';
-  }
-
-  onCreateContextMenu($event: MouseEvent): void {
-    this.contextMenuService.show.next({
-      contextMenu: this.createContextMenu,
-      event: $event,
-      item: null
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
   }
 
   openTransferDialog(item: CcList, $event) {

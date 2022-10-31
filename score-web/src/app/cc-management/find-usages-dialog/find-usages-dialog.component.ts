@@ -1,23 +1,15 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FindUsagesDialogService} from './domain/find-usages-dialog.service';
-import {
-  AccFlatNode,
-  AsccpFlatNode,
-  BccpFlatNode,
-  DtFlatNode,
-  CcFlatNode,
-  CcFlatNodeFlattener,
-  VSCcTreeDataSource
-} from '../domain/cc-flat-tree';
-import {DataSourceSearcher, getKey, next, VSFlatTreeControl} from '../../common/flat-tree';
+import {AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, DtFlatNode} from '../domain/cc-flat-tree';
+import {getKey, next} from '../../common/flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {forkJoin} from 'rxjs';
-import {CcGraph, CcGraphNode, CcNodeDetail} from '../domain/core-component-node';
+import {CcGraph, CcGraphNode} from '../domain/core-component-node';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
-class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
 
+class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatabase<T> {
   toAsccpNode(asccpNode: CcGraphNode, parent: CcFlatNode) {
     const node = new AsccpFlatNode(asccpNode);
     node.state = asccpNode.state;
@@ -38,14 +30,7 @@ class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
     return node;
   }
 
-  flatten(): CcFlatNode[] {
-    return super.flatten().slice(1).map(e => {
-      e.level -= 1;
-      return e;
-    });
-  }
-
-  getChildren(node: CcFlatNode): CcFlatNode[] {
+  getChildren(node: T): T[] {
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -61,7 +46,7 @@ class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
       return [];
     }
 
-    let children = [];
+    const children = [];
 
     if (node instanceof DtFlatNode) {
       targets.forEach(target => {
@@ -76,7 +61,7 @@ class FindUsagesCcFlatNodeFlattener extends CcFlatNodeFlattener {
       } else if (target.startsWith('ASCCP-')) {
         const asccpNode = this.toAsccpNode(nodes[target], node);
         if (asccpNode.isUserExtensionGroup) {
-          const uegAccNode = this.getChildren(asccpNode)[0];
+          const uegAccNode = this.getChildren(asccpNode as unknown as T)[0];
           children.push(...this.getChildren(uegAccNode).map(e => {
             e.level = node.level + 1;
             e.parent = node;
@@ -112,8 +97,7 @@ export class FindUsagesDialogComponent implements OnInit {
   paddingPixel = 12;
   isUpdating: boolean;
 
-  dataSource: VSCcTreeDataSource<CcFlatNode>;
-  treeControl: VSFlatTreeControl<CcFlatNode> = new VSFlatTreeControl<CcFlatNode>();
+  dataSource: CcFlatNodeDataSource<CcFlatNode>;
 
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
@@ -121,27 +105,28 @@ export class FindUsagesDialogComponent implements OnInit {
   hasBasedAcc: boolean;
 
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize: number = 33;
+  virtualScrollItemSize = 33;
 
   get minBufferPx(): number {
-    return 20 * this.virtualScrollItemSize;
+    return 10000 * this.virtualScrollItemSize;
   }
 
   get maxBufferPx(): number {
-    return 20 * 20 * this.virtualScrollItemSize;
+    return 1000000 * this.virtualScrollItemSize;
   }
 
   constructor(private dialogRef: MatDialogRef<FindUsagesDialogComponent>,
               private service: FindUsagesDialogService,
               private ccNodeService: CcNodeService,
-              @Inject(MAT_DIALOG_DATA) public data: any) { }
+              @Inject(MAT_DIALOG_DATA) public data: any) {
+  }
 
   ngOnInit(): void {
     forkJoin([
       this.service.findUsages(this.data.type, this.data.manifestId)
     ]).subscribe(([findUsagesResp]) => {
       const edge = findUsagesResp.graph.edges[findUsagesResp.rootNodeKey];
-      let sizeOfNodes: number = (!!edge) ? edge.targets.length : 0;
+      const sizeOfNodes: number = (!!edge) ? edge.targets.length : 0;
       if (!sizeOfNodes) {
         this.title = 'Nothing found';
       } else {
@@ -151,20 +136,17 @@ export class FindUsagesDialogComponent implements OnInit {
       const ccGraph = new CcGraph();
       ccGraph.graph = findUsagesResp.graph;
 
-      const keys = findUsagesResp.rootNodeKey.split('-');
+      const delimiter = findUsagesResp.rootNodeKey.indexOf('-');
+      const keys = [findUsagesResp.rootNodeKey.substring(0, delimiter),
+        findUsagesResp.rootNodeKey.substring(delimiter + 1)];
 
-      const flattener = new FindUsagesCcFlatNodeFlattener(ccGraph, keys[0], Number(keys[1]));
-      setTimeout(() => {
-        const nodes = flattener.flatten();
-        this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.ccNodeService, []);
-        this.isUpdating = false;
-      }, 0);
+      const database = new FindUsagesCcFlatNodeDatabase<CcFlatNode>(ccGraph, keys[0], Number(keys[1]));
+      this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.ccNodeService);
+      this.dataSource.data = database.rootNode.children as CcFlatNode[];
+
+      this.isUpdating = false;
     });
   }
-
-  getLevel = (node: CcFlatNode) => node.level;
-  isExpandable = (node: CcFlatNode) => node.expandable;
-  hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
   onResize(event) {
     this._innerHeight = window.innerHeight;
@@ -187,12 +169,12 @@ export class FindUsagesDialogComponent implements OnInit {
       $event.stopPropagation();
     }
 
-    this.treeControl.toggle(node);
+    this.dataSource.toggle(node);
   }
 
   keyNavigation($event: KeyboardEvent) {
     if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.treeControl.toggle(this.cursorNode);
+      this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     }

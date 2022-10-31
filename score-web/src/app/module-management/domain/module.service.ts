@@ -8,6 +8,7 @@ import {
   ModuleElement,
   ModuleSet,
   ModuleSetListRequest,
+  ModuleSetMetadata,
   ModuleSetModule,
   ModuleSetModuleListRequest,
   ModuleSetRelease,
@@ -69,6 +70,10 @@ export class ModuleService {
     return this.http.get<ModuleSet>('/api/module_set/' + moduleSetId);
   }
 
+  getModuleSetMetadata(moduleSetId: number): Observable<ModuleSetMetadata> {
+    return this.http.get<ModuleSetMetadata>('/api/module_set/' + moduleSetId + '/metadata');
+  }
+
   getModuleSetRelease(moduleSetReleaseId: number): Observable<ModuleSetRelease> {
     return this.http.get<ModuleSetRelease>('/api/module_set_release/' + moduleSetReleaseId);
   }
@@ -100,6 +105,7 @@ export class ModuleService {
   createModuleSetRelease(moduleSetRelease: ModuleSetRelease, basedModuleSetReleaseId?: number): Observable<ModuleSetRelease> {
     const params = {
       moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
+      moduleSetReleaseDescription: moduleSetRelease.moduleSetReleaseDescription,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
       default: moduleSetRelease.default
@@ -121,6 +127,7 @@ export class ModuleService {
   updateModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<ModuleSetRelease> {
     return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId, {
       moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
+      moduleSetReleaseDescription: moduleSetRelease.moduleSetReleaseDescription,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
       default: moduleSetRelease.default

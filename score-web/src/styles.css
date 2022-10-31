@@ -784,6 +784,7 @@ td.mat-cell:last-child {
 }
 
 .tree-breadcrumb {
+  display: inline;
   line-height: 24px;
   font-size: 12px;
 }

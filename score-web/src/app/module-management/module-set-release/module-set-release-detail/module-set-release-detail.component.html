@@ -11,7 +11,16 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName">
+          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName"
+                [disabled]="!roles.includes('developer')">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea [(ngModel)]="moduleSetRelease.moduleSetReleaseDescription"
+                    [disabled]="!roles.includes('developer')"
+                    cols="30" data-id="moduleSetRelease.description" matInput
+                    rows="6"></textarea>
         </mat-form-field>
 
         <mat-form-field>
@@ -53,18 +62,23 @@
     </mat-card>
   </mat-card>
 
-  <div class="row action-group m-0" *ngIf="roles.includes('developer')">
+  <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
-      <button (click)="updateModuleSetRelease()" [disabled]="!isChanged" color="primary"
+      <button (click)="updateModuleSetRelease()"
+              *ngIf="roles.includes('developer')"
+              [disabled]="!isChanged" color="primary"
               mat-raised-button>
         Update
       </button>
 
-      <button (click)="exportScheme()" color="primary" mat-raised-button>
+      <button (click)="exportScheme()"
+              *ngIf="roles.includes('developer')"
+              color="primary" mat-raised-button>
         Export
       </button>
 
-      <button (click)="assignCCs()" color="primary" mat-raised-button>
+      <button (click)="assignCCs()"
+              color="primary" mat-raised-button>
         Assign CCs
       </button>
     </div>

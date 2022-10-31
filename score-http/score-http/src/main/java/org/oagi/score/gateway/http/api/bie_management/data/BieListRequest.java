@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class BieListRequest {
 
+    private String den;
     private String propertyTerm;
     private String businessContext;
     private BigInteger asccpManifestId;
@@ -21,6 +22,7 @@ public class BieListRequest {
     private List<String> excludePropertyTerms = Collections.emptyList();
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();
     private List<BieState> states = Collections.emptyList();
+    private List<String> types = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();
     private BigInteger releaseId;

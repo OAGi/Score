@@ -13,6 +13,7 @@ import org.oagi.score.export.model.*;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.populate.helper.Context;
 import org.oagi.score.provider.ImportedDataProvider;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -412,24 +413,26 @@ public class XMLExportSchemaModuleVisitor {
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                importedDataProvider.findBdtPriRestriListByDtId(bdtSimpleType.getBdtId()).stream()
-                        .filter(e -> e.getCodeListId() != null).collect(Collectors.toList());
+                importedDataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
+                        .filter(e -> e.getCodeListManifestId() != null).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
-        CodeListRecord codeList = importedDataProvider.findCodeList(bdtPriRestriList.get(0).getCodeListId());
+        CodeListManifestRecord codeListManifest = importedDataProvider.findCodeListManifest(bdtPriRestriList.get(0).getCodeListManifestId());
+        CodeListRecord codeList = importedDataProvider.findCodeList(codeListManifest.getCodeListId());
         return codeList.getName();
     }
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                importedDataProvider.findBdtPriRestriListByDtId(bdtSimpleType.getBdtId()).stream()
-                        .filter(e -> e.getAgencyIdListId() != null).collect(Collectors.toList());
+                importedDataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
+                        .filter(e -> e.getAgencyIdListManifestId() != null).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
 
-        AgencyIdListRecord agencyIdList = importedDataProvider.findAgencyIdList(bdtPriRestriList.get(0).getAgencyIdListId());
+        AgencyIdListManifestRecord agencyIdListManifest = importedDataProvider.findAgencyIdListManifest(bdtPriRestriList.get(0).getAgencyIdListManifestId());
+        AgencyIdListRecord agencyIdList = importedDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
         return agencyIdList.getName();
     }
 

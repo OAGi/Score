@@ -42,6 +42,8 @@ public class BbieScReadRepository {
             return null;
         }
 
+        List<String> cdtPrimitives = dtScReadRepository.getCdtPrimitivesByManifestId(ULong.valueOf(dtScManifestId));
+
         BbieScNode bbieScNode = new BbieScNode();
 
         BbieScNode.BdtSc bdtSc = bbieScNode.getBdtSc();
@@ -54,6 +56,7 @@ public class BbieScReadRepository {
         bdtSc.setDefinition(dtScRecord.getDefinition());
         bdtSc.setDefaultValue(dtScRecord.getDefaultValue());
         bdtSc.setFixedValue(dtScRecord.getFixedValue());
+        bdtSc.setCdtPrimitives(cdtPrimitives);
         bdtSc.setState(CcState.valueOf(
                 dslContext.select(DT.STATE)
                         .from(DT)
@@ -101,8 +104,8 @@ public class BbieScReadRepository {
         SelectOnConditionStep<Record1<ULong>> step = dslContext.select(
                 BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID)
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
+                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
+                .join(DT_SC).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
                 .join(CDT_SC_AWD_PRI_XPS_TYPE_MAP).on(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID))
                 .join(XBT).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID));
         return step.where(conds)
@@ -128,6 +131,13 @@ public class BbieScReadRepository {
             bbieSc.setGuid(bbieScRecord.getGuid());
             bbieSc.setCardinalityMin(bbieScRecord.getCardinalityMin());
             bbieSc.setCardinalityMax(bbieScRecord.getCardinalityMax());
+            if (bbieScRecord.getFacetMinLength() != null) {
+                bbieSc.setMinLength(bbieScRecord.getFacetMinLength().intValue());
+            }
+            if (bbieScRecord.getFacetMaxLength() != null) {
+                bbieSc.setMaxLength(bbieScRecord.getFacetMaxLength().intValue());
+            }
+            bbieSc.setPattern(bbieScRecord.getFacetPattern());
             bbieSc.setRemark(bbieScRecord.getRemark());
             bbieSc.setBizTerm(bbieScRecord.getBizTerm());
             bbieSc.setDefinition(bbieScRecord.getDefinition());
@@ -137,29 +147,31 @@ public class BbieScReadRepository {
 
             bbieSc.setBdtScPriRestriId((bbieScRecord.getDtScPriRestriId() != null) ?
                     bbieScRecord.getDtScPriRestriId().toBigInteger() : null);
-            bbieSc.setCodeListId((bbieScRecord.getCodeListId() != null) ?
-                    bbieScRecord.getCodeListId().toBigInteger() : null);
-            bbieSc.setAgencyIdListId((bbieScRecord.getAgencyIdListId() != null) ?
-                    bbieScRecord.getAgencyIdListId().toBigInteger() : null);
+            bbieSc.setCodeListManifestId((bbieScRecord.getCodeListManifestId() != null) ?
+                    bbieScRecord.getCodeListManifestId().toBigInteger() : null);
+            bbieSc.setAgencyIdListManifestId((bbieScRecord.getAgencyIdListManifestId() != null) ?
+                    bbieScRecord.getAgencyIdListManifestId().toBigInteger() : null);
         }
 
         return bbieSc;
     }
 
     public List<BieEditUsed> getUsedBbieScList(BigInteger topLevelAsbiepId) {
-        return dslContext.select(BBIE_SC.BBIE_SC_ID, BBIE_SC.BASED_DT_SC_MANIFEST_ID, BBIE_SC.HASH_PATH, BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID)
+        return dslContext.select(BBIE_SC.IS_USED, BBIE_SC.BBIE_SC_ID, BBIE_SC.BASED_DT_SC_MANIFEST_ID,
+                        BBIE_SC.HASH_PATH, BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID,
+                        BBIE_SC.CARDINALITY_MIN, BBIE_SC.CARDINALITY_MAX)
                 .from(BBIE_SC)
-                .where(and(
-                        BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
-                        BBIE_SC.IS_USED.eq((byte) 1)
-                ))
+                .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchStream().map(record -> {
                     BieEditUsed bieEditUsed = new BieEditUsed();
+                    bieEditUsed.setUsed(record.get(BBIE_SC.IS_USED) == 1);
                     bieEditUsed.setType("BBIE_SC");
                     bieEditUsed.setBieId(record.get(BBIE_SC.BBIE_SC_ID).toBigInteger());
                     bieEditUsed.setManifestId(record.get(BBIE_SC.BASED_DT_SC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(BBIE_SC.HASH_PATH));
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+                    bieEditUsed.setCardinalityMin(record.get(BBIE_SC.CARDINALITY_MIN));
+                    bieEditUsed.setCardinalityMax(record.get(BBIE_SC.CARDINALITY_MAX));
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

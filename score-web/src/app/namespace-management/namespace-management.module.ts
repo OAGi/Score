@@ -8,7 +8,6 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
-import {ContextMenuModule} from 'ngx-contextmenu';
 
 const routes: Routes = [
   {
@@ -39,8 +38,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule,
-    ContextMenuModule
+    CommonModule
   ],
   declarations: [
     NamespaceListComponent,

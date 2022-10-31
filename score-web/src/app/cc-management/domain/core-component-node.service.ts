@@ -1,16 +1,19 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {AccFlatNode, AsccpFlatNode, BccpFlatNode, DtFlatNode, DtScFlatNode, CcFlatNode} from './cc-flat-tree';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {
-  CcAccNode, CcAccNodeDetail,
+  BodCreateResponse,
+  CcAccNode,
+  CcAccNodeDetail,
   CcAsccpNode,
   CcAsccpNodeDetail,
   CcBccpNode,
-  CcBccpNodeDetail, CcBdtNode, CcDtNodeDetail,
+  CcBccpNodeDetail,
+  CcBdtNode,
   CcBdtScNodeDetail,
   CcCreateResponse,
-  BodCreateResponse,
+  CcDtNodeDetail,
   CcGraph,
   CcNodeDetail,
   CcNodeUpdateResponse,
@@ -164,7 +167,8 @@ export class CcNodeService {
   }
 
   appendAssociation(releaseId: number, accManifestId: number,
-                    manifestId: number, type: string, pos: number): Observable<any> | undefined {
+                    manifestId: number, type: string, attribute: boolean,
+                    pos: number): Observable<any> | undefined {
     const body = new Map<string, number>();
     body['releaseId'] = releaseId;
     body['pos'] = pos;
@@ -172,6 +176,9 @@ export class CcNodeService {
       body['asccpManifestId'] = manifestId;
     } else if (type === 'BCCP') {
       body['bccpManifestId'] = manifestId;
+      if (attribute) {
+        body['attribute'] = true;
+      }
     } else {
       return;
     }

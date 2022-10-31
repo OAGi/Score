@@ -16,9 +16,11 @@
         <mat-form-field>
           <mat-label>Release Namespace</mat-label>
           <mat-select [(ngModel)]="selectedNamespace" [required]="true">
-            <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                   [placeholderLabel]="'Search...'"
-                                   [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            </mat-option>
             <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace">
               {{ namespace.uri }}
             </mat-option>

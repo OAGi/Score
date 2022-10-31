@@ -11,7 +11,7 @@ import {
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, finalize, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OAuth2AppInfo, UserToken} from './domain/auth';
@@ -20,7 +20,7 @@ import {OAuth2AppInfo, UserToken} from './domain/auth';
 export class AuthService implements OnInit, CanActivate {
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
-  USER_INFO_KEY = 'X-SRT-UserInfo';
+  USER_INFO_KEY = 'X-Score-UserInfo';
   ROLE_DEVELOPER = 'developer';
   ROLE_END_USER = 'end-user';
   ROLE_ADMIN = 'admin';
@@ -107,18 +107,18 @@ export class AuthService implements OnInit, CanActivate {
   logout(url?) {
     localStorage.removeItem(this.USER_INFO_KEY);
 
-    this.http.get('/api/logout').subscribe(_ => {
-    });
-
-    if (url === undefined || url === null) {
-      this.http.get('/api/' + environment.logoutPath).subscribe(_ => {
-        this.redirectToLogin(url);
-      }, err => {
+    this.http.get('/api/' + environment.logoutPath)
+      .subscribe(resp => {
         this.redirectToLogin(url);
       });
-    } else {
-      this.redirectToLogin(url);
+  }
+
+  logoutPath(): string {
+    const userToken = this.getUserToken();
+    if (!!userToken && userToken.authentication === 'oauth2') {
+      return '/api/oauth2/logout';
     }
+    return '/logout';
   }
 
   redirectToLogin(url?) {
@@ -131,7 +131,6 @@ export class AuthService implements OnInit, CanActivate {
         }
       });
     } else {
-      this.router.navigate(commands);
       return this.router.navigate(commands);
     }
   }
@@ -204,14 +203,16 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
                 });
               } else {
                 this.snackBar.open(((!!errorMessage) ? errorMessage : error.message), '', {
-                  duration: 3000,
+                  duration: 5000,
                 });
               }
 
               break;
 
             case 401:
-              if (req.url.indexOf(environment.logoutPath) === -1) {
+              if (req.url.indexOf(environment.statePath) !== -1) {
+                // ignore
+              } else if (req.url.indexOf(environment.logoutPath) === -1) {
                 this.snackBar.open('Authentication Failure', '', {
                   duration: 3000,
                 });

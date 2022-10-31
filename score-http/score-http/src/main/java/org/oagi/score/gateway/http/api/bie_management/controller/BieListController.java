@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import org.oagi.score.data.BizCtx;
+import org.oagi.score.gateway.http.api.bie_management.data.BieEvent;
 import org.oagi.score.gateway.http.api.bie_management.data.BieList;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.DeleteBieListRequest;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,12 +28,13 @@ import java.util.stream.Collectors;
 public class BieListController {
 
     @Autowired
-    private BieService service;
+    private BieService bieService;
 
     @RequestMapping(value = "/bie_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieList> getBieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @RequestParam(name = "den", required = false) String den,
                                             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
                                             @RequestParam(name = "businessContext", required = false) String businessContext,
                                             @RequestParam(name = "asccpManifestId", required = false) BigInteger asccpManifestId,
@@ -52,6 +55,7 @@ public class BieListController {
 
         BieListRequest request = new BieListRequest();
 
+        request.setDen(den);
         request.setPropertyTerm(propertyTerm);
         request.setBusinessContext(businessContext);
         request.setAsccpManifestId(asccpManifestId);
@@ -90,7 +94,7 @@ public class BieListController {
         pageRequest.setPageIndex(pageIndex);
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
-        return service.getBieList(user, request);
+        return bieService.getBieList(user, request);
     }
 
     @RequestMapping(value = "/bie_list/{topLevelAsbiepId}/usage",
@@ -111,7 +115,7 @@ public class BieListController {
         pageRequest.setPageIndex(pageIndex);
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
-        return service.getUsageOfBieList(user, request);
+        return bieService.getUsageOfBieList(user, request);
     }
 
     @RequestMapping(value = "/profile_bie_list/delete", method = RequestMethod.POST,
@@ -119,20 +123,20 @@ public class BieListController {
     public ResponseEntity deleteBieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                         @RequestBody DeleteBieListRequest request) {
         List<BigInteger> topLevelAsbiepIds = request.getTopLevelAsbiepIds();
-        service.deleteBieList(user, topLevelAsbiepIds);
+        bieService.deleteBieList(user, topLevelAsbiepIds);
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/profile_bie/business_ctx_from_abie/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BizCtx findBizCtxFromAbieId(@PathVariable("id") BigInteger abieId) {
-        return service.findBizCtxByAbieId(abieId);
+        return bieService.findBizCtxByAbieId(abieId);
     }
 
     @RequestMapping(value = "/profile_bie/{id}/biz_ctx", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BizCtxAssignment> getAssignBizCtx(@PathVariable("id") BigInteger topLevelAsbiepId) {
-        return service.getAssignBizCtx(topLevelAsbiepId);
+        return bieService.getAssignBizCtx(topLevelAsbiepId);
     }
 
     @RequestMapping(value = "/profile_bie/{id}/assign_biz_ctx", method = RequestMethod.POST,
@@ -140,7 +144,7 @@ public class BieListController {
     public ResponseEntity assignBizCtx(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                        @PathVariable("id") BigInteger topLevelAsbiepId,
                                        @RequestBody Map<String, List<Long>> request) {
-        service.assignBizCtx(user, topLevelAsbiepId, request.getOrDefault("bizCtxList", Collections.emptyList()));
+        bieService.assignBizCtx(user, topLevelAsbiepId, request.getOrDefault("bizCtxList", Collections.emptyList()));
         return ResponseEntity.noContent().build();
     }
 
@@ -150,7 +154,16 @@ public class BieListController {
                                             @PathVariable("id") BigInteger topLevelAsbiepId,
                                             @RequestBody Map<String, String> request) {
         String targetLoginId = request.get("targetLoginId");
-        service.transferOwnership(user, topLevelAsbiepId, targetLoginId);
+        bieService.transferOwnership(user, topLevelAsbiepId, targetLoginId);
+
+        BieEvent event = new BieEvent();
+        event.setAction("UpdateOwnership");
+        event.setTopLevelAsbiepId(topLevelAsbiepId);
+        event.addProperty("actor", user.getName());
+        event.addProperty("target", targetLoginId);
+        event.addProperty("timestamp", LocalDateTime.now());
+        bieService.fireBieEvent(event);
+
         return ResponseEntity.noContent().build();
     }
 

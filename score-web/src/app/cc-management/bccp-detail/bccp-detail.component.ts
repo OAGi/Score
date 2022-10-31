@@ -3,13 +3,18 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {DataSourceSearcher, VSFlatTreeControl} from '../../common/flat-tree';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {BccpFlatNode, CcFlatNode, CcFlatNodeFlattener, VSCcTreeDataSource} from '../domain/cc-flat-tree';
+import {
+  BccpFlatNode,
+  CcFlatNode,
+  CcFlatNodeDatabase,
+  CcFlatNodeDataSource,
+  CcFlatNodeDataSourceSearcher
+} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
@@ -24,7 +29,6 @@ import {
   OagisComponentType,
   OagisComponentTypes
 } from '../domain/core-component-node';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {CreateBccpDialogComponent} from '../cc-list/create-bccp-dialog/create-bccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
@@ -37,6 +41,8 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
+import {Clipboard} from "@angular/cdk/clipboard";
+import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 
 @Component({
   selector: 'score-bccp-detail',
@@ -54,9 +60,8 @@ export class BccpDetailComponent implements OnInit {
   entityTypes: EntityType[] = EntityTypes;
 
   rootNode: BccpFlatNode;
-  dataSource: VSCcTreeDataSource<CcFlatNode>;
-  treeControl: VSFlatTreeControl<CcFlatNode>;
-  searcher: DataSourceSearcher<CcFlatNode>;
+  dataSource: CcFlatNodeDataSource<CcFlatNode>;
+  searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
   lastRevision: CcRevisionResponse;
   selectedNode: CcFlatNode;
@@ -66,28 +71,36 @@ export class BccpDetailComponent implements OnInit {
   namespaces: SimpleNamespace[];
   commentControl: CommentControl;
 
-  excludeSCs: boolean;
   initialExpandDepth: number = 10;
 
+  contextMenuItem: CcFlatNode;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
-  @ViewChild('bccpContextMenu', {static: true}) public bccpContextMenu: ContextMenuComponent;
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
   virtualScrollItemSize: number = 33;
 
   get minBufferPx(): number {
-    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * this.virtualScrollItemSize;
+    return 10000 * this.virtualScrollItemSize;
   }
 
   get maxBufferPx(): number {
-    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * 20 * this.virtualScrollItemSize;
+    return 1000000 * this.virtualScrollItemSize;
+  }
+
+  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+
+  get hideCardinality(): boolean {
+    return this.dataSource.hideCardinality;
+  }
+
+  set hideCardinality(hideCardinality: boolean) {
+    this.dataSource.hideCardinality = hideCardinality;
+    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
   constructor(private service: CcNodeService,
               private searchOptionsService: SearchOptionsService,
               private releaseService: ReleaseService,
               private snackBar: MatSnackBar,
-              private contextMenuService: ContextMenuService,
               private namespaceService: NamespaceService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
@@ -95,14 +108,14 @@ export class BccpDetailComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private auth: AuthService,
-              private stompService: RxStompService) {
+              private stompService: RxStompService,
+              private clipboard: Clipboard) {
   }
 
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
     this.isUpdating = true;
-    this.excludeSCs = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.manifestId = parseInt(params.get('manifestId'), 10);
@@ -140,21 +153,55 @@ export class BccpDetailComponent implements OnInit {
         }
       });
 
-      const flattener = new CcFlatNodeFlattener(ccGraph, 'BCCP', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs, this.initialExpandDepth);
-        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
-        this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
-        this.isUpdating = false;
-        this.rootNode = nodes[0] as BccpFlatNode;
-        this.rootNode.access = rootNode.access;
-        this.rootNode.state = rootNode.state;
-        this.rootNode.reset();
+      const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'BCCP', this.manifestId);
+      this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.dataSource.init();
+      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
 
-        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
-        this.onClick(this.rootNode);
-      }, 0);
+      this.rootNode = this.dataSource.data[0] as BccpFlatNode;
+      this.rootNode.access = rootNode.access;
+      this.rootNode.state = rootNode.state;
+      this.rootNode.reset();
+
+      // Issue #1254
+      // Initial expanding by the query path
+      const url = this.router.url;
+      const manifestId = this.manifestId.toString();
+      const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
+
+      if (!!queryPath) {
+        this.goToPath(queryPath);
+      } else {
+        this.onClick(this.dataSource.data[0]);
+      }
+
+      this.isUpdating = false;
+    }, err => {
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000
+      });
     });
+  }
+
+  goToPath(path: string) {
+    let curNode = this.dataSource.data[0];
+    let idx = 0;
+    path.split('/')
+      .map(e => decodeURI(e))
+      .map(e => e.replace(new RegExp('\\s', 'g'), '')).forEach(nodeName => {
+      for (const node of this.dataSource.data.slice(idx)) {
+        if (node.name.replace(new RegExp('\\s', 'g'), '') === nodeName) {
+          this.dataSource.expand(node);
+          curNode = node;
+          break;
+        }
+        idx++;
+      }
+    });
+
+    this.onClick(curNode);
+    this.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -184,37 +231,71 @@ export class BccpDetailComponent implements OnInit {
     });
   }
 
-  getGraph(callbackFn) {
-    this.service.getGraphNode(this.rootNode.type, this.manifestId).subscribe(graph => {
-      const flattener = new CcFlatNodeFlattener(
-        graph, 'BCCP', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs);
-        return callbackFn(nodes);
-      });
+  copyLink(node: CcFlatNode, $event?) {
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    if (!node) {
+      return;
+    }
+
+    const url = window.location.href;
+    const manifestId = this.manifestId.toString();
+    const idIdx = url.indexOf(manifestId);
+    const queryPath = url.substring(0, idIdx + manifestId.length) + '/' + node.queryPath;
+
+    this.clipboard.copy(queryPath);
+    this.snackBar.open('Link copied', '', {
+      duration: 3000
     });
   }
 
   reload(snackMsg?: string) {
+    let selectedNodeManifestId;
+    if (this.selectedNode) {
+      selectedNodeManifestId = this.selectedNode.manifestId;
+      this.selectedNode = undefined;
+    }
+    const expandedNodes = this.dataSource.data.filter(e => e.expanded);
+
     this.isUpdating = true;
     forkJoin([
       this.service.getBccpNode(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
-    ]).subscribe(([rootNode, graph]) => {
-      const flattener = new CcFlatNodeFlattener(graph, 'BCCP', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten(this.excludeSCs, );
-        this.treeControl = new VSFlatTreeControl<CcFlatNode>(undefined, undefined, flattener);
-        this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
-        this.isUpdating = false;
-        this.rootNode = nodes[0] as BccpFlatNode;
-        this.rootNode.access = rootNode.access;
-        this.rootNode.state = rootNode.state;
-        this.rootNode.reset();
-        this.searcher = new DataSourceSearcher(this.dataSource, this.excludeSCs);
-        this.treeControl.expand(this.dataSource.getRootNode());
-        this.onClick(this.dataSource.getRootNode());
-      }, 0);
+    ]).subscribe(([rootNode, ccGraph]) => {
+      const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'BCCP', this.manifestId);
+      this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.dataSource.init();
+
+      this.rootNode = this.dataSource.data[0] as BccpFlatNode;
+      this.rootNode.access = rootNode.access;
+      this.rootNode.state = rootNode.state;
+      this.rootNode.reset();
+
+      this.onClick(this.dataSource.data[0]);
+
+      // recover the tree expansion status
+      for (const expandedNode of expandedNodes) {
+        for (const datum of this.dataSource.data) {
+          if (expandedNode.manifestId === datum.manifestId && !this.dataSource.isExpanded(datum)) {
+            this.dataSource.toggle(datum);
+            break;
+          }
+        }
+      }
+      // recover the selected node.
+      if (!!selectedNodeManifestId) {
+        for (const datum of this.dataSource.data) {
+          if (datum.manifestId === selectedNodeManifestId) {
+            this.onClick(datum);
+            break;
+          }
+        }
+      }
+
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
       }
@@ -260,6 +341,7 @@ export class BccpDetailComponent implements OnInit {
       $event.preventDefault();
       $event.stopPropagation();
     }
+
     this.commentControl.closeCommentSlide();
     this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
       this.selectedNode = node;
@@ -273,7 +355,7 @@ export class BccpDetailComponent implements OnInit {
       $event.stopPropagation();
     }
 
-    this.treeControl.toggle(node);
+    this.dataSource.toggle(node);
   }
 
   /* For type casting of detail property */
@@ -334,7 +416,7 @@ export class BccpDetailComponent implements OnInit {
   }
 
   get isChanged() {
-    return this.dataSource.changedNodes.length > 0;
+    return this.dataSource.getChanged().length > 0;
   }
 
   _updateDetails(details: CcFlatNode[]) {
@@ -360,7 +442,7 @@ export class BccpDetailComponent implements OnInit {
       return;
     }
 
-    const details = this.dataSource.changedNodes;
+    const details = this.dataSource.getChanged();
     let emptyDefinition = false;
     let emptyNamespace = false;
     let emptyPropertyTerm = false;
@@ -407,16 +489,6 @@ export class BccpDetailComponent implements OnInit {
     } else {
       this._updateDetails(details);
     }
-  }
-
-  onContextMenu($event: MouseEvent, node: CcFlatNode): void {
-    this.contextMenuService.show.next({
-      contextMenu: (node.level === 0) ? this.bccpContextMenu : this.defaultContextMenu,
-      event: $event,
-      item: node,
-    });
-    $event.preventDefault();
-    $event.stopPropagation();
   }
 
   openSearchOptions() {
@@ -490,7 +562,7 @@ export class BccpDetailComponent implements OnInit {
     if (!state) {
       return;
     }
-    const rootNode = this.dataSource.getRootNode();
+    const rootNode = this.dataSource.data[0];
 
     if (state !== 'WIP') {
       this.dataSource.loadDetail(rootNode, (detail) => {
@@ -512,7 +584,7 @@ export class BccpDetailComponent implements OnInit {
   afterStateChanged(state: string, access: string) {
     this.rootNode.state = state;
     this.rootNode.access = access;
-    const root = this.dataSource.getRootNode();
+    const root = this.dataSource.data[0];
     (root.detail as CcBccpNodeDetail).bccp.state = state;
   }
 
@@ -650,10 +722,13 @@ export class BccpDetailComponent implements OnInit {
   }
 
   openHistory(node: CcFlatNode) {
-    window.open('/log/core-component/' + node.guid, '_blank');
+    window.open('/log/core-component/' + node.guid + '?type=' + node.type + '&manifestId=' + node.manifestId, '_blank');
   }
 
   visibleFindUsages(node: CcFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
     return node.type.toUpperCase() === 'ACC' || node.type.toUpperCase() === 'ASCCP' || node.type.toUpperCase() === 'BCCP';
   }
 
@@ -677,9 +752,9 @@ export class BccpDetailComponent implements OnInit {
     this.commentControl.toggleCommentSlide(type, node.detail);
   }
 
-  scrollToNode(node: CcFlatNode) {
+  scrollToNode(node: CcFlatNode, delay?: number) {
     const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index);
+    this.scrollTree(index, delay);
     this.cursorNode = node;
   }
 
@@ -689,7 +764,7 @@ export class BccpDetailComponent implements OnInit {
     } else if ($event.key === 'ArrowUp') {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.treeControl.toggle(this.cursorNode);
+      this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     }
@@ -709,10 +784,17 @@ export class BccpDetailComponent implements OnInit {
     return '';
   }
 
-  scrollTree(index: number) {
-    const range = this.virtualScroll.getRenderedRange();
-    if (range.start > index || range.end < index) {
-      this.virtualScroll.scrollToOffset(index * 33);
+  scrollTree(index: number, delay?: number) {
+    if (index < 0) {
+      return;
+    }
+
+    if (delay) {
+      setTimeout(() => {
+        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+      }, delay);
+    } else {
+      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
     }
   }
 
@@ -741,34 +823,15 @@ export class BccpDetailComponent implements OnInit {
 
   search(inputKeyword, backward?: boolean, force?: boolean) {
     this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.virtualScroll.scrollToIndex(index);
+      this.scrollTree(index, 500);
     });
   }
 
   move(val: number) {
     this.searcher.go(val).subscribe(index => {
-      this.virtualScroll.scrollToIndex(index);
+      this.onClick(this.dataSource.data[index]);
+      this.scrollTree(index);
     });
-  }
-
-  changeExcludeSCs(): void{
-    if (this.isChanged) {
-      const dialogConfig = this.confirmDialogService.newConfig();
-      dialogConfig.data.header = 'Warning';
-      dialogConfig.data.content = ['Unsaved changes will be lost.'];
-      dialogConfig.data.action = 'Okay';
-
-      this.confirmDialogService.open(dialogConfig).afterClosed()
-        .subscribe(result => {
-          if (!result) {
-            this.excludeSCs = !this.excludeSCs;
-            return;
-          }
-          this.reload();
-        });
-    } else {
-      this.reload();
-    }
   }
 
 }

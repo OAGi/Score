@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.impl.jooq.bie;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -17,7 +18,6 @@ import java.util.*;
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqBieReadRepository
         extends JooqScoreRepository
@@ -196,8 +196,8 @@ public class JooqBieReadRepository
                 BBIE.FROM_ABIE_ID,
                 BBIE.TO_BBIEP_ID,
                 BBIE.BDT_PRI_RESTRI_ID,
-                BBIE.CODE_LIST_ID,
-                BBIE.AGENCY_ID_LIST_ID,
+                BBIE.CODE_LIST_MANIFEST_ID,
+                BBIE.AGENCY_ID_LIST_MANIFEST_ID,
                 BBIE.CARDINALITY_MIN,
                 BBIE.CARDINALITY_MAX,
                 BBIE.DEFAULT_VALUE,
@@ -224,10 +224,10 @@ public class JooqBieReadRepository
             bbie.setToBbiepId(record.get(BBIE.TO_BBIEP_ID).toBigInteger());
             bbie.setBdtPriRestriId((record.get(BBIE.BDT_PRI_RESTRI_ID) != null) ?
                     record.get(BBIE.BDT_PRI_RESTRI_ID).toBigInteger() : null);
-            bbie.setCodeListId((record.get(BBIE.CODE_LIST_ID) != null) ?
-                    record.get(BBIE.CODE_LIST_ID).toBigInteger() : null);
-            bbie.setAgencyIdListId((record.get(BBIE.AGENCY_ID_LIST_ID) != null) ?
-                    record.get(BBIE.AGENCY_ID_LIST_ID).toBigInteger() : null);
+            bbie.setCodeListManifestId((record.get(BBIE.CODE_LIST_MANIFEST_ID) != null) ?
+                    record.get(BBIE.CODE_LIST_MANIFEST_ID).toBigInteger() : null);
+            bbie.setAgencyIdListManifestId((record.get(BBIE.AGENCY_ID_LIST_MANIFEST_ID) != null) ?
+                    record.get(BBIE.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger() : null);
             bbie.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
             bbie.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
             bbie.setDefaultValue(record.get(BBIE.DEFAULT_VALUE));
@@ -310,8 +310,8 @@ public class JooqBieReadRepository
                 BBIE_SC.HASH_PATH,
                 BBIE_SC.BBIE_ID,
                 BBIE_SC.DT_SC_PRI_RESTRI_ID,
-                BBIE_SC.CODE_LIST_ID,
-                BBIE_SC.AGENCY_ID_LIST_ID,
+                BBIE_SC.CODE_LIST_MANIFEST_ID,
+                BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID,
                 BBIE_SC.CARDINALITY_MIN,
                 BBIE_SC.CARDINALITY_MAX,
                 BBIE_SC.DEFAULT_VALUE,
@@ -336,10 +336,10 @@ public class JooqBieReadRepository
             bbieSc.setHashPath(record.get(BBIE_SC.HASH_PATH));
             bbieSc.setDtScPriRestriId((record.get(BBIE_SC.DT_SC_PRI_RESTRI_ID) != null) ?
                     record.get(BBIE_SC.DT_SC_PRI_RESTRI_ID).toBigInteger() : null);
-            bbieSc.setCodeListId((record.get(BBIE_SC.CODE_LIST_ID) != null) ?
-                    record.get(BBIE_SC.CODE_LIST_ID).toBigInteger() : null);
-            bbieSc.setAgencyIdListId((record.get(BBIE_SC.AGENCY_ID_LIST_ID) != null) ?
-                    record.get(BBIE_SC.AGENCY_ID_LIST_ID).toBigInteger() : null);
+            bbieSc.setCodeListManifestId((record.get(BBIE_SC.CODE_LIST_MANIFEST_ID) != null) ?
+                    record.get(BBIE_SC.CODE_LIST_MANIFEST_ID).toBigInteger() : null);
+            bbieSc.setAgencyIdListManifestId((record.get(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID) != null) ?
+                    record.get(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger() : null);
             bbieSc.setCardinalityMin(record.get(BBIE_SC.CARDINALITY_MIN));
             bbieSc.setCardinalityMax(record.get(BBIE_SC.CARDINALITY_MAX));
             bbieSc.setDefaultValue(record.get(BBIE_SC.DEFAULT_VALUE));

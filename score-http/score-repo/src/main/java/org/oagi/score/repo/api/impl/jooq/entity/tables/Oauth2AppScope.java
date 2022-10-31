@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function3;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row3;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -138,6 +142,11 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         return new Oauth2AppScope(alias, this);
     }
 
+    @Override
+    public Oauth2AppScope as(Table<?> alias) {
+        return new Oauth2AppScope(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -154,6 +163,14 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         return new Oauth2AppScope(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public Oauth2AppScope rename(Table<?> name) {
+        return new Oauth2AppScope(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row3 type methods
     // -------------------------------------------------------------------------
@@ -161,5 +178,20 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
     @Override
     public Row3<ULong, ULong, String> fieldsRow() {
         return (Row3) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function3<? super ULong, ? super ULong, ? super String, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super ULong, ? super String, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

@@ -21,10 +21,10 @@ public class BdtPriRestriRepository implements ScoreRepository<BdtPriRestri> {
     private SelectJoinStep<Record6<ULong, ULong, ULong, ULong, ULong, Byte>> getSelectJoinStep() {
         return dslContext.select(
                 Tables.BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
-                Tables.BDT_PRI_RESTRI.BDT_ID,
+                Tables.BDT_PRI_RESTRI.BDT_MANIFEST_ID,
                 Tables.BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                Tables.BDT_PRI_RESTRI.CODE_LIST_ID,
-                Tables.BDT_PRI_RESTRI.AGENCY_ID_LIST_ID,
+                Tables.BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                Tables.BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
                 Tables.BDT_PRI_RESTRI.IS_DEFAULT.as("defaulted")
         ).from(Tables.BDT_PRI_RESTRI);
     }

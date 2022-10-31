@@ -5,7 +5,7 @@ import {BieReportService} from './domain/bie-report.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {ReuseReport} from './domain/bie-report';
 import {finalize} from 'rxjs/operators';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'score-bie-report',
@@ -61,7 +61,7 @@ export class BieReportComponent implements OnInit {
   }
 
   getRouteLink(report: ReuseReport): string {
-    return "/profile_bie/edit/" + report.reusingTopLevelAsbiepId + "?q=" + base64Encode(report.displayPath);
+    return "/profile_bie/" + report.reusingTopLevelAsbiepId + "?q=" + base64Encode(report.displayPath);
   }
 
   convertToCsv(): string {

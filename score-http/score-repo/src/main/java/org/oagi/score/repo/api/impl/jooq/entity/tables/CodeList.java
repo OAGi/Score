@@ -7,13 +7,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function22;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
+import org.jooq.Row22;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -80,13 +85,6 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * The column <code>oagi.code_list.list_id</code>. External identifier.
      */
     public final TableField<CodeListRecord, String> LIST_ID = createField(DSL.name("list_id"), SQLDataType.VARCHAR(100).nullable(false), this, "External identifier.");
-
-    /**
-     * The column <code>oagi.code_list.agency_id_list_value_id</code>. Foreign
-     * key to the AGENCY_ID_LIST_VALUE table. It indicates the organization
-     * which maintains the code list.
-     */
-    public final TableField<CodeListRecord, ULong> AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the AGENCY_ID_LIST_VALUE table. It indicates the organization which maintains the code list.");
 
     /**
      * The column <code>oagi.code_list.version_id</code>. Code list version
@@ -251,10 +249,9 @@ public class CodeList extends TableImpl<CodeListRecord> {
 
     @Override
     public List<ForeignKey<CodeListRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.CODE_LIST_NAMESPACE_ID_FK, Keys.CODE_LIST_BASED_CODE_LIST_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK, Keys.CODE_LIST_CREATED_BY_FK, Keys.CODE_LIST_OWNER_USER_ID_FK, Keys.CODE_LIST_LAST_UPDATED_BY_FK, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, Keys.CODE_LIST_NEXT_CODE_LIST_ID_FK);
+        return Arrays.asList(Keys.CODE_LIST_NAMESPACE_ID_FK, Keys.CODE_LIST_BASED_CODE_LIST_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK, Keys.CODE_LIST_CREATED_BY_FK, Keys.CODE_LIST_OWNER_USER_ID_FK, Keys.CODE_LIST_LAST_UPDATED_BY_FK, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, Keys.CODE_LIST_NEXT_CODE_LIST_ID_FK);
     }
 
-    private transient AgencyIdListValue _agencyIdListValue;
     private transient Namespace _namespace;
     private transient CodeList _codeListBasedCodeListIdFk;
     private transient CodeList _codeListReplacementCodeListIdFk;
@@ -263,17 +260,6 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient AppUser _codeListLastUpdatedByFk;
     private transient CodeList _codeListPrevCodeListIdFk;
     private transient CodeList _codeListNextCodeListIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
-     * table.
-     */
-    public AgencyIdListValue agencyIdListValue() {
-        if (_agencyIdListValue == null)
-            _agencyIdListValue = new AgencyIdListValue(this, Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_ID_FK);
-
-        return _agencyIdListValue;
-    }
 
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
@@ -372,6 +358,11 @@ public class CodeList extends TableImpl<CodeListRecord> {
         return new CodeList(alias, this);
     }
 
+    @Override
+    public CodeList as(Table<?> alias) {
+        return new CodeList(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -386,5 +377,37 @@ public class CodeList extends TableImpl<CodeListRecord> {
     @Override
     public CodeList rename(Name name) {
         return new CodeList(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public CodeList rename(Table<?> name) {
+        return new CodeList(name.getQualifiedName(), null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Row22 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, String, String, String, ULong, ULong, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
+        return (Row22) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

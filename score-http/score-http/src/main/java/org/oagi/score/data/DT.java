@@ -11,6 +11,7 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DT implements CoreComponent {
 
+    private BigInteger dtManifestId = BigInteger.ZERO;
     private BigInteger dtId = BigInteger.ZERO;
     private String guid;
     private int type;
@@ -18,6 +19,7 @@ public class DT implements CoreComponent {
     private String representationTerm;
     private String qualifier;
     private String sixDigitId;
+    private BigInteger basedDtManifestId = BigInteger.ZERO;
     private BigInteger basedDtId = BigInteger.ZERO;
     private String den;
     private String definition;

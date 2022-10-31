@@ -7,7 +7,6 @@ import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
 import {TranslateModule} from '@ngx-translate/core';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
@@ -16,10 +15,10 @@ import {CreateDtscDialogComponent} from './create-dtsc-dialog/create-dtsc-dialog
 
 const routes: Routes = [
   {
-    path: 'core_component/dt',
+    path: 'core_component/dt/:manifestId',
     children: [
       {
-        path: ':manifestId',
+        path: '**',
         component: BdtDetailComponent,
         canActivate: [AuthService],
       }
@@ -36,7 +35,6 @@ const routes: Routes = [
     MatInputModule,
     TranslateModule,
     CommonModule,
-    ContextMenuModule,
     ScoreCommonModule,
     SearchOptionsDialogModule,
     DragDropModule,

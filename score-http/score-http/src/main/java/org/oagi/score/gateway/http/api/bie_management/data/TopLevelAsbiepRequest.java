@@ -10,5 +10,6 @@ public class TopLevelAsbiepRequest {
     private BigInteger topLevelAsbiepId;
     private String version;
     private String status;
+    private Boolean inverseMode;
 
 }

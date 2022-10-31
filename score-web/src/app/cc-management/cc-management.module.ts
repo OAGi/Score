@@ -12,7 +12,6 @@ import {ExtensionDetailModule} from './extension-detail/extension-detail.module'
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
 
 import {TranslateModule} from '@ngx-translate/core';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {CcListModule} from './cc-list/cc-list.module';
 import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
 import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
@@ -33,7 +32,6 @@ import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
     RefactorDialogModule,
     TranslateModule,
     CommonModule,
-    ContextMenuModule,
     ScoreCommonModule,
   ],
   declarations: []

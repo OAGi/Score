@@ -8,7 +8,6 @@ import {ReleaseListComponent} from './release-list/release-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
@@ -47,7 +46,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    ContextMenuModule,
     CommonModule,
     DragDropModule,
     ScoreCommonModule

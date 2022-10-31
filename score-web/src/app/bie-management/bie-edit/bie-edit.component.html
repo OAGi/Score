@@ -21,79 +21,96 @@
                           <mat-placeholder *ngIf="!selectedNode">Search</mat-placeholder>
                           <mat-placeholder *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-placeholder>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                                 [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
-                          <mat-hint matSuffix *ngIf="searcher.searchResult.length > 0"
-                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}}+</mat-hint>
-                          <mat-hint matSuffix *ngIf="searcher.searchResult.length === 0"
-                                    align="end">0/0</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.searchResult.length > 0"
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results</mat-hint>
                         </mat-form-field>
                       </div>
-                      <div class="col-3 buttons">
+                      <div class="col-3 actions-wrap">
                         <button mat-icon-button
-                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(-1)">
                           <mat-icon>keyboard_arrow_up</mat-icon>
                         </button>
                         <button mat-icon-button
-                                [disabled]="!searcher.searchResult || searcher.searchResult.length === 0"
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(1)">
                           <mat-icon>keyboard_arrow_down</mat-icon>
                         </button>
                         <button mat-icon-button
+                                [hidden]="searcher.fullSearched"
+                                [disabled]="searcher.isSearching"
+                                [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                                 (click)="search(searcher.inputKeyword, false, true)">
-                          <mat-icon>search</mat-icon>
+                          <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                         </button>
                         <button mat-icon-button
+                                [disabled]="searcher.isSearching"
                                 [hidden]="!searcher.inputKeyword"
-                                (click)="searcher.resetSearch()">
+                                (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
                           <mat-icon>close</mat-icon>
                         </button>
                         <div style="height: 19px;">
                           <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
                                                 [hidden]="!searcher.isSearching"></mat-progress-spinner>
                         </div>
-                        <div class="ml-auto align-self-center pl-2">
-                          <mat-checkbox class="exclude-scs"
-                                        [(ngModel)]="excludeSCs" (change)="changeExcludeSCs()">
-                            <span>Exclude SCs</span>
-                          </mat-checkbox>
-                        </div>
                       </div>
                     </div>
                   </div>
                   <div class="col-7 actions-wrap">
-                    <div class="actions ml-auto">
-                      <mat-checkbox class="hide-unused"
-                                    [(ngModel)]="treeControl.hideUnused">
-                        <span>Hide unused</span>
-                      </mat-checkbox>
-                      <button mat-raised-button color="primary" (click)="updateDetails()"
-                              *ngIf="state === 'WIP'"
-                              [disabled]="isUpdating || !isChanged || access !== 'CanEdit' || !isValid">
-                        Update
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('QA')"
-                              *ngIf="state === 'WIP'"
-                              [disabled]="isUpdating || isChanged || access !== 'CanEdit' || !isValid">
-                        Move to QA
-                      </button>
-                      <button mat-raised-button color="warn" (click)="updateState('WIP')"
-                              *ngIf="state === 'QA'"
-                              [disabled]="isUpdating || access !== 'CanMove'">
-                        Back to WIP
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('Production')"
-                              *ngIf="state === 'QA'"
-                              [disabled]="isUpdating || access !== 'CanMove'">
-                        Move to Production
-                      </button>
+                    <div class="actions ml-auto d-flex align-items-center">
+                      <div>
+                        <button mat-icon-button [id]="'bie-settings'"
+                                [matMenuTriggerFor]="settingsContextMenu">
+                          <mat-icon>settings</mat-icon>
+                        </button>
+                      </div>
+                      <div class="ml-3">
+                        <button mat-raised-button color="primary" (click)="updateDetails()"
+                                *ngIf="state === 'WIP' && access === 'CanEdit'"
+                                [disabled]="isUpdating || !isChanged || !isValid">
+                          Update
+                        </button>
+                        <button mat-raised-button color="accent" (click)="updateState('QA')"
+                                *ngIf="state === 'WIP' && access === 'CanEdit'"
+                                [disabled]="isUpdating || isChanged || !isValid">
+                          Move to QA
+                        </button>
+                        <button mat-raised-button color="warn" (click)="updateState('WIP')"
+                                *ngIf="state === 'QA' && access === 'CanMove'"
+                                [disabled]="isUpdating">
+                          Back to WIP
+                        </button>
+                        <button mat-raised-button color="accent" (click)="updateState('Production')"
+                                *ngIf="state === 'QA' && access === 'CanMove'"
+                                [disabled]="isUpdating">
+                          Move to Production
+                        </button>
+                      </div>
                     </div>
+                    <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+                      <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
+                        <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideCardinality">
+                          <span>Hide cardinality</span>
+                        </mat-checkbox>
+                      </button>
+                      <button mat-menu-item [id]="'bie-settings-hide-unused'">
+                        <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideUnused">
+                          <span>Hide unused</span>
+                        </mat-checkbox>
+                      </button>
+                    </mat-menu>
                   </div>
                 </div>
                 <div class="row">
                   <div class="tree-breadcrumbs-wrap" id="tree-breadcrumbs-wrap" *ngIf="selectedNode">
                     <div class="tree-breadcrumb"
-                           *ngFor="let bread of selectedNode.parents; let last = last;">
+                         *ngFor="let bread of selectedNode.parents; let last = last;">
                       <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
                       <span *ngIf="last"
                             class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
@@ -107,29 +124,31 @@
           </mat-card>
         </div>
       </div>
-
       <div class="row m-0" (window:resize)="onResize($event)">
         <div class="col-12 p-0">
           <as-split unit="percent" [direction]="'horizontal'" style="overflow-y: scroll;">
             <as-split-area class="left-panel" size="30">
               <mat-card class="bie-node-tree-panel">
                 <mat-card-content class="mat-card-container">
-                  <cdk-virtual-scroll-viewport itemSize="33"
+                  <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
+                                               minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                                [style.height.px]="innerHeight" #virtualScroll>
-                    <div *cdkVirtualFor="let node of dataSource" class="example-item">
+                    <div *cdkVirtualFor="let node of dataSource" class="example-item"
+                         (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
                       <div class="mat-tree-node d-flex pointer"
                            tabIndex="0"
+                           [attr.data-level]="node.level"
                            [attr.data-path]="node.path"
                            [class]="{'tree-node-selected': cursorNode === node}"
                            (click)="onClick(node, $event)"
                            (keydown)="keyNavigation($event)"
                            [style.padding-left]="node.level * paddingPixel + 'px'">
-                        <button *ngIf="treeControl.isExpandable(node); else disabledRef;"
+                        <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                                 (click)="toggle(node, $event)"
                                 class="align-self-center"
                                 mat-icon-button>
                           <mat-icon class="mat-icon-rtl-mirror">
-                            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                            {{ node.expanded ? 'expand_more' : 'chevron_right' }}
                           </mat-icon>
                         </button>
                         <ng-template #disabledRef>
@@ -138,7 +157,7 @@
 
                         <mat-checkbox class="pr-2"
                                       *ngIf="node.level > 0"
-                                      [checked]="node.used"
+                                      [checked]="used(node)"
                                       [disabled]="!isUsable(node)"
                                       (click)="toggleTreeUsed(node, $event)"
                                       [matTooltip]="getNodeTooltip(node)"
@@ -151,118 +170,92 @@
                           this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd']"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
+
+                        <span [class]="['pl-2']" *ngIf="!dataSource.hideCardinality">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+
                         <mat-icon matTooltip="Reused"
-                                  fontSet="fontawesome"
-                                  fontIcon="fa-recycle"
-                                  class="pointer" *ngIf="node.derived"
+                                  fontSet="fontawesome" fontIcon="fa-recycle"
+                                  [class]="['pl-3', 'pointer']" *ngIf="node.derived"
                                   (click)="openNewEditBieTab(node)"></mat-icon>
-                        <mat-icon class="align-self-center ml-auto"
-                                  *ngIf="treeControl.isExpandable(node)"
-                                  (click)="onContextMenu($event, node)">more_vert
-                        </mat-icon>
+                        <div class="ml-auto align-self-center mr-2" style="margin-bottom: 3px">
+                          <mat-icon [hidden]="!node.showCopyLinkIcon"
+                                    class="copy-link-icon"
+                                    matTooltip="Copy Link"
+                                    (click)="copyLink(node, $event)">
+                            link
+                          </mat-icon>
+                          <mat-icon [style.visibility]="dataSource.isExpandable(node) ? '' : 'hidden'"
+                                    class="context-menu-icon"
+                                    [matMenuTriggerFor]="contextMenu"
+                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                          </mat-icon>
+                        </div>
                       </div>
                     </div>
                   </cdk-virtual-scroll-viewport>
 
                   <!-- Context Menu Area -->
-                  <context-menu #defaultContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
+                  <mat-menu class="context-menu" #contextMenu="matMenu">
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
                       <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
+                    </button>
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" [visible]="canCreateBIEFromThis">
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="createBIEfromThis($event.item)" [visible]="canCreateBIEFromThis">
-                      <span class="context-menu-item">Make BIE reusable</span>
-                    </ng-template>
-                  </context-menu>
-
-                  <context-menu #developerContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
-                      <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
-                      <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" [visible]="canSeeReuseContextMenus">
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="reuseBIE($event.item)" [visible]="canReuseBIE">
+                    </button>
+                    <mat-divider *ngIf="canReuseBIE(contextMenuItem) || canCreateBIEFromThis(contextMenuItem)"></mat-divider>
+                    <button mat-menu-item (click)="reuseBIE(contextMenuItem)"
+                            *ngIf="canEdit && canReuseBIE(contextMenuItem)">
                       <span class="context-menu-item">Reuse BIE</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="createBIEfromThis($event.item)" [visible]="canCreateBIEFromThis">
+                    </button>
+                    <button mat-menu-item (click)="createBIEfromThis(contextMenuItem)"
+                            *ngIf="canCreateBIEFromThis(contextMenuItem)">
                       <span class="context-menu-item">Make BIE reusable</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="removeReusedBIE($event.item)" [visible]="canRemoveReusedBIE">
+                    </button>
+                    <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
                       <span class="context-menu-item">Remove Reused BIE</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" [visible]="isExtension">
-                    </ng-template>
-                    <ng-template contextMenuItem let-item [visible]="isExtension">
-                      <span class="context-menu-item" [attr.disabled]="true"
-                            [matTooltip]="'Developer cannot create ABIE Extension'">Create ABIE Extension Locally</span>
-                    </ng-template>
-                    <ng-template contextMenuItem let-item [visible]="isExtension">
-                      <span class="context-menu-item" [attr.disabled]="true"
-                            [matTooltip]="'Developer cannot create ABIE Extension'">Create ABIE Extension Globally</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" *ngIf="canEdit" [visible]="isUsableChildren || isCardinalityEditable"></ng-template>
-                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isUsableChildren" (execute)="enableChildren($event.item)">
-                      <span class="context-menu-item">Enable Children</span>
-                    </ng-template>
-                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isCardinalityEditable" (execute)="setMaxCardinality($event.item)">
-                      <span class="context-menu-item">Set Children Max Cardinality to 1</span>
-                    </ng-template>
-                  </context-menu>
-
-                  <context-menu #endUserContextMenu>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 2)">
-                      <span class="context-menu-item">Expand 2</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item, 3)">
-                      <span class="context-menu-item">Expand 3</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
-                      <span class="context-menu-item">Expand All</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" [visible]="canSeeReuseContextMenus">
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="reuseBIE($event.item)" [visible]="canReuseBIE">
-                      <span class="context-menu-item">Reuse BIE</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="createBIEfromThis($event.item)" [visible]="canCreateBIEFromThis">
-                      <span class="context-menu-item">Make BIE reusable</span>
-                    </ng-template>
-                    <ng-template contextMenuItem (execute)="removeReusedBIE($event.item)" [visible]="canRemoveReusedBIE">
-                      <span class="context-menu-item">Remove Reused BIE</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" [visible]="isExtension">
-                    </ng-template>
-                    <ng-template contextMenuItem let-item (execute)="createLocalAbieExtension($event.item)" [visible]="isExtension">
+                    </button>
+                    <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
+                    <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
+                            *ngIf="canEdit && isExtension(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem)"
+                            [matTooltip]="'Developer cannot create ABIE Extension'"
+                            [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Locally</span>
-                    </ng-template>
-                    <ng-template contextMenuItem let-item (execute)="createGlobalAbieExtension($event.item)" [visible]="isExtension">
+                    </button>
+                    <button mat-menu-item (click)="createGlobalAbieExtension(contextMenuItem)"
+                            *ngIf="canEdit && isExtension(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem)"
+                            [matTooltip]="'Developer cannot create ABIE Extension'"
+                            [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
-                    </ng-template>
-                    <ng-template contextMenuItem divider="true" *ngIf="canEdit" [visible]="isUsableChildren || isCardinalityEditable"></ng-template>
-                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isUsableChildren" (execute)="enableChildren($event.item)">
+                    </button>
+                    <mat-divider *ngIf="canEdit && (isUsableChildren(contextMenuItem) || isCardinalityEditable(contextMenuItem))"></mat-divider>
+                    <button mat-menu-item (click)="enableChildren(contextMenuItem)"
+                            *ngIf="canEdit"
+                            [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Enable Children</span>
-                    </ng-template>
-                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isCardinalityEditable" (execute)="setMaxCardinality($event.item)">
+                    </button>
+                    <button mat-menu-item (click)="setMaxCardinality(contextMenuItem)"
+                            *ngIf="canEdit"
+                            [disabled]="!isCardinalityEditable(contextMenuItem)">
                       <span class="context-menu-item">Set Children Max Cardinality to 1</span>
-                    </ng-template>
-                  </context-menu>
+                    </button>
+                    <mat-divider *ngIf="canEdit"></mat-divider>
+                    <button mat-menu-item (click)="checkNillableOnChildBCCs(contextMenuItem)"
+                            *ngIf="canEdit">
+                      <span class="context-menu-item">Check nillable on Child BCCs</span>
+                    </button>
+                    <button mat-menu-item (click)="uncheckNillableOnChildBCCs(contextMenuItem)"
+                            *ngIf="canEdit">
+                      <span class="context-menu-item">Uncheck nillable on Child BCCs</span>
+                    </button>
+                  </mat-menu>
                 </mat-card-content>
               </mat-card>
             </as-split-area>
-
             <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
               <!-- ABIE -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded ">
@@ -329,7 +322,18 @@
                           </mat-form-field>
                         </div>
                       </div>
-
+                      <!--
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="rootNode.inverseMode">
+                              Inverse Mode
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+                      -->
                       <div class="row">
                         <div class="col-md-6 col-sm-12">
                           <mat-form-field>
@@ -410,7 +414,7 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [disabled]="!isUsable(selectedNode)"
-                                          [checked]="selectedNode.used"
+                                          [checked]="used(selectedNode)"
                                           (click)="toggleDetailUsed(selectedNode, $event)"
                                           matTooltip="This component is required."
                                           [matTooltipDisabled]="!selectedNode.required">
@@ -445,7 +449,7 @@
                           <mat-form-field>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
-                            <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
                               Cardinality Min is <strong>required</strong>
                             </mat-error>
                             <mat-error
@@ -472,7 +476,7 @@
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
 
-                            <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMax.hasError('required') || bieCardinalityMax.hasError('whitespace')">
                               Cardinality Max is <strong>required</strong>
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
@@ -640,7 +644,7 @@
                         <div class="col-6">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
-                                          [checked]="selectedNode.used"
+                                          [checked]="used(selectedNode)"
                                           (click)="toggleDetailUsed(selectedNode, $event)"
                                           [disabled]="!isUsable(selectedNode)"
                                           matTooltip="This component is required."
@@ -675,7 +679,7 @@
                           <mat-form-field>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
-                            <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
                               Cardinality Min is <strong>required</strong>
                             </mat-error>
                             <mat-error
@@ -701,7 +705,7 @@
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
 
-                            <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMax.hasError('required') || bieCardinalityMax.hasError('whitespace')">
                               Cardinality Max is <strong>required</strong>
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
@@ -775,7 +779,7 @@
                                 <input matInput placeholder="Default Value"
                                        [(ngModel)]="asBbiepDetail().bbie.defaultValue"
                                        [disabled]="!isEditable(selectedNode) ||
-                                                   (isVersionIdNode(selectedNode) && rootNode.version) ||
+                                                   !!(isVersionIdNode(selectedNode) && rootNode.version) ||
                                                    isReflectValue()">
                               </mat-form-field>
                             </mat-card-content>
@@ -816,7 +820,7 @@
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Code'">
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbiepDetail().bbie.codeListId"
+                                            [(ngModel)]="asBbiepDetail().bbie.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
                                   <mat-option>
@@ -841,7 +845,7 @@
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Agency'">
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbiepDetail().bbie.agencyIdListId"
+                                            [(ngModel)]="asBbiepDetail().bbie.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
                                   <mat-option>
@@ -867,6 +871,53 @@
                           </mat-card>
                         </div>
                       </div>
+
+                      <mat-card *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
+                        <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
+                        <mat-card-content>
+                          <div class="row">
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Minimum Length"
+                                       [formControl]="bieMinimumLength">
+                                <mat-error
+                                  *ngIf="!bieMinimumLength.hasError('min') && bieMinimumLength.hasError('pattern')">
+                                  '{{ bieMinimumLength.value }}' is not allowed for Minimum Length
+                                </mat-error>
+                                <mat-error *ngIf="bieMinimumLength.hasError('min')">
+                                  {{ bieMinimumLength.getError('min') }}
+                                </mat-error>
+                                <mat-error *ngIf="bieMinimumLength.hasError('max')">
+                                  {{ bieMinimumLength.getError('max') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Maximum Length"
+                                       [formControl]="bieMaximumLength">
+                                <mat-error
+                                  *ngIf="!bieMaximumLength.hasError('min') && bieMaximumLength.hasError('pattern')">
+                                  '{{ bieMaximumLength.value }}' is not allowed for Maximum Length
+                                </mat-error>
+                                <mat-error *ngIf="bieMaximumLength.hasError('min')">
+                                  {{ bieMaximumLength.getError('min') }}
+                                </mat-error>
+                                <mat-error *ngIf="bieMaximumLength.hasError('max')">
+                                  {{ bieMaximumLength.getError('max') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Pattern" maxlength="255"
+                                       [(ngModel)]="asBbiepDetail().bbie.pattern"
+                                       [disabled]="!isEditable(selectedNode)">
+                              </mat-form-field>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
 
                       <div class="row">
                         <div class="col-12">
@@ -915,7 +966,7 @@
                         <div class="col-11">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
-                                          [checked]="selectedNode.used"
+                                          [checked]="used(selectedNode)"
                                           (click)="toggleDetailUsed(selectedNode, $event)"
                                           [disabled]="!isUsable(selectedNode)"
                                           matTooltip="This component is required."
@@ -939,7 +990,7 @@
                           <mat-form-field>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
-                            <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
                               Cardinality Min is <strong>required</strong>
                             </mat-error>
                             <mat-error
@@ -966,7 +1017,7 @@
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
 
-                            <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                            <mat-error *ngIf="bieCardinalityMax.hasError('required') || bieCardinalityMax.hasError('whitespace')">
                               Cardinality Max is <strong>required</strong>
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
@@ -1083,7 +1134,7 @@
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.valueDomainType === 'Code'">
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbieScDetail().bbieSc.codeListId"
+                                            [(ngModel)]="asBbieScDetail().bbieSc.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
                                   <mat-option>
@@ -1108,7 +1159,7 @@
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.valueDomainType === 'Agency'">
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbieScDetail().bbieSc.agencyIdListId"
+                                            [(ngModel)]="asBbieScDetail().bbieSc.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode)">
                                   <mat-option>
@@ -1134,6 +1185,53 @@
                           </mat-card>
                         </div>
                       </div>
+
+                      <mat-card *ngIf="isStringTypePrimitive(asBbieScDetail().bdtSc.cdtPrimitives)">
+                        <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
+                        <mat-card-content>
+                          <div class="row">
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Minimum Length"
+                                       [formControl]="bieMinimumLength">
+                                <mat-error
+                                  *ngIf="!bieMinimumLength.hasError('min') && bieMinimumLength.hasError('pattern')">
+                                  '{{ bieMinimumLength.value }}' is not allowed for Minimum Length
+                                </mat-error>
+                                <mat-error *ngIf="bieMinimumLength.hasError('min')">
+                                  {{ bieMinimumLength.getError('min') }}
+                                </mat-error>
+                                <mat-error *ngIf="bieMinimumLength.hasError('max')">
+                                  {{ bieMinimumLength.getError('max') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Maximum Length"
+                                       [formControl]="bieMaximumLength">
+                                <mat-error
+                                  *ngIf="!bieMaximumLength.hasError('min') && bieMaximumLength.hasError('pattern')">
+                                  '{{ bieMaximumLength.value }}' is not allowed for Maximum Length
+                                </mat-error>
+                                <mat-error *ngIf="bieMaximumLength.hasError('min')">
+                                  {{ bieMaximumLength.getError('min') }}
+                                </mat-error>
+                                <mat-error *ngIf="bieMaximumLength.hasError('max')">
+                                  {{ bieMaximumLength.getError('max') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Pattern" maxlength="255"
+                                       [(ngModel)]="asBbieScDetail().bbieSc.pattern"
+                                       [disabled]="!isEditable(selectedNode)">
+                              </mat-form-field>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
 
                       <div class="row">
                         <div class="col-12">

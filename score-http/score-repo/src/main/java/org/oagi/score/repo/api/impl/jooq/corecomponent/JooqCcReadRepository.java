@@ -1,6 +1,7 @@
 package org.oagi.score.repo.api.impl.jooq.corecomponent;
 
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.CcReadRepository;
@@ -906,10 +907,10 @@ public class JooqCcReadRepository
 
     private SelectJoinStep selectBdtPriRestri() {
         return dslContext().select(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
-                BDT_PRI_RESTRI.BDT_ID,
+                BDT_PRI_RESTRI.BDT_MANIFEST_ID,
                 BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_PRI_RESTRI.CODE_LIST_ID,
-                BDT_PRI_RESTRI.AGENCY_ID_LIST_ID,
+                BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
                 BDT_PRI_RESTRI.IS_DEFAULT,
                 XBT.NAME, XBT.XBT_ID)
                 .from(BDT_PRI_RESTRI)
@@ -922,17 +923,17 @@ public class JooqCcReadRepository
         return record -> {
             BdtPriRestri bdtPriRestri = new BdtPriRestri();
             bdtPriRestri.setBdtPriRestriId(record.get(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID).toBigInteger());
-            bdtPriRestri.setBdtId(record.get(BDT_PRI_RESTRI.BDT_ID).toBigInteger());
+            bdtPriRestri.setBdtManifestId(record.get(BDT_PRI_RESTRI.BDT_MANIFEST_ID).toBigInteger());
             if (record.get(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID) != null) {
                 bdtPriRestri.setCdtAwdPriXpsTypeMapId(record.get(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID).toBigInteger());
                 bdtPriRestri.setXbtId(record.get(XBT.XBT_ID).toBigInteger());
                 bdtPriRestri.setXbtName(record.get(XBT.NAME));
             }
-            if (record.get(BDT_PRI_RESTRI.CODE_LIST_ID) != null) {
-                bdtPriRestri.setCodeListId(record.get(BDT_PRI_RESTRI.CODE_LIST_ID).toBigInteger());
+            if (record.get(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID) != null) {
+                bdtPriRestri.setCodeListManifestId(record.get(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID).toBigInteger());
             }
-            if (record.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_ID) != null) {
-                bdtPriRestri.setAgencyIdListId(record.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_ID).toBigInteger());
+            if (record.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID) != null) {
+                bdtPriRestri.setAgencyIdListManifestId(record.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger());
             }
             bdtPriRestri.setDefault(record.get(BDT_PRI_RESTRI.IS_DEFAULT) == (byte) 1);
             return bdtPriRestri;
@@ -941,10 +942,10 @@ public class JooqCcReadRepository
 
     private SelectJoinStep selectBdtScPriRestri() {
         return dslContext().select(BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
-                BDT_SC_PRI_RESTRI.BDT_SC_ID,
+                BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
                 BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_SC_PRI_RESTRI.CODE_LIST_ID,
-                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID,
+                BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
                 BDT_SC_PRI_RESTRI.IS_DEFAULT,
                 XBT.XBT_ID, XBT.NAME)
                 .from(BDT_SC_PRI_RESTRI)
@@ -957,17 +958,17 @@ public class JooqCcReadRepository
         return record -> {
             BdtScPriRestri bdtScPriRestri = new BdtScPriRestri();
             bdtScPriRestri.setBdtScPriRestriId(record.get(BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID).toBigInteger());
-            bdtScPriRestri.setBdtScId(record.get(BDT_SC_PRI_RESTRI.BDT_SC_ID).toBigInteger());
+            bdtScPriRestri.setBdtScManifestId(record.get(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID).toBigInteger());
             if (record.get(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID) != null) {
                 bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(record.get(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID).toBigInteger());
                 bdtScPriRestri.setXbtId(record.get(XBT.XBT_ID).toBigInteger());
                 bdtScPriRestri.setXbtName(record.get(XBT.NAME));
             }
-            if (record.get(BDT_SC_PRI_RESTRI.CODE_LIST_ID) != null) {
-                bdtScPriRestri.setCodeListId(record.get(BDT_SC_PRI_RESTRI.CODE_LIST_ID).toBigInteger());
+            if (record.get(BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID) != null) {
+                bdtScPriRestri.setCodeListManifestId(record.get(BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID).toBigInteger());
             }
-            if (record.get(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID) != null) {
-                bdtScPriRestri.setAgencyIdListId(record.get(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID).toBigInteger());
+            if (record.get(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID) != null) {
+                bdtScPriRestri.setAgencyIdListManifestId(record.get(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger());
             }
             bdtScPriRestri.setDefault(record.get(BDT_SC_PRI_RESTRI.IS_DEFAULT) == (byte) 1);
             return bdtScPriRestri;

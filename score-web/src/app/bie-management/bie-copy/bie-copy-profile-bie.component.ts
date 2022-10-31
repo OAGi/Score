@@ -13,7 +13,7 @@ import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {PageRequest, PageResponse} from '../../basis/basis';
+import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Decode, initFilter, loadBranch, saveBranch} from '../../common/utility';
@@ -36,7 +36,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxList: BusinessContext[] = [];
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();

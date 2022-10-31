@@ -41,9 +41,9 @@ public class CodeListReadRepository {
                 BCCP_MANIFEST.RELEASE_ID)
                 .from(BCCP_MANIFEST)
                 .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
-                .join(BDT_PRI_RESTRI).on(DT_MANIFEST.DT_ID.eq(BDT_PRI_RESTRI.BDT_ID))
+                .join(BDT_PRI_RESTRI).on(DT_MANIFEST.DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
                 .join(CODE_LIST_MANIFEST).on(and(
-                        BDT_PRI_RESTRI.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID),
+                        BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID),
                         BCCP_MANIFEST.RELEASE_ID.eq(CODE_LIST_MANIFEST.RELEASE_ID)
                 ))
                 .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),
@@ -158,9 +158,9 @@ public class CodeListReadRepository {
                 CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
                 DT_SC_MANIFEST.RELEASE_ID)
                 .from(DT_SC_MANIFEST)
-                .join(BDT_SC_PRI_RESTRI).on(DT_SC_MANIFEST.DT_SC_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_ID))
+                .join(BDT_SC_PRI_RESTRI).on(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
                 .join(CODE_LIST_MANIFEST).on(and(
-                        BDT_SC_PRI_RESTRI.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID),
+                        BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID),
                         DT_SC_MANIFEST.RELEASE_ID.eq(CODE_LIST_MANIFEST.RELEASE_ID)
                 ))
                 .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),

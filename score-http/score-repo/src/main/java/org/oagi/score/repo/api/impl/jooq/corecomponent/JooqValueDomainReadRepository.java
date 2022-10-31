@@ -3,12 +3,14 @@ package org.oagi.score.repo.api.impl.jooq.corecomponent;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.agency.model.AgencyIdList;
+import org.oagi.score.repo.api.agency.model.AgencyIdListManifest;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
 import org.oagi.score.repo.api.corecomponent.model.BdtPriRestri;
 import org.oagi.score.repo.api.corecomponent.model.BdtScPriRestri;
 import org.oagi.score.repo.api.corecomponent.model.CodeList;
+import org.oagi.score.repo.api.corecomponent.model.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 
 import java.math.BigInteger;
@@ -30,25 +32,43 @@ public class JooqValueDomainReadRepository
     }
 
     @Override
+    public List<CodeListManifest> getCodeListManifestList(
+            BigInteger releaseId) throws ScoreDataAccessException {
+        return dslContext().select(
+                        CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.RELEASE_ID,
+                        CODE_LIST_MANIFEST.CODE_LIST_ID,
+                        CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.CONFLICT,
+                        CODE_LIST_MANIFEST.LOG_ID,
+                        CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID)
+                .from(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchInto(CodeListManifest.class);
+    }
+
+    @Override
     public List<CodeList> getCodeListList(BigInteger releaseId) throws ScoreDataAccessException {
         return dslContext()
-                .select(CODE_LIST.CODE_LIST_ID,
+                .select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                        CODE_LIST.CODE_LIST_ID,
                         CODE_LIST.GUID,
                         CODE_LIST.NAME,
                         CODE_LIST.LIST_ID,
                         CODE_LIST.VERSION_ID,
                         CODE_LIST_MANIFEST.as("based_clm").CODE_LIST_ID.as("based_code_list_id"),
-                        CODE_LIST.AGENCY_ID_LIST_VALUE_ID,
+                        CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
                         AGENCY_ID_LIST_VALUE.NAME.as("agencyName"),
                         CODE_LIST.PREV_CODE_LIST_ID,
                         CODE_LIST.NEXT_CODE_LIST_ID)
                 .from(CODE_LIST)
                 .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(and(
+                        CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID)))
+                .join(AGENCY_ID_LIST_VALUE).on(and(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID)))
                 .leftOuterJoin(CODE_LIST_MANIFEST.as("based_clm")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based_clm").CODE_LIST_MANIFEST_ID))
-                .join(AGENCY_ID_LIST_VALUE).on(CODE_LIST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
-                .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(
-                        and(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)),
-                        AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(CODE_LIST_MANIFEST.RELEASE_ID))
                 .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .fetchInto(CodeList.class);
     }
@@ -56,14 +76,14 @@ public class JooqValueDomainReadRepository
     @Override
     public Map<BigInteger, BdtPriRestri> getBdtPriRestriMap(BigInteger releaseId) throws ScoreDataAccessException {
         List<BdtPriRestri> bdtPriRestriRecords = dslContext().select(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
-                BDT_PRI_RESTRI.BDT_ID,
-                BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_PRI_RESTRI.CODE_LIST_ID,
-                BDT_PRI_RESTRI.AGENCY_ID_LIST_ID,
-                BDT_PRI_RESTRI.IS_DEFAULT,
-                XBT.NAME.as("XBT_NAME"), XBT.XBT_ID)
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                        BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.IS_DEFAULT,
+                        XBT.NAME.as("XBT_NAME"), XBT.XBT_ID)
                 .from(BDT_PRI_RESTRI)
-                .join(DT_MANIFEST).on(and(BDT_PRI_RESTRI.BDT_ID.eq(DT_MANIFEST.DT_ID), DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .join(DT_MANIFEST).on(and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID), DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP)
                 .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
                 .leftJoin(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
@@ -76,14 +96,14 @@ public class JooqValueDomainReadRepository
     @Override
     public Map<BigInteger, BdtScPriRestri> getBdtScPriRestriMap(BigInteger releaseId) throws ScoreDataAccessException {
         List<BdtScPriRestri> bdtScPriRestriRecords = dslContext().select(BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
-                BDT_SC_PRI_RESTRI.BDT_SC_ID,
-                BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_SC_PRI_RESTRI.CODE_LIST_ID,
-                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID,
-                BDT_SC_PRI_RESTRI.IS_DEFAULT,
-                XBT.XBT_ID, XBT.NAME.as("XBT_NAME"))
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT,
+                        XBT.XBT_ID, XBT.NAME.as("XBT_NAME"))
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC_MANIFEST).on(and(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID), DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .join(DT_SC_MANIFEST).on(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID), DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .leftJoin(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
                 .on(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID))
                 .leftJoin(XBT).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
@@ -94,43 +114,60 @@ public class JooqValueDomainReadRepository
     }
 
     @Override
-    public Map<BigInteger, List<BdtPriRestri>> getBdtPriRestriBdtIdMap(BigInteger releaseId) throws ScoreDataAccessException {
+    public Map<BigInteger, List<BdtPriRestri>> getBdtPriRestriByBdtManifestIdMap(BigInteger releaseId) throws ScoreDataAccessException {
         List<BdtPriRestri> bdtPriRestriRecords = dslContext().select(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
-                BDT_PRI_RESTRI.BDT_ID,
-                BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_PRI_RESTRI.CODE_LIST_ID,
-                BDT_PRI_RESTRI.AGENCY_ID_LIST_ID,
-                BDT_PRI_RESTRI.IS_DEFAULT,
-                XBT.NAME.as("XBT_NAME"), XBT.XBT_ID)
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                        BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.IS_DEFAULT,
+                        XBT.NAME.as("XBT_NAME"), XBT.XBT_ID)
                 .from(BDT_PRI_RESTRI)
-                .join(DT_MANIFEST).on(and(BDT_PRI_RESTRI.BDT_ID.eq(DT_MANIFEST.DT_ID), DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .join(DT_MANIFEST).on(and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID), DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP)
                 .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
                 .leftJoin(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .fetchInto(BdtPriRestri.class);
 
         return bdtPriRestriRecords.stream()
-                .collect(groupingBy(BdtPriRestri::getBdtId));
+                .collect(groupingBy(BdtPriRestri::getBdtManifestId));
     }
 
     @Override
-    public Map<BigInteger, List<BdtScPriRestri>> getBdtScPriRestriBdtScIdMap(BigInteger releaseId) throws ScoreDataAccessException {
+    public Map<BigInteger, List<BdtScPriRestri>> getBdtScPriRestriByBdtScManifestIdMap(BigInteger releaseId) throws ScoreDataAccessException {
         List<BdtScPriRestri> bdtScPriRestriRecords = dslContext().select(BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
-                BDT_SC_PRI_RESTRI.BDT_SC_ID,
-                BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
-                BDT_SC_PRI_RESTRI.CODE_LIST_ID,
-                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID,
-                BDT_SC_PRI_RESTRI.IS_DEFAULT,
-                XBT.XBT_ID, XBT.NAME.as("XBT_NAME"))
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT,
+                        XBT.XBT_ID, XBT.NAME.as("XBT_NAME"))
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC_MANIFEST).on(and(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID), DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .join(DT_SC_MANIFEST).on(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID), DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .leftJoin(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
                 .on(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID))
                 .leftJoin(XBT).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .fetchInto(BdtScPriRestri.class);
 
         return bdtScPriRestriRecords.stream()
-                .collect(groupingBy(BdtScPriRestri::getBdtScId));
+                .collect(groupingBy(BdtScPriRestri::getBdtScManifestId));
+    }
+
+    @Override
+    public List<AgencyIdListManifest> getAgencyIdListManifestList(
+            BigInteger releaseId) throws ScoreDataAccessException {
+        return dslContext().select(
+                        AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID,
+                        AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID,
+                        AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.LOG_ID,
+                        AGENCY_ID_LIST_MANIFEST.CONFLICT,
+                        AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchInto(AgencyIdListManifest.class);
     }
 
     @Override
@@ -147,9 +184,9 @@ public class JooqValueDomainReadRepository
                         AGENCY_ID_LIST.NEXT_AGENCY_ID_LIST_ID)
                 .from(AGENCY_ID_LIST)
                 .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
-                .leftOuterJoin(AGENCY_ID_LIST_MANIFEST.as("based_ail")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_ail").AGENCY_ID_LIST_MANIFEST_ID))
                 .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
                 .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .leftOuterJoin(AGENCY_ID_LIST_MANIFEST.as("based_ail")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_ail").AGENCY_ID_LIST_MANIFEST_ID))
                 .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .fetchInto(AgencyIdList.class);
     }

@@ -41,8 +41,8 @@ public class PendingListService {
     private SessionService sessionService;
 
     public PageResponse<AppOauth2User> getPendingList(AuthenticatedPrincipal user, PendingListRequest request) {
-        AppUser requester = sessionService.getAppUser(user);
-        if (!requester.isDeveloper()) {
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        if (!requester.isAdmin()) {
             throw new InsufficientAuthenticationException(
                     messages.getMessage(
                             "ExceptionTranslationFilter.insufficientAuthentication",

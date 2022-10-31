@@ -6,6 +6,8 @@ import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 class Helper {
 
@@ -25,7 +27,7 @@ class Helper {
             return false;
         }
 
-        ABIE abie = generationContext.queryTargetABIE2(asbiep);
+        ABIE abie = generationContext.queryTargetABIE(asbiep);
         ACC acc = generationContext.queryBasedACC(abie);
         return OagisComponentType.Embedded.getValue() == acc.getOagisComponentType();
     }
@@ -33,23 +35,23 @@ class Helper {
     static CodeList getCodeList(GenerationContext generationContext, BBIE bbie, DT bdt) {
         CodeList codeList = null;
 
-        if (bbie.getCodeListId() != null) {
-            codeList = generationContext.findCodeList(bbie.getCodeListId());
+        if (bbie.getCodeListManifestId() != null) {
+            codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
         }
 
         if (codeList == null) {
             BdtPriRestri bdtPriRestri =
                     generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
-            if (bdtPriRestri != null && bdtPriRestri.getCodeListId() != null) {
-                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListId());
+            if (bdtPriRestri != null && bdtPriRestri.getCodeListManifestId() != null) {
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListManifestId());
             }
         }
 
         if (codeList == null) {
             BdtPriRestri bdtPriRestri =
-                    generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
-            if (bdtPriRestri != null && bdtPriRestri.getCodeListId() != null) {
-                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListId());
+                    generationContext.findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
+            if (bdtPriRestri != null && bdtPriRestri.getCodeListManifestId() != null) {
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListManifestId());
             }
         }
         return codeList;
@@ -63,11 +65,15 @@ class Helper {
         return xbt;
     }
 
-    static String getCodeListTypeName(CodeList codeList) {
+    static String getCodeListTypeName(CodeList codeList, AgencyIdListValue agencyIdListValue) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(CODE_LIST_NAME_PREFIX);
-        sb.append(codeList.getAgencyId()).append('_');
+        if (agencyIdListValue != null) {
+            sb.append(agencyIdListValue.getValue()).append('_');
+        } else {
+            sb.append('_');
+        }
         sb.append(codeList.getVersionId()).append('_');
         String name = codeList.getName();
         if (StringUtils.hasLength(name)) {
@@ -94,5 +100,39 @@ class Helper {
         sb.append(agencyIdList.getListId());
 
         return sb.toString();
+    }
+
+    public static String convertIdentifierToId(String str) {
+        if (!StringUtils.hasLength(str)) {
+            return str;
+        }
+        return str.replaceAll("Identifier", "Id")
+                .replaceAll("identifier", "id");
+    }
+
+    public static String camelCase(String... terms) {
+        String term = Arrays.stream(terms).collect(Collectors.joining());
+        if (terms.length == 1) {
+            term = _camelCase(terms[0]);
+        } else if (term.contains(" ")) {
+            term = Arrays.stream(terms).map(e -> _camelCase(e)).collect(Collectors.joining());
+        }
+
+        if (!StringUtils.hasLength(term)) {
+            throw new IllegalArgumentException();
+        }
+
+        return Character.toLowerCase(term.charAt(0)) + term.substring(1);
+    }
+
+    private static String _camelCase(String term) {
+        return Arrays.stream(term.split(" ")).filter(e -> StringUtils.hasLength(e))
+                .map(e -> {
+                    if (e.length() > 1) {
+                        return Character.toUpperCase(e.charAt(0)) + e.substring(1).toLowerCase();
+                    } else {
+                        return e.toUpperCase();
+                    }
+                }).collect(Collectors.joining());
     }
 }

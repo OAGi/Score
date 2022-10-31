@@ -131,12 +131,6 @@ public class CodeListUpliftingService {
             }
 
             newCodeList = copyCodeList(codeList, requester, timestamp);
-            newCodeList.setAgencyIdListValueId(
-                    dslContext.select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)
-                            .from(AGENCY_ID_LIST_VALUE_MANIFEST)
-                            .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(newCodeListManifest.getAgencyIdListValueManifestId()))
-                            .fetchOneInto(ULong.class)
-            );
             newCodeList.setBasedCodeListId(targetBasedCodeListManifest.getCodeListId());
             newCodeList.setCodeListId(
                     dslContext.insertInto(CODE_LIST)
@@ -217,12 +211,6 @@ public class CodeListUpliftingService {
 
         } else {
             newCodeList = copyCodeList(codeList, requester, timestamp);
-            newCodeList.setAgencyIdListValueId(
-                    dslContext.select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)
-                            .from(AGENCY_ID_LIST_VALUE_MANIFEST)
-                            .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(newCodeListManifest.getAgencyIdListValueManifestId()))
-                            .fetchOneInto(ULong.class)
-            );
             newCodeList.setCodeListId(
                     dslContext.insertInto(CODE_LIST)
                             .set(newCodeList)
@@ -301,7 +289,6 @@ public class CodeListUpliftingService {
         newCodeList.setBasedCodeListId(codeList.getBasedCodeListId());
         newCodeList.setName(codeList.getName());
         newCodeList.setListId(codeList.getListId());
-        newCodeList.setAgencyIdListValueId(codeList.getAgencyIdListValueId());
         newCodeList.setVersionId(codeList.getVersionId());
         newCodeList.setRemark(codeList.getRemark());
         newCodeList.setDefinition(codeList.getDefinition());

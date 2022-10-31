@@ -5,7 +5,7 @@
       <span class="flex-11-auto"></span>
       <button mat-icon-button class="ml-2" matTooltip="Create Component"
               *ngIf="hasCreatePermission()"
-              (click)="onCreateContextMenu($event)">
+              [matMenuTriggerFor]="contextMenu">
         <mat-icon>add</mat-icon>
       </button>
 
@@ -64,28 +64,29 @@
     </mat-toolbar>
   </div>
 
-  <context-menu #createContextMenu>
-    <ng-template contextMenuItem (execute)="createAcc()">
+  <mat-menu class="context-menu" #contextMenu="matMenu">
+    <button mat-menu-item (click)="createAcc()">
       <span class="context-menu-item">ACC</span>
-    </ng-template>
-    <ng-template contextMenuItem (execute)="createAsccp('Default')">
+    </button>
+    <button mat-menu-item (click)="createAsccp('Default')">
       <span class="context-menu-item">ASCCP</span>
-    </ng-template>
-    <ng-template contextMenuItem (execute)="createBccp()">
+    </button>
+    <button mat-menu-item (click)="createBccp()">
       <span class="context-menu-item">BCCP</span>
-    </ng-template>
-    <ng-template contextMenuItem (execute)="createBdt()">
+    </button>
+    <button mat-menu-item (click)="createBdt()">
       <span class="context-menu-item">DT</span>
-    </ng-template>
-    <ng-template contextMenuItem [divider]="true" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
-    </ng-template>
-    <ng-template contextMenuItem (execute)="createBOD()" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
+    </button>
+    <mat-divider *ngIf="request.release.releaseNum === workingRelease.releaseNum"></mat-divider>
+    <button mat-menu-item (click)="createBOD()"
+            *ngIf="request.release.releaseNum === workingRelease.releaseNum">
       <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi BOD Component</span>
-    </ng-template>
-    <ng-template contextMenuItem (execute)="createAsccp('Verb')" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
+    </button>
+    <button mat-menu-item (click)="createAsccp('Verb')"
+            *ngIf="request.release.releaseNum === workingRelease.releaseNum">
       <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Verb Component</span>
-    </ng-template>
-  </context-menu>
+    </button>
+  </mat-menu>
 
   <mat-card class="pt-3">
     <mat-card class="search-box">
@@ -304,8 +305,6 @@
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()"
                             [disabled]="row.type === 'ASCC' || row.type === 'BCC'"
-                            matTooltip="This component cannot be modified."
-                            [matTooltipDisabled]="row.state === 'WIP'"
                             (change)="$event ? toggle(row) : null"
                             [checked]="isSelected(row)">
               </mat-checkbox>

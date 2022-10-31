@@ -10,13 +10,16 @@ import static org.oagi.score.common.ScoreConstants.OAGIS_VERSION;
 
 public class BDTSC implements Component {
 
+    private DtScManifestRecord dtScManifest;
+
     private DtScRecord dtSc;
 
     private ImportedDataProvider importedDataProvider;
 
-    public BDTSC(DtScRecord dtSc,
+    public BDTSC(DtScManifestRecord dtScManifest, DtScRecord dtSc,
                  ImportedDataProvider importedDataProvider) {
         this.importedDataProvider = importedDataProvider;
+        this.dtScManifest = dtScManifest;
         this.dtSc = dtSc;
     }
 
@@ -49,6 +52,10 @@ public class BDTSC implements Component {
 
     public String getGuid() {
         return GUID_PREFIX + dtSc.getGuid();
+    }
+
+    public DtScManifestRecord getBdtScManifest() {
+        return dtScManifest;
     }
 
     public DtScRecord getBdtSc() {
@@ -100,11 +107,11 @@ public class BDTSC implements Component {
         }
 
         List<BdtScPriRestriRecord> bdtScPriRestriList =
-                importedDataProvider.findBdtScPriRestriListByDtScId(dtSc.getDtScId());
+                importedDataProvider.findBdtScPriRestriListByDtScManifestId(dtScManifest.getDtScManifestId());
 
         List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                 bdtScPriRestriList.stream()
-                        .filter(e -> e.getCodeListId() != null)
+                        .filter(e -> e.getCodeListManifestId() != null)
                         .collect(Collectors.toList());
         if (codeListBdtScPriRestri.size() > 1) {
             throw new IllegalStateException();
@@ -113,7 +120,7 @@ public class BDTSC implements Component {
         if (codeListBdtScPriRestri.isEmpty()) {
             List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
                     bdtScPriRestriList.stream()
-                            .filter(e -> e.getAgencyIdListId() != null)
+                            .filter(e -> e.getAgencyIdListManifestId() != null)
                             .collect(Collectors.toList());
             if (agencyIdBdtScPriRestri.size() > 1) {
                 throw new IllegalStateException();
@@ -133,11 +140,13 @@ public class BDTSC implements Component {
                 xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 typeName = xbt.getBuiltinType();
             } else {
-                agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
+                AgencyIdListManifestRecord agencyIdListManifest = importedDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
+                agencyIdList = importedDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
                 typeName = agencyIdList.getName() + "ContentType";
             }
         } else {
-            codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
+            CodeListManifestRecord codeListManifest = importedDataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
+            codeList = importedDataProvider.findCodeList(codeListManifest.getCodeListId());
             typeName = codeList.getName() + "ContentType";
         }
     }

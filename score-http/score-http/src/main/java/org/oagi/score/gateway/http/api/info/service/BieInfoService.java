@@ -35,7 +35,7 @@ public class BieInfoService {
     private SessionService sessionService;
 
     public SummaryBieInfo getSummaryBieInfo(AuthenticatedPrincipal user, BigInteger releaseId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         if (user == null || requester == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }

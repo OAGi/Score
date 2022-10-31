@@ -35,7 +35,12 @@
 
   <mat-card class="mt-4">
     <mat-card-header>
-      <mat-card-title>Modules</mat-card-title>
+      <mat-card-title>
+        <div>
+          <span>Modules</span>
+          <span class="pl-2" style="font-size: 14px;">(Total directory: {{ moduleSetMetadata.numberOfDirectories }}, Total file: {{ moduleSetMetadata.numberOfFiles }})</span>
+        </div>
+      </mat-card-title>
     </mat-card-header>
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">

@@ -11,8 +11,6 @@ import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxSchemeRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxSchemeValueRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,6 +244,9 @@ public class BieGenerateService {
                 break;
             case "OPENAPI30":
                 generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
+                break;
+            case "ODF":
+                generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown expression option: " + expressionOption);

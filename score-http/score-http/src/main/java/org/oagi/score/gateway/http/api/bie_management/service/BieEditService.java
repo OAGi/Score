@@ -374,8 +374,9 @@ public class BieEditService implements InitializingBean {
 
         String status = request.getTopLevelAsbiepDetail().getStatus();
         String version = request.getTopLevelAsbiepDetail().getVersion();
+        Boolean inverseMode = request.getTopLevelAsbiepDetail().getInverseMode();
         UpdateTopLevelAsbiepRequest topLevelAsbiepRequest = new UpdateTopLevelAsbiepRequest(user, timestamp,
-                request.getTopLevelAsbiepId(), status, version);
+                request.getTopLevelAsbiepId(), status, version, inverseMode);
         topLevelAsbiepWriteRepository.updateTopLevelAsbiep(topLevelAsbiepRequest);
         return response;
     }
@@ -563,7 +564,7 @@ public class BieEditService implements InitializingBean {
 
     public List<AvailableCodeList> availableCodeListListByBccpManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bccpManifestId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         List<CodeListState> states = Collections.emptyList();
         if (requester.isDeveloper()) {
             states = Arrays.asList(CodeListState.Published);
@@ -573,7 +574,7 @@ public class BieEditService implements InitializingBean {
 
     public List<AvailableCodeList> availableCodeListListByBdtScManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bdtScManifestId) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         List<CodeListState> states = Collections.emptyList();
         if (requester.isDeveloper()) {
             states = Arrays.asList(CodeListState.Published);
@@ -598,7 +599,7 @@ public class BieEditService implements InitializingBean {
 
     @Transactional
     public void reuseBIE(AuthenticatedPrincipal user, ReuseBIERequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getTopLevelAsbiepId())))
@@ -758,7 +759,7 @@ public class BieEditService implements InitializingBean {
 
     @Transactional
     public void removeReusedBIE(AuthenticatedPrincipal user, RemoveReusedBIERequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
                 .where(and(ASBIE.HASH_PATH.eq(request.getAsbieHashPath()),
@@ -802,7 +803,7 @@ public class BieEditService implements InitializingBean {
 
     @Transactional
     public void resetDetailBIE(AuthenticatedPrincipal user, ResetDetailBIERequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getTopLevelAsbiepId())))
@@ -932,6 +933,9 @@ public class BieEditService implements InitializingBean {
                 bbieRecord.setIsNillable(bccRecord.getIsNillable());
                 bbieRecord.setDefinition(null);
                 bbieRecord.setExample(null);
+                bbieRecord.setFacetMinLength(null);
+                bbieRecord.setFacetMaxLength(null);
+                bbieRecord.setFacetPattern(null);
 
                 List<AvailableBdtPriRestri> bdtPriRestriList =
                         bdtPriRestriReadRepository.availableBdtPriRestriListByBccManifestId(bbieRecord.getBasedBccManifestId().toBigInteger());
@@ -942,8 +946,8 @@ public class BieEditService implements InitializingBean {
                 }
 
                 bbieRecord.setBdtPriRestriId(ULong.valueOf(bdtPriRestriList.get(0).getBdtPriRestriId()));
-                bbieRecord.setCodeListId(null);
-                bbieRecord.setAgencyIdListId(null);
+                bbieRecord.setCodeListManifestId(null);
+                bbieRecord.setAgencyIdListManifestId(null);
                 bbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                 bbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
 
@@ -953,9 +957,12 @@ public class BieEditService implements InitializingBean {
                         BBIE.FIXED_VALUE,
                         BBIE.DEFINITION,
                         BBIE.BDT_PRI_RESTRI_ID,
-                        BBIE.CODE_LIST_ID,
-                        BBIE.AGENCY_ID_LIST_ID,
+                        BBIE.CODE_LIST_MANIFEST_ID,
+                        BBIE.AGENCY_ID_LIST_MANIFEST_ID,
                         BBIE.EXAMPLE,
+                        BBIE.FACET_MIN_LENGTH,
+                        BBIE.FACET_MAX_LENGTH,
+                        BBIE.FACET_PATTERN,
                         BBIE.IS_NULL,
                         BBIE.IS_NILLABLE,
                         BBIE.LAST_UPDATED_BY,
@@ -995,28 +1002,34 @@ public class BieEditService implements InitializingBean {
                 }
 
                 bbieScRecord.setDtScPriRestriId(ULong.valueOf(bdtScPriRestriList.get(0).getBdtScPriRestriId()));
-                bbieScRecord.setCodeListId(null);
-                bbieScRecord.setAgencyIdListId(null);
+                bbieScRecord.setCodeListManifestId(null);
+                bbieScRecord.setAgencyIdListManifestId(null);
                 bbieScRecord.setDefaultValue(null);
                 bbieScRecord.setFixedValue(null);
                 bbieScRecord.setExample(null);
                 bbieScRecord.setDefinition(null);
                 bbieScRecord.setRemark(null);
                 bbieScRecord.setBizTerm(null);
+                bbieScRecord.setFacetMinLength(null);
+                bbieScRecord.setFacetMaxLength(null);
+                bbieScRecord.setFacetPattern(null);
                 bbieScRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                 bbieScRecord.setLastUpdateTimestamp(LocalDateTime.now());
 
                 bbieScRecord.update(BBIE_SC.CARDINALITY_MIN,
                         BBIE_SC.CARDINALITY_MAX,
                         BBIE_SC.DT_SC_PRI_RESTRI_ID,
-                        BBIE_SC.CODE_LIST_ID,
-                        BBIE_SC.AGENCY_ID_LIST_ID,
+                        BBIE_SC.CODE_LIST_MANIFEST_ID,
+                        BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID,
                         BBIE_SC.DEFAULT_VALUE,
                         BBIE_SC.FIXED_VALUE,
                         BBIE_SC.EXAMPLE,
                         BBIE_SC.REMARK,
                         BBIE_SC.BIZ_TERM,
                         BBIE_SC.DEFINITION,
+                        BBIE_SC.FACET_MIN_LENGTH,
+                        BBIE_SC.FACET_MAX_LENGTH,
+                        BBIE_SC.FACET_PATTERN,
                         BBIE_SC.LAST_UPDATED_BY,
                         BBIE_SC.LAST_UPDATE_TIMESTAMP);
                 break;

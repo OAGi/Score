@@ -9,7 +9,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {MarkdownModule} from 'ngx-markdown';
 
 const routes: Routes = [
@@ -39,7 +38,6 @@ const routes: Routes = [
     ConfirmDialogModule,
     CommonModule,
     ScoreCommonModule,
-    ContextMenuModule,
     MarkdownModule
   ],
   declarations: [

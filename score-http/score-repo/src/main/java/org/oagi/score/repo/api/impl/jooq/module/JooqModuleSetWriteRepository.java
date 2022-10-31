@@ -103,7 +103,7 @@ public class JooqModuleSetWriteRepository
                 .fetchOne();
 
         if (moduleSetRecord == null) {
-            throw new IllegalArgumentException("Can not found ModuleSet.");
+            throw new IllegalArgumentException("Cannot find a module set with the ID " + request.getModuleSetId());
         }
 
         moduleSetRecord.setName(request.getName());
@@ -135,7 +135,7 @@ public class JooqModuleSetWriteRepository
         if (dslContext().selectFrom(MODULE_SET_RELEASE)
                 .where(MODULE_SET_RELEASE.MODULE_SET_ID.eq(ULong.valueOf(request.getModuleSetId())))
                 .fetch().size() > 0) {
-            throw new IllegalArgumentException("This ModuleSet in use can not be discard.");
+            throw new IllegalArgumentException("Module set in use cannot be discarded.");
         }
 
         dslContext().update(MODULE)
