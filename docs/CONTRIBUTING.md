@@ -14,7 +14,7 @@
   - [Read user guide or at least read its content.](https://github.com/OAGi/Score/blob/kbserm-start-of-contribution-guide/docs/user_guide/index.rst)
 - How to contribute  
   - Fork the current Score repo to developer's private repo.
-  - Create an issue if one does not exist
+  - Create an issue if one does not exist (see also [General Guideline to Issue Management](./GeneralGuidelineToIssueManagement.md))
   - Discuss issue in the Score meeting
     - If issue is accepted,
       - assign label bug, enhancement, or design change
