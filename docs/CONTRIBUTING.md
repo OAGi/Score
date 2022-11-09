@@ -19,7 +19,7 @@
     - Make sure that a specific branch for a specific milestone and issue exists (e.g., 'develop/2.4/1291' branch for the issue #1291 in the 2.4 milestone. 'develop/2.4/1291' branch will be merged into 'develop/2.4', and 'develop/2.4' will be merged into 'develop'.)
     - Once entered a project, the issue is placed on "To DO" card.
   - After that, the issue may traverse through the following cards a few rounds in various order. These cards only serve as indications that the issue has been through these stages. In some cases, with multiple developers working on the same issue, some of these activities can occur in parallel, e.g., writing test assertions (in detail) may happen at the same time as coding. Comments may be made in the issue when some of these tasks are not needed for the issue. 
-    - "Writing Test Assertion" Card - See [Overview of test case document](./docs/OverviewOfTestCaseDocument) about how to write test assertions.
+    - "Writing Test Assertion" Card - See [Overview of test case document](./OverviewOfTestCaseDocument) about how to write test assertions.
     - "Coding and Unit Testing" Card - See - [Development environment requirement](https://github.com/OAGi/Score/wiki/Getting-Score-develop-environments-with-Docker,-Node.js,-and-JDK.) and [Overview of code structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4417093633/Overview+of+Code+Structure) to learn about what you may need to start writing code and the coding convention.
     - "Implementing test script" Card - See - Overview of test script development and execution
     - "Debugging" - This means executing the test and may also be changing content associated with other tasks.
