@@ -4,7 +4,7 @@ The purpose of this document is to describe what test case document is, its stru
 # Purpose of the Test Case Document
 The purpose of the test case document is to document expected behavior (normal and exception ones) of the Score’s functionalities. This includes all rules and constraints on certain functionalities. This information is then used for developing acceptance test scripts and oftentimes also for developing the user guide.
 
-Test Case Document can be access at this [link](./docs/test_cases).
+Test Case Document can be access at this [link](./test_cases).
 
 # Document Structure
 Test case document provides three levels of functional decomposition (or grouping). The first level is Test Suites (TS). Each Test Suite has one or more Test Cases (TC).  Each Test Case typically has many Test Assertions (TA) and Test Steps. Test Steps are optional. It is a human readable version of test scripts. Having them as a prelude to test script writing will make the task easier. However, it could be cumbersome to keep them in sync as some ideas may change quite a bit when writing the test script.
