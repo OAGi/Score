@@ -1,18 +1,13 @@
 # Contributing Guideline
 
-## Content
-- [Development environment requirement](https://github.com/OAGi/Score/wiki/Getting-Score-develop-environments-with-Docker,-Node.js,-and-JDK.)
-- Learn about Score
+## Learn about Score
   - [Read installation guide and component architecture](https://github.com/OAGi/Score/wiki/Basic-Installation-Guide-using-Docker-for-Score-Application-Release-1.1.2-and-up)
+  - [Read user guide or at least read its content.](./user_guide/index.rst) and/or [Test Case Document](./test_cases/) particularly if you are modifying an existing functionality. Even if you are modifying a certain functionality or adding a new, it might impact other functionalities as well, so it is good to know overall Score behavior. Get advise from the community how changes or additions may impact other functionalities will help speed up the development.
   - [Overview of database structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4403363841/Overview+of+Score+Database+Structure)
-  - [Overview of code structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4417093633/Overview+of+Code+Structure)
-  - [Overview of test case document](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4419911764/Overview+of+Test+Case+Document)
-  - Overview of test script development and execution
-  - How to set up Score development environment
+  - How to set up Score development environment (I think this should be included in the Development Environment Requirement or the other way around)
     - How to initialize database with OAGIS data (for development testing and acceptance testing).
     - [How to set up Score locally](https://github.com/OAGi/Score/wiki/Getting-Score-develop-environments-with-Docker,-Node.js,-and-JDK.)
-  - [Read user guide or at least read its content.](https://github.com/OAGi/Score/blob/kbserm-start-of-contribution-guide/docs/user_guide/index.rst)
-- How to contribute  
+## How to contribute  
   - Fork the current Score repo to developer's private repo.
   - Create an issue if one does not exist (see also [General Guideline to Issue Management](./GeneralGuidelineToIssueManagement.md))
   - Discuss issue in the Score meeting
@@ -24,9 +19,9 @@
     - Make sure that a specific branch for a specific milestone and issue exists (e.g., 'develop/2.4/1291' branch for the issue #1291 in the 2.4 milestone. 'develop/2.4/1291' branch will be merged into 'develop/2.4', and 'develop/2.4' will be merged into 'develop'.)
     - Once entered a project, the issue is placed on "To DO" card.
   - After that, the issue may traverse through the following cards a few rounds in various order. These cards only serve as indications that the issue has been through these stages. In some cases, with multiple developers working on the same issue, some of these activities can occur in parallel, e.g., writing test assertions (in detail) may happen at the same time as coding. Comments may be made in the issue when some of these tasks are not needed for the issue. 
-    - "Writing Test Assertion" 
-    - "Coding and Unit Testing"
-    - "Implementing test script"
+    - "Writing Test Assertion" Card - See [Overview of test case document](./docs/Overview+of+Test+Case+Document) about how to write test assertions.
+    - "Coding and Unit Testing" Card - See - [Development environment requirement](https://github.com/OAGi/Score/wiki/Getting-Score-develop-environments-with-Docker,-Node.js,-and-JDK.) and [Overview of code structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4417093633/Overview+of+Code+Structure) to learn about what you may need to start writing code and the coding convention.
+    - "Implementing test script" Card - See - Overview of test script development and execution
     - "Debugging" - This means executing the test and may also be changing content associated with other tasks.
     - "Updating user guide"
   - Once, all of the above tasks are done, create a pull request. Alternatively, a pull request can be created after every task. Comments indicating the specific task and the issue the pull request is about should be provided.
