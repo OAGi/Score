@@ -87,7 +87,13 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logout();
+    const userToken = this.userToken;
+    if (!!userToken && userToken.authentication === 'oauth2') {
+      localStorage.removeItem(this.auth.USER_INFO_KEY);
+      window.location.href = '/api/oauth2/logout';
+    } else {
+      this.auth.logout();
+    }
   }
 
   languageCurrentOagis(translate: TranslateService) {

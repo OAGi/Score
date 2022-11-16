@@ -226,9 +226,11 @@
             <th mat-header-cell *matHeaderCellDef>
             </th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button *ngIf="userToken.roles.includes('developer') && getContextMenu(element) !== undefined"
-                      [contextMenu]="getContextMenu(element)" [contextMenuSubject]="element"
-                      (click)="onContextMenu($event, element)">
+              <button mat-icon-button
+                      *ngIf="userToken.roles.includes('developer') &&
+                             (element.state === 'Initialized' || element.state === 'Draft')"
+                      [matMenuTriggerFor]="contextMenu"
+                      (click)="contextMenuItem = element; $event.stopPropagation();">
                 <mat-icon>more_vert</mat-icon>
               </button>
             </td>
@@ -246,22 +248,23 @@
       </div>
     </mat-card-content>
 
-    <context-menu #contextMenuForInitialized>
-      <ng-template contextMenuItem (execute)="createDraft($event.item)">
+    <mat-menu class="context-menu" #contextMenu="matMenu">
+      <button mat-menu-item (click)="createDraft(contextMenuItem)"
+              *ngIf="!!contextMenuItem && contextMenuItem.state === 'Initialized'">
         <span class="context-menu-item">Create Draft</span>
-      </ng-template>
-      <ng-template contextMenuItem (execute)="discard($event.item)">
+      </button>
+      <button mat-menu-item (click)="discard(contextMenuItem)"
+              *ngIf="!!contextMenuItem && contextMenuItem.state === 'Initialized'">
         <span class="context-menu-item">Discard</span>
-      </ng-template>
-    </context-menu>
-
-    <context-menu #contextMenuForDraft>
-      <ng-template contextMenuItem (execute)="updateState($event.item, 'Initialized')">
+      </button>
+      <button mat-menu-item (click)="updateState(contextMenuItem, 'Initialized')"
+              *ngIf="!!contextMenuItem && contextMenuItem.state === 'Draft'">
         <span class="context-menu-item">Move back to Initialized</span>
-      </ng-template>
-      <ng-template contextMenuItem (execute)="updateState($event.item, 'Published')">
-        <span class="context-menu-item" >Move to Published</span>
-      </ng-template>
-    </context-menu>
+      </button>
+      <button mat-menu-item (click)="updateState(contextMenuItem, 'Published')"
+              *ngIf="!!contextMenuItem && contextMenuItem.state === 'Draft'">
+        <span class="context-menu-item">Move to Published</span>
+      </button>
+    </mat-menu>
   </mat-card>
 </div>

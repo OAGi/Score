@@ -8,6 +8,8 @@ public interface BDTSimple {
 
     final String GUID_PREFIX = "oagis-id-";
 
+    public ULong getBdtManifestId();
+
     public ULong getBdtId();
 
     public boolean isDefaultBDT();

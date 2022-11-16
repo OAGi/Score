@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,14 +152,16 @@ public class LogSnapshotResolver {
         return userProperties;
     }
 
-    public Map<String, Object> getCodeList(ULong codeListId) {
-        if (codeListId == null || codeListId.longValue() <= 0L) {
+    public Map<String, Object> getCodeListByCodeListManifestId(ULong codeListManifestId) {
+        if (codeListManifestId == null || codeListManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        CodeListRecord codeListRecord = dslContext.selectFrom(CODE_LIST)
-                .where(CODE_LIST.CODE_LIST_ID.eq(codeListId))
-                .fetchOptional().orElse(null);
+        CodeListRecord codeListRecord = dslContext.select(CODE_LIST.fields())
+                .from(CODE_LIST)
+                .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestId))
+                .fetchOptionalInto(CodeListRecord.class).orElse(null);
         if (codeListRecord == null) {
             return new HashMap();
         }
@@ -169,7 +170,12 @@ public class LogSnapshotResolver {
         userProperties.put("guid", codeListRecord.getGuid());
         userProperties.put("name", codeListRecord.getName());
         userProperties.put("listId", codeListRecord.getListId());
-        userProperties.put("agencyIdListValueId", getAgencyIdListValue(codeListRecord.getAgencyIdListValueId()));
+        userProperties.put("agencyIdListValue", getAgencyIdListValueByAgencyIdListValueManifestId(
+                dslContext.select(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                        .from(CODE_LIST_MANIFEST)
+                        .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestId))
+                        .fetchOneInto(ULong.class)
+        ));
         userProperties.put("versionId", codeListRecord.getVersionId());
         return userProperties;
     }
@@ -194,14 +200,17 @@ public class LogSnapshotResolver {
         return userProperties;
     }
 
-    public Map<String, Object> getAgencyIdListValue(ULong agencyIdListValueId) {
-        if (agencyIdListValueId == null || agencyIdListValueId.longValue() <= 0L) {
+    public Map<String, Object> getAgencyIdListValueByAgencyIdListValueManifestId(
+            ULong agencyIdListValueManifestId) {
+        if (agencyIdListValueManifestId == null || agencyIdListValueManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        AgencyIdListValueRecord agencyIdListValueRecord = dslContext.selectFrom(AGENCY_ID_LIST_VALUE)
-                .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(agencyIdListValueId))
-                .fetchOptional().orElse(null);
+        AgencyIdListValueRecord agencyIdListValueRecord = dslContext.select(AGENCY_ID_LIST_VALUE.fields())
+                .from(AGENCY_ID_LIST_VALUE)
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID))
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(agencyIdListValueManifestId))
+                .fetchOptionalInto(AgencyIdListValueRecord.class).orElse(null);
         if (agencyIdListValueRecord == null) {
             return new HashMap();
         }

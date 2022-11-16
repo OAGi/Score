@@ -122,7 +122,7 @@ public class CcNodeRepository {
         accNode.setGroup(oagisComponentType.isGroup());
         boolean isWorkingRelease = accNode.getReleaseNum().equals("Working");
         accNode.setAccess(AccessPrivilege.toAccessPrivilege(
-                sessionService.getAppUser(user), sessionService.getAppUser(accNode.getOwnerUserId()),
+                sessionService.getAppUserByUsername(user), sessionService.getAppUserByUsername(accNode.getOwnerUserId()),
                 accNode.getState(), isWorkingRelease));
         accNode.setHasChild(hasChild(accNode));
         accNode.setHasExtension(hasExtension(user, accNode));
@@ -209,8 +209,8 @@ public class CcNodeRepository {
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcAsccpNode.class);
 
-        AppUser requester = sessionService.getAppUser(user);
-        AppUser owner = sessionService.getAppUser(asccpNode.getOwnerUserId());
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        AppUser owner = sessionService.getAppUserByUsername(asccpNode.getOwnerUserId());
         boolean isWorkingRelease = asccpNode.getReleaseNum().equals("Working");
         asccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, asccpNode.getState(), isWorkingRelease));
         asccpNode.setHasChild(true); // role_of_acc_id must not be null.
@@ -323,8 +323,8 @@ public class CcNodeRepository {
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcBccpNode.class);
 
-        AppUser requester = sessionService.getAppUser(user);
-        AppUser owner = sessionService.getAppUser(bccpNode.getOwnerUserId());
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        AppUser owner = sessionService.getAppUserByUsername(bccpNode.getOwnerUserId());
         boolean isWorkingRelease = bccpNode.getReleaseNum().equals("Working");
         bccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bccpNode.getState(), isWorkingRelease));
         bccpNode.setHasChild(hasChild(bccpNode));
@@ -337,8 +337,8 @@ public class CcNodeRepository {
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcBdtNode.class);
 
-        AppUser requester = sessionService.getAppUser(user);
-        AppUser owner = sessionService.getAppUser(bdtNode.getOwnerUserId());
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        AppUser owner = sessionService.getAppUserByUsername(bdtNode.getOwnerUserId());
         boolean isWorkingRelease = bdtNode.getReleaseNum().equals("Working");
         bdtNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bdtNode.getState(), isWorkingRelease));
         bdtNode.setHasChild(hasChild(bdtNode));
@@ -351,8 +351,8 @@ public class CcNodeRepository {
                 .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcBdtScNode.class);
 
-        AppUser requester = sessionService.getAppUser(user);
-        AppUser owner = sessionService.getAppUser(dtScNode.getOwnerUserId());
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        AppUser owner = sessionService.getAppUserByUsername(dtScNode.getOwnerUserId());
         boolean isWorkingRelease = dtScNode.getReleaseNum().equals("Working");
         dtScNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, dtScNode.getState(), isWorkingRelease));
 
@@ -714,11 +714,11 @@ public class CcNodeRepository {
         return bccpNodeDetail;
     }
 
-    private Map<String, CcBdtPriRestri> getPriResriMapByDtId(ULong dtId) {
+    private Map<String, CcBdtPriRestri> getPriResriMapByDtManifestId(ULong dtManifestId) {
         Map<String, CcBdtPriRestri> bdtPriRestriMap = new HashMap<>();
 
         List<BdtPriRestriRecord> bdtPriRestriRecords = dslContext.selectFrom(BDT_PRI_RESTRI)
-                .where(BDT_PRI_RESTRI.BDT_ID.eq(dtId))
+                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifestId))
                 .fetch();
 
         for (BdtPriRestriRecord bdtPriRestriRecord : bdtPriRestriRecords) {
@@ -739,22 +739,24 @@ public class CcNodeRepository {
                 ccBdtPriRestri.setXbtName(result.get(XBT.NAME));
 
                 bdtPriRestriMap.put(PrimitiveRestriType.Primitive.toString() + bdtPriRestriRecord.getCdtAwdPriXpsTypeMapId(), ccBdtPriRestri);
-            } else if (bdtPriRestriRecord.getCodeListId() != null) {
+            } else if (bdtPriRestriRecord.getCodeListManifestId() != null) {
                 ccBdtPriRestri.setType(PrimitiveRestriType.CodeList);
-                ccBdtPriRestri.setCodeListId(bdtPriRestriRecord.getCodeListId().toBigInteger());
+                ccBdtPriRestri.setCodeListManifestId(bdtPriRestriRecord.getCodeListManifestId().toBigInteger());
                 ccBdtPriRestri.setCodeListName(dslContext.select(CODE_LIST.NAME).from(CODE_LIST)
-                        .where(CODE_LIST.CODE_LIST_ID.eq(bdtPriRestriRecord.getCodeListId()))
+                        .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                        .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(bdtPriRestriRecord.getCodeListManifestId()))
                         .fetchOneInto(String.class));
 
-                bdtPriRestriMap.put(PrimitiveRestriType.CodeList.toString() + bdtPriRestriRecord.getCodeListId(), ccBdtPriRestri);
-            } else if (bdtPriRestriRecord.getAgencyIdListId() != null) {
+                bdtPriRestriMap.put(PrimitiveRestriType.CodeList.toString() + bdtPriRestriRecord.getCodeListManifestId(), ccBdtPriRestri);
+            } else if (bdtPriRestriRecord.getAgencyIdListManifestId() != null) {
                 ccBdtPriRestri.setType(PrimitiveRestriType.AgencyIdList);
-                ccBdtPriRestri.setAgencyIdListId(bdtPriRestriRecord.getAgencyIdListId().toBigInteger());
+                ccBdtPriRestri.setAgencyIdListManifestId(bdtPriRestriRecord.getAgencyIdListManifestId().toBigInteger());
                 ccBdtPriRestri.setAgencyIdListName(dslContext.select(AGENCY_ID_LIST.NAME).from(AGENCY_ID_LIST)
-                        .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(bdtPriRestriRecord.getAgencyIdListId()))
+                        .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                        .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(bdtPriRestriRecord.getAgencyIdListManifestId()))
                         .fetchOneInto(String.class));
 
-                bdtPriRestriMap.put(PrimitiveRestriType.AgencyIdList.toString() + bdtPriRestriRecord.getAgencyIdListId(), ccBdtPriRestri);
+                bdtPriRestriMap.put(PrimitiveRestriType.AgencyIdList.toString() + bdtPriRestriRecord.getAgencyIdListManifestId(), ccBdtPriRestri);
             }
 
             ccBdtPriRestri.setDefault(bdtPriRestriRecord.getIsDefault() == (byte) 1);
@@ -817,8 +819,8 @@ public class CcNodeRepository {
 
         // BDT
         if (detail.getBasedBdtManifestId() != null) {
-            Map<String, CcBdtPriRestri> priResriMap = getPriResriMapByDtId(ULong.valueOf(detail.getBdtId()));
-            Map<String, CcBdtPriRestri> basePriResriMap = getPriResriMapByDtId(ULong.valueOf(detail.getBasedBdtId()));
+            Map<String, CcBdtPriRestri> priResriMap = getPriResriMapByDtManifestId(ULong.valueOf(detail.getManifestId()));
+            Map<String, CcBdtPriRestri> basePriResriMap = getPriResriMapByDtManifestId(ULong.valueOf(detail.getBasedBdtManifestId()));
             priResriMap.keySet().stream().forEach(key -> {
                 if (basePriResriMap.get(key) != null) {
                     priResriMap.get(key).setInherited(true);
@@ -832,28 +834,34 @@ public class CcNodeRepository {
         } else {
             detail.setBdtPriRestriList(dslContext.select(
                             CDT_AWD_PRI.CDT_AWD_PRI_ID,
-                            CDT_AWD_PRI.IS_DEFAULT,
-                            CDT_PRI.NAME)
+                            CDT_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT,
+                            CDT_PRI.NAME.as("CDT_PRI_NAME"),
+                            XBT.XBT_ID,
+                            XBT.NAME)
                     .from(CDT_AWD_PRI)
                     .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                    .join(CDT_AWD_PRI_XPS_TYPE_MAP).on(CDT_AWD_PRI.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID))
+                    .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                     .where(CDT_AWD_PRI.CDT_ID.eq(ULong.valueOf(detail.getBdtId())))
                     .fetch().stream().map(e -> {
                         CcBdtPriRestri ccBdtPriRestri = new CcBdtPriRestri();
                         ccBdtPriRestri.setType(PrimitiveRestriType.Primitive);
-                        ccBdtPriRestri.setPrimitiveName(e.get(CDT_PRI.NAME));
+                        ccBdtPriRestri.setPrimitiveName(e.get(CDT_PRI.NAME.as("CDT_PRI_NAME")));
                         ccBdtPriRestri.setCdtAwdPriId(e.get(CDT_AWD_PRI.CDT_AWD_PRI_ID).toBigInteger());
                         ccBdtPriRestri.setDefault(e.get(CDT_AWD_PRI.IS_DEFAULT) == (byte) 1);
+                        ccBdtPriRestri.setXbtId(e.get(XBT.XBT_ID).toBigInteger());
+                        ccBdtPriRestri.setXbtName(e.get(XBT.NAME));
                         return ccBdtPriRestri;
                     }).collect(Collectors.toList()));
         }
         return detail;
     }
 
-    private Map<String, CcBdtScPriRestri> getPriScRestriMapByDtScId(ULong dtScId) {
+    private Map<String, CcBdtScPriRestri> getPriScRestriMapByDtScManifestId(ULong dtScManifestId) {
         Map<String, CcBdtScPriRestri> bdtScPriRestriMap = new HashMap<>();
 
         List<BdtScPriRestriRecord> bdtScPriRestriRecords = dslContext.selectFrom(BDT_SC_PRI_RESTRI)
-                .where(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(dtScId))
+                .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifestId))
                 .fetch();
 
         for (BdtScPriRestriRecord bdtScPriRestriRecord : bdtScPriRestriRecords) {
@@ -874,22 +882,24 @@ public class CcNodeRepository {
                 ccBdtScPriRestri.setXbtName(result.get(XBT.NAME));
 
                 bdtScPriRestriMap.put(PrimitiveRestriType.Primitive.toString() + bdtScPriRestriRecord.getCdtScAwdPriXpsTypeMapId(), ccBdtScPriRestri);
-            } else if (bdtScPriRestriRecord.getCodeListId() != null) {
+            } else if (bdtScPriRestriRecord.getCodeListManifestId() != null) {
                 ccBdtScPriRestri.setType(PrimitiveRestriType.CodeList);
-                ccBdtScPriRestri.setCodeListId(bdtScPriRestriRecord.getCodeListId().toBigInteger());
+                ccBdtScPriRestri.setCodeListManifestId(bdtScPriRestriRecord.getCodeListManifestId().toBigInteger());
                 ccBdtScPriRestri.setCodeListName(dslContext.select(CODE_LIST.NAME).from(CODE_LIST)
-                        .where(CODE_LIST.CODE_LIST_ID.eq(bdtScPriRestriRecord.getCodeListId()))
+                        .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                        .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(bdtScPriRestriRecord.getCodeListManifestId()))
                         .fetchOneInto(String.class));
 
-                bdtScPriRestriMap.put(PrimitiveRestriType.CodeList.toString() + bdtScPriRestriRecord.getCodeListId(), ccBdtScPriRestri);
-            } else if (bdtScPriRestriRecord.getAgencyIdListId() != null) {
+                bdtScPriRestriMap.put(PrimitiveRestriType.CodeList.toString() + bdtScPriRestriRecord.getCodeListManifestId(), ccBdtScPriRestri);
+            } else if (bdtScPriRestriRecord.getAgencyIdListManifestId() != null) {
                 ccBdtScPriRestri.setType(PrimitiveRestriType.AgencyIdList);
-                ccBdtScPriRestri.setAgencyIdListId(bdtScPriRestriRecord.getAgencyIdListId().toBigInteger());
+                ccBdtScPriRestri.setAgencyIdListManifestId(bdtScPriRestriRecord.getAgencyIdListManifestId().toBigInteger());
                 ccBdtScPriRestri.setAgencyIdListName(dslContext.select(AGENCY_ID_LIST.NAME).from(AGENCY_ID_LIST)
-                        .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(bdtScPriRestriRecord.getAgencyIdListId()))
+                        .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                        .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(bdtScPriRestriRecord.getAgencyIdListManifestId()))
                         .fetchOneInto(String.class));
 
-                bdtScPriRestriMap.put(PrimitiveRestriType.AgencyIdList.toString() + bdtScPriRestriRecord.getAgencyIdListId(), ccBdtScPriRestri);
+                bdtScPriRestriMap.put(PrimitiveRestriType.AgencyIdList.toString() + bdtScPriRestriRecord.getAgencyIdListManifestId(), ccBdtScPriRestri);
             }
 
             ccBdtScPriRestri.setDefault(bdtScPriRestriRecord.getIsDefault() == (byte) 1);
@@ -926,7 +936,8 @@ public class CcNodeRepository {
                         DT_MANIFEST.LOG_ID,
                         LOG.REVISION_NUM,
                         LOG.REVISION_TRACKING_NUM,
-                        DT_MANIFEST.BASED_DT_MANIFEST_ID)
+                        DT_MANIFEST.BASED_DT_MANIFEST_ID,
+                        DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID)
                 .from(DT_SC_MANIFEST)
                 .join(DT_SC)
                 .on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
@@ -954,9 +965,9 @@ public class CcNodeRepository {
         detail.setSpec(String.join(", ", specs));
 
         if (detail.getBasedDtManifestId() != null) {
-            Map<String, CcBdtScPriRestri> priResriMap = getPriScRestriMapByDtScId(ULong.valueOf(detail.getBdtScId()));
-            if (detail.getBasedDtScId() != null) {
-                Map<String, CcBdtScPriRestri> basePriResriMap = getPriScRestriMapByDtScId(ULong.valueOf(detail.getBasedDtScId()));
+            Map<String, CcBdtScPriRestri> priResriMap = getPriScRestriMapByDtScManifestId(ULong.valueOf(detail.getManifestId()));
+            if (detail.getBasedDtScManifestId() != null) {
+                Map<String, CcBdtScPriRestri> basePriResriMap = getPriScRestriMapByDtScManifestId(ULong.valueOf(detail.getBasedDtScManifestId()));
                 priResriMap.keySet().stream().forEach(key -> {
                     if (basePriResriMap.get(key) != null) {
                         priResriMap.get(key).setInherited(true);
@@ -970,17 +981,23 @@ public class CcNodeRepository {
         } else {
             detail.setBdtScPriRestriList(dslContext.select(
                             CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID,
-                            CDT_SC_AWD_PRI.IS_DEFAULT,
-                            CDT_PRI.NAME)
+                            CDT_SC_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT,
+                            CDT_PRI.NAME.as("CDT_PRI_NAME"),
+                            XBT.XBT_ID,
+                            XBT.NAME)
                     .from(CDT_SC_AWD_PRI)
                     .join(CDT_PRI).on(CDT_SC_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                    .join(CDT_SC_AWD_PRI_XPS_TYPE_MAP).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID))
+                    .join(XBT).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                     .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(ULong.valueOf(detail.getBdtScId())))
                     .fetch().stream().map(e -> {
                         CcBdtScPriRestri ccBdtScPriRestri = new CcBdtScPriRestri();
                         ccBdtScPriRestri.setType(PrimitiveRestriType.Primitive);
-                        ccBdtScPriRestri.setPrimitiveName(e.get(CDT_PRI.NAME));
+                        ccBdtScPriRestri.setPrimitiveName(e.get(CDT_PRI.NAME.as("CDT_PRI_NAME")));
                         ccBdtScPriRestri.setCdtScAwdPriId(e.get(CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID).toBigInteger());
-                        ccBdtScPriRestri.setDefault(e.get(CDT_SC_AWD_PRI.IS_DEFAULT) == (byte) 1);
+                        ccBdtScPriRestri.setDefault(e.get(CDT_SC_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT) == (byte) 1);
+                        ccBdtScPriRestri.setXbtId(e.get(XBT.XBT_ID).toBigInteger());
+                        ccBdtScPriRestri.setXbtName(e.get(XBT.NAME));
                         return ccBdtScPriRestri;
                     }).collect(Collectors.toList()));
         }

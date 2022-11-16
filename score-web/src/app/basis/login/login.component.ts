@@ -4,7 +4,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {OAuth2AppInfo} from '../../authentication/domain/auth';
 import {Observable} from 'rxjs';
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'score-login',
@@ -17,7 +17,7 @@ export class LoginComponent implements AfterViewChecked {
   next = '';
   err = undefined;
 
-  paddingTop: string = '10%';
+  paddingTop = '10%';
   observer;
   @ViewChild('authForm', {static: false, read: ElementRef}) authForm: ElementRef;
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
@@ -28,7 +28,7 @@ export class LoginComponent implements AfterViewChecked {
               private route: ActivatedRoute,
               private router: Router) {
     this.route.queryParams.subscribe(params => {
-      this.next = this.auth.nextParam(params['next']);
+      this.next = this.auth.nextParam(params.next);
       if (!this.next) {
         this.next = '/';
       }
@@ -82,7 +82,8 @@ export class LoginComponent implements AfterViewChecked {
   }
 
   onResize(event?) {
-    this.paddingTop = Math.max(window.innerHeight - this.authForm.nativeElement.offsetHeight, 30) / 2 + 'px';
+    const maxHeight = window.innerHeight - ((!!this.authForm) ? this.authForm.nativeElement.offsetHeight : 0);
+    this.paddingTop = Math.max(maxHeight, 30) / 2 + 'px';
   }
 
   ngAfterViewChecked(): void {

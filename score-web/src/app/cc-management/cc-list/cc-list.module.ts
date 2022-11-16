@@ -4,7 +4,6 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
 import {CcListComponent} from './cc-list.component';
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
@@ -30,9 +29,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    ContextMenuModule.forRoot({
-      useBootstrap4: true,
-    }),
     CommonModule,
     TranslateModule,
     ScoreCommonModule

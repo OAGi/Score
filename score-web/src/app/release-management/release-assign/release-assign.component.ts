@@ -292,7 +292,6 @@ export class ReleaseAssignComponent implements OnInit {
       if (Object.getOwnPropertyNames(map.statusMapForDt).length > 0) {
         this.addErrorsToNode(map.statusMapForDt, 'DT');
       }
-      console.log(map);
       if (map.succeed) {
         this.snackBar.open('All components are valid.', '', {
           duration: 3000,

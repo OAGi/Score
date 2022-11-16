@@ -3,6 +3,7 @@ package org.oagi.score.export.model;
 import org.jooq.types.ULong;
 import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BdtPriRestriRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.XbtRecord;
 
@@ -12,7 +13,11 @@ import java.util.stream.Collectors;
 
 public class BDTSimpleType extends AbstractBDTSimple {
 
+    private DtManifestRecord dtManifestRecord;
+
     private DtRecord dataType;
+
+    private DtManifestRecord baseDtManifestRecord;
 
     private DtRecord baseDataType;
 
@@ -24,22 +29,33 @@ public class BDTSimpleType extends AbstractBDTSimple {
 
     private ImportedDataProvider importedDataProvider;
 
-    public BDTSimpleType(DtRecord dataType, DtRecord baseDataType, boolean isDefaultBDT, ImportedDataProvider importedDataProvider) {
-        this(dataType, baseDataType, isDefaultBDT, null, null, importedDataProvider);
+    public BDTSimpleType(DtManifestRecord dtManifestRecord, DtRecord dataType,
+                         DtManifestRecord baseDtManifestRecord, DtRecord baseDataType,
+                         boolean isDefaultBDT, ImportedDataProvider importedDataProvider) {
+        this(dtManifestRecord, dataType, baseDtManifestRecord, baseDataType,
+                isDefaultBDT, null, null, importedDataProvider);
     }
 
-    public BDTSimpleType(DtRecord dataType, DtRecord baseDataType, boolean isDefaultBDT,
+    public BDTSimpleType(DtManifestRecord dtManifestRecord, DtRecord dataType,
+                         DtManifestRecord baseDtManifestRecord, DtRecord baseDataType,
+                         boolean isDefaultBDT,
                          List<BdtPriRestriRecord> bdtPriRestriList,
                          List<XbtRecord> xbtList,
                          ImportedDataProvider importedDataProvider) {
         super(importedDataProvider);
 
+        this.dtManifestRecord = dtManifestRecord;
         this.dataType = dataType;
+        this.baseDtManifestRecord = baseDtManifestRecord;
         this.baseDataType = baseDataType;
         this.isDefaultBDT = isDefaultBDT;
         this.bdtPriRestriList = (bdtPriRestriList != null) ? bdtPriRestriList : Collections.emptyList();
         this.xbtList = (xbtList != null) ? xbtList : Collections.emptyList();
         this.importedDataProvider = importedDataProvider;
+    }
+
+    public ULong getBdtManifestId() {
+        return this.dtManifestRecord.getDtManifestId();
     }
 
     @Override

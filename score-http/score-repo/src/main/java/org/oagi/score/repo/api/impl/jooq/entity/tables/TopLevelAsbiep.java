@@ -7,14 +7,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function10;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Records;
+import org.jooq.Row10;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -108,6 +112,13 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * The column <code>oagi.top_level_asbiep.state</code>.
      */
     public final TableField<TopLevelAsbiepRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.inverse_mode</code>. If this is
+     * true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be
+     * treated as used BIEs.
+     */
+    public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
 
     private TopLevelAsbiep(Name alias, Table<TopLevelAsbiepRecord> aliased) {
         this(alias, aliased, null);
@@ -219,6 +230,11 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return new TopLevelAsbiep(alias, this);
     }
 
+    @Override
+    public TopLevelAsbiep as(Table<?> alias) {
+        return new TopLevelAsbiep(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -235,12 +251,35 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return new TopLevelAsbiep(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public TopLevelAsbiep rename(Table<?> name) {
+        return new TopLevelAsbiep(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row10 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> fieldsRow() {
+        return (Row10) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

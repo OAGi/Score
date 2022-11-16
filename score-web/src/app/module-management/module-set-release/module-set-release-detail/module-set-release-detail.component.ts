@@ -4,7 +4,7 @@ import {FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 import {ReplaySubject} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
@@ -15,7 +15,7 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
-import {PageRequest} from "../../../basis/basis";
+import {PageRequest} from '../../../basis/basis';
 
 @Component({
   selector: 'score-module-set-detail',

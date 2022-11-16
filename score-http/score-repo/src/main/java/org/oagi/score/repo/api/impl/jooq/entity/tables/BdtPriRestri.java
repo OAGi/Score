@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function6;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row6;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -61,10 +65,11 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     public final TableField<BdtPriRestriRecord, ULong> BDT_PRI_RESTRI_ID = createField(DSL.name("bdt_pri_restri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
-     * table. It shall point to only DT that is a BDT (not a CDT).
+     * The column <code>oagi.bdt_pri_restri.bdt_manifest_id</code>. Foreign key
+     * to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a
+     * CDT).
      */
-    public final TableField<BdtPriRestriRecord, ULong> BDT_ID = createField(DSL.name("bdt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).");
+    public final TableField<BdtPriRestriRecord, ULong> BDT_MANIFEST_ID = createField(DSL.name("bdt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a CDT).");
 
     /**
      * The column <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
@@ -75,17 +80,18 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     public final TableField<BdtPriRestriRecord, ULong> CDT_AWD_PRI_XPS_TYPE_MAP_ID = createField(DSL.name("cdt_awd_pri_xps_type_map_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
-     * the CODE_LIST table.
+     * The column <code>oagi.bdt_pri_restri.code_list_manifest_id</code>.
+     * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public final TableField<BdtPriRestriRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the CODE_LIST table.");
+    public final TableField<BdtPriRestriRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the CODE_LIST_MANIFEST table.");
 
     /**
-     * The column <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
-     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
-     * BDT content can be restricted to an agency identification.
+     * The column <code>oagi.bdt_pri_restri.agency_id_list_manifest_id</code>.
+     * This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in
+     * the case that the BDT content can be restricted to an agency
+     * identification.
      */
-    public final TableField<BdtPriRestriRecord, ULong> AGENCY_ID_LIST_ID = createField(DSL.name("agency_id_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.");
+    public final TableField<BdtPriRestriRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case that the BDT content can be restricted to an agency identification.");
 
     /**
      * The column <code>oagi.bdt_pri_restri.is_default</code>. This allows
@@ -145,22 +151,22 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
 
     @Override
     public List<ForeignKey<BdtPriRestriRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BDT_PRI_RESTRI_BDT_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+        return Arrays.asList(Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK);
     }
 
-    private transient Dt _dt;
+    private transient DtManifest _dtManifest;
     private transient CdtAwdPriXpsTypeMap _cdtAwdPriXpsTypeMap;
-    private transient CodeList _codeList;
-    private transient AgencyIdList _agencyIdList;
+    private transient CodeListManifest _codeListManifest;
+    private transient AgencyIdListManifest _agencyIdListManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table.
+     * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
      */
-    public Dt dt() {
-        if (_dt == null)
-            _dt = new Dt(this, Keys.BDT_PRI_RESTRI_BDT_ID_FK);
+    public DtManifest dtManifest() {
+        if (_dtManifest == null)
+            _dtManifest = new DtManifest(this, Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK);
 
-        return _dt;
+        return _dtManifest;
     }
 
     /**
@@ -175,23 +181,25 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     }
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table.
+     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
+     * table.
      */
-    public CodeList codeList() {
-        if (_codeList == null)
-            _codeList = new CodeList(this, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK);
+    public CodeListManifest codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifest(this, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK);
 
-        return _codeList;
+        return _codeListManifest;
     }
 
     /**
-     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
+     * Get the implicit join path to the
+     * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdList agencyIdList() {
-        if (_agencyIdList == null)
-            _agencyIdList = new AgencyIdList(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+    public AgencyIdListManifest agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK);
 
-        return _agencyIdList;
+        return _agencyIdListManifest;
     }
 
     @Override
@@ -202,6 +210,11 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     @Override
     public BdtPriRestri as(Name alias) {
         return new BdtPriRestri(alias, this);
+    }
+
+    @Override
+    public BdtPriRestri as(Table<?> alias) {
+        return new BdtPriRestri(alias.getQualifiedName(), this);
     }
 
     /**
@@ -220,6 +233,14 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return new BdtPriRestri(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public BdtPriRestri rename(Table<?> name) {
+        return new BdtPriRestri(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row6 type methods
     // -------------------------------------------------------------------------
@@ -227,5 +248,20 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     @Override
     public Row6<ULong, ULong, ULong, ULong, ULong, Byte> fieldsRow() {
         return (Row6) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

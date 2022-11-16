@@ -7,6 +7,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
@@ -23,7 +24,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.oagi.score.gateway.http.helper.Utility.toZuluTimeString;
@@ -109,15 +114,22 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
-        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId());
+        ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
+        generationContext.referenceCounter().increase(asbiep);
+        try {
+            logger.debug("Generating Top Level ABIE w/ given ASBIEP Id: " + asbiep.getAsbiepId());
 
-        logger.debug("Generating Top Level ABIE w/ given ASBIEP Id: " + asbiep.getAsbiepId());
+            rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAsbiep);
 
-        rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAsbiep);
-
-        ABIE abie = generationContext.queryTargetABIE(asbiep);
-        Element rootSeqNode = generateABIE(abie, rootElementNode);
-        generateBIEs(abie, rootSeqNode);
+            ABIE abie = generationContext.queryTargetABIE(asbiep);
+            Element rootSeqNode = generateABIE(abie, rootElementNode);
+            generateBIEs(abie, rootSeqNode);
+            if (rootSeqNode.getChildren().isEmpty()) {
+                rootSeqNode.detach();
+            }
+        } finally {
+            generationContext.referenceCounter().decrease(asbiep);
+        }
     }
 
     private String key(BIE bie) {
@@ -341,7 +353,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         boolean bieOagiScoreMetaData = option.isBieOagiScoreMetaData();
         boolean basedCcMetaData = option.isBasedCcMetaData();
 
-        if (!basedCcMetaData && !bieOagiScoreMetaData && !basedCcMetaData) {
+        if (!basedCcMetaData && !bieOagiScoreMetaData) {
             return;
         }
 
@@ -560,14 +572,19 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         setDefinition(complexType, abie.getDefinition());
         setOptionalDocumentation(complexType, abie, acc);
 
-        Element sequenceElement = newElement("sequence");
-        complexType.addContent(sequenceElement);
+        Element element;
+        if (OagisComponentType.Choice.getValue() == acc.getOagisComponentType()) {
+            element = newElement("choice");
+            complexType.addContent(element);
+        } else {
+            element = newElement("sequence");
+            complexType.addContent(element);
+        }
 
-        return sequenceElement;
+        return element;
     }
 
     public void generateBIEs(ABIE abie, Element parent) {
-
         List<BIE> childBIEs = generationContext.queryChildBIEs(abie);
         for (BIE bie : childBIEs) {
             if (bie instanceof BBIE) {
@@ -583,11 +600,15 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     Element node = generateASBIE(asbie, parent);
                     ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
                     Element asbiepNode = generateASBIEP(asbiep, node);
-                    ABIE childAbie = generationContext.queryTargetABIE2(asbiep);
-                    Element sequenceNode = generateABIE(childAbie, asbiepNode);
-                    generateBIEs(childAbie, sequenceNode);
-                    if (sequenceNode.getChildren().isEmpty()) {
-                        sequenceNode.detach();
+                    ABIE childAbie = generationContext.queryTargetABIE(asbiep);
+                    Element compositorNode = generateABIE(childAbie, asbiepNode);
+
+                    generationContext.referenceCounter().increase(asbiep)
+                            .ifNotCircularReference(asbiep, () -> generateBIEs(childAbie, compositorNode))
+                            .decrease(asbiep);
+
+                    if (compositorNode.getChildren().isEmpty()) {
+                        compositorNode.detach();
                     }
                 }
             }
@@ -635,14 +656,16 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         complexType.addContent(simpleContent);
         simpleContent.addContent(extNode);
 
-        extNode.setAttribute("base", Helper.getCodeListTypeName(codeList));
+        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+        extNode.setAttribute("base", codeListTypeName);
         eNode.addContent(complexType);
         return eNode;
     }
 
     public String setBDTBase(DT bdt) {
         BdtPriRestri bdtPriRestri =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                generationContext.findBdtPriRestriByBdtManifestIdAndDefaultIsTrue(bdt.getDtId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
         addXbtSimpleType(xbt);
         return xbt.getBuiltinType();
@@ -652,13 +675,18 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         BdtPriRestri bdtPriRestri =
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
-        addXbtSimpleType(xbt);
-        return xbt.getBuiltinType();
+        String typeName = null;
+        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+            typeName = addXbtSimpleType(xbt, bbie);
+        } else {
+            addXbtSimpleType(xbt);
+        }
+        return (typeName != null) ? typeName : xbt.getBuiltinType();
     }
 
     public Element setBBIE_Attr_Type(DT bdt, Element gNode) {
         BdtPriRestri bdtPriRestri =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                generationContext.findBdtPriRestriByBdtManifestIdAndDefaultIsTrue(bdt.getDtId());
         CdtAwdPriXpsTypeMap cdtAwdPriXpsTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
         Xbt xbt =
@@ -670,17 +698,23 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         return gNode;
     }
 
-    public Element setBBIE_Attr_Type(BBIE gBBIE, Element gNode) {
+    public Element setBBIE_Attr_Type(BBIE bbie, Element gNode) {
         BdtPriRestri aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
+                generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         CdtAwdPriXpsTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         Xbt xbt =
                 generationContext.findXbt(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-        if (xbt.getBuiltinType() != null) {
-            gNode.setAttribute("type", xbt.getBuiltinType());
+
+        String typeName = null;
+        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+            typeName = addXbtSimpleType(xbt, bbie);
+        } else {
+            addXbtSimpleType(xbt);
         }
-        addXbtSimpleType(xbt);
+
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.getBuiltinType());
+
         return gNode;
     }
 
@@ -722,7 +756,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         if (asbie.isNillable())
             element.setAttribute("nillable", String.valueOf(asbie.isNillable()));
 
-        while (!parent.getName().equals("sequence")) {
+        while (!parent.getName().equals("sequence") && !parent.getName().equals("choice")) {
             parent = parent.getParentElement();
         }
 
@@ -751,9 +785,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             eNode.setAttribute("id", getGuidWithPrefix(bbie.getGuid()));
         }
 
-        if (bbie.getDefaultValue() != null && bbie.getFixedValue() != null) {
-            System.out.println("Error");
-        }
         if (bbie.isNillable()) {
             eNode.setAttribute("nillable", "true");
         }
@@ -784,9 +815,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             eNode.setAttribute("id", getGuidWithPrefix(bbie.getGuid()));
         }
 
-        if (bbie.getDefaultValue() != null && bbie.getFixedValue() != null) {
-            System.out.println("Error");
-        }
         if (bbie.isNillable()) {
             eNode.setAttribute("nillable", "true");
         }
@@ -812,42 +840,77 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         setDefinition(node, bbie.getDefinition());
         setOptionalDocumentation(node, bbie, bcc);
 
-        BBIEP bbiep = generationContext.findBBIEP(bbie.getToBbiepId());
+        TopLevelAsbiep topLevelAsbiep = generationContext.findTopLevelAsbiep(bbie.getOwnerTopLevelAsbiepId());
+        BBIEP bbiep = generationContext.findBBIEP(bbie.getToBbiepId(), topLevelAsbiep);
         BCCP bccp = generationContext.findBCCP(bbiep.getBasedBccpManifestId());
 
         setDefinition(node, bbiep.getDefinition());
         setOptionalDocumentation(node, bbiep, bccp);
     }
 
-    public Element setBBIEType(DT bdt, Element gNode) {
-        BdtPriRestri bdtPriRestri =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
-        Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
-        if (xbt.getBuiltinType() != null) {
-            gNode.setAttribute("type", xbt.getBuiltinType());
-        }
-        addXbtSimpleType(xbt);
-
-        return gNode;
-    }
-
     public Element setBBIEType(BBIE bbie, Element gNode) {
         BdtPriRestri bdtPriRestri =
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
-        if (xbt.getBuiltinType() != null) {
-            gNode.setAttribute("type", xbt.getBuiltinType());
+        String typeName = null;
+        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+            typeName = addXbtSimpleType(xbt, bbie);
+        } else {
+            addXbtSimpleType(xbt);
         }
-        addXbtSimpleType(xbt);
+
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.getBuiltinType());
 
         return gNode;
+    }
+
+    public String addXbtSimpleType(Xbt xbt, FacetRestrictionsAware facetRestri) {
+        if (xbt == null) {
+            return null;
+        }
+        if (rootElementNode == null) {
+            return null;
+        }
+
+        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
+        String name = "type_" + guid;
+
+        Element xbtNode = newElement("simpleType");
+        xbtNode.setAttribute("name", name);
+        if (option.isBieGuid()) {
+            xbtNode.setAttribute("id", ScoreGuid.randomGuid());
+        }
+
+        Element restrictionNode = newElement("restriction");
+        restrictionNode.setAttribute("base", xbt.getBuiltinType());
+        xbtNode.addContent(restrictionNode);
+
+        if (facetRestri.getMinLength() != null) {
+            Element minLengthNode = newElement("minLength");
+            minLengthNode.setAttribute("value", facetRestri.getMinLength().toString());
+            restrictionNode.addContent(minLengthNode);
+        }
+        if (facetRestri.getMaxLength() != null) {
+            Element maxLengthNode = newElement("maxLength");
+            maxLengthNode.setAttribute("value", facetRestri.getMaxLength().toString());
+            restrictionNode.addContent(maxLengthNode);
+        }
+        if (facetRestri.getPattern() != null) {
+            Element patternNode = newElement("pattern");
+            patternNode.setAttribute("value", facetRestri.getPattern().toString());
+            restrictionNode.addContent(patternNode);
+        }
+
+        schemaNode.addContent(xbtNode);
+
+        return name;
     }
 
     public void addXbtSimpleType(Xbt xbt) {
         /*
          * Issue #521
          * If XBT has a value of schema definition, it is not XML Schema Built-in Type.
-         * It should generated as the XML Schema simple type at the global level.
+         * It should be generated as the XML Schema simple type at the global level.
          */
         if (xbt == null || !StringUtils.hasLength(xbt.getSchemaDefinition())) {
             return;
@@ -896,7 +959,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         eNode = handleElementBBIE(bbie, eNode);
 
         if (bcc.getEntityType() == BCCEntityType.Element.getValue()) {
-            while (!parent.getName().equals("sequence")) {
+            while (!parent.getName().equals("sequence") && !parent.getName().equals("choice")) {
                 parent = parent.getParentElement();
             }
             parent.addContent(eNode);
@@ -922,7 +985,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 } else {
                     if (bbie.getBdtPriRestriId() == null) {
                         if (bbieScList.isEmpty()) {
-                            eNode = setBBIEType(bdt, eNode);
+                            eNode = setBBIEType(bbie, eNode);
                         } else {
                             eNode = generateBDT(bbie, eNode);
                             eNode = generateSCs(bbie, eNode, bbieScList);
@@ -940,10 +1003,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 if (option.isBieGuid()) {
                     eNode.setAttribute("id", ScoreGuid.randomGuid());
                 }
-                generateCodeList(codeList, bdt);
+                generateCodeList(codeList, bbie);
 
                 if (bbieScList.isEmpty()) {
-                    eNode.setAttribute("type", Helper.getCodeListTypeName(codeList));
+                    AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+                    eNode.setAttribute("type", Helper.getCodeListTypeName(codeList, agencyIdListValue));
                 } else {
                     eNode = generateBDT(bbie, eNode, codeList);
                     eNode = generateSCs(bbie, eNode, bbieScList);
@@ -992,19 +1056,23 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 if (option.isBieGuid()) {
                     eNode.setAttribute("id", ScoreGuid.randomGuid());
                 }
-                generateCodeList(codeList, bdt);
+                generateCodeList(codeList, bbie);
 
                 if (bbieScList.isEmpty()) {
-                    if (Helper.getCodeListTypeName(codeList) != null) {
-                        eNode.setAttribute("type", Helper.getCodeListTypeName(codeList));
+                    AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+                    String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                    if (StringUtils.hasLength(codeListTypeName)) {
+                        eNode.setAttribute("type", codeListTypeName);
                     }
                     return eNode;
                 } else {
                     if (bbie.getBdtPriRestriId() == null) {
                         eNode = setBBIE_Attr_Type(bdt, eNode);
                     } else {
-                        if (Helper.getCodeListTypeName(codeList) != null) {
-                            eNode.setAttribute("type", Helper.getCodeListTypeName(codeList));
+                        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+                        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                        if (StringUtils.hasLength(codeListTypeName)) {
+                            eNode.setAttribute("type", codeListTypeName);
                         }
                     }
                 }
@@ -1027,10 +1095,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         return eNode;
     }
 
-    public String setCodeListRestrictionAttr(DT bdt) {
+    public String setCodeListRestrictionAttr(BBIE bbie) {
         BdtPriRestri bdtPriRestri =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
-        if (bdtPriRestri.getCodeListId() != null) {
+                generationContext.findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
+        if (bdtPriRestri.getCodeListManifestId() != null) {
             return "xsd:token";
         } else {
             CdtAwdPriXpsTypeMap cdtAwdPriXpsTypeMap =
@@ -1041,10 +1109,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
     }
 
-    public String setCodeListRestrictionAttr(DTSC dtSc) {
+    public String setCodeListRestrictionAttr(BBIESC bbieSc) {
         BdtScPriRestri bdtScPriRestri =
-                generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
-        if (bdtScPriRestri.getCodeListId() != null) {
+                generationContext.findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc);
+        if (bdtScPriRestri.getCodeListManifestId() != null) {
             return "xsd:token";
         } else {
             CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
@@ -1055,12 +1123,12 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
     }
 
-    public Element generateCodeList(CodeList codeList, DT bdt) {
-        return generateCodeList(codeList, setCodeListRestrictionAttr(bdt));
+    public Element generateCodeList(CodeList codeList, BBIE bbie) {
+        return generateCodeList(codeList, setCodeListRestrictionAttr(bbie));
     }
 
-    public Element generateCodeList(CodeList codeList, DTSC dtSc) {
-        return generateCodeList(codeList, setCodeListRestrictionAttr(dtSc));
+    public Element generateCodeList(CodeList codeList, BBIESC bbieSc) {
+        return generateCodeList(codeList, setCodeListRestrictionAttr(bbieSc));
     }
 
     private Element generateCodeList(CodeList codeList, String codeListRestrictionAttr) {
@@ -1070,7 +1138,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         Element stNode = newElement("simpleType");
 
-        stNode.setAttribute("name", Helper.getCodeListTypeName(codeList));
+        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+        stNode.setAttribute("name", Helper.getCodeListTypeName(codeList, agencyIdListValue));
         if (option.isBieGuid()) {
             stNode.setAttribute("id", getGuidWithPrefix(codeList.getGuid()));
         }
@@ -1140,16 +1209,21 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         DTSC dtSc = generationContext.findDtSc(bbieSc.getBasedDtScManifestId());
         if (dtSc != null) {
             BdtScPriRestri bdtScPriRestri =
-                    generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
+                    generationContext.findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc);
             if (bdtScPriRestri != null) {
                 CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
                         generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
                 if (cdtScAwdPriXpsTypeMap != null) {
                     Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
-                    if (xbt != null && xbt.getBuiltinType() != null) {
-                        gNode.setAttribute("type", xbt.getBuiltinType());
+
+                    String typeName = null;
+                    if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+                        typeName = addXbtSimpleType(xbt, bbieSc);
+                    } else {
+                        addXbtSimpleType(xbt);
                     }
-                    addXbtSimpleType(xbt);
+
+                    gNode.setAttribute("type", (typeName != null) ? typeName : xbt.getBuiltinType());
                 }
             }
         }
@@ -1162,10 +1236,16 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap =
                 generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
         Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
-        if (xbt.getBuiltinType() != null) {
-            gNode.setAttribute("type", xbt.getBuiltinType());
+
+        String typeName = null;
+        if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+            typeName = addXbtSimpleType(xbt, bbieSc);
+        } else {
+            addXbtSimpleType(xbt);
         }
-        addXbtSimpleType(xbt);
+
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.getBuiltinType());
+
         return gNode;
 
     }
@@ -1223,11 +1303,12 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     aNode.setAttribute("id", ScoreGuid.randomGuid());
                 }
 
-                DTSC dtSc = generationContext.findDtSc(bbieSc.getBasedDtScManifestId());
-                generateCodeList(codeList, dtSc);
+                generateCodeList(codeList, bbieSc);
 
-                if (Helper.getCodeListTypeName(codeList) != null) {
-                    aNode.setAttribute("type", Helper.getCodeListTypeName(codeList));
+                AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+                String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                if (StringUtils.hasLength(codeListTypeName)) {
+                    aNode.setAttribute("type", codeListTypeName);
                 }
             }
 

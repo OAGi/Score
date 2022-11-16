@@ -34,19 +34,22 @@
       <div class="row pt-2 ml-0 mr-0" (window:resize)="onResize($event)">
         <div class="col-6">
           <div class="row tree-search-box" *ngIf="sourceSearcher && sourceDataSource">
-            <div class="col-9">
+            <div class="col-8">
               <mat-form-field>
                 <mat-placeholder *ngIf="!sourceSelectedNode">Search</mat-placeholder>
                 <mat-placeholder *ngIf="sourceSelectedNode">Search > {{sourceSelectedNode.name}}</mat-placeholder>
                 <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
+                       [disabled]="sourceSearcher.isSearching"
                        (keyup.enter)="search('source')">
-                <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length > 0"
-                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}}+</mat-hint>
-                <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length === 0"
-                          align="end">0/0</mat-hint>
+                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && sourceSearcher.searchResult.length > 0"
+                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}} in {{ sourceSearcher.searchedItemCount }}{{ sourceSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && !sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0"
+                          align="end">0 results in {{ sourceSearcher.searchedItemCount }} nodes</mat-hint>
+                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0"
+                          align="end">0 results</mat-hint>
               </mat-form-field>
             </div>
-            <div class="col-3 buttons">
+            <div class="col-3 actions-wrap">
               <button mat-icon-button
                       [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
                       (click)="move('source', -1)">
@@ -58,8 +61,11 @@
                 <mat-icon>keyboard_arrow_down</mat-icon>
               </button>
               <button mat-icon-button
+                      [hidden]="sourceSearcher.fullSearched"
+                      [disabled]="sourceSearcher.isSearching"
+                      [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
                       (click)="search('source', false, true)">
-                <mat-icon>search</mat-icon>
+                <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
               </button>
               <button mat-icon-button
                       [hidden]="!sourceSearcher.inputKeyword"
@@ -71,6 +77,21 @@
                                       [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
               </div>
             </div>
+            <div class="col-1 actions-wrap">
+              <div class="actions ml-auto">
+                <button mat-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
+                  <mat-icon>settings</mat-icon>
+                </button>
+              </div>
+            </div>
+            <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
+              <button mat-menu-item>
+                <mat-checkbox class="d-inline-flex pr-2"
+                              [(ngModel)]="sourceDataSource.hideCardinality">
+                  <span>Hide cardinality</span>
+                </mat-checkbox>
+              </button>
+            </mat-menu>
           </div>
           <div class="row" style="padding: 0 15px;">
             <div class="tree-breadcrumbs-wrap" id="bc-source" *ngIf="sourceSelectedNode">
@@ -87,7 +108,7 @@
           <!-- Source BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx(sourceDataSource) }}" maxBufferPx="{{ maxBufferPx(sourceDataSource) }}"
+              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                            [style.height.px]="innerHeight" #sourceVirtualScroll>
                 <div *cdkVirtualFor="let node of sourceDataSource" class="example-item">
                   <div class="mat-tree-node d-flex pointer"
@@ -96,12 +117,12 @@
                        [class]="{'tree-node-selected': sourceSelectedNode === node}"
                        (click)="onSourceClick(node)"
                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="sourceTreeControl.isExpandable(node); else disabledRef;"
-                            (click)="sourceTreeControl.toggle(node)"
+                    <button *ngIf="sourceDataSource.isExpandable(node); else disabledRef;"
+                            (click)="sourceDataSource.toggle(node)"
                             class="align-self-center"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
-                        {{ sourceTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                        {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                       </mat-icon>
                     </button>
                     <ng-template #disabledRef>
@@ -117,13 +138,19 @@
                           this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex ? 'search-index' : 'asd']"
                           [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
                     </span>
+
+                    <span [class]="['pl-2']" *ngIf="!sourceDataSource.hideCardinality">
+                      {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                    </span>
+
                     <mat-icon matTooltip="Reused"
                               fontSet="fontawesome"
                               fontIcon="fa-recycle"
                               class="pointer" *ngIf="node.derived"></mat-icon>
                     <mat-icon class="align-self-center ml-auto"
-                              *ngIf="sourceTreeControl.isExpandable(node)"
-                              (click)="onContextMenu($event, node)">more_vert
+                              *ngIf="sourceDataSource.isExpandable(node)"
+                              [matMenuTriggerFor]="contextMenu"
+                              (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                     </mat-icon>
                   </div>
                 </div>
@@ -139,19 +166,22 @@
         </div>
         <div class="col-6">
           <div class="row tree-search-box" *ngIf="targetSearcher && targetDataSource">
-            <div class="col-9">
+            <div class="col-8">
               <mat-form-field>
                 <mat-placeholder *ngIf="!targetSelectedNode">Search</mat-placeholder>
                 <mat-placeholder *ngIf="targetSelectedNode">Search > {{targetSelectedNode.name}}</mat-placeholder>
                 <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
+                       [disabled]="targetSearcher.isSearching"
                        (keyup.enter)="search('target')">
-                <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length > 0"
-                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}}+</mat-hint>
-                <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length === 0"
-                          align="end">0/0</mat-hint>
+                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && targetSearcher.searchResult.length > 0"
+                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}} in {{ targetSearcher.searchedItemCount }}{{ targetSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && !targetSearcher.fullSearched && targetSearcher.searchResult.length === 0"
+                          align="end">0 results in {{ targetSearcher.searchedItemCount }} nodes</mat-hint>
+                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && targetSearcher.fullSearched && targetSearcher.searchResult.length === 0"
+                          align="end">0 results</mat-hint>
               </mat-form-field>
             </div>
-            <div class="col-3 buttons">
+            <div class="col-3 actions-wrap">
               <button mat-icon-button
                       [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
                       (click)="move('target', -1)">
@@ -163,8 +193,11 @@
                 <mat-icon>keyboard_arrow_down</mat-icon>
               </button>
               <button mat-icon-button
+                      [hidden]="targetSearcher.fullSearched"
+                      [disabled]="targetSearcher.isSearching"
+                      [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
                       (click)="search('target', false, true)">
-                <mat-icon>search</mat-icon>
+                <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
               </button>
               <button mat-icon-button
                       [hidden]="!targetSearcher.inputKeyword"
@@ -176,6 +209,21 @@
                                       [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
               </div>
             </div>
+            <div class="col-1 actions-wrap">
+              <div class="actions ml-auto">
+                <button mat-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
+                  <mat-icon>settings</mat-icon>
+                </button>
+              </div>
+            </div>
+            <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
+              <button mat-menu-item>
+                <mat-checkbox class="d-inline-flex pr-2"
+                              [(ngModel)]="targetDataSource.hideCardinality">
+                  <span>Hide cardinality</span>
+                </mat-checkbox>
+              </button>
+            </mat-menu>
           </div>
           <div class="row" style="padding: 0 15px;">
             <div class="tree-breadcrumbs-wrap" id="bc-target" *ngIf="targetSelectedNode">
@@ -192,7 +240,7 @@
           <!-- Target BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx(targetDataSource) }}" maxBufferPx="{{ maxBufferPx(targetDataSource) }}"
+              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                            [style.height.px]="innerHeight" #targetVirtualScroll>
                 <div *cdkVirtualFor="let node of targetDataSource" class="example-item">
                   <div class="mat-tree-node d-flex pointer"
@@ -201,12 +249,12 @@
                        [class]="{'tree-node-selected': targetSelectedNode === node}"
                        (click)="onTargetClick(node)"
                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="targetTreeControl.isExpandable(node); else disabledRef;"
-                            (click)="targetTreeControl.toggle(node)"
+                    <button *ngIf="targetDataSource.isExpandable(node); else disabledRef;"
+                            (click)="targetDataSource.toggle(node)"
                             class="align-self-center"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
-                        {{ targetTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                        {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                       </mat-icon>
                     </button>
                     <ng-template #disabledRef>
@@ -222,17 +270,23 @@
                           this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex ? 'search-index' : 'asd']"
                           [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                     </span>
+
+                    <span [class]="['pl-2']" *ngIf="!targetDataSource.hideCardinality">
+                      {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                    </span>
+
                     <mat-icon matTooltip="Select BIE"
                               (click)="matchReused(node)"
-                              class="pointer" *ngIf="node.source && node.source.derived && !node.reusedTolevelAsbiepId">priority_high</mat-icon>
+                              class="pointer" *ngIf="node.source && node.source.derived && !node.reusedTopLevelAsbiepId">priority_high</mat-icon>
                     <mat-icon matTooltip="Reused"
                               fontSet="fontawesome"
                               fontIcon="fa-recycle"
                               (click)="matchReused(node)"
-                              class="pointer" *ngIf="node.reusedTolevelAsbiepId"></mat-icon>
+                              class="pointer" *ngIf="node.reusedTopLevelAsbiepId"></mat-icon>
                     <mat-icon class="align-self-center ml-auto"
-                              *ngIf="targetTreeControl.isExpandable(node)"
-                              (click)="onContextMenu($event, node)">more_vert
+                              *ngIf="targetDataSource.isExpandable(node)"
+                              [matMenuTriggerFor]="contextMenu"
+                              (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                     </mat-icon>
                   </div>
                 </div>
@@ -246,28 +300,24 @@
       </div>
 
       <!-- Context Menu Area -->
-      <context-menu #defaultSourceContextMenu>
-        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item, 2)">
+      <mat-menu class="context-menu" #contextMenu="matMenu">
+        <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 2)"
+                *ngIf="isSource(contextMenuItem)">
           <span class="context-menu-item">Expand 2</span>
-        </ng-template>
-        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item, 3)">
+        </button>
+        <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 3)"
+                *ngIf="isSource(contextMenuItem)">
           <span class="context-menu-item">Expand 3</span>
-        </ng-template>
-        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item)">
-          <span class="context-menu-item">Expand All</span>
-        </ng-template>
-      </context-menu>
-      <context-menu #defaultTargetContextMenu>
-        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item, 2)">
+        </button>
+        <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 2)"
+                *ngIf="isTarget(contextMenuItem)">
           <span class="context-menu-item">Expand 2</span>
-        </ng-template>
-        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item, 3)">
+        </button>
+        <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 3)"
+                *ngIf="isTarget(contextMenuItem)">
           <span class="context-menu-item">Expand 3</span>
-        </ng-template>
-        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item)">
-          <span class="context-menu-item">Expand All</span>
-        </ng-template>
-      </context-menu>
+        </button>
+      </mat-menu>
 
       <div class="row action-group m-0">
         <div class="actions">

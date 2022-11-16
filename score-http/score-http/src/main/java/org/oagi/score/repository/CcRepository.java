@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.jooq.impl.DSL.concat;
-import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -129,8 +127,7 @@ public class CcRepository {
     public List<BdtPriRestriRecord> findAllBdtPriRestri(ULong moduleSetReleaseId) {
         return dslContext.select(BDT_PRI_RESTRI.fields())
                 .from(BDT_PRI_RESTRI)
-                .join(DT).on(BDT_PRI_RESTRI.BDT_ID.eq(DT.DT_ID))
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
+                .join(DT_MANIFEST).on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
                 .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))
                 .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(BdtPriRestriRecord.class);
@@ -150,8 +147,7 @@ public class CcRepository {
     public List<BdtScPriRestriRecord> findAllBdtScPriRestri(ULong moduleSetReleaseId) {
         return dslContext.select(BDT_SC_PRI_RESTRI.fields())
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
+                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
                 .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID))
                 .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(BdtScPriRestriRecord.class);

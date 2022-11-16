@@ -4,7 +4,6 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MaterialModule} from '../../material.module';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
 import {AuthService} from '../../authentication/auth.service';
 import {BieExpressComponent} from './bie-express.component';
@@ -28,9 +27,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    ContextMenuModule.forRoot({
-      useBootstrap4: true,
-    }),
     TranslateModule,
     CommonModule,
     ScoreCommonModule,

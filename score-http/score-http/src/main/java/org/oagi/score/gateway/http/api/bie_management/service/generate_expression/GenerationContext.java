@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.service.generate_expressi
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.oagi.score.data.*;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.component.asbiep.AsbiepReadRepository;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.top_level_asbiep.TopLevelAsbiepReadRepository;
@@ -28,6 +29,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class GenerationContext implements InitializingBean {
 
     private final List<TopLevelAsbiep> topLevelAsbieps;
+    private Map<BigInteger, TopLevelAsbiep> topLevelAsbiepMap;
 
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
@@ -122,10 +124,13 @@ public class GenerationContext implements InitializingBean {
     @Autowired
     private ReleaseRepository releaseRepository;
     // Prepared Datas
-    private Map<BigInteger, BdtPriRestri> findBdtPriRestriByBdtIdAndDefaultIsTrueMap;
+    private Map<BigInteger, BigInteger> findBdtManifestIdByBbieIdMap;
+    private Map<BigInteger, BdtPriRestri> findBdtPriRestriByBdtManifestIdAndDefaultIsTrueMap;
     private Map<BigInteger, BdtPriRestri> findBdtPriRestriMap;
     private Map<BigInteger, CdtAwdPriXpsTypeMap> findCdtAwdPriXpsTypeMapMap;
-    private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriByBdtIdAndDefaultIsTrueMap;
+
+    private Map<BigInteger, BigInteger> findBdtScManifestIdByBbieScIdMap;
+    private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrueMap;
     private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriMap;
     private Map<BigInteger, CdtScAwdPriXpsTypeMap> findCdtScAwdPriXpsTypeMapMap;
     private Map<BigInteger, Xbt> findXbtMap;
@@ -135,12 +140,12 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, BCC> findBCCMap;
     private Map<BigInteger, BCCP> findBCCPMap;
     private Map<BigInteger, List<BCC>> findBCCByFromAccIdMap;
-    private Map<BigInteger, BCCP> findBccpByBccpIdMap;
     private Map<BigInteger, ASCC> findASCCMap;
     private Map<BigInteger, List<ASCC>> findASCCByFromAccIdMap;
     private Map<BigInteger, ASCCP> findASCCPMap;
     private Map<BigInteger, DT> findDTMap;
     private Map<BigInteger, DTSC> findDtScMap;
+    private Map<BigInteger, List<DTSC>> findDtScByOwnerDtManifestIdMap;
     private Map<BigInteger, AgencyIdList> findAgencyIdListMap;
     private Map<BigInteger, AgencyIdListValue> findAgencyIdListValueMap;
     private Map<BigInteger, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
@@ -153,7 +158,7 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, ASBIEP> findAsbiepByRoleOfAbieIdMap;
     private Map<BigInteger, BBIEP> findBBIEPMap;
     private Map<BigInteger, String> findUserNameMap;
-    private Map<BigInteger, String> findReleaseNumberMap;
+    private Map<BigInteger, Release> findReleaseMap;
     private Map<BigInteger, ContextScheme> findContextSchemeMap;
     private Map<BigInteger, ContextCategory> findContextCategoryMap;
 
@@ -191,6 +196,9 @@ public class GenerationContext implements InitializingBean {
         topLevelAsbiepSet.addAll(topLevelAsbieps);
         topLevelAsbiepSet.addAll(findRefTopLevelAsbieps(topLevelAsbiepSet));
 
+        this.topLevelAsbiepMap = topLevelAsbiepSet.stream()
+                .collect(Collectors.toMap(TopLevelAsbiep::getTopLevelAsbiepId, Function.identity()));
+
         init(topLevelAsbiepSet.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toList()), releaseIdSet.iterator().next());
     }
 
@@ -211,16 +219,16 @@ public class GenerationContext implements InitializingBean {
 
     private void init(Collection<BigInteger> topLevelAsbiepIds, BigInteger releaseId) {
         List<BdtPriRestri> bdtPriRestriList = bdtPriRestriRepository.findAll();
-        findBdtPriRestriByBdtIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
+        findBdtPriRestriByBdtManifestIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
                 .filter(e -> e.isDefault())
-                .collect(Collectors.toMap(e -> e.getBdtId(), Function.identity()));
+                .collect(Collectors.toMap(e -> e.getBdtManifestId(), Function.identity()));
         findBdtPriRestriMap = bdtPriRestriList.stream()
                 .collect(Collectors.toMap(e -> e.getBdtPriRestriId(), Function.identity()));
 
         List<BdtScPriRestri> bdtScPriRestriList = bdtScPriRestriRepository.findAll();
-        findBdtScPriRestriByBdtIdAndDefaultIsTrueMap = bdtScPriRestriList.stream()
+        findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrueMap = bdtScPriRestriList.stream()
                 .filter(e -> e.isDefault())
-                .collect(Collectors.toMap(e -> e.getBdtScId(), Function.identity()));
+                .collect(Collectors.toMap(e -> e.getBdtScManifestId(), Function.identity()));
         findBdtScPriRestriMap = bdtScPriRestriList.stream()
                 .collect(Collectors.toMap(e -> e.getBdtScPriRestriId(), Function.identity()));
 
@@ -234,12 +242,12 @@ public class GenerationContext implements InitializingBean {
 
         List<Xbt> xbtList = xbtRepository.findAll();
         findXbtMap = xbtList.stream()
-                .filter(e -> e.getReleaseId() == releaseId)
+                .filter(e -> e.getReleaseId().equals(releaseId))
                 .collect(Collectors.toMap(e -> e.getXbtId(), Function.identity()));
 
-        List<CodeList> codeLists = codeListRepository.findAll();
+        List<CodeList> codeLists = codeListRepository.findAllByReleaseId(releaseId);
         findCodeListMap = codeLists.stream()
-                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+                .collect(Collectors.toMap(e -> e.getCodeListManifestId(), Function.identity()));
 
         List<CodeListValue> codeListValues = codeListValueRepository.findAll();
         findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap = codeListValues.stream()
@@ -257,8 +265,6 @@ public class GenerationContext implements InitializingBean {
         List<BCCP> bccpList = bccpRepository.findAllByReleaseId(releaseId);
         findBCCPMap = bccpList.stream()
                 .collect(Collectors.toMap(e -> e.getBccpManifestId(), Function.identity()));
-        findBccpByBccpIdMap = bccpList.stream()
-                .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
 
         List<ASCC> asccList = asccRepository.findAllByReleaseId(releaseId);
         findASCCMap = asccList.stream()
@@ -273,16 +279,18 @@ public class GenerationContext implements InitializingBean {
 
         List<DT> dataTypeList = dataTypeRepository.findAll();
         findDTMap = dataTypeList.stream()
-                .filter(e -> e.getReleaseId() == releaseId)
-                .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
+                .filter(e -> e.getReleaseId().equals(releaseId))
+                .collect(Collectors.toMap(e -> e.getDtManifestId(), Function.identity()));
 
         List<DTSC> dtScList = dtScRepository.findAllByReleaseId(releaseId);
         findDtScMap = dtScList.stream()
                 .collect(Collectors.toMap(e -> e.getDtScManifestId(), Function.identity()));
+        findDtScByOwnerDtManifestIdMap = dtScList.stream()
+                .collect(Collectors.groupingBy(DTSC::getOwnerDtManifestId));
 
-        List<AgencyIdList> agencyIdLists = agencyIdListRepository.findAll();
+        List<AgencyIdList> agencyIdLists = agencyIdListRepository.findAllByReleaseId(releaseId);
         findAgencyIdListMap = agencyIdLists.stream()
-                .collect(Collectors.toMap(e -> e.getAgencyIdListId(), Function.identity()));
+                .collect(Collectors.toMap(e -> e.getAgencyIdListManifestId(), Function.identity()));
 
         List<AgencyIdListValue> agencyIdListValues = agencyIdListValueRepository.findAll();
         findAgencyIdListValueMap = agencyIdListValues.stream()
@@ -324,8 +332,8 @@ public class GenerationContext implements InitializingBean {
                 .collect(Collectors.toMap(e -> e.getBbiepId(), Function.identity()));
 
         findUserNameMap = userRepository.getUsernameMap();
-        findReleaseNumberMap = releaseRepository.findAll().stream()
-                .collect(Collectors.toMap(e -> e.getReleaseId(), e -> e.getReleaseNum()));
+        findReleaseMap = releaseRepository.findAll().stream()
+                .collect(Collectors.toMap(e -> e.getReleaseId(), Function.identity()));
 
         findContextSchemeMap = ctxSchemeRepository.findAll().stream()
                 .collect(Collectors.toMap(e -> e.getCtxSchemeId(), Function.identity()));
@@ -333,8 +341,20 @@ public class GenerationContext implements InitializingBean {
                 .collect(Collectors.toMap(e -> e.getCtxCategoryId(), Function.identity()));
     }
 
-    public BdtPriRestri findBdtPriRestriByBdtIdAndDefaultIsTrue(BigInteger bdtId) {
-        return (bdtId != null && bdtId.longValue() > 0L) ? findBdtPriRestriByBdtIdAndDefaultIsTrueMap.get(bdtId) : null;
+    private static BigInteger BASE_ID_FOR_DUMMIES = BigInteger.valueOf(100000000L);
+
+    public TopLevelAsbiep findTopLevelAsbiep(BigInteger topLevelAsbiepId) {
+        return this.topLevelAsbiepMap.get(topLevelAsbiepId);
+    }
+
+    public BdtPriRestri findBdtPriRestriByBbieAndDefaultIsTrue(BBIE bbie) {
+        BCC bcc = findBCC(bbie.getBasedBccManifestId());
+        BCCP bccp = findBCCP(bcc.getToBccpManifestId());
+        return findBdtPriRestriByBdtManifestIdAndDefaultIsTrue(bccp.getBdtManifestId());
+    }
+
+    public BdtPriRestri findBdtPriRestriByBdtManifestIdAndDefaultIsTrue(BigInteger bdtManifestId) {
+        return (bdtManifestId != null && bdtManifestId.longValue() > 0L) ? findBdtPriRestriByBdtManifestIdAndDefaultIsTrueMap.get(bdtManifestId) : null;
     }
 
     public BdtPriRestri findBdtPriRestri(BigInteger bdtPriRestriId) {
@@ -346,8 +366,13 @@ public class GenerationContext implements InitializingBean {
                 findCdtAwdPriXpsTypeMapMap.get(cdtAwdPriXpsTypeMapId) : null;
     }
 
-    public BdtScPriRestri findBdtScPriRestriByBdtScIdAndDefaultIsTrue(BigInteger bdtScId) {
-        return (bdtScId != null && bdtScId.longValue() > 0L) ? findBdtScPriRestriByBdtIdAndDefaultIsTrueMap.get(bdtScId) : null;
+    public BdtScPriRestri findBdtScPriRestriByBbieScAndDefaultIsTrue(BBIESC bbieSc) {
+        DTSC dtSc = findDtSc(bbieSc.getBasedDtScManifestId());
+        return findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrue(dtSc.getDtScManifestId());
+    }
+
+    public BdtScPriRestri findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrue(BigInteger bdtScManifestId) {
+        return (bdtScManifestId != null && bdtScManifestId.longValue() > 0L) ? findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrueMap.get(bdtScManifestId) : null;
     }
 
     public BdtScPriRestri findBdtScPriRestri(BigInteger bdtScPriRestriId) {
@@ -363,8 +388,8 @@ public class GenerationContext implements InitializingBean {
         return (xbtId.longValue() > 0L) ? findXbtMap.get(xbtId) : null;
     }
 
-    public CodeList findCodeList(BigInteger codeListId) {
-        return (codeListId != null && codeListId.longValue() > 0L) ? findCodeListMap.get(codeListId) : null;
+    public CodeList findCodeList(BigInteger codeListManifestId) {
+        return (codeListManifestId != null && codeListManifestId.longValue() > 0L) ? findCodeListMap.get(codeListManifestId) : null;
     }
 
     public List<CodeListValue> findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(BigInteger codeListId) {
@@ -393,16 +418,16 @@ public class GenerationContext implements InitializingBean {
         return (asccpManifestId != null && asccpManifestId.longValue() > 0L) ? findASCCPMap.get(asccpManifestId) : null;
     }
 
-    public DT findDT(BigInteger dtId) {
-        return (dtId != null && dtId.longValue() > 0L) ? findDTMap.get(dtId) : null;
+    public DT findDT(BigInteger dtManifestId) {
+        return (dtManifestId != null && dtManifestId.longValue() > 0L) ? findDTMap.get(dtManifestId) : null;
     }
 
     public DTSC findDtSc(BigInteger dtScManifestId) {
         return (dtScManifestId != null && dtScManifestId.longValue() > 0L) ? findDtScMap.get(dtScManifestId) : null;
     }
 
-    public AgencyIdList findAgencyIdList(BigInteger agencyIdListId) {
-        return (agencyIdListId != null && agencyIdListId.longValue() > 0L) ? findAgencyIdListMap.get(agencyIdListId) : null;
+    public AgencyIdList findAgencyIdList(BigInteger agencyIdListManifestId) {
+        return (agencyIdListManifestId != null && agencyIdListManifestId.longValue() > 0L) ? findAgencyIdListMap.get(agencyIdListManifestId) : null;
     }
 
     public AgencyIdListValue findAgencyIdListValue(BigInteger agencyIdListValueId) {
@@ -415,46 +440,163 @@ public class GenerationContext implements InitializingBean {
                 Collections.emptyList();
     }
 
-    public ABIE findAbie(BigInteger abieId) {
-        return (abieId != null && abieId.longValue() > 0L) ? findAbieMap.get(abieId) : null;
+    public ABIE findAbie(BigInteger abieId, TopLevelAsbiep topLevelAsbiep) {
+        if (abieId == null || abieId.longValue() <= 0L) {
+            return null;
+        }
+        if (abieId.compareTo(BASE_ID_FOR_DUMMIES) == 1) {
+            ACC acc = findACC(abieId.subtract(BASE_ID_FOR_DUMMIES));
+
+            ABIE abie = new ABIE();
+            abie.setAbieId(BASE_ID_FOR_DUMMIES.add(acc.getAccManifestId()));
+            abie.setGuid(ScoreGuid.randomGuid());
+            abie.setBasedAccManifestId(acc.getAccManifestId());
+            abie.setCreatedBy(topLevelAsbiep.getLastUpdatedBy());
+            abie.setLastUpdatedBy(topLevelAsbiep.getLastUpdatedBy());
+            abie.setCreationTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            abie.setLastUpdateTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            abie.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+            return abie;
+        } else {
+            return findAbieMap.get(abieId);
+        }
     }
 
-    public List<BBIE> findBbieByFromAbieIdAndUsedIsTrue(BigInteger fromAbieId) {
-        return findBbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
-                findBbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
-                Collections.emptyList();
-    }
+    public List<BBIESC> findBbieScByBbieIdAndUsedIsTrue(BBIE bbie) {
+        if (bbie == null) {
+            return Collections.emptyList();
+        }
 
-    public List<BBIESC> findBbieScByBbieIdAndUsedIsTrue(BigInteger bbieId) {
-        return findBbieScByBbieIdAndUsedIsTrueMap.containsKey(bbieId) ?
+        BigInteger bbieId = bbie.getBbieId();
+        List<BBIESC> storedBBIESCs =  findBbieScByBbieIdAndUsedIsTrueMap.containsKey(bbieId) ?
                 findBbieScByBbieIdAndUsedIsTrueMap.get(bbieId) :
                 Collections.emptyList();
+
+        TopLevelAsbiep topLevelAsbiep = this.topLevelAsbiepMap.get(bbie.getOwnerTopLevelAsbiepId());
+        if (!topLevelAsbiep.isInverseMode()) {
+            return storedBBIESCs;
+        }
+
+        Map<BigInteger, BBIESC> storedBbieScMap = storedBBIESCs.stream()
+                .collect(Collectors.toMap(BBIESC::getBasedDtScManifestId, Function.identity()));
+
+        BCC bcc = findBCC(bbie.getBasedBccManifestId());
+        BCCP bccp = findBCCP(bcc.getToBccpManifestId());
+        DT bdt = findDT(bccp.getBdtManifestId());
+        List<DTSC> dtScList = findDtScByOwnerDtManifestIdMap.get(bdt.getDtManifestId());
+        if (dtScList == null) {
+            dtScList = Collections.emptyList();
+        }
+        dtScList = dtScList.stream().filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
+
+        List<BBIESC> bbieScList = new ArrayList();
+        for (DTSC dtSc : dtScList) {
+            if (storedBbieScMap.containsKey(dtSc.getDtScManifestId())) {
+                bbieScList.add(storedBbieScMap.get(dtSc.getDtScManifestId()));
+            } else {
+                BBIESC dummyBbieSc = new BBIESC();
+                dummyBbieSc.setBbieScId(BASE_ID_FOR_DUMMIES.add(dtSc.getDtScManifestId()));
+                dummyBbieSc.setGuid(ScoreGuid.randomGuid());
+                dummyBbieSc.setBbieId(bbieId);
+                dummyBbieSc.setBasedDtScManifestId(dtSc.getDtScManifestId());
+
+                BdtScPriRestri bdtScPriRestri =
+                        findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrue(dtSc.getDtScManifestId());
+                dummyBbieSc.setDtScPriRestriId(bdtScPriRestri.getBdtScPriRestriId());
+
+                dummyBbieSc.setCardinalityMin(dtSc.getCardinalityMin());
+                dummyBbieSc.setCardinalityMax(dtSc.getCardinalityMax());
+                dummyBbieSc.setDefaultValue(dtSc.getDefaultValue());
+                dummyBbieSc.setFixedValue(dtSc.getFixedValue());
+                dummyBbieSc.setUsed(topLevelAsbiep.isInverseMode());
+                dummyBbieSc.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+                bbieScList.add(dummyBbieSc);
+            }
+        }
+
+        return bbieScList;
     }
 
-    public List<ASBIE> findAsbieByFromAbieId(BigInteger fromAbieId) {
-        return findAsbieByFromAbieIdMap.containsKey(fromAbieId) ?
-                findAsbieByFromAbieIdMap.get(fromAbieId) :
-                Collections.emptyList();
+    private List<ASCC> findAsccListByAccManifestId(BigInteger accManifestId) {
+        if (!findASCCByFromAccIdMap.containsKey(accManifestId)) {
+            return Collections.emptyList();
+        }
+
+        List<ASCC> asccList = new ArrayList();
+        for (ASCC ascc : findASCCByFromAccIdMap.get(accManifestId)) {
+            ASCCP asccp = findASCCP(ascc.getToAsccpManifestId());
+            ACC acc = findACC(asccp.getRoleOfAccManifestId());
+            OagisComponentType componentType = OagisComponentType.valueOf(acc.getOagisComponentType());
+            if (componentType.isGroup()) {
+                asccList.addAll(findAsccListByAccManifestId(acc.getAccManifestId()));
+            } else {
+                asccList.add(ascc);
+            }
+        }
+        return asccList;
     }
 
-    public ASBIEP findASBIEP(BigInteger asbiepId) {
-        return (asbiepId != null && asbiepId.longValue() > 0L) ? findASBIEPMap.get(asbiepId) : null;
+    public ASBIEP findASBIEP(BigInteger asbiepId, TopLevelAsbiep topLevelAsbiep) {
+        if (asbiepId == null || asbiepId.longValue() <= 0L) {
+            return null;
+        }
+        if (asbiepId.compareTo(BASE_ID_FOR_DUMMIES) == 1) {
+            ASCCP asccp = findASCCP(asbiepId.subtract(BASE_ID_FOR_DUMMIES));
+
+            ASBIEP asbiep = new ASBIEP();
+            asbiep.setAsbiepId(BASE_ID_FOR_DUMMIES.add(asccp.getAsccpManifestId()));
+            asbiep.setGuid(ScoreGuid.randomGuid());
+            asbiep.setBasedAsccpManifestId(asccp.getAsccpManifestId());
+            ACC roleOfAcc = findACC(asccp.getRoleOfAccManifestId());
+            asbiep.setRoleOfAbieId(BASE_ID_FOR_DUMMIES.add(roleOfAcc.getAccManifestId()));
+            asbiep.setCreatedBy(topLevelAsbiep.getLastUpdatedBy());
+            asbiep.setLastUpdatedBy(topLevelAsbiep.getLastUpdatedBy());
+            asbiep.setCreationTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            asbiep.setLastUpdateTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            asbiep.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+            return asbiep;
+        } else {
+            return findASBIEPMap.get(asbiepId);
+        }
     }
 
     public ASBIEP findAsbiepByRoleOfAbieId(BigInteger roleOfAbieId) {
         return (roleOfAbieId != null && roleOfAbieId.longValue() > 0L) ? findAsbiepByRoleOfAbieIdMap.get(roleOfAbieId) : null;
     }
 
-    public BBIEP findBBIEP(BigInteger bbiepId) {
-        return (bbiepId != null && bbiepId.longValue() > 0L) ? findBBIEPMap.get(bbiepId) : null;
+    public BBIEP findBBIEP(BigInteger bbiepId, TopLevelAsbiep topLevelAsbiep) {
+        if (bbiepId == null || bbiepId.longValue() <= 0L) {
+            return null;
+        }
+        if (bbiepId.compareTo(BASE_ID_FOR_DUMMIES) == 1) {
+            BCCP bccp = findBCCP(bbiepId.subtract(BASE_ID_FOR_DUMMIES));
+
+            BBIEP bbiep = new BBIEP();
+            bbiep.setBbiepId(BASE_ID_FOR_DUMMIES.add(bccp.getBccpManifestId()));
+            bbiep.setGuid(ScoreGuid.randomGuid());
+            bbiep.setBasedBccpManifestId(bccp.getBccpManifestId());
+            bbiep.setCreatedBy(topLevelAsbiep.getLastUpdatedBy());
+            bbiep.setLastUpdatedBy(topLevelAsbiep.getLastUpdatedBy());
+            bbiep.setCreationTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            bbiep.setLastUpdateTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+            bbiep.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+            return bbiep;
+        } else {
+            return findBBIEPMap.get(bbiepId);
+        }
     }
 
     public String findUserName(BigInteger userId) {
         return (userId != null && userId.longValue() > 0L) ? findUserNameMap.get(userId) : null;
     }
 
+    public Release findRelease(BigInteger releaseId) {
+        return (releaseId != null && releaseId.longValue() > 0L) ? findReleaseMap.get(releaseId) : null;
+    }
+
     public String findReleaseNumber(BigInteger releaseId) {
-        return (releaseId != null && releaseId.longValue() > 0L) ? findReleaseNumberMap.get(releaseId) : null;
+        Release release = findRelease(releaseId);
+        return (release != null) ? release.getReleaseNum() : null;
     }
 
     public ACC queryBasedACC(ABIE abie) {
@@ -540,11 +682,10 @@ public class GenerationContext implements InitializingBean {
             return Collections.emptyList();
         }
 
-        List<ASBIE> asbieList = findAsbieByFromAbieId(abie.getAbieId());
-        List<BBIE> bbieList = findBbieByFromAbieIdAndUsedIsTrue(abie.getAbieId());
+        TopLevelAsbiep topLevelAsbiep = this.topLevelAsbiepMap.get(abie.getOwnerTopLevelAsbiepId());
 
         List<BIE> result = new ArrayList();
-        for (BIE bie : sorted(abie, asbieList, bbieList)) {
+        for (BIE bie : findAssociationBIEs(abie)) {
             if (bie instanceof BBIE) {
                 BBIE bbie = (BBIE) bie;
                 if (bbie.getCardinalityMax() != 0) {
@@ -552,8 +693,8 @@ public class GenerationContext implements InitializingBean {
                 }
             } else {
                 ASBIE asbie = (ASBIE) bie;
-                ASBIEP toAsbiep = findASBIEP(asbie.getToAsbiepId());
-                ABIE roleOfAbie = findAbie(toAsbiep.getRoleOfAbieId());
+                ASBIEP toAsbiep = findASBIEP(asbie.getToAsbiepId(), topLevelAsbiep);
+                ABIE roleOfAbie = findAbie(toAsbiep.getRoleOfAbieId(), topLevelAsbiep);
                 ACC roleOfAcc = findACC(roleOfAbie.getBasedAccManifestId());
 
                 OagisComponentType oagisComponentType = OagisComponentType.valueOf(roleOfAcc.getOagisComponentType());
@@ -568,9 +709,139 @@ public class GenerationContext implements InitializingBean {
         return result;
     }
 
+    public List<BIE> findAssociationBIEs(ABIE abie) {
+        if (abie == null) {
+            return Collections.emptyList();
+        }
+
+        BigInteger fromAbieId = abie.getAbieId();
+        List<ASBIE> storedASBIEs = findAsbieByFromAbieIdMap.containsKey(fromAbieId) ?
+                findAsbieByFromAbieIdMap.get(fromAbieId) :
+                Collections.emptyList();
+        List<BBIE> storedBBIEs = findBbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
+                findBbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
+                Collections.emptyList();
+
+        TopLevelAsbiep topLevelAsbiep = this.topLevelAsbiepMap.get(abie.getOwnerTopLevelAsbiepId());
+        if (!topLevelAsbiep.isInverseMode()) {
+            return sorted(abie,
+                    storedASBIEs.stream().filter(e -> e.isUsed()).collect(Collectors.toList()),
+                    storedBBIEs.stream().filter(e -> e.isUsed()).collect(Collectors.toList()));
+        }
+
+        Map<BigInteger, ASBIE> storedAsbieMap = storedASBIEs.stream()
+                .collect(Collectors.toMap(ASBIE::getBasedAsccManifestId, Function.identity()));
+        Map<BigInteger, BBIE> storedBbieMap = storedBBIEs.stream()
+                .collect(Collectors.toMap(BBIE::getBasedBccManifestId, Function.identity()));
+
+        ACC acc = findACC(abie.getBasedAccManifestId());
+        List<CoreComponent> associations = findAssociationCCs(acc);
+
+        List<ASBIE> asbieList = new ArrayList();
+        List<BBIE> bbieList = new ArrayList();
+        for (CoreComponent association : associations) {
+            if (association instanceof ASCC) {
+                ASCC ascc = (ASCC) association;
+                if (storedAsbieMap.containsKey(ascc.getAsccManifestId())) {
+                    asbieList.add(storedAsbieMap.get(ascc.getAsccManifestId()));
+                } else {
+                    ASBIE dummyAsbie = new ASBIE();
+                    dummyAsbie.setAsbieId(BASE_ID_FOR_DUMMIES.add(ascc.getAsccManifestId()));
+                    dummyAsbie.setGuid(ScoreGuid.randomGuid());
+                    dummyAsbie.setBasedAsccManifestId(ascc.getAsccManifestId());
+                    dummyAsbie.setFromAbieId(fromAbieId);
+
+                    ASCCP toAsccp = findASCCP(ascc.getToAsccpManifestId());
+                    dummyAsbie.setToAsbiepId(BASE_ID_FOR_DUMMIES.add(toAsccp.getAsccpManifestId()));
+                    dummyAsbie.setCardinalityMin(ascc.getCardinalityMin());
+                    dummyAsbie.setCardinalityMax(ascc.getCardinalityMax());
+                    dummyAsbie.setCreatedBy(topLevelAsbiep.getLastUpdatedBy());
+                    dummyAsbie.setLastUpdatedBy(topLevelAsbiep.getLastUpdatedBy());
+                    dummyAsbie.setCreationTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+                    dummyAsbie.setLastUpdateTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+                    dummyAsbie.setUsed(topLevelAsbiep.isInverseMode());
+                    dummyAsbie.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+
+                    asbieList.add(dummyAsbie);
+                }
+            } else {
+                BCC bcc = (BCC) association;
+                if (storedBbieMap.containsKey(bcc.getBccManifestId())) {
+                    bbieList.add(storedBbieMap.get(bcc.getBccManifestId()));
+                } else {
+                    BBIE dummyBbie = new BBIE();
+                    dummyBbie.setBbieId(BASE_ID_FOR_DUMMIES.add(bcc.getBccManifestId()));
+                    dummyBbie.setGuid(ScoreGuid.randomGuid());
+                    dummyBbie.setBasedBccManifestId(bcc.getBccManifestId());
+                    dummyBbie.setFromAbieId(fromAbieId);
+
+                    BCCP toBccp = findBCCP(bcc.getToBccpManifestId());
+                    dummyBbie.setToBbiepId(BASE_ID_FOR_DUMMIES.add(toBccp.getBccpManifestId()));
+
+                    BdtPriRestri bdtPriRestri =
+                            findBdtPriRestriByBdtManifestIdAndDefaultIsTrue(toBccp.getBdtManifestId());
+                    dummyBbie.setBdtPriRestriId(bdtPriRestri.getBdtPriRestriId());
+
+                    dummyBbie.setCardinalityMin(bcc.getCardinalityMin());
+                    dummyBbie.setCardinalityMax(bcc.getCardinalityMax());
+                    dummyBbie.setDefaultValue(toBccp.getDefaultValue());
+                    dummyBbie.setFixedValue(toBccp.getFixedValue());
+                    dummyBbie.setNillable(toBccp.isNillable());
+                    dummyBbie.setCreatedBy(topLevelAsbiep.getLastUpdatedBy());
+                    dummyBbie.setLastUpdatedBy(topLevelAsbiep.getLastUpdatedBy());
+                    dummyBbie.setCreationTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+                    dummyBbie.setLastUpdateTimestamp(topLevelAsbiep.getLastUpdateTimestamp());
+                    dummyBbie.setUsed(topLevelAsbiep.isInverseMode());
+                    dummyBbie.setOwnerTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+
+                    bbieList.add(dummyBbie);
+                }
+            }
+        }
+
+        return sorted(abie,
+                asbieList.stream().filter(e -> e.isUsed()).collect(Collectors.toList()),
+                bbieList.stream().filter(e -> e.isUsed()).collect(Collectors.toList()));
+    }
+
+    private List<CoreComponent> findAssociationCCs(ACC acc) {
+        List<CoreComponent> ccList = new ArrayList();
+        Stack<ACC> accStack = new Stack();
+
+        while (acc != null) {
+            accStack.push(acc);
+            if (acc.getBasedAccManifestId() == null) {
+                break;
+            }
+            acc = findACC(acc.getBasedAccManifestId());
+        }
+        while (!accStack.isEmpty()) {
+            acc = accStack.pop();
+
+            BigInteger accManifestId = acc.getAccManifestId();
+
+            if (findASCCByFromAccIdMap.containsKey(accManifestId)) {
+                for (ASCC ascc : findASCCByFromAccIdMap.get(accManifestId)) {
+                    ASCCP asccp = findASCCP(ascc.getToAsccpManifestId());
+                    ACC roleOfAcc = findACC(asccp.getRoleOfAccManifestId());
+                    OagisComponentType componentType = OagisComponentType.valueOf(roleOfAcc.getOagisComponentType());
+                    if (componentType.isGroup()) {
+                        ccList.addAll(findAssociationCCs(roleOfAcc));
+                    } else {
+                        ccList.add(ascc);
+                    }
+                }
+            }
+            if (findBCCByFromAccIdMap.containsKey(accManifestId)) {
+                ccList.addAll(findBCCByFromAccIdMap.get(accManifestId));
+            }
+        }
+        return ccList;
+    }
+
     // Get only SCs whose is_used is true.
     public List<BBIESC> queryBBIESCs(BBIE bbie) {
-        return (bbie != null) ? findBbieScByBbieIdAndUsedIsTrue(bbie.getBbieId()) : Collections.emptyList();
+        return (bbie != null) ? findBbieScByBbieIdAndUsedIsTrue(bbie) : Collections.emptyList();
     }
 
     public ASBIEP receiveASBIEP(ABIE abie) {
@@ -584,7 +855,7 @@ public class GenerationContext implements InitializingBean {
     }
 
     public DT queryBDT(BCCP bccp) {
-        return (bccp != null) ? findDT(bccp.getBdtId()) : null;
+        return (bccp != null) ? findDT(bccp.getBdtManifestId()) : null;
     }
 
     public ASCCP queryBasedASCCP(ASBIEP asbiep) {
@@ -596,16 +867,21 @@ public class GenerationContext implements InitializingBean {
     }
 
     public ABIE queryTargetABIE(ASBIEP asbiep) {
-        return (asbiep != null) ? findAbie(asbiep.getRoleOfAbieId()) : null;
+        if (asbiep == null) {
+            return null;
+        }
+
+        TopLevelAsbiep topLevelAsbiep = this.topLevelAsbiepMap.get(asbiep.getOwnerTopLevelAsbiepId());
+        return findAbie(asbiep.getRoleOfAbieId(), topLevelAsbiep);
     }
 
     public ACC queryTargetACC(ASBIEP asbiep) {
-        ABIE abie = (asbiep != null) ? findAbie(asbiep.getRoleOfAbieId()) : null;
-        return (abie != null) ? findACC(abie.getBasedAccManifestId()) : null;
-    }
+        if (asbiep == null) {
+            return null;
+        }
 
-    public ABIE queryTargetABIE2(ASBIEP asbiep) {
-        return (asbiep != null) ? findAbie(asbiep.getRoleOfAbieId()) : null;
+        ABIE abie = queryTargetABIE(asbiep);
+        return (abie != null) ? findACC(abie.getBasedAccManifestId()) : null;
     }
 
     public BCC queryBasedBCC(BBIE bbie) {
@@ -613,7 +889,7 @@ public class GenerationContext implements InitializingBean {
     }
 
     public BCCP queryToBCCP(BCC bcc) {
-        return (bcc != null) ? findBccpByBccpIdMap.get(bcc.getToBccpId()) : null;
+        return (bcc != null) ? findBCCP(bcc.getToBccpManifestId()) : null;
     }
 
     public CodeList getCodeList(BBIESC bbieSc) {
@@ -621,20 +897,20 @@ public class GenerationContext implements InitializingBean {
             return null;
         }
 
-        CodeList codeList = findCodeList(bbieSc.getCodeListId());
+        CodeList codeList = findCodeList(bbieSc.getCodeListManifestId());
         if (codeList != null) {
             return codeList;
         }
 
         BdtScPriRestri bdtScPriRestri = findBdtScPriRestri(bbieSc.getDtScPriRestriId());
         if (bdtScPriRestri != null) {
-            return findCodeList(bdtScPriRestri.getCodeListId());
+            return findCodeList(bdtScPriRestri.getCodeListManifestId());
         } else {
             DTSC gDTSC = findDtSc(bbieSc.getBasedDtScManifestId());
             BdtScPriRestri bBDTSCPrimitiveRestriction =
-                    (gDTSC != null) ? findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gDTSC.getDtScId()) : null;
+                    (gDTSC != null) ? findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc) : null;
             if (bBDTSCPrimitiveRestriction != null) {
-                codeList = findCodeList(bBDTSCPrimitiveRestriction.getCodeListId());
+                codeList = findCodeList(bBDTSCPrimitiveRestriction.getCodeListManifestId());
             }
         }
 
@@ -645,7 +921,7 @@ public class GenerationContext implements InitializingBean {
         if (bbie == null) {
             return null;
         }
-        AgencyIdList agencyIdList = findAgencyIdList(bbie.getAgencyIdListId());
+        AgencyIdList agencyIdList = findAgencyIdList(bbie.getAgencyIdListManifestId());
         if (agencyIdList != null) {
             return agencyIdList;
         }
@@ -653,14 +929,13 @@ public class GenerationContext implements InitializingBean {
         BdtPriRestri bdtPriRestri =
                 findBdtPriRestri(bbie.getBdtPriRestriId());
         if (bdtPriRestri != null) {
-            agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListId());
+            agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListManifestId());
         }
 
         if (agencyIdList == null) {
-            DT bdt = queryAssocBDT(bbie);
-            bdtPriRestri = findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+            bdtPriRestri = findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
             if (bdtPriRestri != null) {
-                agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListId());
+                agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListManifestId());
             }
         }
         return agencyIdList;
@@ -670,7 +945,7 @@ public class GenerationContext implements InitializingBean {
         if (bbieSc == null) {
             return null;
         }
-        AgencyIdList agencyIdList = findAgencyIdList(bbieSc.getAgencyIdListId());
+        AgencyIdList agencyIdList = findAgencyIdList(bbieSc.getAgencyIdListManifestId());
         if (agencyIdList != null) {
             return agencyIdList;
         }
@@ -678,14 +953,14 @@ public class GenerationContext implements InitializingBean {
         BdtScPriRestri bdtScPriRestri =
                 findBdtScPriRestri(bbieSc.getDtScPriRestriId());
         if (bdtScPriRestri != null) {
-            agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListId());
+            agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListManifestId());
         }
 
         if (agencyIdList == null) {
             DTSC gDTSC = findDtSc(bbieSc.getBasedDtScManifestId());
-            bdtScPriRestri = (gDTSC != null) ? findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gDTSC.getDtScId()) : null;
+            bdtScPriRestri = (gDTSC != null) ? findBdtScPriRestriByBbieScAndDefaultIsTrue(bbieSc) : null;
             if (bdtScPriRestri != null) {
-                agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListId());
+                agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListManifestId());
             }
         }
         return agencyIdList;
@@ -698,7 +973,11 @@ public class GenerationContext implements InitializingBean {
     }
 
     public ASBIEP queryAssocToASBIEP(ASBIE asbie) {
-        return (asbie != null) ? findASBIEP(asbie.getToAsbiepId()) : null;
+        if (asbie == null) {
+            return null;
+        }
+        TopLevelAsbiep topLevelAsbiep = this.topLevelAsbiepMap.get(asbie.getOwnerTopLevelAsbiepId());
+        return findASBIEP(asbie.getToAsbiepId(), topLevelAsbiep);
     }
 
     public DT queryAssocBDT(BBIE bbie) {
@@ -766,6 +1045,15 @@ public class GenerationContext implements InitializingBean {
                 return 1;
             } // returning 0 would merge keys
         }
+    }
+
+    private AsbiepReferenceCounter referenceCounter;
+
+    public AsbiepReferenceCounter referenceCounter() {
+        if (referenceCounter == null) {
+            referenceCounter = new AsbiepReferenceCounter(this);
+        }
+        return referenceCounter;
     }
 
 }

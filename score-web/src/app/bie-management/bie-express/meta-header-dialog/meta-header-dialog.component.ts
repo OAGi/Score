@@ -25,7 +25,7 @@ import {finalize} from 'rxjs/operators';
 export class MetaHeaderDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -56,7 +56,7 @@ export class MetaHeaderDialogComponent implements OnInit {
   ngOnInit() {
     this.request = new BieListRequest(undefined,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.propertyTerm = 'Meta Header';
+    this.request.filters.den = 'Meta Header. Meta Header';
     this.request.access = 'CanView';
     this.request.release = this.release;
 

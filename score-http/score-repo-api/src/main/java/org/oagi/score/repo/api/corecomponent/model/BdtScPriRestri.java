@@ -6,12 +6,12 @@ import java.math.BigInteger;
 public class BdtScPriRestri implements Serializable {
 
     private BigInteger bdtScPriRestriId;
-    private BigInteger bdtScId;
+    private BigInteger bdtScManifestId;
     private BigInteger xbtId;
     private String xbtName;
     private BigInteger cdtScAwdPriXpsTypeMapId;
-    private BigInteger codeListId;
-    private BigInteger agencyIdListId;
+    private BigInteger codeListManifestId;
+    private BigInteger agencyIdListManifestId;
     private boolean isDefault;
 
     public BigInteger getBdtScPriRestriId() {
@@ -22,12 +22,12 @@ public class BdtScPriRestri implements Serializable {
         this.bdtScPriRestriId = bdtScPriRestriId;
     }
 
-    public BigInteger getBdtScId() {
-        return bdtScId;
+    public BigInteger getBdtScManifestId() {
+        return bdtScManifestId;
     }
 
-    public void setBdtScId(BigInteger bdtScId) {
-        this.bdtScId = bdtScId;
+    public void setBdtScManifestId(BigInteger bdtScManifestId) {
+        this.bdtScManifestId = bdtScManifestId;
     }
 
     public BigInteger getXbtId() {
@@ -54,20 +54,20 @@ public class BdtScPriRestri implements Serializable {
         this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
     }
 
-    public BigInteger getCodeListId() {
-        return codeListId;
+    public BigInteger getCodeListManifestId() {
+        return codeListManifestId;
     }
 
-    public void setCodeListId(BigInteger codeListId) {
-        this.codeListId = codeListId;
+    public void setCodeListManifestId(BigInteger codeListManifestId) {
+        this.codeListManifestId = codeListManifestId;
     }
 
-    public BigInteger getAgencyIdListId() {
-        return agencyIdListId;
+    public BigInteger getAgencyIdListManifestId() {
+        return agencyIdListManifestId;
     }
 
-    public void setAgencyIdListId(BigInteger agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+    public void setAgencyIdListManifestId(BigInteger agencyIdListManifestId) {
+        this.agencyIdListManifestId = agencyIdListManifestId;
     }
 
     public boolean isDefault() {

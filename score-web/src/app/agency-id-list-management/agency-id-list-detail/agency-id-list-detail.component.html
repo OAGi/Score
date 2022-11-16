@@ -70,7 +70,7 @@
             <div class="col-12 actions-wrap" *ngIf="isWorkingRelease()">
               <button mat-raised-button color="primary" (click)="update()"
                       *ngIf="state === 'WIP' && access === 'CanEdit'"
-                      [disabled]="!isChanged">
+                      [disabled]="isUpdating || !isChanged">
                 Update
               </button>
               <button mat-raised-button color="accent" (click)="updateState('Draft')"
@@ -116,7 +116,7 @@
               </button>
               <button mat-raised-button color="primary" (click)="update()"
                       *ngIf="state === 'WIP' && access === 'CanEdit'"
-                      [disabled]="!isChanged">
+                      [disabled]="isUpdating || !isChanged">
                 Update
               </button>
               <button mat-raised-button color="accent" (click)="updateState('QA')"
@@ -167,6 +167,13 @@
               </div>
               <div class="col-2">
                 <mat-form-field>
+                  <mat-label>GUID</mat-label>
+                  <input matInput maxlength="41"
+                         [(ngModel)]="agencyIdList.guid" [disabled]="true">
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
                   <mat-label>Release</mat-label>
                   <input matInput [(ngModel)]="agencyIdList.releaseNum" [disabled]="true">
                 </mat-form-field>
@@ -177,13 +184,13 @@
                   <input matInput [(ngModel)]="agencyIdList.revisionNum" [disabled]="true">
                 </mat-form-field>
               </div>
-              <div class="col-3">
+              <div class="col-2">
                 <mat-form-field>
                   <mat-label>State</mat-label>
                   <input matInput [(ngModel)]="agencyIdList.state" [disabled]="true">
                 </mat-form-field>
               </div>
-              <div class="col-3">
+              <div class="col-2">
                 <mat-form-field *ngIf="agencyIdList && agencyIdList.owner">
                   <mat-label>Owner</mat-label>
                   <input matInput [(ngModel)]="agencyIdList.owner.username" [disabled]="true">
@@ -192,83 +199,44 @@
             </div>
 
             <div class="row">
-              <div class="col-12">
+              <div class="col-2"
+                   *ngIf="agencyIdList.basedAgencyIdListManifestId !== undefined && agencyIdList.basedAgencyIdListManifestId > 0">
                 <mat-form-field>
-                  <mat-label>GUID</mat-label>
-                  <input matInput maxlength="41"
-                         [(ngModel)]="agencyIdList.guid" [disabled]="true">
+                  <mat-label>Based Agency ID List</mat-label>
+                  <input matInput required data-id="agencyIdList.basedAgencyIdList" [(ngModel)]="agencyIdList.basedAgencyIdListName"
+                         maxlength="100" [disabled]="true"/>
                 </mat-form-field>
               </div>
-            </div>
-
-            <mat-form-field *ngIf="agencyIdList.basedAgencyIdListManifestId !== undefined && agencyIdList.basedAgencyIdListManifestId > 0">
-              <mat-label>Based Agency ID List</mat-label>
-              <input matInput required data-id="agencyIdList.basedAgencyIdList" [(ngModel)]="agencyIdList.basedAgencyIdListName"
-                     maxlength="100" [disabled]="true"/>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Name</mat-label>
-              <input matInput required data-id="agencyIdList.name" [(ngModel)]="agencyIdList.name" maxlength="100"
-                     [disabled]="access !== 'CanEdit' || hasRevision"/>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>List ID</mat-label>
-              <input matInput required data-id="agencyIdList.listId" [(ngModel)]="agencyIdList.listId" maxlength="100"
-                     [disabled]="access !== 'CanEdit' || hasRevision"/>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Agency ID</mat-label>
-              <mat-select data-id="agencyIdList.agencyIdListValueId" [(ngModel)]="agencyIdList.agencyIdListValueManifestId"
-                          [disabled]="access !== 'CanEdit' || hasRevision">
-                <mat-option>
-                  <ngx-mat-select-search [formControl]="valueFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
-                </mat-option>
-                <mat-option *ngFor="let value of valueFilteredList | async" [value]="value.agencyIdListValueManifestId">
-                  {{ value.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Version</mat-label>
-              <input matInput required data-id="agencyIdList.version" [(ngModel)]="agencyIdList.versionId" maxlength="100"
-                     [disabled]="access !== 'CanEdit'"/>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Namespace</mat-label>
-              <mat-select data-id="agencyIdList.namespace" [(ngModel)]="agencyIdList.namespaceId" placeholder="Namespace" required
-                          [disabled]="access !== 'CanEdit' || hasRevision">
-                <mat-option *ngFor="let namespace of getSelectableNamespaces(agencyIdList.namespaceId)"
-                            [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Definition</mat-label>
-              <textarea rows="6" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition"
-                        [disabled]="access !== 'CanEdit'"></textarea>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Definition Source</mat-label>
-              <input matInput data-id="agencyIdList.definitionSource" [(ngModel)]="agencyIdList.definitionSource" maxlength="100"
-                     [disabled]="access !== 'CanEdit'"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!userRoles.includes('developer')">
-              <mat-label>Remark</mat-label>
-              <input matInput data-id="agencyIdList.remark" [(ngModel)]="agencyIdList.remark" maxlength="225"
-                     [disabled]="access !== 'CanEdit'"/>
-            </mat-form-field>
-
-            <div *ngIf="showDeprecateCheckbox" class="row" style="padding: 14px 0 22px 0;">
-              <div class="col-12" >
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Name</mat-label>
+                  <input matInput required data-id="agencyIdList.name" [(ngModel)]="agencyIdList.name" maxlength="100"
+                         [disabled]="access !== 'CanEdit' || hasRevision"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>List ID</mat-label>
+                  <input matInput required data-id="agencyIdList.listId" [(ngModel)]="agencyIdList.listId" maxlength="100"
+                         [disabled]="access !== 'CanEdit' || hasRevision"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Version</mat-label>
+                  <input matInput required data-id="agencyIdList.version" [(ngModel)]="agencyIdList.versionId" maxlength="100"
+                         [disabled]="access !== 'CanEdit'"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2"
+                   *ngIf="!userRoles.includes('developer')">
+                <mat-form-field>
+                  <mat-label>Remark</mat-label>
+                  <input matInput data-id="agencyIdList.remark" [(ngModel)]="agencyIdList.remark" maxlength="225"
+                         [disabled]="access !== 'CanEdit'"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2" *ngIf="showDeprecateCheckbox">
                 <mat-checkbox color="primary"
                               data-id="agencyIdList.deprecated" [(ngModel)]="agencyIdList.deprecated"
                               [disabled]="access !== 'CanEdit' || !canDeprecate">
@@ -276,13 +244,78 @@
                 </mat-checkbox>
               </div>
             </div>
+
+            <div class="row">
+              <div class="col-4">
+                <mat-form-field>
+                  <mat-label>Definition</mat-label>
+                  <textarea rows="5" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition"
+                            [disabled]="access !== 'CanEdit'"></textarea>
+                </mat-form-field>
+              </div>
+              <div class="col-8">
+                <div class="row">
+                  <div class="col-6">
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field>
+                      <mat-label>Agency ID List Value</mat-label>
+                      <mat-select data-id="agencyIdList.agencyIdListValueId" [(ngModel)]="agencyIdList.agencyIdListValueManifestId"
+                                  [disabled]="access !== 'CanEdit' || hasRevision">
+                        <mat-option>
+                          <ngx-mat-select-search [formControl]="valueFilterCtrl"
+                                                 [placeholderLabel]="'Search...'"
+                                                 [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let value of valueFilteredList | async" [value]="value.agencyIdListValueManifestId">
+                          {{ value.name }} ({{ value.value }})
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <mat-form-field>
+                      <mat-label>Definition Source</mat-label>
+                      <input matInput data-id="agencyIdList.definitionSource" [(ngModel)]="agencyIdList.definitionSource" maxlength="100"
+                             [disabled]="access !== 'CanEdit'"/>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field>
+                      <mat-label>Namespace</mat-label>
+                      <mat-select data-id="agencyIdList.namespace" [(ngModel)]="agencyIdList.namespaceId" placeholder="Namespace" required
+                                  [disabled]="access !== 'CanEdit' || hasRevision">
+                        <mat-option *ngFor="let namespace of getSelectableNamespaces(agencyIdList.namespaceId)"
+                                    [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
           </mat-card-content>
         </mat-card>
       </mat-card>
 
       <mat-card>
-        <mat-card-header>
+        <mat-card-header class="align-items-baseline">
           <mat-card-title>Agency ID List Values</mat-card-title>
+          <div style="padding: 8px 0 8px 12px;" *ngIf="state === 'WIP' && access === 'CanEdit'">
+            <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary"
+                    [disabled]="access !== 'CanEdit' || isDisabled(agencyIdList)">
+              <mat-icon>add</mat-icon>
+              Add
+            </button>
+            <button mat-raised-button class="mr-2" (click)="removeAgencyIdListValues()"
+                    [hidden]="dataSource.data.length == 0"
+                    [disabled]="isDisabled(agencyIdList) || this.selection.selected.length == 0"
+                    color="warn">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+          </div>
         </mat-card-header>
 
         <mat-card>
@@ -361,20 +394,6 @@
                 showFirstLastButtons></mat-paginator>
             </div>
           </mat-card-content>
-
-          <mat-card-actions style="padding: 8px 0 8px 12px;" *ngIf="state === 'WIP' && access === 'CanEdit'">
-            <button mat-raised-button (click)="openDialog()" color="primary"
-                    [disabled]="access !== 'CanEdit' || isDisabled(agencyIdList)">
-              <mat-icon>add</mat-icon>
-              Add
-            </button>
-            <button mat-raised-button (click)="removeAgencyIdListValues()" [hidden]="dataSource.data.length == 0"
-                    [disabled]="isDisabled(agencyIdList) || this.selection.selected.length == 0"
-                    color="warn">
-              <mat-icon>delete</mat-icon>
-              Remove
-            </button>
-          </mat-card-actions>
         </mat-card>
       </mat-card>
     </div>

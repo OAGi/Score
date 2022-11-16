@@ -125,9 +125,9 @@
             <th *matHeaderCellDef mat-header-cell>
             </th>
             <td *matCellDef="let element" mat-cell>
-              <button (click)="onContextMenu($event, element)"
-                      [contextMenuSubject]="element" [contextMenu]="contextMenu"
-                      mat-icon-button>
+              <button mat-icon-button
+                      [matMenuTriggerFor]="contextMenu"
+                      (click)="contextMenuItem = element; $event.stopPropagation();">
                 <mat-icon>more_vert</mat-icon>
               </button>
             </td>
@@ -145,11 +145,10 @@
       </div>
     </mat-card-content>
 
-    <context-menu #contextMenu>
-      <ng-template (execute)="discard($event.item, $event)" contextMenuItem
-                   let-item>
+    <mat-menu class="context-menu" #contextMenu="matMenu">
+      <button mat-menu-item (click)="discard(contextMenuItem)">
         <span class="context-menu-item">Discard</span>
-      </ng-template>
-    </context-menu>
+      </button>
+    </mat-menu>
   </mat-card>
 </div>

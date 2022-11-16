@@ -1,6 +1,8 @@
 package org.oagi.score.repo.api.impl.jooq.module;
 
 import org.jooq.DSLContext;
+import org.jooq.InsertSetMoreStep;
+import org.jooq.UpdateSetStep;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.model.CcType;
@@ -72,10 +74,18 @@ public class JooqModuleSetReleaseWriteRepository
             moduleSetReleaseName = getDefaultModuleSetReleaseName(request.getModuleSetId());
         }
 
-        ModuleSetReleaseRecord moduleSetReleaseRecord = dslContext().insertInto(MODULE_SET_RELEASE)
-                .set(MODULE_SET_RELEASE.RELEASE_ID, ULong.valueOf(request.getReleaseId()))
-                .set(MODULE_SET_RELEASE.MODULE_SET_ID, ULong.valueOf(request.getModuleSetId()))
-                .set(MODULE_SET_RELEASE.NAME, moduleSetReleaseName)
+        InsertSetMoreStep<ModuleSetReleaseRecord> insertSetMoreStep =
+                dslContext().insertInto(MODULE_SET_RELEASE)
+                        .set(MODULE_SET_RELEASE.RELEASE_ID, ULong.valueOf(request.getReleaseId()))
+                        .set(MODULE_SET_RELEASE.MODULE_SET_ID, ULong.valueOf(request.getModuleSetId()))
+                        .set(MODULE_SET_RELEASE.NAME, moduleSetReleaseName);
+
+        String moduleSetReleaseDescription = request.getModuleSetReleaseDescription();
+        if (StringUtils.hasLength(moduleSetReleaseDescription)) {
+            insertSetMoreStep = insertSetMoreStep.set(MODULE_SET_RELEASE.DESCRIPTION, moduleSetReleaseDescription);
+        }
+
+        ModuleSetReleaseRecord moduleSetReleaseRecord = insertSetMoreStep
                 .set(MODULE_SET_RELEASE.IS_DEFAULT, request.isDefault() ? (byte) 1 : 0)
                 .set(MODULE_SET_RELEASE.CREATED_BY, requesterUserId)
                 .set(MODULE_SET_RELEASE.LAST_UPDATED_BY, requesterUserId)
@@ -122,16 +132,24 @@ public class JooqModuleSetReleaseWriteRepository
         if (!StringUtils.hasLength(moduleSetReleaseName)) {
             moduleSetReleaseName = getDefaultModuleSetReleaseName(request.getModuleSetId());
         }
+        String moduleSetReleaseDescription = request.getModuleSetReleaseDescription();
 
-        dslContext().update(MODULE_SET_RELEASE)
-            .set(MODULE_SET_RELEASE.RELEASE_ID, ULong.valueOf(request.getReleaseId()))
-            .set(MODULE_SET_RELEASE.MODULE_SET_ID, ULong.valueOf(request.getModuleSetId()))
-            .set(MODULE_SET_RELEASE.NAME, moduleSetReleaseName)
-            .set(MODULE_SET_RELEASE.IS_DEFAULT, request.isDefault() ? (byte) 1 : 0)
-            .set(MODULE_SET_RELEASE.LAST_UPDATED_BY, requesterUserId)
-            .set(MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP, timestamp)
-            .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId())))
-            .execute();
+        UpdateSetStep updateSetStep = dslContext().update(MODULE_SET_RELEASE)
+                .set(MODULE_SET_RELEASE.RELEASE_ID, ULong.valueOf(request.getReleaseId()))
+                .set(MODULE_SET_RELEASE.MODULE_SET_ID, ULong.valueOf(request.getModuleSetId()))
+                .set(MODULE_SET_RELEASE.NAME, moduleSetReleaseName);
+
+        if (StringUtils.hasLength(moduleSetReleaseDescription)) {
+            updateSetStep = updateSetStep.set(MODULE_SET_RELEASE.DESCRIPTION, moduleSetReleaseDescription);
+        } else {
+            updateSetStep = updateSetStep.setNull(MODULE_SET_RELEASE.DESCRIPTION);
+        }
+
+        updateSetStep.set(MODULE_SET_RELEASE.IS_DEFAULT, request.isDefault() ? (byte) 1 : 0)
+                .set(MODULE_SET_RELEASE.LAST_UPDATED_BY, requesterUserId)
+                .set(MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP, timestamp)
+                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId())))
+                .execute();
 
         ModuleSetReleaseRecord moduleSetReleaseRecord = dslContext().selectFrom(MODULE_SET_RELEASE)
                 .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(request.getModuleSetReleaseId())))
@@ -142,6 +160,7 @@ public class JooqModuleSetReleaseWriteRepository
         moduleSetRelease.setReleaseId(moduleSetReleaseRecord.getReleaseId().toBigInteger());
         moduleSetRelease.setModuleSetId(moduleSetReleaseRecord.getModuleSetId().toBigInteger());
         moduleSetRelease.setModuleSetReleaseName(moduleSetReleaseRecord.getName());
+        moduleSetRelease.setModuleSetReleaseDescription(moduleSetReleaseRecord.getDescription());
         moduleSetRelease.setDefault(request.isDefault());
 
         moduleSetRelease.setCreationTimestamp(

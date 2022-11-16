@@ -5,6 +5,8 @@ import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.account_management.service.AccountListService;
 import org.oagi.score.gateway.http.api.account_management.service.AccountService;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
+import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -20,7 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +36,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.service.configuration.AppUserAuthority.*;
 
 @RestController
-public class AccountController {
+public class AccountController implements InitializingBean {
 
     @Autowired
     private CsrfTokenRepository csrfTokenRepository;
@@ -43,6 +49,18 @@ public class AccountController {
 
     @Autowired
     private PendingListService pendingListService;
+
+    @Autowired
+    private ScoreClientRegistrationRepository clientRegistrationRepository;
+
+    private OidcClientInitiatedLogoutSuccessHandler oidcClientInitiatedLogoutSuccessHandler;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.oidcClientInitiatedLogoutSuccessHandler =
+                new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
+        this.oidcClientInitiatedLogoutSuccessHandler.setDefaultTargetUrl("/logout");
+    }
 
     @RequestMapping(value = "/state", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -108,5 +126,12 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @RequestMapping(value = "/oauth2/logout", method = RequestMethod.GET)
+    public void oauth2Logout(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                             HttpServletRequest request,
+                             HttpServletResponse response,
+                             Authentication authentication) throws IOException, ServletException {
+        this.oidcClientInitiatedLogoutSuccessHandler
+                .onLogoutSuccess(request, response, authentication);
+    }
 }

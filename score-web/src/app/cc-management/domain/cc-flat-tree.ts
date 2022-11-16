@@ -1,23 +1,19 @@
-import {BbieScFlatNode, BieFlatNode, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
-import {
-  FlatNode,
-  FlatNodeFlattener,
-  FlatNodeFlattenerListener,
-  getKey,
-  next,
-  VSFlatTreeControl,
-  VSFlatTreeDataSource
-} from '../../common/flat-tree';
+import {BieFlatNode, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail, CcDtNodeDetail,
+  CcBccpNodeDetail,
   CcBdtScNodeDetail,
+  CcDtNodeDetail,
   CcGraph,
   CcGraphNode,
   CcNodeDetail
 } from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
+import {CollectionViewer, DataSource} from '@angular/cdk/collections';
+import {BehaviorSubject, empty, Observable} from 'rxjs';
+import {sha256} from '../../common/utility';
 
 export interface CcFlatNode extends FlatNode {
   type: string;
@@ -29,36 +25,33 @@ export interface CcFlatNode extends FlatNode {
   manifestId: number;
   revisionNum: number;
 
+  cardinalityMin: number;
+  cardinalityMax: number;
+
   isCycle: boolean;
   isChanged: boolean;
   detail: CcNodeDetail;
   parents: CcFlatNode[];
 
+  path: string;
+  hashPath: string;
+
   inhibited: boolean;
 
   typeClass: string;
 
+  dataSource: CcFlatNodeDataSource<CcFlatNode>;
+
   addChangeListener(listener: ChangeListener<CcFlatNode>);
+  removeChangeListener(listener: ChangeListener<CcFlatNode>);
   fireChangeEvent(propertyName: string, val: any);
   reset();
+
+  showCopyLinkIcon: boolean;
+  queryPath: string;
 }
 
 export abstract class CcFlatNodeImpl implements CcFlatNode {
-  level: number;
-  _expanded: boolean;
-  expandable: boolean;
-
-  parent?: FlatNode;
-  children: FlatNode[] = [];
-
-  changeListeners: ChangeListener<CcFlatNode>[] = [];
-
-  state: string;
-  access: string;
-  revisionNum: number;
-  isCycle: boolean = false;
-
-  detail: CcNodeDetail;
 
   abstract get guid(): string;
   abstract get name(): string;
@@ -66,6 +59,12 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
   abstract get typeClass(): string;
   abstract get manifestId(): number;
   abstract get releaseId(): number;
+
+  abstract get path(): string;
+  abstract get hashPath(): string;
+
+  abstract get cardinalityMin(): number;
+  abstract get cardinalityMax(): number;
 
   get expanded(): boolean {
     return this._expanded || false;
@@ -77,32 +76,6 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
 
   get hasExtension(): boolean {
     return this._hasExtension(this);
-  }
-
-  _hasExtension(node: CcFlatNode): boolean {
-    if (!node || !node.children) {
-      return false;
-    }
-    for (const child of node.children) {
-      if (child instanceof AsccpFlatNode) {
-        if (child.asccpNode.propertyTerm === 'Extension') {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  addChangeListener(listener: ChangeListener<CcFlatNode>) {
-    if (listener) {
-      this.changeListeners.push(listener);
-    }
-  }
-
-  fireChangeEvent(propertyName: string, val: any) {
-    this.changeListeners.forEach(listener => {
-      listener.onChange(this, propertyName, val);
-    });
   }
 
   get parents(): CcFlatNode[] {
@@ -123,21 +96,115 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
     return (!!this.detail) ? this.detail.hashCode : 0;
   }
 
+  get inhibited() {
+    return false;
+  }
+
+  level: number;
+  _expanded: boolean;
+  _expandable: boolean = undefined;
+
+  parent?: FlatNode;
+  _children: CcFlatNode[] = [];
+
+  changeListeners: ChangeListener<CcFlatNode>[] = [];
+
+  state: string;
+  access: string;
+  revisionNum: number;
+  isCycle = false;
+
+  detail: CcNodeDetail;
+
+  deprecated: boolean;
+
+  dataSource: CcFlatNodeDataSource<CcFlatNode>;
+
+  showCopyLinkIcon = false;
+
+  get queryPath(): string {
+    const parent = this.parent as CcFlatNode;
+    if (!!parent) {
+      return [parent.queryPath,
+        this.name.replace(new RegExp(' ', 'g'), '')].join('/');
+    }
+    return this.name.replace(new RegExp(' ', 'g'), '');
+  }
+
+  _hasExtension(node: CcFlatNode): boolean {
+    if (!node || !node.children) {
+      return false;
+    }
+    for (const child of node.children) {
+      if (child instanceof AsccpFlatNode) {
+        if (child.asccpNode.propertyTerm === 'Extension') {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  addChangeListener(listener: ChangeListener<CcFlatNode>) {
+    if (!!listener && this.changeListeners.indexOf(listener) === -1) {
+      this.changeListeners.push(listener);
+    }
+  }
+
+  removeChangeListener(listener: ChangeListener<CcFlatNode>) {
+    if (!!listener && this.changeListeners.indexOf(listener) > -1) {
+      this.changeListeners.splice(this.changeListeners.indexOf(listener), 1);
+    }
+  }
+
+  fireChangeEvent(propertyName: string, val: any) {
+    this.changeListeners.forEach(listener => {
+      listener.onChange(this, propertyName, val);
+    });
+  }
+
   reset() {
     if (!!this.detail) {
       this.detail.reset();
     }
   }
 
-  deprecated: boolean;
+  getChildren(options?: any | undefined): CcFlatNode[] {
+    if (!!options && options.hideProhibited) {
+      return this._children.filter(e => !e.inhibited);
+    }
+    return this._children;
+  }
 
-  get inhibited() {
-    return false;
+  get children(): CcFlatNode[] {
+    return this.getChildren({
+      hideProhibited: !!this.dataSource && this.dataSource.hideProhibited
+    });
+  }
+
+  set children(children: CcFlatNode[]) {
+    this._children = children;
+  }
+
+  get expandable(): boolean {
+    if (this._expandable !== undefined) {
+      return this._expandable;
+    }
+    if (this._children.length === 0) {
+      this.dataSource.database.loadChildren(this);
+    }
+    return this.children.length > 0;
+  }
+
+  set expandable(expandable: boolean) {
+    this._expandable = expandable;
   }
 }
 
 export class AccFlatNode extends CcFlatNodeImpl {
   accNode: CcGraphNode;
+  private _path: string;
+  private _hashPath: string;
 
   constructor(accNode: CcGraphNode) {
     super();
@@ -186,11 +253,41 @@ export class AccFlatNode extends CcFlatNodeImpl {
   get accManifestId(): number {
     return this.manifestId;
   }
+
+  get path(): string {
+    if (!this._path) {
+      this._path = 'ACC-' + this.accNode.manifestId;
+      if (!!this.parent) {
+        this._path = [(this.parent as CcFlatNode).path, this._path].join('>');
+      }
+    }
+    return this._path;
+  }
+
+  get hashPath(): string {
+    if (!this._hashPath) {
+      this._hashPath = sha256(this.path);
+    }
+    return this._hashPath;
+  }
+
+  get cardinalityMin(): number {
+    return undefined;
+  }
+
+  get cardinalityMax(): number {
+    return undefined;
+  }
 }
 
 export class AsccpFlatNode extends CcFlatNodeImpl {
   asccpNode: CcGraphNode;
   asccNode?: CcGraphNode;
+  private _path: string;
+  private _hashPath: string;
+
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor(asccpNode: CcGraphNode,
               asccNode?: CcGraphNode) {
@@ -249,12 +346,71 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
   get isUserExtensionGroup(): boolean {
     return this.asccpNode.propertyTerm.endsWith('User Extension Group');
   }
+
+  get path(): string {
+    if (!this._path) {
+      this._path = 'ASCCP-' + this.asccpNode.manifestId;
+      if (!!this.parent) {
+        this._path = [(this.parent as CcFlatNode).path,
+          ('ASCC-' + this.asccNode.manifestId), this._path].join('>');
+      }
+    }
+    return this._path;
+  }
+
+  get hashPath(): string {
+    if (!this._hashPath) {
+      this._hashPath = sha256(this.path);
+    }
+    return this._hashPath;
+  }
+
+  get cardinalityMin(): number {
+    if (!!this.detail && !!(this.detail as CcAsccpNodeDetail).ascc && !!(this.detail as CcAsccpNodeDetail).ascc.cardinalityMin) {
+      return (this.detail as CcAsccpNodeDetail).ascc.cardinalityMin;
+    }
+    if (this._cardinalityMin === undefined) {
+      if (!!this.asccNode) {
+        return this.asccNode.cardinalityMin;
+      } else {
+        return undefined;
+      }
+    }
+    return this._cardinalityMin;
+  }
+
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    if (!!this.detail && !!(this.detail as CcAsccpNodeDetail).ascc && !!(this.detail as CcAsccpNodeDetail).ascc.cardinalityMax) {
+      return (this.detail as CcAsccpNodeDetail).ascc.cardinalityMax;
+    }
+    if (this._cardinalityMax === undefined) {
+      if (!!this.asccNode) {
+        return this.asccNode.cardinalityMax;
+      } else {
+        return undefined;
+      }
+    }
+    return this._cardinalityMax;
+  }
+
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
+  }
 }
 
 export class BccpFlatNode extends CcFlatNodeImpl {
   bccNode?: CcGraphNode;
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
+  private _path: string;
+  private _hashPath: string;
+
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor(bccpNode: CcGraphNode,
               bdtNode: CcGraphNode,
@@ -263,7 +419,7 @@ export class BccpFlatNode extends CcFlatNodeImpl {
     this.bccpNode = bccpNode;
     this.bdtNode = bdtNode;
     this.bccNode = bccNode;
-    this.deprecated = bccpNode.deprecated || bdtNode.deprecated || (!!bccNode && bccNode.deprecated);
+    this.deprecated = bccpNode.deprecated || (!!bdtNode && bdtNode.deprecated) || (!!bccNode && bccNode.deprecated);
   }
 
   get type(): string {
@@ -324,10 +480,66 @@ export class BccpFlatNode extends CcFlatNodeImpl {
     }
     return undefined;
   }
+
+  get path(): string {
+    if (!this._path) {
+      this._path = 'BCCP-' + this.bccpNode.manifestId;
+      if (!!this.parent) {
+        this._path = [(this.parent as CcFlatNode).path,
+          ('BCC-' + this.bccNode.manifestId), this._path].join('>');
+      }
+    }
+    return this._path;
+  }
+
+  get hashPath(): string {
+    if (!this._hashPath) {
+      this._hashPath = sha256(this.path);
+    }
+    return this._hashPath;
+  }
+
+  get cardinalityMin(): number {
+    if (!!this.detail && !!(this.detail as CcBccpNodeDetail).bcc && !!(this.detail as CcBccpNodeDetail).bcc.cardinalityMin) {
+      return (this.detail as CcBccpNodeDetail).bcc.cardinalityMin;
+    }
+    if (this._cardinalityMin === undefined) {
+      if (!!this.bccNode) {
+        return this.bccNode.cardinalityMin;
+      } else {
+        return undefined;
+      }
+    }
+    return this._cardinalityMin;
+  }
+
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    if (!!this.detail && !!(this.detail as CcBccpNodeDetail).bcc && !!(this.detail as CcBccpNodeDetail).bcc.cardinalityMax) {
+      return (this.detail as CcBccpNodeDetail).bcc.cardinalityMax;
+    }
+    if (this._cardinalityMax === undefined) {
+      if (!!this.bccNode) {
+        return this.bccNode.cardinalityMax;
+      } else {
+        return undefined;
+      }
+    }
+    return this._cardinalityMax;
+  }
+
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
+  }
 }
 
 export class DtFlatNode extends CcFlatNodeImpl {
   dtNode: CcGraphNode;
+  private _path: string;
+  private _hashPath: string;
 
   constructor(dtNode: CcGraphNode) {
     super();
@@ -376,10 +588,40 @@ export class DtFlatNode extends CcFlatNodeImpl {
   get basedManifestId(): number {
     return this.detail ? (this.detail as CcDtNodeDetail).basedBdtManifestId : undefined;
   }
+
+  get path(): string {
+    if (!this._path) {
+      this._path = 'DT-' + this.dtNode.manifestId;
+      if (!!this.parent) {
+        this._path = [(this.parent as CcFlatNode).path, this._path].join('>');
+      }
+    }
+    return this._path;
+  }
+
+  get hashPath(): string {
+    if (!this._hashPath) {
+      this._hashPath = sha256(this.path);
+    }
+    return this._hashPath;
+  }
+
+  get cardinalityMin(): number {
+    return undefined;
+  }
+
+  get cardinalityMax(): number {
+    return undefined;
+  }
 }
 
 export class DtScFlatNode extends CcFlatNodeImpl {
   dtScNode: CcGraphNode;
+  private _path: string;
+  private _hashPath: string;
+
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor(dtScNode: CcGraphNode) {
     super();
@@ -440,139 +682,53 @@ export class DtScFlatNode extends CcFlatNodeImpl {
   get removeAble(): boolean {
     return !(this.dtScNode.basedDtScId > 0);
   }
-}
 
-export class VSCcTreeDataSource<T extends CcFlatNode> extends VSFlatTreeDataSource<T> implements ChangeListener<T> {
-
-  changedNodes: T[] = [];
-  private _listeners: ChangeListener<T>[];
-
-  constructor(treeControl: VSFlatTreeControl<T>, data: T[],
-              public service: CcNodeService,
-              listeners?: ChangeListener<T>[]) {
-    super(treeControl, data);
-    this._listeners = listeners || [];
-    data.forEach(e => this._addChangeListener(e));
-  }
-
-  _addChangeListener(node: T) {
-    node.addChangeListener(this);
-    this._listeners.forEach(listener => node.addChangeListener(listener));
-  }
-
-  onChange(entity: T, propertyName: string, val: any) {
-    const idx = this.changedNodes.indexOf(entity);
-    if (entity.isChanged) {
-      if (idx === -1) {
-        this.changedNodes.push(entity);
-      }
-    } else {
-      if (idx > -1) {
-        this.changedNodes.splice(idx, 1);
+  get path(): string {
+    if (!this._path) {
+      this._path = 'DT_SC-' + this.dtScNode.manifestId;
+      if (!!this.parent) {
+        this._path = [(this.parent as CcFlatNode).path, this._path].join('>');
       }
     }
+    return this._path;
   }
 
-  getNodeFullIndex(node: T) {
-    return this.cachedData.indexOf(node);
-  }
-
-  getNodeByFullIndex(index: number) {
-    return this.cachedData.length > index ? this.cachedData[index] : undefined;
-  }
-
-  loadDetail(node: CcFlatNode, callbackFn?) {
-    if (node.detail) {
-      return callbackFn && callbackFn(node);
+  get hashPath(): string {
+    if (!this._hashPath) {
+      this._hashPath = sha256(this.path);
     }
-
-    this.service.getDetail(node).subscribe(detail => {
-      node.detail = detail;
-      return callbackFn && callbackFn(detail);
-    });
+    return this._hashPath;
   }
 
-  getRootNode(): CcFlatNode {
-    return this.data[0];
+  get cardinalityMin(): number {
+    if (this._cardinalityMin === undefined) {
+      return this.dtScNode.cardinalityMin;
+    }
+    return this._cardinalityMin;
   }
 
-  getChanged(): CcFlatNode[] {
-    return this.cachedData.filter(e => e.isChanged);
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
   }
 
-  resetChanged() {
-    this.changedNodes.forEach(e => {
-      e.reset();
-    });
-    this.changedNodes = [];
+  get cardinalityMax(): number {
+    if (this._cardinalityMax === undefined) {
+      return this.dtScNode.cardinalityMax;
+    }
+    return this._cardinalityMax;
   }
 
-  insertNodes(nodes: T[], siblingIndex: number) {
-    if (!nodes || nodes.length === 0) {
-      return;
-    }
-    const cachedData = this.cachedData;
-    let start;
-    if (siblingIndex === -1 || siblingIndex >= this.getRootNode().children.length) {
-      start = cachedData.length;
-    } else {
-      if (this.getRootNode().children.length === 0) {
-        start = 1;
-      } else {
-        start = cachedData.indexOf(this.getRootNode().children[siblingIndex] as T);
-      }
-    }
-
-    const rootChildren = this.getRootNode().children;
-    rootChildren.splice(siblingIndex, 0, nodes[0]);
-    cachedData[0].children = rootChildren;
-    nodes[0].parent = this.getRootNode();
-
-    const head = cachedData.slice(0, start);
-    const tail = cachedData.slice(start, cachedData.length);
-    this.cachedData = head.concat(nodes).concat(tail);
-    nodes.forEach(e => this._addChangeListener(e));
-  }
-
-  removeNodes(siblingIndex: number) {
-    const cachedData = this.cachedData;
-    let start;
-    start = cachedData.indexOf(this.getRootNode().children[siblingIndex] as T);
-    let end = cachedData.findIndex((e, index) => index > start && e.level === 1);
-    if (end === -1) {
-      end = cachedData.length;
-    }
-
-    const rootChildren = this.getRootNode().children;
-    cachedData[0].children = rootChildren;
-    rootChildren.splice(siblingIndex, 1);
-
-    cachedData.splice(start, end - start);
-    this.cachedData = cachedData;
-  }
-
-  getNodesByLevelAndIndex(nodes: T[], siblingIndex: number) {
-    const siblings = nodes.filter(e => e.level === 1);
-    if (siblings.length < siblingIndex) {
-      return [];
-    }
-    if (siblingIndex === -1) {
-      siblingIndex = siblings.length - 1;
-    }
-    const start = nodes.indexOf(siblings[siblingIndex]);
-    let end = nodes.findIndex((e, index) => index > start && e.level === 1);
-    if (end === -1) {
-      end = nodes.length;
-    }
-    return nodes.slice(start, end);
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
   }
 }
 
-export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
+export class CcFlatNodeDatabase<T extends CcFlatNode> {
+
+  dataSource: CcFlatNodeDataSource<T>;
   _ccGraph: CcGraph;
-  _manifestId: number;
-  _type: string;
-  _listeners: FlatNodeFlattenerListener<CcFlatNode>[] = [];
+  private _type: string;
+  private _manifestId: number;
 
   constructor(ccGraph: CcGraph, type: string, manifestId: number) {
     this._ccGraph = ccGraph;
@@ -584,57 +740,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     return this._type.toUpperCase() + '-' + this._manifestId;
   }
 
-  addListener(listener: FlatNodeFlattenerListener<CcFlatNode>) {
-    this._listeners.push(listener);
-  }
-
-  toAccNode(accNode: CcGraphNode, parent: CcFlatNode) {
-    const node = new AccFlatNode(accNode);
-    node.state = accNode.state;
-    node.deprecated = accNode.deprecated;
-    node.level = parent.level + 1;
-    node.parent = parent;
-    return node;
-  }
-
-  toAsccpNode(asccNode: CcGraphNode, parent: CcFlatNode) {
-    const asccpNode = next(this._ccGraph, asccNode);
-    const node = new AsccpFlatNode(asccpNode, asccNode);
-    node.state = asccpNode.state;
-    node.deprecated = asccpNode.deprecated || asccNode.deprecated;
-    node.level = parent.level + 1;
-    node.parent = parent;
-    node.isCycle = this.detectCycle(node);
-    return node;
-  }
-
-  toBccpNode(bccNode: CcGraphNode, parent: CcFlatNode) {
-    const bccpNode = next(this._ccGraph, bccNode);
-    const bdtNode = next(this._ccGraph, bccpNode);
-    const node = new BccpFlatNode(bccpNode, bdtNode, bccNode);
-    node.deprecated = bccpNode.deprecated || bccNode.deprecated || bdtNode.deprecated;
-    node.state = bccpNode.state;
-    node.level = parent.level + 1;
-    node.parent = parent;
-    return node;
-  }
-
-  toDtScNode(bdtScNode: CcGraphNode, parent: CcFlatNode) {
-    const node = new DtScFlatNode(bdtScNode);
-    node.deprecated = bdtScNode.deprecated;
-    node.state = bdtScNode.state;
-    node.level = parent.level + 1;
-    node.parent = parent;
-    return node;
-  }
-
-  fireEvent(node: CcFlatNode) {
-    this._listeners.forEach(listener => {
-      listener.onFlatten(node);
-    });
-  }
-
-  flatten(excludeSCs?: boolean, initialExpandDepth?: number): CcFlatNode[] {
+  get rootNode(): T {
     let node;
     if (this._type === 'ACC') {
       const accNode = this._ccGraph.graph.nodes[this.key];
@@ -651,59 +757,39 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       node = new DtFlatNode(bdtNode);
     }
     node.level = 0;
-    this.fireEvent(node);
+    node.dataSource = this.dataSource;
 
-    const nodes = [node,];
-    this._doFlatten(nodes, node, excludeSCs, initialExpandDepth);
-    return nodes;
+    this.loadChildren(node);
+
+    return node;
   }
 
-  _doFlatten(nodes: CcFlatNode[], node: CcFlatNode, excludeSCs?: boolean, depth?: number) {
-    if (excludeSCs && node.type === 'BCCP') {
-      node.children = [];
-      node.expandable = this.hasDtScChildren((node as BccpFlatNode).bdtNode);
-    } else {
-      const children = this.getChildren(node);
-      node.expandable = children.length > 0;
-
-      if (depth === 0) {
-        node.children = [];
-      } else {
-        node.children = children;
-        node.children.map(e => e as CcFlatNode).forEach(e => {
-          nodes.push(e);
-          this.fireEvent(e);
-          if (e instanceof AsccpFlatNode && e.isCycle) {
-            return;
-          }
-          this._doFlatten(nodes, e, excludeSCs, depth - 1);
-        });
-      }
+  children(node: T): T[] {
+    if (!node.expandable) {
+      return [];
     }
+    return node.children as T[];
   }
 
-  detectCycle(node: AsccpFlatNode): boolean {
-    const asccpManifestId = node.asccpNode.manifestId;
-    let cur = node.parent;
-    while (cur) {
-      if (cur instanceof AsccpFlatNode && (cur as AsccpFlatNode).asccpManifestId === asccpManifestId) {
-        return true;
-      }
-      cur = cur.parent;
+  loadChildren(node: T) {
+    if (node.children.length > 0) {
+      return;
     }
-    return false;
+
+    node.children = this.getChildren(node);
+    if (node.children.length === 0) {
+      node.expandable = false;
+    }
+    node.children.map(e => e as T).forEach(e => {
+      if (e instanceof AsccpFlatNode) {
+        if (!e.isCycle) {
+          this.loadChildren(e);
+        }
+      }
+    });
   }
 
-  afterAsccpFlatNode(node: AsccpFlatNode) {
-  }
-
-  afterBccpFlatNode(node: BccpFlatNode) {
-  }
-
-  afterBdtScFlatNode(node: BbieScFlatNode) {
-  }
-
-  getChildren(node: CcFlatNode): CcFlatNode[] {
+  getChildren(node: T): T[] {
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -719,7 +805,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       return [];
     }
 
-    let children = [];
+    const children = [];
 
     if (node instanceof DtFlatNode) {
       targets.forEach(target => {
@@ -734,7 +820,7 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
       } else if (target.startsWith('ASCC-')) {
         const asccpNode = this.toAsccpNode(nodes[target], node);
         if (asccpNode.isUserExtensionGroup) {
-          const uegAccNode = this.getChildren(asccpNode)[0];
+          const uegAccNode = this.getChildren(asccpNode as unknown as T)[0];
           children.push(...this.getChildren(uegAccNode).map(e => {
             e.level = node.level + 1;
             e.parent = node;
@@ -757,34 +843,529 @@ export class CcFlatNodeFlattener implements FlatNodeFlattener<CcFlatNode> {
     return children;
   }
 
-  expand(node: CcFlatNode) {
-    node.children = this.getChildren(node);
-    node.expandable = node.children.length > 0;
-    node.children.map(e => e as CcFlatNode).forEach(e => {
-      this.fireEvent(e);
-      if (e instanceof AsccpFlatNode && e.isCycle) {
-        return;
+  toAccNode(accNode: CcGraphNode, parent: CcFlatNode): AccFlatNode {
+    const node = new AccFlatNode(accNode);
+    node.state = accNode.state;
+    node.deprecated = accNode.deprecated;
+    node.level = parent.level + 1;
+    node.parent = parent;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toAsccpNode(asccNode: CcGraphNode, parent: CcFlatNode): AsccpFlatNode {
+    const asccpNode = next(this._ccGraph, asccNode);
+    const node = new AsccpFlatNode(asccpNode, asccNode);
+    node.state = asccpNode.state;
+    node.deprecated = asccpNode.deprecated || asccNode.deprecated;
+    node.level = parent.level + 1;
+    node.parent = parent;
+    node.isCycle = this.detectCycle(node);
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toBccpNode(bccNode: CcGraphNode, parent: CcFlatNode): BccpFlatNode {
+    const bccpNode = next(this._ccGraph, bccNode);
+    const bdtNode = next(this._ccGraph, bccpNode);
+    const node = new BccpFlatNode(bccpNode, bdtNode, bccNode);
+    node.deprecated = bccpNode.deprecated || bccNode.deprecated || bdtNode.deprecated;
+    node.state = bccpNode.state;
+    node.level = parent.level + 1;
+    node.parent = parent;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toDtScNode(bdtScNode: CcGraphNode, parent: CcFlatNode): DtScFlatNode {
+    const node = new DtScFlatNode(bdtScNode);
+    node.deprecated = bdtScNode.deprecated;
+    node.state = bdtScNode.state;
+    node.level = parent.level + 1;
+    node.parent = parent;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  detectCycle(node: AsccpFlatNode): boolean {
+    const asccpManifestId = node.asccpNode.manifestId;
+    let cur = node.parent;
+    while (cur) {
+      if (cur instanceof AsccpFlatNode && (cur as AsccpFlatNode).asccpManifestId === asccpManifestId) {
+        return true;
       }
-      e.expandable = this.getChildren(e).length > 0;
+      cur = cur.parent;
+    }
+    return false;
+  }
+}
+
+export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>, ChangeListener<T> {
+
+  listeners: ChangeListener<DataSource<T>>[] = [];
+  dataChange = new BehaviorSubject<T[]>([]);
+
+  _hideCardinality: boolean = false;
+  _hideProhibited: boolean = false;
+
+  addListener(listener: ChangeListener<CcFlatNodeDataSource<T>>) {
+    if (!!listener && this.listeners.indexOf(listener) === -1) {
+      this.listeners.push(listener);
+    }
+  }
+
+  get data(): T[] {
+    return this.dataChange.value;
+  }
+
+  set data(value: T[]) {
+    value.forEach(e => e.addChangeListener(this));
+    this.dataChange.next(value);
+    this.listeners.forEach(e => e.onChange(this, 'data', value));
+  }
+
+  init() {
+    this.data = [this._database.rootNode as unknown as T, ];
+  }
+
+  getChanged(): T[] {
+    let nodes = [this.data[0], ];
+    const changedNodes = [];
+    while (nodes.length > 0) {
+      const node = nodes.shift();
+      if (node.isChanged) {
+        changedNodes.push(node);
+      }
+      const children = node.getChildren();
+      if (children && children.length > 0) {
+        nodes = children.concat(nodes) as T[];
+      }
+    }
+    return changedNodes;
+  }
+
+  resetChanged() {
+    this.getChanged().forEach(e => {
+      e.reset();
     });
   }
 
-  hasDtScChildren(node: CcGraphNode): boolean {
-    const nodes = this._ccGraph.graph.nodes;
-    const edges = this._ccGraph.graph.edges;
-
-    const edge = edges[getKey(node)];
-    const targets = (!!edge) ? edge.targets : [];
-    if (!targets || targets.length === 0) {
-      return false;
-    }
-
-    switch (node.type) {
-      case 'DT':
-        return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).length > 0;
-
-      default :
-        return false;
+  onChange(entity: T, propertyName: string, val: any) {
+    if (!!this.delegatedListeners) {
+      this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
     }
   }
+
+  get hideCardinality(): boolean {
+    return this._hideCardinality;
+  }
+
+  set hideCardinality(hideCardinality: boolean) {
+    if (this._hideCardinality === hideCardinality) {
+      return;
+    }
+
+    this._hideCardinality = hideCardinality;
+    this.listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
+  }
+
+  get hideProhibited(): boolean {
+    return this._hideProhibited;
+  }
+
+  set hideProhibited(hideProhibited: boolean) {
+    if (this._hideProhibited === hideProhibited) {
+      return;
+    }
+
+    this._hideProhibited = hideProhibited;
+    if (hideProhibited) {
+      this.data = this.data.filter(e => !e.inhibited);
+    } else {
+      this.data.forEach(e => {
+        (e as CcFlatNode).expandable = undefined;
+      });
+      const expandedData = this.data.filter(e => this.isExpanded(e));
+      this.collapse(this.data[0] as T);
+      this.data = [this.data[0], ];
+
+      for (const item of expandedData) {
+        this.expand(item as T);
+      }
+    }
+
+    this.listeners.forEach(e => e.onChange(this, 'hideProhibited', hideProhibited));
+  }
+
+  insertNodes(nodes: T[], siblingIndex: number) {
+    if (!nodes || nodes.length === 0) {
+      return;
+    }
+    const data = this.data;
+    let start;
+    if (siblingIndex === -1 || siblingIndex >= this.data[0].children.length) {
+      start = data.length;
+    } else {
+      if (this.data[0].children.length === 0) {
+        start = 1;
+      } else {
+        start = data.indexOf(this.data[0].children[siblingIndex] as T);
+      }
+    }
+
+    const rootChildren = this.data[0].children;
+    rootChildren.splice(siblingIndex, 0, nodes[0]);
+    data[0].children = rootChildren;
+    nodes[0].parent = this.data[0];
+
+    const head = data.slice(0, start);
+    const tail = data.slice(start, data.length);
+    this.data = head.concat(nodes).concat(tail);
+  }
+
+  removeNodes(siblingIndex: number) {
+    const data = this.data;
+    let start;
+    start = data.indexOf(this.data[0].children[siblingIndex] as T);
+    let end = data.findIndex((e, index) => index > start && e.level === 1);
+    if (end === -1) {
+      end = data.length;
+    }
+
+    const rootChildren = this.data[0].children;
+    data[0].children = rootChildren;
+    rootChildren.splice(siblingIndex, 1);
+
+    data.splice(start, end - start);
+    this.data = data;
+  }
+
+  getNodesByLevelAndIndex(nodes: T[], siblingIndex: number) {
+    const siblings = nodes.filter(e => e.level === 1);
+    if (siblings.length < siblingIndex) {
+      return [];
+    }
+    if (siblingIndex === -1) {
+      siblingIndex = siblings.length - 1;
+    }
+    const start = nodes.indexOf(siblings[siblingIndex]);
+    let end = nodes.findIndex((e, index) => index > start && e.level === 1);
+    if (end === -1) {
+      end = nodes.length;
+    }
+    return nodes.slice(start, end);
+  }
+
+  constructor(
+    private _database: CcFlatNodeDatabase<T>,
+    private service: CcNodeService,
+    private delegatedListeners?: ChangeListener<T>[]
+  ) {
+    _database.dataSource = this;
+  }
+
+  connect(collectionViewer: CollectionViewer): Observable<readonly T[]> {
+    return this.dataChange;
+  }
+
+  disconnect(collectionViewer: CollectionViewer): void {
+  }
+
+  get database(): CcFlatNodeDatabase<T> {
+    return this._database;
+  }
+
+  isExpanded(node: T): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.expanded;
+  }
+
+  getLevel(node: T): number {
+    return node.level;
+  }
+
+  isExpandable(node: T): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.expandable;
+  }
+
+  toggle(node: T) {
+    if (!node) {
+      return;
+    }
+    if (this.isExpanded(node)) {
+      this.collapse(node);
+    } else {
+      this.expand(node);
+    }
+  }
+
+  expand(node: T) {
+    if (!node) {
+      return;
+    }
+    if (node.parent && !this.isExpanded(node.parent as T)) {
+      this.expand(node.parent as T);
+    }
+    if (this.isExpanded(node)) {
+      return;
+    }
+    this.toggleNode(node, true);
+  }
+
+  expandDescendants(node: T, level?: number) {
+    this.expand(node);
+
+    if (level > 0) {
+      node.children.forEach(e => this.expandDescendants(e as T, level - 1));
+    }
+  }
+
+  collapse(node: T) {
+    if (!node) {
+      return;
+    }
+    if (!this.isExpanded(node)) {
+      return;
+    }
+    this.toggleNode(node, false);
+    this.collapseDescendants(node);
+  }
+
+  collapseDescendants(dataNode: T) {
+    if (!!dataNode.children) {
+      dataNode.children.forEach(e => this.collapse(e as T));
+    }
+  }
+
+  toggleNode(node: T, expand: boolean) {
+    if (!node) {
+      return;
+    }
+
+    let children = this._database.children(node);
+    if (this.hideProhibited) {
+      children = children.filter(e => !e.inhibited);
+    }
+    const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
+    if (!children || index < 0) {
+      // If no children, or cannot find the node, no op
+      return;
+    }
+
+    if (expand) {
+      children.map(e => e as T).forEach(e => {
+        e.expanded = false;
+        e.addChangeListener(this);
+      });
+      this.data.splice(index + 1, 0, ...children);
+    } else {
+      let count = 0;
+      for (
+        let i = index + 1;
+        i < this.data.length && this.data[i].level > node.level;
+        i++, count++
+      ) {
+      }
+      this.data.splice(index + 1, count).forEach(e => {
+        e.expanded = false;
+        e.removeChangeListener(this);
+      });
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+  }
+
+  loadDetail(node: T, callbackFn?) {
+    if (node.detail) {
+      return callbackFn && callbackFn(node);
+    }
+
+    this.service.getDetail(node).subscribe(detail => {
+      node.detail = detail;
+      return callbackFn && callbackFn(detail);
+    });
+  }
+}
+
+export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
+  implements ChangeListener<CcFlatNodeDataSource<T>> {
+
+  searchKeyword = '';
+  _inputKeyword = '';
+  selectedNode: T;
+  searchResult: T[] = [];
+  searchedData: T[];
+  fullSearched = false;
+  searchedItemCount = 0;
+  searchIndex = 0;
+  isSearching = false;
+  searchPrefix = '';
+
+  constructor(private dataSource: CcFlatNodeDataSource<T>,
+              private database: CcFlatNodeDatabase<T>) {
+    this.dataSource.addListener(this);
+  }
+
+  get inputKeyword(): string {
+    return this._inputKeyword;
+  }
+
+  set inputKeyword(inputKeyword: string) {
+    if (inputKeyword !== this._inputKeyword) {
+      this.resetSearch();
+    }
+    this._inputKeyword = inputKeyword;
+  }
+
+  onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
+    if (propertyName === 'hideProhibited') {
+      this.resetSearch();
+    }
+  }
+
+  prev(node: T): T {
+    const index = this.getNodeIndex(node);
+    if (index > 0) {
+      return this.dataSource.data[index - 1];
+    }
+    return node;
+  }
+
+  next(node: T): T {
+    const index = this.getNodeIndex(node);
+    if (index < this.dataSource.data.length - 1) {
+      return this.dataSource.data[index + 1];
+    }
+    return node;
+  }
+
+  go(val: number): Observable<number> {
+    this.searchIndex += val;
+    if (this.searchResult.length <= this.searchIndex) {
+      this.searchIndex = 0;
+    }
+    if (this.searchIndex < 0) {
+      this.searchIndex = this.searchResult.length - 1;
+    }
+
+    return new Observable(subscriber => {
+      if (!!this.searchResult && this.searchResult.length > 0) {
+        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
+      } else {
+        subscriber.next(-1);
+      }
+      subscriber.complete();
+    });
+  }
+
+  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
+    if (this.isSearching) {
+      return empty();
+    }
+    if (!inputKeyword || inputKeyword.length === 0) {
+      this.resetSearch();
+      return empty();
+    }
+
+    this.isSearching = true;
+    if (!this.fullSearched || force) {
+      const searchResult = [];
+      const evaluator = this.getEvaluator(inputKeyword);
+
+      const threshold = 100;
+      let expandingLimit = 1000;
+      let data = (!this.searchedData || this.searchedData.length === 0) ?
+        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0],] : [selectedNode,]) :
+        this.searchedData;
+      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
+        const item = data.shift();
+        this.searchedItemCount++;
+        if (evaluator.eval(item)) {
+          searchResult.push(item);
+        }
+        if (item.expandable) {
+          expandingLimit--;
+        }
+
+        if (item.children.length > 0) {
+          data = data.concat(item.children as T[]);
+        }
+      }
+
+      if (data.length === 0) {
+        this.fullSearched = true;
+      } else {
+        this.searchedData = data;
+      }
+
+      this.searchResult = this.searchResult.concat(searchResult);
+      this.searchKeyword = evaluator.keywordForHighlight();
+      if (searchResult.length > 0) {
+        searchResult.forEach(e => this.dataSource.expand(e));
+        this.searchResult = this.sort(this.searchResult);
+      }
+    } else {
+      if (backward) {
+        this.searchIndex -= 1;
+      } else {
+        this.searchIndex += 1;
+      }
+      if (this.searchResult.length <= this.searchIndex) {
+        this.searchIndex = 0;
+      }
+      if (this.searchIndex < 0) {
+        this.searchIndex = this.searchResult.length - 1;
+      }
+    }
+
+    this.isSearching = false;
+
+    return new Observable(subscriber => {
+      if (!!this.searchResult && this.searchResult.length > 0) {
+        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
+      } else {
+        subscriber.next(-1);
+      }
+      subscriber.complete();
+    });
+  }
+
+  sort(searchResult: T[]): T[] {
+    return searchResult.sort((a, b) => {
+      const aIdx = this.dataSource.data.indexOf(a);
+      const bIdx = this.dataSource.data.indexOf(b);
+      return aIdx - bIdx;
+    });
+  }
+
+  resetSearch() {
+    this.searchKeyword = undefined;
+    this.selectedNode = undefined;
+    this.searchResult = [];
+    this.searchedData = [];
+    this.fullSearched = false;
+    this.searchedItemCount = 0;
+    this.searchIndex = 0;
+    this.isSearching = false;
+    this.searchPrefix = '';
+  }
+
+  getNodeIndex(node: T) {
+    if (!this.dataSource.isExpanded(node)) {
+      this.dataSource.expand(node);
+    }
+    return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
+  }
+
+  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
+    return new PathLikeExpressionEvaluator(expr, false);
+  }
+
 }

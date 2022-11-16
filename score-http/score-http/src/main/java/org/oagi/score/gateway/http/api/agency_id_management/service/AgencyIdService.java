@@ -121,8 +121,8 @@ public class AgencyIdService {
         AgencyIdList agencyIdList = scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdList(manifestId);
         boolean isWorkingRelease = agencyIdList.getReleaseNum().equals("Working");
         agencyIdList.setAccess(
-                AccessPrivilege.toAccessPrivilege(sessionService.getAppUser(user.getUserId()),
-                        sessionService.getAppUser(agencyIdList.getOwner().getUserId()),
+                AccessPrivilege.toAccessPrivilege(sessionService.getAppUserByUsername(user.getUserId()),
+                        sessionService.getAppUserByUsername(agencyIdList.getOwner().getUserId()),
                         agencyIdList.getState().name(), isWorkingRelease).name()
         );
         if (agencyIdList.getPrevAgencyIdListId() != null) {

@@ -10,6 +10,7 @@ import java.util.Map;
 public class GenerateExpressionOption {
 
     private Map<BigInteger, String> filenames = Collections.emptyMap();
+    private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
     private boolean bieDefinition = true;
     private boolean bieGuid;
     private boolean bieCctsMetaData;
@@ -40,8 +41,34 @@ public class GenerateExpressionOption {
     private boolean includePaginationResponseForJsonForOpenAPI30GetTemplate;
     private BigInteger paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate;
 
+    private boolean isOnlyBCCPsForOpenDocumentFormat = true;
+    private String odfExpressionFormat = "ODS";
+
+    public boolean hasOpenAPI30GetTemplateOptions() {
+        if (arrayForJsonExpressionForOpenAPI30GetTemplate) {
+            return true;
+        }
+        if (includeMetaHeaderForJsonForOpenAPI30GetTemplate) {
+            return true;
+        }
+        if (includePaginationResponseForJsonForOpenAPI30GetTemplate) {
+            return true;
+        }
+        return false;
+    }
+
     private boolean openAPI30PostTemplate;
     private boolean arrayForJsonExpressionForOpenAPI30PostTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30PostTemplate;
     private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate;
+
+    public boolean hasOpenAPI30PostTemplateOptions() {
+        if (arrayForJsonExpressionForOpenAPI30PostTemplate) {
+            return true;
+        }
+        if (includeMetaHeaderForJsonForOpenAPI30PostTemplate) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -7,7 +7,7 @@ import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
-import {AgencyIdList, AgencyIdListValue, SimpleAgencyIdListValue} from '../domain/agency-id-list';
+import {AgencyIdList, AgencyIdListValue} from '../domain/agency-id-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -19,7 +19,7 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {hashCode, initFilter} from '../../common/utility';
+import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
@@ -147,8 +147,8 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   init(agencyIdList: AgencyIdList) {
-    this.hashCode = hashCode(agencyIdList);
-    this.agencyIdList = agencyIdList;
+    this.agencyIdList = new AgencyIdList(agencyIdList);
+    this.hashCode = this.agencyIdList.hashCode;
 
     this._updateDataSource(this.agencyIdList.values);
     this.valueFilteredList.next(agencyIdList.values.slice());
@@ -175,7 +175,7 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   get isChanged(): boolean {
-    return this.hashCode !== hashCode(this.agencyIdList);
+    return this.hashCode !== this.agencyIdList.hashCode;
   }
 
   isDisabled(agencyIdList: AgencyIdList) {
@@ -409,15 +409,16 @@ export class AgencyIdListDetailComponent implements OnInit {
   doUpdate() {
     this.isUpdating = true;
 
-    this.service.update(this.agencyIdList).pipe(finalize(() => {
-      this.isUpdating = false;
-    })).subscribe(_ => {
+    this.service.update(this.agencyIdList).subscribe(_ => {
       this.service.getAgencyIdList(this.agencyIdList.agencyIdListManifestId).subscribe(agencyIdList => {
         this.init(agencyIdList);
+        this.isUpdating = false;
         this.snackBar.open('Updated', '', {
           duration: 3000,
         });
       });
+    }, error => {
+      this.isUpdating = false;
     });
   }
 
@@ -491,17 +492,19 @@ export class AgencyIdListDetailComponent implements OnInit {
         if (result) {
           this.isUpdating = true;
 
-          this.service.updateState(this.agencyIdList, state).pipe(finalize(() => {
-            this.isUpdating = false;
-          })).subscribe(_ => {
+          this.service.updateState(this.agencyIdList, state).subscribe(_ => {
             forkJoin([
               this.service.getAgencyIdList(this.manifestId),
             ]).subscribe(([agencyIdList]) => {
               this.init(agencyIdList);
+
+              this.isUpdating = false;
               this.snackBar.open('Updated', '', {
                 duration: 3000,
               });
             });
+          }, error => {
+            this.isUpdating = false;
           });
         }
       });
@@ -518,15 +521,16 @@ export class AgencyIdListDetailComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.isUpdating = true;
-          this.service.makeNewRevision(this.agencyIdList).pipe(finalize(() => {
-            this.isUpdating = false;
-          })).subscribe(_ => {
+          this.service.makeNewRevision(this.agencyIdList).subscribe(_ => {
             this.service.getAgencyIdList(this.manifestId).subscribe(agencyIdList => {
               this.init(agencyIdList);
+              this.isUpdating = false;
               this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
             });
+          }, error => {
+            this.isUpdating = false;
           });
         }
       });
@@ -549,15 +553,16 @@ export class AgencyIdListDetailComponent implements OnInit {
         }
         this.isUpdating = true;
         const state = 'WIP';
-        this.service.restore(this.agencyIdList.agencyIdListManifestId).pipe(finalize(() => {
-          this.isUpdating = false;
-        })).subscribe(_ => {
+        this.service.restore(this.agencyIdList.agencyIdListManifestId).subscribe(_ => {
           this.service.getAgencyIdList(this.agencyIdList.agencyIdListManifestId).subscribe(resp => {
             this.init(resp);
+            this.isUpdating = false;
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
           });
+        }, error => {
+          this.isUpdating = false;
         });
       });
   }
@@ -580,6 +585,8 @@ export class AgencyIdListDetailComponent implements OnInit {
             this.isUpdating = false;
 
             this.router.navigateByUrl('/agency_id_list');
+          }, error => {
+            this.isUpdating = false;
           });
         }
       });
@@ -664,19 +671,16 @@ export class AgencyIdListDetailComponent implements OnInit {
 
         this.isUpdating = true;
         this.service.cancelRevision(this.manifestId)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
           .subscribe(resp => {
             this.service.getAgencyIdList(this.manifestId).subscribe(agencyIdList => {
               this.init(agencyIdList);
+              this.isUpdating = false;
               this.snackBar.open('Canceled', '', {
                 duration: 3000,
               });
             });
           }, err => {
+            this.isUpdating = false;
           });
       });
   }

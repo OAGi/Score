@@ -8,7 +8,7 @@ import {SelectionModel} from '../../../../node_modules/@angular/cdk/collections'
 import {BieExpressService} from './domain/bie-express.service';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieExpressOption} from './domain/generate-expression';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {AccountListService} from '../../account-management/domain/account-list.service';
@@ -35,7 +35,7 @@ export class BieExpressComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -54,6 +54,7 @@ export class BieExpressComponent implements OnInit {
 
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
+  odfFormats: string[] = ['ODS', 'FODS', 'XLSX'];
 
   // Memorizer
   previousPackageOption: string;
@@ -79,6 +80,8 @@ export class BieExpressComponent implements OnInit {
     this.option.packageOption = 'ALL';
     // Default Open API expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
+    // Default ODF expression format is 'ODS'.
+    this.option.odfExpressionFormat = 'ODS';
 
     // Init BIE table
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
@@ -207,9 +210,13 @@ export class BieExpressComponent implements OnInit {
     const selectedTopLevelAsbiepIds = this.selection.selected;
 
     this.option.filenames = {};
+    this.option.bizCtxIds = {};
     for (const selectedTopLevelAsbiepId of selectedTopLevelAsbiepIds) {
-      const filename = this.getFilename(Number(selectedTopLevelAsbiepId));
-      this.option.filenames[Number(selectedTopLevelAsbiepId)] = filename;
+      const filename = this.getFilename(selectedTopLevelAsbiepId);
+      this.option.filenames[selectedTopLevelAsbiepId] = filename;
+
+      const selectedBusinessContext = this.businessContextSelection[selectedTopLevelAsbiepId];
+      this.option.bizCtxIds[selectedTopLevelAsbiepId] = selectedBusinessContext.businessContextId;
     }
 
     this.loading = true;

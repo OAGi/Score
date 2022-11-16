@@ -13,6 +13,7 @@ public class BCC implements CoreComponent {
 
     private BigInteger bccManifestId = BigInteger.ZERO;
     private BigInteger fromAccManifestId = BigInteger.ZERO;
+    private BigInteger toBccpManifestId = BigInteger.ZERO;
     private BigInteger bccId = BigInteger.ZERO;
     private String guid;
     private int cardinalityMin;

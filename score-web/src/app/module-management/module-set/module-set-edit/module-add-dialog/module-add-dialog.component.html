@@ -4,7 +4,7 @@
 
 <mat-card style="box-shadow: none; padding: 0;">
   <mat-card-header>
-    <mat-card-title>Add module/directory to "{{parentDirName}}"</mat-card-title>
+    <mat-card-title>Add module file/directory to {{(!parentDirName) ? 'the root' : ("'" + parentDirName + "'")}} directory</mat-card-title>
   </mat-card-header>
 </mat-card>
 
@@ -60,12 +60,12 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Copy from exist module Set.
+          Copy from existing module set
         </mat-panel-title>
       </mat-expansion-panel-header>
       <div>
         <mat-form-field>
-          <mat-label>ModuleSet</mat-label>
+          <mat-label>Module Set</mat-label>
           <mat-select [(ngModel)]="selectedModuleSetId" (ngModelChange)="onModuleSetChange(selectedModuleSetId)">
             <mat-option *ngFor="let moduleSet of moduleSetList" [value]="moduleSet.moduleSetId">
               {{moduleSet.name}}

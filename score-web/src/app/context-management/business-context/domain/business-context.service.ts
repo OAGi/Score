@@ -91,7 +91,7 @@ export class BusinessContextService implements OnInit {
       return this.http.delete('/api/business_context/' + businessContextIds[0]);
     } else {
       return this.http.post<any>('/api/business_context/delete', {
-        businessContextIds: businessContextIds
+        businessContextIdList: businessContextIds
       });
     }
   }

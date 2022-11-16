@@ -89,13 +89,23 @@ public class ScoreClientRegistrationRepository
                                 .put("prompt", prompt);
                     }
 
-                    return builder.clientId(oauth2AppRecord.getClientId())
+                    // https://github.com/spring-projects/spring-security/issues/10059
+                    Map<String, Object> configurationMetadata = new HashMap();
+                    String endSessionEndpoint = oauth2AppRecord.getEndSessionEndpoint();
+                    if (StringUtils.hasLength(endSessionEndpoint)) {
+                        configurationMetadata.put("end_session_endpoint", endSessionEndpoint);
+                    }
+
+                    ClientRegistration registration = builder.clientId(oauth2AppRecord.getClientId())
                             .clientSecret(oauth2AppRecord.getClientSecret())
                             .redirectUriTemplate(oauth2AppRecord.getRedirectUri())
                             .clientAuthenticationMethod(clientAuthenticationMethod)
                             .authorizationGrantType(authorizationGrantType)
+                            .providerConfigurationMetadata(configurationMetadata)
                             .scope(scopes)
                             .build();
+
+                    return registration;
                 }).collect(Collectors.toMap(ClientRegistration::getRegistrationId, Function.identity()));
     }
 

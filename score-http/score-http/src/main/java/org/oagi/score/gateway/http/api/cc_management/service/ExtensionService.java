@@ -81,10 +81,10 @@ public class ExtensionService {
         AccManifestRecord extensionAcc = getExtensionAcc(manifestId);
         CcAccNode ueAcc = repository.getAccNodeByAccManifestId(user, extensionAcc.getAccManifestId().toBigInteger());
 
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         BigInteger ownerUserId = dslContext.select(ACC.OWNER_USER_ID).from(ACC)
                 .where(ACC.ACC_ID.eq(ULong.valueOf(ueAcc.getAccId()))).fetchOneInto(BigInteger.class);
-        AppUser owner = sessionService.getAppUser(ownerUserId);
+        AppUser owner = sessionService.getAppUserByUsername(ownerUserId);
         boolean isWorkingRelease = ueAcc.getReleaseNum().equals("Working");
         AccessPrivilege accessPrivilege = AccessPrivilege.toAccessPrivilege(requester, owner, ueAcc.getState(), isWorkingRelease);
         ueAcc.setAccess(accessPrivilege);
@@ -114,7 +114,7 @@ public class ExtensionService {
     @Transactional
     public BigInteger appendUserExtension(BieEditAcc eAcc, ACC ueAcc,
                                           BigInteger releaseId, AuthenticatedPrincipal user) {
-        AppUser appUser = sessionService.getAppUser(user);
+        AppUser appUser = sessionService.getAppUserByUsername(user);
         if (appUser.isDeveloper()) {
             throw new IllegalArgumentException("Developer cannot create User Extension.");
         }

@@ -168,48 +168,48 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie.code_list_id</code>. This is a foreign key to
-     * the CODE_LIST table. If a code list is assigned to the BBIE (or also can
-     * be viewed as assigned to the BBIEP for this association), then this
-     * column stores the assigned code list. It should be noted that one of the
-     * possible primitives assignable to the BDT_PRI_RESTRI_ID column may also
-     * be a code list. So this column is typically used when the user wants to
-     * assign another code list different from the one permissible by the CC
-     * model.
+     * Setter for <code>oagi.bbie.code_list_manifest_id</code>. This is a
+     * foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned
+     * to the BBIE (or also can be viewed as assigned to the BBIEP for this
+     * association), then this column stores the assigned code list. It should
+     * be noted that one of the possible primitives assignable to the
+     * BDT_PRI_RESTRI_ID column may also be a code list. So this column is
+     * typically used when the user wants to assign another code list different
+     * from the one permissible by the CC model.
      */
-    public void setCodeListId(ULong value) {
+    public void setCodeListManifestId(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie.code_list_id</code>. This is a foreign key to
-     * the CODE_LIST table. If a code list is assigned to the BBIE (or also can
-     * be viewed as assigned to the BBIEP for this association), then this
-     * column stores the assigned code list. It should be noted that one of the
-     * possible primitives assignable to the BDT_PRI_RESTRI_ID column may also
-     * be a code list. So this column is typically used when the user wants to
-     * assign another code list different from the one permissible by the CC
-     * model.
+     * Getter for <code>oagi.bbie.code_list_manifest_id</code>. This is a
+     * foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned
+     * to the BBIE (or also can be viewed as assigned to the BBIEP for this
+     * association), then this column stores the assigned code list. It should
+     * be noted that one of the possible primitives assignable to the
+     * BDT_PRI_RESTRI_ID column may also be a code list. So this column is
+     * typically used when the user wants to assign another code list different
+     * from the one permissible by the CC model.
      */
-    public ULong getCodeListId() {
+    public ULong getCodeListManifestId() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.bbie.agency_id_list_id</code>. This is a foreign
-     * key to the AGENCY_ID_LIST table. It is used in the case that the BDT
-     * content can be restricted to an agency identification.
+     * Setter for <code>oagi.bbie.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
+     * that the BDT content can be restricted to an agency identification.
      */
-    public void setAgencyIdListId(ULong value) {
+    public void setAgencyIdListManifestId(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie.agency_id_list_id</code>. This is a foreign
-     * key to the AGENCY_ID_LIST table. It is used in the case that the BDT
-     * content can be restricted to an agency identification.
+     * Getter for <code>oagi.bbie.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
+     * that the BDT content can be restricted to an agency identification.
      */
-    public ULong getAgencyIdListId() {
+    public ULong getAgencyIdListManifestId() {
         return (ULong) get(9);
     }
 
@@ -248,12 +248,60 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     }
 
     /**
+     * Setter for <code>oagi.bbie.facet_min_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public void setFacetMinLength(ULong value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbie.facet_min_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public ULong getFacetMinLength() {
+        return (ULong) get(12);
+    }
+
+    /**
+     * Setter for <code>oagi.bbie.facet_max_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public void setFacetMaxLength(ULong value) {
+        set(13, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbie.facet_max_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public ULong getFacetMaxLength() {
+        return (ULong) get(13);
+    }
+
+    /**
+     * Setter for <code>oagi.bbie.facet_pattern</code>. Defines a constraint on
+     * the lexical space of a datatype to literals in a specific pattern.
+     */
+    public void setFacetPattern(String value) {
+        set(14, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbie.facet_pattern</code>. Defines a constraint on
+     * the lexical space of a datatype to literals in a specific pattern.
+     */
+    public String getFacetPattern() {
+        return (String) get(14);
+    }
+
+    /**
      * Setter for <code>oagi.bbie.default_value</code>. This column specifies
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
      */
     public void setDefaultValue(String value) {
-        set(12, value);
+        set(15, value);
     }
 
     /**
@@ -262,7 +310,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * be used at the same time.
      */
     public String getDefaultValue() {
-        return (String) get(12);
+        return (String) get(15);
     }
 
     /**
@@ -271,7 +319,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * schema.
      */
     public void setIsNillable(Byte value) {
-        set(13, value);
+        set(16, value);
     }
 
     /**
@@ -280,7 +328,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * schema.
      */
     public Byte getIsNillable() {
-        return (Byte) get(13);
+        return (Byte) get(16);
     }
 
     /**
@@ -289,7 +337,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * used at the same time.
      */
     public void setFixedValue(String value) {
-        set(14, value);
+        set(17, value);
     }
 
     /**
@@ -298,7 +346,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * used at the same time.
      */
     public String getFixedValue() {
-        return (String) get(14);
+        return (String) get(17);
     }
 
     /**
@@ -308,7 +356,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * cannot have a value.
      */
     public void setIsNull(Byte value) {
-        set(15, value);
+        set(18, value);
     }
 
     /**
@@ -318,7 +366,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * cannot have a value.
      */
     public Byte getIsNull() {
-        return (Byte) get(15);
+        return (Byte) get(18);
     }
 
     /**
@@ -327,7 +375,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * inherited from the based BCC.
      */
     public void setDefinition(String value) {
-        set(16, value);
+        set(19, value);
     }
 
     /**
@@ -336,21 +384,21 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * inherited from the based BCC.
      */
     public String getDefinition() {
-        return (String) get(16);
+        return (String) get(19);
     }
 
     /**
      * Setter for <code>oagi.bbie.example</code>.
      */
     public void setExample(String value) {
-        set(17, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>oagi.bbie.example</code>.
      */
     public String getExample() {
-        return (String) get(17);
+        return (String) get(20);
     }
 
     /**
@@ -365,7 +413,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * "Type of BOM should be recognized in the BOM/typeCode."
      */
     public void setRemark(String value) {
-        set(18, value);
+        set(21, value);
     }
 
     /**
@@ -380,7 +428,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * "Type of BOM should be recognized in the BOM/typeCode."
      */
     public String getRemark() {
-        return (String) get(18);
+        return (String) get(21);
     }
 
     /**
@@ -390,7 +438,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * CREATED_BY.
      */
     public void setCreatedBy(ULong value) {
-        set(19, value);
+        set(22, value);
     }
 
     /**
@@ -400,7 +448,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * CREATED_BY.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(19);
+        return (ULong) get(22);
     }
 
     /**
@@ -408,7 +456,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * referring to the user who has last updated the ASBIE record. 
      */
     public void setLastUpdatedBy(ULong value) {
-        set(20, value);
+        set(23, value);
     }
 
     /**
@@ -416,7 +464,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * referring to the user who has last updated the ASBIE record. 
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(20);
+        return (ULong) get(23);
     }
 
     /**
@@ -425,7 +473,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * have the same CREATION_TIMESTAMP.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(21, value);
+        set(24, value);
     }
 
     /**
@@ -434,7 +482,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * have the same CREATION_TIMESTAMP.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(21);
+        return (LocalDateTime) get(24);
     }
 
     /**
@@ -442,7 +490,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * when the ASBIE was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(22, value);
+        set(25, value);
     }
 
     /**
@@ -450,7 +498,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * when the ASBIE was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(22);
+        return (LocalDateTime) get(25);
     }
 
     /**
@@ -462,7 +510,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
      */
     public void setSeqKey(BigDecimal value) {
-        set(23, value);
+        set(26, value);
     }
 
     /**
@@ -474,7 +522,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
      */
     public BigDecimal getSeqKey() {
-        return (BigDecimal) get(23);
+        return (BigDecimal) get(26);
     }
 
     /**
@@ -483,7 +531,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * field/component should be generated in the expression generation.
      */
     public void setIsUsed(Byte value) {
-        set(24, value);
+        set(27, value);
     }
 
     /**
@@ -492,7 +540,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * field/component should be generated in the expression generation.
      */
     public Byte getIsUsed() {
-        return (Byte) get(24);
+        return (Byte) get(27);
     }
 
     /**
@@ -500,7 +548,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(25, value);
+        set(28, value);
     }
 
     /**
@@ -508,7 +556,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(25);
+        return (ULong) get(28);
     }
 
     // -------------------------------------------------------------------------
@@ -534,7 +582,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     /**
      * Create a detached, initialised BbieRecord
      */
-    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListId, ULong agencyIdListId, Integer cardinalityMin, Integer cardinalityMax, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, ULong ownerTopLevelAsbiepId) {
+    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, ULong ownerTopLevelAsbiepId) {
         super(Bbie.BBIE);
 
         setBbieId(bbieId);
@@ -545,10 +593,13 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setFromAbieId(fromAbieId);
         setToBbiepId(toBbiepId);
         setBdtPriRestriId(bdtPriRestriId);
-        setCodeListId(codeListId);
-        setAgencyIdListId(agencyIdListId);
+        setCodeListManifestId(codeListManifestId);
+        setAgencyIdListManifestId(agencyIdListManifestId);
         setCardinalityMin(cardinalityMin);
         setCardinalityMax(cardinalityMax);
+        setFacetMinLength(facetMinLength);
+        setFacetMaxLength(facetMaxLength);
+        setFacetPattern(facetPattern);
         setDefaultValue(defaultValue);
         setIsNillable(isNillable);
         setFixedValue(fixedValue);

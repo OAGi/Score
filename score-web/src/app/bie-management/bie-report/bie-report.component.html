@@ -86,7 +86,7 @@
             <th mat-header-cell *matHeaderCellDef > Reused</th>
             <td mat-cell *matCellDef="let element">
               <span class="den ellipsis" *ngIf="isAccessibleRight(element)">
-                  <a href="/profile_bie/edit/{{element.reusedTopLevelAsbiepId}}" target="_blank">
+                  <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
                     {{ element.reusedPropertyTerm }}
                   </a>
                 </span>

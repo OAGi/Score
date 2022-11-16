@@ -3,7 +3,7 @@ import {PageRequest} from '../../basis/basis';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode} from '../../common/utility';
+import {base64Decode, base64Encode, hashCode4String} from '../../common/utility';
 
 export class AgencyIdListForListRequest {
   release: SimpleRelease;
@@ -120,7 +120,6 @@ export class AgencyIdList {
   basedAgencyIdListManifestId: number;
   basedAgencyIdListName: string;
   agencyId: number;
-  agencyIdListId: number;
   versionId: string;
   namespaceId: number;
   namespaceUri: string;
@@ -147,6 +146,63 @@ export class AgencyIdList {
   prev: AgencyIdList;
 
   prevAgencyIdListManifestId: number;
+
+  constructor(obj?: AgencyIdList) {
+    if (!!obj) {
+      this.releaseId = obj.releaseId;
+      this.agencyIdListManifestId = obj.agencyIdListManifestId;
+      this.agencyIdListValueManifestId = obj.agencyIdListValueManifestId;
+      this.name = obj.name;
+      this.basedAgencyIdListManifestId = obj.basedAgencyIdListManifestId;
+      this.basedAgencyIdListName = obj.basedAgencyIdListName;
+      this.agencyId = obj.agencyId;
+      this.versionId = obj.versionId;
+      this.namespaceId = obj.namespaceId;
+      this.namespaceUri = obj.namespaceUri;
+
+      this.guid = obj.guid;
+      this.listId = obj.listId;
+      this.definition = obj.definition;
+      this.definitionSource = obj.definitionSource;
+      this.remark = obj.remark;
+
+      this.deprecated = obj.deprecated;
+      this.state = obj.state;
+      this.access = obj.access;
+
+      this.releaseNum = obj.releaseNum;
+      this.releaseState = obj.releaseState;
+      this.revisionNum = obj.revisionNum;
+      this.owner = obj.owner;
+      this.lastUpdatedBy = obj.lastUpdatedBy;
+
+      this.lastUpdateTimestamp = obj.lastUpdateTimestamp;
+
+      this.values = (obj.values) ? obj.values.map(val => new AgencyIdListValue(val)) : [];
+      this.prev = obj.prev;
+
+      this.prevAgencyIdListManifestId = obj.prevAgencyIdListManifestId;
+    }
+  }
+
+  get hashCode(): number {
+    return ((this.releaseId) ? this.releaseId : 0) +
+      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0) +
+      ((this.agencyIdListValueManifestId) ? this.agencyIdListValueManifestId : 0) +
+      ((this.name) ? hashCode4String(this.name) : 0) +
+      ((this.basedAgencyIdListManifestId) ? this.basedAgencyIdListManifestId : 0) +
+      ((this.agencyId) ? this.agencyId : 0) +
+      ((this.versionId) ? hashCode4String(this.versionId) : 0) +
+      ((this.namespaceId) ? this.namespaceId : 0) +
+      ((this.guid) ? hashCode4String(this.guid) : 0) +
+      ((this.listId) ? hashCode4String(this.listId) : 0) +
+      ((this.definition) ? hashCode4String(this.definition) : 0) +
+      ((this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
+      ((this.remark) ? hashCode4String(this.remark) : 0) +
+      ((this.deprecated) ? 1231 : 1237) +
+      ((this.state) ? hashCode4String(this.state) : 0) +
+      ((this.values) ? this.values.map(val => val.hashCode).reduce((s, a) => s + a, 0) : 0);
+  }
 }
 
 export class AgencyIdListValue {
@@ -163,6 +219,33 @@ export class AgencyIdListValue {
 
   get derived(): boolean {
     return !!this.basedAgencyIdListValueManifestId;
+  }
+
+  constructor(obj?: AgencyIdListValue) {
+    if (!!obj) {
+      this.agencyIdListValueManifestId = obj.agencyIdListValueManifestId;
+      this.basedAgencyIdListValueManifestId = obj.basedAgencyIdListValueManifestId;
+      this.guid = obj.guid;
+      this.value = obj.value;
+      this.name = obj.name;
+      this.definition = obj.definition;
+      this.definitionSource = obj.definitionSource;
+
+      this.deprecated = obj.deprecated;
+      this.used = obj.used;
+    }
+  }
+
+  get hashCode(): number {
+    return ((this.agencyIdListValueManifestId) ? this.agencyIdListValueManifestId : 0) +
+      ((this.basedAgencyIdListValueManifestId) ? this.basedAgencyIdListValueManifestId : 0) +
+      ((this.guid) ? hashCode4String(this.guid) : 0) +
+      ((this.value) ? hashCode4String(this.value) : 0) +
+      ((this.name) ? hashCode4String(this.name) : 0) +
+      ((this.definition) ? hashCode4String(this.definition) : 0) +
+      ((this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
+      ((this.deprecated) ? 1231 : 1237) +
+      ((this.used) ? 1231 : 1237);
   }
 }
 

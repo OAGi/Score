@@ -7,7 +7,9 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../../account-management/domain/accounts';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {NamespaceList, NamespaceListRequest} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {PageRequest} from '../../basis/basis';
@@ -19,7 +21,6 @@ import {ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
@@ -45,16 +46,15 @@ export class NamespaceListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: NamespaceListRequest;
 
+  contextMenuItem: NamespaceList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
   constructor(private service: NamespaceService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -172,11 +172,14 @@ export class NamespaceListComponent implements OnInit {
     this.router.navigateByUrl('/namespace/create');
   }
 
-  isEditable(item: NamespaceList) {
+  isEditable(item: NamespaceList): boolean {
+    if (!item) {
+      return false;
+    }
     return (item.owner === this.auth.getUserToken().username);
   }
 
-  discard(item: NamespaceList, $event) {
+  discard(item: NamespaceList) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -206,18 +209,7 @@ export class NamespaceListComponent implements OnInit {
       });
   }
 
-  onContextMenu($event: MouseEvent, item: NamespaceList): void {
-    this.contextMenuService.show.next({
-      contextMenu: this.contextMenu,
-      event: $event,
-      item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  openTransferDialog(item: NamespaceList, $event) {
+  openTransferDialog(item: NamespaceList) {
     if (!this.isEditable(item)) {
       return;
     }

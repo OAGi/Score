@@ -6,9 +6,10 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {AccountList} from '../../account-management/domain/accounts';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AgencyIdList, AgencyIdListForListRequest} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -64,11 +65,7 @@ export class AgencyIdListListComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('contextMenuDefault', {static: true}) public contextMenuDefault: ContextMenuComponent;
-  @ViewChild('contextMenuDeleted', {static: true}) public contextMenuDeleted: ContextMenuComponent;
-  @ViewChild('contextMenuEditable', {static: true}) public contextMenuEditable: ContextMenuComponent;
-  @ViewChild('contextMenuEditableRevised', {static: true}) public contextMenuEditableRevised: ContextMenuComponent;
-  @ViewChild('createContextMenu', {static: true}) public createContextMenu: ContextMenuComponent;
+  contextMenuItem: AgencyIdList;
 
   constructor(private service: AgencyIdListService,
               private releaseService: ReleaseService,
@@ -76,7 +73,6 @@ export class AgencyIdListListComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -197,7 +193,8 @@ export class AgencyIdListListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.username === this.currentUser).length;
+    const numRows = this.dataSource.data.filter(row => this.canSelect.indexOf(row.state) > -1 &&
+      !this.hasRevision(row) && row.owner.username === this.currentUser).length;
     return numSelected === numRows;
   }
 
@@ -313,16 +310,29 @@ export class AgencyIdListListComponent implements OnInit {
       });
   }
 
-  hasRevision(agencyIdList: AgencyIdList): boolean{
-    return agencyIdList.prevAgencyIdListManifestId != undefined;
+  hasRevision(item: AgencyIdList): boolean {
+    if (!item) {
+      return false;
+    }
+    return item.prevAgencyIdListManifestId !== undefined;
   }
 
   isEditable(item: AgencyIdList) {
+    if (!item) {
+      return false;
+    }
     return item.owner.username === this.currentUser && item.state === 'WIP';
   }
 
-  openTransferDialog(item: AgencyIdList, $event) {
-    if (!this.isEditable(item)) {
+  canRestore(item: AgencyIdList) {
+    if (!item) {
+      return false;
+    }
+    return item.owner.username === this.currentUser && item.state === 'Deleted';
+  }
+
+  openTransferDialog() {
+    if (!this.isEditable(this.contextMenuItem)) {
       return;
     }
 
@@ -333,7 +343,7 @@ export class AgencyIdListListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(item.agencyIdListManifestId, result.loginId).subscribe(_ => {
+        this.service.transferOwnership(this.contextMenuItem.agencyIdListManifestId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
@@ -343,8 +353,8 @@ export class AgencyIdListListComponent implements OnInit {
     });
   }
 
-  delete(item: AgencyIdList, $event) {
-    if (!this.isEditable(item)) {
+  delete() {
+    if (!this.isEditable(this.contextMenuItem)) {
       return;
     }
 
@@ -360,7 +370,7 @@ export class AgencyIdListListComponent implements OnInit {
         }
 
         this.loading = true;
-        this.service.delete(item.agencyIdListManifestId)
+        this.service.delete(this.contextMenuItem.agencyIdListManifestId)
           .pipe(
             finalize(() => {
               this.loading = false;
@@ -374,39 +384,16 @@ export class AgencyIdListListComponent implements OnInit {
       });
   }
 
-  onContextMenu($event: MouseEvent, item: AgencyIdList): void {
-    let contextMenu;
-    contextMenu = this.contextMenuDefault;
-    if (item.owner.username === this.currentUser && item.state === 'Deleted') {
-      contextMenu = this.contextMenuDeleted;
-    } else if (this.isEditable(item)) {
-      if (this.hasRevision(item)) {
-        contextMenu = this.contextMenuEditable;
-      } else {
-        contextMenu = this.contextMenuEditableRevised;
-      }
-    }
-
-    this.contextMenuService.show.next({
-      contextMenu,
-      event: $event,
-      item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  openDetail(item: AgencyIdList, $event?) {
+  openDetail($event?) {
     if (!!$event) {
       $event.preventDefault();
       $event.stopPropagation();
     }
-    this.router.navigateByUrl('/agency_id_list/' + item.agencyIdListManifestId);
+    this.router.navigateByUrl('/agency_id_list/' + this.contextMenuItem.agencyIdListManifestId);
     return;
   }
 
-  openDialogCcListRestore(item: AgencyIdList) {
+  openDialogCcListRestore() {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore agency ID list';
@@ -418,7 +405,7 @@ export class AgencyIdListListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.restore(item.agencyIdListManifestId).subscribe(_ => {
+          this.service.restore(this.contextMenuItem.agencyIdListManifestId).subscribe(_ => {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });

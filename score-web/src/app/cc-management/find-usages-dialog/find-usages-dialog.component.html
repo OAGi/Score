@@ -20,12 +20,12 @@
                        [matTooltip]="'Circular reference detected.'"
                        [matTooltipDisabled]="!node.isCycle"
                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="treeControl.isExpandable(node); else disabledRef;"
+                    <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                             (click)="toggle(node, $event)"
                             class="align-self-center"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
-                        {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                        {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                       </mat-icon>
                     </button>
                     <ng-template #disabledRef>

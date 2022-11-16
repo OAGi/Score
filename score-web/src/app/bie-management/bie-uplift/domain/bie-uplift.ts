@@ -1,10 +1,15 @@
-import {AbieFlatNode, AsbiepFlatNode, BbiepFlatNode, BbieScFlatNode, BieFlatNode, WrappedBieFlatNode} from '../../domain/bie-flat-tree';
+import {
+  AsbiepFlatNode,
+  BbiepFlatNode,
+  BbieScFlatNode,
+  BieFlatNode,
+  WrappedBieFlatNode
+} from '../../domain/bie-flat-tree';
 
 
 export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
   target: BieUpliftTargetFlatNode;
   fixed: boolean;
-  bieId: number;
   context: string;
 
   constructor(node: BieFlatNode) {
@@ -51,7 +56,7 @@ export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
 
 export class BieUpliftTargetFlatNode extends WrappedBieFlatNode {
   source: BieUpliftSourceFlatNode;
-  reusedTolevelAsbiepId: number;
+  reusedTopLevelAsbiepId: number;
   emptyRequired: boolean;
 
   constructor(node: BieFlatNode) {
@@ -234,7 +239,7 @@ export class MatchInfo {
     this.sourceDisplayPath = '/' + source.parents.map(i => i.name).join(' /');
     if (target) {
       this.targetDisplayPath = '/' + target.parents.map(i => i.name).join(' /');
-      if(source.fixed) {
+      if (source.fixed) {
         this.match = 'System';
       } else {
         this.match = 'Manual';
@@ -245,7 +250,7 @@ export class MatchInfo {
     }
     if (source.derived) {
       this.reuse = 'Not selected';
-      if (target && target.reusedTolevelAsbiepId) {
+      if (target && target.reusedTopLevelAsbiepId) {
         this.reuse = 'Selected';
       }
     }

@@ -21,6 +21,10 @@ export class BieExpressService {
           for (const topLevelAsbiepId of Object.keys(value)) {
             params = params.set('filenames[' + topLevelAsbiepId + ']', value[topLevelAsbiepId]);
           }
+        } else if (key === 'bizCtxIds') {
+          for (const topLevelAsbiepId of Object.keys(value)) {
+            params = params.set('bizCtxIds[' + topLevelAsbiepId + ']', Number(value[topLevelAsbiepId]));
+          }
         } else {
           params = params.set(key, option[key]);
         }

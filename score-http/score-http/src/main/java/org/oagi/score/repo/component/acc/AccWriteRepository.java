@@ -121,7 +121,7 @@ public class AccWriteRepository {
     }
 
     public ReviseAccRepositoryResponse reviseAcc(ReviseAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -352,7 +352,7 @@ public class AccWriteRepository {
     }
 
     public UpdateAccPropertiesRepositoryResponse updateAccProperties(UpdateAccPropertiesRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -506,7 +506,7 @@ public class AccWriteRepository {
     }
 
     public UpdateAccBasedAccRepositoryResponse updateAccBasedAcc(UpdateAccBasedAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -536,10 +536,8 @@ public class AccWriteRepository {
                     .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(request.getBasedAccManifestId())))
                     .fetchOne();
 
-            if (basedAccAlreadyContainAssociation(accManifestRecord, basedAccManifestRecord)) {
-                throw new IllegalArgumentException("Based ACC that already contains an Association with the same property term.");
-            }
-
+            // Issue #1024
+            ensureNoConflictsInAssociation(accManifestRecord, basedAccManifestRecord);
             accRecord.setBasedAccId(basedAccManifestRecord.getAccId());
         }
         accRecord.setLastUpdatedBy(userId);
@@ -565,8 +563,8 @@ public class AccWriteRepository {
         return new UpdateAccBasedAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger());
     }
 
-    private boolean basedAccAlreadyContainAssociation(AccManifestRecord accManifestRecord,
-                                                      AccManifestRecord basedAccManifestRecord) {
+    private void ensureNoConflictsInAssociation(AccManifestRecord accManifestRecord,
+                                                AccManifestRecord basedAccManifestRecord) {
         List<AsccManifestRecord> asccManifestRecords = dslContext.selectFrom(ASCC_MANIFEST)
                 .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
@@ -581,30 +579,48 @@ public class AccWriteRepository {
         List<ULong> bccpManifestIds = bccManifestRecords.stream()
                 .map(BccManifestRecord::getToBccpManifestId).collect(Collectors.toList());
 
-
         while (basedAccManifestRecord != null) {
-            if (dslContext.selectCount()
-                    .from(ASCC_MANIFEST)
-                    .where(and(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
-                            ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.in(asccpManifestIds)))
-                    .fetchOptionalInto(Integer.class).orElse(0) > 0) {
-                return true;
+            List<String> conflictAsccpList = dslContext.select(ASCCP.DEN)
+                    .from(ASCCP)
+                    .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                    .join(ASCC_MANIFEST).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID))
+                    .where(
+                            and(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
+                                    ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.in(asccpManifestIds))
+                    )
+                    .fetchInto(String.class);
+            if (!conflictAsccpList.isEmpty()) {
+                if (conflictAsccpList.size() == 1) {
+                    throw new IllegalArgumentException("There is a conflict in ASCCPs between the current ACC and the base ACC [" + conflictAsccpList.get(0) + "]");
+                } else {
+                    throw new IllegalArgumentException("There are conflicts in ASCCPs between the current ACC and the base ACC [" + String.join(", ", conflictAsccpList) + "]");
+                }
             }
-            if (dslContext.selectCount()
-                    .from(BCC_MANIFEST)
-                    .where(and(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
-                            BCC_MANIFEST.TO_BCCP_MANIFEST_ID.in(bccpManifestIds)))
-                    .fetchOptionalInto(Integer.class).orElse(0) > 0) {
-                return true;
+
+            List<String> conflictBccpList = dslContext.select(BCCP.DEN)
+                    .from(BCCP)
+                    .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+                    .join(BCC_MANIFEST).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCC_MANIFEST.TO_BCCP_MANIFEST_ID))
+                    .where(
+                            and(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
+                                    BCC_MANIFEST.TO_BCCP_MANIFEST_ID.in(bccpManifestIds))
+                    )
+                    .fetchInto(String.class);
+            if (!conflictBccpList.isEmpty()) {
+                if (conflictBccpList.size() == 1) {
+                    throw new IllegalArgumentException("There is a conflict in BCCPs between the current ACC and the base ACC [" + conflictBccpList.get(0) + "]");
+                } else {
+                    throw new IllegalArgumentException("There are conflicts in BCCPs between the current ACC and the base ACC [" + String.join(", ", conflictBccpList) + "]");
+                }
             }
+
             basedAccManifestRecord = dslContext.selectFrom(ACC_MANIFEST)
                     .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(basedAccManifestRecord.getBasedAccManifestId())).fetchOne();
         }
-        return false;
     }
 
     public UpdateAccStateRepositoryResponse updateAccState(UpdateAccStateRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -742,7 +758,7 @@ public class AccWriteRepository {
     }
 
     public DeleteAccRepositoryResponse deleteAcc(DeleteAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -785,7 +801,7 @@ public class AccWriteRepository {
     }
 
     public PurgeAccRepositoryResponse purgeAcc(PurgeAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -907,7 +923,7 @@ public class AccWriteRepository {
     }
 
     public DeleteAccRepositoryResponse removeAcc(DeleteAccRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -957,7 +973,7 @@ public class AccWriteRepository {
     }
 
     public UpdateAccOwnerRepositoryResponse updateAccOwner(UpdateAccOwnerRepositoryRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -1021,7 +1037,7 @@ public class AccWriteRepository {
     }
 
     public void moveSeq(UpdateSeqKeyRequest request) {
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
 
@@ -1058,7 +1074,7 @@ public class AccWriteRepository {
 
     public void moveSeq(AuthenticatedPrincipal requester, AccRecord accRecord, AccManifestRecord accManifestRecord,
                         CcId item, CcId after) {
-        AppUser user = sessionService.getAppUser(requester);
+        AppUser user = sessionService.getAppUserByUsername(requester);
         ULong userId = ULong.valueOf(user.getAppUserId());
         SeqKeyHandler seqKeyHandler;
 

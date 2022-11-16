@@ -9,14 +9,20 @@ import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-lis
 import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
 import {CodeListService} from '../../code-list-management/domain/code-list.service';
-import {DataSourceSearcher, VSFlatTreeControl} from '../../common/flat-tree';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CcListService} from '../cc-list/domain/cc-list.service';
-import {CcFlatNode, CcFlatNodeFlattener, DtFlatNode, DtScFlatNode, VSCcTreeDataSource} from '../domain/cc-flat-tree';
+import {
+  CcFlatNode,
+  CcFlatNodeDatabase,
+  CcFlatNodeDataSource,
+  CcFlatNodeDataSourceSearcher,
+  DtFlatNode,
+  DtScFlatNode
+} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
@@ -35,7 +41,6 @@ import {
   OagisComponentType,
   OagisComponentTypes
 } from '../domain/core-component-node';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
@@ -46,75 +51,9 @@ import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
-import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
-import {FlatTreeControlOptions} from '@angular/cdk/tree';
-import {FormControl} from "@angular/forms";
+import {Clipboard} from '@angular/cdk/clipboard';
+import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 
-
-class VSBdtFlatTreeControl<T extends CcFlatNode> extends VSFlatTreeControl<T> {
-  private _hideProhibited: boolean;
-
-  private flattener: CcFlatNodeFlattener;
-
-  constructor(hideProhibited: boolean | undefined, options?: FlatTreeControlOptions<T, T> | undefined, flattener?: CcFlatNodeFlattener) {
-    super(node => {
-      if (!node.expandable) {
-        return false;
-      }
-      return (this.hideProhibited) ? node.children.filter(e => !(e as DtScFlatNode).inhibited).length > 0 : node.expandable;
-    }, options);
-
-    this.flattener = flattener;
-    this._hideProhibited = hideProhibited;
-  }
-
-  expand(dataNode: T, reset?: boolean) {
-    if (!dataNode || !this.isExpandable(dataNode) || this.isExpanded(dataNode)) {
-      return;
-    }
-
-    super.expand(dataNode, reset);
-  }
-
-  get hideProhibited(): boolean {
-    return this._hideProhibited;
-  }
-
-  set hideProhibited(val: boolean) {
-    this._hideProhibited = val;
-    this.dataSource.resetData();
-  }
-}
-
-export class VSBdtFlatTreeDataSource<T extends CcFlatNode> extends VSCcTreeDataSource<T> {
-
-  constructor(treeControl: VSFlatTreeControl<T>, data: T[],
-              public service: CcNodeService,
-              listeners?: ChangeListener<T>[]) {
-    super(treeControl, data, service, listeners);
-  }
-
-  get cachedData(): T[] {
-    return ((this.treeControl as VSBdtFlatTreeControl<T>).hideProhibited) ?
-      super.cachedData.filter(e => !e.inhibited) : super.cachedData;
-  }
-
-  set cachedData(data: T[]) {
-    super.cachedData = data;
-  }
-
-  dataFilter(node: T): boolean {
-    if (node.level === 0) {
-      return true;
-    }
-    if (!this.treeControl) {
-      return false;
-    }
-    const a = this.treeControl.isExpanded(node) || this.treeControl.isExpanded(node.parent as T);
-    const b = (this.treeControl as VSBdtFlatTreeControl<T>).hideProhibited ? (!node.inhibited) as boolean : true;
-    return a && b;
-  }
-}
 
 @Component({
   selector: 'score-bccp-detail',
@@ -132,9 +71,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   entityTypes: EntityType[] = EntityTypes;
 
   rootNode: DtFlatNode;
-  dataSource: VSBdtFlatTreeDataSource<CcFlatNode>;
-  treeControl: VSBdtFlatTreeControl<CcFlatNode>;
-  searcher: DataSourceSearcher<CcFlatNode>;
+  dataSource: CcFlatNodeDataSource<CcFlatNode>;
+  searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
   lastRevision: CcRevisionResponse;
   selectedNode: CcFlatNode;
@@ -144,7 +82,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   namespaces: SimpleNamespace[];
   commentControl: CommentControl;
 
-  initialExpandDepth: number = 10;
+  initialExpandDepth = 10;
 
   primitiveTypeList = ['Primitive', 'Code List', 'Agency ID List'];
   primitiveList = ['Binary', 'Boolean', 'Decimal', 'Double', 'Float', 'Integer', 'NormalizedString', 'String', 'TimeDuration', 'TimePoint', 'Token'];
@@ -158,19 +96,38 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
 
+  contextMenuItem: CcFlatNode;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
-  @ViewChild('dtContextMenu', {static: true}) public dtContextMenu: ContextMenuComponent;
-  @ViewChild('dtScContextMenu', {static: true}) public dtScContextMenu: ContextMenuComponent;
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize: number = 33;
+  virtualScrollItemSize = 33;
 
   get minBufferPx(): number {
-    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * this.virtualScrollItemSize;
+    return 10000 * this.virtualScrollItemSize;
   }
 
   get maxBufferPx(): number {
-    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * 20 * this.virtualScrollItemSize;
+    return 1000000 * this.virtualScrollItemSize;
+  }
+
+  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+  HIDE_PROHIBITED_PROPERTY_KEY = 'CC-Settings-Hide-Prohibited';
+
+  get hideCardinality(): boolean {
+    return this.dataSource.hideCardinality;
+  }
+
+  set hideCardinality(hideCardinality: boolean) {
+    this.dataSource.hideCardinality = hideCardinality;
+    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
+  }
+
+  get hideProhibited(): boolean {
+    return this.dataSource.hideProhibited;
+  }
+
+  set hideProhibited(hideProhibited: boolean) {
+    this.dataSource.hideProhibited = hideProhibited;
+    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, hideProhibited);
   }
 
   constructor(private service: CcNodeService,
@@ -180,7 +137,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
               private searchOptionsService: SearchOptionsService,
               private releaseService: ReleaseService,
               private snackBar: MatSnackBar,
-              private contextMenuService: ContextMenuService,
               private namespaceService: NamespaceService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
@@ -188,7 +144,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
               private router: Router,
               private route: ActivatedRoute,
               private auth: AuthService,
-              private stompService: RxStompService) {
+              private stompService: RxStompService,
+              private clipboard: Clipboard) {
   }
 
   ngOnInit() {
@@ -232,31 +189,66 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         }
       });
 
-      const flattener = new CcFlatNodeFlattener(ccGraph, 'DT', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten(false, this.initialExpandDepth);
-        this.treeControl = new VSBdtFlatTreeControl<CcFlatNode>(true, undefined, flattener);
-        this.dataSource = new VSBdtFlatTreeDataSource(this.treeControl, nodes, this.service, []);
+      const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
+      this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.dataSource.init();
+      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, true);
+
+      this.rootNode = this.dataSource.data[0] as DtFlatNode;
+      this.rootNode.access = rootNode.access;
+      this.rootNode.state = rootNode.state;
+      this.rootNode.reset();
+
+      forkJoin([
+        this.codeListService.getSimpleCodeLists(rootNode.releaseId),
+        this.agencyIdListservice.getSimpleAgencyIdLists(rootNode.releaseId),
+        this.ccListService.getSimpleXbtList(rootNode.releaseId),
+      ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
+        this.codeLists = codeLists.list;
+        this.agencyIdLists = agencyIdLists.results;
+        this.xbtList = xbtList.map(e => new CcXbt(e));
+
+        // Issue #1254
+        // Initial expanding by the query path
+        const url = this.router.url;
+        const manifestId = this.manifestId.toString();
+        const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
+
+        if (!!queryPath) {
+          this.goToPath(queryPath);
+        } else {
+          this.onClick(this.dataSource.data[0]);
+        }
+
         this.isUpdating = false;
-        this.rootNode = nodes[0] as DtFlatNode;
-        this.rootNode.access = rootNode.access;
-        this.rootNode.state = rootNode.state;
-        this.rootNode.reset();
-        this.searcher = new DataSourceSearcher(this.dataSource);
-
-        forkJoin([
-          this.codeListService.getSimpleCodeLists(rootNode.releaseId),
-          this.agencyIdListservice.getSimpleAgencyIdLists(rootNode.releaseId),
-          this.ccListService.getSimpleXbtList(rootNode.releaseId),
-        ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
-          this.codeLists = codeLists.list;
-          this.agencyIdLists = agencyIdLists.results;
-          this.xbtList = xbtList.map(e => new CcXbt(e));
-          this.onClick(this.rootNode);
-        });
-
-      }, 0);
+      });
+    }, err => {
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000
+      });
     });
+  }
+
+  goToPath(path: string) {
+    let curNode = this.dataSource.data[0];
+    let idx = 0;
+    path.split('/')
+      .map(e => decodeURI(e))
+      .map(e => e.replace(new RegExp('\\s', 'g'), '')).forEach(nodeName => {
+      for (const node of this.dataSource.data.slice(idx)) {
+        if (node.name.replace(new RegExp('\\s', 'g'), '') === nodeName) {
+          this.dataSource.expand(node);
+          curNode = node;
+          break;
+        }
+        idx++;
+      }
+    });
+
+    this.onClick(curNode);
+    this.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -269,8 +261,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     comment.isNew = true;
 
     if (comment.prevCommentId) {
-      let idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
-      let childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
+      const idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
+      const childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
       this.commentControl.comments.splice(idx + childrenCnt + 1, 0, comment);
     } else {
       this.commentControl.comments.push(comment);
@@ -286,38 +278,73 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
-  getGraph(callbackFn) {
-    this.service.getGraphNode(this.rootNode.type, this.manifestId).subscribe(graph => {
-      const flattener = new CcFlatNodeFlattener(
-        graph, 'DT', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten();
-        return callbackFn(nodes);
-      });
+  copyLink(node: CcFlatNode, $event?) {
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    if (!node) {
+      return;
+    }
+
+    const url = window.location.href;
+    const manifestId = this.manifestId.toString();
+    const idIdx = url.indexOf(manifestId);
+    const queryPath = url.substring(0, idIdx + manifestId.length) + '/' + node.queryPath;
+
+    this.clipboard.copy(queryPath);
+    this.snackBar.open('Link copied', '', {
+      duration: 3000
     });
   }
 
   reload(snackMsg?: string) {
+    let selectedNodeManifestId;
+    if (this.selectedNode) {
+      selectedNodeManifestId = this.selectedNode.manifestId;
+      this.selectedNode = undefined;
+    }
+    const expandedNodes = this.dataSource.data.filter(e => e.expanded);
+    const hideProhibited = this.dataSource.hideProhibited;
+
     this.isUpdating = true;
     forkJoin([
       this.service.getBdtNode(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
-    ]).subscribe(([rootNode, graph]) => {
-      const flattener = new CcFlatNodeFlattener(graph, 'DT', this.manifestId);
-      setTimeout(() => {
-        const nodes = flattener.flatten();
-        this.treeControl = new VSBdtFlatTreeControl<CcFlatNode>(this.treeControl.hideProhibited, undefined, flattener);
-        this.dataSource = new VSBdtFlatTreeDataSource(this.treeControl, nodes, this.service, []);
-        this.isUpdating = false;
-        this.rootNode = nodes[0] as DtFlatNode;
-        this.rootNode.access = rootNode.access;
-        this.rootNode.state = rootNode.state;
-        this.rootNode.reset();
-        this.searcher = new DataSourceSearcher(this.dataSource);
+    ]).subscribe(([rootNode, ccGraph]) => {
+      const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
+      this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.dataSource.init();
+      this.dataSource.hideProhibited = hideProhibited;
 
-        this.treeControl.expand(this.dataSource.getRootNode());
-        this.onClick(this.dataSource.getRootNode());
-      }, 0);
+      this.rootNode = this.dataSource.data[0] as DtFlatNode;
+      this.rootNode.access = rootNode.access;
+      this.rootNode.state = rootNode.state;
+      this.rootNode.reset();
+
+      this.onClick(this.dataSource.data[0]);
+
+      // recover the tree expansion status
+      for (const expandedNode of expandedNodes) {
+        for (const datum of this.dataSource.data) {
+          if (expandedNode.manifestId === datum.manifestId && !this.dataSource.isExpanded(datum)) {
+            this.dataSource.toggle(datum);
+            break;
+          }
+        }
+      }
+      // recover the selected node.
+      if (!!selectedNodeManifestId) {
+        for (const datum of this.dataSource.data) {
+          if (datum.manifestId === selectedNodeManifestId) {
+            this.onClick(datum);
+            break;
+          }
+        }
+      }
+
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
       }
@@ -340,11 +367,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   get state(): string {
-    return (this.rootNode) ? this.rootNode.state : '';
+    return (!!this.rootNode) ? this.rootNode.state : '';
   }
 
   get access(): string {
-    return (this.rootNode) ? this.rootNode.access : '';
+    return (!!this.rootNode) ? this.rootNode.access : '';
   }
 
   hasRevision(): boolean {
@@ -360,6 +387,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       $event.preventDefault();
       $event.stopPropagation();
     }
+
     this.commentControl.closeCommentSlide();
     this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
       if (detail instanceof DtFlatNode || detail instanceof DtScFlatNode) {
@@ -389,7 +417,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           aId = a.bdtScPriRestriId;
           bId = b.bdtScPriRestriId;
         }
-        if (aId == bId) {
+        if (aId === bId) {
           return 0;
         }
         if (aId === undefined) {
@@ -495,7 +523,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   get isChanged() {
-    return this.dataSource.changedNodes.length > 0;
+    return this.dataSource.getChanged().length > 0;
   }
 
   _updateDetails(details: CcFlatNode[]) {
@@ -519,7 +547,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       return;
     }
 
-    const details = this.dataSource.changedNodes;
+    const details = this.dataSource.getChanged();
     let emptyDefinition = false;
     let emptyNamespace = false;
     let emptyQualifier = false;
@@ -585,23 +613,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     }
   }
 
-  onContextMenu($event: MouseEvent, node: CcFlatNode): void {
-    const data = {
-      event: $event,
-      item: node,
-    };
-
-    if (node.level === 0) {
-      data['contextMenu'] = this.dtContextMenu;
-    } else {
-      data['contextMenu'] = (node as DtScFlatNode).removeAble ? this.dtScContextMenu : this.defaultContextMenu;
-    }
-
-    this.contextMenuService.show.next(data);
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
   openSearchOptions() {
     const dialogRef = this.dialog.open(SearchOptionsDialogComponent, {
       data: {},
@@ -619,8 +630,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
-  discardSc(node: CcFlatNode) {
+  canDiscard(node: CcFlatNode): boolean {
+    if (!(node instanceof DtScFlatNode)) {
+      return false;
+    }
+    return (node as DtScFlatNode).removeAble;
+  }
 
+  discardSc(node: CcFlatNode) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove supplementary component?';
     dialogConfig.data.content = ['Are you sure you want to remove this supplementary component?'];
@@ -672,7 +689,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     if (!state) {
       return;
     }
-    const rootNode = this.dataSource.getRootNode();
+    const rootNode = this.dataSource.data[0];
 
     if (state !== 'WIP') {
       this.dataSource.loadDetail(rootNode, (detail) => {
@@ -694,7 +711,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   afterStateChanged(state: string, access: string) {
     this.rootNode.state = state;
     this.rootNode.access = access;
-    const root = this.dataSource.getRootNode();
+    const root = this.dataSource.data[0];
     (root.detail as CcDtNodeDetail).state = state;
   }
 
@@ -832,7 +849,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   openHistory(node: CcFlatNode) {
-    window.open('/log/core-component/' + node.guid, '_blank');
+    window.open('/log/core-component/' + node.guid + '?type=' + node.type + '&manifestId=' + node.manifestId, '_blank');
   }
 
   openComments(type: string, node?: CcFlatNode) {
@@ -842,9 +859,9 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.commentControl.toggleCommentSlide(type, node.detail);
   }
 
-  scrollToNode(node: CcFlatNode) {
+  scrollToNode(node: CcFlatNode, delay?: number) {
     const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index);
+    this.scrollTree(index, delay);
     this.cursorNode = node;
   }
 
@@ -854,7 +871,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     } else if ($event.key === 'ArrowUp') {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.treeControl.toggle(this.cursorNode);
+      this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     }
@@ -874,10 +891,17 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return '';
   }
 
-  scrollTree(index: number) {
-    const range = this.virtualScroll.getRenderedRange();
-    if (range.start > index || range.end < index) {
-      this.virtualScroll.scrollToOffset(index * 33);
+  scrollTree(index: number, delay?: number) {
+    if (index < 0) {
+      return;
+    }
+
+    if (delay) {
+      setTimeout(() => {
+        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+      }, delay);
+    } else {
+      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
     }
   }
 
@@ -906,13 +930,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   search(inputKeyword, backward?: boolean, force?: boolean) {
     this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.virtualScroll.scrollToIndex(index);
+      this.scrollTree(index, 500);
     });
   }
 
   move(val: number) {
     this.searcher.go(val).subscribe(index => {
-      this.virtualScroll.scrollToIndex(index);
+      this.onClick(this.dataSource.data[index]);
+      this.scrollTree(index);
     });
   }
 
@@ -930,7 +955,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       $event.stopPropagation();
     }
 
-    this.treeControl.toggle(node);
+    this.dataSource.toggle(node);
   }
 
   hasTokenPrimitive(detail: CcDtNodeDetail | CcBdtScNodeDetail) {
@@ -981,12 +1006,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
             }
             break;
           case 'CodeList':
-            if (this.selectedValueDomain.bdtPriRestri.codeListId !== bdtPriRestri.codeListId) {
+            if (this.selectedValueDomain.bdtPriRestri.codeListManifestId !== bdtPriRestri.codeListManifestId) {
               newBdtPriRestriList.push(bdtPriRestri);
             }
             break;
           case 'AgencyIdList':
-            if (this.selectedValueDomain.bdtPriRestri.agencyIdListId !== bdtPriRestri.agencyIdListId) {
+            if (this.selectedValueDomain.bdtPriRestri.agencyIdListManifestId !== bdtPriRestri.agencyIdListManifestId) {
               newBdtPriRestriList.push(bdtPriRestri);
             }
             break;
@@ -1015,12 +1040,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
             }
             break;
           case 'CodeList':
-            if (this.selectedValueDomain.bdtScPriRestri.codeListId !== bdtScPriRestri.codeListId) {
+            if (this.selectedValueDomain.bdtScPriRestri.codeListManifestId !== bdtScPriRestri.codeListManifestId) {
               newBdtScPriRestriList.push(bdtScPriRestri);
             }
             break;
           case 'AgencyIdList':
-            if (this.selectedValueDomain.bdtScPriRestri.agencyIdListId !== bdtScPriRestri.agencyIdListId) {
+            if (this.selectedValueDomain.bdtScPriRestri.agencyIdListManifestId !== bdtScPriRestri.agencyIdListManifestId) {
               newBdtScPriRestriList.push(bdtScPriRestri);
             }
             break;
@@ -1041,43 +1066,43 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   filteredCodeLists(element: any): CodeListForList[] {
-    let selfCodeListId;
+    let selfCodeListManifestId;
     if (!!element.bdtPriRestri) {
-      selfCodeListId = element.bdtPriRestri.codeListId;
+      selfCodeListManifestId = element.bdtPriRestri.codeListManifestId;
     } else if (!!element.bdtScPriRestri) {
-      selfCodeListId = element.bdtScPriRestri.codeListId;
+      selfCodeListManifestId = element.bdtScPriRestri.codeListManifestId;
     }
 
     const selectedCodeLists = this.restrictionDataSource.data.filter(e => e.type === 'CodeList').map(e => {
       if (!!e.bdtPriRestri) {
-        return e.bdtPriRestri.codeListId;
+        return e.bdtPriRestri.codeListManifestId;
       } else if (!!e.bdtScPriRestri) {
-        return e.bdtScPriRestri.codeListId;
+        return e.bdtScPriRestri.codeListManifestId;
       }
       return undefined;
     }).filter(e => !!e);
 
-    return this.codeLists.filter(e => !selectedCodeLists.includes(e.codeListId) || e.codeListId === selfCodeListId);
+    return this.codeLists.filter(e => !selectedCodeLists.includes(e.codeListManifestId) || e.codeListManifestId === selfCodeListManifestId);
   }
 
   filteredAgencyIdLists(element: any): AgencyIdList[] {
-    let selfAgencyIdListId;
+    let selfAgencyIdListManifestId;
     if (!!element.bdtPriRestri) {
-      selfAgencyIdListId = element.bdtPriRestri.agencyIdListId;
+      selfAgencyIdListManifestId = element.bdtPriRestri.agencyIdListManifestId;
     } else if (!!element.bdtScPriRestri) {
-      selfAgencyIdListId = element.bdtScPriRestri.agencyIdListId;
+      selfAgencyIdListManifestId = element.bdtScPriRestri.agencyIdListManifestId;
     }
 
     const selectedAgencyIdLists = this.restrictionDataSource.data.filter(e => e.type === 'AgencyIdList').map(e => {
       if (!!e.bdtPriRestri) {
-        return e.bdtPriRestri.agencyIdListId;
+        return e.bdtPriRestri.agencyIdListManifestId;
       } else if (!!e.bdtScPriRestri) {
-        return e.bdtScPriRestri.agencyIdListId;
+        return e.bdtScPriRestri.agencyIdListManifestId;
       }
       return undefined;
     }).filter(e => !!e);
 
-    return this.agencyIdLists.filter(e => !selectedAgencyIdLists.includes(e.agencyIdListId) || e.agencyIdListId === selfAgencyIdListId);
+    return this.agencyIdLists.filter(e => !selectedAgencyIdLists.includes(e.agencyIdListManifestId) || e.agencyIdListManifestId === selfAgencyIdListManifestId);
   }
 
   onChangeValueDomain(detail: CcNodeDetail) {

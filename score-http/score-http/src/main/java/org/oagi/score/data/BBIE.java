@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.Date;
 
 @Data
-public class BBIE implements BIE {
+public class BBIE implements BIE, FacetRestrictionsAware {
 
     private BigInteger bbieId = BigInteger.ZERO;
     private String guid;
@@ -14,10 +14,13 @@ public class BBIE implements BIE {
     private BigInteger fromAbieId = BigInteger.ZERO;
     private BigInteger toBbiepId = BigInteger.ZERO;
     private BigInteger bdtPriRestriId = BigInteger.ZERO;
-    private BigInteger codeListId = BigInteger.ZERO;
-    private BigInteger agencyIdListId = BigInteger.ZERO;
+    private BigInteger codeListManifestId = BigInteger.ZERO;
+    private BigInteger agencyIdListManifestId = BigInteger.ZERO;
     private int cardinalityMin;
     private int cardinalityMax;
+    private BigInteger minLength;
+    private BigInteger maxLength;
+    private String pattern;
     private String defaultValue;
     private boolean nillable;
     private String fixedValue;

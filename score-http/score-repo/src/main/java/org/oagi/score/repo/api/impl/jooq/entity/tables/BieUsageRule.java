@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function7;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row7;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -229,6 +233,11 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         return new BieUsageRule(alias, this);
     }
 
+    @Override
+    public BieUsageRule as(Table<?> alias) {
+        return new BieUsageRule(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -245,6 +254,14 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         return new BieUsageRule(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public BieUsageRule rename(Table<?> name) {
+        return new BieUsageRule(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row7 type methods
     // -------------------------------------------------------------------------
@@ -252,5 +269,20 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     @Override
     public Row7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> fieldsRow() {
         return (Row7) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

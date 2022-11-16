@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function10;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row10;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -274,6 +278,11 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
         return new AgencyIdListManifest(alias, this);
     }
 
+    @Override
+    public AgencyIdListManifest as(Table<?> alias) {
+        return new AgencyIdListManifest(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -290,6 +299,14 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
         return new AgencyIdListManifest(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public AgencyIdListManifest rename(Table<?> name) {
+        return new AgencyIdListManifest(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row10 type methods
     // -------------------------------------------------------------------------
@@ -297,5 +314,20 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
     @Override
     public Row10<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
         return (Row10) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

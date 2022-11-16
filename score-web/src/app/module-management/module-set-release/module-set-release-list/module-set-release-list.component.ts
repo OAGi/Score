@@ -8,7 +8,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -40,16 +39,15 @@ export class ModuleSetReleaseListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ModuleSetReleaseListRequest;
 
+  contextMenuItem: ModuleSetRelease;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
   constructor(private service: ModuleService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -146,22 +144,15 @@ export class ModuleSetReleaseListComponent implements OnInit {
     });
   }
 
-  onContextMenu($event: MouseEvent, item: ModuleSetRelease): void {
-    this.contextMenuService.show.next({
-      contextMenu: this.contextMenu,
-      event: $event,
-      item: item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
 
   isEditable(item: ModuleSetRelease) {
+    if (!item) {
+      return false;
+    }
     return true;
   }
 
-  discard(item: ModuleSetRelease, $event) {
+  discard(item: ModuleSetRelease) {
     if (!this.isEditable(item)) {
       return;
     }

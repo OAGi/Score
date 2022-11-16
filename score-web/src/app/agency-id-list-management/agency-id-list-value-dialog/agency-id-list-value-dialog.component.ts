@@ -22,12 +22,12 @@ export class AgencyIdListValueDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<AgencyIdListValueDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) {
 
-    this.agencyIdListValue = data.agencyIdListValue;
+    this.agencyIdListValue = new AgencyIdListValue(data.agencyIdListValue);
     this.lastRevisionValue = data.lastRevisionValue;
     this.agencyId = data.agencyId;
     this.isEditable = data.isEditable;
 
-    this._hashCode = hashCode(this.agencyIdListValue);
+    this._hashCode = this.agencyIdListValue.hashCode;
   }
 
   get hasRevision(): boolean {

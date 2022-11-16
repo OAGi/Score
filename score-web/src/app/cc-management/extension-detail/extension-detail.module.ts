@@ -6,9 +6,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
-import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {
+  AppendAssociationDialogComponent
+} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {ExtensionDetailComponent} from './extension-detail.component';
@@ -16,10 +17,10 @@ import {SearchOptionsDialogModule} from '../search-options-dialog/search-options
 
 const routes: Routes = [
   {
-    path: 'core_component/extension',
+    path: 'core_component/extension/:manifestId',
     children: [
       {
-        path: ':manifestId',
+        path: '**',
         component: ExtensionDetailComponent,
         canActivate: [AuthService],
       }
@@ -34,9 +35,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     MatInputModule,
-    ContextMenuModule.forRoot({
-      useBootstrap4: true,
-    }),
     CommonModule,
     TranslateModule,
     ScoreCommonModule,

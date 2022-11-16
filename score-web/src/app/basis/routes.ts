@@ -3,6 +3,7 @@ import {DisabledActivate, DisabledComponent} from './disabled/disabled.component
 
 import {HomepageComponent} from './homepage/homepage.component';
 import {LoginComponent} from './login/login.component';
+import {LogoutComponent} from './logout/logout.component';
 import {JoinComponent} from './join/join.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {AuthService} from '../authentication/auth.service';
@@ -19,6 +20,10 @@ export const SCORE_WEBAPP_ROUTES: Routes = [
   {
     path: environment.loginPath,
     component: LoginComponent
+  },
+  {
+    path: environment.logoutPath,
+    component: LogoutComponent
   },
   {
     path: 'pending',

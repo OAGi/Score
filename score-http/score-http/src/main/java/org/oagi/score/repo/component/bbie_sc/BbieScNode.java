@@ -4,6 +4,8 @@ import lombok.Data;
 import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 public class BbieScNode {
@@ -20,6 +22,7 @@ public class BbieScNode {
         private String defaultValue;
         private String fixedValue;
         private CcState state;
+        private List<String> cdtPrimitives = Collections.emptyList();
     }
 
     private BdtSc bdtSc = new BdtSc();
@@ -37,6 +40,9 @@ public class BbieScNode {
         private String guid;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
+        private Integer minLength;
+        private Integer maxLength;
+        private String pattern;
         private String remark;
         private String bizTerm;
         private String definition;
@@ -45,11 +51,11 @@ public class BbieScNode {
         private String example;
 
         private BigInteger bdtScPriRestriId;
-        private BigInteger codeListId;
-        private BigInteger agencyIdListId;
+        private BigInteger codeListManifestId;
+        private BigInteger agencyIdListManifestId;
 
         public boolean isEmptyPrimitive() {
-            return (bdtScPriRestriId == null && codeListId == null && agencyIdListId == null);
+            return (bdtScPriRestriId == null && codeListManifestId == null && agencyIdListManifestId == null);
         }
     }
 

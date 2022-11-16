@@ -42,6 +42,9 @@ export class BieListService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
+    if (request.filters.den) {
+      params = params.set('den', request.filters.den);
+    }
     if (request.filters.propertyTerm) {
       params = params.set('propertyTerm', request.filters.propertyTerm);
     }

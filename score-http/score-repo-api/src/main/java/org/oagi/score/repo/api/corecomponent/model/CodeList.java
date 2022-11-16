@@ -6,6 +6,8 @@ import java.util.Objects;
 
 public class CodeList implements CoreComponent, Serializable {
 
+    private BigInteger codeListManifestId;
+
     private BigInteger codeListId;
 
     private String guid;
@@ -15,6 +17,24 @@ public class CodeList implements CoreComponent, Serializable {
     private String versionId;
 
     private BigInteger basedCodeListId;
+
+    private String listId;
+
+    private BigInteger agencyIdListValueManifestId;
+
+    private String agencyName;
+
+    private BigInteger prevCodeListId;
+
+    private BigInteger nextCodeListId;
+
+    public BigInteger getCodeListManifestId() {
+        return codeListManifestId;
+    }
+
+    public void setCodeListManifestId(BigInteger codeListManifestId) {
+        this.codeListManifestId = codeListManifestId;
+    }
 
     public BigInteger getBasedCodeListId() {
         return basedCodeListId;
@@ -32,10 +52,6 @@ public class CodeList implements CoreComponent, Serializable {
         this.listId = listId;
     }
 
-    private String listId;
-
-    private BigInteger agencyIdListValueId;
-
     public String getAgencyName() {
         return agencyName;
     }
@@ -43,12 +59,6 @@ public class CodeList implements CoreComponent, Serializable {
     public void setAgencyName(String agencyName) {
         this.agencyName = agencyName;
     }
-
-    private String agencyName;
-
-    private BigInteger prevCodeListId;
-
-    private BigInteger nextCodeListId;
 
     public BigInteger getCodeListId() {
         return codeListId;
@@ -78,12 +88,12 @@ public class CodeList implements CoreComponent, Serializable {
         this.versionId = versionId;
     }
 
-    public BigInteger getAgencyIdListValueId() {
-        return agencyIdListValueId;
+    public BigInteger getAgencyIdListValueManifestId() {
+        return agencyIdListValueManifestId;
     }
 
-    public void setAgencyIdListValueId(BigInteger agencyIdListValueId) {
-        this.agencyIdListValueId = agencyIdListValueId;
+    public void setAgencyIdListValueManifestId(BigInteger agencyIdListValueManifestId) {
+        this.agencyIdListValueManifestId = agencyIdListValueManifestId;
     }
 
     public BigInteger getPrevCodeListId() {

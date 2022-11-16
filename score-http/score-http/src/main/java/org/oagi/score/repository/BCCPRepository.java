@@ -26,6 +26,8 @@ public class BCCPRepository implements ScoreRepository<BCCP> {
                 Tables.BCCP.PROPERTY_TERM,
                 Tables.BCCP.REPRESENTATION_TERM,
                 Tables.BCCP.DEFAULT_VALUE,
+                Tables.BCCP.FIXED_VALUE,
+                Tables.BCCP_MANIFEST.BDT_MANIFEST_ID,
                 Tables.BCCP.BDT_ID,
                 Tables.BCCP.DEN,
                 Tables.BCCP.DEFINITION,

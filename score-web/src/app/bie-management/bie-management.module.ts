@@ -4,7 +4,6 @@ import {MatBadgeModule} from '@angular/material/badge';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {ContextMenuModule} from 'ngx-contextmenu';
 import {BieExpressModule} from './bie-express/bie-express.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
 import {BieListDialogComponent} from './bie-list-dialog/bie-list-dialog.component';
@@ -22,7 +21,6 @@ import {BieCopyService} from './bie-copy/domain/bie-copy.service';
 import {ReleaseService} from '../release-management/domain/release.service';
 
 import {TranslateModule} from '@ngx-translate/core';
-import {BieEditModule} from './bie-edit/bie-edit.module';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {BieReportComponent} from './bie-report/bie-report.component';
@@ -31,6 +29,12 @@ import {BieUpliftComponent} from './bie-uplift/bie-uplift.component';
 import {BieUpliftService} from './bie-uplift/domain/bie-uplift.service';
 import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.component';
 import {ReportDialogComponent} from './bie-uplift/report-dialog/report-dialog.component';
+import {BieEditComponent} from './bie-edit/bie-edit.component';
+import {ReuseBieDialogComponent} from './bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
+import {BieEditService} from './bie-edit/domain/bie-edit.service';
+import {MatDialogModule} from '@angular/material/dialog';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {AngularSplitModule} from 'angular-split';
 
 const routes: Routes = [
   {
@@ -95,6 +99,16 @@ const routes: Routes = [
             canActivate: [AuthService]
           }
         ]
+      },
+      {
+        path: ':id',
+        children: [
+          {
+            path: '**',
+            component: BieEditComponent,
+            canActivate: [AuthService]
+          }
+        ]
       }
     ]
   }
@@ -108,15 +122,14 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     BieExpressModule,
-    BieEditModule,
     TransferOwnershipDialogModule,
-    ContextMenuModule.forRoot({
-      useBootstrap4: true,
-    }),
     TranslateModule,
     CommonModule,
     ScoreCommonModule,
     MatBadgeModule,
+    MatDialogModule,
+    NgxMatSelectSearchModule,
+    AngularSplitModule
   ],
   declarations: [
     BieCreateBizCtxComponent,
@@ -128,7 +141,12 @@ const routes: Routes = [
     BieListDialogComponent,
     BieUpliftComponent,
     ReportDialogComponent,
-    BieReportComponent
+    BieReportComponent,
+    BieEditComponent,
+    ReuseBieDialogComponent
+  ],
+  entryComponents: [
+    ReuseBieDialogComponent
   ],
   providers: [
     ReleaseService,
@@ -136,7 +154,8 @@ const routes: Routes = [
     BieCopyService,
     BieListService,
     BieUpliftService,
-    BieReportService
+    BieReportService,
+    BieEditService
   ]
 })
 export class BieManagementModule {

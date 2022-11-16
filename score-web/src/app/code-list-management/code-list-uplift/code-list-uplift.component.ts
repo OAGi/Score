@@ -6,7 +6,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -69,13 +68,9 @@ export class CodeListUpliftComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
 
+  contextMenuItem: CodeListForList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('contextMenuDefault', {static: true}) public contextMenuDefault: ContextMenuComponent;
-  @ViewChild('contextMenuDeleted', {static: true}) public contextMenuDeleted: ContextMenuComponent;
-  @ViewChild('contextMenuEditable', {static: true}) public contextMenuEditable: ContextMenuComponent;
-  @ViewChild('contextMenuEditableRevised', {static: true}) public contextMenuEditableRevised: ContextMenuComponent;
-  @ViewChild('createContextMenu', {static: true}) public createContextMenu: ContextMenuComponent;
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
@@ -83,7 +78,6 @@ export class CodeListUpliftComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
-              private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -352,29 +346,6 @@ export class CodeListUpliftComponent implements OnInit {
       });
   }
 
-  onContextMenu($event: MouseEvent, item: CodeListForList): void {
-    let contextMenu;
-    contextMenu = this.contextMenuDefault;
-    if (item.owner === this.currentUser && item.state === 'Deleted') {
-      contextMenu = this.contextMenuDeleted;
-    } else if (this.isEditable(item)) {
-      if (item.revision === '1') {
-        contextMenu = this.contextMenuEditable;
-      } else {
-        contextMenu = this.contextMenuEditableRevised;
-      }
-    }
-
-    this.contextMenuService.show.next({
-      contextMenu,
-      event: $event,
-      item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
   openDetail(item: CodeListForList, $event?) {
     if (!!$event) {
       $event.preventDefault();
@@ -423,7 +394,7 @@ export class CodeListUpliftComponent implements OnInit {
           ];
 
           result.duplicatedValues.forEach(e => {
-            dialogConfig.data.content.push(" - " + e);
+            dialogConfig.data.content.push(' - ' + e);
           });
 
           this.confirmDialogService.open(dialogConfig).afterClosed()

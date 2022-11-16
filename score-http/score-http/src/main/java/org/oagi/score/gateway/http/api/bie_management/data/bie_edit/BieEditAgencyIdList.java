@@ -7,6 +7,8 @@ import java.math.BigInteger;
 @Data
 public class BieEditAgencyIdList {
 
+    private BigInteger agencyIdListManifestId;
+    private BigInteger basedAgencyIdListManifestId;
     private BigInteger agencyIdListId;
     private boolean isDefault;
     private String agencyIdListName;

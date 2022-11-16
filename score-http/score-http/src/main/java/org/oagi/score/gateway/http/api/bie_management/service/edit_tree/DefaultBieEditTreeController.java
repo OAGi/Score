@@ -100,7 +100,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId())) {
                         accessPrivilege = AccessPrivilege.CanView;
                     } else {
-                        throw new DataAccessForbiddenException("'" + sessionService.getAppUser(user).getLoginId() +
+                        throw new DataAccessForbiddenException("'" + sessionService.getAppUserByUsername(user).getLoginId() +
                                 "' doesn't have an access privilege.");
                     }
                 }
@@ -151,7 +151,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 ABIE.ABIE_ID,
                 ABIE.BASED_ACC_MANIFEST_ID.as("acc_manifest_id"),
                 inline("abie").as("type"),
-                inline(true).as("used"))
+                inline(true).as("used"),
+                TOP_LEVEL_ASBIEP.INVERSE_MODE)
                 .from(TOP_LEVEL_ASBIEP)
                 .join(ASBIEP).on(and(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID),
@@ -161,7 +162,6 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                         ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.ABIE_ID),
                         ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
                 ))
-
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -724,8 +724,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     BBIE.CARDINALITY_MAX.as("bie_cardinality_max"),
                     BBIE.IS_USED.as("used"),
                     BBIE.BDT_PRI_RESTRI_ID,
-                    BBIE.CODE_LIST_ID,
-                    BBIE.AGENCY_ID_LIST_ID,
+                    BBIE.CODE_LIST_MANIFEST_ID,
+                    BBIE.AGENCY_ID_LIST_MANIFEST_ID,
                     BBIE.DEFAULT_VALUE.as("bie_default_value"),
                     BBIE.FIXED_VALUE.as("bie_fixed_value"),
                     BBIE.IS_NILLABLE.as("bie_nillable"),
@@ -736,15 +736,15 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     .fetchOneInto(BieEditBbiepNodeDetail.class);
 
             /* Issue #762 */
-            if (detail.getAgencyIdListId() != null && detail.getAgencyIdListId().longValue() > 0L) {
+            if (detail.getAgencyIdListManifestId() != null && detail.getAgencyIdListManifestId().longValue() > 0L) {
                 detail.setBdtPriRestriId(null);
-                detail.setCodeListId(null);
-            } else if (detail.getCodeListId() != null && detail.getCodeListId().longValue() > 0L) {
+                detail.setCodeListManifestId(null);
+            } else if (detail.getCodeListManifestId() != null && detail.getCodeListManifestId().longValue() > 0L) {
                 detail.setBdtPriRestriId(null);
-                detail.setAgencyIdListId(null);
+                detail.setAgencyIdListManifestId(null);
             } else if (detail.getBdtPriRestriId() != null && detail.getBdtPriRestriId().longValue() > 0L) {
-                detail.setCodeListId(null);
-                detail.setAgencyIdListId(null);
+                detail.setCodeListManifestId(null);
+                detail.setAgencyIdListManifestId(null);
             }
         } else {
             detail = dslContext.select(
@@ -754,7 +754,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     BCC.FIXED_VALUE.as("bie_fixed_value"),
                     BCC.IS_NILLABLE.as("bie_nillable"))
                     .from(BCC)
-                    .where(BCC.BCC_ID.eq(ULong.valueOf(bbiepNode.getBccManifestId())))
+                    .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+                    .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bbiepNode.getBccManifestId())))
                     .fetchOneInto(BieEditBbiepNodeDetail.class);
         }
 
@@ -818,7 +819,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     }
 
     private BieEditBdtPriRestri getBdtPriRestri(BieEditBbiepNode bbiepNode) {
-        BigInteger bdtId = bbiepNode.getBdtManifestId();
+        BigInteger bdtManifestId = bbiepNode.getBdtManifestId();
 
         List<BieEditXbt> bieEditXbtList = dslContext.select(
                 BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID.as("pri_restri_id"),
@@ -826,23 +827,23 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .from(BDT_PRI_RESTRI)
                 .join(CDT_AWD_PRI_XPS_TYPE_MAP).on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
                 .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
-                .where(BDT_PRI_RESTRI.BDT_ID.eq(ULong.valueOf(bdtId)))
+                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId)))
                 .fetchInto(BieEditXbt.class);
 
         List<BieEditCodeList> bieEditCodeLists = dslContext.select(
                 CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
                 BDT_PRI_RESTRI.IS_DEFAULT, CODE_LIST.NAME.as("code_list_name"))
                 .from(BDT_PRI_RESTRI)
-                .join(CODE_LIST_MANIFEST).on(BDT_PRI_RESTRI.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                .join(CODE_LIST_MANIFEST).on(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                .where(BDT_PRI_RESTRI.BDT_ID.eq(ULong.valueOf(bdtId)))
+                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId)))
                 .fetchInto(BieEditCodeList.class);
 
         List<BieEditAgencyIdList> bieEditAgencyIdLists = dslContext.select(
                 AGENCY_ID_LIST.AGENCY_ID_LIST_ID, BDT_PRI_RESTRI.IS_DEFAULT, AGENCY_ID_LIST.NAME.as("agency_id_list_name"))
                 .from(BDT_PRI_RESTRI)
-                .join(AGENCY_ID_LIST).on(BDT_PRI_RESTRI.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(BDT_PRI_RESTRI.BDT_ID.eq(ULong.valueOf(bdtId)))
+                .join(AGENCY_ID_LIST_MANIFEST).on(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId)))
                 .fetchInto(BieEditAgencyIdList.class);
 
         if (bieEditCodeLists.isEmpty() && bieEditAgencyIdLists.isEmpty()) {
@@ -894,8 +895,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     BBIE_SC.CARDINALITY_MAX.as("bie_cardinality_max"),
                     BBIE_SC.IS_USED.as("used"),
                     BBIE_SC.DT_SC_PRI_RESTRI_ID,
-                    BBIE_SC.CODE_LIST_ID,
-                    BBIE_SC.AGENCY_ID_LIST_ID,
+                    BBIE_SC.CODE_LIST_MANIFEST_ID,
+                    BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID,
                     BBIE_SC.DEFAULT_VALUE.as("bie_default_value"),
                     BBIE_SC.FIXED_VALUE.as("bie_fixed_value"),
                     BBIE_SC.BIZ_TERM,
@@ -908,15 +909,15 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     .fetchOneInto(BieEditBbieScNodeDetail.class);
 
             /* Issue #762 */
-            if (detail.getAgencyIdListId() != null && detail.getAgencyIdListId().longValue() > 0L) {
+            if (detail.getAgencyIdListManifestId() != null && detail.getAgencyIdListManifestId().longValue() > 0L) {
                 detail.setDtScPriRestriId(null);
-                detail.setCodeListId(null);
-            } else if (detail.getCodeListId() != null && detail.getCodeListId().longValue() > 0L) {
+                detail.setCodeListManifestId(null);
+            } else if (detail.getCodeListManifestId() != null && detail.getCodeListManifestId().longValue() > 0L) {
                 detail.setDtScPriRestriId(null);
-                detail.setAgencyIdListId(null);
+                detail.setAgencyIdListManifestId(null);
             } else if (detail.getDtScPriRestriId() != null && detail.getDtScPriRestriId().longValue() > 0L) {
-                detail.setCodeListId(null);
-                detail.setAgencyIdListId(null);
+                detail.setCodeListManifestId(null);
+                detail.setAgencyIdListManifestId(null);
             }
         } else {
             detail = dslContext.select(
@@ -926,7 +927,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     DT_SC.FIXED_VALUE.as("bie_fixed_value")
             )
                     .from(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(ULong.valueOf(bbieScNode.getDtScManifestId())))
+                    .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
+                    .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(bbieScNode.getDtScManifestId())))
                     .fetchOneInto(BieEditBbieScNodeDetail.class);
         }
 
@@ -971,7 +973,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 XBT.XBT_ID,
                 XBT.NAME.as("xbt_name"))
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
+                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
                 .join(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
                 .on(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID
                         .eq(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID))
@@ -985,9 +987,10 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 BDT_SC_PRI_RESTRI.IS_DEFAULT,
                 CODE_LIST.NAME.as("code_list_name"))
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .join(CODE_LIST).on(BDT_SC_PRI_RESTRI.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
+                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
+                .join(CODE_LIST_MANIFEST).on(BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
                 .fetchInto(BieEditCodeList.class);
 
         List<BieEditAgencyIdList> bieEditAgencyIdLists = dslContext.select(
@@ -995,10 +998,10 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 BDT_SC_PRI_RESTRI.IS_DEFAULT,
                 AGENCY_ID_LIST.NAME.as("agency_id_list_name"))
                 .from(BDT_SC_PRI_RESTRI)
-                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .join(AGENCY_ID_LIST).on(
-                        BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
+                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
+                .join(AGENCY_ID_LIST_MANIFEST).on(
+                        BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
                 .fetchInto(BieEditAgencyIdList.class);
 
         if (bieEditCodeLists.isEmpty() && bieEditAgencyIdLists.isEmpty()) {
@@ -1025,18 +1028,25 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
     private List<BieEditCodeList> getAllCodeLists() {
         return dslContext.select(
+                CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
                 CODE_LIST.CODE_LIST_ID,
                 CODE_LIST.NAME.as("code_list_name"),
-                CODE_LIST.STATE).from(CODE_LIST)
+                CODE_LIST.STATE)
+                .from(CODE_LIST)
+                .join(CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .where(CODE_LIST.STATE.eq("Published"))
                 .fetchInto(BieEditCodeList.class);
     }
 
     private List<BieEditAgencyIdList> getAllAgencyIdLists() {
         return dslContext.select(
+                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
                 AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
                 AGENCY_ID_LIST.NAME.as("agency_id_list_name"))
                 .from(AGENCY_ID_LIST)
+                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                 .fetchInto(BieEditAgencyIdList.class);
     }
 
@@ -1187,25 +1197,25 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         BigInteger bdtPriRestriId = bbiepNodeDetail.getBdtPriRestriId();
-        BigInteger codeListId = bbiepNodeDetail.getCodeListId();
-        BigInteger agencyIdListId = bbiepNodeDetail.getAgencyIdListId();
+        BigInteger codeListManifestId = bbiepNodeDetail.getCodeListManifestId();
+        BigInteger agencyIdListManifestId = bbiepNodeDetail.getAgencyIdListManifestId();
 
-        if (agencyIdListId != null) {
+        if (agencyIdListManifestId != null) {
             dslContext.update(BBIE)
-                    .set(BBIE.AGENCY_ID_LIST_ID, ULong.valueOf(agencyIdListId))
-                    .setNull(BBIE.CODE_LIST_ID)
+                    .set(BBIE.AGENCY_ID_LIST_MANIFEST_ID, ULong.valueOf(agencyIdListManifestId))
+                    .setNull(BBIE.CODE_LIST_MANIFEST_ID)
                     .setNull(BBIE.BDT_PRI_RESTRI_ID)
                     .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
-        } else if (codeListId != null) {
+        } else if (codeListManifestId != null) {
             dslContext.update(BBIE)
-                    .setNull(BBIE.AGENCY_ID_LIST_ID)
-                    .set(BBIE.CODE_LIST_ID, ULong.valueOf(codeListId))
+                    .setNull(BBIE.AGENCY_ID_LIST_MANIFEST_ID)
+                    .set(BBIE.CODE_LIST_MANIFEST_ID, ULong.valueOf(codeListManifestId))
                     .setNull(BBIE.BDT_PRI_RESTRI_ID)
                     .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
         } else if (bdtPriRestriId != null) {
             dslContext.update(BBIE)
-                    .setNull(BBIE.AGENCY_ID_LIST_ID)
-                    .setNull(BBIE.CODE_LIST_ID)
+                    .setNull(BBIE.AGENCY_ID_LIST_MANIFEST_ID)
+                    .setNull(BBIE.CODE_LIST_MANIFEST_ID)
                     .set(BBIE.BDT_PRI_RESTRI_ID, ULong.valueOf(bdtPriRestriId))
                     .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
         }
@@ -1265,26 +1275,26 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         BigInteger dtScPriRestriId = bbieScNodeDetail.getDtScPriRestriId();
-        BigInteger codeListId = bbieScNodeDetail.getCodeListId();
-        BigInteger agencyIdListId = bbieScNodeDetail.getAgencyIdListId();
+        BigInteger codeListManifestId = bbieScNodeDetail.getCodeListManifestId();
+        BigInteger agencyIdListManifestId = bbieScNodeDetail.getAgencyIdListManifestId();
 
-        if (agencyIdListId != null) {
+        if (agencyIdListManifestId != null) {
             dslContext.update(BBIE_SC)
                     .setNull(BBIE_SC.DT_SC_PRI_RESTRI_ID)
-                    .setNull(BBIE_SC.CODE_LIST_ID)
-                    .set(BBIE_SC.AGENCY_ID_LIST_ID, ULong.valueOf(agencyIdListId))
+                    .setNull(BBIE_SC.CODE_LIST_MANIFEST_ID)
+                    .set(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID, ULong.valueOf(agencyIdListManifestId))
                     .where(BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScManifestId()))).execute();
-        } else if (codeListId != null) {
+        } else if (codeListManifestId != null) {
             dslContext.update(BBIE_SC)
                     .setNull(BBIE_SC.DT_SC_PRI_RESTRI_ID)
-                    .set(BBIE_SC.CODE_LIST_ID, ULong.valueOf(codeListId))
-                    .setNull(BBIE_SC.AGENCY_ID_LIST_ID)
+                    .set(BBIE_SC.CODE_LIST_MANIFEST_ID, ULong.valueOf(codeListManifestId))
+                    .setNull(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID)
                     .where(BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScManifestId()))).execute();
         } else if (dtScPriRestriId != null) {
             dslContext.update(BBIE_SC)
                     .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, ULong.valueOf(dtScPriRestriId))
-                    .setNull(BBIE_SC.CODE_LIST_ID)
-                    .setNull(BBIE_SC.AGENCY_ID_LIST_ID)
+                    .setNull(BBIE_SC.CODE_LIST_MANIFEST_ID)
+                    .setNull(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID)
                     .where(BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScManifestId()))).execute();
         }
 

@@ -15,6 +15,7 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {ModuleElement, ModuleSetRelease, Tile} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {MatPaginator} from '@angular/material/paginator';
+import {UserToken} from '../../../authentication/domain/auth';
 
 @Component({
   selector: 'score-module-set-assign',
@@ -101,6 +102,15 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
 
   init(moduleSetRelease: ModuleSetRelease) {
     this.moduleSetRelease = moduleSetRelease;
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get roles(): string[] {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.roles : [];
   }
 
   /** Whether the number of selected elements matches the total number of rows. */

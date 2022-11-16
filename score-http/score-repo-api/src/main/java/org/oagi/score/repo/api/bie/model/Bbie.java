@@ -20,9 +20,9 @@ public class Bbie implements BieAssociation {
 
     private BigInteger bdtPriRestriId;
 
-    private BigInteger codeListId;
+    private BigInteger codeListManifestId;
 
-    private BigInteger agencyIdListId;
+    private BigInteger agencyIdListManifestId;
 
     private String defaultValue;
 
@@ -108,20 +108,20 @@ public class Bbie implements BieAssociation {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
-    public BigInteger getCodeListId() {
-        return codeListId;
+    public BigInteger getCodeListManifestId() {
+        return codeListManifestId;
     }
 
-    public void setCodeListId(BigInteger codeListId) {
-        this.codeListId = codeListId;
+    public void setCodeListManifestId(BigInteger codeListManifestId) {
+        this.codeListManifestId = codeListManifestId;
     }
 
-    public BigInteger getAgencyIdListId() {
-        return agencyIdListId;
+    public BigInteger getAgencyIdListManifestId() {
+        return agencyIdListManifestId;
     }
 
-    public void setAgencyIdListId(BigInteger agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+    public void setAgencyIdListManifestId(BigInteger agencyIdListManifestId) {
+        this.agencyIdListManifestId = agencyIdListManifestId;
     }
 
     public String getDefaultValue() {

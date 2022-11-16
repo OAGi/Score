@@ -401,7 +401,8 @@ public class LogSerializer {
         properties.put("guid", codeListRecord.getGuid());
         properties.put("name", codeListRecord.getName());
         properties.put("listId", codeListRecord.getListId());
-        properties.put("agencyId", resolver.getAgencyIdListValue(codeListRecord.getAgencyIdListValueId()));
+        properties.put("agencyId", resolver.getAgencyIdListValueByAgencyIdListValueManifestId(
+                codeListManifestRecord.getAgencyIdListValueManifestId()));
         properties.put("versionId", codeListRecord.getVersionId());
         properties.put("remark", codeListRecord.getRemark());
         properties.put("definition", codeListRecord.getDefinition());
@@ -410,7 +411,8 @@ public class LogSerializer {
         properties.put("deprecated", (byte) 1 == codeListRecord.getIsDeprecated());
         properties.put("extensible", (byte) 1 == codeListRecord.getExtensibleIndicator());
 
-        properties.put("basedCodeList", resolver.getCodeList(codeListRecord.getBasedCodeListId()));
+        properties.put("basedCodeList", resolver.getCodeListByCodeListManifestId(
+                codeListManifestRecord.getBasedCodeListManifestId()));
         properties.put("ownerUser", resolver.getUser(codeListRecord.getOwnerUserId()));
         properties.put("namespace", resolver.getNamespace(codeListRecord.getNamespaceId()));
 
@@ -478,7 +480,8 @@ public class LogSerializer {
         properties.put("component", "agencyIdList");
         properties.put("guid", agencyIdListRecord.getGuid());
         properties.put("enumTypeGuid", agencyIdListRecord.getEnumTypeGuid());
-        properties.put("agencyIdListValue", resolver.getAgencyIdListValue(agencyIdListRecord.getAgencyIdListValueId()));
+        properties.put("agencyIdListValue", resolver.getAgencyIdListValueByAgencyIdListValueManifestId(
+                agencyIdListManifestRecord.getAgencyIdListValueManifestId()));
         properties.put("name", agencyIdListRecord.getName());
         properties.put("listId", agencyIdListRecord.getListId());
         properties.put("versionId", agencyIdListRecord.getVersionId());

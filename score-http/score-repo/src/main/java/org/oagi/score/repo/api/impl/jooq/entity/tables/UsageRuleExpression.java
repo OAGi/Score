@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function4;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row4;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -155,6 +159,11 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
         return new UsageRuleExpression(alias, this);
     }
 
+    @Override
+    public UsageRuleExpression as(Table<?> alias) {
+        return new UsageRuleExpression(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -171,6 +180,14 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
         return new UsageRuleExpression(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public UsageRuleExpression rename(Table<?> name) {
+        return new UsageRuleExpression(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row4 type methods
     // -------------------------------------------------------------------------
@@ -178,5 +195,20 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
     @Override
     public Row4<ULong, Integer, String, ULong> fieldsRow() {
         return (Row4) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function4<? super ULong, ? super Integer, ? super String, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super Integer, ? super String, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

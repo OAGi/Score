@@ -29,7 +29,7 @@ public class AccountService {
 
     @Transactional
     public void setEnable(AuthenticatedPrincipal user, long targetUserId, boolean enabled) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         if (!requester.isDeveloper()) {
             throw new InsufficientAuthenticationException(
                     messages.getMessage(

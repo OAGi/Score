@@ -1,8 +1,8 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {forkJoin, merge, Observable} from 'rxjs';
-import {finalize, map} from 'rxjs/operators';
+import {forkJoin} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {Location} from '@angular/common';
@@ -14,125 +14,46 @@ import {BieListService} from '../bie-list/domain/bie-list.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {BieUpliftService} from './domain/bie-uplift.service';
-import {BieUpliftMap, BieUpliftSourceFlatNode, BieUpliftTargetFlatNode, MatchInfo, UpliftNode} from './domain/bie-uplift';
+import {
+  BieUpliftMap,
+  BieUpliftSourceFlatNode,
+  BieUpliftTargetFlatNode,
+  MatchInfo,
+  UpliftNode
+} from './domain/bie-uplift';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {
-  AbieFlatNode,
   AsbiepFlatNode,
   BbiepFlatNode,
   BbieScFlatNode,
-  BieDataSourceSearcher,
   BieFlatNode,
-  BieFlatNodeFlattener,
-  VSBieFlatTreeControl,
-  VSBieFlatTreeDataSource,
+  BieFlatNodeDatabase,
+  BieFlatNodeDataSource,
+  BieFlatNodeDataSourceSearcher
 } from '../domain/bie-flat-tree';
-import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
-import {RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
+import {CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {VSFlatTreeDataSource} from '../../common/flat-tree';
 
 
-class BieUpliftSourceFlatNodeFlattener extends BieFlatNodeFlattener {
-
-  private _usedAsbieMap: {};
-  private _usedBbieMap: {};
-  private _usedBbieScMap: {};
-  private _refBieList?: RefBie[];
-
-  constructor(ccGraph: CcGraph, asccpManifestId: number, topLevelAsbiepId: number,
-              usedBieList: UsedBie[], refBieList: RefBie[]) {
-    super(ccGraph, asccpManifestId, topLevelAsbiepId);
-
-    this._usedAsbieMap = usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
-      r[a.manifestId] = [...r[a.manifestId] || [], a];
-      return r;
-    }, {});
-    this._usedBbieMap = usedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
-      r[a.manifestId] = [...r[a.manifestId] || [], a];
-      return r;
-    }, {});
-    this._usedBbieScMap = usedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
-      r[a.manifestId] = [...r[a.manifestId] || [], a];
-      return r;
-    }, {});
-    this._refBieList = refBieList;
+export class BieUpliftSourceFlatNodeDatabase<T extends BieFlatNode> extends BieFlatNodeDatabase<T> {
+  get rootNode(): T {
+    const rootNode = super.rootNode;
+    return new BieUpliftSourceFlatNode(rootNode) as unknown as T;
   }
-
-  afterAsbiepFlatNode(node: AsbiepFlatNode) {
-    if (!node.used) {
-      let used = this._usedAsbieMap[node.asccNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
-          if (!(node.parent as BieFlatNode).used) {
-            subscriber.next(false);
-          } else {
-            used = used.filter(u => u.hashPath === node.asbieHashPath);
-            subscriber.next(!!used && used.length > 0 ? true : false);
-          }
-          subscriber.complete();
-        });
-      }
-    }
-
-    let derived = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
-    if (!!derived && derived.length > 0) {
-      derived = derived.filter(u => u.hashPath === node.asbieHashPath);
-    }
-    node.derived = !!derived && derived.length > 0;
-    if (node.derived) {
-      node.topLevelAsbiepId = derived[0].refTopLevelAsbiepId;
-    }
-  }
-
-  afterBbiepFlatNode(node: BbiepFlatNode) {
-    if (!node.used) {
-      let used = this._usedBbieMap[node.bccNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
-          if (!(node.parent as BieFlatNode).used) {
-            subscriber.next(false);
-          } else {
-            used = used.filter(u => u.hashPath === node.bbieHashPath);
-            subscriber.next(!!used && used.length > 0 ? true : false);
-          }
-          subscriber.complete();
-        });
-      }
-    }
-  }
-
-  afterBbieScFlatNode(node: BbieScFlatNode) {
-    if (!node.used) {
-      let used = this._usedBbieScMap[node.bdtScNode.manifestId];
-      if (!used || used.length === 0) {
-        node.used = false;
-      } else {
-        node.used = new Observable(subscriber => {
-          if (!(node.parent as BieFlatNode).used) {
-            subscriber.next(false);
-          } else {
-            used = used.filter(u => u.hashPath === node.bbieScHashPath);
-            subscriber.next(!!used && used.length > 0 ? true : false);
-          }
-          subscriber.complete();
-        });
-      }
-    }
+  loadChildren(node: T) {
+    super.loadChildren(node);
+    node.children = node.children.map(e => new BieUpliftSourceFlatNode(e as T));
   }
 }
 
-class VSBieUpliftSourceFlatTreeDataSource extends VSBieFlatTreeDataSource<BieUpliftSourceFlatNode> {
-  dataFilter(node: BieUpliftSourceFlatNode): boolean {
-    if (node.locked) {
-      return false;
-    }
-    return super.dataFilter(node);
+export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieFlatNodeDatabase<T> {
+  get rootNode(): T {
+    const rootNode = super.rootNode;
+    return new BieUpliftTargetFlatNode(rootNode) as unknown as T;
+  }
+  loadChildren(node: T) {
+    super.loadChildren(node);
+    node.children = node.children.map(e => new BieUpliftTargetFlatNode(e as T));
   }
 }
 
@@ -151,30 +72,23 @@ export class BieUpliftComponent implements OnInit {
   @ViewChild('targetVirtualScroll', {static: true}) public targetVirtualScroll: CdkVirtualScrollViewport;
   virtualScrollItemSize: number = 33;
 
-  minBufferPx(dataSource: VSFlatTreeDataSource<BieFlatNode>): number {
-    return Math.max((dataSource) ? dataSource.data[0].children.length : 0, 20) * this.virtualScrollItemSize;
+  get minBufferPx(): number {
+    return 10000 * this.virtualScrollItemSize;
   }
 
-  maxBufferPx(dataSource: VSFlatTreeDataSource<BieFlatNode>): number {
-    return Math.max((dataSource) ? dataSource.data[0].children.length : 0, 20) * 20 * this.virtualScrollItemSize;
+  get maxBufferPx(): number {
+    return 1000000 * this.virtualScrollItemSize;
   }
 
-  @ViewChild('defaultSourceContextMenu', {static: true}) public defaultSourceContextMenu: ContextMenuComponent;
-  @ViewChild('defaultTargetContextMenu', {static: true}) public defaultTargetContextMenu: ContextMenuComponent;
+  contextMenuItem: BieFlatNode;
 
-  sourceTreeControl: VSBieFlatTreeControl<BieUpliftSourceFlatNode> =
-    new VSBieFlatTreeControl<BieUpliftSourceFlatNode>(true, undefined, undefined, undefined);
-  targetTreeControl: VSBieFlatTreeControl<BieUpliftTargetFlatNode> =
-    new VSBieFlatTreeControl<BieUpliftTargetFlatNode>(false, undefined, undefined, undefined);
+  sourceDataSource: BieFlatNodeDataSource<BieUpliftSourceFlatNode>;
+  targetDataSource: BieFlatNodeDataSource<BieUpliftTargetFlatNode>;
+  sourceSearcher: BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>;
+  targetSearcher: BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>;
 
-  sourceDataSource: VSBieUpliftSourceFlatTreeDataSource;
-  targetDataSource: VSBieFlatTreeDataSource<BieUpliftTargetFlatNode>;
-  sourceSearcher: BieDataSourceSearcher;
-  targetSearcher: BieDataSourceSearcher;
   sourceSelectedNode: BieUpliftSourceFlatNode;
   targetSelectedNode: BieUpliftTargetFlatNode;
-
-  initialExpandDepth: number = 10;
 
   paddingPixel = 12;
   innerY: number = window.innerHeight;
@@ -197,7 +111,6 @@ export class BieUpliftComponent implements OnInit {
               private bieEditService: BieEditService,
               private ccNodeService: CcNodeService,
               private bieUpliftService: BieUpliftService,
-              private contextMenuService: ContextMenuService,
               private auth: AuthService,
               private location: Location,
               private router: Router,
@@ -218,57 +131,86 @@ export class BieUpliftComponent implements OnInit {
       this.targetAsccpManifestId = resp.asccpManifestId;
       this.targetReleaseNum = resp.releaseNum;
 
-      merge(
-        forkJoin([
-          this.bieEditService.getGraphNode(this.topLevelAsbiepId),
-          this.bieEditService.getRootNode(this.topLevelAsbiepId),
-          this.bieEditService.getUsedBieList(this.topLevelAsbiepId),
-          this.bieEditService.getRefBieList(this.topLevelAsbiepId)
-        ]).pipe(map(([sourceCcGraph, sourceRootNode,
-                       sourceUsedBieList, sourceRefBieList]) => {
-          this.bieGuid = sourceRootNode.guid;
-          this.bieName = sourceRootNode.name;
-          this.sourceReleaseNum = sourceRootNode.releaseNum;
-          return new BieUpliftSourceFlatNodeFlattener(
-            sourceCcGraph, sourceRootNode.asccpManifestId, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList)
-            .flatten(false, this.initialExpandDepth);
-        })),
-        this.ccNodeService.getGraphNode('ASCCP', this.targetAsccpManifestId).pipe(map(targetCcGraph => {
-          return new BieFlatNodeFlattener(
-            targetCcGraph, this.targetAsccpManifestId).flatten(false, this.initialExpandDepth);
-        }))
-      ).subscribe(nodes => {
-        if ((nodes[0] as AbieFlatNode).asccpNode.manifestId === this.targetAsccpManifestId) {
-          this.targetDataSource = new VSBieFlatTreeDataSource(this.targetTreeControl, nodes.map(e => new BieUpliftTargetFlatNode(e)));
-          this.targetSearcher = new BieDataSourceSearcher(this.targetDataSource);
-        } else {
-          this.sourceDataSource = new VSBieUpliftSourceFlatTreeDataSource(this.sourceTreeControl, nodes.filter(e => e.used).map(e => new BieUpliftSourceFlatNode(e)));
-          this.sourceSearcher = new BieDataSourceSearcher(this.sourceDataSource);
-        }
-      }, () => {
+      forkJoin([
+        this.bieEditService.getGraphNode(this.topLevelAsbiepId),
+        this.bieEditService.getRootNode(this.topLevelAsbiepId),
+        this.bieEditService.getUsedBieList(this.topLevelAsbiepId),
+        this.bieEditService.getRefBieList(this.topLevelAsbiepId),
+        this.ccNodeService.getGraphNode('ASCCP', this.targetAsccpManifestId)
+      ]).subscribe(([sourceCcGraph, sourceRootNode,
+                      sourceUsedBieList, sourceRefBieList,
+                      targetCcGraph]) => {
+        this.bieGuid = sourceRootNode.guid;
+        this.bieName = sourceRootNode.name;
+        this.sourceReleaseNum = sourceRootNode.releaseNum;
 
-      }, () => {
+        const sourceDatabase = new BieUpliftSourceFlatNodeDatabase<BieUpliftSourceFlatNode>(sourceCcGraph,
+          sourceRootNode.asccpManifestId, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
+        this.sourceDataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(sourceDatabase, this.bieEditService);
+        this.sourceSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>(this.sourceDataSource, sourceDatabase);
+        this.sourceDataSource.init();
+
+        this.sourceDataSource.hideUnused = true;
+
+        const targetDatabase = new BieUpliftTargetFlatNodeDatabase<BieUpliftTargetFlatNode>(targetCcGraph,
+          this.targetAsccpManifestId, undefined, [], []);
+        this.targetDataSource = new BieFlatNodeDataSource<BieUpliftTargetFlatNode>(targetDatabase, this.bieEditService);
+        this.targetSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>(this.targetDataSource, targetDatabase);
+        this.targetDataSource.init();
+
         this.bieUpliftService.getUpliftBieMap(this.topLevelAsbiepId, this.targetReleaseId).subscribe(bieUpliftMap => {
-          const sourceNodes = this.sourceDataSource.cachedData;
-          const targetNodes = this.targetDataSource.cachedData;
-          this.initMapping(sourceNodes, targetNodes, bieUpliftMap);
+          const sourceData = [];
+          let sourceStack = [this.sourceDataSource.data[0], ];
+          while (sourceStack.length > 0) {
+            const item = sourceStack.shift();
+            sourceData.push(item);
+            if (item.expandable && item.children.length === 0) {
+              this.sourceDataSource.database.loadChildren(item);
+            }
+            sourceStack = item.children.filter(e => (e as BieUpliftSourceFlatNode).used)
+              .concat(sourceStack) as BieUpliftSourceFlatNode[];
+          }
 
-          this.loading = false;
-          sourceNodes[0].target = targetNodes[0];
-          this.unmatchedSource = this.sourceDataSource.cachedData.filter(e => !e.isMapped);
+          const targetData = [];
+          let targetStack = [this.targetDataSource.data[0], ];
+          while (targetStack.length > 0) {
+            const targetItem = targetStack.shift();
+            for (const sourceItem of sourceData) {
+              if (sourceItem.bieType === targetItem.bieType &&
+                sourceItem.name === targetItem.name &&
+                sourceItem.level === targetItem.level) {
+                targetData.push(targetItem);
+
+                if (targetItem.expandable && targetItem.children.length === 0) {
+                  this.targetDataSource.database.loadChildren(targetItem);
+                }
+                targetStack = targetItem.children.concat(targetStack) as BieUpliftTargetFlatNode[];
+                break;
+              }
+            }
+          }
+
+          this.initMapping(sourceData, targetData, bieUpliftMap);
+          this.sourceDataSource.collapse(this.sourceDataSource.data[0]);
+          this.targetDataSource.collapse(this.targetDataSource.data[0]);
+
+          sourceData[0].target = targetData[0];
+          this.unmatchedSource = this.sourceDataSource.data.filter(e => !e.isMapped);
           if (this.unmatchedSource.length > 0) {
-            this.unmatchedSource.forEach(e => this.sourceTreeControl.expand(e));
+            this.unmatchedSource.forEach(e => this.sourceDataSource.expand(e));
             this.currentUnmatchedSource = this.unmatchedSource[0];
             this.expandSourceNode(this.currentUnmatchedSource);
             this.scrollToSourceNode(this.currentUnmatchedSource);
           } else {
-            this.expandSourceNode(sourceNodes[0]);
-            this.scrollToSourceNode(sourceNodes[0]);
+            this.expandSourceNode(sourceData[0]);
+            this.scrollToSourceNode(sourceData[0]);
           }
 
           if (!this.targetSelectedNode) {
-            this.targetSelectedNode = targetNodes[0];
+            this.targetSelectedNode = targetData[0];
           }
+
+          this.loading = false;
         });
       });
     });
@@ -296,12 +238,13 @@ export class BieUpliftComponent implements OnInit {
     return node.type.toUpperCase() + '-' + node.manifestId;
   }
 
-  initMapping(sourceNodes: BieUpliftSourceFlatNode[], targetNodes: BieUpliftTargetFlatNode[],
+  initMapping(sourceData: BieUpliftSourceFlatNode[], targetData: BieUpliftTargetFlatNode[],
               bieUpliftMap: BieUpliftMap) {
     const sourceAsbiepList = new Map<number, BieUpliftSourceFlatNode[]>();
     const sourceBbiepList = new Map<number, BieUpliftSourceFlatNode[]>();
     const sourceBbieScList = new Map<number, BieUpliftSourceFlatNode[]>();
-    sourceNodes.forEach(e => {
+
+    sourceData.forEach(e => {
       if (e.type.toUpperCase() === 'ASBIEP') {
         const key = (e._node as AsbiepFlatNode).asccNode.manifestId;
         if (!sourceAsbiepList.has(key)) {
@@ -329,7 +272,8 @@ export class BieUpliftComponent implements OnInit {
     const targetAsbiepList = new Map<number, BieUpliftTargetFlatNode[]>();
     const targetBbiepList = new Map<number, BieUpliftTargetFlatNode[]>();
     const targetBbieScList = new Map<number, BieUpliftTargetFlatNode[]>();
-    targetNodes.forEach(e => {
+
+    targetData.forEach(e => {
       if (e.type.toUpperCase() === 'ASBIEP') {
         const key = (e._node as AsbiepFlatNode).asccNode.manifestId;
         if (!targetAsbiepList.has(key)) {
@@ -418,36 +362,16 @@ export class BieUpliftComponent implements OnInit {
     return this.innerY - 400;
   }
 
-  onContextMenu($event: MouseEvent, item: BieFlatNode): void {
-    let contextMenu;
-    if (item instanceof BieUpliftSourceFlatNode) {
-      contextMenu = this.defaultSourceContextMenu;
-    } else if (item instanceof BieUpliftTargetFlatNode) {
-      contextMenu = this.defaultTargetContextMenu;
-    }
-
-    if (contextMenu) {
-      this.contextMenuService.show.next({
-        contextMenu,
-        event: $event,
-        item,
-      });
-    }
-
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
   search(type: string, backward?: boolean, force?: boolean) {
     if (type === 'source') {
       this.sourceSearcher.search(this.sourceSearcher.inputKeyword, this.sourceSelectedNode, backward, force)
         .subscribe(index => {
-          this.sourceVirtualScroll.scrollToIndex(index);
+          this.sourceVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
         });
     } else if (type === 'target') {
       this.targetSearcher.search(this.targetSearcher.inputKeyword, this.targetSelectedNode, backward, force)
         .subscribe(index => {
-          this.targetVirtualScroll.scrollToIndex(index);
+          this.targetVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
         });
     }
   }
@@ -455,11 +379,13 @@ export class BieUpliftComponent implements OnInit {
   move(type: string, val: number) {
     if (type === 'source') {
       this.sourceSearcher.go(val).subscribe(index => {
-        this.sourceVirtualScroll.scrollToIndex(index);
+        this.onSourceClick(this.sourceDataSource.data[index]);
+        this.sourceVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
       });
     } else if (type === 'target') {
       this.targetSearcher.go(val).subscribe(index => {
-        this.targetVirtualScroll.scrollToIndex(index);
+        this.onTargetClick(this.targetDataSource.data[index]);
+        this.targetVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
       });
     }
   }
@@ -494,12 +420,30 @@ export class BieUpliftComponent implements OnInit {
   }
 
   scrollToSourceNode(node: BieUpliftSourceFlatNode) {
-    const index = this.sourceDataSource.data.indexOf(node);
+    let index = -1;
+    let currentNode = node;
+    while (currentNode) {
+      index = this.sourceDataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
+      if (index !== -1) {
+        break;
+      }
+      this.sourceDataSource.toggleNode(currentNode.parent as BieUpliftSourceFlatNode, true);
+      currentNode = currentNode.parent as BieUpliftSourceFlatNode;
+    }
     this.scrollTree(this.sourceVirtualScroll, index);
   }
 
   scrollToTargetNode(node: BieUpliftTargetFlatNode) {
-    const index = this.targetDataSource.data.indexOf(node);
+    let index = -1;
+    let currentNode = node;
+    while (currentNode) {
+      index = this.targetDataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
+      if (index !== -1) {
+        break;
+      }
+      this.targetDataSource.toggleNode(currentNode.parent as BieUpliftTargetFlatNode, true);
+      currentNode = currentNode.parent as BieUpliftTargetFlatNode;
+    }
     this.scrollTree(this.targetVirtualScroll, index);
   }
 
@@ -516,10 +460,24 @@ export class BieUpliftComponent implements OnInit {
   }
 
   scrollTree(scroll: CdkVirtualScrollViewport, index: number) {
-    const range = scroll.getRenderedRange();
-    if (range.start + 10 > index || range.end - 10 < index) {
-      scroll.scrollToIndex(index);
+    if (index < 0) {
+      return;
     }
+    scroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  }
+
+  isSource(node: BieFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+    return node instanceof BieUpliftSourceFlatNode;
+  }
+
+  isTarget(node: BieFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+    return node instanceof BieUpliftTargetFlatNode;
   }
 
   canMatch(node: BieUpliftTargetFlatNode): boolean {
@@ -541,11 +499,11 @@ export class BieUpliftComponent implements OnInit {
 
     if (node.source) {
       node.source = undefined;
-      node.reusedTolevelAsbiepId = undefined;
+      node.reusedTopLevelAsbiepId = undefined;
       this.sourceSelectedNode.target = undefined;
     } else {
       if (this.sourceSelectedNode.target) {
-        this.sourceSelectedNode.target.reusedTolevelAsbiepId = undefined;
+        this.sourceSelectedNode.target.reusedTopLevelAsbiepId = undefined;
         this.sourceSelectedNode.target.source = undefined;
       }
       this.sourceSelectedNode.target = undefined;
@@ -556,7 +514,7 @@ export class BieUpliftComponent implements OnInit {
 
   createUpliftBIE() {
     this.loading = true;
-    const source = this.sourceDataSource.cachedData.filter(e => {
+    const source = this.sourceDataSource.data.filter(e => {
       if (e.derived) {
         return true;
       }
@@ -569,7 +527,7 @@ export class BieUpliftComponent implements OnInit {
     source.forEach(e => {
       let upliftNode;
       if (e.target) {
-        upliftNode = new UpliftNode(e.type, e.bieId, e.path, e.target.path, e.target.reusedTolevelAsbiepId);
+        upliftNode = new UpliftNode(e.type, e.bieId, e.path, e.target.path, e.target.reusedTopLevelAsbiepId);
         if (e.type.toUpperCase() === 'ASBIEP') {
           upliftNode.bieType = 'ASBIE';
           upliftNode.sourceManifestId = (e._node as AsbiepFlatNode).asccNode.manifestId;
@@ -584,7 +542,7 @@ export class BieUpliftComponent implements OnInit {
           upliftNode.targetManifestId = (e.target._node as BbieScFlatNode).bdtScNode.manifestId;
         }
         e.target.parents.forEach(p => {
-          const parentTargetNode = this.targetDataSource.cachedData.find(v => v.equal(p));
+          const parentTargetNode = this.targetDataSource.data.find(v => v.equal(p));
           if (parentTargetNode && parentTargetNode.level !== 0 && !parentTargetNode.source) {
             parentTargetNode.emptyRequired = true;
           }
@@ -606,7 +564,7 @@ export class BieUpliftComponent implements OnInit {
       matched.push(upliftNode);
     });
 
-    const targets = this.targetDataSource.cachedData.filter(e => e.emptyRequired);
+    const targets = this.targetDataSource.data.filter(e => e.emptyRequired);
     targets.forEach(e => {
       const upliftNode = new UpliftNode(e.type, null, null, e.path, null);
       if (e.type.toUpperCase() === 'ASBIEP') {
@@ -627,7 +585,7 @@ export class BieUpliftComponent implements OnInit {
         this.loading = false;
       }))
       .subscribe(result => {
-        this.router.navigateByUrl('/profile_bie/edit/' + result.topLevelAsbiepId);
+        this.router.navigateByUrl('/profile_bie/' + result.topLevelAsbiepId);
       });
   }
 
@@ -651,9 +609,9 @@ export class BieUpliftComponent implements OnInit {
       });
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (!selectedTopLevelAsbiepId) {
-          node.reusedTolevelAsbiepId = undefined;
+          node.reusedTopLevelAsbiepId = undefined;
         } else {
-          node.reusedTolevelAsbiepId = selectedTopLevelAsbiepId;
+          node.reusedTopLevelAsbiepId = selectedTopLevelAsbiepId;
         }
       });
     }
@@ -661,7 +619,7 @@ export class BieUpliftComponent implements OnInit {
 
   report() {
     const reports = [];
-    this.sourceDataSource.cachedData.filter(e => e.level > 0 && e.used && !e.locked).forEach(e => {
+    this.sourceDataSource.data.filter(e => e.level > 0 && e.used && !e.locked).forEach(e => {
       reports.push(new MatchInfo(e));
     });
 
@@ -691,21 +649,12 @@ export class BieUpliftComponent implements OnInit {
   }
 
   expandSourceNode(node: BieUpliftSourceFlatNode) {
-    node.parents.forEach(p => {
-      const parentNode = this.sourceDataSource.cachedData.find(v => v.equal(p));
-      this.sourceTreeControl.expand(parentNode);
-    });
-
+    this.sourceDataSource.expand(node);
     this.onSourceClick(node);
   }
 
   expandTargetNode(node: BieUpliftTargetFlatNode) {
-    node.parents.forEach(p => {
-      const parentNode = this.targetDataSource.cachedData.find(v => v.equal(p));
-      if (node !== parentNode) {
-        this.targetTreeControl.expand(parentNode);
-      }
-    });
+    this.targetDataSource.expand(node);
   }
 
   lookUpUnmatched(direction: number) {
@@ -732,7 +681,7 @@ export class BieUpliftComponent implements OnInit {
 
     this.expandSourceNode(this.currentUnmatchedSource);
     this.sourceVirtualScroll.scrollToIndex(
-      this.sourceDataSource.data.indexOf(this.currentUnmatchedSource)
+      this.sourceDataSource.data.indexOf(this.currentUnmatchedSource) * this.virtualScrollItemSize, 'smooth'
     );
   }
 }

@@ -7,14 +7,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function8;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row8;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -182,6 +186,11 @@ public class Message extends TableImpl<MessageRecord> {
         return new Message(alias, this);
     }
 
+    @Override
+    public Message as(Table<?> alias) {
+        return new Message(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -198,6 +207,14 @@ public class Message extends TableImpl<MessageRecord> {
         return new Message(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public Message rename(Table<?> name) {
+        return new Message(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row8 type methods
     // -------------------------------------------------------------------------
@@ -205,5 +222,20 @@ public class Message extends TableImpl<MessageRecord> {
     @Override
     public Row8<ULong, ULong, ULong, String, String, String, Byte, LocalDateTime> fieldsRow() {
         return (Row8) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

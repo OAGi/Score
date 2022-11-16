@@ -73,8 +73,13 @@ tr.element-row:not(.expanded-row):active {
   width: 70px;
 }
 
-.mat-column-state, .mat-column-owner {
+.mat-column-state {
   width: 100px;
+}
+
+.mat-column-owner {
+  width: 12%;
+  font-size: 13px;
 }
 
 .den {

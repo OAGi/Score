@@ -1,16 +1,8 @@
-import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
 import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
-import {
-  emptyToUndefined,
-  hashCode,
-  hashCode4Array,
-  hashCode4String,
-  toCamelCase,
-} from '../../common/utility';
-import {AccFlatNode, AsccpFlatNode, BccpFlatNode, DtFlatNode, DtScFlatNode, CcFlatNode} from './cc-flat-tree';
+import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String, toCamelCase,} from '../../common/utility';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 
 export class CcNode {
   type: string;
@@ -336,11 +328,33 @@ export const OAGIS10BODs: OagisComponentType = new OagisComponentType(7, 'OAGIS1
 export const BOD: OagisComponentType = new OagisComponentType(8, 'BOD');
 export const Verb: OagisComponentType = new OagisComponentType(9, 'Verb');
 export const Noun: OagisComponentType = new OagisComponentType(10, 'Noun');
+export const Choice: OagisComponentType = new OagisComponentType(11, 'Choice');
+export const AttributeGroup: OagisComponentType = new OagisComponentType(12, 'Attribute Group');
 
 export const OagisComponentTypes: OagisComponentType[] = [
   Base, Semantics, Extension, SemanticGroup, UserExtensionGroup,
-  Embedded, OAGIS10Nouns, OAGIS10BODs
+  Embedded, OAGIS10Nouns, OAGIS10BODs, Choice, AttributeGroup
 ];
+
+export const OagisEntities: OagisComponentType[] = [
+  BOD, Noun, Verb
+];
+
+export const OagisComponentTypeMap = {
+  0: Base,
+  1: Semantics,
+  2: Extension,
+  3: SemanticGroup,
+  4: UserExtensionGroup,
+  5: Embedded,
+  6: OAGIS10Nouns,
+  7: OAGIS10BODs,
+  8: BOD,
+  9: Verb,
+  10: Noun,
+  11: Choice,
+  12: AttributeGroup
+};
 
 class AsccDetail {
   private _node: CcFlatNode;
@@ -425,6 +439,7 @@ class AsccDetail {
 
   set cardinalityMin(value: number) {
     this._cardinalityMin = value;
+    this._node.cardinalityMin = value;
     this._node.fireChangeEvent('cardinalityMin', value);
   }
 
@@ -434,6 +449,7 @@ class AsccDetail {
 
   set cardinalityMax(value: number) {
     this._cardinalityMax = value;
+    this._node.cardinalityMax = value;
     this._node.fireChangeEvent('cardinalityMax', value);
   }
 
@@ -778,6 +794,7 @@ class BccDetail {
 
   set cardinalityMin(value: number) {
     this._cardinalityMin = value;
+    this._node.cardinalityMin = value;
     this._node.fireChangeEvent('cardinalityMin', value);
   }
 
@@ -787,6 +804,7 @@ class BccDetail {
 
   set cardinalityMax(value: number) {
     this._cardinalityMax = value;
+    this._node.cardinalityMax = value;
     this._node.fireChangeEvent('cardinalityMax', value);
   }
 
@@ -1148,10 +1166,8 @@ export class CcBdtPriRestri {
   primitiveName: string;
   xbtId: number;
   xbtName: string;
-  codeListId: number;
   codeListManifestId: number;
   codeListName: string;
-  agencyIdListId: number;
   agencyIdListManifestId: number;
   agencyIdListName: string;
   _default: boolean;
@@ -1169,23 +1185,20 @@ export class CcBdtPriRestri {
       // Changed from 'Agency ID List' to 'Code List'
       this.type = 'CodeList';
 
-      if (!!this.agencyIdListId) {
+      if (!!this.agencyIdListManifestId) {
         // If the Agency ID List was a default, it changes to 'token'.
         if (this.parent.defaultValueDomain.name === this.agencyIdListName) {
           this.parent.defaultValueDomain = 'token';
         }
 
         this.selectedAgencyIdList = undefined;
-        this.agencyIdListId = undefined;
         this.agencyIdListManifestId = undefined;
         this.agencyIdListName = undefined;
       }
 
-      this.codeListId = val.codeListId;
       this.codeListManifestId = val.codeListManifestId;
       this.codeListName = val.codeListName;
     } else {
-      this.codeListId = undefined;
       this.codeListManifestId = undefined;
       this.codeListName = undefined;
     }
@@ -1202,23 +1215,20 @@ export class CcBdtPriRestri {
       // Changed from 'Code List' to 'Agency ID List'
       this.type = 'AgencyIdList';
 
-      if (!!this.codeListId) {
+      if (!!this.codeListManifestId) {
         // If the Code List was a default, it changes to 'token'.
         if (this.parent.defaultValueDomain.name === this.codeListName) {
           this.parent.defaultValueDomain = 'token';
         }
 
         this.selectedCodeList = undefined;
-        this.codeListId = undefined;
         this.codeListManifestId = undefined;
         this.codeListName = undefined;
       }
 
-      this.agencyIdListId = val.agencyIdListId;
       this.agencyIdListManifestId = val.agencyIdListManifestId;
       this.agencyIdListName = val.name;
     } else {
-      this.agencyIdListId = undefined;
       this.agencyIdListManifestId = undefined;
       this.agencyIdListName = undefined;
     }
@@ -1240,19 +1250,19 @@ export class CcBdtPriRestri {
     this.primitiveName = obj.primitiveName;
     this.xbtId = obj.xbtId;
     this.xbtName = obj.xbtName;
-    this.codeListId = obj.codeListId;
+    this.codeListManifestId = obj.codeListManifestId;
     this.codeListName = obj.codeListName;
-    this.agencyIdListId = obj.agencyIdListId;
+    this.agencyIdListManifestId = obj.agencyIdListManifestId;
     this.agencyIdListName = obj.agencyIdListName;
     this._default = obj.default;
     this.inherited = obj.inherited;
 
     if (this.isCodeList) {
-      this.selectedCodeList = dtPrimitiveAware.codeLists.filter(e => e.codeListId === this.codeListId)[0];
+      this.selectedCodeList = dtPrimitiveAware.codeLists.filter(e => e.codeListManifestId === this.codeListManifestId)[0];
     }
 
     if (this.isAgencyIdList) {
-      this.selectedAgencyIdList = dtPrimitiveAware.agencyIdLists.filter(e => e.agencyIdListId === this.agencyIdListId)[0];
+      this.selectedAgencyIdList = dtPrimitiveAware.agencyIdLists.filter(e => e.agencyIdListManifestId === this.agencyIdListManifestId)[0];
     }
 
     this.$hashCode = this.hashCode;
@@ -1283,7 +1293,6 @@ export class CcBdtPriRestri {
       this.xbtId, this.xbtName,
       (this.selectedCodeList) ? {
         codeListManifestId: this.selectedCodeList.codeListManifestId,
-        codeListId: this.selectedCodeList.codeListId,
         codeListName: this.selectedCodeList.codeListName
       } : undefined, (this.selectedAgencyIdList) ? {
         agencyIdListManifestId: this.selectedAgencyIdList.agencyIdListManifestId,
@@ -1307,8 +1316,8 @@ export class CcBdtPriRestri {
       cdtScAwdPriId: this.cdtScAwdPriId,
       cdtScAwdPriXpsTypeMapId: this.cdtScAwdPriXpsTypeMapId,
       primitiveName: this.primitiveName,
-      codeListId: this.isCodeList ? this.selectedCodeList.codeListId : null,
-      agencyIdListId: this.isAgencyIdList ? this.selectedAgencyIdList.agencyIdListId : null,
+      codeListManifestId: this.isCodeList ? this.selectedCodeList.codeListManifestId : null,
+      agencyIdListManifestId: this.isAgencyIdList ? this.selectedAgencyIdList.agencyIdListManifestId : null,
       xbtId: this.xbtId,
       xbtName: this.xbtName,
       default: this.default,
@@ -1499,12 +1508,12 @@ export class CcDtNodeDetail extends CcNodeDetail {
           }
 
           get id(): number {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListId : undefined;
+            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListManifestId : undefined;
           }
 
           set id(id: number) {
             if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListId = id;
+              valueDomain.selectedCodeList.codeListManifestId = id;
             }
           }
 
@@ -1538,12 +1547,12 @@ export class CcDtNodeDetail extends CcNodeDetail {
           }
 
           get id(): number {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyId : undefined;
+            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyIdListManifestId : undefined;
           }
 
           set id(id: number) {
             if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.agencyId = id;
+              valueDomain.selectedAgencyIdList.agencyIdListManifestId = id;
             }
           }
 
@@ -1572,7 +1581,11 @@ export class CcDtNodeDetail extends CcNodeDetail {
     if (primitiveList.length > 0) {
       this.bdtPriRestriListByGroup.push({
         label: 'Primitive',
-        list: primitiveList
+        list: primitiveList.sort((a, b) => {
+          const aName = a.self.primitiveName + ' - ' + a.name;
+          const bName = b.self.primitiveName + ' - ' + b.name;
+          return compare(aName, bName);
+        })
       });
     }
     if (this.codeListList.length > 0) {
@@ -1590,30 +1603,54 @@ export class CcDtNodeDetail extends CcNodeDetail {
   }
 
   get valueDomains(): any[] {
-    const valueDomains = [];
+    let valueDomains = [];
     for (const primitiveName of this.primitiveMap.keys()) {
       valueDomains.push({
         type: 'Primitive',
         name: primitiveName,
-        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name)
+        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name).sort((a, b) => compare(a, b))
       });
     }
-    for (const codeList of this.codeListList) {
+    valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
+
+    let userCodeLists = [];
+    for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
-      valueDomains.push({
-        type: 'CodeList',
-        name: codeList.name,
-        bdtPriRestri
-      });
+      if (!bdtPriRestri.inherited) {
+        userCodeLists.push({
+          type: 'CodeList',
+          name: codeList.name,
+          bdtPriRestri
+        });
+      } else {
+        valueDomains.push({
+          type: 'CodeList',
+          name: codeList.name,
+          bdtPriRestri
+        });
+      }
     }
-    for (const agencyIdList of this.agencyIdListList) {
+    valueDomains.push(...userCodeLists);
+
+    let userAgencyIdLists = [];
+    for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
-      valueDomains.push({
-        type: 'AgencyIdList',
-        name: agencyIdList.name,
-        bdtPriRestri
-      });
+      if (!bdtPriRestri.inherited) {
+        userAgencyIdLists.push({
+          type: 'AgencyIdList',
+          name: agencyIdList.name,
+          bdtPriRestri
+        });
+      } else {
+        valueDomains.push({
+          type: 'AgencyIdList',
+          name: agencyIdList.name,
+          bdtPriRestri
+        });
+      }
     }
+    valueDomains.push(...userAgencyIdLists);
+
     return valueDomains;
   }
 
@@ -1706,9 +1743,9 @@ export class CcDtNodeDetail extends CcNodeDetail {
 
   get den(): string {
     if (this.qualifier) {
-      return this.qualifier + '_ ' + this.representationTerm + '. Type';
+      return this.qualifier + '_ ' + this.dataTypeTerm + '. Type';
     }
-    return this.representationTerm + '. Type';
+    return this.dataTypeTerm + '. Type';
   }
 
   set den(val: string) { // do nothing
@@ -1963,12 +2000,12 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
           }
 
           get id(): number {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListId : undefined;
+            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListManifestId : undefined;
           }
 
           set id(id: number) {
             if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListId = id;
+              valueDomain.selectedCodeList.codeListManifestId = id;
             }
           }
 
@@ -2002,12 +2039,12 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
           }
 
           get id(): number {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyId : undefined;
+            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyIdListManifestId : undefined;
           }
 
           set id(id: number) {
             if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.agencyId = id;
+              valueDomain.selectedAgencyIdList.agencyIdListManifestId = id;
             }
           }
 
@@ -2036,7 +2073,11 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     if (primitiveList.length > 0) {
       this.bdtScPriRestriListByGroup.push({
         label: 'Primitive',
-        list: primitiveList
+        list: primitiveList.sort((a, b) => {
+          const aName = a.self.primitiveName + ' - ' + a.name;
+          const bName = b.self.primitiveName + ' - ' + b.name;
+          return compare(aName, bName);
+        })
       });
     }
     if (this.codeListList.length > 0) {
@@ -2054,30 +2095,54 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   }
 
   get valueDomains(): any[] {
-    const valueDomains = [];
+    let valueDomains = [];
     for (const primitiveName of this.primitiveMap.keys()) {
       valueDomains.push({
         type: 'Primitive',
         name: primitiveName,
-        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name)
+        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name).sort((a, b) => compare(a, b))
       });
     }
-    for (const codeList of this.codeListList) {
+    valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
+
+    let userCodeLists = [];
+    for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
-      valueDomains.push({
-        type: 'CodeList',
-        name: codeList.name,
-        bdtScPriRestri
-      });
+      if (!bdtScPriRestri.inherited) {
+        userCodeLists.push({
+          type: 'CodeList',
+          name: codeList.name,
+          bdtScPriRestri
+        });
+      } else {
+        valueDomains.push({
+          type: 'CodeList',
+          name: codeList.name,
+          bdtScPriRestri
+        });
+      }
     }
-    for (const agencyIdList of this.agencyIdListList) {
+    valueDomains.push(...userCodeLists);
+
+    let userAgencyIdLists = [];
+    for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
-      valueDomains.push({
-        type: 'AgencyIdList',
-        name: agencyIdList.name,
-        bdtScPriRestri
-      });
+      if (!bdtScPriRestri.inherited) {
+        userAgencyIdLists.push({
+          type: 'AgencyIdList',
+          name: agencyIdList.name,
+          bdtScPriRestri
+        });
+      } else {
+        valueDomains.push({
+          type: 'AgencyIdList',
+          name: agencyIdList.name,
+          bdtScPriRestri
+        });
+      }
     }
+    valueDomains.push(...userAgencyIdLists);
+
     return valueDomains;
   }
 

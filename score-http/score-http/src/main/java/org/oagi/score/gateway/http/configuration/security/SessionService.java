@@ -22,6 +22,7 @@ import java.util.Map;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.user.model.ScoreUser.SYSTEM_USER_ID;
 
 @Service
 @Transactional(readOnly = true)
@@ -81,7 +82,7 @@ public class SessionService {
         }
     }
 
-    public AppUser getAppUser(String username) {
+    public AppUser getAppUserByUsername(String username) {
         return dslContext.select(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
@@ -95,7 +96,7 @@ public class SessionService {
                 .fetchOneInto(AppUser.class);
     }
 
-    public AppUser getAppUser(BigInteger appUserId) {
+    public AppUser getAppUserByUsername(BigInteger appUserId) {
         return dslContext.select(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
@@ -109,11 +110,11 @@ public class SessionService {
                 .fetchOneInto(AppUser.class);
     }
 
-    public AppUser getAppUser(User user) {
-        return getAppUser(user.getUsername());
+    public AppUser getAppUserByUsername(User user) {
+        return getAppUserByUsername(user.getUsername());
     }
 
-    public AppUser getAppUser(OAuth2User user) {
+    public AppUser getAppUserByUsername(OAuth2User user) {
         String sub = user.getAttribute("sub");
         return dslContext.select(
                 APP_USER.APP_USER_ID,
@@ -129,13 +130,13 @@ public class SessionService {
                 .fetchOneInto(AppUser.class);
     }
 
-    public AppUser getAppUser(AuthenticatedPrincipal user) {
+    public AppUser getAppUserByUsername(AuthenticatedPrincipal user) {
         if (user instanceof User) {
-            return getAppUser((User) user);
+            return getAppUserByUsername((User) user);
         } else if (user instanceof OAuth2User) {
-            return getAppUser((OAuth2User) user);
+            return getAppUserByUsername((OAuth2User) user);
         }
-        return getAppUser(user.getName());
+        return getAppUserByUsername(user.getName());
     }
 
     public void invalidateByUsername(String username) {
@@ -152,7 +153,7 @@ public class SessionService {
     }
 
     public org.oagi.score.repo.api.user.model.ScoreUser getScoreSystemUser() {
-        return getScoreUserByUserId(BigInteger.ZERO);
+        return getScoreUserByUserId(SYSTEM_USER_ID);
     }
 
     public org.oagi.score.repo.api.user.model.ScoreUser asScoreUser(AuthenticatedPrincipal user) {

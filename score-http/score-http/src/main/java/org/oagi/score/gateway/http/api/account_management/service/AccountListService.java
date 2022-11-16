@@ -94,7 +94,7 @@ public class AccountListService {
         }
         Boolean excludeRequester = request.getExcludeRequester();
         if (excludeRequester != null && excludeRequester == true) {
-            conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUser(user).getLoginId().trim()));
+            conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
 
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
@@ -204,7 +204,7 @@ public class AccountListService {
 
     @Transactional
     public void insert(AuthenticatedPrincipal user, AppUser account) {
-        org.oagi.score.service.common.data.AppUser appUser = sessionService.getAppUser(user);
+        org.oagi.score.service.common.data.AppUser appUser = sessionService.getAppUserByUsername(user);
         if (!appUser.isAdmin()) {
             throw new DataAccessForbiddenException("Only admin user can create a new account.");
         }

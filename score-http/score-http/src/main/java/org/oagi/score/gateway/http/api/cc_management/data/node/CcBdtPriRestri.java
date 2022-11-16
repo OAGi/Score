@@ -17,10 +17,10 @@ public class CcBdtPriRestri {
     private BigInteger xbtId;
     private String xbtName;
 
-    private BigInteger codeListId;
+    private BigInteger codeListManifestId;
     private String codeListName;
 
-    private BigInteger agencyIdListId;
+    private BigInteger agencyIdListManifestId;
     private String agencyIdListName;
 
     private boolean isDefault;

@@ -113,7 +113,11 @@ export class ModuleSet {
   createModuleSetRelease: boolean;
   targetReleaseId: number;
   targetModuleSetReleaseId: number;
+}
 
+export class ModuleSetMetadata {
+  numberOfDirectories: number = 0;
+  numberOfFiles: number = 0;
 }
 
 export class ModuleSetModuleListRequest {
@@ -205,6 +209,7 @@ export class ModuleSetRelease {
   moduleSetReleaseId: number;
 
   moduleSetReleaseName: string;
+  moduleSetReleaseDescription: string;
 
   moduleSetId: number;
   /* moduleSet */

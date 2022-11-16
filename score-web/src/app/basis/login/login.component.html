@@ -1,5 +1,6 @@
 <div class="auth-box">
-  <div class="auth-form" #authForm (window:resize)="onResize($event)">
+  <ng-template #emptyBlock></ng-template>
+  <div class="auth-form" #authForm (window:resize)="onResize($event)" *ngIf="(oauth2AppInfos | async) as oAuth2AppInfos; else emptyBlock">
     <form role="form" (submit)="login()" *ngIf="!roles.includes('pending') && !roles.includes('reject')">
       <div class="auth-form-header">
         <h1>Sign in to NIST/OAGi Score</h1>
@@ -28,7 +29,7 @@
                data-disable-with="Signing in…">
       </div>
 
-      <div *ngIf="(oauth2AppInfos | async) as oAuth2AppInfos; else emptyBlock">
+      <div>
         <div class="or-container" *ngIf="oAuth2AppInfos.length > 0">
           <div class="line-separator"></div>
           <div class="or-label">or</div>
@@ -47,8 +48,6 @@
           </div>
         </div>
       </div>
-
-      <ng-template #emptyBlock></ng-template>
     </form>
   </div>
 </div>

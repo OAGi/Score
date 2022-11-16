@@ -1,9 +1,6 @@
 package org.oagi.score.gateway.http.configuration.security;
 
-import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizationRequestRepository;
-import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizationRequestResolver;
-import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
-import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2LoginConfigurer;
+import org.oagi.score.gateway.http.configuration.oauth2.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -49,6 +46,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ScoreAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private ScoreClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -96,6 +96,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService);
     }
 
+    @Bean
+    public OidcIdTokenDecoderFactory oidcIdTokenDecoderFactory() {
+        return new OidcIdTokenDecoderFactory();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -129,6 +134,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
+                /**
+                 * RP-Initiated Logout is implemented in
+                 * {@code org.oagi.score.gateway.http.api.account_management.controller.AccountController#oauth2Logout}
+                 * using {@code OidcClientInitiatedLogoutSuccessHandler}
+                 */
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)

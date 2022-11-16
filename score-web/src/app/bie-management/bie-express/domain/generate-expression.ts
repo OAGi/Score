@@ -1,5 +1,6 @@
 export class BieExpressOption {
   filenames = {};
+  bizCtxIds = {};
 
   bieDefinition: boolean;
   businessContext: boolean;
@@ -25,7 +26,7 @@ export class BieExpressOption {
   includePaginationResponseForJson: boolean;
   paginationResponseTopLevelAsbiepId: number;
 
-  openAPICodeGenerationFriendly: boolean;
+  openAPICodeGenerationFriendly: boolean = true;
   openAPIExpressionFormat: string;
   openAPI30GetTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30GetTemplate: boolean;
@@ -38,4 +39,6 @@ export class BieExpressOption {
   arrayForJsonExpressionForOpenAPI30PostTemplate: boolean;
   includeMetaHeaderForJsonForOpenAPI30PostTemplate: boolean;
   metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate: number;
+
+  odfExpressionFormat: string;
 }

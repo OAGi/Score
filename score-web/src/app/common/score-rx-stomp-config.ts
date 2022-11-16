@@ -1,8 +1,11 @@
 import {InjectableRxStompConfig} from '@stomp/ng2-stompjs';
+import {environment} from '../../environments/environment';
+
 
 export const scoreRxStompConfig: InjectableRxStompConfig = {
+
   // Which server?
-  brokerURL: 'ws://[::1]:9000/messages',
+  brokerURL: environment.stompBrokerUrl,
 
   // Headers
   // Typical keys: login, passcode, host

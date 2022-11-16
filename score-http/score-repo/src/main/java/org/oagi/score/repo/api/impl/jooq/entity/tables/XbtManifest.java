@@ -6,14 +6,18 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function7;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row7;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -206,6 +210,11 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return new XbtManifest(alias, this);
     }
 
+    @Override
+    public XbtManifest as(Table<?> alias) {
+        return new XbtManifest(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -222,6 +231,14 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return new XbtManifest(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public XbtManifest rename(Table<?> name) {
+        return new XbtManifest(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row7 type methods
     // -------------------------------------------------------------------------
@@ -229,5 +246,20 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     @Override
     public Row7<ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
         return (Row7) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

@@ -90,6 +90,7 @@ export class BieEditAbieNode extends BieEditNode {
 
   access: string;
   topLevelAsbiepState: string;
+  inverseMode: boolean;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -105,7 +106,12 @@ export class BieEditAbieNode extends BieEditNode {
 
       this.access = abie.access;
       this.topLevelAsbiepState = abie.topLevelAsbiepState;
+      this.inverseMode = abie.inverseMode;
     }
+  }
+
+  get hashCode(): number {
+    return super.hashCode + ((this.inverseMode) ? 1 : 0);
   }
 }
 
@@ -156,7 +162,6 @@ export class CodeList {
 }
 
 export class AgencyIdList {
-  agencyIdListId: number;
   agencyIdListManifestId: number;
   basedAgencyIdListManifestId: number;
   agencyIdListName: string;
@@ -211,7 +216,7 @@ export class BieDetailRequest {
 }
 
 export class BieDetailUpdateRequest {
-  topLevelAsbiepDetail: BieEditNode;
+  topLevelAsbiepDetail: BieEditAbieNode;
   abieDetails: AbieDetail[];
   asbieDetails: AsbieDetail[];
   asbiepDetails: AsbiepDetail[];
@@ -233,7 +238,8 @@ export class BieDetailUpdateRequest {
     return {
       topLevelAsbiepDetail: this.topLevelAsbiepDetail ? {
         version: this.topLevelAsbiepDetail.version,
-        status: this.topLevelAsbiepDetail.status
+        status: this.topLevelAsbiepDetail.status,
+        inverseMode: this.topLevelAsbiepDetail.inverseMode
       } : {},
       abieDetails: this.abieDetails.map(e => e.json),
       asbieDetails: this.asbieDetails.map(e => e.json),
@@ -256,18 +262,24 @@ export class BieDetailUpdateResponse {
 }
 
 export class UsedBie {
+  used: boolean;
   bieId: number;
   hashPath: string;
   type: string;
   manifestId: number;
   ownerTopLevelAsbiepId: number;
+  cardinalityMin: number;
+  cardinalityMax: number;
 
   constructor(obj) {
+    this.used = obj && obj.used;
     this.bieId = obj && obj.bieId || 0;
     this.hashPath = obj && obj.hashPath || '';
     this.type = obj && obj.type || '';
     this.manifestId = obj && obj.manifestId || 0;
     this.ownerTopLevelAsbiepId = obj && obj.ownerTopLevelAsbiepId || 0;
+    this.cardinalityMin = obj && obj.cardinalityMin || 0;
+    this.cardinalityMax = obj && obj.cardinalityMax || 0;
   }
 }
 

@@ -103,6 +103,27 @@ export function filter(formControl: FormControl,
   );
 }
 
+export function loadBooleanProperty(userToken: UserToken, key: string, defaultValue: boolean): boolean {
+  if (!userToken || !key) {
+    return defaultValue;
+  }
+
+  const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
+  try {
+    return JSON.parse(atob(localStorage.getItem(itemKey))).value;
+  } catch (ignore) {
+    return defaultValue;
+  }
+}
+
+export function saveBooleanProperty(userToken: UserToken, key: string, value: boolean) {
+  if (!userToken || !key) {
+    return;
+  }
+  const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
+  localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
+}
+
 export function loadBranch(userToken: UserToken, type: string): number | undefined {
   if (!userToken || !type) {
     return undefined;
@@ -130,6 +151,18 @@ export function truncate(str: string, len: number): string {
     return str;
   }
   return str.substring(0, len - 3) + '...';
+}
+
+export function compare(a: string, b: string): number {
+  if (!a) {
+    return 1;
+  } else if (!b) {
+    return -1;
+  } else if (!a && !b) {
+    return 0;
+  } else {
+    return a.localeCompare(b);
+  }
 }
 
 export function toCamelCase(value: string): string {

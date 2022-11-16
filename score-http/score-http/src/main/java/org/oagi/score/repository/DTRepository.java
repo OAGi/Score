@@ -20,12 +20,14 @@ public class DTRepository implements ScoreRepository<DT> {
 
     private SelectOnConditionStep<Record> getSelectOnConditionStep() {
         return dslContext.select(
+                Tables.DT_MANIFEST.DT_MANIFEST_ID,
                 Tables.DT.DT_ID,
                 Tables.DT.GUID,
                 Tables.DT.DATA_TYPE_TERM,
                 Tables.DT.REPRESENTATION_TERM,
                 Tables.DT.QUALIFIER,
                 Tables.DT.SIX_DIGIT_ID,
+                Tables.DT_MANIFEST.BASED_DT_MANIFEST_ID,
                 Tables.DT.BASED_DT_ID,
                 Tables.DT.DEN,
                 Tables.DT.DEFINITION,

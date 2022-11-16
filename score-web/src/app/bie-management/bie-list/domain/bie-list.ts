@@ -11,11 +11,13 @@ export class BieListRequest {
     propertyTerm: string;
     businessContext: string;
     asccpManifestId: number;
+    den: string;
   };
   excludePropertyTerms: string[] = [];
   excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
+  types: string[] = [];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   updatedDate: {
@@ -53,6 +55,7 @@ export class BieListRequest {
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access');
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updatedDate = {
@@ -62,7 +65,8 @@ export class BieListRequest {
     this.filters = {
       propertyTerm: params.get('propertyTerm') || '',
       businessContext: params.get('businessContext') || '',
-      asccpManifestId: Number(params.get('asccpManifestId')) || 0
+      asccpManifestId: Number(params.get('asccpManifestId')) || 0,
+      den: params.get('den') || '',
     };
   }
 
@@ -84,6 +88,9 @@ export class BieListRequest {
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.types && this.types.length > 0) {
+      params = params.set('types', this.types.join(','));
     }
     if (this.access && this.access.length > 0) {
       params = params.set('access', this.access);
@@ -109,6 +116,9 @@ export class BieListRequest {
     if (this.filters.asccpManifestId) {
       params = params.set('asccpManifestId', this.filters.asccpManifestId.toString());
     }
+    if (this.filters.den && this.filters.den.length > 0) {
+      params = params.set('den', '' + this.filters.den);
+    }
     if (extras) {
       Object.keys(extras).forEach(key => {
         params = params.set(key.toString(), extras[key]);
@@ -121,6 +131,7 @@ export class BieListRequest {
 
 export class BieList {
   topLevelAsbiepId: number;
+  den: string;
   propertyTerm: string;
   guid: string;
   releaseNum: string;
@@ -136,6 +147,29 @@ export class BieList {
   lastUpdateUser: string;
   state: string;
   businessContexts: BusinessContext[];
+}
+
+export class AsbieBbieList {
+  type: string;
+  bieId: number;
+  guid: string;
+  den: string;
+  state: string;
+  version: string;
+  status: string;
+  bizCtxId: string;
+  bizCtxName: string;
+  releaseId: number;
+  releaseNum: string;
+  remark: string;
+  lastUpdateUser: string;
+  lastUpdateTimestamp: Date;
+  used: string;
+  topLevelAsbiepId: number;
+  topLevelAsccpPropertyTerm: string;
+  businessContexts: BusinessContext[];
+  owner: string;
+  access: string;
 }
 
 export class SummaryBie {

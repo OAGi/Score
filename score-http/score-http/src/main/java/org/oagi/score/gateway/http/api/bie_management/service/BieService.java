@@ -1,14 +1,12 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BizCtx;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
-import org.oagi.score.gateway.http.api.bie_management.data.BieList;
-import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
@@ -32,7 +30,10 @@ import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.*;
 import org.oagi.score.service.message.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,8 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 @Service
 @Transactional(readOnly = true)
 public class BieService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private SessionService sessionService;
@@ -77,6 +80,9 @@ public class BieService {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
@@ -151,9 +157,10 @@ public class BieService {
 
     public PageResponse<BieList> getBieList(AuthenticatedPrincipal user, BieListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         PaginationResponse<BieList> result = bieRepository.selectBieLists()
+                .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
                 .setAsccpManifestId(request.getAsccpManifestId())
@@ -200,7 +207,7 @@ public class BieService {
 
     public PageResponse<BieList> getUsageOfBieList(AuthenticatedPrincipal user, BieListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         PageResponse<BieList> response = new PageResponse();
         response.setPage(pageRequest.getPageIndex());
         response.setSize(pageRequest.getPageSize());
@@ -317,7 +324,7 @@ public class BieService {
                 failureMessageBody = failureMessageBody.append("\n---\n[**")
                         .append(source.get(ASCCP.PROPERTY_TERM))
                         .append("**](")
-                        .append("/profile_bie/edit/").append(topLevelAsbiepId)
+                        .append("/profile_bie/").append(topLevelAsbiepId)
                         .append(") (")
                         .append(source.get(ASBIEP.GUID))
                         .append(") cannot be discarded due to the referential integrity violation by following BIEs:")
@@ -326,7 +333,7 @@ public class BieService {
                     failureMessageBody = failureMessageBody.append("- [")
                             .append(target.getPropertyTerm())
                             .append("](")
-                            .append("/profile_bie/edit/").append(target.getTopLevelAsbiepId())
+                            .append("/profile_bie/").append(target.getTopLevelAsbiepId())
                             .append(") (")
                             .append(target.getGuid())
                             .append(")\n");
@@ -380,7 +387,7 @@ public class BieService {
         long ownerAppUserId = dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(
-                        sessionService.getAppUser(user).getLoginId()
+                        sessionService.getAppUserByUsername(user).getLoginId()
                 ))
                 .fetchOptionalInto(Long.class).orElse(0L);
         if (ownerAppUserId == 0L) {
@@ -432,6 +439,14 @@ public class BieService {
             //if a couple (biz ctx id , toplevelasbiepId) already exist dont insert it - just update it.
         }
 
+    }
+
+    public void fireBieEvent(BieEvent event) {
+        try {
+            simpMessagingTemplate.convertAndSend("/topic/bie/" + event.getTopLevelAsbiepId(), event);
+        } catch (Exception ignore) {
+            logger.error("Couldn't send BIE event: " + event, ignore);
+        }
     }
 
 

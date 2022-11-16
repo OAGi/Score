@@ -134,12 +134,12 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="propertyTerm">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
+      <ng-container matColumnDef="den">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
         <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
           <div class="ellipsis d-flex">
-            <a target="_blank" rel="noopener noreferrer" href="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
-              <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
+            <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}">
+              <span class="den ellipsis" style="margin-right: 10px;">{{ element.den }}</span>
             </a>
           </div>
           <div class="description ellipsis">{{ element.guid }}</div>
@@ -165,7 +165,7 @@
               </mat-chip>
             </a>
             <a target="_blank" rel="noopener noreferrer"
-               routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
+               routerLink="/profile_bie/{{ element.topLevelAsbiepId }}">
               <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }} more...</mat-chip>
             </a>
           </mat-chip-list>

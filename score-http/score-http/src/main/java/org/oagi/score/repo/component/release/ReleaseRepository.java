@@ -6,7 +6,6 @@ import org.jooq.Record8;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdService;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScManifestRecord;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.data.Release;
 import org.oagi.score.service.common.data.CcState;
@@ -163,7 +162,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
             throw new IllegalArgumentException("Only the release in '" + Initialized + "' can discard.");
         }
 
-        AppUser user = sessionService.getAppUser(request.getUser());
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
         if (!user.isDeveloper()) {
             throw new IllegalArgumentException("It only allows to discard the release for developers.");
         }
@@ -179,7 +178,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
     public void updateState(BigInteger userId,
                             BigInteger releaseId,
                             ReleaseState releaseState) {
-        AppUser appUser = sessionService.getAppUser(userId);
+        AppUser appUser = sessionService.getAppUserByUsername(userId);
         if (!appUser.isDeveloper()) {
             throw new IllegalArgumentException("It only allows to update the state of the release for developers.");
         }
@@ -270,6 +269,11 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                     workingReleaseRecord.getReleaseId().toBigInteger(), agencyIdListManifestIds);
             updateAgencyIdListValueDependencies(releaseRecord.getReleaseId().toBigInteger());
 
+            copyBdtPriRestriFromWorking(releaseRecord.getReleaseId().toBigInteger(),
+                    workingReleaseRecord.getReleaseId().toBigInteger(), bdtManifestIds);
+            copyBdtScPriRestriFromWorking(releaseRecord.getReleaseId().toBigInteger(),
+                    workingReleaseRecord.getReleaseId().toBigInteger(), bdtManifestIds);
+
         } catch (Exception e) {
             releaseRecord.setReleaseNote(e.getMessage());
             releaseRecord.update(RELEASE.RELEASE_NOTE);
@@ -299,6 +303,138 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .where(and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
                                 (or(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNotNull(),
                                         ACC_MANIFEST.ACC_MANIFEST_ID.in(accManifestIds)))))).execute();
+    }
+
+    private void copyBdtPriRestriFromWorking(BigInteger releaseId, BigInteger workingReleaseId,
+                                             List<BigInteger> dtManifestIds) {
+        dslContext.insertInto(BDT_PRI_RESTRI,
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                        BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_MANIFEST.as("target").DT_MANIFEST_ID,
+                                BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
+                                BDT_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_MANIFEST.as("working"))
+                        .join(DT_MANIFEST.as("target")).on(and(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
+                                DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_PRI_RESTRI).on(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
+                        .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.isNotNull(),
+                                (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
+                                        DT_MANIFEST.as("working").DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
+
+        dslContext.insertInto(BDT_PRI_RESTRI,
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                        BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_MANIFEST.as("target").DT_MANIFEST_ID,
+                                CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                                BDT_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_MANIFEST.as("working"))
+                        .join(DT_MANIFEST.as("target")).on(and(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
+                                DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_PRI_RESTRI).on(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
+                        .join(CODE_LIST_MANIFEST).on(and(
+                                CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.isNotNull(),
+                                (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
+                                        DT_MANIFEST.as("working").DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
+
+        dslContext.insertInto(BDT_PRI_RESTRI,
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                        BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_MANIFEST.as("target").DT_MANIFEST_ID,
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                                BDT_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_MANIFEST.as("working"))
+                        .join(DT_MANIFEST.as("target")).on(and(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
+                                DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_PRI_RESTRI).on(
+                                DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
+                        .join(AGENCY_ID_LIST_MANIFEST).on(and(
+                                AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull(),
+                                (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
+                                        DT_MANIFEST.as("working").DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
+    }
+
+    private void copyBdtScPriRestriFromWorking(BigInteger releaseId, BigInteger workingReleaseId,
+                                               List<BigInteger> dtManifestIds) {
+        dslContext.insertInto(BDT_SC_PRI_RESTRI,
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_SC_MANIFEST.as("target").DT_SC_MANIFEST_ID,
+                                BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
+                                BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_SC_MANIFEST.as("working"))
+                        .join(DT_SC_MANIFEST.as("target")).on(and(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_SC_PRI_RESTRI).on(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
+                        .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.isNotNull(),
+                                (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
+                                        DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
+
+        dslContext.insertInto(BDT_SC_PRI_RESTRI,
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_SC_MANIFEST.as("target").DT_SC_MANIFEST_ID,
+                                CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                                BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_SC_MANIFEST.as("working"))
+                        .join(DT_SC_MANIFEST.as("target")).on(and(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_SC_PRI_RESTRI).on(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
+                        .join(CODE_LIST_MANIFEST).on(and(
+                                CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID.isNotNull(),
+                                (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
+                                        DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
+
+        dslContext.insertInto(BDT_SC_PRI_RESTRI,
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                .select(dslContext.select(
+                                DT_SC_MANIFEST.as("target").DT_SC_MANIFEST_ID,
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                                BDT_SC_PRI_RESTRI.IS_DEFAULT)
+                        .from(DT_SC_MANIFEST.as("working"))
+                        .join(DT_SC_MANIFEST.as("target")).on(and(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .join(BDT_SC_PRI_RESTRI).on(
+                                DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
+                        .join(AGENCY_ID_LIST_MANIFEST).on(and(
+                                AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                        .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
+                                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull(),
+                                (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
+                                        DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(dtManifestIds)))))).execute();
     }
 
     private void copyDtManifestRecordsFromWorking(BigInteger releaseId, BigInteger workingReleaseId,
@@ -589,6 +725,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 DT_SC_MANIFEST.RELEASE_ID,
                 DT_SC_MANIFEST.DT_SC_ID,
                 DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID,
+                DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID,
                 DT_SC_MANIFEST.CONFLICT,
                 DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID,
                 DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID)
@@ -596,6 +733,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         DT_SC_MANIFEST.DT_SC_ID,
                         DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID,
+                        DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID,
                         DT_SC_MANIFEST.CONFLICT,
                         DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID,
                         DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
@@ -854,6 +992,13 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID, DT_MANIFEST.DT_MANIFEST_ID)
                 .where(and(DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
+                .execute();
+
+        dslContext.update(DT_SC_MANIFEST.join(DT_SC_MANIFEST.as("based"))
+                        .on(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("based").NEXT_DT_SC_MANIFEST_ID)))
+                .set(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.as("based").DT_SC_MANIFEST_ID)
+                .where(and(DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        DT_SC_MANIFEST.as("based").RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
         dslContext.update(DT_SC_MANIFEST
@@ -1368,7 +1513,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 throw new IllegalArgumentException("The release in '" + releaseRecord.getState() + "' state cannot be transited.");
         }
 
-        AppUser appUser = sessionService.getAppUser(user);
+        AppUser appUser = sessionService.getAppUserByUsername(user);
         ULong userId = ULong.valueOf(appUser.getAppUserId());
         LocalDateTime timestamp = LocalDateTime.now();
 
@@ -1382,6 +1527,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
         releaseRecord.update(RELEASE.STATE, RELEASE.LAST_UPDATED_BY, RELEASE.LAST_UPDATE_TIMESTAMP);
 
         // update CCs' states by transited release state.
+        ULong releaseId = releaseRecord.getReleaseId();
         if (fromCcState != null && toCcState != null) {
             if (toCcState == ReleaseDraft) {
                 ReleaseValidationRequest validationRequest = request.getValidationRequest();
@@ -1408,7 +1554,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
                 List<ULong> moduleSetReleases = dslContext.select(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID)
                         .from(MODULE_SET_RELEASE)
-                        .where(MODULE_SET_RELEASE.RELEASE_ID.eq(releaseRecord.getReleaseId())).fetchInto(ULong.class);
+                        .where(MODULE_SET_RELEASE.RELEASE_ID.eq(releaseId)).fetchInto(ULong.class);
 
                 if (moduleSetReleases.size() > 0) {
                     dslContext.deleteFrom(MODULE_ACC_MANIFEST).where(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleases)).execute();
@@ -1422,83 +1568,97 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 }
 
                 dslContext.update(ASCC_MANIFEST).setNull(ASCC_MANIFEST.SEQ_KEY_ID)
-                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(BCC_MANIFEST).setNull(BCC_MANIFEST.SEQ_KEY_ID)
-                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(SEQ_KEY.join(ASCC_MANIFEST).on(SEQ_KEY.ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.ASCC_MANIFEST_ID)))
                         .setNull(SEQ_KEY.PREV_SEQ_KEY_ID)
                         .setNull(SEQ_KEY.NEXT_SEQ_KEY_ID)
-                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(SEQ_KEY.join(BCC_MANIFEST).on(SEQ_KEY.BCC_MANIFEST_ID.eq(BCC_MANIFEST.BCC_MANIFEST_ID)))
                         .setNull(SEQ_KEY.PREV_SEQ_KEY_ID)
                         .setNull(SEQ_KEY.NEXT_SEQ_KEY_ID)
-                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(SEQ_KEY).where(SEQ_KEY.ASCC_MANIFEST_ID.in(
                         select(ASCC_MANIFEST.ASCC_MANIFEST_ID)
                         .from(ASCC_MANIFEST)
-                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))))
+                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))))
                         .execute();
                 dslContext.deleteFrom(SEQ_KEY).where(SEQ_KEY.BCC_MANIFEST_ID.in(
                         select(BCC_MANIFEST.BCC_MANIFEST_ID)
                                 .from(BCC_MANIFEST)
-                                .where(BCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))))
+                                .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))))
                         .execute();
                 dslContext.deleteFrom(BCC_MANIFEST)
-                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(BCCP_MANIFEST)
-                        .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(XBT_MANIFEST)
-                        .where(XBT_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
+                        .execute();
+                dslContext.deleteFrom(BDT_SC_PRI_RESTRI).where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.in(
+                        select(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID)
+                                .from(BDT_SC_PRI_RESTRI)
+                                .join(DT_SC_MANIFEST).on(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
+                                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId)))).execute();
+                dslContext.update(DT_SC_MANIFEST)
+                        .setNull(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID)
+                        .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(DT_SC_MANIFEST)
-                        .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
+                dslContext.deleteFrom(BDT_PRI_RESTRI).where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.in(
+                        select(BDT_PRI_RESTRI.BDT_MANIFEST_ID)
+                                .from(BDT_PRI_RESTRI)
+                                .join(DT_MANIFEST).on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId)))).execute();
                 dslContext.update(DT_MANIFEST)
                         .setNull(DT_MANIFEST.BASED_DT_MANIFEST_ID)
-                        .where(DT_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(DT_MANIFEST)
-                        .where(DT_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(ASCC_MANIFEST)
-                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(ASCCP_MANIFEST)
-                        .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(ACC_MANIFEST)
                         .setNull(ACC_MANIFEST.BASED_ACC_MANIFEST_ID)
-                        .where(ACC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(ACC_MANIFEST)
-                        .where(ACC_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(CODE_LIST_VALUE_MANIFEST)
-                        .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(CODE_LIST_MANIFEST)
                         .setNull(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID)
-                        .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(CODE_LIST_MANIFEST)
-                        .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.update(AGENCY_ID_LIST_MANIFEST)
                         .setNull(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
                         .setNull(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID)
-                        .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
-                        .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
                 dslContext.deleteFrom(AGENCY_ID_LIST_MANIFEST)
-                        .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseRecord.getReleaseId()))
+                        .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                         .execute();
 
             } else if (toCcState == CcState.Published) {

@@ -81,7 +81,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
 
     @Transactional
     public void createBieFromExistingBie(AuthenticatedPrincipal user, CreateBieFromExistingBieRequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
 
         ULong topLevelAsbiepId = ULong.valueOf(request.getTopLevelAsbiepId());
         ULong asbiepId = dslContext.select(ASBIE.TO_ASBIEP_ID)
@@ -193,8 +193,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                 BBIE.FROM_ABIE_ID,
                 BBIE.TO_BBIEP_ID,
                 BBIE.BDT_PRI_RESTRI_ID,
-                BBIE.CODE_LIST_ID,
-                BBIE.AGENCY_ID_LIST_ID,
+                BBIE.CODE_LIST_MANIFEST_ID,
+                BBIE.AGENCY_ID_LIST_MANIFEST_ID,
                 BBIE.CARDINALITY_MIN,
                 BBIE.CARDINALITY_MAX,
                 BBIE.DEFAULT_VALUE,
@@ -245,8 +245,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                 BBIE_SC.BBIE_ID,
                 BBIE_SC.BASED_DT_SC_MANIFEST_ID,
                 BBIE_SC.DT_SC_PRI_RESTRI_ID,
-                BBIE_SC.CODE_LIST_ID,
-                BBIE_SC.AGENCY_ID_LIST_ID,
+                BBIE_SC.CODE_LIST_MANIFEST_ID,
+                BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID,
                 BBIE_SC.CARDINALITY_MIN,
                 BBIE_SC.CARDINALITY_MAX,
                 BBIE_SC.DEFAULT_VALUE,
@@ -299,8 +299,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private BigInteger fromAbieId;
         private BigInteger toBbiepId;
         private Long bdtPriRestriId;
-        private Long codeListId;
-        private Long agencyIdListId;
+        private Long codeListManifestId;
+        private Long agencyIdListManifestId;
         private int cardinalityMin;
         private int cardinalityMax;
         private String defaultValue;
@@ -351,8 +351,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private BigInteger bbieId;
         private BigInteger basedDtScManifestId;
         private Long dtScPriRestriId;
-        private Long codeListId;
-        private Long agencyIdListId;
+        private Long codeListManifestId;
+        private Long agencyIdListManifestId;
         private int cardinalityMin;
         private int cardinalityMax;
         private String defaultValue;
@@ -684,8 +684,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                     .set(BBIE.TO_BBIEP_ID, ULong.valueOf(bbie.getToBbiepId()))
                     .set(BBIE.BASED_BCC_MANIFEST_ID, ULong.valueOf(bbie.getBasedBccManifestId()))
                     .set(BBIE.BDT_PRI_RESTRI_ID, (bbie.getBdtPriRestriId() != null) ? ULong.valueOf(bbie.getBdtPriRestriId()) : null)
-                    .set(BBIE.CODE_LIST_ID, (bbie.getCodeListId() != null) ? ULong.valueOf(bbie.getCodeListId()) : null)
-                    .set(BBIE.AGENCY_ID_LIST_ID, (bbie.getAgencyIdListId() != null) ? ULong.valueOf(bbie.getAgencyIdListId()) : null)
+                    .set(BBIE.CODE_LIST_MANIFEST_ID, (bbie.getCodeListManifestId() != null) ? ULong.valueOf(bbie.getCodeListManifestId()) : null)
+                    .set(BBIE.AGENCY_ID_LIST_MANIFEST_ID, (bbie.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbie.getAgencyIdListManifestId()) : null)
                     .set(BBIE.DEFAULT_VALUE, bbie.getDefaultValue())
                     .set(BBIE.FIXED_VALUE, bbie.getFixedValue())
                     .set(BBIE.DEFINITION, bbie.getDefinition())
@@ -714,8 +714,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                     .set(BBIE_SC.BBIE_ID, ULong.valueOf(bbieSc.getBbieId()))
                     .set(BBIE_SC.BASED_DT_SC_MANIFEST_ID, ULong.valueOf(bbieSc.getBasedDtScManifestId()))
                     .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, (bbieSc.getDtScPriRestriId() != null) ? ULong.valueOf(bbieSc.getDtScPriRestriId()) : null)
-                    .set(BBIE_SC.CODE_LIST_ID, (bbieSc.getCodeListId() != null) ? ULong.valueOf(bbieSc.getCodeListId()) : null)
-                    .set(BBIE_SC.AGENCY_ID_LIST_ID, (bbieSc.getAgencyIdListId() != null) ? ULong.valueOf(bbieSc.getAgencyIdListId()) : null)
+                    .set(BBIE_SC.CODE_LIST_MANIFEST_ID, (bbieSc.getCodeListManifestId() != null) ? ULong.valueOf(bbieSc.getCodeListManifestId()) : null)
+                    .set(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID, (bbieSc.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbieSc.getAgencyIdListManifestId()) : null)
                     .set(BBIE_SC.DEFAULT_VALUE, bbieSc.getDefaultValue())
                     .set(BBIE_SC.FIXED_VALUE, bbieSc.getFixedValue())
                     .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())

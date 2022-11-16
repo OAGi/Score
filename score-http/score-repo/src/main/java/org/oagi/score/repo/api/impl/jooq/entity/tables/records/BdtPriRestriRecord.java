@@ -44,18 +44,20 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
-     * table. It shall point to only DT that is a BDT (not a CDT).
+     * Setter for <code>oagi.bdt_pri_restri.bdt_manifest_id</code>. Foreign key
+     * to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a
+     * CDT).
      */
-    public void setBdtId(ULong value) {
+    public void setBdtManifestId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.bdt_id</code>. Foreign key to the DT
-     * table. It shall point to only DT that is a BDT (not a CDT).
+     * Getter for <code>oagi.bdt_pri_restri.bdt_manifest_id</code>. Foreign key
+     * to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a
+     * CDT).
      */
-    public ULong getBdtId() {
+    public ULong getBdtManifestId() {
         return (ULong) get(1);
     }
 
@@ -80,36 +82,38 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
-     * the CODE_LIST table.
+     * Setter for <code>oagi.bdt_pri_restri.code_list_manifest_id</code>.
+     * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public void setCodeListId(ULong value) {
+    public void setCodeListManifestId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.code_list_id</code>. Foreign key to
-     * the CODE_LIST table.
+     * Getter for <code>oagi.bdt_pri_restri.code_list_manifest_id</code>.
+     * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public ULong getCodeListId() {
+    public ULong getCodeListManifestId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
-     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
-     * BDT content can be restricted to an agency identification.
+     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_manifest_id</code>.
+     * This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in
+     * the case that the BDT content can be restricted to an agency
+     * identification.
      */
-    public void setAgencyIdListId(ULong value) {
+    public void setAgencyIdListManifestId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.bdt_pri_restri.agency_id_list_id</code>. This is a
-     * foreign key to the AGENCY_ID_LIST table. It is used in the case that the
-     * BDT content can be restricted to an agency identification.
+     * Getter for <code>oagi.bdt_pri_restri.agency_id_list_manifest_id</code>.
+     * This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in
+     * the case that the BDT content can be restricted to an agency
+     * identification.
      */
-    public ULong getAgencyIdListId() {
+    public ULong getAgencyIdListManifestId() {
         return (ULong) get(4);
     }
 
@@ -163,7 +167,7 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public Field<ULong> field2() {
-        return BdtPriRestri.BDT_PRI_RESTRI.BDT_ID;
+        return BdtPriRestri.BDT_PRI_RESTRI.BDT_MANIFEST_ID;
     }
 
     @Override
@@ -173,12 +177,12 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public Field<ULong> field4() {
-        return BdtPriRestri.BDT_PRI_RESTRI.CODE_LIST_ID;
+        return BdtPriRestri.BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID;
     }
 
     @Override
     public Field<ULong> field5() {
-        return BdtPriRestri.BDT_PRI_RESTRI.AGENCY_ID_LIST_ID;
+        return BdtPriRestri.BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID;
     }
 
     @Override
@@ -193,7 +197,7 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public ULong component2() {
-        return getBdtId();
+        return getBdtManifestId();
     }
 
     @Override
@@ -203,12 +207,12 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public ULong component4() {
-        return getCodeListId();
+        return getCodeListManifestId();
     }
 
     @Override
     public ULong component5() {
-        return getAgencyIdListId();
+        return getAgencyIdListManifestId();
     }
 
     @Override
@@ -223,7 +227,7 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public ULong value2() {
-        return getBdtId();
+        return getBdtManifestId();
     }
 
     @Override
@@ -233,12 +237,12 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public ULong value4() {
-        return getCodeListId();
+        return getCodeListManifestId();
     }
 
     @Override
     public ULong value5() {
-        return getAgencyIdListId();
+        return getAgencyIdListManifestId();
     }
 
     @Override
@@ -254,7 +258,7 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public BdtPriRestriRecord value2(ULong value) {
-        setBdtId(value);
+        setBdtManifestId(value);
         return this;
     }
 
@@ -266,13 +270,13 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
 
     @Override
     public BdtPriRestriRecord value4(ULong value) {
-        setCodeListId(value);
+        setCodeListManifestId(value);
         return this;
     }
 
     @Override
     public BdtPriRestriRecord value5(ULong value) {
-        setAgencyIdListId(value);
+        setAgencyIdListManifestId(value);
         return this;
     }
 
@@ -307,14 +311,14 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     /**
      * Create a detached, initialised BdtPriRestriRecord
      */
-    public BdtPriRestriRecord(ULong bdtPriRestriId, ULong bdtId, ULong cdtAwdPriXpsTypeMapId, ULong codeListId, ULong agencyIdListId, Byte isDefault) {
+    public BdtPriRestriRecord(ULong bdtPriRestriId, ULong bdtManifestId, ULong cdtAwdPriXpsTypeMapId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
         super(BdtPriRestri.BDT_PRI_RESTRI);
 
         setBdtPriRestriId(bdtPriRestriId);
-        setBdtId(bdtId);
+        setBdtManifestId(bdtManifestId);
         setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
-        setCodeListId(codeListId);
-        setAgencyIdListId(agencyIdListId);
+        setCodeListManifestId(codeListManifestId);
+        setAgencyIdListManifestId(agencyIdListManifestId);
         setIsDefault(isDefault);
     }
 }

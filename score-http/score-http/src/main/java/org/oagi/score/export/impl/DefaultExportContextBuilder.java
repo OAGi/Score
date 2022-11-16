@@ -44,7 +44,7 @@ public class DefaultExportContextBuilder {
         createAgencyIdList(moduleMap);
         createCodeLists(moduleMap);
         createXBTs(moduleMap);
-        createCDT(moduleMap);
+        createBDT(moduleMap);
         createBCCP(moduleMap);
         createACC(moduleMap);
         createASCCP(moduleMap);
@@ -145,14 +145,18 @@ public class DefaultExportContextBuilder {
         });
     }
 
-    private void createCDT(Map<ULong, SchemaModule> moduleMap) {
-        List<DtRecord> cdtList = importedDataProvider.findDT().stream()
-                .filter(e -> e.getBasedDtId() != null).collect(Collectors.toList());
-        cdtList.forEach(bdt->{
-            if (bdt.getBasedDtId() == null) {
+    private void createBDT(Map<ULong, SchemaModule> moduleMap) {
+        List<DtManifestRecord> bdtManifestList = importedDataProvider.findDtManifest().stream()
+                .filter(e -> e.getBasedDtManifestId() != null).collect(Collectors.toList());
+        bdtManifestList.forEach(bdtManifest -> {
+            if (bdtManifest.getBasedDtManifestId() == null) {
                 throw new IllegalStateException();
             }
-            DtRecord baseDataType = importedDataProvider.findDT(bdt.getBasedDtId());
+            DtRecord bdt = importedDataProvider.findDT(bdtManifest.getDtId());
+            DtManifestRecord basedDtManifest =
+                    importedDataProvider.findDtManifest(bdtManifest.getBasedDtManifestId());
+
+            DtRecord baseDataType = importedDataProvider.findDT(basedDtManifest.getDtId());
             ModuleCCID moduleCCID = importedDataProvider.findModuleDt(bdt.getDtId());
             if (moduleCCID == null) {
                 return;
@@ -167,24 +171,24 @@ public class DefaultExportContextBuilder {
                 addDependency(schemaModule, baseSchemaModule);
             }
 
-            List<DtScRecord> dtScList =
-                    importedDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
-                            .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
+            List<DtScManifestRecord> dtScManifestList =
+                    importedDataProvider.findDtScManifestByOwnerDtManifestId(bdtManifest.getDtManifestId()).stream()
+                            .filter(e -> importedDataProvider.findDtSc(e.getDtScId()).getCardinalityMax() > 0).collect(Collectors.toList());
 
             boolean isDefaultBDT = schemaModule.getPath().contains("BusinessDataType_1");
             BDTSimple bdtSimple;
-            if (dtScList.isEmpty()) {
-                ULong bdtId = bdt.getDtId();
+            if (dtScManifestList.isEmpty()) {
+                ULong bdtManifestId = bdtManifest.getDtManifestId();
                 List<BdtPriRestriRecord> bdtPriRestriList =
-                        importedDataProvider.findBdtPriRestriListByDtId(bdtId);
+                        importedDataProvider.findBdtPriRestriListByDtManifestId(bdtManifestId);
                 List<CdtAwdPriXpsTypeMapRecord> cdtAwdPriXpsTypeMapList =
-                        importedDataProvider.findCdtAwdPriXpsTypeMapListByDtId(bdtId);
+                        importedDataProvider.findCdtAwdPriXpsTypeMapListByDtManifestId(bdtManifestId);
                 if (!cdtAwdPriXpsTypeMapList.isEmpty()) {
                     List<XbtRecord> xbtList = cdtAwdPriXpsTypeMapList.stream()
                             .map(e -> importedDataProvider.findXbt(e.getXbtId()))
                             .collect(Collectors.toList());
                     bdtSimple = new BDTSimpleType(
-                            bdt, baseDataType, isDefaultBDT,
+                            bdtManifest, bdt, basedDtManifest, baseDataType, isDefaultBDT,
                             bdtPriRestriList, xbtList, importedDataProvider);
                     xbtList.forEach(xbtRecord -> {
                         ModuleCCID xbtModuleCCID = importedDataProvider.findModuleXbt(xbtRecord.getXbtId());
@@ -196,17 +200,22 @@ public class DefaultExportContextBuilder {
                     });
                 } else {
                     bdtSimple = new BDTSimpleType(
-                            bdt, baseDataType, isDefaultBDT, importedDataProvider);
+                            bdtManifest, bdt, basedDtManifest, baseDataType, isDefaultBDT, importedDataProvider);
                 }
             } else {
-                bdtSimple = new BDTSimpleContent(bdt, baseDataType, isDefaultBDT, dtScList, importedDataProvider);
-                dtScList.forEach(dtScRecord -> {
+                Map<DtScManifestRecord, DtScRecord> dtScMap = new HashMap();
+                for (DtScManifestRecord dtScManifest : dtScManifestList) {
+                    dtScMap.put(dtScManifest, importedDataProvider.findDtSc(dtScManifest.getDtScId()));
+                }
+                bdtSimple = new BDTSimpleContent(bdtManifest, bdt, basedDtManifest, baseDataType,
+                        isDefaultBDT, dtScMap, importedDataProvider);
+                dtScManifestList.forEach(dtScManifestRecord -> {
                     List<BdtScPriRestriRecord> bdtScPriRestriList =
-                            importedDataProvider.findBdtScPriRestriListByDtScId(dtScRecord.getDtScId());
+                            importedDataProvider.findBdtScPriRestriListByDtScManifestId(dtScManifestRecord.getDtScManifestId());
 
                     List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                             bdtScPriRestriList.stream()
-                                    .filter(e -> e.getCodeListId() != null)
+                                    .filter(e -> e.getCodeListManifestId() != null)
                                     .collect(Collectors.toList());
                     if (codeListBdtScPriRestri.size() > 1) {
                         throw new IllegalStateException();
@@ -215,7 +224,7 @@ public class DefaultExportContextBuilder {
                     if (codeListBdtScPriRestri.isEmpty()) {
                         List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
                                 bdtScPriRestriList.stream()
-                                        .filter(e -> e.getAgencyIdListId() != null)
+                                        .filter(e -> e.getAgencyIdListManifestId() != null)
                                         .collect(Collectors.toList());
                         if (agencyIdBdtScPriRestri.size() > 1) {
                             throw new IllegalStateException();
@@ -238,12 +247,14 @@ public class DefaultExportContextBuilder {
                                 addDependency(schemaModule, moduleMap.get(xbtModuleCCID.getModuleId()));
                             }
                         } else {
-                            AgencyIdListRecord agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
+                            AgencyIdListManifestRecord agencyIdListManifest = importedDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
+                            AgencyIdListRecord agencyIdList = importedDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
                             ModuleCCID agencyIdListModuleCCID = importedDataProvider.findModuleAgencyIdList(agencyIdList.getAgencyIdListId());
                             addDependency(schemaModule, moduleMap.get(agencyIdListModuleCCID.getModuleId()));
                         }
                     } else {
-                        CodeListRecord codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
+                        CodeListManifestRecord codeListManifest = importedDataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
+                        CodeListRecord codeList = importedDataProvider.findCodeList(codeListManifest.getCodeListId());
                         ModuleCCID codeListModuleCCID = importedDataProvider.findModuleCodeList(codeList.getCodeListId());
                         addDependency(schemaModule, moduleMap.get(codeListModuleCCID.getModuleId()));
                     }

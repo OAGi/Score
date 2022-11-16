@@ -6,12 +6,12 @@ import java.math.BigInteger;
 public class BdtPriRestri implements Serializable {
 
     private BigInteger bdtPriRestriId;
-    private BigInteger bdtId;
+    private BigInteger bdtManifestId;
     private BigInteger xbtId;
     private String xbtName;
     private BigInteger cdtAwdPriXpsTypeMapId;
-    private BigInteger codeListId;
-    private BigInteger agencyIdListId;
+    private BigInteger codeListManifestId;
+    private BigInteger agencyIdListManifestId;
     private boolean isDefault;
 
     public BigInteger getBdtPriRestriId() {
@@ -22,12 +22,12 @@ public class BdtPriRestri implements Serializable {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
-    public BigInteger getBdtId() {
-        return bdtId;
+    public BigInteger getBdtManifestId() {
+        return bdtManifestId;
     }
 
-    public void setBdtId(BigInteger bdtId) {
-        this.bdtId = bdtId;
+    public void setBdtManifestId(BigInteger bdtManifestId) {
+        this.bdtManifestId = bdtManifestId;
     }
 
     public BigInteger getXbtId() {
@@ -54,20 +54,20 @@ public class BdtPriRestri implements Serializable {
         this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
     }
 
-    public BigInteger getCodeListId() {
-        return codeListId;
+    public BigInteger getCodeListManifestId() {
+        return codeListManifestId;
     }
 
-    public void setCodeListId(BigInteger codeListId) {
-        this.codeListId = codeListId;
+    public void setCodeListManifestId(BigInteger codeListManifestId) {
+        this.codeListManifestId = codeListManifestId;
     }
 
-    public BigInteger getAgencyIdListId() {
-        return agencyIdListId;
+    public BigInteger getAgencyIdListManifestId() {
+        return agencyIdListManifestId;
     }
 
-    public void setAgencyIdListId(BigInteger agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+    public void setAgencyIdListManifestId(BigInteger agencyIdListManifestId) {
+        this.agencyIdListManifestId = agencyIdListManifestId;
     }
 
     public boolean isDefault() {

@@ -15,7 +15,6 @@ import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
-import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
@@ -44,14 +43,12 @@ export class ReleaseListComponent implements OnInit {
   states: string[] = ['Initialized', 'Draft', 'Published'];
   request: ReleaseListRequest;
 
+  contextMenuItem: ReleaseList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('contextMenuForInitialized', {static: true}) public contextMenuForInitialized: ContextMenuComponent;
-  @ViewChild('contextMenuForDraft', {static: true}) public contextMenuForDraft: ContextMenuComponent;
 
   constructor(private service: ReleaseService,
               private accountService: AccountListService,
-              private contextMenuService: ContextMenuService,
               private snackBar: MatSnackBar,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
@@ -242,7 +239,7 @@ export class ReleaseListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          const releaseIds = (release) ? [release.releaseId,] : this.selection.selected;
+          const releaseIds = (release) ? [release.releaseId, ] : this.selection.selected;
           this.service.discard(releaseIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
@@ -251,31 +248,5 @@ export class ReleaseListComponent implements OnInit {
           });
         }
       });
-  }
-
-  getContextMenu(item: ReleaseList) {
-    if (item.state === 'Initialized') {
-      return this.contextMenuForInitialized;
-    } else if (item.state === 'Draft') {
-      return this.contextMenuForDraft;
-    } else {
-      return undefined;
-    }
-  }
-
-  onContextMenu($event: MouseEvent, item: ReleaseList): void {
-    const contextMenu = this.getContextMenu(item);
-    if (!contextMenu) {
-      return;
-    }
-
-    this.contextMenuService.show.next({
-      contextMenu,
-      event: $event,
-      item,
-    });
-
-    $event.preventDefault();
-    $event.stopPropagation();
   }
 }

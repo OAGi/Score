@@ -253,7 +253,7 @@ export class BieCreateAsccpComponent implements OnInit {
           duration: 3000,
         });
 
-        this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);
+        this.router.navigateByUrl('/profile_bie/' + resp['topLevelAsbiepId']);
       });
   }
 

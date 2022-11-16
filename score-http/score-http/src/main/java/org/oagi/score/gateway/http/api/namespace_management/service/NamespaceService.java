@@ -41,14 +41,14 @@ public class NamespaceService {
     private NamespaceReadRepository readRepository;
 
     public List<SimpleNamespace> getSimpleNamespaces(AuthenticatedPrincipal user) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         return dslContext.select(NAMESPACE.NAMESPACE_ID, NAMESPACE.URI, NAMESPACE.IS_STD_NMSP.as("standard"))
                 .from(NAMESPACE)
                 .fetchInto(SimpleNamespace.class);
     }
 
     public PageResponse<NamespaceList> getNamespaceList(AuthenticatedPrincipal user, NamespaceListRequest request) {
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         return readRepository.fetch(requester, request);
     }
 
@@ -94,7 +94,7 @@ public class NamespaceService {
             throw new IllegalArgumentException("Namespace Prefix '" + namespace.getPrefix() + "' exists.");
         }
 
-        AppUser requester = sessionService.getAppUser(user);
+        AppUser requester = sessionService.getAppUserByUsername(user);
         BigInteger userId = requester.getAppUserId();
         LocalDateTime timestamp = LocalDateTime.now();
 
@@ -159,7 +159,7 @@ public class NamespaceService {
 
     @Transactional
     public void transferOwnership(AuthenticatedPrincipal user, BigInteger namespaceId, String targetLoginId) {
-        AppUser owner = sessionService.getAppUser(user.getName());
+        AppUser owner = sessionService.getAppUserByUsername(user.getName());
         LocalDateTime timestamp = LocalDateTime.now();
 
         AppUserRecord targetUserRecord = dslContext.selectFrom(APP_USER)

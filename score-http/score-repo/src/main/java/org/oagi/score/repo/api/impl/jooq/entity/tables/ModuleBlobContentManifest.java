@@ -7,15 +7,19 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function8;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row8;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -237,6 +241,11 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
         return new ModuleBlobContentManifest(alias, this);
     }
 
+    @Override
+    public ModuleBlobContentManifest as(Table<?> alias) {
+        return new ModuleBlobContentManifest(alias.getQualifiedName(), this);
+    }
+
     /**
      * Rename this table
      */
@@ -253,6 +262,14 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
         return new ModuleBlobContentManifest(name, null);
     }
 
+    /**
+     * Rename this table
+     */
+    @Override
+    public ModuleBlobContentManifest rename(Table<?> name) {
+        return new ModuleBlobContentManifest(name.getQualifiedName(), null);
+    }
+
     // -------------------------------------------------------------------------
     // Row8 type methods
     // -------------------------------------------------------------------------
@@ -260,5 +277,20 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
     @Override
     public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row8) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

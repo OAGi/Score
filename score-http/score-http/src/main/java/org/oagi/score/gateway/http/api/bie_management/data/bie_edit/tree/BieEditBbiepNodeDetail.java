@@ -36,8 +36,8 @@ public class BieEditBbiepNodeDetail extends BieEditBbiepNode implements BieEditN
     private String bdtDen;
 
     private BigInteger bdtPriRestriId;
-    private BigInteger codeListId;
-    private BigInteger agencyIdListId;
+    private BigInteger codeListManifestId;
+    private BigInteger agencyIdListManifestId;
 
     private List<BieEditXbt> xbtList = Collections.emptyList();
     private List<BieEditCodeList> codeLists = Collections.emptyList();

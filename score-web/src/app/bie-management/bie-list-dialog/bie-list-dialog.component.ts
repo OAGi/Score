@@ -67,6 +67,6 @@ export class BieListDialogComponent implements OnInit {
   }
 
   getRouteLink(report: ReuseReport): string {
-    return "/profile_bie/edit/" + report.reusingTopLevelAsbiepId + "?q=" + base64Encode(report.displayPath);
+    return "/profile_bie/" + report.reusingTopLevelAsbiepId + "?q=" + base64Encode(report.displayPath);
   }
 }

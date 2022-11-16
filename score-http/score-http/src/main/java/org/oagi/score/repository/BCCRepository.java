@@ -23,6 +23,7 @@ public class BCCRepository implements ScoreRepository<BCC> {
         return dslContext.select(
                 Tables.BCC_MANIFEST.BCC_MANIFEST_ID,
                 Tables.BCC_MANIFEST.FROM_ACC_MANIFEST_ID,
+                Tables.BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
                 Tables.BCC.BCC_ID,
                 Tables.BCC.GUID,
                 Tables.BCC.CARDINALITY_MIN,

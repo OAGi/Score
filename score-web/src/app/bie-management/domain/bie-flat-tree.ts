@@ -1,35 +1,33 @@
-import {FlatTreeControlOptions} from '@angular/cdk/tree';
-import {Observable} from 'rxjs';
 import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
-import {hashCode4String, sha256} from '../../common/utility';
-import {
-  DataSourceSearcher,
-  ExpressionEvaluator,
-  FlatNode,
-  FlatNodeFlattener,
-  FlatNodeFlattenerListener,
-  FlatNodeImpl,
-  getKey,
-  PathLikeExpressionEvaluator,
-  VSFlatTreeControl,
-  VSFlatTreeDataSource
-} from '../../common/flat-tree';
-import {finalize} from 'rxjs/operators';
-import {BieEditFlatNodeFlattener} from '../bie-edit/bie-edit.component';
+import {hashCode4String, loadBooleanProperty, sha256} from '../../common/utility';
+import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
+import {BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
+import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
+import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
+import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 
 
 export interface BieFlatNode extends FlatNode {
+
+  self: BieFlatNode;
+  bieId: number;
   bieType: string;
   topLevelAsbiepId: number;
   deprecated: boolean;
+  inverseMode: boolean;
 
-  used: Observable<boolean> | boolean;
+  used: boolean | undefined;
   required?: boolean;
   locked?: boolean;
   derived?: boolean;
+
   isGroup: boolean;
   isChanged: boolean;
   isCycle: boolean;
+  isChoice: boolean;
+
+  cardinalityMin: number;
+  cardinalityMax: number;
 
   path: string;
   hashPath: string;
@@ -39,28 +37,33 @@ export interface BieFlatNode extends FlatNode {
   parents: BieFlatNode[];
 
   addChangeListener(listener: ChangeListener<BieFlatNode>);
+  removeChangeListener(listener: ChangeListener<BieFlatNode>);
+
   fireChangeEvent(propertyName: string, val: any);
   reset();
+
+  showCopyLinkIcon: boolean;
+  queryPath: string;
+
 }
 
 export interface ChangeListener<T> {
   onChange(entity: T, propertyName: string, val: any);
 }
 
-export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNode {
-  changeListeners: ChangeListener<BieFlatNode>[] = [];
-  $hashCode?: number;
+export abstract class BieFlatNodeImpl implements BieFlatNode {
 
-  bieType: string;
-  topLevelAsbiepId: number;
+  get self(): BieFlatNode {
+    return this;
+  }
 
-  _used: Observable<boolean> | boolean;
-  required?: boolean;
-  locked?: boolean;
-  _derived?: boolean;
-  isCycle: boolean = false;
+  get bieId(): number {
+    return this._bieId;
+  }
 
-  _detail: BieEditNodeDetail;
+  set bieId(bieId: number) {
+    this._bieId = bieId;
+  }
 
   get type(): string {
     return this.bieType;
@@ -74,9 +77,15 @@ export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNod
     return false;
   }
 
-  abstract get path(): string;
+  get isChoice(): boolean {
+    return false;
+  }
 
+  abstract get path(): string;
   abstract get hashPath(): string;
+
+  abstract get cardinalityMin(): number;
+  abstract get cardinalityMax(): number;
 
   get parents(): BieFlatNode[] {
     let node: BieFlatNode = this;
@@ -90,51 +99,60 @@ export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNod
     return result.reverse();
   }
 
-  set used(used: Observable<boolean> | boolean) {
-    this._used = used;
-    if (used instanceof Observable) {
+  set used(used: boolean) {
+    if (this._used === used) {
       return;
     }
 
+    this._used = used;
     if (this.$hashCode === undefined) {
-      this.$hashCode = (used) ? 1 : 0;
+      this.$hashCode = this.hashCode;
     }
 
+    const children = this.children.map(e => e as BieFlatNode);
     if (used) {
-      if (this.parent) {
-        if (!(this.parent as BieFlatNode).derived && (this.parent as BieFlatNode).used !== used) {
-          (this.parent as BieFlatNode).used = used;
-        }
-        this.parent.children.filter(e => e !== this).forEach(child => {
-          if (!(child as BieFlatNode).locked && (child as BieFlatNode).required && (child as BieFlatNode).used !== used) {
-            (child as BieFlatNode).used = used;
+      // this.parent.derived means it's reused
+      if (!!this.parent && !this.parent.derived) {
+        this.parent.used = used;
+
+        this.parent.children.map(e => e as BieFlatNode).filter(e => !e.locked).forEach(e => {
+          if (e.isGroup || e.required) {
+            e.used = used;
           }
         });
       }
-      this.children.filter(e => e !== this).forEach(child => {
-        if (!(child as BieFlatNode).locked && (child as BieFlatNode).required && (child as BieFlatNode).used !== used) {
-          (child as BieFlatNode).used = used;
+
+      children.filter(e => !e.locked).forEach(e => {
+        if (e.isGroup || e.required) {
+          e.used = used;
         }
       });
     } else {
-      this.children.forEach(child => {
-        if (!(child as BieFlatNode).locked && (child as BieFlatNode).used !== used) {
-          (child as BieFlatNode).used = used;
-        }
+      children.filter(e => !e.locked).forEach(e => {
+        e.used = used;
       });
+
+      if (children.filter(e => !e.required).filter(e => e.used).length === 0) {
+        children.filter(e => e.required).forEach(e => e.used = used);
+      }
+
+      // this.parent.derived means it's reused
+      if (!!this.parent && !this.parent.derived && this.parent.used === undefined) {
+        if (this.parent.children.map(e => e as BieFlatNode)
+          .filter(e => e.used === false).length === this.parent.children.length) {
+          this.parent.used = false;
+        } else {
+          this.parent.used = true;
+        }
+      }
     }
+
     this.fireChangeEvent('used', this._used);
   }
 
-  get used(): Observable<boolean> | boolean {
+  get used(): boolean | undefined {
     if (this.isGroup) {
       return (this.parent as BieFlatNode).used;
-    }
-    if (this._used instanceof Observable) {
-      this._used.subscribe(val => {
-        this.used = val;
-        this.$hashCode = (val) ? 1 : 0;
-      });
     }
     return this._used;
   }
@@ -160,16 +178,9 @@ export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNod
     this._derived = derived;
   }
 
-  reset() {
-    this.$hashCode = this.hashCode;
-    if (this._detail) {
-      this._detail.reset();
-    }
-    this.fireChangeEvent('reset', this);
-  }
-
   get hashCode() {
-    return (this.used) ? 1 : 0;
+    // return ((!!this.bieId) ? this.bieId : 0) + ((this._used === undefined) ? 0 : ((this._used) ? 1231 : 1237));
+    return ((!!this.bieId) ? this.bieId : 0) + ((this._used) ? 1231 : 1237);
   }
 
   get isChanged(): boolean {
@@ -197,9 +208,71 @@ export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNod
     return this._detail;
   }
 
+  changeListeners: ChangeListener<BieFlatNode>[] = [];
+  $hashCode?: number;
+
+  name: string;
+  level: number;
+  bieType: string;
+  topLevelAsbiepId: number;
+
+  _bieId: number = undefined;
+  _used: boolean = undefined;
+  _expanded: boolean = false;
+  _expandable: boolean = undefined;
+  required?: boolean;
+  locked?: boolean;
+  _derived?: boolean;
+  isCycle = false;
+
+  parent?: BieFlatNode;
+  _children: BieFlatNode[] = [];
+  _detail: BieEditNodeDetail;
+
+  deprecated: boolean;
+  rootNode: BieEditAbieNode;
+
+  get inverseMode(): boolean {
+    if (!this.rootNode) {
+      return false;
+    }
+    return this.rootNode.inverseMode;
+  }
+
+  dataSource: BieFlatNodeDataSource<any>;
+
+  showCopyLinkIcon = false;
+
+  get queryPath(): string {
+    let parent = this.parent;
+    while (!!parent && parent.isGroup) {
+      parent = parent.parent as BieFlatNode;
+    }
+
+    if (!!parent) {
+      return [parent.queryPath,
+        this.name.replace(new RegExp(' ', 'g'), '')].join('/');
+    }
+    return this.name.replace(new RegExp(' ', 'g'), '');
+  }
+
+  reset() {
+    this.$hashCode = this.hashCode;
+    if (this._detail) {
+      this._detail.reset();
+    }
+    this.fireChangeEvent('reset', this);
+  }
+
   addChangeListener(listener: ChangeListener<BieFlatNode>) {
-    if (listener) {
+    if (listener && this.changeListeners.indexOf(listener) === -1) {
       this.changeListeners.push(listener);
+    }
+  }
+
+  removeChangeListener(listener: ChangeListener<BieFlatNode>) {
+    if (!!listener && this.changeListeners.indexOf(listener) > -1) {
+      this.changeListeners.splice(this.changeListeners.indexOf(listener), 1);
     }
   }
 
@@ -209,7 +282,36 @@ export abstract class BieFlatNodeImpl extends FlatNodeImpl implements BieFlatNod
     });
   }
 
-  deprecated: boolean;
+  getChildren(options?: any | undefined): BieFlatNode[] {
+    if (!!options && options.hideUnused) {
+      return this._children.filter(e => e.used);
+    }
+    return this._children;
+  }
+
+  get children(): BieFlatNode[] {
+    return this.getChildren({
+      hideUnused: !!this.dataSource && this.dataSource.hideUnused
+    });
+  }
+
+  set children(children: BieFlatNode[]) {
+    this._children = children;
+  }
+
+  get expandable(): boolean {
+    if (this._expandable !== undefined) {
+      return this._expandable;
+    }
+    if (this._children.length === 0) {
+      this.dataSource.database.loadChildren(this);
+    }
+    return this.children.length > 0;
+  }
+
+  set expandable(expandable: boolean) {
+    this._expandable = expandable;
+  }
 }
 
 export class AbieFlatNode extends BieFlatNodeImpl {
@@ -264,8 +366,12 @@ export class AbieFlatNode extends BieFlatNodeImpl {
     return this._hashPath;
   }
 
-  get expandable(): boolean {
-    return true;
+  get cardinalityMin(): number {
+    return 1;
+  }
+
+  get cardinalityMax(): number {
+    return 1;
   }
 }
 
@@ -276,6 +382,9 @@ export class AsbiepFlatNode extends AbieFlatNode {
 
   intermediateAccNodes: CcGraphNode[];
   asccNode: CcGraphNode;
+
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor() {
     super();
@@ -293,13 +402,17 @@ export class AsbiepFlatNode extends AbieFlatNode {
     return this.accNode.componentType.endsWith('Group');
   }
 
+  get isChoice(): boolean {
+    return this.accNode.componentType.endsWith('Choice');
+  }
+
   get asbiePath(): string {
     if (!this._asbiePath) {
       let arr;
       if (this.intermediateAccNodes && this.intermediateAccNodes.length > 0) {
         arr = [(this.parent as AsbiepFlatNode).asbiepPath, this.intermediateAccNodes.map(e => getKey(e)).join('>')];
       } else {
-        arr = [(this.parent as BieFlatNode).path,];
+        arr = [(this.parent as BieFlatNode).path, ];
       }
       arr.push('ASCC-' + this.asccNode.manifestId);
       this._asbiePath = arr.join('>');
@@ -334,8 +447,32 @@ export class AsbiepFlatNode extends AbieFlatNode {
     this._asbiePath = undefined;
   }
 
-  get expandable(): boolean {
-    return true;
+  get cardinalityMin(): number {
+    if (!!this._detail && !!(this._detail as BieEditAsbiepNodeDetail).asbie.cardinalityMin) {
+      return (this._detail as BieEditAsbiepNodeDetail).asbie.cardinalityMin;
+    }
+    if (this._cardinalityMin === undefined) {
+      return this.asccNode.cardinalityMin;
+    }
+    return this._cardinalityMin;
+  }
+
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    if (!!this._detail && !!(this._detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax) {
+      return (this._detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax;
+    }
+    if (this._cardinalityMax === undefined) {
+      return this.asccNode.cardinalityMax;
+    }
+    return this._cardinalityMax;
+  }
+
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
   }
 }
 
@@ -355,12 +492,12 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
 
-  private _hasChild: boolean;
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor() {
     super();
     this.bieType = 'BBIEP';
-    this._hasChild = false;
   }
 
   get type(): string {
@@ -380,7 +517,7 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
       if (this.intermediateAccNodes && this.intermediateAccNodes.length > 0) {
         arr = [(this.parent as AsbiepFlatNode).asbiepPath, this.intermediateAccNodes.map(e => getKey(e)).join('>')];
       } else {
-        arr = [(this.parent as BieFlatNode).path,];
+        arr = [(this.parent as BieFlatNode).path, ];
       }
       arr.push('BCC-' + this.bccNode.manifestId);
       this._bbiePath = arr.join('>');
@@ -431,12 +568,32 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
     return this.bdtHashPath;
   }
 
-  set expandable(val: boolean) {
-    this._hasChild = val;
+  get cardinalityMin(): number {
+    if (!!this._detail && !!(this._detail as BieEditBbiepNodeDetail).bbie.cardinalityMin) {
+      return (this._detail as BieEditBbiepNodeDetail).bbie.cardinalityMin;
+    }
+    if (this._cardinalityMin === undefined) {
+      return this.bccNode.cardinalityMin;
+    }
+    return this._cardinalityMin;
   }
 
-  get expandable(): boolean {
-    return this._hasChild;
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    if (!!this._detail && !!(this._detail as BieEditBbiepNodeDetail).bbie.cardinalityMax) {
+      return (this._detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
+    }
+    if (this._cardinalityMax === undefined) {
+      return this.bccNode.cardinalityMax;
+    }
+    return this._cardinalityMax;
+  }
+
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
   }
 }
 
@@ -449,6 +606,9 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
   bccNode: CcGraphNode;
   bdtScNode: CcGraphNode;
   bdtNode: CcGraphNode;
+
+  private _cardinalityMin: number = undefined;
+  private _cardinalityMax: number = undefined;
 
   constructor() {
     super();
@@ -476,6 +636,34 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
   get hashPath(): string {
     return this.bbieScHashPath;
   }
+
+  get cardinalityMin(): number {
+    if (!!this._detail && !!(this._detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMin) {
+      return (this._detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMin;
+    }
+    if (this._cardinalityMin === undefined) {
+      return this.bdtScNode.cardinalityMin;
+    }
+    return this._cardinalityMin;
+  }
+
+  set cardinalityMin(cardinalityMin: number) {
+    this._cardinalityMin = cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    if (!!this._detail && !!(this._detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax) {
+      return (this._detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
+    }
+    if (this._cardinalityMax === undefined) {
+      return this.bdtScNode.cardinalityMax;
+    }
+    return this._cardinalityMax;
+  }
+
+  set cardinalityMax(cardinalityMax: number) {
+    this._cardinalityMax = cardinalityMax;
+  }
 }
 
 export class WrappedBieFlatNode implements BieFlatNode {
@@ -483,6 +671,18 @@ export class WrappedBieFlatNode implements BieFlatNode {
 
   constructor(node: BieFlatNode) {
     this._node = node;
+  }
+
+  get self(): BieFlatNode {
+    return this._node;
+  }
+
+  get bieId(): number {
+    return this._node.bieId;
+  }
+
+  set bieId(bieId: number) {
+    this._node.bieId = bieId;
   }
 
   get bieType(): string {
@@ -550,6 +750,10 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return this._node.expandable;
   }
 
+  set expandable(expandable: boolean) {
+    this._node.expandable = expandable;
+  }
+
   get parent(): FlatNode {
     return this._node.parent;
   }
@@ -574,6 +778,14 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return this._node.isChanged;
   }
 
+  get isChoice(): boolean {
+    return this._node.isChoice;
+  }
+
+  getChildren(options?: any | undefined): FlatNode[] {
+    return this._node.getChildren(options);
+  }
+
   get children(): FlatNode[] {
     return this._node.children;
   }
@@ -594,16 +806,11 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return result.reverse();
   }
 
-  get used(): Observable<boolean> | boolean {
-    if (this._node.used instanceof Observable) {
-      this._node.used.subscribe(val => {
-        this.used = val;
-      });
-    }
+  get used(): boolean {
     return this._node.used;
   }
 
-  set used(used: Observable<boolean> | boolean) {
+  set used(used: boolean) {
     this._node.used = used;
   }
 
@@ -623,12 +830,40 @@ export class WrappedBieFlatNode implements BieFlatNode {
     this._node.addChangeListener(listener);
   }
 
+  removeChangeListener(listener: ChangeListener<BieFlatNode>) {
+    this._node.removeChangeListener(listener);
+  }
+
   fireChangeEvent(propertyName: string, val: any) {
     this._node.fireChangeEvent(propertyName, val);
   }
 
   get deprecated(): boolean {
     return this._node.deprecated;
+  }
+
+  get inverseMode(): boolean {
+    return this._node.inverseMode;
+  }
+
+  get cardinalityMin(): number {
+    return this._node.cardinalityMin;
+  }
+
+  get cardinalityMax(): number {
+    return this._node.cardinalityMax;
+  }
+
+  get showCopyLinkIcon(): boolean {
+    return this._node.showCopyLinkIcon;
+  }
+
+  set showCopyLinkIcon(showCopyLinkIcon: boolean) {
+    this._node.showCopyLinkIcon = showCopyLinkIcon;
+  }
+
+  get queryPath(): string {
+    return this._node.queryPath;
   }
 }
 
@@ -670,6 +905,7 @@ export class BccDetail {
   cardinalityMax: number;
   defaultValue: string;
   fixedValue: string;
+  cdtPrimitives: string[];
 }
 
 export class BccpDetail {
@@ -716,6 +952,7 @@ export class BdtScDetail {
   defaultValue: string;
   fixedValue: string;
   fixedOrDefault: string;
+  cdtPrimitives: string[];
 }
 
 export class AbieDetail {
@@ -861,6 +1098,7 @@ export class AsbieDetail {
 
   set cardinalityMin(value: number) {
     this._cardinalityMin = value;
+    this._node.cardinalityMin = value;
     this._node.fireChangeEvent('cardinalityMin', value);
   }
 
@@ -870,6 +1108,7 @@ export class AsbieDetail {
 
   set cardinalityMax(value: number) {
     this._cardinalityMax = value;
+    this._node.cardinalityMax = value;
     this._node.fireChangeEvent('cardinalityMax', value);
   }
 
@@ -942,7 +1181,7 @@ export class AsbieDetail {
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.cardinalityMin) ? this.cardinalityMin : 0) +
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      (((this.nillable) ? 1 : 0)) +
+      (((this.nillable) ? 1231 : 1237)) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((this.seqKey) ? this.seqKey : 0);
   }
@@ -1075,6 +1314,9 @@ export class BbieDetail {
   seqKey: number;
   private _cardinalityMin: number;
   private _cardinalityMax: number;
+  private _minLength: number;
+  private _maxLength: number;
+  private _pattern: string;
   private _nillable: boolean;
   private _remark: string;
   private _definition: string;
@@ -1085,8 +1327,8 @@ export class BbieDetail {
 
   valueDomainType: string;
   private _bdtPriRestriId: number;
-  private _codeListId: number;
-  private _agencyIdListId: number;
+  private _codeListManifestId: number;
+  private _agencyIdListManifestId: number;
 
   constructor(node: BbiepFlatNode) {
     this._node = node;
@@ -1098,6 +1340,7 @@ export class BbieDetail {
 
   set cardinalityMin(value: number) {
     this._cardinalityMin = value;
+    this._node.cardinalityMin = value;
     this._node.fireChangeEvent('cardinalityMin', value);
   }
 
@@ -1107,7 +1350,35 @@ export class BbieDetail {
 
   set cardinalityMax(value: number) {
     this._cardinalityMax = value;
+    this._node.cardinalityMax = value;
     this._node.fireChangeEvent('cardinalityMax', value);
+  }
+
+  get minLength(): number {
+    return this._minLength;
+  }
+
+  set minLength(value: number) {
+    this._minLength = value;
+    this._node.fireChangeEvent('minLength', value);
+  }
+
+  get maxLength(): number {
+    return this._maxLength;
+  }
+
+  set maxLength(value: number) {
+    this._maxLength = value;
+    this._node.fireChangeEvent('maxLength', value);
+  }
+
+  get pattern(): string {
+    return this._pattern;
+  }
+
+  set pattern(value: string) {
+    this._pattern = value;
+    this._node.fireChangeEvent('pattern', value);
   }
 
   get nillable(): boolean {
@@ -1173,22 +1444,22 @@ export class BbieDetail {
     this._node.fireChangeEvent('bdtPriRestriId', value);
   }
 
-  get codeListId(): number {
-    return this._codeListId;
+  get codeListManifestId(): number {
+    return this._codeListManifestId;
   }
 
-  set codeListId(value: number) {
-    this._codeListId = value;
-    this._node.fireChangeEvent('codeListId', value);
+  set codeListManifestId(value: number) {
+    this._codeListManifestId = value;
+    this._node.fireChangeEvent('codeListManifestId', value);
   }
 
-  get agencyIdListId(): number {
-    return this._agencyIdListId;
+  get agencyIdListManifestId(): number {
+    return this._agencyIdListManifestId;
   }
 
-  set agencyIdListId(value: number) {
-    this._agencyIdListId = value;
-    this._node.fireChangeEvent('agencyIdListId', value);
+  set agencyIdListManifestId(value: number) {
+    this._agencyIdListManifestId = value;
+    this._node.fireChangeEvent('agencyIdListManifestId', value);
   }
 
   get used(): boolean {
@@ -1231,6 +1502,9 @@ export class BbieDetail {
       this.definition = obj.definition;
       this.cardinalityMin = obj.cardinalityMin;
       this.cardinalityMax = obj.cardinalityMax;
+      this.minLength = obj.minLength;
+      this.maxLength = obj.maxLength;
+      this.pattern = obj.pattern;
       this.definition = obj.definition;
 
       this.nillable = obj.nillable;
@@ -1240,11 +1514,11 @@ export class BbieDetail {
         this.fixedValue = obj.fixedValue;
       }
       this.example = obj.example;
-      if (obj.agencyIdListId) {
-        this.agencyIdListId = obj.agencyIdListId;
+      if (obj.agencyIdListManifestId) {
+        this.agencyIdListManifestId = obj.agencyIdListManifestId;
         this.valueDomainType = 'Agency';
-      } else if (obj.codeListId) {
-        this.codeListId = obj.codeListId;
+      } else if (obj.codeListManifestId) {
+        this.codeListManifestId = obj.codeListManifestId;
         this.valueDomainType = 'Code';
       } else {
         this.bdtPriRestriId = obj.bdtPriRestriId;
@@ -1260,14 +1534,17 @@ export class BbieDetail {
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.cardinalityMin) ? this.cardinalityMin : 0) +
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.nillable) ? 1 : 0) +
+      ((this.minLength) ? this.minLength : 0) +
+      ((this.maxLength) ? this.maxLength : 0) +
+      ((!!this.pattern) ? hashCode4String(this.pattern) : 0) +
+      ((this.nillable) ? 1231 : 1237) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
       ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
       ((this.bdtPriRestriId) ? this.bdtPriRestriId : 0) +
-      ((this.codeListId) ? this.codeListId : 0) +
-      ((this.agencyIdListId) ? this.agencyIdListId : 0) +
+      ((this.codeListManifestId) ? this.codeListManifestId : 0) +
+      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0) +
       ((this.seqKey) ? this.seqKey : 0);
   }
 
@@ -1278,14 +1555,17 @@ export class BbieDetail {
       definition: this.definition,
       cardinalityMin: this.cardinalityMin,
       cardinalityMax: this.cardinalityMax,
+      minLength: this.minLength,
+      maxLength: this.maxLength,
+      pattern: this.pattern,
       nillable: this.nillable,
       remark: this.remark,
       example: this.example,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
       bdtPriRestriId: this.bdtPriRestriId,
-      codeListId: this.codeListId,
-      agencyIdListId: this.agencyIdListId,
+      codeListManifestId: this.codeListManifestId,
+      agencyIdListManifestId: this.agencyIdListManifestId,
       seqKey: this.seqKey,
       used: this.used,
       basedBccManifestId: this.basedBccManifestId,
@@ -1390,6 +1670,9 @@ export class BbieScDetail {
   guid: string;
   private _cardinalityMin: number;
   private _cardinalityMax: number;
+  private _minLength: number;
+  private _maxLength: number;
+  private _pattern: string;
   private _remark: string;
   private _bizTerm: string;
   private _definition: string;
@@ -1400,8 +1683,8 @@ export class BbieScDetail {
 
   valueDomainType: string;
   private _bdtScPriRestriId: number;
-  private _codeListId: number;
-  private _agencyIdListId: number;
+  private _codeListManifestId: number;
+  private _agencyIdListManifestId: number;
 
   constructor(node: BbieScFlatNode) {
     this._node = node;
@@ -1413,6 +1696,7 @@ export class BbieScDetail {
 
   set cardinalityMin(value: number) {
     this._cardinalityMin = value;
+    this._node.cardinalityMin = value;
     this._node.fireChangeEvent('cardinalityMin', value);
   }
 
@@ -1422,7 +1706,35 @@ export class BbieScDetail {
 
   set cardinalityMax(value: number) {
     this._cardinalityMax = value;
+    this._node.cardinalityMax = value;
     this._node.fireChangeEvent('cardinalityMax', value);
+  }
+
+  get minLength(): number {
+    return this._minLength;
+  }
+
+  set minLength(value: number) {
+    this._minLength = value;
+    this._node.fireChangeEvent('minLength', value);
+  }
+
+  get maxLength(): number {
+    return this._maxLength;
+  }
+
+  set maxLength(value: number) {
+    this._maxLength = value;
+    this._node.fireChangeEvent('maxLength', value);
+  }
+
+  get pattern(): string {
+    return this._pattern;
+  }
+
+  set pattern(value: string) {
+    this._pattern = value;
+    this._node.fireChangeEvent('pattern', value);
   }
 
   get remark(): string {
@@ -1488,22 +1800,22 @@ export class BbieScDetail {
     this._node.fireChangeEvent('bdtScPriRestriId', value);
   }
 
-  get codeListId(): number {
-    return this._codeListId;
+  get codeListManifestId(): number {
+    return this._codeListManifestId;
   }
 
-  set codeListId(value: number) {
-    this._codeListId = value;
-    this._node.fireChangeEvent('codeListId', value);
+  set codeListManifestId(value: number) {
+    this._codeListManifestId = value;
+    this._node.fireChangeEvent('codeListManifestId', value);
   }
 
-  get agencyIdListId(): number {
-    return this._agencyIdListId;
+  get agencyIdListManifestId(): number {
+    return this._agencyIdListManifestId;
   }
 
-  set agencyIdListId(value: number) {
-    this._agencyIdListId = value;
-    this._node.fireChangeEvent('agencyIdListId', value);
+  set agencyIdListManifestId(value: number) {
+    this._agencyIdListManifestId = value;
+    this._node.fireChangeEvent('agencyIdListManifestId', value);
   }
 
   get used(): boolean {
@@ -1532,6 +1844,9 @@ export class BbieScDetail {
       this.guid = obj.guid;
       this.cardinalityMin = obj.cardinalityMin;
       this.cardinalityMax = obj.cardinalityMax;
+      this.minLength = obj.minLength;
+      this.maxLength = obj.maxLength;
+      this.pattern = obj.pattern;
 
       this.definition = obj.definition;
       this.bizTerm = obj.bizTerm;
@@ -1539,11 +1854,11 @@ export class BbieScDetail {
       this.defaultValue = obj.defaultValue;
       this.fixedValue = obj.fixedValue;
       this.example = obj.example;
-      if (obj.agencyIdListId) {
-        this.agencyIdListId = obj.agencyIdListId;
+      if (obj.agencyIdListManifestId) {
+        this.agencyIdListManifestId = obj.agencyIdListManifestId;
         this.valueDomainType = 'Agency';
-      } else if (obj.codeListId) {
-        this.codeListId = obj.codeListId;
+      } else if (obj.codeListManifestId) {
+        this.codeListManifestId = obj.codeListManifestId;
         this.valueDomainType = 'Code';
       } else {
         this.bdtScPriRestriId = obj.bdtScPriRestriId;
@@ -1558,14 +1873,17 @@ export class BbieScDetail {
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.cardinalityMin) ? this.cardinalityMin : 0) +
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
+      ((this.minLength) ? this.minLength : 0) +
+      ((this.maxLength) ? this.maxLength : 0) +
+      ((!!this.pattern) ? hashCode4String(this.pattern) : 0) +
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
       ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
       ((this.bdtScPriRestriId) ? this.bdtScPriRestriId : 0) +
-      ((this.codeListId) ? this.codeListId : 0) +
-      ((this.agencyIdListId) ? this.agencyIdListId : 0);
+      ((this.codeListManifestId) ? this.codeListManifestId : 0) +
+      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0);
   }
 
   get json(): any {
@@ -1575,14 +1893,17 @@ export class BbieScDetail {
       definition: this.definition,
       cardinalityMin: this.cardinalityMin,
       cardinalityMax: this.cardinalityMax,
+      minLength: this.minLength,
+      maxLength: this.maxLength,
+      pattern: this.pattern,
       bizTerm: this.bizTerm,
       remark: this.remark,
       example: this.example,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
       bdtScPriRestriId: this.bdtScPriRestriId,
-      codeListId: this.codeListId,
-      agencyIdListId: this.agencyIdListId,
+      codeListManifestId: this.codeListManifestId,
+      agencyIdListManifestId: this.agencyIdListManifestId,
       used: this.used,
       basedDtScManifestId: this.basedDtScManifestId,
       path: this.path,
@@ -1700,7 +2021,7 @@ export class BieEditBbiepNodeDetail extends BieEditNodeDetail {
   }
 
   get isValid() {
-    if (!(this.bbie.bdtPriRestriId || this.bbie.codeListId || this.bbie.agencyIdListId)) {
+    if (!(this.bbie.bdtPriRestriId || this.bbie.codeListManifestId || this.bbie.agencyIdListManifestId)) {
       return false;
     }
     return true;
@@ -1732,7 +2053,7 @@ export class BieEditBbieScNodeDetail extends BieEditNodeDetail {
   }
 
   get isValid() {
-    if (!(this.bbieSc.bdtScPriRestriId || this.bbieSc.codeListId || this.bbieSc.agencyIdListId)) {
+    if (!(this.bbieSc.bdtScPriRestriId || this.bbieSc.codeListManifestId || this.bbieSc.agencyIdListManifestId)) {
       return false;
     }
     return true;
@@ -1744,91 +2065,6 @@ export class BieEditBbieScNodeDetail extends BieEditNodeDetail {
   }
 }
 
-
-export class VSBieFlatTreeControl<T extends BieFlatNode> extends VSFlatTreeControl<T> {
-  private _hideUnused: boolean;
-
-  private flattener: BieEditFlatNodeFlattener;
-
-  constructor(hideUnused?: boolean | undefined, isExpandable?: (dataNode: T) => boolean, options?: FlatTreeControlOptions<T, T> | undefined, flattener?: BieEditFlatNodeFlattener) {
-    super((isExpandable) ? isExpandable : node => {
-      if (!node.expandable) {
-        return false;
-      }
-      return (hideUnused) ?
-        node.children.filter(e => (e as BieFlatNode).isGroup ? this.isExpandable(e as T) : (e as BieFlatNode).used)
-          .length > 0 : true;
-    }, options);
-
-    this.flattener = flattener;
-    this._hideUnused = hideUnused || false;
-  }
-
-  children(node: BieFlatNode): BieFlatNode[] {
-    const nodes = [];
-    node.children.map(e => e as BieFlatNode).forEach(e => {
-      if (e.isGroup) {
-        nodes.push(...this.children(e));
-      } else {
-        nodes.push(e);
-      }
-    });
-    return nodes;
-  }
-
-  expand(dataNode: T, reset?: boolean) {
-    if (!dataNode || !this.isExpandable(dataNode) || this.isExpanded(dataNode)) {
-      return;
-    }
-
-    dataNode.expanded = true;
-
-    if (!!this.flattener && dataNode.children.length === 0) {
-      this.flattener.expand(dataNode as BieFlatNode);
-
-      const index = this.dataSource.cachedData.indexOf(dataNode);
-      this.dataSource.cachedData.splice(index + 1, 0,
-        ...this.children(dataNode) as T[]);
-    }
-
-    if (dataNode.parent) {
-      this.expand(dataNode.parent as T, false);
-    }
-
-    if (reset === undefined || reset) {
-      this.dataSource.resetData();
-    }
-  }
-
-  get hideUnused(): boolean {
-    return this._hideUnused;
-  }
-
-  set hideUnused(hideUnused: boolean) {
-    this._hideUnused = hideUnused;
-    this.dataSource.resetData();
-  }
-}
-
-export class VSBieFlatTreeDataSource<T extends BieFlatNode> extends VSFlatTreeDataSource<T> {
-
-  constructor(treeControl: VSBieFlatTreeControl<T>, data: T[]) {
-    super(treeControl, data);
-  }
-
-  dataFilter(node: T): boolean {
-    if (node.level === 0) {
-      return true;
-    }
-    if (!this.treeControl) {
-      return false;
-    }
-    const a = this.treeControl.isExpanded(node) || this.treeControl.isExpanded(node.parent as T);
-    const b = (this.treeControl as VSBieFlatTreeControl<T>).hideUnused ? ((node.isGroup) ? true : node.used as boolean) : true;
-    return a && b;
-  }
-}
-
 export class Association {
 
   intermediateAccNodes: CcGraphNode[] = [];
@@ -1837,204 +2073,178 @@ export class Association {
 
 }
 
-export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
+export class BiePathLikeExpressionEvaluator<T extends BieFlatNode> extends PathLikeExpressionEvaluator<T> {
+  protected next(node: T): T {
+    let next = node.parent as T;
+    while (next && next.isGroup) {
+      next = next.parent as T;
+    }
+    return next;
+  }
+}
+
+export class BieFlatNodeDatabase<T extends BieFlatNode> {
+
   private _ccGraph: CcGraph;
   private _topLevelAsbiepId: number;
   private _asccpManifestId: number;
-  private _listeners: FlatNodeFlattenerListener<BieFlatNode>[] = [];
   private _validState: string[];
 
-  constructor(ccGraph: CcGraph, asccpManifestId: number,
-              topLevelAsbiepId?: number) {
+  private _usedAsbieMap = {};
+  private _usedBbieMap = {};
+  private _usedBbieScMap = {};
+  private _refBieList: RefBie[] = [];
+
+  dataSource: BieFlatNodeDataSource<T>;
+
+  constructor(ccGraph: CcGraph, asccpManifestId: number, topLevelAsbiepId: number,
+              usedBieList: UsedBie[], refBieList: RefBie[]) {
     this._ccGraph = ccGraph;
     this._asccpManifestId = asccpManifestId;
     this._topLevelAsbiepId = topLevelAsbiepId;
     this._validState = ['Published', 'Production'];
+
+    this._usedAsbieMap = usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
+      r[a.manifestId] = [...r[a.manifestId] || [], a];
+      return r;
+    }, {});
+    this._usedBbieMap = usedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
+      r[a.manifestId] = [...r[a.manifestId] || [], a];
+      return r;
+    }, {});
+    this._usedBbieScMap = usedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
+      r[a.manifestId] = [...r[a.manifestId] || [], a];
+      return r;
+    }, {});
+    this._refBieList = refBieList;
   }
 
-  addListener(listener: FlatNodeFlattenerListener<BieFlatNode>) {
-    this._listeners.push(listener);
-  }
-
-  toAbieNode(key: string): AbieFlatNode {
-    const node = new AbieFlatNode();
-    node.asccpNode = this._ccGraph.graph.nodes[key];
-    node.accNode = this.getChildren(node.asccpNode)[0];
-    node.name = node.asccpNode.propertyTerm;
-    node.level = 0;
-    node.used = true;
-    node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated;
-    return node;
-  }
-
-  toAsbiepNode(ascc: Association, parent: AsbiepFlatNode) {
-    const node = new AsbiepFlatNode();
-    node.asccNode = ascc.assocNode;
-    node.required = node.asccNode.cardinalityMin > 0;
-    node.asccpNode = this.getChildren(node.asccNode)[0];
-    node.accNode = this.getChildren(node.asccpNode)[0];
-    node.name = node.asccpNode.propertyTerm;
-    if (parent.isGroup) {
-      node.level = parent.level;
-      node.parent = parent;
-    } else {
-      node.level = parent.level + 1;
-      node.parent = parent;
-    }
-    node.intermediateAccNodes = ascc.intermediateAccNodes;
-    const usable = this._validState.indexOf(node.asccNode.state) > -1
-      && this._validState.indexOf(node.asccpNode.state) > -1
-      && this._validState.indexOf(node.accNode.state) > -1;
-    if (parent.derived || !usable) {
-      node.locked = true;
-    } else {
-      node.locked = parent.locked;
-    }
-    node.topLevelAsbiepId = parent.topLevelAsbiepId;
-    if (!node.isGroup) {
-      node.isCycle = this.detectCycle(node);
+  children(node: T): T[] {
+    if (!node.expandable) {
+      return [];
     }
 
-    node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated || node.asccNode.deprecated;
-    return node;
-  }
-
-  toBbiepNode(bcc: Association, parent: AsbiepFlatNode) {
-    const node = new BbiepFlatNode();
-    node.bccNode = bcc.assocNode;
-    node.required = node.bccNode.cardinalityMin > 0;
-    node.bccpNode = this.getChildren(node.bccNode)[0];
-    node.bdtNode = this.getChildren(node.bccpNode)[0];
-    node.name = node.bccpNode.propertyTerm;
-    if (parent.isGroup) {
-      node.level = parent.level;
-      node.parent = parent;
-    } else {
-      node.level = parent.level + 1;
-      node.parent = parent;
-    }
-    node.intermediateAccNodes = bcc.intermediateAccNodes;
-    const usable = this._validState.indexOf(node.bccNode.state) > -1
-      && this._validState.indexOf(node.bccpNode.state) > -1
-      && this._validState.indexOf(node.bdtNode.state) > -1;
-    if (parent.derived || !usable) {
-      node.locked = true;
-    } else {
-      node.locked = parent.locked;
-    }
-    node.topLevelAsbiepId = parent.topLevelAsbiepId;
-
-    node.deprecated = node.bccpNode.deprecated || node.bdtNode.deprecated || node.bccNode.deprecated;
-    return node;
-  }
-
-  toBbieScNode(bccNode: CcGraphNode, bdtScNode: CcGraphNode, parent: BieFlatNode) {
-    const node = new BbieScFlatNode();
-    node.bccNode = bccNode;
-    node.bdtScNode = this._ccGraph.graph.nodes[getKey(bdtScNode)];
-    node.required = node.bdtScNode.cardinalityMin > 0;
-    node.name = node.bdtScNode.propertyTerm + ' ' + node.bdtScNode.representationTerm;
-    node.level = parent.level + 1;
-    node.parent = parent;
-    const usable = this._validState.indexOf(node.bccNode.state) > -1
-      && this._validState.indexOf(node.bdtScNode.state) > -1;
-    if (parent.derived || !usable) {
-      node.locked = true;
-    } else {
-      node.locked = parent.locked;
-    }
-    node.topLevelAsbiepId = parent.topLevelAsbiepId;
-    node.deprecated = node.bdtScNode.deprecated ;
-    return node;
-  }
-
-  fireEvent(node: BieFlatNode) {
-    this._listeners.forEach(listener => {
-      listener.onFlatten(node);
+    const nodes = [];
+    const attributes = [];
+    node.children.map(e => e as T).forEach(e => {
+      const _node = e.self; // in case of it is WrappedBieFlatNode
+      if (_node.isGroup) {
+        if ((_node as AsbiepFlatNode).accNode.componentType === 'AttributeGroup') {
+          attributes.push(...this.children(e));
+        } else {
+          nodes.push(...this.children(e));
+        }
+      } else {
+        if (_node instanceof BbiepFlatNode && (_node as BbiepFlatNode).bccNode.entityType === 'Attribute') {
+          attributes.push(e);
+        } else {
+          nodes.push(e);
+        }
+      }
     });
+    return attributes.concat(nodes);
   }
 
-  flatten(excludeSCs?: boolean, initialExpandDepth?: number): BieFlatNode[] {
-    const node = this.toAbieNode('ASCCP-' + this._asccpManifestId);
-    node.topLevelAsbiepId = this._topLevelAsbiepId;
-    this.fireEvent(node);
+  loadChildren(node: T) {
+    if (node.children.length > 0) {
+      return;
+    }
 
-    const nodes = [node,];
-    this._doFlatten(nodes, node, excludeSCs, initialExpandDepth);
-    return nodes;
-  }
-
-  _doFlatten(nodes: BieFlatNode[], node: BieFlatNode, excludeSCs?: boolean, depth?: number) {
     let children = [];
-    if (node instanceof AbieFlatNode || node instanceof AsbiepFlatNode) {
-      if (depth === 0) {
-        return;
-      } else {
-        children = this.getAssociations(node.accNode);
-        node.children = children.map((e: Association) => {
-          if (e.assocNode.type === 'ASCC') {
-            const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, node as AsbiepFlatNode);
-            this.afterAsbiepFlatNode(asbiepNode);
-            return asbiepNode;
-          } else {
-            const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, node as AsbiepFlatNode);
-            this.afterBbiepFlatNode(bbiepNode);
-            return bbiepNode;
-          }
-        });
+    const nodeBieType = node.bieType;
+    const _node = node.self; // in case of it is WrappedBieFlatNode
+    if (nodeBieType === 'ABIE' || nodeBieType === 'ASBIEP') {
+      children = this.getAssociations((_node as AsbiepFlatNode).accNode);
+      node.children = children.map((e: Association) => {
+        if (e.assocNode.type === 'ASCC') {
+          const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, _node as AsbiepFlatNode);
+          this.afterAsbiepFlatNode(asbiepNode);
+          asbiepNode.reset();
+          return asbiepNode;
+        } else {
+          const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, _node as AsbiepFlatNode);
+          this.afterBbiepFlatNode(bbiepNode);
+          bbiepNode.reset();
+          return bbiepNode;
+        }
+      });
 
-        node.children.map(e => e as BieFlatNode).forEach(e => {
-          if (!e.isGroup) {
-            nodes.push(e);
-            this.fireEvent(e);
-          }
-          if (e.isCycle) {
-            return;
-          }
-          this._doFlatten(nodes, e, excludeSCs, (e.isGroup) ? depth : depth - 1);
-        });
-      }
-    } else if (node instanceof BbiepFlatNode) {
-      if (excludeSCs) {
-        node.children = [];
-        node.expandable = this.hasBdtScChildren(node.bdtNode);
-      } else {
-        children = this.getChildren(node.bdtNode);
-        node.children = children.map(e => {
-          const bbieScNode = this.toBbieScNode(node.bccNode, e, node);
-          this.afterBbieScFlatNode(bbieScNode);
-          return bbieScNode;
-        });
-
-        node.children.map(e => e as BieFlatNode)
-          .forEach(e => {
-            nodes.push(e);
-            this.fireEvent(e);
-          });
-        node.expandable = node.children.length > 0;
-      }
+      node.children.map(e => e as T).forEach(e => {
+        if (e.isGroup) {
+          this.loadChildren(e);
+        }
+      });
+    } else if (nodeBieType === 'BBIEP') {
+      children = this.getChildren((_node as BbiepFlatNode).bdtNode);
+      node.children = children.map(e => {
+        const bbieScNode = this.toBbieScNode((_node as BbiepFlatNode).bccNode, e, node);
+        this.afterBbieScFlatNode(bbieScNode);
+        bbieScNode.reset();
+        return bbieScNode;
+      }).sort((a, b) => a.name.localeCompare(b.name));
     }
-  }
 
-  detectCycle(node: AsbiepFlatNode): boolean {
-    const asccpManifestId = node.asccpNode.manifestId;
-    let cur = node.parent;
-    while (cur) {
-      if ((cur as AbieFlatNode).asccpNode.manifestId === asccpManifestId) {
-        return true;
-      }
-      cur = cur.parent;
+    if (node.children.length === 0) {
+      node.expandable = false;
     }
-    return false;
   }
 
   afterAsbiepFlatNode(node: AsbiepFlatNode) {
+    let used = this._usedAsbieMap[node.asccNode.manifestId];
+    if (!!used && used.length > 0) {
+      used = used.filter(u => {
+        if (node.derived) {
+          return u.ownerTopLevelAsbiepId === (node.parent as AbieFlatNode).topLevelAsbiepId &&
+            u.hashPath === node.asbieHashPath;
+        } else {
+          return u.ownerTopLevelAsbiepId === node.topLevelAsbiepId &&
+            u.hashPath === node.asbieHashPath;
+        }
+      });
+      if (!!used && used.length > 0) {
+        node.bieId = used[0].bieId;
+        node.used = used[0].used;
+        node.cardinalityMin = used[0].cardinalityMin;
+        node.cardinalityMax = used[0].cardinalityMax;
+      }
+    }
+
+    let derived = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
+    if (!!derived && derived.length > 0) {
+      derived = derived.filter(u => u.hashPath === node.asbieHashPath);
+    }
+    node.derived = !!derived && derived.length > 0;
+    if (node.derived) {
+      node.topLevelAsbiepId = derived[0].refTopLevelAsbiepId;
+    }
   }
 
   afterBbiepFlatNode(node: BbiepFlatNode) {
+    let used = this._usedBbieMap[node.bccNode.manifestId];
+    if (!!used && used.length > 0) {
+      used = used.filter(u => u.ownerTopLevelAsbiepId === node.topLevelAsbiepId && u.hashPath === node.bbieHashPath);
+
+      if (!!used && used.length > 0) {
+        node.bieId = used[0].bieId;
+        node.used = used[0].used;
+        node.cardinalityMin = used[0].cardinalityMin;
+        node.cardinalityMax = used[0].cardinalityMax;
+      }
+    }
   }
 
   afterBbieScFlatNode(node: BbieScFlatNode) {
+    let used = this._usedBbieScMap[node.bdtScNode.manifestId];
+    if (!!used && used.length > 0) {
+      used = used.filter(u => u.ownerTopLevelAsbiepId === node.topLevelAsbiepId && u.hashPath === node.hashPath);
+
+      if (!!used && used.length > 0) {
+        node.bieId = used[0].bieId;
+        node.used = used[0].used;
+        node.cardinalityMin = used[0].cardinalityMin;
+        node.cardinalityMax = used[0].cardinalityMax;
+      }
+    }
   }
 
   getChildren(node: CcGraphNode): CcGraphNode[] {
@@ -2055,71 +2265,13 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
       case 'BCC':
       case 'ASCCP':
       case 'BCCP':
-        return [nodes[targets[0]],];
+        return [nodes[targets[0]], ];
 
       case 'DT':
         return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0);
 
       case 'DT_SC':
         return [];
-    }
-  }
-
-  expand(node: BieFlatNode) {
-    let children = [];
-    if (node instanceof AbieFlatNode || node instanceof AsbiepFlatNode) {
-      children = this.getAssociations(node.accNode);
-      node.children = children.map((e: Association) => {
-        if (e.assocNode.type === 'ASCC') {
-          const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, node as AsbiepFlatNode);
-          this.afterAsbiepFlatNode(asbiepNode);
-          return asbiepNode;
-        } else {
-          const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, node as AsbiepFlatNode);
-          this.afterBbiepFlatNode(bbiepNode);
-          return bbiepNode;
-        }
-      });
-
-      node.children.map(e => e as BieFlatNode).forEach(e => {
-        if (!e.isGroup) {
-          this.fireEvent(e);
-        } else {
-          this.expand(e);
-        }
-      });
-    } else if (node instanceof BbiepFlatNode) {
-      children = this.getChildren(node.bdtNode);
-      node.children = children.map(e => {
-        const bbieScNode = this.toBbieScNode(node.bccNode, e, node);
-        this.afterBbieScFlatNode(bbieScNode);
-        return bbieScNode;
-      });
-
-      node.children.map(e => e as BieFlatNode)
-        .forEach(e => {
-          this.fireEvent(e);
-        });
-      node.expandable = node.children.length > 0;
-    }
-  }
-
-  hasBdtScChildren(node: CcGraphNode): boolean {
-    const nodes = this._ccGraph.graph.nodes;
-    const edges = this._ccGraph.graph.edges;
-
-    const edge = edges[getKey(node)];
-    const targets = (!!edge) ? edge.targets : [];
-    if (!targets || targets.length === 0) {
-      return false;
-    }
-
-    switch (node.type) {
-      case 'DT':
-        return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).length > 0;
-
-      default :
-        return false;
     }
   }
 
@@ -2175,21 +2327,650 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
       children.slice(lastAttrIndex, children.length)
     );
   }
-}
 
-export class BiePathLikeExpressionEvaluator extends PathLikeExpressionEvaluator<BieFlatNode> {
-  protected next(node: BieFlatNode): BieFlatNode {
-    let next = node.parent as BieFlatNode;
-    while (next && (next as BieFlatNode).isGroup) {
-      next = next.parent as BieFlatNode;
+  get rootNode(): T {
+    const node = this.toAbieNode('ASCCP-' + this._asccpManifestId);
+    node.topLevelAsbiepId = this._topLevelAsbiepId;
+    return node as unknown as T;
+  }
+
+  toAbieNode(key: string): AbieFlatNode {
+    const node = new AbieFlatNode();
+    node.asccpNode = this._ccGraph.graph.nodes[key];
+    node.accNode = this.getChildren(node.asccpNode)[0];
+    node.name = node.asccpNode.propertyTerm;
+    node.level = 0;
+    node.used = true;
+    node.required = true;
+    node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toAsbiepNode(ascc: Association, parent: AsbiepFlatNode) {
+    const node = new AsbiepFlatNode();
+    node.asccNode = ascc.assocNode;
+    node.required = node.asccNode.cardinalityMin > 0;
+    node.asccpNode = this.getChildren(node.asccNode)[0];
+    node.accNode = this.getChildren(node.asccpNode)[0];
+    node.name = node.asccpNode.propertyTerm;
+    if (parent.isGroup) {
+      node.level = parent.level;
+      node.parent = parent;
+    } else {
+      node.level = parent.level + 1;
+      node.parent = parent;
     }
-    return next;
+    node.intermediateAccNodes = ascc.intermediateAccNodes;
+    const usable = this._validState.indexOf(node.asccNode.state) > -1
+      && this._validState.indexOf(node.asccpNode.state) > -1
+      && this._validState.indexOf(node.accNode.state) > -1;
+    if (parent.derived || !usable) {
+      node.locked = true;
+    } else {
+      node.locked = parent.locked;
+    }
+    node.topLevelAsbiepId = parent.topLevelAsbiepId;
+    if (!node.isGroup) {
+      node.isCycle = this.detectCycle(node);
+    }
+
+    node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated || node.asccNode.deprecated;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toBbiepNode(bcc: Association, parent: AsbiepFlatNode) {
+    const node = new BbiepFlatNode();
+    node.bccNode = bcc.assocNode;
+    node.required = node.bccNode.cardinalityMin > 0;
+    node.bccpNode = this.getChildren(node.bccNode)[0];
+    node.bdtNode = this.getChildren(node.bccpNode)[0];
+    node.name = node.bccpNode.propertyTerm;
+    if (parent.isGroup) {
+      node.level = parent.level;
+      node.parent = parent;
+    } else {
+      node.level = parent.level + 1;
+      node.parent = parent;
+    }
+    node.intermediateAccNodes = bcc.intermediateAccNodes;
+    const usable = this._validState.indexOf(node.bccNode.state) > -1
+      && this._validState.indexOf(node.bccpNode.state) > -1
+      && this._validState.indexOf(node.bdtNode.state) > -1;
+    if (parent.derived || !usable) {
+      node.locked = true;
+    } else {
+      node.locked = parent.locked;
+    }
+    node.topLevelAsbiepId = parent.topLevelAsbiepId;
+
+    node.deprecated = node.bccpNode.deprecated || node.bdtNode.deprecated || node.bccNode.deprecated;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toBbieScNode(bccNode: CcGraphNode, bdtScNode: CcGraphNode, parent: T) {
+    const node = new BbieScFlatNode();
+    node.bccNode = bccNode;
+    node.bdtScNode = this._ccGraph.graph.nodes[getKey(bdtScNode)];
+    node.required = node.bdtScNode.cardinalityMin > 0;
+    node.name = node.bdtScNode.propertyTerm + ' ' + node.bdtScNode.representationTerm;
+    node.level = parent.level + 1;
+    node.parent = parent;
+    const usable = this._validState.indexOf(node.bccNode.state) > -1
+      && this._validState.indexOf(node.bdtScNode.state) > -1;
+    if (parent.derived || !usable) {
+      node.locked = true;
+    } else {
+      node.locked = parent.locked;
+    }
+    node.topLevelAsbiepId = parent.topLevelAsbiepId;
+    node.deprecated = node.bdtScNode.deprecated;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  detectCycle(node: AsbiepFlatNode): boolean {
+    const asccpManifestId = node.asccpNode.manifestId;
+    let cur = node.parent;
+    while (cur) {
+      if ((cur as AbieFlatNode).asccpNode.manifestId === asccpManifestId) {
+        return true;
+      }
+      cur = cur.parent as BieFlatNode;
+    }
+    return false;
   }
 }
 
-export class BieDataSourceSearcher extends DataSourceSearcher<BieFlatNode> {
+export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<T>, ChangeListener<T> {
 
-  protected getEvaluator(expr: string): ExpressionEvaluator<BieFlatNode> {
-    return new BiePathLikeExpressionEvaluator(expr, false, this.excludeSCs);
+  dataChange = new BehaviorSubject<T[]>([]);
+  _listeners: ChangeListener<BieFlatNodeDataSource<T>>[] = [];
+
+  _hideUnused: boolean = false;
+  _hideCardinality: boolean = false;
+
+  get data(): T[] {
+    return this.dataChange.value;
   }
+
+  set data(value: T[]) {
+    value.forEach(e => e.addChangeListener(this));
+    this.dataChange.next(value);
+  }
+
+  addListener(listener: ChangeListener<BieFlatNodeDataSource<T>>) {
+    if (!!listener && this._listeners.indexOf(listener) === -1) {
+      this._listeners.push(listener);
+    }
+  }
+
+  init() {
+    this.data = [this._database.rootNode as unknown as T, ];
+
+    // pre-expanding nodes to recognize required elements.
+    let nodes = [this.data[0], ];
+    while (nodes.length > 0) {
+      const node = nodes.shift();
+      if (node.required && node.expandable && node.children.length === 0) {
+        this._database.loadChildren(node);
+      }
+      nodes = node.children.concat(nodes) as T[];
+    }
+  }
+
+  getChanged(): T[] {
+    if (!this.data || this.data.length === 0) {
+      return [];
+    }
+
+    let nodes = [this.data[0], ];
+    const changedNodes = [];
+    while (nodes.length > 0) {
+      const node = nodes.shift();
+      if (!node.isGroup && node.isChanged) {
+        changedNodes.push(node);
+      }
+      const children = node.getChildren();
+      if (children && children.length > 0) {
+        nodes = children.concat(nodes) as T[];
+      }
+    }
+    return changedNodes;
+  }
+
+  onChange(entity: T, propertyName: string, val: any) {
+    if (!!this.delegatedListeners) {
+      this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
+    }
+  }
+
+  get hideCardinality(): boolean {
+    return this._hideCardinality;
+  }
+
+  set hideCardinality(hideCardinality: boolean) {
+    if (this._hideCardinality === hideCardinality) {
+      return;
+    }
+
+    this._hideCardinality = hideCardinality;
+    this._listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
+  }
+
+  get hideUnused(): boolean {
+    return this._hideUnused;
+  }
+
+  set hideUnused(hideUnused: boolean) {
+    if (this._hideUnused === hideUnused) {
+      return;
+    }
+
+    this._hideUnused = hideUnused;
+    if (hideUnused) {
+      this.data = this.data.filter(e => e.used);
+    } else {
+      this.data.forEach(e => {
+        (e as BieFlatNode).expandable = undefined;
+      });
+      const expandedData = this.data.filter(e => this.isExpanded(e));
+      this.collapse(this.data[0] as T);
+      this.data = [this.data[0], ];
+
+      for (const item of expandedData) {
+        this.expand(item as T);
+      }
+    }
+
+    this._listeners.forEach(e => e.onChange(this, 'hideUnused', hideUnused));
+  }
+
+  constructor(
+    private _database: BieFlatNodeDatabase<T>,
+    private service: BieEditService,
+    private delegatedListeners?: ChangeListener<T>[]
+  ) {
+    _database.dataSource = this;
+  }
+
+  get database(): BieFlatNodeDatabase<T> {
+    return this._database;
+  }
+
+  isExpanded(node: T): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.expanded;
+  }
+
+  getLevel(node: T): number {
+    return node.level;
+  }
+
+  isExpandable(node: T): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.expandable;
+  }
+
+  toggle(node: T) {
+    if (!node) {
+      return;
+    }
+    if (this.isExpanded(node)) {
+      this.collapse(node);
+    } else {
+      this.expand(node);
+    }
+  }
+
+  expand(node: T) {
+    if (!node) {
+      return;
+    }
+    if (node.parent && !this.isExpanded(node.parent as T)) {
+      this.expand(node.parent as T);
+    }
+    if (this.isExpanded(node)) {
+      return;
+    }
+    this.toggleNode(node, true);
+  }
+
+  expandDescendants(node: T, level?: number) {
+    this.expand(node);
+
+    if (level > 0) {
+      node.children.forEach(e => this.expandDescendants(e as T, level - 1));
+    }
+  }
+
+  collapse(node: T) {
+    if (!node) {
+      return;
+    }
+    if (!this.isExpanded(node)) {
+      return;
+    }
+    this.toggleNode(node, false);
+    this.collapseDescendants(node);
+  }
+
+  collapseDescendants(dataNode: T) {
+    if (!!dataNode.children) {
+      dataNode.children.forEach(e => this.collapse(e as T));
+    }
+  }
+
+  connect(collectionViewer: CollectionViewer): Observable<T[]> {
+    return this.dataChange;
+  }
+
+  disconnect(collectionViewer: CollectionViewer): void {
+  }
+
+  /** Handle expand/collapse behaviors */
+  handleTreeControl(change: SelectionChange<T>) {
+    if (change.added) {
+      change.added.forEach(node => this.toggleNode(node, true));
+    }
+    if (change.removed) {
+      change.removed
+        .slice()
+        .reverse()
+        .forEach(node => this.toggleNode(node, false));
+    }
+  }
+
+  /**
+   * Toggle the node, remove from display list
+   */
+  toggleNode(node: T, expand: boolean) {
+    if (!node) {
+      return;
+    }
+
+    let children = this._database.children(node);
+    if (this.hideUnused) {
+      children = children.filter(e => e.used);
+    }
+    const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
+    if (!children || index < 0) {
+      // If no children, or cannot find the node, no op
+      return;
+    }
+
+    if (expand) {
+      children.map(e => e as T).forEach(e => {
+        e.expanded = false;
+        e.addChangeListener(this);
+      });
+      this.data.splice(index + 1, 0, ...children);
+    } else {
+      let count = 0;
+      for (
+        let i = index + 1;
+        i < this.data.length && this.data[i].level > node.level;
+        i++, count++
+      ) {
+      }
+      this.data.splice(index + 1, count).forEach(e => {
+        e.expanded = false;
+        e.removeChangeListener(this);
+      });
+
+      // Too many nodes in BIE tree.
+      if (node.bieType === 'BBIEP') {
+        if (children.filter(e => !e.isChanged).length === 0) {
+          node.children = [];
+        }
+      }
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+  }
+
+  loadDetail(node: T, callbackFn?) {
+    if (node.detail.isLoaded) {
+      return callbackFn && callbackFn(node);
+    }
+
+    switch (node.bieType.toUpperCase()) {
+      case 'ABIE':
+        const abieNode = (node as unknown as AbieFlatNode);
+        forkJoin([
+          this.service.getDetail(node.topLevelAsbiepId, 'ABIE',
+            abieNode.accNode.manifestId, abieNode.abiePath),
+          this.service.getDetail(node.topLevelAsbiepId, 'ASBIEP',
+            abieNode.asccpNode.manifestId, abieNode.asbiepPath),
+        ]).subscribe(([abieDetail, asbiepDetail]) => {
+          (node.detail as BieEditAbieNodeDetail).acc = (abieDetail as unknown as BieEditAbieNodeDetail).acc;
+          (node.detail as BieEditAbieNodeDetail).abie.update((abieDetail as unknown as BieEditAbieNodeDetail).abie);
+          (node.detail as BieEditAbieNodeDetail).asccp = (asbiepDetail as unknown as BieEditAbieNodeDetail).asccp;
+          (node.detail as BieEditAbieNodeDetail).asbiep.update((asbiepDetail as unknown as BieEditAbieNodeDetail).asbiep);
+          (node.detail as BieEditAbieNodeDetail).reset();
+          node.detail.isLoaded = true;
+          return callbackFn && callbackFn(node);
+        });
+        break;
+
+      case 'ASBIEP':
+        const asbiepNode = (node as unknown as AsbiepFlatNode);
+        let topLevelAsbiepId = node.topLevelAsbiepId;
+        if (node.derived) {
+          topLevelAsbiepId = (node.parent as AsbiepFlatNode).topLevelAsbiepId;
+        }
+        forkJoin([
+          this.service.getDetail(topLevelAsbiepId, 'ASBIE',
+            asbiepNode.asccNode.manifestId, asbiepNode.asbiePath),
+          this.service.getDetail(node.topLevelAsbiepId, 'ASBIEP',
+            asbiepNode.asccpNode.manifestId, asbiepNode.asbiepPath),
+          this.service.getDetail(node.topLevelAsbiepId, 'ABIE',
+            asbiepNode.accNode.manifestId, asbiepNode.abiePath),
+        ]).subscribe(([asbieDetail, asbiepDetail, abieDetail]) => {
+          const stored = (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax;
+          (node.detail as BieEditAsbiepNodeDetail).ascc = (asbieDetail as unknown as BieEditAsbiepNodeDetail).ascc;
+          (node.detail as BieEditAsbiepNodeDetail).asbie.update((asbieDetail as unknown as BieEditAsbiepNodeDetail).asbie);
+          (node.detail as BieEditAsbiepNodeDetail).asccp = (asbiepDetail as unknown as BieEditAsbiepNodeDetail).asccp;
+          (node.detail as BieEditAsbiepNodeDetail).asbiep.update((asbiepDetail as unknown as BieEditAsbiepNodeDetail).asbiep);
+          (node.detail as BieEditAsbiepNodeDetail).acc = (abieDetail as unknown as BieEditAsbiepNodeDetail).acc;
+          (node.detail as BieEditAsbiepNodeDetail).abie.update((abieDetail as unknown as BieEditAsbiepNodeDetail).abie);
+          (node.detail as BieEditAsbiepNodeDetail).reset();
+          node.detail.isLoaded = true;
+          if (stored !== undefined) {
+            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = stored;
+          }
+
+          return callbackFn && callbackFn(node);
+        });
+        break;
+      case 'BBIEP':
+        const bbiepNode = (node as unknown as BbiepFlatNode);
+        forkJoin([
+          this.service.getDetail(node.topLevelAsbiepId, 'BBIE',
+            bbiepNode.bccNode.manifestId, bbiepNode.bbiePath),
+          this.service.getDetail(node.topLevelAsbiepId, 'BBIEP',
+            bbiepNode.bccpNode.manifestId, bbiepNode.bbiepPath),
+          this.service.getDetail(node.topLevelAsbiepId, 'DT',
+            bbiepNode.bdtNode.manifestId, ''),
+        ]).subscribe(([bbieDetail, bbiepDetail, bdtDetail]) => {
+          const stored = (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
+          (node.detail as BieEditBbiepNodeDetail).bcc = (bbieDetail as unknown as BieEditBbiepNodeDetail).bcc;
+          (node.detail as BieEditBbiepNodeDetail).bbie.update((bbieDetail as unknown as BieEditBbiepNodeDetail).bbie);
+          (node.detail as BieEditBbiepNodeDetail).bccp = (bbiepDetail as unknown as BieEditBbiepNodeDetail).bccp;
+          (node.detail as BieEditBbiepNodeDetail).bbiep.update((bbiepDetail as unknown as BieEditBbiepNodeDetail).bbiep);
+          (node.detail as BieEditBbiepNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
+          (node.detail as BieEditBbiepNodeDetail).reset();
+          node.detail.isLoaded = true;
+          if (stored !== undefined) {
+            (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = stored;
+          }
+          return callbackFn && callbackFn(node);
+        });
+        break;
+      case 'BBIE_SC':
+        const bbieScNode = (node as unknown as BbieScFlatNode);
+        forkJoin([
+          this.service.getDetail(node.topLevelAsbiepId, 'BBIE_SC',
+            bbieScNode.bdtScNode.manifestId, bbieScNode.bbieScPath),
+          this.service.getDetail(node.topLevelAsbiepId, 'DT',
+            bbieScNode.bccNode.manifestId, ''),
+        ]).subscribe(([bbieScDetail, bdtDetail]) => {
+          const stored = (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
+          (node.detail as BieEditBbieScNodeDetail).bdtSc = (bbieScDetail as unknown as BieEditBbieScNodeDetail).bdtSc;
+          (node.detail as BieEditBbieScNodeDetail).bbieSc.update((bbieScDetail as unknown as BieEditBbieScNodeDetail).bbieSc);
+          (node.detail as BieEditBbieScNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
+          (node.detail as BieEditBbieScNodeDetail).reset();
+          node.detail.isLoaded = true;
+          if (stored !== undefined) {
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = stored;
+          }
+          return callbackFn && callbackFn(node);
+        });
+        break;
+    }
+  }
+}
+
+export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
+  implements ChangeListener<BieFlatNodeDataSource<T>> {
+
+  searchKeyword = '';
+  _inputKeyword = '';
+  selectedNode: T;
+  searchResult: T[] = [];
+  searchedData: T[];
+  fullSearched = false;
+  searchedItemCount = 0;
+  searchIndex = 0;
+  isSearching = false;
+  searchPrefix = '';
+
+  constructor(private dataSource: BieFlatNodeDataSource<T>,
+              private database: BieFlatNodeDatabase<T>) {
+    dataSource.addListener(this);
+  }
+
+  get inputKeyword(): string {
+    return this._inputKeyword;
+  }
+
+  set inputKeyword(inputKeyword: string) {
+    if (inputKeyword !== this._inputKeyword) {
+      this.resetSearch();
+    }
+    this._inputKeyword = inputKeyword;
+  }
+
+  onChange(entity: BieFlatNodeDataSource<T>, propertyName: string, val: any) {
+    if (propertyName === 'hideUnused') {
+      this.resetSearch();
+    }
+  }
+
+  prev(node: T): T {
+    const index = this.getNodeIndex(node);
+    if (index > 0) {
+      return this.dataSource.data[index - 1];
+    }
+    return node;
+  }
+
+  next(node: T): T {
+    const index = this.getNodeIndex(node);
+    if (index < this.dataSource.data.length - 1) {
+      return this.dataSource.data[index + 1];
+    }
+    return node;
+  }
+
+  go(val: number): Observable<number> {
+    this.searchIndex += val;
+    if (this.searchResult.length <= this.searchIndex) {
+      this.searchIndex = 0;
+    }
+    if (this.searchIndex < 0) {
+      this.searchIndex = this.searchResult.length - 1;
+    }
+
+    return new Observable(subscriber => {
+      if (!!this.searchResult && this.searchResult.length > 0) {
+        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
+      } else {
+        subscriber.next(-1);
+      }
+      subscriber.complete();
+    });
+  }
+
+  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
+    if (this.isSearching) {
+      return empty();
+    }
+    if (!inputKeyword || inputKeyword.length === 0) {
+      this.resetSearch();
+      return empty();
+    }
+
+    this.isSearching = true;
+    if (!this.fullSearched || force) {
+      const searchResult = [];
+      const evaluator = this.getEvaluator(inputKeyword);
+
+      const threshold = 100;
+      let expandingLimit = 1000;
+      let data = (!this.searchedData || this.searchedData.length === 0) ?
+        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0],] : [selectedNode,]) :
+        this.searchedData;
+      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
+        const item = data.shift();
+        this.searchedItemCount++;
+        if (!item.isGroup && evaluator.eval(item)) {
+          searchResult.push(item);
+        }
+        if (item.expandable) {
+          expandingLimit--;
+        }
+
+        if (item.children.length > 0) {
+          data = data.concat(item.children as T[]);
+        }
+      }
+
+      if (data.length === 0) {
+        this.fullSearched = true;
+      } else {
+        this.searchedData = data;
+      }
+
+      this.searchResult = this.searchResult.concat(searchResult);
+      this.searchKeyword = evaluator.keywordForHighlight();
+      if (searchResult.length > 0) {
+        searchResult.forEach(e => this.dataSource.expand(e));
+        this.searchResult = this.sort(this.searchResult);
+      }
+    } else {
+      if (backward) {
+        this.searchIndex -= 1;
+      } else {
+        this.searchIndex += 1;
+      }
+      if (this.searchResult.length <= this.searchIndex) {
+        this.searchIndex = 0;
+      }
+      if (this.searchIndex < 0) {
+        this.searchIndex = this.searchResult.length - 1;
+      }
+    }
+
+    this.isSearching = false;
+
+    return new Observable(subscriber => {
+      if (!!this.searchResult && this.searchResult.length > 0) {
+        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
+      } else {
+        subscriber.next(-1);
+      }
+      subscriber.complete();
+    });
+  }
+
+  sort(searchResult: T[]): T[] {
+    return searchResult.sort((a, b) => {
+      const aIdx = this.dataSource.data.indexOf(a);
+      const bIdx = this.dataSource.data.indexOf(b);
+      return aIdx - bIdx;
+    });
+  }
+
+  resetSearch() {
+    this.searchKeyword = undefined;
+    this.selectedNode = undefined;
+    this.searchResult = [];
+    this.searchedData = [];
+    this.fullSearched = false;
+    this.searchedItemCount = 0;
+    this.searchIndex = 0;
+    this.isSearching = false;
+    this.searchPrefix = '';
+  }
+
+  getNodeIndex(node: T) {
+    if (!this.dataSource.isExpanded(node)) {
+      this.dataSource.expand(node);
+    }
+    return this.dataSource.data.indexOf(node);
+  }
+
+  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
+    return new BiePathLikeExpressionEvaluator(expr, false);
+  }
+
 }
