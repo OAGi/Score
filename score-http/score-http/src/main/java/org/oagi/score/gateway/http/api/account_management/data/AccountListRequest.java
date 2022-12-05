@@ -16,6 +16,8 @@ public class AccountListRequest {
     private List<String> roles = Collections.emptyList();
     private boolean excludeSSO;
     private Boolean excludeRequester;
+    private Long tenantId;
+    private boolean notConnectedToTenant;
 
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
 

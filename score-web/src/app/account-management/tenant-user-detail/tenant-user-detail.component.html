@@ -1,0 +1,138 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button *ngIf="!addUserToTenant else done" mat-raised-button class="ml-2" color="primary" (click)="setAddUserView()">
+        Add User
+      </button>
+      <ng-template #done>   
+      <button mat-raised-button class="ml-2" color="primary" (click)="setListView()">
+        Done
+      </button>
+      </ng-template>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-3">
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <input matInput [(ngModel)]="request.filters.loginId" (keyup.enter)="onChange()" placeholder="Login ID">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <input matInput [(ngModel)]="request.filters.name" (keyup.enter)="onChange()" placeholder="Name">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <input matInput [(ngModel)]="request.filters.organization" (keyup.enter)="onChange()"
+                       placeholder="Organization">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Status</mat-label>
+                <mat-select [(ngModel)]="request.filters.status" multiple>
+                  <mat-option [value]="'enable'">
+                    Enable
+                  </mat-option>
+                  <mat-option [value]="'disable'">
+                    Disable
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+      <div class="mat-elevation-z1">
+        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+               [dataSource]="dataSource">
+
+          <ng-container matColumnDef="loginId">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Login ID</th>
+            <td mat-cell *matCellDef="let element">
+              <a routerLink="{{ element.appUserId }}"> {{ element.loginId }} </a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Role</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
+              <span *ngSwitchCase="true">Developer</span>
+              <span *ngSwitchCase="false">End User</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="organization">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Organization</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.organization }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.enabled) ? 'Enable' : 'Disable' }}
+            </td>
+          </ng-container>
+
+          <ng-container *ngIf="!addUserToTenant else addButton" matColumnDef="remove">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Remove</th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-raised-button color="warn" (click)="removeUser(element.appUserId)" style="margin-right: 10px;">
+                  Remove
+                  </button>
+            </td>
+          </ng-container>
+
+          <ng-template #addButton>
+            <ng-container matColumnDef="remove">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Add</th>
+              <td mat-cell *matCellDef="let element">
+                  <button mat-raised-button color="accent" (click)="addUser(element.appUserId)" style="margin-right: 10px;">
+                    Add
+                  </button>
+              </td>
+            </ng-container>
+
+          </ng-template>   
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

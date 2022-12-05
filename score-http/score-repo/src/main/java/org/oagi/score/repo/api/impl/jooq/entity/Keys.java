@@ -80,9 +80,12 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.UserTenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AbieRecord;
@@ -156,9 +159,12 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.Oauth2AppScopeRec
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.RefSpecRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.SeqKeyRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantBusinessCtxRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UsageRuleExpressionRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UsageRuleRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UserTenantRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.XbtManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.XbtRecord;
 
@@ -254,9 +260,14 @@ public class Keys {
     public static final UniqueKey<RefSpecRecord> KEY_REF_SPEC_PRIMARY = Internal.createUniqueKey(RefSpec.REF_SPEC, DSL.name("KEY_ref_spec_PRIMARY"), new TableField[] { RefSpec.REF_SPEC.REF_SPEC_ID }, true);
     public static final UniqueKey<ReleaseRecord> KEY_RELEASE_PRIMARY = Internal.createUniqueKey(Release.RELEASE, DSL.name("KEY_release_PRIMARY"), new TableField[] { Release.RELEASE.RELEASE_ID }, true);
     public static final UniqueKey<SeqKeyRecord> KEY_SEQ_KEY_PRIMARY = Internal.createUniqueKey(SeqKey.SEQ_KEY, DSL.name("KEY_seq_key_PRIMARY"), new TableField[] { SeqKey.SEQ_KEY.SEQ_KEY_ID }, true);
+    public static final UniqueKey<TenantRecord> KEY_TENANT_PRIMARY = Internal.createUniqueKey(Tenant.TENANT, DSL.name("KEY_tenant_PRIMARY"), new TableField[] { Tenant.TENANT.TENANT_ID }, true);
+    public static final UniqueKey<TenantBusinessCtxRecord> KEY_TENANT_BUSINESS_CTX_PRIMARY = Internal.createUniqueKey(TenantBusinessCtx.TENANT_BUSINESS_CTX, DSL.name("KEY_tenant_business_ctx_PRIMARY"), new TableField[] { TenantBusinessCtx.TENANT_BUSINESS_CTX.TENANT_BUSINESS_CTX_ID }, true);
+    public static final UniqueKey<TenantBusinessCtxRecord> KEY_TENANT_BUSINESS_CTX_TENANT_BUSINESS_CTX_PAIR = Internal.createUniqueKey(TenantBusinessCtx.TENANT_BUSINESS_CTX, DSL.name("KEY_tenant_business_ctx_tenant_business_ctx_pair"), new TableField[] { TenantBusinessCtx.TENANT_BUSINESS_CTX.TENANT_ID, TenantBusinessCtx.TENANT_BUSINESS_CTX.BIZ_CTX_ID }, true);
     public static final UniqueKey<TopLevelAsbiepRecord> KEY_TOP_LEVEL_ASBIEP_PRIMARY = Internal.createUniqueKey(TopLevelAsbiep.TOP_LEVEL_ASBIEP, DSL.name("KEY_top_level_asbiep_PRIMARY"), new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID }, true);
     public static final UniqueKey<UsageRuleRecord> KEY_USAGE_RULE_PRIMARY = Internal.createUniqueKey(UsageRule.USAGE_RULE, DSL.name("KEY_usage_rule_PRIMARY"), new TableField[] { UsageRule.USAGE_RULE.USAGE_RULE_ID }, true);
     public static final UniqueKey<UsageRuleExpressionRecord> KEY_USAGE_RULE_EXPRESSION_PRIMARY = Internal.createUniqueKey(UsageRuleExpression.USAGE_RULE_EXPRESSION, DSL.name("KEY_usage_rule_expression_PRIMARY"), new TableField[] { UsageRuleExpression.USAGE_RULE_EXPRESSION.USAGE_RULE_EXPRESSION_ID }, true);
+    public static final UniqueKey<UserTenantRecord> KEY_USER_TENANT_PRIMARY = Internal.createUniqueKey(UserTenant.USER_TENANT, DSL.name("KEY_user_tenant_PRIMARY"), new TableField[] { UserTenant.USER_TENANT.USER_TENANT_ID }, true);
+    public static final UniqueKey<UserTenantRecord> KEY_USER_TENANT_USER_TENANT_PAIR = Internal.createUniqueKey(UserTenant.USER_TENANT, DSL.name("KEY_user_tenant_user_tenant_pair"), new TableField[] { UserTenant.USER_TENANT.TENANT_ID, UserTenant.USER_TENANT.APP_USER_ID }, true);
     public static final UniqueKey<XbtRecord> KEY_XBT_PRIMARY = Internal.createUniqueKey(Xbt.XBT, DSL.name("KEY_xbt_PRIMARY"), new TableField[] { Xbt.XBT.XBT_ID }, true);
     public static final UniqueKey<XbtManifestRecord> KEY_XBT_MANIFEST_PRIMARY = Internal.createUniqueKey(XbtManifest.XBT_MANIFEST, DSL.name("KEY_xbt_manifest_PRIMARY"), new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true);
 
@@ -595,11 +606,15 @@ public class Keys {
     public static final ForeignKey<SeqKeyRecord, AccManifestRecord> SEQ_KEY_FROM_ACC_MANIFEST_ID_FK = Internal.createForeignKey(SeqKey.SEQ_KEY, DSL.name("seq_key_from_acc_manifest_id_fk"), new TableField[] { SeqKey.SEQ_KEY.FROM_ACC_MANIFEST_ID }, Keys.KEY_ACC_MANIFEST_PRIMARY, new TableField[] { AccManifest.ACC_MANIFEST.ACC_MANIFEST_ID }, true);
     public static final ForeignKey<SeqKeyRecord, SeqKeyRecord> SEQ_KEY_NEXT_SEQ_KEY_ID_FK = Internal.createForeignKey(SeqKey.SEQ_KEY, DSL.name("seq_key_next_seq_key_id_fk"), new TableField[] { SeqKey.SEQ_KEY.NEXT_SEQ_KEY_ID }, Keys.KEY_SEQ_KEY_PRIMARY, new TableField[] { SeqKey.SEQ_KEY.SEQ_KEY_ID }, true);
     public static final ForeignKey<SeqKeyRecord, SeqKeyRecord> SEQ_KEY_PREV_SEQ_KEY_ID_FK = Internal.createForeignKey(SeqKey.SEQ_KEY, DSL.name("seq_key_prev_seq_key_id_fk"), new TableField[] { SeqKey.SEQ_KEY.PREV_SEQ_KEY_ID }, Keys.KEY_SEQ_KEY_PRIMARY, new TableField[] { SeqKey.SEQ_KEY.SEQ_KEY_ID }, true);
+    public static final ForeignKey<TenantBusinessCtxRecord, BizCtxRecord> ORGANIZATION_BUSINESS_CTX_BIZ_CTX_ID_FK = Internal.createForeignKey(TenantBusinessCtx.TENANT_BUSINESS_CTX, DSL.name("organization_business_ctx_biz_ctx_id_fk"), new TableField[] { TenantBusinessCtx.TENANT_BUSINESS_CTX.BIZ_CTX_ID }, Keys.KEY_BIZ_CTX_PRIMARY, new TableField[] { BizCtx.BIZ_CTX.BIZ_CTX_ID }, true);
+    public static final ForeignKey<TenantBusinessCtxRecord, TenantRecord> TENANT_BUSINESS_CTX_TENANT_ID_FK = Internal.createForeignKey(TenantBusinessCtx.TENANT_BUSINESS_CTX, DSL.name("tenant_business_ctx_tenant_id_fk"), new TableField[] { TenantBusinessCtx.TENANT_BUSINESS_CTX.TENANT_ID }, Keys.KEY_TENANT_PRIMARY, new TableField[] { Tenant.TENANT.TENANT_ID }, true);
     public static final ForeignKey<TopLevelAsbiepRecord, AsbiepRecord> TOP_LEVEL_ASBIEP_ASBIEP_ID_FK = Internal.createForeignKey(TopLevelAsbiep.TOP_LEVEL_ASBIEP, DSL.name("top_level_asbiep_asbiep_id_fk"), new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.ASBIEP_ID }, Keys.KEY_ASBIEP_PRIMARY, new TableField[] { Asbiep.ASBIEP.ASBIEP_ID }, true);
     public static final ForeignKey<TopLevelAsbiepRecord, AppUserRecord> TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK = Internal.createForeignKey(TopLevelAsbiep.TOP_LEVEL_ASBIEP, DSL.name("top_level_asbiep_last_updated_by_fk"), new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
     public static final ForeignKey<TopLevelAsbiepRecord, AppUserRecord> TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK = Internal.createForeignKey(TopLevelAsbiep.TOP_LEVEL_ASBIEP, DSL.name("top_level_asbiep_owner_user_id_fk"), new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
     public static final ForeignKey<TopLevelAsbiepRecord, ReleaseRecord> TOP_LEVEL_ASBIEP_RELEASE_ID_FK = Internal.createForeignKey(TopLevelAsbiep.TOP_LEVEL_ASBIEP, DSL.name("top_level_asbiep_release_id_fk"), new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.RELEASE_ID }, Keys.KEY_RELEASE_PRIMARY, new TableField[] { Release.RELEASE.RELEASE_ID }, true);
     public static final ForeignKey<UsageRuleExpressionRecord, UsageRuleRecord> USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK = Internal.createForeignKey(UsageRuleExpression.USAGE_RULE_EXPRESSION, DSL.name("usage_rule_expression_represented_usage_rule_id_fk"), new TableField[] { UsageRuleExpression.USAGE_RULE_EXPRESSION.REPRESENTED_USAGE_RULE_ID }, Keys.KEY_USAGE_RULE_PRIMARY, new TableField[] { UsageRule.USAGE_RULE.USAGE_RULE_ID }, true);
+    public static final ForeignKey<UserTenantRecord, AppUserRecord> USER_TENANT_TENANT_ID_APP_USER_ID_FK = Internal.createForeignKey(UserTenant.USER_TENANT, DSL.name("user_tenant_tenant_id_app_user_id_fk"), new TableField[] { UserTenant.USER_TENANT.APP_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
+    public static final ForeignKey<UserTenantRecord, TenantRecord> USER_TENANT_TENANT_ID_FK = Internal.createForeignKey(UserTenant.USER_TENANT, DSL.name("user_tenant_tenant_id_fk"), new TableField[] { UserTenant.USER_TENANT.TENANT_ID }, Keys.KEY_TENANT_PRIMARY, new TableField[] { Tenant.TENANT.TENANT_ID }, true);
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_CREATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_created_by_fk"), new TableField[] { Xbt.XBT.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_last_updated_by_fk"), new TableField[] { Xbt.XBT.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_owner_user_id_fk"), new TableField[] { Xbt.XBT.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);

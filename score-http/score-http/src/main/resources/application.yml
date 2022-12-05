@@ -38,3 +38,4 @@ logging:
     org.springframework.messaging: DEBUG
     org.jooq: DEBUG
     org.oagi.score: DEBUG
+

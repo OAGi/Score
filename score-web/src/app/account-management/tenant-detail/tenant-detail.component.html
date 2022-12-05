@@ -1,0 +1,49 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+    </mat-card-header>  
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container" *ngIf="tenantBussinessCtxInfo !== undefined">
+        <mat-card-header>
+          <mat-card-title>{{ tenantBussinessCtxInfo.name }}</mat-card-title>
+        </mat-card-header>
+        <table mat-table [dataSource]="tenantBussinessCtxInfo.businessContext">
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Business Context Name</th>
+            <td mat-cell *matCellDef="let element">
+
+              <div class="checkbox">
+                <mat-checkbox color="primary"
+                              data-id="element.businessCtxId"
+                              [(ngModel)]="element.checked">
+                              {{ element.name }}
+                </mat-checkbox>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          
+        </table>     
+      </mat-card-content>
+    </mat-card>
+
+ </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="update()">
+          Update
+        </button>
+        </div>
+    </div>
+  </div>
+</div>

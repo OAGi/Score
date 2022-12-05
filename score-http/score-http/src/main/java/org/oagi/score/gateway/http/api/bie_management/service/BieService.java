@@ -8,6 +8,7 @@ import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
+import org.oagi.score.gateway.http.api.tenant.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.CoreComponentRepository;
@@ -83,6 +84,9 @@ public class BieService {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    
+    @Autowired
+    private TenantService tenantService;
 
     @Transactional
     public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
@@ -158,6 +162,8 @@ public class BieService {
     public PageResponse<BieList> getBieList(AuthenticatedPrincipal user, BieListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);
+        List<ULong> userTenantIds = tenantService
+        		.getUserTenantsRoleByUserId(ULong.valueOf(requester.getAppUserId()));
 
         PaginationResponse<BieList> result = bieRepository.selectBieLists()
                 .setDen(request.getDen())
@@ -173,6 +179,7 @@ public class BieService {
                 .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
+                .setTenantBusinessCtx(userTenantIds)
                 .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchInto(BieList.class);

@@ -35,6 +35,8 @@ public class AccountListController {
             @RequestParam(name = "roles", required = false) String roles,
             @RequestParam(name = "excludeSSO", required = false) Boolean excludeSSO,
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
+            @RequestParam(name = "tenantId", required = false) Long tenantId,
+            @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
@@ -57,7 +59,9 @@ public class AccountListController {
         }
         request.setExcludeSSO(excludeSSO != null ? excludeSSO : false);
         request.setExcludeRequester(excludeRequester);
-
+        request.setTenantId(tenantId);
+        request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
+        
         PageRequest pageRequest = new PageRequest();
         pageRequest.setSortActive(sortActive);
         pageRequest.setSortDirection(sortDirection);

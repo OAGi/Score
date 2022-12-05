@@ -11,6 +11,8 @@ export class AccountListRequest {
     status: string[];
     roles: string[];
     excludeSSO: boolean;
+    tenantId: number;
+    notConnectedToTenant: boolean;
   };
   page: PageRequest = new PageRequest();
 
@@ -43,7 +45,9 @@ export class AccountListRequest {
       organization: params.get('organization') || '',
       status: (params.get('status')) ? Array.from(params.get('status').split(',')) : [],
       roles: (params.get('roles')) ? Array.from(params.get('roles').split(',')) : [],
-      excludeSSO: false
+      excludeSSO: false, 
+      tenantId: Number(params.get('tenantId')) || null,
+      notConnectedToTenant: false,
     };
   }
 
@@ -71,6 +75,15 @@ export class AccountListRequest {
     }
     if (this.filters.excludeSSO) {
       params = params.set('excludeSSO', '' + this.filters.excludeSSO);
+    }
+    if (this.filters.excludeSSO) {
+      params = params.set('excludeSSO', '' + this.filters.excludeSSO);
+    }
+    if (this.filters.tenantId) {
+      params = params.set('tenantId', this.filters.tenantId.toString());
+    }
+    if (this.filters.notConnectedToTenant) {
+      params = params.set('notConnectedToTenant', '' + this.filters.notConnectedToTenant);
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

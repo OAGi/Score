@@ -27,6 +27,7 @@ import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.USER_TENANT;;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,7 +54,9 @@ public class AccountListService {
                 APP_USER.ORGANIZATION,
                 APP_OAUTH2_USER.APP_OAUTH2_USER_ID
         ).from(APP_USER)
-                .leftJoin(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID));
+                .leftJoin(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID))
+                .leftJoin(USER_TENANT)
+                .on(USER_TENANT.APP_USER_ID.eq(APP_USER.APP_USER_ID));
 
         List<Condition> conditions = new ArrayList();
         if (StringUtils.hasLength(request.getLoginId())) {
@@ -96,6 +99,19 @@ public class AccountListService {
         if (excludeRequester != null && excludeRequester == true) {
             conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
+        
+        Long tenantId = request.getTenantId();
+        boolean notConnectedToTenant = request.isNotConnectedToTenant();
+        if(tenantId != null && !notConnectedToTenant) {
+        	conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
+        }
+        
+        if(tenantId != null && notConnectedToTenant) {
+        	conditions.add(APP_USER.APP_USER_ID.notIn(
+        			dslContext.select(USER_TENANT.APP_USER_ID)
+        			.from(USER_TENANT)
+        			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+        }
 
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 
@@ -137,6 +153,8 @@ public class AccountListService {
         }
 
         SelectWithTiesAfterOffsetStep<Record6<ULong, String, String, Byte, String, ULong>> offsetStep = null;
+        
+        int pageCount = dslContext.fetchCount(conditionStep);
         if (sortField != null) {
             offsetStep = conditionStep.orderBy(sortField)
                     .limit(pageRequest.getOffset(), pageRequest.getPageSize());
@@ -154,12 +172,7 @@ public class AccountListService {
         response.setList(result);
         response.setPage(pageRequest.getPageIndex());
         response.setSize(pageRequest.getPageSize());
-        response.setLength(dslContext.selectCount()
-                .from(APP_USER)
-                .leftJoin(APP_OAUTH2_USER)
-                .on(APP_OAUTH2_USER.APP_USER_ID.eq(APP_USER.APP_USER_ID))
-                .where(conditions)
-                .fetchOptionalInto(Integer.class).orElse(0));
+        response.setLength(pageCount);
 
         return response;
     }

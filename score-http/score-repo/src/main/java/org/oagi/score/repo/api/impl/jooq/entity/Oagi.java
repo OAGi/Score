@@ -81,9 +81,12 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.UserTenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest;
 
@@ -571,6 +574,16 @@ public class Oagi extends SchemaImpl {
     public final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
+     * This table about the user tenant role.
+     */
+    public final Tenant TENANT = Tenant.TENANT;
+
+    /**
+     * This table captures the tenant role and theirs bussiness contexts.
+     */
+    public final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
+
+    /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and
      * the owner_top_level_asbiep_id column in all BIE tables allow all related
      * BIEs to be retrieved all at once speeding up the profile BOD
@@ -593,6 +606,11 @@ public class Oagi extends SchemaImpl {
      * rule.
      */
     public final UsageRuleExpression USAGE_RULE_EXPRESSION = UsageRuleExpression.USAGE_RULE_EXPRESSION;
+
+    /**
+     * This table captures the tenant roles of the user
+     */
+    public final UserTenant USER_TENANT = UserTenant.USER_TENANT;
 
     /**
      * This table stores XML schema built-in types and OAGIS built-in types.
@@ -693,9 +711,12 @@ public class Oagi extends SchemaImpl {
             RefSpec.REF_SPEC,
             Release.RELEASE,
             SeqKey.SEQ_KEY,
+            Tenant.TENANT,
+            TenantBusinessCtx.TENANT_BUSINESS_CTX,
             TopLevelAsbiep.TOP_LEVEL_ASBIEP,
             UsageRule.USAGE_RULE,
             UsageRuleExpression.USAGE_RULE_EXPRESSION,
+            UserTenant.USER_TENANT,
             Xbt.XBT,
             XbtManifest.XBT_MANIFEST
         );

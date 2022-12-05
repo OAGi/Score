@@ -649,6 +649,15 @@ public class BusinessInformationEntityRepository {
             }
             return this;
         }
+        
+        public SelectBieListArguments setTenantBusinessCtx(List<ULong> userTenantIds ) {
+
+        conditions.add(BIZ_CTX.BIZ_CTX_ID.in
+               			(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+               			 .from(TENANT_BUSINESS_CTX)
+               			 .where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
+            return this;
+        }
 
         public List<Condition> getConditions() {
             return conditions;
@@ -706,7 +715,8 @@ public class BusinessInformationEntityRepository {
                 .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
-                .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID));
+                .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
+                .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
     }
 
     private <E> PaginationResponse<E> selectBieList(SelectBieListArguments arguments, Class<? extends E> type) {

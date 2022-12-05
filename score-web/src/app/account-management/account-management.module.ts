@@ -14,6 +14,11 @@ import {AccountListComponent} from './account-list/account-list.component';
 import {AccountListService} from './domain/account-list.service';
 import {AccountDetailComponent} from './account-detail/account-detail.component';
 import {AccountCreateComponent} from './account-create/account-create.component';
+import {TenantListComponent} from './tenant-list/tenant-list.component';
+import {TenantDetailComponent} from './tenant-detail/tenant-detail.component';
+import {TenantListService} from './domain/tenant-list.service';
+import {TenantUserDetailComponent} from './tenant-user-detail/tenant-user-detail.component';
+import {TenantCreateComponent} from './tenant-create/tenant-create.component';
 
 
 const routes: Routes = [
@@ -47,6 +52,26 @@ const routes: Routes = [
     component: AccountDetailComponent,
     canActivate: [CanActivateAdmin]
   },
+  {
+    path: 'tenant',
+    component: TenantListComponent,
+    canActivate: [CanActivateAdmin]
+  },
+  {
+    path: 'tenant/create',
+    component: TenantCreateComponent,
+    canActivate: [CanActivateAdmin]
+  },
+  {
+    path: 'tenant/:id',
+    component: TenantDetailComponent,
+    canActivate: [CanActivateAdmin]
+  },
+  {
+    path: 'tenant/users/:id',
+    component: TenantUserDetailComponent,
+    canActivate: [CanActivateAdmin]
+  },
 ];
 
 @NgModule({
@@ -64,7 +89,11 @@ const routes: Routes = [
     AccountCreateComponent,
     PendingDetailComponent,
     PendingListComponent,
-    AccountListDialogComponent
+    AccountListDialogComponent,
+    TenantListComponent, 
+    TenantDetailComponent, 
+    TenantUserDetailComponent, 
+    TenantCreateComponent
   ],
   providers: [
     SettingsService,
@@ -73,6 +102,7 @@ const routes: Routes = [
     CanActivateUser,
     CanActivateDeveloper,
     CanActivateAdmin,
+    TenantListService
   ]
 })
 export class AccountManagementModule {
