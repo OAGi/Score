@@ -301,3 +301,18 @@ export class CanActivateUser implements CanActivate {
   }
 
 }
+
+@Injectable()
+export class CanActivateTenantInstance implements CanActivate {
+
+  constructor(private authService: AuthService) {
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+
+    const userToken = this.authService.getUserToken();
+    return userToken.isTenantInstance;
+  }
+
+}

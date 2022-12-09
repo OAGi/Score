@@ -1,11 +1,21 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ "BIE_CREATE.TITLE" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
-    </mat-card-header>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button *ngIf="!addBusinessCtxToTenant else done" mat-raised-button class="ml-2" color="primary" (click)="setAddBusnessCtxView()">
+        Add Business Context
+      </button>
+      <ng-template #done>   
+      <button mat-raised-button class="ml-2" color="primary" (click)="setListView()">
+        Done
+      </button>
+      </ng-template>
+    </mat-toolbar>
+  </div>
 
-    <mat-card class="mb-2 search-box">
+  <mat-card class="pt-3">
+    <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
@@ -14,11 +24,11 @@
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
                   <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterUsernameListFilterCtrl"
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterUsernameList | async" [value]="loginId">
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
                 </mat-select>
@@ -81,41 +91,16 @@
 
     <mat-card-content class="mat-card-container">
       <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="dataSource">
-
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? toggle(row) : null"
-                            [checked]="isSelected(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container>
 
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
             <td mat-cell *matCellDef="let element">
-              <span>
-                <a target="_blank" rel="noopener noreferrer"
-                   href="/context_management/business_context/{{ element.businessContextId }}">{{ element.name }}</a>
-              </span>
-              <div class="description ellipsis">{{ element.guid }}</div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="tenant">
-            <th mat-header-cell *matHeaderCellDef [hidden]="!isTenantInstance()"> Tenant</th>
-            <td mat-cell *matCellDef="let element" [hidden]="!isTenantInstance()">
-             {{ element.connectedTenantNames }}
+                <span>{{ element.name }}</span>
+                <div class="description ellipsis">
+                  {{ element.guid }}
+                </div>
             </td>
           </ng-container>
 
@@ -127,6 +112,27 @@
               </div>
             </td>
           </ng-container>
+
+          <ng-container *ngIf="!addBusinessCtxToTenant else addButton" matColumnDef="manage">
+            <th mat-header-cell *matHeaderCellDef>Manage</th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-raised-button color="warn"  style="margin-right: 10px;" (click)="removeTenantBusinessCtx(element.businessContextId)">
+                  Remove
+                  </button>
+            </td>
+          </ng-container>
+
+          <ng-template #addButton>
+            <ng-container matColumnDef="manage">
+              <th mat-header-cell *matHeaderCellDef>Add</th>
+              <td mat-cell *matCellDef="let element">
+                  <button mat-raised-button color="accent"  style="margin-right: 10px;" (click)="addTenantBusinessCtx(element.businessContextId)">
+                    Add
+                  </button>
+              </td>
+            </ng-container>
+
+          </ng-template> 
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"
@@ -140,21 +146,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="next()"
-                [hidden]="dataSource.data.length == 0"
-                [disabled]="this.selection.selected.length == 0">
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
-
-
-
-
-

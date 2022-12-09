@@ -1,7 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {TenantListRequest, TenantList, TenantBusinessCtxInfo} from './tenants'
+import {TenantListRequest, TenantList} from './tenants'
 import {PageResponse} from '../../basis/basis';
 
 @Injectable()
@@ -29,23 +29,26 @@ export class TenantListService implements OnInit {
     return this.http.get<TenantList>('/api/tenants/' + tenantId);
   }
 
-  getTenantBusinessCtxInfo(tenantId: number) : Observable<TenantBusinessCtxInfo> {
-    return this.http.get<TenantBusinessCtxInfo>('/api/tenants/biz/' + tenantId);
-  }
-
-  updateTenantBusinessCtxInfo(info: TenantBusinessCtxInfo): Observable<any> {
-      return this.http.put('/api/tenants/contexts', info);
-  }
-
   createTenant(tenantName: string): Observable<any>{
     return this.http.post('/api/tenants', tenantName);
   }
 
+  updateTenant(tenantId:number, tenantName: string): Observable<any>{
+    return this.http.put('/api/tenants/' + tenantId, tenantName);
+  }
   deleteTenantUser(tenantId:number, appUserId: number): Observable<any>{
     return this.http.put('/api/tenants/users/' + tenantId, appUserId);
   }
 
   addTenantUser(tenantId:number, appUserId: number): Observable<any>{
     return this.http.post('/api/tenants/users/' + tenantId, appUserId);
+  }
+
+  addTenantBusinessCtx(tenantId:number, businessCtxId: number): Observable<any>{
+    return this.http.post('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
+  }
+
+  deleteTenantBusinessCtx(tenantId:number, businessCtxId: number): Observable<any>{
+    return this.http.put('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
   }
 }

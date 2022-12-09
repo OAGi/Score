@@ -58,14 +58,8 @@ export class TenantList {
 }
 
 export class BusinessTenantContext{
-    businessCtxId : number
+  businessCtxId : number
 	name : string
 	checked : boolean
-}
-
-export class TenantBusinessCtxInfo{
-    tenantId: number;
-    name: string;
-    businessContext : BusinessTenantContext[]
 }
 

@@ -1,15 +1,15 @@
 package org.oagi.score.gateway.http.api.tenant.controller;
 
 import org.oagi.score.gateway.http.api.tenant.data.Tenant;
-import org.oagi.score.gateway.http.api.tenant.data.TenantBusinessCtxInfo;
 import org.oagi.score.gateway.http.api.tenant.data.TenantListRequest;
 import org.oagi.score.gateway.http.api.tenant.service.TenantService;
+import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class TenantController {
 	
 	@Autowired
-	private TenantService tenantService;	
+	private TenantService tenantService;
+	
+    @Autowired
+    private ConfigurationService configService;
 	
 	@RequestMapping(value = "/tenants", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -29,6 +32,10 @@ public class TenantController {
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize){
+		
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
 		
 		TenantListRequest tenantRequest = new TenantListRequest();
 		tenantRequest.setName(name);
@@ -39,14 +46,30 @@ public class TenantController {
         pageRequest.setPageSize(pageSize);
         tenantRequest.setPageRequest(pageRequest);
         
-		return tenantService.getAllTenantRoles(tenantRequest);
+		return tenantService.getAllTenantRoles(tenantRequest);		
 	}
 	
 	@RequestMapping(value = "/tenants", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity createTenant(@RequestBody String name){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
 		if(!name.isBlank()) {
 			tenantService.createTenant(name);
+			return ResponseEntity.accepted().build();
+		}
+		 return ResponseEntity.badRequest().build();
+	}
+	
+	@RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity updateTenantInfo(@PathVariable("tenantId") Long tenantId, @RequestBody String name){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
+		if(!name.isBlank()) {
+			tenantService.updateTenant(tenantId, name);
 			return ResponseEntity.accepted().build();
 		}
 		 return ResponseEntity.badRequest().build();
@@ -55,29 +78,19 @@ public class TenantController {
 	@RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public Tenant getTenantInfo(@PathVariable("tenantId") Long tenantId){
-		return tenantService.getTenantById(tenantId);
-	}
-	
-	@RequestMapping(value = "/tenants/biz/{tenantId}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-	public TenantBusinessCtxInfo getTenantBusinessCtxInfo(@PathVariable("tenantId") Long tenantId){
-		return tenantService.getTenantBusinessCxtInfoById(tenantId);
-	}
-	
-	@RequestMapping(value = "/tenants/contexts", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity updateTenantBusinessCtxInfo(@RequestBody TenantBusinessCtxInfo info ){
-		if(info != null && info.getTenantId() != null) {
-			tenantService.updateTenantBusinessContext(info);
-			 return ResponseEntity.accepted().build();
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
 		}
-		 return ResponseEntity.badRequest().build();
+		return tenantService.getTenantById(tenantId);
 	}
 	
 	@RequestMapping(value = "/tenants/users/{tenantId}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity connectUserToTenant(@PathVariable("tenantId") Long tenantId,
 			@RequestBody Long appUserId ){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
 		if(appUserId != null) {
 			tenantService.addUserToTenant(tenantId, appUserId);
 			return ResponseEntity.accepted().build();
@@ -89,8 +102,39 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity disconnectUserFromTenant(@PathVariable("tenantId") Long tenantId,
 			@RequestBody Long appUserId ){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
 		if(appUserId != null) {
 			tenantService.deleteTenantUser(tenantId, appUserId);
+			return ResponseEntity.noContent().build();
+		}
+		 return ResponseEntity.badRequest().build();
+	}
+	
+	@RequestMapping(value = "/tenants/bis-ctx/{tenantId}", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity connectBusinessCtxToTenant(@PathVariable("tenantId") Long tenantId,
+			@RequestBody Long businessCtxId ){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
+		if(businessCtxId != null) {
+			tenantService.addBusinessCtxToTenant(tenantId, businessCtxId);
+			return ResponseEntity.accepted().build();
+		}
+		 return ResponseEntity.badRequest().build();
+	}
+	
+	@RequestMapping(value = "/tenants/bis-ctx/{tenantId}", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity disconnectBusinessCtxFromTenant(@PathVariable("tenantId") Long tenantId,
+			@RequestBody Long businessCtxId ){
+		if(!configService.isTenantInstance()) {
+			throw new AccessDeniedException("Unauthorised Access!");
+		}
+		if(businessCtxId != null) {
+			tenantService.deleteTenantBusinessCtx(tenantId, businessCtxId);
 			return ResponseEntity.noContent().build();
 		}
 		 return ResponseEntity.badRequest().build();

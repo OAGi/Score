@@ -32,7 +32,12 @@ export class BusinessContextService implements OnInit {
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
     }
-
+    if (request.filters.tenantId) {
+      params = params.set('tenantId', request.filters.tenantId);
+    }
+    if (request.filters.notConnectedToTenant) {
+      params = params.set('notConnectedToTenant', 'true');
+    }
     return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
   }
 

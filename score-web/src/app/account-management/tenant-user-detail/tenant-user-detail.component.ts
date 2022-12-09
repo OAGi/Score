@@ -26,7 +26,7 @@ export class TenantUserDetailComponent implements OnInit {
   tenantInfo : TenantList;
   tenantId : any;
   displayedColumns: string[] = [
-    'loginId', 'role', 'name', 'organization', 'status', 'remove'
+    'loginId', 'role', 'name', 'organization', 'status', 'manage'
   ];
   dataSource = new MatTableDataSource<AccountList>();
 

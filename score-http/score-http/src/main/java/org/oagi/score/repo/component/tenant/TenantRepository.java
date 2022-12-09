@@ -1,35 +1,26 @@
 package org.oagi.score.repo.component.tenant;
 
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.TENANT;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.TENANT_BUSINESS_CTX;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.USER_TENANT;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.SelectConnectByStep;
 import org.jooq.SelectJoinStep;
-import org.jooq.SelectOnConditionStep;
 import org.jooq.SelectWithTiesAfterOffsetStep;
 import org.jooq.SortField;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.tenant.data.BusinessTenantContext;
 import org.oagi.score.gateway.http.api.tenant.data.Tenant;
-import org.oagi.score.gateway.http.api.tenant.data.TenantBusinessCtxInfo;
 import org.oagi.score.gateway.http.api.tenant.data.TenantListRequest;
-import org.oagi.score.gateway.http.api.tenant.data.TenantUserInfo;
-import org.oagi.score.gateway.http.api.tenant.data.UserTenantInfo;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantBusinessCtxRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UserTenantRecord;
-import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -50,17 +41,26 @@ public class TenantRepository {
 				  		.on(TENANT.TENANT_ID.eq(USER_TENANT.TENANT_ID))
 				        .where(USER_TENANT.APP_USER_ID.eq(userId))
 				        .fetch(TENANT.TENANT_ID);
-	  }
-	  
+	  }	  
 
-		public Tenant getTenantById(Long tenantId) {
+	  public Tenant getTenantById(Long tenantId) {
 			return dslContext.select(
 			  		TENANT.TENANT_ID, 
 			  		TENANT.NAME)
 			  		.from(TENANT)
 			        .where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
 			        .fetchOneInto(Tenant.class);
-		}
+	  }
+	  
+	  public List<String> getTenantNameByBusinessCtxId(Long businessCtxId){
+		  return dslContext.select(
+			  		TENANT.NAME)
+			  		.from(TENANT)
+			  		.join(TENANT_BUSINESS_CTX)
+			  		.on(TENANT.TENANT_ID.eq(TENANT_BUSINESS_CTX.TENANT_ID))
+			        .where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(ULong.valueOf(businessCtxId)))
+			        .fetch(TENANT.NAME);
+	  }
 
 	  public PageResponse<Tenant> getAllTenantsRole(TenantListRequest tenantRequest){
 		  		  
@@ -121,52 +121,17 @@ public class TenantRepository {
         .set(record)
         .returning().fetchOne().getTenantId().longValue();	
    }
-
-	public TenantBusinessCtxInfo getTenantBusinessCxtInfoById(Long tenantId) {
-		TenantBusinessCtxInfo info = dslContext.select(
-				  TENANT.TENANT_ID,
-				  TENANT.NAME)
-				  .from(TENANT)
-				  .where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
-				  .fetchOneInto(TenantBusinessCtxInfo.class);
-		if(info != null) {
-			List<BusinessTenantContext> tenantCtxs = new ArrayList<>();
-			tenantCtxs = getTenantBusinessCtxs(tenantId);			
-			
-			List<BusinessTenantContext> ctxsWithoutTenant = new ArrayList<>();
-			ctxsWithoutTenant = getBusinessCtxsNotAssociatedWithTenant(tenantId);
-			
-			if(ctxsWithoutTenant != null && !ctxsWithoutTenant.isEmpty()) {
-				tenantCtxs.addAll(ctxsWithoutTenant);
-			}
-			info.setBusinessContext(tenantCtxs);
-		}
-		return info;
-	}
 	
-	public boolean updateTenantBusinessContext(TenantBusinessCtxInfo tenantContextInfo) {
-		Tenant tenant = dslContext.select(
-				  TENANT.TENANT_ID,
-				  TENANT.NAME)
-				  .from(TENANT)
-				  .where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantContextInfo.getTenantId())))
-				  .fetchOneInto(Tenant.class);
+	public void updateTenant(Long tenantId, String name) {
+		Tenant tenant = getTenantById(tenantId);
 		
-		boolean result = false;
-		
-		if(tenant != null) {
-			tenantContextInfo.getBusinessContext().forEach( c->{
-				if(c.isChecked()) {
-					connectTenantToBusinessCtx(tenantContextInfo.getTenantId(), c);
-				}else {
-					disconnectTenantToBusinessCtx(tenantContextInfo.getTenantId(), c);
-				}
-			});		
-			result = true;
+		if(tenant != null && !tenant.getName().equals(name)){
+			dslContext.update(TENANT)
+			.set(TENANT.NAME, name)
+			.where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			.execute();
 		}
-		
-		return result;
-	}	
+  }
 	
 	public void addUserToTenant(Long tenantId, Long appUserId) {
 		if(!checkIfUserTenantExists(tenantId, appUserId)) {
@@ -187,76 +152,33 @@ public class TenantRepository {
 			.execute();
 		}
 	}
-
-	private List<BusinessTenantContext> getBusinessCtxsNotAssociatedWithTenant(Long tenantId) {
-		List<BusinessTenantContext> ctxsWithoutTenant;
-		ctxsWithoutTenant = dslContext.select(
-				BIZ_CTX.BIZ_CTX_ID,
-				BIZ_CTX.NAME)
-				.from(BIZ_CTX)
-				.where(BIZ_CTX.BIZ_CTX_ID.notIn(
-						dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
-						.from(TENANT_BUSINESS_CTX)
-						.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
-						))
-				.fetchStream()
-				.map( e->{ 
-					BusinessTenantContext context = new BusinessTenantContext();
-					context.setBusinessCtxId(e.get(BIZ_CTX.BIZ_CTX_ID).longValue());
-					context.setName(e.get(BIZ_CTX.NAME));
-					return context;
-				}).collect(Collectors.toList());
-		return ctxsWithoutTenant;
-	}	
-
-	private List<BusinessTenantContext> getTenantBusinessCtxs(Long tenantId) {
-		List<BusinessTenantContext> tenantCtxs;
-		tenantCtxs = dslContext.select(
-				BIZ_CTX.BIZ_CTX_ID,
-				BIZ_CTX.NAME)
-				.from(TENANT_BUSINESS_CTX)
-				.join(BIZ_CTX)
-				.on(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
-				.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
-				.fetchStream()
-				.map( e->{ 
-					BusinessTenantContext context = new BusinessTenantContext();
-					context.setBusinessCtxId(e.get(BIZ_CTX.BIZ_CTX_ID).longValue());
-					context.setName(e.get(BIZ_CTX.NAME));
-					context.setChecked(true);
-					return context;
-				}).collect(Collectors.toList());
-		return tenantCtxs;
-	}
-
-
-	private void disconnectTenantToBusinessCtx(Long tenantId, BusinessTenantContext context) {
-		if(checkIfTenantCtxExists(tenantId, context)) {
-			dslContext.deleteFrom(TENANT_BUSINESS_CTX)
-			.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
-			.and(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(ULong.valueOf(context.getBusinessCtxId())))
-			.execute();
-		}
-	}
-
-	private void connectTenantToBusinessCtx(Long tenantId, BusinessTenantContext context) {
-		
-		if(!checkIfTenantCtxExists(tenantId, context)) {
+	
+	public void addBusinessCtxToTenant(Long tenantId, Long businessCtxId) {
+		if(!checkIfTenantCtxExists(tenantId, businessCtxId)) {
 			TenantBusinessCtxRecord record = new TenantBusinessCtxRecord();
 			record.setTenantId(ULong.valueOf(tenantId));
-			record.setBizCtxId(ULong.valueOf(context.getBusinessCtxId()));
+			record.setBizCtxId(ULong.valueOf(businessCtxId));
 			dslContext.insertInto(TENANT_BUSINESS_CTX)
 	                .set(record)
 	                .returning().fetchOne().getTenantBusinessCtxId().longValue();
 		}
 	}
+	
+	public void deleteTenantBusinessCtx(Long tenantId, Long businessCtxId) {
+		if(checkIfTenantCtxExists(tenantId, businessCtxId)) {
+			dslContext.deleteFrom(TENANT_BUSINESS_CTX)
+			.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			.and(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(ULong.valueOf(businessCtxId)))
+			.execute();
+		}
+	}
 
-	private boolean checkIfTenantCtxExists(Long tenantId, BusinessTenantContext context) {
+	private boolean checkIfTenantCtxExists(Long tenantId, Long businessCtxId) {
 		ULong tenantBusinessContextId = dslContext.select(
 				TENANT_BUSINESS_CTX.TENANT_BUSINESS_CTX_ID)
 				.from(TENANT_BUSINESS_CTX)
 				.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
-				.and(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(ULong.valueOf(context.getBusinessCtxId())))
+				.and(TENANT_BUSINESS_CTX.BIZ_CTX_ID.eq(ULong.valueOf(businessCtxId)))
 				.fetchOne(TENANT_BUSINESS_CTX.TENANT_BUSINESS_CTX_ID);
 		return tenantBusinessContextId != null ? true : false;
 	}

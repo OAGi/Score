@@ -1,12 +1,42 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ABIE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ASBIE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ASBIEP;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ASCCP;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ASCCP_MANIFEST;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BBIE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BBIEP;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BBIE_SC;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX_ASSIGNMENT;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.TOP_LEVEL_ASBIEP;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.jooq.Condition;
+import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Record2;
+import org.jooq.Record3;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BizCtx;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
-import org.oagi.score.gateway.http.api.bie_management.data.*;
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
+import org.oagi.score.gateway.http.api.bie_management.data.BieEvent;
+import org.oagi.score.gateway.http.api.bie_management.data.BieList;
+import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.tenant.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -29,7 +59,11 @@ import org.oagi.score.repository.ABIERepository;
 import org.oagi.score.repository.BizCtxRepository;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
-import org.oagi.score.service.common.data.*;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.OagisComponentType;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.service.message.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +72,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -196,7 +223,7 @@ public class BieService {
             getBusinessContextListRequest.setPageSize(-1);
 
             GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                    .getBusinessContextList(getBusinessContextListRequest);
+                    .getBusinessContextList(getBusinessContextListRequest, false);
 
             bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
             bieList.setAccess(
@@ -245,7 +272,7 @@ public class BieService {
             getBusinessContextListRequest.setPageSize(-1);
 
             GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                    .getBusinessContextList(getBusinessContextListRequest);
+                    .getBusinessContextList(getBusinessContextListRequest, false);
 
             bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
             bieList.setAccess(

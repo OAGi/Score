@@ -7,6 +7,8 @@ import {ScoreUser} from '../../../authentication/domain/auth';
 export class BusinessContextListRequest {
   filters: {
     name: string;
+    tenantId: number;
+    notConnectedToTenant: boolean;
   };
   updaterUsernameList: string[] = [];
   updatedDate: {
@@ -44,7 +46,9 @@ export class BusinessContextListRequest {
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
-      name: params.get('name') || ''
+      name: params.get('name') || '',
+      tenantId: Number(params.get('tenantId')) || null,
+      notConnectedToTenant: false,
     };
   }
 
@@ -67,6 +71,12 @@ export class BusinessContextListRequest {
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);
     }
+    if (this.filters.tenantId) {
+      params = params.set('tenantId', this.filters.tenantId.toString());
+    }
+    if (this.filters.notConnectedToTenant) {
+      params = params.set('notConnectedToTenant', '' + this.filters.notConnectedToTenant);
+    }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
@@ -80,6 +90,7 @@ export class BusinessContext {
   lastUpdatedBy: ScoreUser;
   businessContextValueList: BusinessContextValue[];
   used: boolean;
+  connectedTenantNames: string;
 }
 
 export class BusinessContextValue {

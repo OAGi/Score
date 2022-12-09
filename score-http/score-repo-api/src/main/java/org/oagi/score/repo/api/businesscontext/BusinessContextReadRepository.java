@@ -12,6 +12,6 @@ public interface BusinessContextReadRepository {
             GetBusinessContextRequest request) throws ScoreDataAccessException;
 
     GetBusinessContextListResponse getBusinessContextList(
-            GetBusinessContextListRequest request) throws ScoreDataAccessException;
+            GetBusinessContextListRequest request, boolean isTenantInstance) throws ScoreDataAccessException;
     
 }

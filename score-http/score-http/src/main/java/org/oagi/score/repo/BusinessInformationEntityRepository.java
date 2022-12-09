@@ -2,6 +2,7 @@ package org.oagi.score.repo;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
@@ -32,6 +33,9 @@ public class BusinessInformationEntityRepository {
 
     @Autowired
     private DSLContext dslContext;
+    
+    @Autowired
+    private ConfigurationService configService;
 
     public class InsertTopLevelAsbiepArguments {
         private ULong releaseId;
@@ -651,11 +655,12 @@ public class BusinessInformationEntityRepository {
         }
         
         public SelectBieListArguments setTenantBusinessCtx(List<ULong> userTenantIds ) {
-
-        conditions.add(BIZ_CTX.BIZ_CTX_ID.in
+        	if(configService.isTenantInstance()) {
+        		conditions.add(BIZ_CTX.BIZ_CTX_ID.in
                			(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
                			 .from(TENANT_BUSINESS_CTX)
                			 .where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
+        	}
             return this;
         }
 

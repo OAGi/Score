@@ -12,7 +12,7 @@
     <mat-menu #bieMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="profile_bie" title="{{'BIE_NAV.VIEW'| translate}}"> View/Edit BIE</button>
-        <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}">
+        <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}" [disabled]="isTenant && !hasTenantRole">
           Create BIE
         </button>
         <button mat-menu-item routerLink="profile_bie/copy" title="{{'BIE_NAV.COPY' | translate}}">
@@ -36,7 +36,7 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="contextMenu">Context</button>
+    <button mat-button [matMenuTriggerFor]="contextMenu" *ngIf="showContextButton()">Context</button>
     <mat-menu #contextMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="context_management/context_category">View/Edit Context Category</button>
@@ -45,7 +45,7 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
+    <button *ngIf="!isTenant" mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
@@ -74,7 +74,7 @@
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
         <button mat-menu-item routerLink="account/pending">Pending SSO</button>
-        <button mat-menu-item routerLink="tenant">Tenant</button>
+        <button *ngIf="isTenant" mat-menu-item routerLink="tenant">Tenant</button>
       </ng-template>
     </mat-menu>
 

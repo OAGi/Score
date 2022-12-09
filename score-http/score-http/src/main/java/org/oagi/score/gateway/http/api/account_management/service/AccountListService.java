@@ -5,6 +5,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
+import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -41,6 +42,9 @@ public class AccountListService {
 
     @Autowired
     private DSLContext dslContext;
+    
+    @Autowired
+    private ConfigurationService configService;
 
     public PageResponse<AppUser> getAccounts(AuthenticatedPrincipal user,
                                              AccountListRequest request) {
@@ -100,19 +104,21 @@ public class AccountListService {
             conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
         
-        Long tenantId = request.getTenantId();
-        boolean notConnectedToTenant = request.isNotConnectedToTenant();
-        if(tenantId != null && !notConnectedToTenant) {
-        	conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
+        if(configService.isTenantInstance()) {
+        	  Long tenantId = request.getTenantId();
+              boolean notConnectedToTenant = request.isNotConnectedToTenant();
+              if(tenantId != null && !notConnectedToTenant) {
+              	conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
+              }
+              
+              if(tenantId != null && notConnectedToTenant) {
+              	conditions.add(APP_USER.APP_USER_ID.notIn(
+              			dslContext.select(USER_TENANT.APP_USER_ID)
+              			.from(USER_TENANT)
+              			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+              }
         }
         
-        if(tenantId != null && notConnectedToTenant) {
-        	conditions.add(APP_USER.APP_USER_ID.notIn(
-        			dslContext.select(USER_TENANT.APP_USER_ID)
-        			.from(USER_TENANT)
-        			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
-        }
-
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 
         PageRequest pageRequest = request.getPageRequest();

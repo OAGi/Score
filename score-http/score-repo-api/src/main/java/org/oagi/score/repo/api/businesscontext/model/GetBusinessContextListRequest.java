@@ -16,6 +16,8 @@ public class GetBusinessContextListRequest extends PaginationRequest<BusinessCon
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
+    private Long tenantId;
+    private boolean notConnectedToTenant;
 
     public GetBusinessContextListRequest(ScoreUser requester) {
         super(requester, BusinessContext.class);
@@ -84,4 +86,19 @@ public class GetBusinessContextListRequest extends PaginationRequest<BusinessCon
         this.updateEndDate = updateEndDate;
     }
 
+	public Long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(Long tenantId) {
+		this.tenantId = tenantId;
+	}
+
+	public boolean isNotConnectedToTenant() {
+		return notConnectedToTenant;
+	}
+
+	public void setNotConnectedToTenant(boolean notConnectedToTenant) {
+		this.notConnectedToTenant = notConnectedToTenant;
+	}
 }

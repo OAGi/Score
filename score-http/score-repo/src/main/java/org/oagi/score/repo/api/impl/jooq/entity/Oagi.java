@@ -53,6 +53,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Comment;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Configuration;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxScheme;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
@@ -421,6 +422,11 @@ public class Oagi extends SchemaImpl {
     public final Comment COMMENT = Comment.COMMENT;
 
     /**
+     * The table stores configuration properties of the application. 
+     */
+    public final Configuration CONFIGURATION = Configuration.CONFIGURATION;
+
+    /**
      * This table captures the context category. Examples of context categories
      * as described in the CCTS are business process, industry, etc.
      */
@@ -683,6 +689,7 @@ public class Oagi extends SchemaImpl {
             CodeListValue.CODE_LIST_VALUE,
             CodeListValueManifest.CODE_LIST_VALUE_MANIFEST,
             Comment.COMMENT,
+            Configuration.CONFIGURATION,
             CtxCategory.CTX_CATEGORY,
             CtxScheme.CTX_SCHEME,
             CtxSchemeValue.CTX_SCHEME_VALUE,

@@ -212,7 +212,7 @@
       </div>
     </mat-tab>
 
-    <mat-tab label="User Extensions">
+    <mat-tab [disabled]="isTenantInstance" label="User Extensions">
       <div class="row m-0">
         <div [classList]="isDeveloper ? 'col-lg-10 col-md-12 col-sm-12' : 'col-lg-5 col-md-12 col-sm-12'">
           <div class="box">

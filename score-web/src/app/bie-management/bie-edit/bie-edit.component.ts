@@ -485,6 +485,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return userToken.roles.includes('developer');
   }
 
+  isTenantInstance(){
+    const userToken = this.auth.getUserToken();
+    return userToken.isTenantInstance;
+  }
+
   canCreateBIEFromThis(node: BieFlatNode): boolean {
     return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.derived;
   }

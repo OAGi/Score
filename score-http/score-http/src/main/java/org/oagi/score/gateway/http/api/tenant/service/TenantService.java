@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.tenant.data.Tenant;
-import org.oagi.score.gateway.http.api.tenant.data.TenantBusinessCtxInfo;
 import org.oagi.score.gateway.http.api.tenant.data.TenantListRequest;
 import org.oagi.score.repo.component.tenant.TenantRepository;
 import org.oagi.score.service.common.data.PageResponse;
@@ -23,6 +22,10 @@ public class TenantService {
 		return tenantRepository.getUserTenantsRoleByUserId(userId);
 	}
 	
+	public List<String> getTenantNameByBusinessCtxId(Long businessCtxId){
+		return tenantRepository.getTenantNameByBusinessCtxId(businessCtxId);
+	}
+	
 	public PageResponse<Tenant> getAllTenantRoles(TenantListRequest tenantRequest){
 		return tenantRepository.getAllTenantsRole(tenantRequest);
 	}
@@ -31,16 +34,13 @@ public class TenantService {
 	    tenantRepository.createTenant(name);
 	}
 	
+
+	public void updateTenant(Long tenantId, String name) {
+	    tenantRepository.updateTenant(tenantId, name);
+	}
+	
 	public Tenant getTenantById(Long tenantId) {
 		return tenantRepository.getTenantById(tenantId);
-	}
-	
-	public TenantBusinessCtxInfo getTenantBusinessCxtInfoById(Long tenantId) {
-		return tenantRepository.getTenantBusinessCxtInfoById(tenantId);
-	}
-	
-	public void updateTenantBusinessContext(TenantBusinessCtxInfo tenantContextInfo) {
-		tenantRepository.updateTenantBusinessContext(tenantContextInfo);
 	}
 	
 	public void addUserToTenant(Long tenantId, Long appUserId) {
@@ -49,5 +49,13 @@ public class TenantService {
 	
 	public void deleteTenantUser(Long tenantId, Long appUserId) {
 		tenantRepository.deleteTenantUser(tenantId, appUserId);
+	}
+	
+	public void addBusinessCtxToTenant(Long tenantId, Long businessCtxId) {
+		tenantRepository.addBusinessCtxToTenant(tenantId, businessCtxId);
+	}
+	
+	public void deleteTenantBusinessCtx(Long tenantId, Long businessCtxId) {
+		tenantRepository.deleteTenantBusinessCtx(tenantId, businessCtxId);
 	}
 }

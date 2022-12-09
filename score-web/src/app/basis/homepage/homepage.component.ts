@@ -64,6 +64,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   selectedRelease: SimpleRelease;
 
   isDeveloper: boolean;
+  isTenantInstance: boolean;
 
   myRecentBIEs = new MatTableDataSource<BieList>();
   @ViewChild('myRecentBIEsSort', {static: false})
@@ -104,6 +105,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     const userToken = this.authService.getUserToken();
     this.isDeveloper = userToken.roles.includes('developer');
+    this.isTenantInstance = userToken.isTenantInstance;
 
     this.releaseService.getSimpleReleases().subscribe(resp => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));

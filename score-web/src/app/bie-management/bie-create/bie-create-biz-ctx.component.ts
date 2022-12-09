@@ -12,6 +12,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
+import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
@@ -28,7 +29,7 @@ export class BieCreateBizCtxComponent implements OnInit {
   subtitle = 'Select Business Contexts';
 
   displayedColumns: string[] = [
-    'select', 'name', 'lastUpdateTimestamp'
+    'select', 'name', 'tenant','lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
   selection = new SelectionModel<number>(true, []);
@@ -44,6 +45,7 @@ export class BieCreateBizCtxComponent implements OnInit {
 
   constructor(private bizCtxService: BusinessContextService,
               private accountService: AccountListService,
+              private authServer: AuthService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -162,6 +164,11 @@ export class BieCreateBizCtxComponent implements OnInit {
   next() {
     const selectedBizCtxIds = this.selection.selected.join(',');
     this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {businessContextIdList: selectedBizCtxIds}});
+  }
+
+  isTenantInstance(){
+    const userToken = this.authServer.getUserToken();
+    return userToken.isTenantInstance;
   }
 
 }

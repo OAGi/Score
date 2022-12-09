@@ -47,6 +47,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Comment;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Configuration;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxScheme;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
@@ -406,6 +407,11 @@ public class Tables {
      * The table <code>oagi.comment</code>.
      */
     public static final Comment COMMENT = Comment.COMMENT;
+
+    /**
+     * The table stores configuration properties of the application. 
+     */
+    public static final Configuration CONFIGURATION = Configuration.CONFIGURATION;
 
     /**
      * This table captures the context category. Examples of context categories
