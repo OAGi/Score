@@ -17,6 +17,7 @@ import org.jooq.SelectWithTiesAfterOffsetStep;
 import org.jooq.SortField;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.tenant.data.Tenant;
+import org.oagi.score.gateway.http.api.tenant.data.TenantInfo;
 import org.oagi.score.gateway.http.api.tenant.data.TenantListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantBusinessCtxRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantRecord;
@@ -43,14 +44,40 @@ public class TenantRepository {
 				        .fetch(TENANT.TENANT_ID);
 	  }	  
 
-	  public Tenant getTenantById(Long tenantId) {
-			return dslContext.select(
+	  public TenantInfo getTenantById(Long tenantId) {
+		  TenantInfo tenant =  dslContext.select(
 			  		TENANT.TENANT_ID, 
 			  		TENANT.NAME)
 			  		.from(TENANT)
 			        .where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
-			        .fetchOneInto(Tenant.class);
+			        .fetchOneInto(TenantInfo.class);
+		
+			tenant.setUsersCount(dslContext.selectCount()
+	        .from(USER_TENANT)
+	        .where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
+	        .fetchOne().value1());
+			
+			tenant.setBusinessCtxCount(dslContext.selectCount()
+			        .from(TENANT_BUSINESS_CTX)
+			        .where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			        .fetchOne().value1());
+			
+			return tenant;
 	  }
+	  
+	  public void deleteTenant(Long tenantId) {
+			dslContext.deleteFrom(USER_TENANT)
+			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			.execute();
+			
+			dslContext.deleteFrom(TENANT_BUSINESS_CTX)
+			.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			.execute();
+			
+			dslContext.deleteFrom(TENANT)
+			.where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
+			.execute();		
+		}
 	  
 	  public List<String> getTenantNameByBusinessCtxId(Long businessCtxId){
 		  return dslContext.select(
@@ -104,15 +131,10 @@ public class TenantRepository {
 	  }
 
 
-	public void createTenant(String name) {
-		 ULong tenantId =  dslContext.select(
-				  TENANT.TENANT_ID)
-				  .from(TENANT)
-				  .where(TENANT.NAME.eq(name))
-				  .fetchOne(TENANT.TENANT_ID);
-		
-		if(tenantId != null) {
-			return;
+	public boolean createTenant(String name) {
+	
+		if(checkIfTenantNameExists(name)) {
+			return false;
 		}
 		
 		TenantRecord record = new TenantRecord();
@@ -120,17 +142,22 @@ public class TenantRepository {
 		dslContext.insertInto(TENANT)
         .set(record)
         .returning().fetchOne().getTenantId().longValue();	
+		
+		return true;
    }
 	
-	public void updateTenant(Long tenantId, String name) {
+	public boolean updateTenant(Long tenantId, String name) {
 		Tenant tenant = getTenantById(tenantId);
 		
-		if(tenant != null && !tenant.getName().equals(name)){
+		if(tenant != null && !checkIfTenantNameExists(name)&& !tenant.getName().equals(name)){
 			dslContext.update(TENANT)
 			.set(TENANT.NAME, name)
 			.where(TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))
 			.execute();
+			
+			return true;
 		}
+		return false;
   }
 	
 	public void addUserToTenant(Long tenantId, Long appUserId) {
@@ -192,5 +219,13 @@ public class TenantRepository {
 				.fetchOne(USER_TENANT.USER_TENANT_ID);
 		return userTenant != null ? true : false;
 	}
-
+	
+	private boolean checkIfTenantNameExists(String name) {
+		 ULong tenantId =  dslContext.select(
+				  TENANT.TENANT_ID)
+				  .from(TENANT)
+				  .where(TENANT.NAME.eq(name))
+				  .fetchOne(TENANT.TENANT_ID);
+		 return tenantId != null ? true : false;
+	}
 }

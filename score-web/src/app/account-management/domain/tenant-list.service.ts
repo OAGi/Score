@@ -1,7 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {TenantListRequest, TenantList} from './tenants'
+import {TenantListRequest, TenantList, TenantInfo} from './tenants'
 import {PageResponse} from '../../basis/basis';
 
 @Injectable()
@@ -25,8 +25,8 @@ export class TenantListService implements OnInit {
     return this.http.get<PageResponse<TenantList>>('/api/tenants', {params: params});
   }
 
-  getTenantInfo(tenantId: number) : Observable<TenantList> {
-    return this.http.get<TenantList>('/api/tenants/' + tenantId);
+  getTenantInfo(tenantId: number) : Observable<TenantInfo> {
+    return this.http.get<TenantInfo>('/api/tenants/' + tenantId);
   }
 
   createTenant(tenantName: string): Observable<any>{
@@ -36,6 +36,11 @@ export class TenantListService implements OnInit {
   updateTenant(tenantId:number, tenantName: string): Observable<any>{
     return this.http.put('/api/tenants/' + tenantId, tenantName);
   }
+
+  deleteTenant(tenantId:number): Observable<any>{
+    return this.http.delete('/api/tenants/' + tenantId);
+  }
+  
   deleteTenantUser(tenantId:number, appUserId: number): Observable<any>{
     return this.http.put('/api/tenants/users/' + tenantId, appUserId);
   }

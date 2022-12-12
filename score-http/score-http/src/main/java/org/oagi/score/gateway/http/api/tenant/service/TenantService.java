@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.tenant.data.Tenant;
+import org.oagi.score.gateway.http.api.tenant.data.TenantInfo;
 import org.oagi.score.gateway.http.api.tenant.data.TenantListRequest;
 import org.oagi.score.repo.component.tenant.TenantRepository;
 import org.oagi.score.service.common.data.PageResponse;
@@ -30,17 +31,21 @@ public class TenantService {
 		return tenantRepository.getAllTenantsRole(tenantRequest);
 	}
 	
-	public void createTenant(String name) {
-	    tenantRepository.createTenant(name);
+	public boolean createTenant(String name) {
+	    return tenantRepository.createTenant(name);
 	}
 	
 
-	public void updateTenant(Long tenantId, String name) {
-	    tenantRepository.updateTenant(tenantId, name);
+	public boolean updateTenant(Long tenantId, String name) {
+	    return tenantRepository.updateTenant(tenantId, name);
 	}
 	
-	public Tenant getTenantById(Long tenantId) {
+	public TenantInfo getTenantById(Long tenantId) {
 		return tenantRepository.getTenantById(tenantId);
+	}
+	
+	public void deleteTenant(Long tenantId) {
+		tenantRepository.deleteTenant(tenantId);
 	}
 	
 	public void addUserToTenant(Long tenantId, Long appUserId) {

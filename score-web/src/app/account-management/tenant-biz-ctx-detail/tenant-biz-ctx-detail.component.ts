@@ -81,7 +81,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     });
   }
 
-  getTenantInfo(tenantId:number){
+   getTenantInfo = (tenantId:number)  =>  {
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;

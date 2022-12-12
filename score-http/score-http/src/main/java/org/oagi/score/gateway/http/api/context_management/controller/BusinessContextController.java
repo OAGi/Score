@@ -87,16 +87,16 @@ public class BusinessContextController {
 
         GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, configService.isTenantInstance());
 
-        List<BusinessContext> ctxs = response.getResults();
-        if(configService.isTenantInstance()) {
-        	 ctxs.forEach(c->{
-             	
-             	List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId().longValue());
-             	String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));
-             	c.setConnectedTenantNames(tenant);
-             });
-        }
-       
+		List<BusinessContext> ctxs = response.getResults();
+		if (configService.isTenantInstance()) {
+			ctxs.forEach(c -> {
+
+				List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId().longValue());
+				String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));
+				c.setConnectedTenantNames(tenant);
+			});
+		}
+
         PageResponse<BusinessContext> pageResponse = new PageResponse<>();
         pageResponse.setList(ctxs);
         pageResponse.setPage(response.getPage());

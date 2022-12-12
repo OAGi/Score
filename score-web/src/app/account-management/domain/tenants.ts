@@ -26,7 +26,8 @@ export class TenantListRequest {
         if (params.get('pageSize')) {
           this.page.pageSize = Number(params.get('pageSize'));
         } else {
-          this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
+          this.page.pageSize = (defaultPageRequest) 
+          ? defaultPageRequest.pageSize : 0;
         }
         this.name = params.get('name') || '';
     }
@@ -35,8 +36,8 @@ export class TenantListRequest {
         let params = new HttpParams()
           .set('sortActive', this.page.sortActive)
           .set('sortDirection', this.page.sortDirection)
-          .set('pageIndex', '' + this.page.pageIndex)
-          .set('pageSize', '' + this.page.pageSize);
+          .set('pageIndex',  + this.page.pageIndex)
+          .set('pageSize',  + this.page.pageSize);
     
      
         if (this.name && this.name.length > 0) {
@@ -55,6 +56,13 @@ export class TenantListRequest {
 export class TenantList {
     tenantId: number;
     name: string;
+}
+
+export class TenantInfo{
+  tenantId: number;
+  name: string;
+  usersCount: number;
+  businessCtxCount:number;
 }
 
 export class BusinessTenantContext{

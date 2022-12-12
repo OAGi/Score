@@ -39,6 +39,7 @@ import org.oagi.score.gateway.http.api.bie_management.data.BieList;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.tenant.service.TenantService;
+import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.CoreComponentRepository;
@@ -114,6 +115,9 @@ public class BieService {
     
     @Autowired
     private TenantService tenantService;
+    
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Transactional
     public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
@@ -206,7 +210,7 @@ public class BieService {
                 .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
-                .setTenantBusinessCtx(userTenantIds)
+                .setTenantBusinessCtx(requester.isAdmin(), userTenantIds)
                 .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchInto(BieList.class);
@@ -223,7 +227,7 @@ public class BieService {
             getBusinessContextListRequest.setPageSize(-1);
 
             GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                    .getBusinessContextList(getBusinessContextListRequest, false);
+                    .getBusinessContextList(getBusinessContextListRequest, configurationService.isTenantInstance());
 
             bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
             bieList.setAccess(

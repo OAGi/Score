@@ -10,8 +10,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 })
 export class TenantCreateComponent implements OnInit {
 
-  title = 'Create Context Category';
+  title = 'Create Tenant';
   name;
+  HTTP_CONFLICT = 409;
 
   constructor(private service: TenantListService,
               private location: Location,
@@ -38,6 +39,16 @@ export class TenantCreateComponent implements OnInit {
         duration: 3000,
       });
       this.router.navigateByUrl('/tenant');
+    }, error => {
+      if(error.status === this.HTTP_CONFLICT){
+        this.snackBar.open(`Tenant with name ${this.name} already exists!`, '', {
+          duration: 3000,
+        });
+      }else{
+        this.snackBar.open(`There is a problem with creation of tenant with name ${this.name}`, '', {
+          duration: 3000,
+        });
+      }
     });
   }
 
