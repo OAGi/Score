@@ -31,6 +31,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectFinalStep;
 import org.jooq.SelectOnConditionStep;
@@ -226,6 +227,8 @@ public class JooqBusinessContextReadRepository
             conditions.add(BIZ_CTX.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
         }
         
+        
+        //for tenant management
         if(isTenantInstance) {
       	  Long tenantId = request.getTenantId();
             boolean notConnectedToTenant = request.isNotConnectedToTenant();
@@ -240,6 +243,12 @@ public class JooqBusinessContextReadRepository
             			.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))));
             }
       }
+       
+		// for editing bie
+		if (isTenantInstance && request.isBieEditing()) {
+			conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+					.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(request.getUserTenantIds()))));
+		}
 
         return conditions;
     }

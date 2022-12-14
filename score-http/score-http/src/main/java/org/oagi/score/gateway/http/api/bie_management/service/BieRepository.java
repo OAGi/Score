@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.service.bie.BieReuseReport;
+import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class BieRepository {
     @Autowired
     private TenantService tenantService;
 
-    public List<SummaryBie> getSummaryBieList(BigInteger releaseId, BigInteger appUserId) {
+    public List<SummaryBie> getSummaryBieList(BigInteger releaseId, AppUser requester) {
 
         SelectOnConditionStep step = dslContext.select(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
@@ -73,9 +74,9 @@ public class BieRepository {
         	conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.isNotNull());
         }
         
-        if(configService.isTenantInstance()) {
+        if(configService.isTenantInstance() && !requester.isAdmin()) {
         	 List<ULong> userTenantIds = tenantService
-        	        		.getUserTenantsRoleByUserId(ULong.valueOf(appUserId));
+        	        		.getUserTenantsRoleByUserId(ULong.valueOf(requester.getAppUserId()));
         	 conditions.add(BIZ_CTX.BIZ_CTX_ID.in
                			(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
                			 .from(TENANT_BUSINESS_CTX)

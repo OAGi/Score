@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.context_management.controller;
 
 import org.oagi.score.service.common.data.PageResponse;
+import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.tenant.service.TenantService;
 import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.repo.api.businesscontext.model.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -52,6 +54,7 @@ public class BusinessContextController {
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
             @RequestParam(name = "tenantId", required = false) Long tenantId,
             @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
+            @RequestParam(name = "isBieEditing", required = false) Boolean isBieEditing,
             @RequestParam(name = "sortActive", required = false) String sortActive,
             @RequestParam(name = "sortDirection", required = false) String sortDirection,
             @RequestParam(name = "pageIndex", defaultValue = "-1") int pageIndex,
@@ -79,6 +82,14 @@ public class BusinessContextController {
         }
         request.setTenantId(tenantId);
         request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
+        request.setBieEditing(isBieEditing != null ? isBieEditing : false);
+        
+        if (configService.isTenantInstance() && request.isBieEditing()) {
+        	List<ULong> userTenantIds = tenantService.getUserTenantsRoleByUserId(ULong.valueOf(request.getRequester().getUserId()));
+        	List<Long> mappedIds = new ArrayList<>();
+        	userTenantIds.forEach(i -> mappedIds.add(i.longValue()));
+        	request.setUserTenantIds(mappedIds);
+        }
         
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);

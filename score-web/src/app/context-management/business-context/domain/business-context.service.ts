@@ -38,6 +38,9 @@ export class BusinessContextService implements OnInit {
     if (request.filters.notConnectedToTenant) {
       params = params.set('notConnectedToTenant', 'true');
     }
+    if (request.filters.isBieEditing) {
+      params = params.set('isBieEditing', 'true');
+    }
     return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
   }
 
@@ -53,6 +56,7 @@ export class BusinessContextService implements OnInit {
   }
 
   getBusinessContextsByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<PageResponse<BusinessContext>> {
+    console.log(`here ${topLevelAsbiepId}`)
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 

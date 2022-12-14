@@ -40,7 +40,7 @@ public class BieInfoService {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }
 
-        List<SummaryBie> summaryBieList = repository.getSummaryBieList(releaseId, requester.getAppUserId());
+        List<SummaryBie> summaryBieList = repository.getSummaryBieList(releaseId, requester);
 
         SummaryBieInfo info = new SummaryBieInfo();
         Map<BieState, Integer> numberOfTotalBieByStates =

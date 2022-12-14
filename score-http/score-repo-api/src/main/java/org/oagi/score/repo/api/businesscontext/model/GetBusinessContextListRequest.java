@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class GetBusinessContextListRequest extends PaginationRequest<BusinessContext> {
 
@@ -18,6 +19,8 @@ public class GetBusinessContextListRequest extends PaginationRequest<BusinessCon
     private LocalDateTime updateEndDate;
     private Long tenantId;
     private boolean notConnectedToTenant;
+    private boolean isBieEditing;
+    private List<Long> userTenantIds;
 
     public GetBusinessContextListRequest(ScoreUser requester) {
         super(requester, BusinessContext.class);
@@ -100,5 +103,21 @@ public class GetBusinessContextListRequest extends PaginationRequest<BusinessCon
 
 	public void setNotConnectedToTenant(boolean notConnectedToTenant) {
 		this.notConnectedToTenant = notConnectedToTenant;
+	}
+
+	public boolean isBieEditing() {
+		return isBieEditing;
+	}
+
+	public void setBieEditing(boolean isBieEditing) {
+		this.isBieEditing = isBieEditing;
+	}
+
+	public List<Long> getUserTenantIds() {
+		return userTenantIds;
+	}
+
+	public void setUserTenantIds(List<Long> userTenantIds) {
+		this.userTenantIds = userTenantIds;
 	}
 }

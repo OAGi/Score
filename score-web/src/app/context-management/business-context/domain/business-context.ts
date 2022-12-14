@@ -9,6 +9,7 @@ export class BusinessContextListRequest {
     name: string;
     tenantId: number;
     notConnectedToTenant: boolean;
+    isBieEditing: boolean;
   };
   updaterUsernameList: string[] = [];
   updatedDate: {
@@ -49,6 +50,7 @@ export class BusinessContextListRequest {
       name: params.get('name') || '',
       tenantId: Number(params.get('tenantId')) || null,
       notConnectedToTenant: false,
+      isBieEditing: false
     };
   }
 
@@ -76,6 +78,9 @@ export class BusinessContextListRequest {
     }
     if (this.filters.notConnectedToTenant) {
       params = params.set('notConnectedToTenant', '' + this.filters.notConnectedToTenant);
+    }
+    if (this.filters.isBieEditing) {
+      params = params.set('isBieEditing', '' + this.filters.isBieEditing);
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

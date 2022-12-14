@@ -1712,6 +1712,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   _loadAllBusinessContexts() {
     const request = new BusinessContextListRequest();
+    if(this.auth.getUserToken().isTenantInstance){
+      request.filters.isBieEditing = true;
+    }
     request.page = new PageRequest('name', 'asc', -1, -1);
     this.bizCtxService.getBusinessContextList(request)
       .subscribe(resp => {
