@@ -21,7 +21,7 @@ import {finalize, switchMap} from 'rxjs/operators';
 
 export class TenantUserDetailComponent implements OnInit {
 
-  title = ' - Users Managment';
+  title = ' - Users Management';
   loading = false;
   tenantInfo : TenantList;
   tenantId : any;

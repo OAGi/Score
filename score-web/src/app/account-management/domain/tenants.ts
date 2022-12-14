@@ -36,8 +36,8 @@ export class TenantListRequest {
         let params = new HttpParams()
           .set('sortActive', this.page.sortActive)
           .set('sortDirection', this.page.sortDirection)
-          .set('pageIndex',  + this.page.pageIndex)
-          .set('pageSize',  + this.page.pageSize);
+          .set('pageIndex',  this.page.pageIndex)
+          .set('pageSize',   this.page.pageSize);
     
      
         if (this.name && this.name.length > 0) {

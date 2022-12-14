@@ -24,7 +24,7 @@ import {finalize, switchMap} from 'rxjs/operators';
   styleUrls: ['./tenant-biz-ctx-detail.component.css']
 })
 export class TenantBusinessCtxDetailComponent implements OnInit {
-  title = ' - Business Context Managment';
+  title = ' - Business Context Management';
   displayedColumns: string[] = [
      'name', 'lastUpdateTimestamp', 'manage'
   ];
