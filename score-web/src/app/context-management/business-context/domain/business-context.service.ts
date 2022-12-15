@@ -56,7 +56,6 @@ export class BusinessContextService implements OnInit {
   }
 
   getBusinessContextsByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<PageResponse<BusinessContext>> {
-    console.log(`here ${topLevelAsbiepId}`)
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
