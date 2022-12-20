@@ -111,6 +111,9 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+      if(this.isTenantInstance()){
+        this.request.filters.isBieEditing = true;
+      }
 
     this.bizCtxService.getBusinessContextList(this.request).pipe(
       finalize(() => {
