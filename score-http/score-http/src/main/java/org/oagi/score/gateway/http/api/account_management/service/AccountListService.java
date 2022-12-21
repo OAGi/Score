@@ -5,6 +5,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
+import org.oagi.score.gateway.http.api.tenant.service.TenantService;
 import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -28,7 +29,8 @@ import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.USER_TENANT;;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.USER_TENANT;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.TENANT_BUSINESS_CTX;
 
 @Service
 @Transactional(readOnly = true)
@@ -45,10 +47,13 @@ public class AccountListService {
     
     @Autowired
     private ConfigurationService configService;
+    
+    @Autowired
+    private TenantService tenantService;
 
     public PageResponse<AppUser> getAccounts(AuthenticatedPrincipal user,
                                              AccountListRequest request) {
-        SelectOnConditionStep step = dslContext.select(
+        SelectOnConditionStep step = dslContext.selectDistinct(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
@@ -116,6 +121,14 @@ public class AccountListService {
               			dslContext.select(USER_TENANT.APP_USER_ID)
               			.from(USER_TENANT)
               			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+              }
+              
+              List<Long> businessCtxIds = request.getBusinessCtxIds();
+              if(businessCtxIds != null && !businessCtxIds.isEmpty()) {
+            	  conditions.add(USER_TENANT.TENANT_ID.in(
+            			  dslContext.select(TENANT_BUSINESS_CTX.TENANT_ID)
+                			.from(TENANT_BUSINESS_CTX)
+                			.where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.in(businessCtxIds))));
               }
         }
         

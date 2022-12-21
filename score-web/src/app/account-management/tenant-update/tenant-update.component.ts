@@ -81,7 +81,7 @@ export class UpdateTenantComponent implements OnInit {
     ];
     if(this.tenant.usersCount > 0 || this.tenant.businessCtxCount > 0){
       dialogConfig.data.content = [
-        `This tenant is assotiated with ${this.tenant.usersCount} Account(s) and ${this.tenant.businessCtxCount} Business context(s)!`,
+        `This tenant is associated with ${this.tenant.usersCount} Account(s) and ${this.tenant.businessCtxCount} Business context(s)!`,
         'Are you sure you want to discard the tenant?',
         'The tenant will be permanently removed.'
       ];

@@ -37,6 +37,7 @@ public class AccountListController {
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
             @RequestParam(name = "tenantId", required = false) Long tenantId,
             @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
+            @RequestParam(name = "businessCtxIds", required = false) String businessCtxIds,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
@@ -62,6 +63,11 @@ public class AccountListController {
         request.setTenantId(tenantId);
         request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
         
+        if (StringUtils.hasLength(businessCtxIds)) {
+            List<Long> businessCtxIdsList = Arrays.asList(businessCtxIds.split(",")).stream()
+            		.map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(Long::parseLong).collect(Collectors.toList());
+            request.setBusinessCtxIds(businessCtxIdsList);
+        }
         PageRequest pageRequest = new PageRequest();
         pageRequest.setSortActive(sortActive);
         pageRequest.setSortDirection(sortDirection);

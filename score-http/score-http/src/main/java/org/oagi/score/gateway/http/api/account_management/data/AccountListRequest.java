@@ -18,6 +18,7 @@ public class AccountListRequest {
     private Boolean excludeRequester;
     private Long tenantId;
     private boolean notConnectedToTenant;
+    private List<Long> businessCtxIds;
 
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
 

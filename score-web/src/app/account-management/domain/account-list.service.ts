@@ -54,6 +54,9 @@ export class AccountListService implements OnInit {
     if (request.filters.notConnectedToTenant) {
       params = params.set('notConnectedToTenant', 'true');
     }
+    if (request.filters.businessCtxIds) {
+      params = params.set('businessCtxIds', request.filters.businessCtxIds.join(','));
+    }
     if (excludeRequester) {
       params = params.set('excludeRequester', 'true');
     }

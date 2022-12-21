@@ -46,7 +46,7 @@ public class BieRepository {
 
     public List<SummaryBie> getSummaryBieList(BigInteger releaseId, AppUser requester) {
 
-        SelectOnConditionStep step = dslContext.select(
+        SelectOnConditionStep step = dslContext.selectDistinct(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
                 TOP_LEVEL_ASBIEP.STATE,

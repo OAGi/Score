@@ -13,6 +13,7 @@ export class AccountListRequest {
     excludeSSO: boolean;
     tenantId: number;
     notConnectedToTenant: boolean;
+    businessCtxIds: number[];
   };
   page: PageRequest = new PageRequest();
 
@@ -48,6 +49,7 @@ export class AccountListRequest {
       excludeSSO: false, 
       tenantId: Number(params.get('tenantId')) || null,
       notConnectedToTenant: false,
+      businessCtxIds: (Number(params.get('businessCtxIds'))) ? Array.from(params.get('businessCtxIds').split(',').map(Number)) : [],
     };
   }
 
@@ -84,6 +86,9 @@ export class AccountListRequest {
     }
     if (this.filters.notConnectedToTenant) {
       params = params.set('notConnectedToTenant', '' + this.filters.notConnectedToTenant);
+    }
+    if (this.filters.businessCtxIds) {
+      params = params.set('businessCtxIds', '' + this.filters.businessCtxIds);
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

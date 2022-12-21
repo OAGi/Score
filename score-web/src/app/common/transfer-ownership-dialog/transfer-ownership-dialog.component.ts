@@ -69,6 +69,11 @@ export class TransferOwnershipDialogComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+
+    if(this.authService.getUserToken().isTenantInstance){
+       this.request.filters.businessCtxIds = this.data.businesCtxIds;
+    }
+
     if (this.data && this.data.roles) {
       this.request.filters.roles = this.data.roles;
     }
