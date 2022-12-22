@@ -60,11 +60,12 @@ public class BieRepository {
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID));
         
-        if(configService.isTenantInstance()) {
-        	step.join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
-            .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
-            .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
-        }
+		if (configService.isTenantInstance()) {
+			step.join(BIZ_CTX_ASSIGNMENT)
+					.on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)).join(BIZ_CTX)
+					.on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID)).leftJoin(TENANT_BUSINESS_CTX)
+					.on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
+		}
 
         SelectConditionStep cond;
         List<Condition> conditions = new ArrayList();
@@ -74,14 +75,12 @@ public class BieRepository {
         	conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.isNotNull());
         }
         
-        if(configService.isTenantInstance() && !requester.isAdmin()) {
-        	 List<ULong> userTenantIds = tenantService
-        	        		.getUserTenantsRoleByUserId(ULong.valueOf(requester.getAppUserId()));
-        	 conditions.add(BIZ_CTX.BIZ_CTX_ID.in
-               			(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
-               			 .from(TENANT_BUSINESS_CTX)
-               			 .where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
-        }
+		if (configService.isTenantInstance() && !requester.isAdmin()) {
+			List<ULong> userTenantIds = tenantService
+					.getUserTenantsRoleByUserId(ULong.valueOf(requester.getAppUserId()));
+			conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+					.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
+		}
         cond =  step.where(conditions);
 
         return cond.fetchInto(SummaryBie.class);

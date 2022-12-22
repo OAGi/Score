@@ -60,11 +60,11 @@ export class UpdateTenantComponent implements OnInit {
       });
       this.router.navigateByUrl('/tenant');
     }, error => {
-      if(error.status === this.HTTP_CONFLICT){
+      if (error.status === this.HTTP_CONFLICT) {
         this.snackBar.open(`Tenant with name ${this.tenant.name} already exists!`, '', {
           duration: 3000,
         });
-      }else{
+      } else {
         this.snackBar.open(`There is a problem with creation of tenant with name ${this.tenant.name}`, '', {
           duration: 3000,
         });
@@ -72,14 +72,14 @@ export class UpdateTenantComponent implements OnInit {
     });
   }
 
-  discard(){
+  discard() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard Tenant?';
     dialogConfig.data.content = [
       'Are you sure you want to discard the tenant?',
       'The tenant will be permanently removed.'
     ];
-    if(this.tenant.usersCount > 0 || this.tenant.businessCtxCount > 0){
+    if (this.tenant.usersCount > 0 || this.tenant.businessCtxCount > 0) {
       dialogConfig.data.content = [
         `This tenant is associated with ${this.tenant.usersCount} Account(s) and ${this.tenant.businessCtxCount} Business context(s)!`,
         'Are you sure you want to discard the tenant?',

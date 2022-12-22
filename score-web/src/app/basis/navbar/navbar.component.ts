@@ -90,8 +90,8 @@ export class NavbarComponent implements OnInit {
     return this.roles.includes('developer');
   }
 
-  showContextButton(){
-    if(this.isTenant){
+  showContextButton() {
+    if (this.isTenant) {
       return this.auth.isAdmin();
     }
     return true;

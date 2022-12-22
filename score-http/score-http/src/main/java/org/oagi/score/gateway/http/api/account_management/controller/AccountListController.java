@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class AccountListController {
             @RequestParam(name = "roles", required = false) String roles,
             @RequestParam(name = "excludeSSO", required = false) Boolean excludeSSO,
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
-            @RequestParam(name = "tenantId", required = false) Long tenantId,
+            @RequestParam(name = "tenantId", required = false) BigInteger tenantId,
             @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
             @RequestParam(name = "businessCtxIds", required = false) String businessCtxIds,
             @RequestParam(name = "sortActive") String sortActive,

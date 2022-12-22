@@ -25,35 +25,35 @@ export class TenantListService implements OnInit {
     return this.http.get<PageResponse<TenantList>>('/api/tenants', {params: params});
   }
 
-  getTenantInfo(tenantId: number) : Observable<TenantInfo> {
+  getTenantInfo(tenantId: number): Observable<TenantInfo> {
     return this.http.get<TenantInfo>('/api/tenants/' + tenantId);
   }
 
-  createTenant(tenantName: string): Observable<any>{
+  createTenant(tenantName: string): Observable<any> {
     return this.http.post('/api/tenants', tenantName);
   }
 
-  updateTenant(tenantId:number, tenantName: string): Observable<any>{
+  updateTenant(tenantId:number, tenantName: string): Observable<any> {
     return this.http.put('/api/tenants/' + tenantId, tenantName);
   }
 
-  deleteTenant(tenantId:number): Observable<any>{
+  deleteTenant(tenantId:number): Observable<any> {
     return this.http.delete('/api/tenants/' + tenantId);
   }
   
-  deleteTenantUser(tenantId:number, appUserId: number): Observable<any>{
+  deleteTenantUser(tenantId:number, appUserId: number) : Observable<any> {
     return this.http.put('/api/tenants/users/' + tenantId, appUserId);
   }
 
-  addTenantUser(tenantId:number, appUserId: number): Observable<any>{
+  addTenantUser(tenantId:number, appUserId: number): Observable<any> {
     return this.http.post('/api/tenants/users/' + tenantId, appUserId);
   }
 
-  addTenantBusinessCtx(tenantId:number, businessCtxId: number): Observable<any>{
+  addTenantBusinessCtx(tenantId:number, businessCtxId: number) : Observable<any> {
     return this.http.post('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
   }
 
-  deleteTenantBusinessCtx(tenantId:number, businessCtxId: number): Observable<any>{
+  deleteTenantBusinessCtx(tenantId:number, businessCtxId: number) : Observable<any> {
     return this.http.put('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
   }
 }

@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.account_management.data;
 import lombok.Data;
 import org.oagi.score.service.common.data.PageRequest;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class AccountListRequest {
     private List<String> roles = Collections.emptyList();
     private boolean excludeSSO;
     private Boolean excludeRequester;
-    private Long tenantId;
+    private BigInteger tenantId;
     private boolean notConnectedToTenant;
     private List<Long> businessCtxIds;
 

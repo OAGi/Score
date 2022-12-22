@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -109,28 +110,24 @@ public class AccountListService {
             conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
         
-        if(configService.isTenantInstance()) {
-        	  Long tenantId = request.getTenantId();
-              boolean notConnectedToTenant = request.isNotConnectedToTenant();
-              if(tenantId != null && !notConnectedToTenant) {
-              	conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
-              }
-              
-              if(tenantId != null && notConnectedToTenant) {
-              	conditions.add(APP_USER.APP_USER_ID.notIn(
-              			dslContext.select(USER_TENANT.APP_USER_ID)
-              			.from(USER_TENANT)
-              			.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
-              }
-              
-              List<Long> businessCtxIds = request.getBusinessCtxIds();
-              if(businessCtxIds != null && !businessCtxIds.isEmpty()) {
-            	  conditions.add(USER_TENANT.TENANT_ID.in(
-            			  dslContext.select(TENANT_BUSINESS_CTX.TENANT_ID)
-                			.from(TENANT_BUSINESS_CTX)
-                			.where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.in(businessCtxIds))));
-              }
-        }
+		if (configService.isTenantInstance()) {
+			BigInteger tenantId = request.getTenantId();
+			boolean notConnectedToTenant = request.isNotConnectedToTenant();
+			if (tenantId != null && !notConnectedToTenant) {
+				conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
+			}
+
+			if (tenantId != null && notConnectedToTenant) {
+				conditions.add(APP_USER.APP_USER_ID.notIn(dslContext.select(USER_TENANT.APP_USER_ID).from(USER_TENANT)
+						.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+			}
+
+			List<Long> businessCtxIds = request.getBusinessCtxIds();
+			if (businessCtxIds != null && !businessCtxIds.isEmpty()) {
+				conditions.add(USER_TENANT.TENANT_ID.in(dslContext.select(TENANT_BUSINESS_CTX.TENANT_ID)
+						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.in(businessCtxIds))));
+			}
+		}
         
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 

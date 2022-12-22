@@ -654,15 +654,13 @@ public class BusinessInformationEntityRepository {
             return this;
         }
         
-        public SelectBieListArguments setTenantBusinessCtx(boolean isAdmin, List<ULong> userTenantIds ) {
-        	if(configService.isTenantInstance() && !isAdmin) {
-        		conditions.add(BIZ_CTX.BIZ_CTX_ID.in
-               			(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
-               			 .from(TENANT_BUSINESS_CTX)
-               			 .where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
-        	}
-            return this;
-        }
+		public SelectBieListArguments setTenantBusinessCtx(boolean isAdmin, List<ULong> userTenantIds) {
+			if (configService.isTenantInstance() && !isAdmin) {
+				conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
+			}
+			return this;
+		}
 
         public List<Condition> getConditions() {
             return conditions;

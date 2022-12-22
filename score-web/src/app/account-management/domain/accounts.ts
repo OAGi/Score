@@ -13,7 +13,7 @@ export class AccountListRequest {
     excludeSSO: boolean;
     tenantId: number;
     notConnectedToTenant: boolean;
-    businessCtxIds: number[];
+    businessCtxIds: string[];
   };
   page: PageRequest = new PageRequest();
 
@@ -49,7 +49,7 @@ export class AccountListRequest {
       excludeSSO: false, 
       tenantId: Number(params.get('tenantId')) || null,
       notConnectedToTenant: false,
-      businessCtxIds: (Number(params.get('businessCtxIds'))) ? Array.from(params.get('businessCtxIds').split(',').map(Number)) : [],
+      businessCtxIds: (params.get('businessCtxIds')) ? Array.from(params.get('businessCtxIds').split(',')) : [],
     };
   }
 

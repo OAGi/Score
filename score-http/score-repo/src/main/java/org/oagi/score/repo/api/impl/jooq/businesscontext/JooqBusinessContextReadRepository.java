@@ -228,22 +228,20 @@ public class JooqBusinessContextReadRepository
         }
         
         
-        //for tenant management
-        if(isTenantInstance) {
-      	  Long tenantId = request.getTenantId();
-            boolean notConnectedToTenant = request.isNotConnectedToTenant();
-            if(tenantId != null && !notConnectedToTenant) {
-            	conditions.add(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)));
-            }
-            
-            if(tenantId != null && notConnectedToTenant) {
-            	conditions.add(BIZ_CTX.BIZ_CTX_ID.notIn(
-            			dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
-            			.from(TENANT_BUSINESS_CTX)
-            			.where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))));
-            }
-      }
-       
+		// for tenant management
+		if (isTenantInstance) {
+			Long tenantId = request.getTenantId();
+			boolean notConnectedToTenant = request.isNotConnectedToTenant();
+			if (tenantId != null && !notConnectedToTenant) {
+				conditions.add(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)));
+			}
+
+			if (tenantId != null && notConnectedToTenant) {
+				conditions.add(BIZ_CTX.BIZ_CTX_ID.notIn(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+			}
+		}
+
 		// for editing bie
 		if (isTenantInstance && request.isBieEditing()) {
 			conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)

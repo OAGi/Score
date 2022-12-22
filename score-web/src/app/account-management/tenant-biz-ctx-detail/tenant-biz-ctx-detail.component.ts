@@ -151,13 +151,13 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     }
   }
 
-  setAddBusnessCtxView(){
+  setAddBusnessCtxView() {
     this.addBusinessCtxToTenant = !this.addBusinessCtxToTenant;
     this.request.filters.notConnectedToTenant = true;
     this.loadBusinessContextList();
   }
 
-  setListView(){
+  setListView() {
     this.addBusinessCtxToTenant = !this.addBusinessCtxToTenant;
     this.request.filters.notConnectedToTenant = false;
     this.paginator.pageIndex = 0; 
@@ -165,7 +165,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     this.loadBusinessContextList();
   }
 
-  removeTenantBusinessCtx(businessCtxId:number){
+  removeTenantBusinessCtx(businessCtxId:number) {
     this.service.deleteTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;
@@ -177,7 +177,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     });
   }
 
-  addTenantBusinessCtx(businessCtxId:number){
+  addTenantBusinessCtx(businessCtxId:number) {
     this.service.addTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;

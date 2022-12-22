@@ -29,7 +29,7 @@ export class BieCreateBizCtxComponent implements OnInit {
   subtitle = 'Select Business Contexts';
 
   displayedColumns: string[] = [
-    'select', 'name', 'tenant','lastUpdateTimestamp'
+    'select', 'name', 'tenant', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
   selection = new SelectionModel<number>(true, []);
@@ -111,7 +111,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-      if(this.isTenantInstance()){
+      if (this.isTenantInstance()) {
         this.request.filters.isBieEditing = true;
       }
 
@@ -169,7 +169,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {businessContextIdList: selectedBizCtxIds}});
   }
 
-  isTenantInstance(){
+  isTenantInstance() {
     const userToken = this.authServer.getUserToken();
     return userToken.isTenantInstance;
   }

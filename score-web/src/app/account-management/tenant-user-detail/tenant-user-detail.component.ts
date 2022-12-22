@@ -72,13 +72,13 @@ export class TenantUserDetailComponent implements OnInit {
       });
   }
 
-  getTenantInfo(tenantId:number){
+  getTenantInfo(tenantId:number) {
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.title = resp.name + this.title ;
+     this.title = resp.name + this.title;
      this.loadAccounts(true);
     }, error => {
       this.dataSource.data = [];
@@ -115,7 +115,7 @@ export class TenantUserDetailComponent implements OnInit {
     this.loadAccounts();
   }
 
-  removeUser(userId:number){
+  removeUser(userId:number) {
     this.service.deleteTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;
@@ -127,13 +127,13 @@ export class TenantUserDetailComponent implements OnInit {
     });
   }
 
-  setAddUserView(){
+  setAddUserView() {
     this.addUserToTenant = !this.addUserToTenant;
     this.request.filters.notConnectedToTenant = true;
     this.loadAccounts();
   }
 
-  setListView(){
+  setListView() {
     this.addUserToTenant = !this.addUserToTenant;
     this.request.filters.notConnectedToTenant = false;
     this.paginator.pageIndex = 0; 
@@ -141,7 +141,7 @@ export class TenantUserDetailComponent implements OnInit {
     this.loadAccounts();
   }
 
-  addUser(userId:number){
+  addUser(userId:number) {
     this.service.addTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;

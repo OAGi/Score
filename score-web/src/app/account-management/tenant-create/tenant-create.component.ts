@@ -40,11 +40,11 @@ export class TenantCreateComponent implements OnInit {
       });
       this.router.navigateByUrl('/tenant');
     }, error => {
-      if(error.status === this.HTTP_CONFLICT){
+      if (error.status === this.HTTP_CONFLICT) {
         this.snackBar.open(`Tenant with name ${this.name} already exists!`, '', {
           duration: 3000,
         });
-      }else{
+      } else {
         this.snackBar.open(`There is a problem with creation of tenant with name ${this.name}`, '', {
           duration: 3000,
         });

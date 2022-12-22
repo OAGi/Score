@@ -15,51 +15,50 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class TenantService {
-	
+
 	@Autowired
 	private TenantRepository tenantRepository;
-	
+
 	public List<ULong> getUserTenantsRoleByUserId(ULong userId) {
 		return tenantRepository.getUserTenantsRoleByUserId(userId);
 	}
-	
-	public List<String> getTenantNameByBusinessCtxId(Long businessCtxId){
+
+	public List<String> getTenantNameByBusinessCtxId(Long businessCtxId) {
 		return tenantRepository.getTenantNameByBusinessCtxId(businessCtxId);
 	}
-	
-	public PageResponse<Tenant> getAllTenantRoles(TenantListRequest tenantRequest){
+
+	public PageResponse<Tenant> getAllTenantRoles(TenantListRequest tenantRequest) {
 		return tenantRepository.getAllTenantsRole(tenantRequest);
 	}
-	
+
 	public boolean createTenant(String name) {
-	    return tenantRepository.createTenant(name);
+		return tenantRepository.createTenant(name);
 	}
-	
 
 	public boolean updateTenant(Long tenantId, String name) {
-	    return tenantRepository.updateTenant(tenantId, name);
+		return tenantRepository.updateTenant(tenantId, name);
 	}
-	
+
 	public TenantInfo getTenantById(Long tenantId) {
 		return tenantRepository.getTenantById(tenantId);
 	}
-	
+
 	public void deleteTenant(Long tenantId) {
 		tenantRepository.deleteTenant(tenantId);
 	}
-	
+
 	public void addUserToTenant(Long tenantId, Long appUserId) {
 		tenantRepository.addUserToTenant(tenantId, appUserId);
 	}
-	
+
 	public void deleteTenantUser(Long tenantId, Long appUserId) {
 		tenantRepository.deleteTenantUser(tenantId, appUserId);
 	}
-	
+
 	public void addBusinessCtxToTenant(Long tenantId, Long businessCtxId) {
 		tenantRepository.addBusinessCtxToTenant(tenantId, businessCtxId);
 	}
-	
+
 	public void deleteTenantBusinessCtx(Long tenantId, Long businessCtxId) {
 		tenantRepository.deleteTenantBusinessCtx(tenantId, businessCtxId);
 	}

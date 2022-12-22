@@ -128,14 +128,14 @@ public class AccountController implements InitializingBean {
 
         return resp;
     }
-    
-    private List<ULong> getUserTenantsRoleByUserId(ULong userId){
-    	List<ULong> tenantRoles = new ArrayList<>();
-    	if(configService.isTenantInstance()) {
-    		tenantRoles = tenantService.getUserTenantsRoleByUserId(userId);
-    	}
-    	return tenantRoles;
-    }
+
+	private List<ULong> getUserTenantsRoleByUserId(ULong userId) {
+		List<ULong> tenantRoles = new ArrayList<>();
+		if (configService.isTenantInstance()) {
+			tenantRoles = tenantService.getUserTenantsRoleByUserId(userId);
+		}
+		return tenantRoles;
+	}
 
     @RequestMapping(value = "/accounts/{id}/enable", method = RequestMethod.POST)
     public ResponseEntity enable(

@@ -271,7 +271,7 @@ export class BieListComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {roles: this.auth.getUserToken().roles};
-    if(this.auth.getUserToken().isTenantInstance){
+    if (this.auth.getUserToken().isTenantInstance) {
       dialogConfig.data = {businesCtxIds: bieList.businessContexts.map(b => b.businessContextId)};
     }
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);

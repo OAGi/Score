@@ -485,7 +485,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return userToken.roles.includes('developer');
   }
 
-  isTenantInstance(){
+  isTenantInstance() {
     const userToken = this.auth.getUserToken();
     return userToken.isTenantInstance;
   }
@@ -1712,7 +1712,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   _loadAllBusinessContexts() {
     const request = new BusinessContextListRequest();
-    if(this.auth.getUserToken().isTenantInstance){
+    if (this.auth.getUserToken().isTenantInstance) {
       request.filters.isBieEditing = true;
     }
     request.page = new PageRequest('name', 'asc', -1, -1);

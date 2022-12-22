@@ -166,7 +166,7 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.router.navigate(['/profile_bie/copy/bie'], {queryParams: {bizCtxIds: selectedBizCtxIds}});
   }
 
-  isTenantInstance(){
+  isTenantInstance() {
     const userToken = this.authServer.getUserToken();
     return userToken.isTenantInstance;
   }

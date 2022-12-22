@@ -59,15 +59,15 @@ export class TenantList {
 }
 
 export class TenantInfo{
-  tenantId: number;
-  name: string;
-  usersCount: number;
-  businessCtxCount:number;
+    tenantId: number;
+    name: string;
+    usersCount: number;
+    businessCtxCount: number;
 }
 
 export class BusinessTenantContext{
-  businessCtxId : number
-	name : string
-	checked : boolean
+    businessCtxId: number
+	  name: string
+	  checked: boolean
 }
 
