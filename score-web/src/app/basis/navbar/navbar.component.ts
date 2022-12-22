@@ -127,4 +127,10 @@ export class NavbarComponent implements OnInit {
     return base64Encode(params.toString());
   }
 
+  showTermsAndCodeListButton() {
+    if (this.isTenant) {
+      return !this.auth.isAdmin();
+    }
+    return false; 
+  }
 }

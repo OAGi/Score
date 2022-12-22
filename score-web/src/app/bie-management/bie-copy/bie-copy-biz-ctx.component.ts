@@ -55,6 +55,10 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.request = new BusinessContextListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('name', 'asc', 0, 10));
 
+    if(this.isTenantInstance()) {
+      this.request.filters.isBieEditing = true;
+    }
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;

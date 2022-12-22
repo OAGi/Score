@@ -31,8 +31,9 @@
         <button mat-menu-item
                 [routerLink]="['/code_list']"
                 [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
+                [disabled] ='showTermsAndCodeListButton()'
         >View/Edit Code List</button>
-        <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer')">Uplift Code List</button>
+        <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer') || showTermsAndCodeListButton()">Uplift Code List</button>
       </ng-template>
     </mat-menu>
 
@@ -57,7 +58,7 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
+    <button *ngIf="!isTenant" mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
     <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="module_management/module_set">
