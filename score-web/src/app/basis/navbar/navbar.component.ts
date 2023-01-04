@@ -20,6 +20,8 @@ export class NavbarComponent implements OnInit {
 
   private _notiCount: number = -1;
   public notiMatIcon: string = 'notifications_none';
+  public isTenant: boolean = false;
+  public hasTenantRole: boolean = false;
 
   constructor(private auth: AuthService,
               private router: Router,
@@ -40,6 +42,8 @@ export class NavbarComponent implements OnInit {
     // subscribe an event
     const userToken = this.auth.getUserToken();
     if (userToken) {
+      this.isTenant = userToken.isTenantInstance;
+      this.hasTenantRole = userToken.tenantRoles !== undefined && userToken.tenantRoles.length > 0;
       this.stompService.watch('/topic/message/' + userToken.username).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (!!data.messageId) {
@@ -86,6 +90,13 @@ export class NavbarComponent implements OnInit {
     return this.roles.includes('developer');
   }
 
+  showContextButton() {
+    if (this.isTenant) {
+      return this.auth.isAdmin();
+    }
+    return true;
+  }
+
   logout() {
     const userToken = this.userToken;
     if (!!userToken && userToken.authentication === 'oauth2') {
@@ -116,4 +127,10 @@ export class NavbarComponent implements OnInit {
     return base64Encode(params.toString());
   }
 
+  showTermsAndCodeListButton() {
+    if (this.isTenant) {
+      return !this.auth.isAdmin();
+    }
+    return false; 
+  }
 }

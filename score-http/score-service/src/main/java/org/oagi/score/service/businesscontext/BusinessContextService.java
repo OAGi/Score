@@ -1,17 +1,26 @@
 package org.oagi.score.service.businesscontext;
 
-import org.jooq.DSLContext;
-import org.jooq.types.ULong;
-import org.oagi.score.repo.api.ScoreRepositoryFactory;
-import org.oagi.score.repo.api.businesscontext.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX_ASSIGNMENT;
 
 import java.math.BigInteger;
 
-import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX_ASSIGNMENT;
+import org.jooq.DSLContext;
+import org.jooq.types.ULong;
+import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.businesscontext.model.CreateBusinessContextRequest;
+import org.oagi.score.repo.api.businesscontext.model.CreateBusinessContextResponse;
+import org.oagi.score.repo.api.businesscontext.model.DeleteBusinessContextRequest;
+import org.oagi.score.repo.api.businesscontext.model.DeleteBusinessContextResponse;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextResponse;
+import org.oagi.score.repo.api.businesscontext.model.UpdateBusinessContextRequest;
+import org.oagi.score.repo.api.businesscontext.model.UpdateBusinessContextResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,10 +32,10 @@ public class BusinessContextService {
     @Autowired
     private DSLContext dslContext;
 
-    public GetBusinessContextListResponse getBusinessContextList(GetBusinessContextListRequest request) {
+    public GetBusinessContextListResponse getBusinessContextList(GetBusinessContextListRequest request, boolean isTenantInstance) {
         GetBusinessContextListResponse response =
                 scoreRepositoryFactory.createBusinessContextReadRepository()
-                        .getBusinessContextList(request);
+                        .getBusinessContextList(request, isTenantInstance);
 
         return response;
     }

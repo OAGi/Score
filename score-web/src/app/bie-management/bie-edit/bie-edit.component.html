@@ -210,7 +210,8 @@
                       <span class="context-menu-item">Reuse BIE</span>
                     </button>
                     <button mat-menu-item (click)="createBIEfromThis(contextMenuItem)"
-                            *ngIf="canCreateBIEFromThis(contextMenuItem)">
+                            *ngIf="canCreateBIEFromThis(contextMenuItem)"
+                            [disabled]="isTenantInstance()">
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
@@ -220,14 +221,14 @@
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
                             *ngIf="canEdit && isExtension(contextMenuItem)"
-                            [disabled]="!canExtend(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem) || isTenantInstance()"
                             [matTooltip]="'Developer cannot create ABIE Extension'"
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Locally</span>
                     </button>
                     <button mat-menu-item (click)="createGlobalAbieExtension(contextMenuItem)"
                             *ngIf="canEdit && isExtension(contextMenuItem)"
-                            [disabled]="!canExtend(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem) || isTenantInstance()"
                             [matTooltip]="'Developer cannot create ABIE Extension'"
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>

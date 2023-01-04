@@ -47,6 +47,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Comment;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Configuration;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxScheme;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
@@ -75,9 +76,12 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.UserTenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest;
 
@@ -405,6 +409,11 @@ public class Tables {
     public static final Comment COMMENT = Comment.COMMENT;
 
     /**
+     * The table stores configuration properties of the application. 
+     */
+    public static final Configuration CONFIGURATION = Configuration.CONFIGURATION;
+
+    /**
      * This table captures the context category. Examples of context categories
      * as described in the CCTS are business process, industry, etc.
      */
@@ -558,6 +567,16 @@ public class Tables {
     public static final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
+     * This table about the user tenant role.
+     */
+    public static final Tenant TENANT = Tenant.TENANT;
+
+    /**
+     * This table captures the tenant role and theirs bussiness contexts.
+     */
+    public static final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
+
+    /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and
      * the owner_top_level_asbiep_id column in all BIE tables allow all related
      * BIEs to be retrieved all at once speeding up the profile BOD
@@ -580,6 +599,11 @@ public class Tables {
      * rule.
      */
     public static final UsageRuleExpression USAGE_RULE_EXPRESSION = UsageRuleExpression.USAGE_RULE_EXPRESSION;
+
+    /**
+     * This table captures the tenant roles of the user
+     */
+    public static final UserTenant USER_TENANT = UserTenant.USER_TENANT;
 
     /**
      * This table stores XML schema built-in types and OAGIS built-in types.

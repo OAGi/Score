@@ -112,6 +112,13 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="tenant">
+            <th mat-header-cell *matHeaderCellDef [hidden]="!isTenantInstance()"> Tenant</th>
+            <td mat-cell *matCellDef="let element" [hidden]="!isTenantInstance()">
+             {{ element.connectedTenantNames }}
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="lastUpdateTimestamp">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">

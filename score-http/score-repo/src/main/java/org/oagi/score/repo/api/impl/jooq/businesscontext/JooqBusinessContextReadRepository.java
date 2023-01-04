@@ -1,28 +1,55 @@
 package org.oagi.score.repo.api.impl.jooq.businesscontext;
 
+import static org.oagi.score.repo.api.base.SortDirection.ASC;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX_ASSIGNMENT;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX_VALUE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CTX_CATEGORY;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CTX_SCHEME;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CTX_SCHEME_VALUE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.TENANT_BUSINESS_CTX;
+import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
+import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
+import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
+import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+
+import java.math.BigInteger;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.RecordMapper;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectFinalStep;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.SortField;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.businesscontext.BusinessContextReadRepository;
-import org.oagi.score.repo.api.businesscontext.model.*;
+import org.oagi.score.repo.api.businesscontext.model.BusinessContext;
+import org.oagi.score.repo.api.businesscontext.model.BusinessContextValue;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextResponse;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
-
-import java.math.BigInteger;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.oagi.score.repo.api.base.SortDirection.ASC;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
-import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
-import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
-import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 
 public class JooqBusinessContextReadRepository
         extends JooqScoreRepository
@@ -33,7 +60,7 @@ public class JooqBusinessContextReadRepository
     }
 
     private SelectOnConditionStep select() {
-        return dslContext().select(
+        return dslContext().selectDistinct(
                 BIZ_CTX.BIZ_CTX_ID,
                 BIZ_CTX.GUID,
                 BIZ_CTX.NAME,
@@ -49,7 +76,8 @@ public class JooqBusinessContextReadRepository
                 BIZ_CTX.LAST_UPDATE_TIMESTAMP)
                 .from(BIZ_CTX)
                 .join(APP_USER.as("creator")).on(BIZ_CTX.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(BIZ_CTX.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(APP_USER.as("updater")).on(BIZ_CTX.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
     }
 
     private RecordMapper<Record, BusinessContext> mapper() {
@@ -156,7 +184,7 @@ public class JooqBusinessContextReadRepository
         };
     }
 
-    private Collection<Condition> getConditions(GetBusinessContextListRequest request) {
+    private Collection<Condition> getConditions(GetBusinessContextListRequest request, boolean isTenantInstance) {
         List<Condition> conditions = new ArrayList();
 
         if (!request.getBusinessContextIdList().isEmpty()) {
@@ -198,6 +226,27 @@ public class JooqBusinessContextReadRepository
         if (request.getUpdateEndDate() != null) {
             conditions.add(BIZ_CTX.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
         }
+        
+        
+		// for tenant management
+		if (isTenantInstance) {
+			Long tenantId = request.getTenantId();
+			boolean notConnectedToTenant = request.isNotConnectedToTenant();
+			if (tenantId != null && !notConnectedToTenant) {
+				conditions.add(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)));
+			}
+
+			if (tenantId != null && notConnectedToTenant) {
+				conditions.add(BIZ_CTX.BIZ_CTX_ID.notIn(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+			}
+		}
+
+		// for editing bie
+		if (isTenantInstance && request.isBieEditing()) {
+			conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+					.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(request.getUserTenantIds()))));
+		}
 
         return conditions;
     }
@@ -227,8 +276,8 @@ public class JooqBusinessContextReadRepository
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBusinessContextListResponse getBusinessContextList(
-            GetBusinessContextListRequest request) throws ScoreDataAccessException {
-        Collection<Condition> conditions = getConditions(request);
+            GetBusinessContextListRequest request, boolean isTenantInstance) throws ScoreDataAccessException {
+        Collection<Condition> conditions = getConditions(request, isTenantInstance);
 
         SelectConditionStep conditionStep;
         if (!request.getTopLevelAsbiepIdList().isEmpty()) {

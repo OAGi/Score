@@ -485,6 +485,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return userToken.roles.includes('developer');
   }
 
+  isTenantInstance() {
+    const userToken = this.auth.getUserToken();
+    return userToken.isTenantInstance;
+  }
+
   canCreateBIEFromThis(node: BieFlatNode): boolean {
     return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.derived;
   }
@@ -1707,6 +1712,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   _loadAllBusinessContexts() {
     const request = new BusinessContextListRequest();
+    if (this.auth.getUserToken().isTenantInstance) {
+      request.filters.isBieEditing = true;
+    }
     request.page = new PageRequest('name', 'asc', -1, -1);
     this.bizCtxService.getBusinessContextList(request)
       .subscribe(resp => {

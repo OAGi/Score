@@ -48,10 +48,18 @@ export class AccountListService implements OnInit {
     if (request.filters.excludeSSO) {
       params = params.set('excludeSSO', 'true');
     }
+    if (request.filters.tenantId) {
+      params = params.set('tenantId', request.filters.tenantId);
+    }
+    if (request.filters.notConnectedToTenant) {
+      params = params.set('notConnectedToTenant', 'true');
+    }
+    if (request.filters.businessCtxIds) {
+      params = params.set('businessCtxIds', request.filters.businessCtxIds.join(','));
+    }
     if (excludeRequester) {
       params = params.set('excludeRequester', 'true');
     }
-
     return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params: params});
   }
 

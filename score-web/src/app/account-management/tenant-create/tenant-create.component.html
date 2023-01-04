@@ -1,0 +1,27 @@
+<div class="context-section">
+    <mat-card class="pt-4 pb-2">
+      <mat-card-header>
+        <mat-card-title>{{ title }}</mat-card-title>
+      </mat-card-header>
+      <mat-card class="mb-2">
+        <mat-card-content class="mat-card-container">
+          <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput required [(ngModel)]="name" maxlength="50"/>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+    </mat-card>
+  
+    <div class="row action-group m-0">
+      <div class="col-12 actions-wrap">
+        <div class="actions">
+          <button mat-raised-button color="primary" (click)="create()"
+                  [disabled]="isDisabled(name)">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

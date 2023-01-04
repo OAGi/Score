@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,9 @@ public class AccountListController {
             @RequestParam(name = "roles", required = false) String roles,
             @RequestParam(name = "excludeSSO", required = false) Boolean excludeSSO,
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
+            @RequestParam(name = "tenantId", required = false) BigInteger tenantId,
+            @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
+            @RequestParam(name = "businessCtxIds", required = false) String businessCtxIds,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
@@ -57,7 +61,14 @@ public class AccountListController {
         }
         request.setExcludeSSO(excludeSSO != null ? excludeSSO : false);
         request.setExcludeRequester(excludeRequester);
-
+        request.setTenantId(tenantId);
+        request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
+        
+        if (StringUtils.hasLength(businessCtxIds)) {
+            List<Long> businessCtxIdsList = Arrays.asList(businessCtxIds.split(",")).stream()
+            		.map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(Long::parseLong).collect(Collectors.toList());
+            request.setBusinessCtxIds(businessCtxIdsList);
+        }
         PageRequest pageRequest = new PageRequest();
         pageRequest.setSortActive(sortActive);
         pageRequest.setSortDirection(sortDirection);

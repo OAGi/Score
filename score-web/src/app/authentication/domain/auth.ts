@@ -9,12 +9,16 @@ export class UserToken {
   roles: string[];
   authentication: string;
   enabled: boolean;
+  isTenantInstance: boolean;
+  tenantRoles: string[];
 
   constructor() {
     this.roles = ['',];
     this.authentication = '';
     this.username = 'unknown';
     this.enabled = false;
+    this.isTenantInstance = false;
+    this.tenantRoles = [];
   }
 }
 
