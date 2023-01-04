@@ -5,7 +5,7 @@ import org.jooq.tools.StringUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.info.data.SummaryBie;
-import org.oagi.score.gateway.http.api.tenant.service.TenantService;
+import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
@@ -47,41 +47,41 @@ public class BieRepository {
     public List<SummaryBie> getSummaryBieList(BigInteger releaseId, AppUser requester) {
 
         SelectOnConditionStep step = dslContext.selectDistinct(
-                TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
-                TOP_LEVEL_ASBIEP.STATE,
-                TOP_LEVEL_ASBIEP.OWNER_USER_ID,
-                APP_USER.LOGIN_ID.as("ownerUsername"),
-                ASCCP.PROPERTY_TERM)
+                        TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                        TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
+                        TOP_LEVEL_ASBIEP.STATE,
+                        TOP_LEVEL_ASBIEP.OWNER_USER_ID,
+                        APP_USER.LOGIN_ID.as("ownerUsername"),
+                        ASCCP.PROPERTY_TERM)
                 .from(TOP_LEVEL_ASBIEP)
                 .join(APP_USER).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(ASBIEP).on(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID));
-        
-		if (configService.isTenantInstance()) {
-			step.join(BIZ_CTX_ASSIGNMENT)
-					.on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)).join(BIZ_CTX)
-					.on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID)).leftJoin(TENANT_BUSINESS_CTX)
-					.on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
-		}
+
+        if (configService.isTenantInstance()) {
+            step.join(BIZ_CTX_ASSIGNMENT)
+                    .on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)).join(BIZ_CTX)
+                    .on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID)).leftJoin(TENANT_BUSINESS_CTX)
+                    .on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
+        }
 
         SelectConditionStep cond;
         List<Condition> conditions = new ArrayList();
         if (releaseId.longValue() > 0) {
-        	conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
+            conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
         } else {
-        	conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.isNotNull());
+            conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.isNotNull());
         }
-        
-		if (configService.isTenantInstance() && !requester.isAdmin()) {
-			List<ULong> userTenantIds = tenantService
-					.getUserTenantsRoleByUserId(ULong.valueOf(requester.getAppUserId()));
-			conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
-					.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
-		}
-        cond =  step.where(conditions);
+
+        if (configService.isTenantInstance() && !requester.isAdmin()) {
+            List<ULong> userTenantIds = tenantService
+                    .getUserTenantsRoleByUserId(requester.getAppUserId());
+            conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext.select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+                    .from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(userTenantIds))));
+        }
+        cond = step.where(conditions);
 
         return cond.fetchInto(SummaryBie.class);
     }

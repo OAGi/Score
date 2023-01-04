@@ -1,29 +1,12 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
-import static org.oagi.score.service.configuration.AppUserAuthority.ADMIN_GRANTED_AUTHORITY;
-import static org.oagi.score.service.configuration.AppUserAuthority.DEVELOPER_GRANTED_AUTHORITY;
-import static org.oagi.score.service.configuration.AppUserAuthority.END_USER_GRANTED_AUTHORITY;
-import static org.oagi.score.service.configuration.AppUserAuthority.PENDING_GRANTED_AUTHORITY;
-import static org.oagi.score.service.configuration.AppUserAuthority.REJECT_GRANTED_AUTHORITY;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.data.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.account_management.service.AccountListService;
 import org.oagi.score.gateway.http.api.account_management.service.AccountService;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
-import org.oagi.score.gateway.http.api.tenant.service.TenantService;
+import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,6 +25,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.oagi.score.service.configuration.AppUserAuthority.*;
 
 @RestController
 public class AccountController implements InitializingBean {
@@ -123,19 +119,18 @@ public class AccountController implements InitializingBean {
         }
         
         resp.put("isTenantInstance", configService.isTenantInstance());
-        resp.put("tenantRoles", 
-        		getUserTenantsRoleByUserId(ULong.valueOf(appUser.getAppUserId())));
+        resp.put("tenantRoles", getUserTenantsRoleByUserId(appUser.getAppUserId()));
 
         return resp;
     }
 
-	private List<ULong> getUserTenantsRoleByUserId(ULong userId) {
-		List<ULong> tenantRoles = new ArrayList<>();
-		if (configService.isTenantInstance()) {
-			tenantRoles = tenantService.getUserTenantsRoleByUserId(userId);
-		}
-		return tenantRoles;
-	}
+    private List<ULong> getUserTenantsRoleByUserId(BigInteger userId) {
+        List<ULong> tenantRoles = new ArrayList<>();
+        if (configService.isTenantInstance()) {
+            tenantRoles = tenantService.getUserTenantsRoleByUserId(userId);
+        }
+        return tenantRoles;
+    }
 
     @RequestMapping(value = "/accounts/{id}/enable", method = RequestMethod.POST)
     public ResponseEntity enable(

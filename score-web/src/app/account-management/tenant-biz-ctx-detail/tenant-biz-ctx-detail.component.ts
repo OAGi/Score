@@ -2,8 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
-import {of} from 'rxjs';
-import {ReplaySubject} from 'rxjs';
+import {of, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -18,6 +17,7 @@ import {initFilter} from '../../common/utility';
 
 
 import {finalize, switchMap} from 'rxjs/operators';
+
 @Component({
   selector: 'score-tenant-biz-ctx-detail',
   templateUrl: './tenant-biz-ctx-detail.component.html',
@@ -26,10 +26,10 @@ import {finalize, switchMap} from 'rxjs/operators';
 export class TenantBusinessCtxDetailComponent implements OnInit {
   title = ' - Business Context Management';
   displayedColumns: string[] = [
-     'name', 'lastUpdateTimestamp', 'manage'
+    'name', 'lastUpdateTimestamp', 'manage'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
-  tenantId : number;
+  tenantId: number;
   loading: boolean;
   addBusinessCtxToTenant = false;
 
@@ -81,14 +81,14 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     });
   }
 
-   getTenantInfo = (tenantId:number)  =>  {
+  getTenantInfo(tenantId: number) {
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.title = resp.name + this.title ;
-     this.loadBusinessContextList(true);
+      this.title = resp.name + this.title;
+      this.loadBusinessContextList(true);
     }, error => {
       this.dataSource.data = [];
     });
@@ -151,7 +151,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     }
   }
 
-  setAddBusnessCtxView() {
+  setAddBusinessCtxView() {
     this.addBusinessCtxToTenant = !this.addBusinessCtxToTenant;
     this.request.filters.notConnectedToTenant = true;
     this.loadBusinessContextList();
@@ -160,30 +160,30 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   setListView() {
     this.addBusinessCtxToTenant = !this.addBusinessCtxToTenant;
     this.request.filters.notConnectedToTenant = false;
-    this.paginator.pageIndex = 0; 
+    this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
     this.loadBusinessContextList();
   }
 
-  removeTenantBusinessCtx(businessCtxId:number) {
+  removeTenantBusinessCtx(businessCtxId: number) {
     this.service.deleteTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.loadBusinessContextList();
+      this.loadBusinessContextList();
     }, error => {
       this.dataSource.data = [];
     });
   }
 
-  addTenantBusinessCtx(businessCtxId:number) {
+  addTenantBusinessCtx(businessCtxId: number) {
     this.service.addTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.loadBusinessContextList();
+      this.loadBusinessContextList();
     }, error => {
       this.dataSource.data = [];
     });

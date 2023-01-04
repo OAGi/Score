@@ -1,12 +1,12 @@
 package org.oagi.score.gateway.http.api.context_management.controller;
 
-import org.oagi.score.service.common.data.PageResponse;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.tenant.service.TenantService;
+import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
 import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
@@ -85,7 +81,7 @@ public class BusinessContextController {
         request.setBieEditing(isBieEditing != null ? isBieEditing : false);
         
         if (configService.isTenantInstance() && request.isBieEditing()) {
-        	List<ULong> userTenantIds = tenantService.getUserTenantsRoleByUserId(ULong.valueOf(request.getRequester().getUserId()));
+            List<ULong> userTenantIds = tenantService.getUserTenantsRoleByUserId(request.getRequester().getUserId());
         	List<Long> mappedIds = new ArrayList<>();
         	userTenantIds.forEach(i -> mappedIds.add(i.longValue()));
         	request.setUserTenantIds(mappedIds);
@@ -99,14 +95,13 @@ public class BusinessContextController {
         GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, configService.isTenantInstance());
 
 		List<BusinessContext> ctxs = response.getResults();
-		if (configService.isTenantInstance()) {
-			ctxs.forEach(c -> {
-
-				List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId().longValue());
-				String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));
-				c.setConnectedTenantNames(tenant);
-			});
-		}
+        if (configService.isTenantInstance()) {
+            ctxs.forEach(c -> {
+                List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId());
+                String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));
+                c.setConnectedTenantNames(tenant);
+            });
+        }
 
         PageResponse<BusinessContext> pageResponse = new PageResponse<>();
         pageResponse.setList(ctxs);

@@ -5,7 +5,7 @@ import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
 import {SettingsComponent} from './settings/settings.component';
-import {CanActivateAdmin, CanActivateDeveloper, CanActivateUser, CanActivateTenantInstance} from '../authentication/auth.service';
+import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanActivateUser} from '../authentication/auth.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
@@ -96,10 +96,10 @@ const routes: Routes = [
     PendingDetailComponent,
     PendingListComponent,
     AccountListDialogComponent,
-    TenantListComponent, 
-    TenantBusinessCtxDetailComponent, 
-    TenantUserDetailComponent, 
-    TenantCreateComponent, 
+    TenantListComponent,
+    TenantBusinessCtxDetailComponent,
+    TenantUserDetailComponent,
+    TenantCreateComponent,
     UpdateTenantComponent
   ],
   providers: [

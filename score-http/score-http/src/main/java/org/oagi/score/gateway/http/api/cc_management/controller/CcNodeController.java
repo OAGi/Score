@@ -5,9 +5,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.repo.component.asccp.UpdateAsccpRoleOfAccRepositoryResponse;
 import org.oagi.score.repo.component.bccp.UpdateBccpBdtRepositoryResponse;
+import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.CcState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.oagi.score.gateway.http.api.cc_management.data.CcType.*;
+import static org.oagi.score.gateway.http.api.cc_management.data.CcType.ACC;
+import static org.oagi.score.gateway.http.api.cc_management.data.CcType.valueOf;
 
 @RestController
 public class CcNodeController {

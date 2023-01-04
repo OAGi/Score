@@ -1,13 +1,13 @@
 package org.oagi.score.gateway.http.api.namespace_management.controller;
 
 import com.google.common.collect.ImmutableMap;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.api.namespace_management.data.Namespace;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceListRequest;
 import org.oagi.score.gateway.http.api.namespace_management.data.SimpleNamespace;
 import org.oagi.score.gateway.http.api.namespace_management.service.NamespaceService;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -2,10 +2,12 @@ package org.oagi.score.gateway.http.api.account_management.data;
 
 import lombok.Data;
 
+import java.math.BigInteger;
+
 @Data
 public class AppUser {
 
-    private long appUserId;
+    private BigInteger appUserId;
     private String loginId;
     private String password;
     private String name;
@@ -13,7 +15,7 @@ public class AppUser {
     private boolean developer;
     private boolean admin;
     private boolean enabled;
-    private long appOauth2UserId;
+    private BigInteger appOauth2UserId;
     private String sub;
 
 }

@@ -5,7 +5,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {Location} from '@angular/common';
 import {MatTableDataSource} from '@angular/material/table';
 import {AuthService} from '../../authentication/auth.service';
-import {TenantListRequest, TenantList} from '../domain/tenants'
+import {TenantList, TenantListRequest} from '../domain/tenants';
 import {TenantListService} from '../domain/tenant-list.service';
 import {PageRequest} from '../../basis/basis';
 import {finalize} from 'rxjs/operators';
@@ -20,8 +20,8 @@ export class TenantListComponent implements OnInit {
 
   title = 'Tenant Roles';
   loading = false;
-  displayedColumns: string[] = [ 'Tenant name', 'Users', 'Business Contexts' ];
-  dataSource = new  MatTableDataSource<TenantList>();
+  displayedColumns: string[] = ['Tenant name', 'Users', 'Business Contexts'];
+  dataSource = new MatTableDataSource<TenantList>();
 
   request: TenantListRequest;
 
@@ -34,7 +34,7 @@ export class TenantListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
-                
+
   }
 
   ngOnInit() {
@@ -43,7 +43,7 @@ export class TenantListComponent implements OnInit {
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0; 
+    this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
@@ -64,14 +64,14 @@ export class TenantListComponent implements OnInit {
   }
 
   loadTenantList(isInit?: boolean) {
-   this.loading = true;
-   this.request.page = new PageRequest(
-   this.sort.active, this.sort.direction,
-   this.paginator.pageIndex, this.paginator.pageSize);
+    this.loading = true;
+    this.request.page = new PageRequest(
+      this.sort.active, this.sort.direction,
+      this.paginator.pageIndex, this.paginator.pageSize);
 
-   this.request.page = new PageRequest(
-   this.sort.active, this.sort.direction,
-   this.paginator.pageIndex, this.paginator.pageSize);
+    this.request.page = new PageRequest(
+      this.sort.active, this.sort.direction,
+      this.paginator.pageIndex, this.paginator.pageSize);
 
     this.service.getTenants(this.request).pipe(
       finalize(() => {

@@ -5,7 +5,7 @@ import {switchMap} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from '../../common/utility';
 import {TenantListService} from '../domain/tenant-list.service';
-import {TenantInfo} from '../domain/tenants'
+import {TenantInfo} from '../domain/tenants';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 
@@ -17,7 +17,7 @@ export class UpdateTenantComponent implements OnInit {
 
   title = 'Edit Tenant';
   tenant: TenantInfo;
-  hashCode; 
+  hashCode;
   HTTP_CONFLICT = 409;
 
 
@@ -46,7 +46,7 @@ export class UpdateTenantComponent implements OnInit {
 
   isDisabled() {
     return this.tenant.name === undefined || this.tenant.name === '';
-  } 
+  }
 
   back() {
     this.location.back();
@@ -89,16 +89,14 @@ export class UpdateTenantComponent implements OnInit {
     dialogConfig.data.action = 'Discard';
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
       if (result) {
-       this.service.deleteTenant(this.tenant.tenantId).subscribe(_ => {
+        this.service.deleteTenant(this.tenant.tenantId).subscribe(_ => {
           this.snackBar.open('Tenant is deleted', '', {
-           duration: 3000,
-         });
+            duration: 3000,
+          });
           this.router.navigateByUrl('/tenant');
         });
       }
     });
-
   }
-
 
 }

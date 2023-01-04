@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.graph.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 

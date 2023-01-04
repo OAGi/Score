@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.XBT_MANIFEST;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.XBT;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.XBT_MANIFEST;
 
 @Service
 @Transactional(readOnly = true)

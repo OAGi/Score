@@ -5,17 +5,13 @@ import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ACC;
-import org.oagi.score.service.common.data.AppUser;
-import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditAcc;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateResponse;
 import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.ManifestRepository;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Utility;
@@ -28,6 +24,10 @@ import org.oagi.score.repo.component.ascc.CreateAsccRepositoryResponse;
 import org.oagi.score.repo.component.asccp.AsccpWriteRepository;
 import org.oagi.score.repo.component.asccp.CreateAsccpRepositoryRequest;
 import org.oagi.score.repo.component.asccp.CreateAsccpRepositoryResponse;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.boolAnd;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service

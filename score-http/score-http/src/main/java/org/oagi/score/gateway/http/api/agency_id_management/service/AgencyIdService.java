@@ -9,7 +9,6 @@ import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.agency.model.AgencyIdList;
 import org.oagi.score.repo.api.agency.model.GetAgencyIdListListRequest;
 import org.oagi.score.repo.api.agency.model.GetAgencyIdListListResponse;
-
 import org.oagi.score.repo.api.corecomponent.model.CcState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AgencyIdListValueRecord;
 import org.oagi.score.repo.api.user.model.ScoreRole;
@@ -23,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;

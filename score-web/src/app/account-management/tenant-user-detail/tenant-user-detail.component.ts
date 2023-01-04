@@ -10,7 +10,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {PageRequest} from '../../basis/basis';
-import {TenantList} from '../domain/tenants'
+import {TenantList} from '../domain/tenants';
 import {finalize, switchMap} from 'rxjs/operators';
 
 @Component({
@@ -23,8 +23,8 @@ export class TenantUserDetailComponent implements OnInit {
 
   title = ' - Users Management';
   loading = false;
-  tenantInfo : TenantList;
-  tenantId : any;
+  tenantInfo: TenantList;
+  tenantId: any;
   displayedColumns: string[] = [
     'loginId', 'role', 'name', 'organization', 'status', 'manage'
   ];
@@ -63,23 +63,23 @@ export class TenantUserDetailComponent implements OnInit {
     this.loading = true;
 
     this.route.paramMap.pipe(
-        switchMap((params: ParamMap) => of(Number(params.get('id'))))
-      ).subscribe(t => {
-        this.loading = true;
-        this.tenantId = t;
-        this.request.filters.tenantId = t;
-        this.getTenantInfo(t);
-      });
+      switchMap((params: ParamMap) => of(Number(params.get('id'))))
+    ).subscribe(t => {
+      this.loading = true;
+      this.tenantId = t;
+      this.request.filters.tenantId = t;
+      this.getTenantInfo(t);
+    });
   }
 
-  getTenantInfo(tenantId:number) {
+  getTenantInfo(tenantId: number) {
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.title = resp.name + this.title;
-     this.loadAccounts(true);
+      this.title = resp.name + this.title;
+      this.loadAccounts(true);
     }, error => {
       this.dataSource.data = [];
     });
@@ -115,13 +115,13 @@ export class TenantUserDetailComponent implements OnInit {
     this.loadAccounts();
   }
 
-  removeUser(userId:number) {
+  removeUser(userId: number) {
     this.service.deleteTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.loadAccounts();
+      this.loadAccounts();
     }, error => {
       this.dataSource.data = [];
     });
@@ -136,18 +136,18 @@ export class TenantUserDetailComponent implements OnInit {
   setListView() {
     this.addUserToTenant = !this.addUserToTenant;
     this.request.filters.notConnectedToTenant = false;
-    this.paginator.pageIndex = 0; 
+    this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
     this.loadAccounts();
   }
 
-  addUser(userId:number) {
+  addUser(userId: number) {
     this.service.addTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
-     this.loadAccounts();
+      this.loadAccounts();
     }, error => {
       this.dataSource.data = [];
     });

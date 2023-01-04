@@ -7,9 +7,8 @@ import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEdit
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditRef;
 import org.oagi.score.gateway.http.api.bie_management.service.BieCreateFromExistingBieService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieEditService;
-import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.agency_id_list.AvailableAgencyIdList;
 import org.oagi.score.repo.component.asbie.AsbieNode;
