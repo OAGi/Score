@@ -271,6 +271,31 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_3")
     public void end_user_can_see_number_of_extensions_owned_by_him_per_state_in_my_user_extensions_by_states_panel() {
+        AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser1);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+
+        UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
+
+        HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
+
+        HomePage.MyUEsByStatesPanel myUEsByStatesPanel = homePage.openMyUEsByStatesPanel();
+        click(homePage.getUserExtensionsTab());
+        WebElement wipStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("WIP");
+        assertTrue(wipStateInTotalTab.isDisplayed());
+        assertTrue(container1.numberOfWIPUEGs <= extractNumberFromText(getText(wipStateInTotalTab)));
+
+        WebElement qaStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("QA");
+        assertTrue(qaStateInTotalTab.isDisplayed());
+        assertTrue(container1.numberOfQAUEGs  <= extractNumberFromText(getText(qaStateInTotalTab)));
+
+        WebElement productionStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("Production");
+        assertTrue(productionStateInTotalTab.isDisplayed());
+        assertTrue(container1.numberOfProductionUEGs <= extractNumberFromText(getText(productionStateInTotalTab)));
+
 
 
     }
@@ -278,6 +303,68 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_4")
     public void end_user_can_click_state_to_view_the_extensions_of_that_state_in_my_user_extensions_by_states_panel() {
+
+        AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser1);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+
+        UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
+
+        HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
+        homePage.setBranch(release.getReleaseNumber());
+
+        click(homePage.getUserExtensionsTab());
+        ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openMyUEsByStatesPanel()
+                .clickStateProgressBar("WIP");
+        click(viewEditCCPageForWIP.getSearchButton());
+
+        assertTrue(container1.numberOfWIPUEGs <= viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
+        assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("QA"));
+        assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("Production"));
+
+        //verify Core Component is listed
+        for (int i = 0; i < container1.numberOfWIPUEGs; i++) {
+            String ccName = container1.ccWIPList.get(i).getKey();
+            String ownerName = container1.ccWIPList.get(i).getValue();
+            assertTrue(viewEditCCPageForWIP.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+        }
+
+        click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getUserExtensionsTab());
+        ViewEditCoreComponentPage viewEditCCPageForQA = homePage.openMyUEsByStatesPanel()
+                .clickStateProgressBar("QA");
+        click(viewEditCCPageForQA.getSearchButton());
+
+        assertEquals(0, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("WIP"));
+        assertTrue(container1.numberOfQAUEGs <= viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("QA"));
+        assertEquals(0, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("Production"));
+
+        //verify Core Component is listed
+        for (int i = 0; i < container1.numberOfQAUEGs; i++) {
+            String ccName = container1.ccQAList.get(i).getKey();
+            String ownerName = container1.ccQAList.get(i).getValue();
+            assertTrue(viewEditCCPageForQA.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+        }
+
+        click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getUserExtensionsTab());
+        ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openMyUEsByStatesPanel()
+                .clickStateProgressBar("Production");
+        click(viewEditCCPageForProduction.getSearchButton());
+
+        assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("WIP"));
+        assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("QA"));
+        assertTrue(container1.numberOfProductionUEGs <=
+                viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("Production"));
+
+        //verify Core Component is listed
+        for (int i = 0; i < container1.numberOfProductionUEGs; i++) {
+            String ccName = container1.ccProductionList.get(i).getKey();
+            String ownerName = container1.ccProductionList.get(i).getValue();
+            assertTrue(viewEditCCPageForProduction.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+        }
 
     }
 
