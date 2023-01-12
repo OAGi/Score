@@ -371,6 +371,55 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_5")
     public void end_user_can_see_number_of_extensions_per_user_and_per_state_in_user_extensions_by_users_and_states_panel() {
+        AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser1);
+        AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser2);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+
+        UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
+        UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
+
+        HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
+        homePage.setBranch(release.getReleaseNumber());
+        click(homePage.getUserExtensionsTab());
+
+        HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
+        uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId());
+        assertTrue(uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId()).isDisplayed());
+
+        WebElement tr = uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId());
+        WebElement td_WIP = uesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
+        WebElement td_QA = uesByUsersAndStatesPanel.getColumnByName(tr, "QA");
+        WebElement td_Production = uesByUsersAndStatesPanel.getColumnByName(tr, "Production");
+        WebElement td_Total = uesByUsersAndStatesPanel.getColumnByName(tr, "total");
+
+        assertEquals(container1.numberOfWIPUEGs, Integer.valueOf(getText(td_WIP)));
+        assertEquals(container1.numberOfQAUEGs, Integer.valueOf(getText(td_QA)));
+        assertEquals(container1.numberOfProductionUEGs, Integer.valueOf(getText(td_Production)));
+        assertEquals(container1.numberOfWIPUEGs +
+                        container1.numberOfQAUEGs +
+                        container1.numberOfProductionUEGs,
+                Integer.valueOf(getText(td_Total)));
+
+        uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId()); // to turn off the checkbox
+        uesByUsersAndStatesPanel.setUsername(endUser2.getLoginId());
+        WebElement tr2 = uesByUsersAndStatesPanel.getTableRecordByValue(endUser2.getLoginId());
+        WebElement td2_WIP = uesByUsersAndStatesPanel.getColumnByName(tr2, "WIP");
+        WebElement td2_QA = uesByUsersAndStatesPanel.getColumnByName(tr2, "QA");
+        WebElement td2_Production = uesByUsersAndStatesPanel.getColumnByName(tr2, "Production");
+        WebElement td2_Total = uesByUsersAndStatesPanel.getColumnByName(tr2, "total");
+
+        assertEquals(container2.numberOfWIPUEGs, Integer.valueOf(getText(td2_WIP)));
+        assertEquals(container2.numberOfQAUEGs, Integer.valueOf(getText(td2_QA)));
+        assertEquals(container2.numberOfProductionUEGs, Integer.valueOf(getText(td2_Production)));
+        assertEquals(container2.numberOfWIPUEGs +
+                        container2.numberOfQAUEGs +
+                        container2.numberOfProductionUEGs,
+                Integer.valueOf(getText(td2_Total)));
 
     }
 
