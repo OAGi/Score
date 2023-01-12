@@ -201,7 +201,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getStateProgressBarByState(String state) {
-            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[1]//div[contains(text(), \"" + state + "\")]"));
+            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[2]//div[contains(text(), \"" + state + "\")]"));
 
         }
 
@@ -363,6 +363,39 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     public TotalUEsByStatesPanel openTotalUEsByStatesPanel() {
         click(getUserExtensionsTab());
         return new TotalUEsByStatesPanelImpl(this);
+    }
+
+    private class MyUEsByStatesPanelImpl implements MyUEsByStatesPanel {
+
+        private BasePage parent;
+
+        MyUEsByStatesPanelImpl(BasePage parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public WebElement getStateProgressBarByState(String state) {
+            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[2]//div[contains(text(), \"" + state + "\")]"));
+        }
+
+        @Override
+        public ViewEditCoreComponentPage clickStateProgressBar(String state) {
+            return retry(() -> {
+                WebElement stateProgressBar = getStateProgressBarByState(state);
+                click(stateProgressBar);
+
+                waitFor(ofMillis(500L));
+                ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+                assert viewEditCoreComponentPage.isOpened();
+                return viewEditCoreComponentPage;
+            });
+        }
+    }
+
+    @Override
+    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new MyUEsByStatesPanelImpl(this);
     }
 
 
