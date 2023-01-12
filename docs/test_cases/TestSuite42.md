@@ -124,7 +124,7 @@ He will select any business term in the new table, put a type code and clicks on
 
 ## Test Case 42.3
 
-**Business Term from BIE detail page **
+**Business Term from BIE detail page**
 
 Pre-condition: N/A
 
