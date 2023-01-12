@@ -75,7 +75,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                    ccWIPList.add(new Pair<String, String>(acc.getDen(), this.appUser.getLoginId()));
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
@@ -87,6 +86,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
+                ccWIPList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
             }
 
             for (int i = 0; i < numberOfQAUEGs; ++i) {
@@ -99,7 +99,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                    ccQAList.add(new Pair<String, String>(acc.getDen(), this.appUser.getLoginId()));
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
@@ -111,6 +110,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
+                ccQAList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
                 accExtensionViewEditPage.moveToQA();
 
                 topLevelAsbiep.setState("QA");
@@ -129,7 +129,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                    ccProductionList.add(new Pair<String, String>(acc.getDen(), this.appUser.getLoginId()));
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
@@ -141,6 +140,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
+
+                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
                 accExtensionViewEditPage.moveToQA();
 
                 topLevelAsbiep.setState("QA");
