@@ -188,7 +188,18 @@ For bulk upload through "Upload Business Terms", if the business term is uploade
 
 
 ### Test Step Pre-condition:
+N/A
 
+### Test Steps:
 
-
-### Test Step:
+1. An end user logins.
+2. He visits the Home page and clicks on the BIE tab.
+3. He clicks on the "View/Edit Business Term" from the dropdown list.
+4. He clicks on the "Upload Business Terms" button. 
+5. On the "Upload Business Terms" page, he will click on "Download template" on the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4241)).
+6. On the same page, he will click on the attach button. An window will open for the end user to select the updated csv files with all the business term information for upload. He will select that file to upload. 
+7. Verify that all the business terms in the uploaded csv file are listed in the table. (Assertion [#2](#test-assertion-4242)).
+8. Verify that a new business term is created in the table if the external reference uri is new in the uploaded csv file. (Assertion [#3](#test-assertion-4243)).
+9. Verify that an existent business term is updated with the new information if the external reference uri is the same as the exitent one in the uploaded csv file. 
+(Assertion [#4](#test-assertion-4244)).
+10. Re-upload the same csv file for a second time. Verify that no more changes in all business terms. 
