@@ -17,15 +17,13 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -172,7 +170,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         private AppUserObject appUser;
         private NamespaceObject userNamespace;
         int numberOfProductionUEGs;
-        private List<Pair<String, String>> ccProductionList = new ArrayList<Pair<String, String>>();
+        private Map<TopLevelASBIEPObject, BCCPObject> bieBCCPMap = new HashMap<>();
 
         public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
             this(appUser, release, namespace, nextInt(2, 5));
@@ -192,7 +190,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             for (int i = 0; i < numberOfProductionUEGs; ++i) {
                 ASCCPObject asccp;
-                BCCPObject bccp;
+                BCCPObject bccpToAppend;
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
                     NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
@@ -201,28 +199,25 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                    bccp = coreComponentAPI.createRandomBCCP(acc, developer, namespace, "Published");
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
 
+                bieBCCPMap.put(topLevelAsbiep, bccpToAppend);
                 BIEMenu bieMenu = homePage.getBIEMenu();
                 ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
-                selectCCPropertyPage.setDEN(bccp.getDen());
-                selectCCPropertyPage.hitSearchButton();
-                //select the found bccp
-                //click on the Append button
-                click(selectCCPropertyPage.getAppendButton());
+                selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
 
-                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
                 accExtensionViewEditPage.moveToQA();
 
                 topLevelAsbiep.setState("QA");
@@ -625,6 +620,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_8")
     public void end_user_can_see_associations_of_user_extensions_that_he_owns_and_not_used_in_bies_in_my_unused_extensions_in_bies_panel() {
+
 
 
 
