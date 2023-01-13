@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebElement;
 
@@ -144,6 +145,73 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                accExtensionViewEditPage.setNamespace(userNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+
+                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                accExtensionViewEditPage.moveToQA();
+
+                topLevelAsbiep.setState("QA");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+
+                accExtensionViewEditPage.moveToProduction();
+
+                topLevelAsbiep.setState("Production");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+            }
+
+            homePage.logout();
+        }
+
+    }
+
+    private class UserExtensionGroupContainer {
+
+        private AppUserObject appUser;
+        private NamespaceObject userNamespace;
+        int numberOfProductionUEGs;
+        private List<Pair<String, String>> ccProductionList = new ArrayList<Pair<String, String>>();
+
+        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
+            this(appUser, release, namespace, nextInt(2, 5));
+        }
+
+        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
+                                          int numberOfProductionUEGs) {
+            this.appUser = appUser;
+            this.userNamespace = userNamespace;
+            this.numberOfProductionUEGs = numberOfProductionUEGs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
+
+            for (int i = 0; i < numberOfProductionUEGs; ++i) {
+                ASCCPObject asccp;
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                }
+                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
+
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+
+
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
 
@@ -550,6 +618,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_8")
     public void end_user_can_see_associations_of_user_extensions_that_he_owns_and_not_used_in_bies_in_my_unused_extensions_in_bies_panel() {
+
 
 
     }
