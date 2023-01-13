@@ -8,6 +8,7 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -103,6 +104,7 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
             selectBusinessContext(businessContext);
         }
         click(getNextButton());
+        waitFor(Duration.ofMillis(2000));
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 new CreateBIEForSelectTopLevelConceptPageImpl(this, businessContexts);
         assert createBIEForSelectTopLevelConceptPage.isOpened();
