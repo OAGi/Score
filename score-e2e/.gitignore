@@ -1,0 +1,11 @@
+# Miscellaneous
+.DS_Store
+
+# Maven artifacts
+target/
+
+# IDEA artifacts
+.idea
+*.iws
+*.iml
+*.ipr

@@ -26,8 +26,6 @@ public interface EditBIEPage extends Page {
 
     ACCExtensionViewEditPage extendBIELocallyOnNode(String path);
 
-    ACCExtensionViewEditPage continueToExtendBIELocallyOnNode();
-
     WebElement getDENField();
 
     WebElement getSearchField();
@@ -145,6 +143,10 @@ public interface EditBIEPage extends Page {
     void moveToProduction();
 
     String getAtentionDialogMessage();
+
+    void getExtendBIEGloballyOptionForNode(String path);
+
+    ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
     /**
      * An interface of the panel for 'Top-Level ASBIEP' node.
