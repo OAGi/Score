@@ -192,6 +192,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             for (int i = 0; i < numberOfProductionUEGs; ++i) {
                 ASCCPObject asccp;
+                BCCPObject bccp;
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
                     NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
@@ -200,6 +201,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                    bccp = coreComponentAPI.createRandomBCCP(acc, developer, namespace, "Published");
+
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
@@ -210,7 +213,11 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
-
+                selectCCPropertyPage.setDEN(bccp.getDen());
+                selectCCPropertyPage.hitSearchButton();
+                //select the found bccp
+                //click on the Append button
+                click(selectCCPropertyPage.getAppendButton());
 
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
