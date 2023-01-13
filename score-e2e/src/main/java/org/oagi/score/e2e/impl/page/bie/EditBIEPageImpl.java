@@ -204,13 +204,19 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
     }
     @Override
-    public ACCExtensionViewEditPage continueToExtendBIELocallyOnNode() {
+    public ACCExtensionViewEditPage continueToExtendBIEOnNode() {
         click(elementToBeClickable(getDriver(), YES_BUTTON_IN_DIALOG_LOCATOR));
         waitFor(ofMillis(500L));
         ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
         switchToNextTab(getDriver());
         assert ACCExtensionViewEditPage.isOpened();
         return ACCExtensionViewEditPage;
+    }
+
+    @Override
+    public void getExtendBIEGloballyOptionForNode(String path) {
+        clickOnDropDownMenuByPath(path);
+        click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
     }
 
     @Override
