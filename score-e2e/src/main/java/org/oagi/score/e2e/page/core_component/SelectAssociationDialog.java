@@ -56,6 +56,10 @@ public interface SelectAssociationDialog extends Dialog {
      */
     void setOwner(String owner);
 
+    WebElement getAssociationTypeSelectField();
+
+    void setAssociationType(String type);
+
     /**
      * Return the UI element of the 'Updater' select field.
      *
@@ -221,4 +225,5 @@ public interface SelectAssociationDialog extends Dialog {
      */
     void close();
 
+    void hitCancelButton();
 }

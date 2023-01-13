@@ -57,6 +57,9 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
+    private static final By ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+
     private final BasePageImpl parent;
 
     private final String contextMenuName;
@@ -131,6 +134,25 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
                 By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
+    }
+
+    @Override
+    public WebElement getAssociationTypeSelectField() {
+        return visibilityOfElementLocated(getDriver(), ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setAssociationType(String type) {
+        click(getAssociationTypeSelectField());
+        try {
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), type);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + type + "\")]"));
+            click(searchedSelectField);
+            escape(getDriver());
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association type " + type, e);
+        }
     }
 
     @Override
@@ -299,6 +321,12 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     @Override
     public WebElement getCancelButton() {
         return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        click(getCancelButton());
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
