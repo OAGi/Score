@@ -464,4 +464,30 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         return new UEsByUsersAndStatesPanelImpl(this);
     }
 
+    private class MyUnusedUEsInBIEsPanelImpl implements MyUnusedUEsInBIEsPanel {
+
+        private BasePage parent;
+
+        MyUnusedUEsInBIEsPanelImpl(BasePage parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN) {
+            WebElement td = visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\""+ueName+"\")]//ancestor::tr//td[6]//*[contains(text(),\""+assocDEN+"\")]"));
+            click(td.findElement(By.tagName("a")));
+            waitFor(ofMillis(500L));
+
+            ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+            assert viewEditCoreComponentPage.isOpened();
+            return viewEditCoreComponentPage;
+        }
+    }
+
+    @Override
+    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
+        click(getUserExtensionsTab());
+        return new MyUnusedUEsInBIEsPanelImpl(this);
+    }
+
 }
