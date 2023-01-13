@@ -620,6 +620,37 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_8")
     public void end_user_can_see_associations_of_user_extensions_that_he_owns_and_not_used_in_bies_in_my_unused_extensions_in_bies_panel() {
+        AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser1);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+
+        UserExtensionGroupContainer ueContainer = new UserExtensionGroupContainer(endUser1, release, endUserNamespace);
+
+        HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
+        homePage.setBranch(release.getReleaseNumber());
+
+        HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
+
+        click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getUserExtensionsTab());
+
+        //need to append a few bccp to bie extensions
+
+        //move the user extensions to production
+
+        //need to select the random bccps, then update
+
+        // repeat the same step to select the same bccps to uncheck, then update
+
+        // verify MyUnusedUEsInBIEsPanel have those random bccps
+
+
+
+
+
 
 
 
