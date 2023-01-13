@@ -11,6 +11,8 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.CreateBIEForSelectBusinessContextsPage;
+import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
@@ -684,7 +686,6 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_5_4")
     public void test_TA_5_4() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -695,6 +696,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
@@ -852,7 +854,6 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_5_5")
     public void test_TA_5_5() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -863,6 +864,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
@@ -1528,7 +1530,6 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_7_5_4")
     public void test_TA_7_5_4() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -1539,6 +1540,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
@@ -1641,7 +1643,6 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_7_5_5")
     public void test_TA_7_5_5() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -1652,6 +1653,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
@@ -1747,6 +1749,35 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             });
 
         }
+    }
+    @Test
+    @DisplayName("TC_6_2_TA_9")
+    public void test_TA_9() {
+        ASCCPObject asccp;
+        AppUserObject usera;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserForCC);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.setBranch(this.release);
+        assertThrows(NoSuchElementException.class, ()-> {createBIEForSelectTopLevelConceptPage.selectCoreComponentByDEN(asccp.getDen());});
     }
 
     @AfterEach
