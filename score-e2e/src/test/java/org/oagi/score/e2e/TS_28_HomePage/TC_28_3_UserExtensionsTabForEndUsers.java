@@ -17,6 +17,7 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -24,6 +25,7 @@ import java.util.*;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -638,16 +640,23 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         click(homePage.getScoreLogo()); // to go to the home page again.
 
         //check the random BCCP nodes for each BIE
+        TopLevelASBIEPObject topBIE;
+        BCCPObject randomBCCP;
 
         for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
+            topBIE = bieBccpEntry.getKey();
+            randomBCCP = bieBccpEntry.getValue();
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(bieBccpEntry.getKey());
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
             getDriver().manage().window().maximize();
 
-            WebElement node = editBIEPage.getNodeByPath("/Extension/" + bieBccpEntry.getValue().getPropertyTerm());
+            WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
             assertTrue(node.isDisplayed());
-            click(node); // select this random BCCP
+
+            WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(getText(node));
+            click(checkBoxForNode);
+
             editBIEPage.hitUpdateButton();
         }
 
