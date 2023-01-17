@@ -635,9 +635,25 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
 
         click(homePage.getScoreLogo()); // to go to the home page again.
-        click(homePage.getUserExtensionsTab());
 
-        //need to append a few bccp to bie extensions
+        //need to append a few BCCP to bie extensions
+
+        for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
+            BIEMenu bieMenu = homePage.getBIEMenu();
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(bieBccpEntry.getKey());
+            getDriver().manage().window().maximize();
+
+            WebElement node = editBIEPage.getNodeByPath("/Extension/" + bieBccpEntry.getValue().getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+
+
+
+        }
+
+
+
 
         //move the user extensions to production
 
