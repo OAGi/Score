@@ -4,7 +4,6 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.AppUserAPI;
 import org.oagi.score.e2e.impl.api.helper.BCryptPasswordEncoder;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 

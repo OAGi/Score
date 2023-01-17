@@ -34,7 +34,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {

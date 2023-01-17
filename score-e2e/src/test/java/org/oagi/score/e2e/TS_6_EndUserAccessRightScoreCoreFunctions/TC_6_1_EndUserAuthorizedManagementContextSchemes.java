@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_6_EndUserAccessRightScoreCoreFunctions;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,10 +9,6 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.ContextMenu;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.ContextCategoryObject;
-import org.oagi.score.e2e.obj.ContextSchemeObject;
-import org.oagi.score.e2e.obj.ContextSchemeValueObject;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.context.ContextSchemeValueDialog;
@@ -35,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertChecked;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
