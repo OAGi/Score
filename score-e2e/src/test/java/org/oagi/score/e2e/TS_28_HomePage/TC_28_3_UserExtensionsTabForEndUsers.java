@@ -650,13 +650,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
             getDriver().manage().window().maximize();
-
             WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
             assertTrue(node.isDisplayed());
-
             WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
             click(checkBoxForNode);
-
             editBIEPage.hitUpdateButton();
         }
 
@@ -666,12 +663,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         //need to select the random bccps, then update
 
 
-        // verify MyUnusedUEsInBIEsPanel have those random bccps
-
-
-
-
-
+        // verify MyUnusedUEsInBIEsPanel have those random BCCPs
 
 
 
