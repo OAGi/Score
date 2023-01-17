@@ -77,6 +77,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By YES_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Yes\")]//ancestor::button/span");
 
+    private static final By RESET_BUTTON_LOCATOR =
+            By.xpath("//button[@mattooltip=\"Reset detail\"]");
+
+    private static final By CONTINUE_RESET_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Reset\")]//ancestor::button/span");
+
+    private static final By RESET_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
+
     private final TopLevelASBIEPObject asbiep;
 
     public EditBIEPageImpl(BasePage parent, TopLevelASBIEPObject asbiep) {
@@ -744,6 +753,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             return getTextAreaFieldByName("Component Definition");
         }
 
+        @Override
+        public void setBusinessTerm(String business_term) {
+            sendKeys(getBusinessTermField(), business_term);
+        }
+
+        @Override
+        public void hitResetButton() {
+            click(elementToBeClickable(getDriver(), RESET_BUTTON_LOCATOR));
+        }
+
+        @Override
+        public void confirmToReset() {
+            click(elementToBeClickable(getDriver(), CONTINUE_RESET_BUTTON_IN_DIALOG_LOCATOR));
+        }
+
+        @Override
+        public String getResetDialogMessage() {
+            return visibilityOfElementLocated(getDriver(), RESET_DIALOG_MESSAGE_LOCATOR).getText();
+        }
     }
 
     private class BBIESCPanelImpl implements BBIESCPanel {
