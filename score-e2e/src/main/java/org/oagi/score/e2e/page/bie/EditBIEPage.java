@@ -280,6 +280,7 @@ public interface EditBIEPage extends Page {
 
         void toggleUsed();
 
+
         /**
          * Return the UI element of the 'Nillable' checkbox.
          *

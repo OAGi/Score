@@ -637,7 +637,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         click(homePage.getScoreLogo()); // to go to the home page again.
 
-        //need to append a few BCCP to bie extensions
+        //check the random BCCP nodes for each BIE
 
         for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
             BIEMenu bieMenu = homePage.getBIEMenu();
@@ -647,18 +647,15 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             WebElement node = editBIEPage.getNodeByPath("/Extension/" + bieBccpEntry.getValue().getPropertyTerm());
             assertTrue(node.isDisplayed());
-            EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
-
+            click(node); // select this random BCCP
+            editBIEPage.hitUpdateButton();
         }
 
+        //uncheck the random BCCP nodes for each BIE
 
-
-
-        //move the user extensions to production
 
         //need to select the random bccps, then update
 
-        // repeat the same step to select the same bccps to uncheck, then update
 
         // verify MyUnusedUEsInBIEsPanel have those random bccps
 
