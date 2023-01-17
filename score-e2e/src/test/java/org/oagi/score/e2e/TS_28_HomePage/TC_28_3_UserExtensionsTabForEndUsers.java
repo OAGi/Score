@@ -212,7 +212,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+                getDriver().manage().window().maximize();
+                SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
                 selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
                 accExtensionViewEditPage.setNamespace(userNamespace);
@@ -647,8 +648,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             WebElement node = editBIEPage.getNodeByPath("/Extension/" + bieBccpEntry.getValue().getPropertyTerm());
             assertTrue(node.isDisplayed());
             EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
-
-
 
         }
 
