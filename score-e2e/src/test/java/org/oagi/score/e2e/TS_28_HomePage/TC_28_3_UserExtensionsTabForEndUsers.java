@@ -654,7 +654,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
             assertTrue(node.isDisplayed());
 
-            WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(getText(node));
+            WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
             click(checkBoxForNode);
 
             editBIEPage.hitUpdateButton();
