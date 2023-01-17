@@ -15,10 +15,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
+
     private List<AppUserObject> randomAccounts = new ArrayList<>();
+
     private String release = "10.8.4";
 
     @BeforeEach
@@ -140,27 +139,28 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         // TODO:
         // Can't open the context menu in a small size of the screen.
         getDriver().manage().window().maximize();
-        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        String objectClassTermFieldBIEPageTitleLocalExtension = editBIEPage.getObjectClassTermFieldLabel();
+        String objectClassTermFieldBIEPageTitleLocalExtension = accExtensionViewEditPage.getObjectClassTermFieldLabel();
         assertEquals("Object Class Term (Space Separated Name)", objectClassTermFieldBIEPageTitleLocalExtension);
 
-        String denFieldBIEPageTitleLocalExtension = editBIEPage.getDENFieldLabel();
+        String denFieldBIEPageTitleLocalExtension = accExtensionViewEditPage.getDENFieldLabel();
         assertEquals("DEN (Dictionary Entry Name)", denFieldBIEPageTitleLocalExtension);
 
-        //CHECK THE SAME FOR THE GLOBAL BIE EXTENSION
+        // CHECK THE SAME FOR THE GLOBAL BIE EXTENSION
 
         BusinessContextObject contextGlobalExtension = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
         TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiepGlobalExtension);
-        editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        String objectClassTermFieldBIEPageTitleGlobalExtension = editBIEPage.getObjectClassTermFieldLabel();
+        String objectClassTermFieldBIEPageTitleGlobalExtension = accExtensionViewEditPage.getObjectClassTermFieldLabel();
         assertEquals("Object Class Term (Space Separated Name)", objectClassTermFieldBIEPageTitleGlobalExtension);
 
-        String denFieldBIEPageTitleGlobalExtension = editBIEPage.getDENFieldLabel();
+        String denFieldBIEPageTitleGlobalExtension = accExtensionViewEditPage.getDENFieldLabel();
         assertEquals("DEN (Dictionary Entry Name)", denFieldBIEPageTitleGlobalExtension);
     }
 
@@ -360,8 +360,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
             DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Identifier. Type", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
-
         }
+
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -379,6 +379,13 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         accViewEditPage.goToNode(bccp.getPropertyTerm());
         String denFieldTitleDT = accViewEditPage.getDENFieldLabelDT();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleDT);
+    }
+
+    @Test
+    public void test() {
+        for (String loginID : Arrays.asList("eu_K316X", "dev_azHuS2k7m")) {
+            thisAccountWillBeDeletedAfterTests(getAPIFactory().getAppUserAPI().getAppUserByLoginID(loginID));
+        }
     }
 
     @AfterEach

@@ -11,7 +11,6 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.CreateBIEForSelectBusinessContextsPage;
 import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
@@ -24,7 +23,8 @@ import org.openqa.selenium.WebElement;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -76,8 +76,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
@@ -85,21 +85,25 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             getDriver().manage().window().maximize();
             if (topLevelAsbiep.getState().equals("WIP")) {
-                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                String revision = getText(editBIEPage.getRevisionField());
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                String revision = getText(accExtensionViewEditPage.getRevisionField());
                 assertEquals("1", revision);
-                editBIEPage.setNamespace(useraNamespace.getUri());
-                editBIEPage.hitUpdateButton();
-                editBIEPage.moveToQA();
-                editBIEPage.moveToProduction();
-                bieMenu.openViewEditBIESubMenu();
-                viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                revision = getText(editBIEPage.getRevisionField());
+
+                accExtensionViewEditPage.setNamespace(useraNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+
+                accExtensionViewEditPage.moveToQA();
+                accExtensionViewEditPage.moveToProduction();
+                viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                accExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                revision = getText(accExtensionViewEditPage.getRevisionField());
                 assertEquals("2", revision);
             } else {
+                EditBIEPage finalEditBIEPage = editBIEPage;
                 assertThrows(TimeoutException.class, () -> {
-                    editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                    finalEditBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 });
                 escape(getDriver());
             }
@@ -140,29 +144,33 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject contextSecondUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             userbBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextSecondUser), asccp, userb, "WIP");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         getDriver().manage().window().maximize();
         assertEquals("WIP", useraBIE.getState());
-        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        editBIEPage.setNamespace(useraNamespace.getUri());
-        editBIEPage.hitUpdateButton();
-        editBIEPage.moveToQA();
+
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage.setNamespace(useraNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
         homePage.logout();
-        loginPage().signIn(userb.getLoginId(), userb.getPassword());
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(userbBIE);
+
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIE);
         assertEquals("WIP", userbBIE.getState());
-        editBIEPage.getExtendBIELocallyOptionForNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         /**
          * Display a dialog indicating “The core component is being extended by “ + [the owner of the UEGACC] or similar.
          */
         assertEquals("Another user is working on the extension.",
-                editBIEPage.getAtentionDialogMessage());
+                editBIEPage.getAttentionDialogMessage());
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.continueToExtendBIEOnNode();
         /**
          * If the UEGACC is in QA state, the end user can view its details but cannot make any change.
@@ -184,17 +192,17 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         switchToMainTab(getDriver());
         homePage.logout();
 
-        loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIE);
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         editBIEPage.backToWIP();
         homePage.logout();
 
-        loginPage().signIn(userb.getLoginId(), userb.getPassword());
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(userbBIE);
-        editBIEPage.getExtendBIELocallyOptionForNode("/" + asccp.getPropertyTerm() + "/Extension");
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIE);
+        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         assertEquals("Editing extension already exist.", getSnackBarMessage(getDriver()));
     }
 
@@ -224,8 +232,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             TopLevelASBIEPObject topLevelAsbiepWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
             biesForTesting.add(topLevelAsbiepWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
@@ -233,38 +241,38 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             getDriver().manage().window().maximize();
             assertEquals("WIP", topLevelAsbiep.getState());
-            editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-            bieMenu.openViewEditBIESubMenu();
-            viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            assertEnabled(editBIEPage.getSourceDefinitionField());
-            assertEnabled(editBIEPage.getDefinitionField());
+            ACCExtensionViewEditPage accExtensionViewEditPage =
+                    editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+            accExtensionViewEditPage =
+                    editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            editBIEPage.setNamespace(useraNamespace.getUri());
+            assertEnabled(accExtensionViewEditPage.getDefinitionSourceField());
+            assertEnabled(accExtensionViewEditPage.getDefinitionField());
 
-            assertDoesNotThrow(() -> {
-                editBIEPage.hitUpdateButton();
-            });
+            accExtensionViewEditPage.setNamespace(useraNamespace);
+            accExtensionViewEditPage.hitUpdateButton();
 
-            editBIEPage.moveToQA();
-            bieMenu.openViewEditBIESubMenu();
-            viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            accExtensionViewEditPage.moveToQA();
+            assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
 
-            assertDisabled(editBIEPage.getSourceDefinitionField());
-            assertDisabled(editBIEPage.getDefinitionField());
+            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+            accExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            assertDoesNotThrow(() -> {
-                editBIEPage.backToWIP();
-            });
-            assertDoesNotThrow(() -> {
-                editBIEPage.moveToQA();
-            });
-            assertDoesNotThrow(() -> {
-                editBIEPage.moveToProduction();
-            });
+            assertDisabled(accExtensionViewEditPage.getDefinitionSourceField());
+            assertDisabled(accExtensionViewEditPage.getDefinitionField());
 
+            accExtensionViewEditPage.backToWIP();
+            assertEquals("WIP", accExtensionViewEditPage.getStateFieldValue());
+
+            accExtensionViewEditPage.moveToQA();
+            assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
+
+            accExtensionViewEditPage.moveToProduction();
+            assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
         }
     }
 
@@ -1029,8 +1037,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
@@ -1038,21 +1046,26 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             getDriver().manage().window().maximize();
             if (topLevelAsbiep.getState().equals("WIP")) {
-                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                String revision = getText(editBIEPage.getRevisionField());
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                String revision = getText(accExtensionViewEditPage.getRevisionField());
                 assertEquals("1", revision);
-                editBIEPage.setNamespace(useraNamespace.getUri());
-                editBIEPage.hitUpdateButton();
-                editBIEPage.moveToQA();
-                editBIEPage.moveToProduction();
-                bieMenu.openViewEditBIESubMenu();
-                viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                revision = getText(editBIEPage.getRevisionField());
+
+                accExtensionViewEditPage.setNamespace(useraNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+                accExtensionViewEditPage.moveToQA();
+                accExtensionViewEditPage.moveToProduction();
+
+                viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                accExtensionViewEditPage =
+                        editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                revision = getText(accExtensionViewEditPage.getRevisionField());
                 assertEquals("2", revision);
             } else {
+                EditBIEPage finalEditBIEPage = editBIEPage;
                 assertThrows(TimeoutException.class, () -> {
-                    editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                    finalEditBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 });
                 escape(getDriver());
             }
@@ -1093,61 +1106,74 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject contextSecondUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             userbBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextSecondUser), asccp, userb, "WIP");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         getDriver().manage().window().maximize();
         assertEquals("WIP", useraBIE.getState());
-        editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        editBIEPage.setNamespace(useraNamespace.getUri());
-        editBIEPage.hitUpdateButton();
-        editBIEPage.moveToQA();
+
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage.setNamespace(useraNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
         homePage.logout();
-        loginPage().signIn(userb.getLoginId(), userb.getPassword());
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(userbBIE);
+
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage nextEditBIEPage = viewEditBIEPage.openEditBIEPage(userbBIE);
         assertEquals("WIP", userbBIE.getState());
-        editBIEPage.getExtendBIEGloballyOptionForNode("/" + asccp.getPropertyTerm() + "/Extension");
+
+        assertThrows(AssertionError.class, () -> {
+            nextEditBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        });
+
         /**
          * Display a dialog indicating “The core component is being extended by “ + [the owner of the UEGACC] or similar.
          */
         assertEquals("Another user is working on the extension.",
-                editBIEPage.getAtentionDialogMessage());
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.continueToExtendBIEOnNode();
+                nextEditBIEPage.getAttentionDialogMessage());
+        ACCExtensionViewEditPage nextACCExtensionViewEditPage = nextEditBIEPage.continueToExtendBIEOnNode();
+
         /**
          * If the UEGACC is in QA state, the end user can view its details but cannot make any change.
          */
-        assertEquals("QA", ACCExtensionViewEditPage.getStateFieldValue());
+        assertEquals("QA", nextACCExtensionViewEditPage.getStateFieldValue());
         assertThrows(TimeoutException.class, () -> {
-            ACCExtensionViewEditPage.getUpdateButton(false);
+            nextACCExtensionViewEditPage.getUpdateButton(false);
         });
         assertThrows(TimeoutException.class, () -> {
-            ACCExtensionViewEditPage.getMoveToQAButton(false);
+            nextACCExtensionViewEditPage.getMoveToQAButton(false);
         });
         assertThrows(TimeoutException.class, () -> {
-            ACCExtensionViewEditPage.getMoveToProductionButton(false);
+            nextACCExtensionViewEditPage.getMoveToProductionButton(false);
         });
-        assertEquals(usera.getLoginId(), ACCExtensionViewEditPage.getOwnerFieldValue());
-        assertDisabled(ACCExtensionViewEditPage.getDefinitionField());
-        assertDisabled(ACCExtensionViewEditPage.getObjectClassTermField());
-        assertDisabled(ACCExtensionViewEditPage.getDefinitionSourceField());
+
+        assertEquals(usera.getLoginId(), nextACCExtensionViewEditPage.getOwnerFieldValue());
+        assertDisabled(nextACCExtensionViewEditPage.getDefinitionField());
+        assertDisabled(nextACCExtensionViewEditPage.getObjectClassTermField());
+        assertDisabled(nextACCExtensionViewEditPage.getDefinitionSourceField());
         switchToMainTab(getDriver());
         homePage.logout();
 
-        loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIE);
-        editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        editBIEPage.backToWIP();
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
+        accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage.backToWIP();
+        assertEquals("WIP", accExtensionViewEditPage.getStateFieldValue());
         homePage.logout();
 
-        loginPage().signIn(userb.getLoginId(), userb.getPassword());
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(userbBIE);
-        editBIEPage.getExtendBIEGloballyOptionForNode("/" + asccp.getPropertyTerm() + "/Extension");
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage finalEditBIEPage = viewEditBIEPage.openEditBIEPage(userbBIE);
+        assertThrows(AssertionError.class, () -> {
+            finalEditBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        });
         assertEquals("Editing extension already exist.", getSnackBarMessage(getDriver()));
     }
 
@@ -1177,8 +1203,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             TopLevelASBIEPObject topLevelAsbiepWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
             biesForTesting.add(topLevelAsbiepWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
@@ -1186,38 +1212,37 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             getDriver().manage().window().maximize();
             assertEquals("WIP", topLevelAsbiep.getState());
-            editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-            bieMenu.openViewEditBIESubMenu();
-            viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            assertEnabled(editBIEPage.getSourceDefinitionField());
-            assertEnabled(editBIEPage.getDefinitionField());
+            ACCExtensionViewEditPage accExtensionViewEditPage =
+                    editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+            accExtensionViewEditPage =
+                    editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            editBIEPage.setNamespace(useraNamespace.getUri());
+            assertEnabled(accExtensionViewEditPage.getDefinitionSourceField());
+            assertEnabled(accExtensionViewEditPage.getDefinitionField());
 
-            assertDoesNotThrow(() -> {
-                editBIEPage.hitUpdateButton();
-            });
-
+            accExtensionViewEditPage.setNamespace(useraNamespace);
+            editBIEPage.hitUpdateButton();
             editBIEPage.moveToQA();
-            bieMenu.openViewEditBIESubMenu();
-            viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            assertDisabled(editBIEPage.getSourceDefinitionField());
-            assertDisabled(editBIEPage.getDefinitionField());
+            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+            accExtensionViewEditPage =
+                    editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-            assertDoesNotThrow(() -> {
-                editBIEPage.backToWIP();
-            });
-            assertDoesNotThrow(() -> {
-                editBIEPage.moveToQA();
-            });
-            assertDoesNotThrow(() -> {
-                editBIEPage.moveToProduction();
-            });
+            assertDisabled(accExtensionViewEditPage.getDefinitionSourceField());
+            assertDisabled(accExtensionViewEditPage.getDefinitionField());
 
+            accExtensionViewEditPage.backToWIP();
+            assertEquals("WIP", accExtensionViewEditPage.getStateFieldValue());
+
+            accExtensionViewEditPage.moveToQA();
+            assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
+
+            accExtensionViewEditPage.moveToProduction();
+            assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
         }
     }
 
@@ -1248,53 +1273,55 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-        getDriver().manage().window().maximize();
-        assertEquals("WIP", useraBIEWIP.getState());
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+        getDriver().manage().window().maximize();
+        assertEquals("WIP", useraBIEWIP.getState());
+
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        SelectAssociationDialog selectCCPropertyPage =
+                accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
 
         /**
-         *  ASCCP cannot be appended to the global extension.
+         * ASCCP cannot be appended to the global extension.
          */
         assertThrows(NoSuchElementException.class, () -> {
             selectCCPropertyPage.setAssociationType("ASCCP");
         });
         escape(getDriver());
         selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
         WebElement node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Extension/" + bccpToAppend.getPropertyTerm());
         assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
-        /**
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        /*
          * Assert that all options are disabled.
          */
-        assertDisabled(BBIEPPanel.getNillableCheckbox());
-        assertDisabled(BBIEPPanel.getUsedCheckbox());
-        assertDisabled(BBIEPPanel.getCardinalityMinField());
-        assertDisabled(BBIEPPanel.getCardinalityMaxField());
-        assertDisabled(BBIEPPanel.getRemarkField());
-        assertDisabled(BBIEPPanel.getExampleField());
-        assertDisabled(BBIEPPanel.getValueConstraintSelectField());
-        assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
-        assertDisabled(BBIEPPanel.getValueDomainField());
-        assertDisabled(BBIEPPanel.getContextDefinitionField());
-        assertDisabled(BBIEPPanel.getAssociationDefinitionField());
-        assertDisabled(BBIEPPanel.getComponentDefinitionField());
-        //TODO
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertDisabled(bbiePanel.getRemarkField());
+        assertDisabled(bbiePanel.getExampleField());
+        assertDisabled(bbiePanel.getValueConstraintSelectField());
+        assertDisabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertDisabled(bbiePanel.getValueDomainField());
+        assertDisabled(bbiePanel.getContextDefinitionField());
+        assertDisabled(bbiePanel.getAssociationDefinitionField());
+        assertDisabled(bbiePanel.getComponentDefinitionField());
+        // TODO:
         // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertDisabled(BBIEPPanel.getBusinessTermField());
-
+        assertDisabled(bbiePanel.getBusinessTermField());
     }
 
     @Test
@@ -1353,8 +1380,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1363,13 +1390,15 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertEquals("WIP", useraBIEWIP.getState());
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             /**
              * It has child association to an end user ASCCP which is not in Production state
              */
             assertNotEquals("Production", asccpToAppend.getState());
-            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            SelectAssociationDialog selectCCPropertyPage =
+                    accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
             /**
              *  ASCCP cannot be appended to the global extension.
              */
@@ -1382,54 +1411,57 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             });
             selectCCPropertyPage.hitCancelButton();
         }
+
         for (BCCPObject bccpToAppend : bccpsForTesting) {
             /**
              * It has child association to an end user BCCP which is not in Production state
              */
             assertNotEquals("Production", bccpToAppend.getState());
-            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
             selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
         }
-        ACCExtensionViewEditPage.setNamespace(namespaceEU);
-        ACCExtensionViewEditPage.hitUpdateButton();
-        ACCExtensionViewEditPage.moveToQA();
-        /**
-         *  there is a corresponding UEGACC in Production state
+
+        accExtensionViewEditPage.setNamespace(namespaceEU);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        /*
+         * there is a corresponding UEGACC in Production state
          */
-        ACCExtensionViewEditPage.moveToProduction();
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        accExtensionViewEditPage.moveToProduction();
+
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage finalEditBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
         for (BCCPObject bccpToAppend : bccpsForTesting) {
-            WebElement node = editBIEPage.getNodeByPath(
+            WebElement node = finalEditBIEPage.getNodeByPath(
                     "/" + asccp.getPropertyTerm() + "/Extension/" + bccpToAppend.getPropertyTerm());
             assertTrue(node.isDisplayed());
-            EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+            EditBIEPage.BBIEPanel bbiePanel = finalEditBIEPage.getBBIEPanel(node);
             /**
              * Assert that all options are disabled.
              */
-            assertDisabled(BBIEPPanel.getNillableCheckbox());
-            assertDisabled(BBIEPPanel.getUsedCheckbox());
-            assertDisabled(BBIEPPanel.getCardinalityMinField());
-            assertDisabled(BBIEPPanel.getCardinalityMaxField());
-            assertDisabled(BBIEPPanel.getRemarkField());
-            assertDisabled(BBIEPPanel.getExampleField());
-            assertDisabled(BBIEPPanel.getValueConstraintSelectField());
-            assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
-            assertDisabled(BBIEPPanel.getValueDomainField());
-            assertDisabled(BBIEPPanel.getContextDefinitionField());
-            assertDisabled(BBIEPPanel.getAssociationDefinitionField());
-            assertDisabled(BBIEPPanel.getComponentDefinitionField());
-            //TODO
+            assertDisabled(bbiePanel.getNillableCheckbox());
+            assertDisabled(bbiePanel.getUsedCheckbox());
+            assertDisabled(bbiePanel.getCardinalityMinField());
+            assertDisabled(bbiePanel.getCardinalityMaxField());
+            assertDisabled(bbiePanel.getRemarkField());
+            assertDisabled(bbiePanel.getExampleField());
+            assertDisabled(bbiePanel.getValueConstraintSelectField());
+            assertDisabled(bbiePanel.getValueDomainRestrictionSelectField());
+            assertDisabled(bbiePanel.getValueDomainField());
+            assertDisabled(bbiePanel.getContextDefinitionField());
+            assertDisabled(bbiePanel.getAssociationDefinitionField());
+            assertDisabled(bbiePanel.getComponentDefinitionField());
+            // TODO:
             // Check if Business Term functionality is enabled. Currently, it is disabled.
-            assertDisabled(BBIEPPanel.getBusinessTermField());
+            assertDisabled(bbiePanel.getBusinessTermField());
         }
+
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             assertThrows(TimeoutException.class, () -> {
-                WebElement node = editBIEPage.getNodeByPath(
+                finalEditBIEPage.getNodeByPath(
                         "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
             });
-
         }
     }
 
@@ -1472,8 +1504,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1482,7 +1514,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertEquals("WIP", useraBIEWIP.getState());
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             /**
              * It has child association to an end user ASCCP that is in the Production state
@@ -1491,9 +1524,10 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             /**
              * The end user ACC (of the ASCCP) is not in the Production state
              */
-            ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
-            assertNotEquals("Production", ACCAssociation.getState());
-            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            ACCObject accAssociation = asccpACCMap.get(asccpToAppend);
+            assertNotEquals("Production", accAssociation.getState());
+            SelectAssociationDialog selectCCPropertyPage =
+                    accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
 
             /**
              *  ASCCP cannot be appended to the global extension.
@@ -1508,22 +1542,22 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             selectCCPropertyPage.hitCancelButton();
         }
 
-        ACCExtensionViewEditPage.setNamespace(namespaceEU);
-        ACCExtensionViewEditPage.hitUpdateButton();
-        ACCExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.setNamespace(namespaceEU);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
         /**
          *  there is a corresponding UEGACC in Production state
          */
-        ACCExtensionViewEditPage.moveToProduction();
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        accExtensionViewEditPage.moveToProduction();
+
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage finalEditBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             assertThrows(TimeoutException.class, () -> {
-                WebElement node = editBIEPage.getNodeByPath(
+                finalEditBIEPage.getNodeByPath(
                         "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
             });
-
         }
     }
 
@@ -1586,8 +1620,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1596,7 +1630,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertEquals("WIP", useraBIEWIP.getState());
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             /**
              * It has child association to an end user ASCCP that is in the Production state
@@ -1607,7 +1642,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
             assertEquals("Production", ACCAssociation.getState());
-            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            SelectAssociationDialog selectCCPropertyPage =
+                    accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
             /**
              *  ASCCP cannot be appended to the global extension.
              */
@@ -1621,20 +1657,20 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             selectCCPropertyPage.hitCancelButton();
         }
 
-        ACCExtensionViewEditPage.setNamespace(namespaceEU);
-        ACCExtensionViewEditPage.hitUpdateButton();
-        ACCExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.setNamespace(namespaceEU);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
         /**
          *  there is a corresponding UEGACC in Production state
          */
-        ACCExtensionViewEditPage.moveToProduction();
+        accExtensionViewEditPage.moveToProduction();
 
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage finalEditBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             assertThrows(TimeoutException.class, () -> {
-                WebElement node = editBIEPage.getNodeByPath(
+                finalEditBIEPage.getNodeByPath(
                         "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
             });
         }
@@ -1704,7 +1740,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertEquals("WIP", useraBIEWIP.getState());
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             /**
              * It has child association to an end user ASCCP that is in the Production state
@@ -1713,9 +1750,10 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             /**
              * The end user ACC (of the ASCCP) is not in the Production state
              */
-            ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
-            assertNotEquals("Production", ACCAssociation.getState());
-            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            ACCObject accAssociation = asccpACCMap.get(asccpToAppend);
+            assertNotEquals("Production", accAssociation.getState());
+            SelectAssociationDialog selectCCPropertyPage =
+                    accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
             /**
              *  ASCCP cannot be appended to the global extension.
              */
@@ -1729,27 +1767,27 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             selectCCPropertyPage.hitCancelButton();
         }
 
-        ACCExtensionViewEditPage.setNamespace(namespaceEU);
-        ACCExtensionViewEditPage.hitUpdateButton();
-        ACCExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.setNamespace(namespaceEU);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
         /**
          *  there is a corresponding UEGACC in Production state
          */
-        ACCExtensionViewEditPage.moveToProduction();
+        accExtensionViewEditPage.moveToProduction();
 
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage finalEditBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
         for (ASCCPObject asccpToAppend : asccpsForTesting) {
             ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
             BCCPObject bccpDescendant = accBCCPMap.get(ACCAssociation);
             assertThrows(TimeoutException.class, () -> {
-                WebElement node = editBIEPage.getNodeByPath(
+                finalEditBIEPage.getNodeByPath(
                         "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
             });
-
         }
     }
+
     @Test
     @DisplayName("TC_6_2_TA_9")
     public void test_TA_9() {
@@ -1767,17 +1805,18 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "Published");
-
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
-
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
         createBIEForSelectTopLevelConceptPage.setBranch(this.release);
-        assertThrows(NoSuchElementException.class, ()-> {createBIEForSelectTopLevelConceptPage.selectCoreComponentByDEN(asccp.getDen());});
+        assertThrows(NoSuchElementException.class, () -> {
+            createBIEForSelectTopLevelConceptPage.selectCoreComponentByDEN(asccp.getDen());
+        });
     }
 
     @AfterEach
