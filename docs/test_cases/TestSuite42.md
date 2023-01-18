@@ -76,7 +76,7 @@ The end user can discard a Business Term in View/Edit Business Term page if it i
 ### Test Assertion:
 
 #### Test Assertion #42.2.1
-The "Business Term Assignment" menu under BIE menu should open the page titled with "Business Term Assignment". 
+The "Business Term Assignment" menu should open the page titled with "Business Term Assignment". 
 
 #### Test Assertion #42.2.2
 On Business Term Assignment page, the end user can view all the business terms with assignments. 
@@ -111,13 +111,12 @@ Diff              |  Diff         | Allow
  
 
 #### Test Assertion #42.2.10
-
-
+For each BIE, there can only be one preferred business term assignment. 
 
 
 ### Test Step Pre-condition:
 
-1. There are at least three BIEs created by end user and developer and they are in different states (WIP, QA, Production). 
+1. There are at least three BIEs (ASBIE, BBIE) created by end user, and they are in different states (WIP, QA, Production). 
 2. There are at least five business terms created. Three of them are assigned to different BIEs. Two of them are not assigned to any BIEs. 
 
 ### Test Step:
@@ -125,19 +124,21 @@ Diff              |  Diff         | Allow
 1. An end user logins.
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks on the "Business Term Assignments" from the dropdown list.
-4. Verify that three business terms in the table. (Assertion [#1] (#test-assertion-4221)).
-5. He clicks on the "Assign Business Term" button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#2] (#test-assertion-4222)).
-6. The end user goes back to "Business Term Assignments" from the BIE dropdown list. 
-7. Verify that he can search the business term assignments based on BIE DEN, business term, extenal reference URI or type code. (Assertion [#3](#test-assertion-4223)).
-8. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (
-    Assertion [#4](#test-assertion-4224)).
-9. He selects any BIE in the table, then clicks on the "Search by Selected BIE", verify that only business terms for the selected BIE are listed. (Assertion [#5](#test-assertion-4225)).
-10. He clicks on the "Assign Business Term" button. Then select any BIE in the new table and click "Next". He will see all the busines terms available for assignment. (Assertion [#6](#test-assertion-4226)).
-11. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then click "Search" button. (Assertion [#7](#test-assertion-4227)).
-12. The end user goes back to "Business Term Assignments" from the BIE dropdown list. 
-13. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". 
-He will select any business term in the new table, put a type code and clicks on "Create" button. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term 
-assignment for the same BIE and type code already exists!. (Assertion [#8](#test-assertion-4228)).
+4. Verify that the title in the open page is "Business Term Assignment". (Assertion [#1] (#test-assertion-4221))
+5. Verify that three business terms in the table. (Assertion [#2] (#test-assertion-4222)).
+6. He clicks on the "Assign Business Term" button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#3] (#test-assertion-4223)).
+7. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+8. Verify that he can search the business term assignments based on BIE DEN, business term, extenal reference URI or type code. (Assertion [#4](#test-assertion-4224)).
+9. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (
+    Assertion [#5](#test-assertion-4225)).
+10. He selects any BIE in the "Businss Term Assignment" page, then clicks on the "Search by Selected BIE", verify that only business terms for the selected BIE are listed. (Assertion [#6](#test-assertion-4226)).
+11. He clicks on the "Assign Business Term" button. Then select any BIE in the new table and click "Next". Verify that he can see all the busines terms available for assignment. (Assertion [#7](#test-assertion-4227)).
+12. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then click "Search" button. 
+13. Verify the search results match the business term asssignments in preconditions(Assertion [#8](#test-assertion-4228)).
+14. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+15. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4229)).
+
+
 14. The end user goes back to "Business Term Assignments" from the BIE dropdown list. 
 15.He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". 
 He will select any business term in the new table, put a type code and clicks on "Create" button. Then repeat the whole process for the same BIE with the same business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
