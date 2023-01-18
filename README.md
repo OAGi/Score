@@ -29,7 +29,3 @@ While XML is a proven workhorse, JSON has emerged as the preferred syntax lighte
 ## Produce Open API Specification
 
 Message formats are only part of interoperability story. Delivering and retrieving messages among systems is another part. RESTful Web API specifications give developers the details they need to invoke or make available the services behind the APIs. Score makes it easy to generate OAS 3.0-compliant API specifications that include the schema object.  There are OAS class generators for many programming languages to accelerate the integration development effort.
-
-## Produce Excel or Open Document Format templates for CSV files
-
-When creating data exchanges in bulk, XML and JSON files are too big for processing as the metadata is repeated with the content.  Now Score allows the expression of a Excel template for specification of Comma-separated-value files, or other delimiters that one chooses.  The column names are based on BIE semantics, so the template generated has two sheets; one for the sample file based on example data entered into Score, and the second the specification of each column, its related path from component definition point of view, and each contextual definition and example data.  This feature alone provides good completeness checklist to see if all context definitions and example data are entered into the BIE.
