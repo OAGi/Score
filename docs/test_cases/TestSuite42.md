@@ -146,7 +146,7 @@ From View/Edit BIE page, select the desired BIE, select the desired node under t
 
 #### Test Assertion #42.3.3
 
-From View/Edit BIE page, select the desired BIE, select the desired node under the BIE, the end user can click the button "Assign New Business Term" to assign new business terms to that node. 
+The end user can assign business terms to a descendant BIE node in the BIE detail page by clicking the "Assign New Business Term" button in BIE detail pane. 
 
 
 ### Test Step Pre-condition:
