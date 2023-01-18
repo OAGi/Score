@@ -1848,6 +1848,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1856,33 +1857,41 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         WebElement node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
         assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
-        BBIEPPanel.toggleUsed();
-        BBIEPPanel.setCardinalityMax(10);
-        BBIEPPanel.setCardinalityMin(5);
-        BBIEPPanel.setBusinessTerm("test business term");
-        BBIEPPanel.setRemark("test remark");
-        BBIEPPanel.setExample("test example");
-        BBIEPPanel.setValueConstraint("Fixed");
-        BBIEPPanel.setFixedValue("test value");
-        BBIEPPanel.setValueDomainRestriction("Primitive");
-        BBIEPPanel.setValueDomain("token");
-        BBIEPPanel.setContextDefinition("test context definition");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        bbiePanel.setCardinalityMax(10);
+        bbiePanel.setCardinalityMin(5);
+        bbiePanel.setBusinessTerm("test business term");
+        bbiePanel.setRemark("test remark");
+        bbiePanel.setExample("test example");
+        bbiePanel.setValueConstraint("Fixed");
+        bbiePanel.setFixedValue("test value");
+        bbiePanel.setValueDomainRestriction("Primitive");
+        bbiePanel.setValueDomain("token");
+        bbiePanel.setContextDefinition("test context definition");
         editBIEPage.hitUpdateButton();
-        BBIEPPanel.hitResetButton();
+
+        assertEquals("10", getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals("5", getText(bbiePanel.getCardinalityMinField()));
+        assertEquals("test business term", getText(bbiePanel.getBusinessTermField()));
+        assertEquals("test remark", getText(bbiePanel.getRemarkField()));
+        assertEquals("test example", getText(bbiePanel.getExampleField()));
+        assertEquals("test context definition", getText(bbiePanel.getContextDefinitionField()));
+
+        bbiePanel.hitResetButton();
         String message = "Are you sure you want to reset values to initial values?";
-        assertEquals(message, BBIEPPanel.getResetDialogMessage());
-        BBIEPPanel.confirmToReset();
+        assertEquals(message, bbiePanel.getResetDialogMessage());
+        bbiePanel.confirmToReset();
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
         assertTrue(node.isDisplayed());
-        BBIEPPanel = editBIEPage.getBBIEPanel(node);
-        assertEquals("unbounded", getText(BBIEPPanel.getCardinalityMaxField()));
-        assertEquals("0", getText(BBIEPPanel.getCardinalityMinField()));
-        assertEquals("", getText(BBIEPPanel.getBusinessTermField()));
-        assertEquals("", getText(BBIEPPanel.getRemarkField()));
-        assertEquals("", getText(BBIEPPanel.getExampleField()));
-        assertEquals("", getText(BBIEPPanel.getContextDefinitionField()));
+        bbiePanel = editBIEPage.getBBIEPanel(node);
+        assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
+        assertEquals("", getText(bbiePanel.getBusinessTermField()));
+        assertEquals("", getText(bbiePanel.getRemarkField()));
+        assertEquals("", getText(bbiePanel.getExampleField()));
+        assertEquals("", getText(bbiePanel.getContextDefinitionField()));
     }
 
     @Test
@@ -1924,8 +1933,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccp_owner_userb = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-
         }
+
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1969,8 +1978,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-
         }
+
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1982,6 +1991,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), this.release);
         });
     }
+
     @Test
     @DisplayName("TC_6_2_TA_14_2")
     public void test_TA_14_2() {
@@ -2009,8 +2019,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-
         }
+
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -2036,21 +2046,21 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
         assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
-        BBIEPPanel.toggleUsed();
-        assertEnabled(BBIEPPanel.getNillableCheckbox());
-        assertEnabled(BBIEPPanel.getUsedCheckbox());
-        assertEnabled(BBIEPPanel.getCardinalityMinField());
-        assertEnabled(BBIEPPanel.getCardinalityMaxField());
-        assertEnabled(BBIEPPanel.getRemarkField());
-        assertEnabled(BBIEPPanel.getExampleField());
-        assertEnabled(BBIEPPanel.getValueConstraintSelectField());
-        assertEnabled(BBIEPPanel.getValueDomainRestrictionSelectField());
-        assertEnabled(BBIEPPanel.getValueDomainField());
-        assertEnabled(BBIEPPanel.getContextDefinitionField());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        assertEnabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getCardinalityMinField());
+        assertEnabled(bbiePanel.getCardinalityMaxField());
+        assertEnabled(bbiePanel.getRemarkField());
+        assertEnabled(bbiePanel.getExampleField());
+        assertEnabled(bbiePanel.getValueConstraintSelectField());
+        assertEnabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertEnabled(bbiePanel.getValueDomainField());
+        assertEnabled(bbiePanel.getContextDefinitionField());
         //TODO
         // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertEnabled(BBIEPPanel.getBusinessTermField());
+        assertEnabled(bbiePanel.getBusinessTermField());
         homePage.logout();
 
         /**
@@ -2067,31 +2077,28 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
         /**
          * Assert descendent nodes are disabled
          */
-
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
         assertTrue(node.isDisplayed());
-        BBIEPPanel = editBIEPage.getBBIEPanel(node);
-        assertDisabled(BBIEPPanel.getNillableCheckbox());
-        assertDisabled(BBIEPPanel.getUsedCheckbox());
-        assertDisabled(BBIEPPanel.getCardinalityMinField());
-        assertDisabled(BBIEPPanel.getCardinalityMaxField());
-        assertDisabled(BBIEPPanel.getRemarkField());
-        assertDisabled(BBIEPPanel.getExampleField());
-        assertDisabled(BBIEPPanel.getValueConstraintSelectField());
-        assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
-        assertDisabled(BBIEPPanel.getValueDomainField());
-        assertDisabled(BBIEPPanel.getContextDefinitionField());
+        bbiePanel = editBIEPage.getBBIEPanel(node);
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertDisabled(bbiePanel.getRemarkField());
+        assertDisabled(bbiePanel.getExampleField());
+        assertDisabled(bbiePanel.getValueConstraintSelectField());
+        assertDisabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertDisabled(bbiePanel.getValueDomainField());
+        assertDisabled(bbiePanel.getContextDefinitionField());
         //TODO
         // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertDisabled(BBIEPPanel.getBusinessTermField());
-
+        assertDisabled(bbiePanel.getBusinessTermField());
     }
-
-
 
     @AfterEach
     public void tearDown() {
