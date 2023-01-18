@@ -61,6 +61,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input[@Value=\"DT\"]" +
                     "//ancestor::mat-tab-group//descendant::mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
 
+    public static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+
 
     private final ACCObject acc;
 
@@ -68,7 +74,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         super(parent);
         this.acc = acc;
     }
-
+ 
     @Override
     protected String getPageUrl() {
         return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
@@ -185,6 +191,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public String getDENFieldLabelDT() {
         return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR_FOR_DT).findElement(By.tagName("mat-label")).getText();
+    }
+
+    @Override
+    public void hitAmendButton() {
+        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
     }
 
     @Override
