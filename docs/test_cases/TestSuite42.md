@@ -87,7 +87,14 @@ On Assign Business Term page, the end user can filter business terms that are al
 
 #### Test Assertion #42.2.8
 
-On Assign Business Term page, the end user cannot create the assignment of the same business term with a type code that already exits for the selected BIE. 
+On the Select Business Term step/page of the business term assignment, the application shall allow or disallow duplicate  business term and type code (or no type code) assignment based on the conditions below.  
+
+Business Term | Type Code | Dis/Allow 
+Same              |  Same         | Disallow
+Same              |  Diff            | Allow
+Diff                 |  Same         | Disallow  
+Diff                 |  Diff            | Allow
+ 
 
 #### Test Assertion #42.2.9
 
