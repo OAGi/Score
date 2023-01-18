@@ -1823,6 +1823,166 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_6_2_TA_10")
+    public void test_TA_10() {
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        AppUserObject usera;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserForCC);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccp.getDen(), this.release);
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+        BBIEPPanel.toggleUsed();
+        BBIEPPanel.setCardinalityMax(10);
+        BBIEPPanel.setCardinalityMin(5);
+        BBIEPPanel.setBusinessTerm("test business term");
+        BBIEPPanel.setRemark("test remark");
+        BBIEPPanel.setExample("test example");
+        BBIEPPanel.setValueConstraint("Fixed");
+        BBIEPPanel.setFixedValue("test value");
+        BBIEPPanel.setValueDomainRestriction("Primitive");
+        BBIEPPanel.setValueDomain("token");
+        BBIEPPanel.setContextDefinition("test context definition");
+        editBIEPage.hitUpdateButton();
+        BBIEPPanel.hitResetButton();
+        String message = "Are you sure you want to reset values to initial values?";
+        assertEquals(message, BBIEPPanel.getResetDialogMessage());
+        BBIEPPanel.confirmToReset();
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        BBIEPPanel = editBIEPage.getBBIEPanel(node);
+        assertEquals("unbounded", getText(BBIEPPanel.getCardinalityMaxField()));
+        assertEquals("0", getText(BBIEPPanel.getCardinalityMinField()));
+        assertEquals("", getText(BBIEPPanel.getBusinessTermField()));
+        assertEquals("", getText(BBIEPPanel.getRemarkField()));
+        assertEquals("", getText(BBIEPPanel.getExampleField()));
+        assertEquals("", getText(BBIEPPanel.getContextDefinitionField()));
+    }
+
+    @Test
+    @DisplayName("TC_6_2_TA_12")
+    public void test_TA_12() {
+        ASCCPObject asccp_owner_usera;
+        ASCCPObject asccp_owner_userb;
+        AppUserObject usera;
+        AppUserObject userb;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            /**
+             * The owner of the ASCCP is usera
+             */
+            ACCObject acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
+
+            /**
+             * The owner of the ASCCP is userb
+             */
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, userb, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            asccp_owner_userb = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Production");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+
+        }
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        assertDoesNotThrow(() -> {
+            createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), this.release);
+        });
+
+        bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        assertDoesNotThrow(() -> {
+            createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_userb.getDen(), this.release);
+        });
+    }
+
+    @Test
+    @DisplayName("TC_6_2_TA_13")
+    public void test_TA_13() {
+        ASCCPObject asccp_owner_usera;
+        AppUserObject usera;
+        AppUserObject userb;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            /**
+             * ACC has a group component type.
+             */
+            ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+
+        }
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        /**
+         * The end user cannot create a new BIE from an ASCCP whose ACC has a group component type.
+         */
+        assertThrows(NoSuchElementException.class, () -> {
+            createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), this.release);
+        });
+    }
+    @Test
     @DisplayName("TC_6_2_TA_14_2")
     public void test_TA_14_2() {
         ASCCPObject asccp;
@@ -1930,7 +2090,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertDisabled(BBIEPPanel.getBusinessTermField());
 
     }
-    
+
+
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

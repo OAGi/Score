@@ -502,6 +502,13 @@ public interface EditBIEPage extends Page {
          */
         WebElement getComponentDefinitionField();
 
+        void setBusinessTerm(String business_term);
+
+        void hitResetButton();
+
+        void confirmToReset();
+
+        String getResetDialogMessage();
     }
 
     BBIESCPanel getBBIESCPanel(WebElement bdtScNode);
