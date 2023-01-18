@@ -8,27 +8,33 @@
 ### Test Assertion:
 
 #### Test Assertion #42.1.1
-The end user can create a Business Term with all information specified. 
+The "View/Edit Business Term" menu should open the page with titled "Business Term". 
 
 #### Test Assertion #42.1.2
-The end user can search for a Business Term based only on its term. 
+The end user can create a Business Term with only required fields including Business Term and External Reference URI field. 
 
 #### Test Assertion #42.1.3
-The end user can search for a Business Term based on the external reference URI.
+The end user cannot create a Business Term if any required field is not provided. 
 
 #### Test Assertion #42.1.4
-The end user can select a Business Term in the table to update its details in Edit Business Term page. 
+The end user can search for a Business Term based only on its term. 
 
 #### Test Assertion #42.1.5
-The end user cannot change Definition field in Edit Business Term page. 
+The end user can search for a Business Term based on the external reference URI.
 
 #### Test Assertion #42.1.6
-The end user cannot save a Business Term with an already existing term and URI in Edit Business Term page.
+The end user can select a Business Term in the table to update its details in Edit Business Term page. 
 
 #### Test Assertion #42.1.7
-The end user cannot discard a Business Term in View/Edit Business Term page if it is used in assignments. 
+The end user cannot change Definition field in Edit Business Term page. 
 
 #### Test Assertion #42.1.8
+The end user cannot save a Business Term with an already existing term and URI in Edit Business Term page.
+
+#### Test Assertion #42.1.9
+The end user cannot discard a Business Term in View/Edit Business Term page if it is used in assignments. 
+
+#### Test Assertion #42.1.10
 The end user can discard a Business Term in the table in View/Edit Business Term page if it is not in any assignments. 
 
 
