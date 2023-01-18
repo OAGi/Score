@@ -172,7 +172,7 @@ From View/Edit BIE page, select the desired BIE, select the desired node under t
 
 ## Test Case 42.4
 
-**Business Term from External Source**
+**Load Business Terms from an External Source**
 
 Pre-condition: N/A
 
