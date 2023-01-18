@@ -9,13 +9,16 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -1819,6 +1822,115 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         });
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_14_2")
+    public void test_TA_14_2() {
+        ASCCPObject asccp;
+        ACCObject acc;
+        BCCPObject bccp;
+        AppUserObject usera;
+        AppUserObject userb;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+
+        }
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccp.getDen(), this.release);
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByDENAndReleaseNum(asccp.getDen(), this.release);
+
+        /**
+         * Assert descendent nodes are editable
+         */
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
+
+        assertEnabled(ASBIEPanel.getRemarkField());
+        assertEnabled(ASBIEPanel.getContextDefinitionField());
+
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertEnabled(ASBIEPanel.getBusinessTermField());
+
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+        BBIEPPanel.toggleUsed();
+        assertEnabled(BBIEPPanel.getNillableCheckbox());
+        assertEnabled(BBIEPPanel.getUsedCheckbox());
+        assertEnabled(BBIEPPanel.getCardinalityMinField());
+        assertEnabled(BBIEPPanel.getCardinalityMaxField());
+        assertEnabled(BBIEPPanel.getRemarkField());
+        assertEnabled(BBIEPPanel.getExampleField());
+        assertEnabled(BBIEPPanel.getValueConstraintSelectField());
+        assertEnabled(BBIEPPanel.getValueDomainRestrictionSelectField());
+        assertEnabled(BBIEPPanel.getValueDomainField());
+        assertEnabled(BBIEPPanel.getContextDefinitionField());
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertEnabled(BBIEPPanel.getBusinessTermField());
+        homePage.logout();
+
+        /**
+         * The end user ASCCP is amended
+         */
+        loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), this.release);
+        accViewEditPage.hitAmendButton();
+        homePage.logout();
+
+        loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        homePage.getBIEMenu();
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        /**
+         * Assert descendent nodes are disabled
+         */
+
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        BBIEPPanel = editBIEPage.getBBIEPanel(node);
+        assertDisabled(BBIEPPanel.getNillableCheckbox());
+        assertDisabled(BBIEPPanel.getUsedCheckbox());
+        assertDisabled(BBIEPPanel.getCardinalityMinField());
+        assertDisabled(BBIEPPanel.getCardinalityMaxField());
+        assertDisabled(BBIEPPanel.getRemarkField());
+        assertDisabled(BBIEPPanel.getExampleField());
+        assertDisabled(BBIEPPanel.getValueConstraintSelectField());
+        assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
+        assertDisabled(BBIEPPanel.getValueDomainField());
+        assertDisabled(BBIEPPanel.getContextDefinitionField());
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertDisabled(BBIEPPanel.getBusinessTermField());
+
+    }
+    
     @AfterEach
     public void tearDown() {
         super.tearDown();
