@@ -8,7 +8,7 @@
 ### Test Assertion:
 
 #### Test Assertion #42.1.1
-The "View/Edit Business Term" menu should open the page titled with "Business Term". 
+The "View/Edit Business Term" menu under BIE menu should open the page titled with "Business Term". 
 
 #### Test Assertion #42.1.2
 The end user can create a Business Term with only required fields including both Business Term and External Reference URI field. 
@@ -70,33 +70,36 @@ The end user can discard a Business Term in View/Edit Business Term page if it i
 
 ## Test Case 42.2
 
-**Business Term Assignments**
+**Business Term Assignment**
 
 
 ### Test Assertion:
 
 #### Test Assertion #42.2.1
-On Business Term Assignments page, the end user can view all the business terms with assignments. 
+The "Business Term Assignment" menu under BIE menu should open the page titled with "Business Term Assignment". 
 
 #### Test Assertion #42.2.2
-On Business Term Assignments page, the end user can click on the "Assign Business Term" button to view all the BIEs available for Business Term assignments. 
+On Business Term Assignment page, the end user can view all the business terms with assignments. 
 
 #### Test Assertion #42.2.3
-On Business Term Assignments page, the end user can search business term assignments by BIE type and den, business term, URI and type code. 
+On Business Term Assignment page, the end user can click on the "Assign Business Term" button to view the ASBIEs, BBIEs and Top-Level BIEs available for Business Term assignments. 
 
 #### Test Assertion #42.2.4
-On Business Term Assignments page, the end user can filter only preferred business terms.  
+On Business Term Assignment page, the end user can search business term assignments by BIE type and den, business term, URI and type code. 
 
 #### Test Assertion #42.2.5
-On Business Term Assignments page, the end user can select a BIE in the table and click "Search by Selected BIE" to view all the business term assignments for that BIE. 
+On Business Term Assignment page, the end user can filter only preferred business terms.  
 
 #### Test Assertion #42.2.6
-On Assign Business Term page, the end user can select any BIE to view all the Business Terms available for assignments. 
+On Business Term Assignment page, the end user can select a BIE in the table and click "Search by Selected BIE" to view all the business term assignments for that BIE. 
 
 #### Test Assertion #42.2.7
-On Assign Business Term page, the end user can filter business terms that are already assigned to the same core component. 
+On Assign Business Term page, the end user can select any BIE to view all the Business Terms available for assignments. 
 
 #### Test Assertion #42.2.8
+On Assign Business Term page, the end user can filter business terms that are already assigned to the same core component. 
+
+#### Test Assertion #42.2.9
 
 On the Select Business Term step/page of the business term assignment, the application shall allow or disallow duplicate  business term and type code (or no type code) assignment based on the conditions below.  
 
@@ -107,9 +110,9 @@ Diff              |  Same         | Disallow
 Diff              |  Diff         | Allow
  
 
-#### Test Assertion #42.2.9
+#### Test Assertion #42.2.10
 
-On Assign Business Term page, the end user can create the assignment of the same business term with different type codes for the selected BIE. 
+
 
 
 ### Test Step Pre-condition:
