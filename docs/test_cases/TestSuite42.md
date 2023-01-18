@@ -23,7 +23,7 @@ The end user can search for a Business Term based only on its term.
 The end user can search for a Business Term based on the external reference URI.
 
 #### Test Assertion #42.1.6
-The end user can select a Business Term in the table to update its details in Edit Business Term page. 
+The end user can open a Business Term on the "Business Term" page to update its details in "Edit Business Term" page. 
 
 #### Test Assertion #42.1.7
 The end user cannot change Definition field in Edit Business Term page. 
@@ -95,11 +95,11 @@ On Assign Business Term page, the end user can filter business terms that are al
 
 On the Select Business Term step/page of the business term assignment, the application shall allow or disallow duplicate  business term and type code (or no type code) assignment based on the conditions below.  
 
-Business Term | Type Code | Dis/Allow 
+Business Term     | Type Code     | Dis/Allow 
 Same              |  Same         | Disallow
-Same              |  Diff            | Allow
-Diff                 |  Same         | Disallow  
-Diff                 |  Diff            | Allow
+Same              |  Diff         | Allow
+Diff              |  Same         | Disallow  
+Diff              |  Diff         | Allow
  
 
 #### Test Assertion #42.2.9
