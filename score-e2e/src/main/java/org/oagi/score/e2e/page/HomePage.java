@@ -242,16 +242,6 @@ public interface HomePage extends Page {
 
     TotalUEsByStatesPanel openTotalUEsByStatesPanel();
 
-    interface MyUEsByStatesPanel {
-
-        WebElement getStateProgressBarByState(String state);
-
-        ViewEditCoreComponentPage clickStateProgressBar(String state);
-
-    }
-
-    MyUEsByStatesPanel openMyUEsByStatesPanel();
-
     interface UEsByUsersAndStatesPanel {
 
         /**
