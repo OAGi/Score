@@ -8,10 +8,10 @@
 ### Test Assertion:
 
 #### Test Assertion #42.1.1
-The "View/Edit Business Term" menu should open the page with titled "Business Term". 
+The "View/Edit Business Term" menu should open the page titled with "Business Term". 
 
 #### Test Assertion #42.1.2
-The end user can create a Business Term with only required fields including Business Term and External Reference URI field. 
+The end user can create a Business Term with only required fields including both Business Term and External Reference URI field. 
 
 #### Test Assertion #42.1.3
 The end user cannot create a Business Term if any required field is not provided. 
@@ -26,16 +26,16 @@ The end user can search for a Business Term based on the external reference URI.
 The end user can open a Business Term on the "Business Term" page to update its details in "Edit Business Term" page. 
 
 #### Test Assertion #42.1.7
-The end user cannot change Definition field in Edit Business Term page. 
+The end user cannot change Definition field in "Edit Business Term" page. 
 
 #### Test Assertion #42.1.8
-The end user cannot save a Business Term with an already existing term and URI in Edit Business Term page.
+The end user cannot save a Business Term with an already existing term and URI in "Edit Business Term" page.
 
 #### Test Assertion #42.1.9
 The end user cannot discard a Business Term in View/Edit Business Term page if it is used in assignments. 
 
 #### Test Assertion #42.1.10
-The end user can discard a Business Term in the table in View/Edit Business Term page if it is not in any assignments. 
+The end user can discard a Business Term in View/Edit Business Term page if it is not in any assignments. 
 
 
 ### Test Step Pre-condition:
@@ -47,21 +47,26 @@ The end user can discard a Business Term in the table in View/Edit Business Term
 1. An end user logins.
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks the "View/Edit Business Term" from the dropdown list.
-4. He clicks the "New Business Term" button from the right above on the "Business Term" page. 
-5. He put the required inputs for Business Term, then "Create" will be enabled. 
-6. He clicks the "Create" button. Repeat the step 3-6 a few times to create several business terms (Assertion [#1](#test-assertion-4211)). 
-7. He search the newly created business terms by putting some common word in the "Term" field and click Search button. 
-8. Verify that only business terms containing the search word are listed in the table (Assertion [#2](#test-assertion-4212)). 
-9. He search the newly created business terms by putting the external reference URI field and click Search button.
-10. Verify that only business terms containing the search URI are listed in the table (Assertion [#3](#test-assertion-4213))
-11. He clicks on any newly created business term in the table and the Edit Business Term page will open. He can modify any fields except "Definition", and the Update button will be enabled. He clicks on the Update button and the page will go back to Business Term list page. 
-12. Verify that the updated business term can be filtered based on the updated field information by searching on the new information. (Assertion [#4](#test-assertion-4214))
-13. He clicks on any newly created business term in the table and the Edit Business Term page will open. Verify that the "Definition" field is not editable. (Assertion [#5](#test-assertion-4215)).
-14. The end user goes back to the homem page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
-15. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button in "Create Business Term" page, he will get a pop up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#6](#test-assertion-4216)).
-16. The end user goes back to the homem page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
-17. He selects a business term which has been assigned to some BIEs. He clicks on the Discard button and he will get a error message: Discard's forbidden! The business term is used. (Assertion [#7](#test-assertion-4217)).
-18. He selects a business term without any assignments. He clicks on the Discard button and he will get a confirmation dialog which reminds that the business term will be permanently removed. He confirms by clicking on the Discard button on the confirmation dialog. The businss term is discarded from the table. (Assertion [#8](#test-assertion-4218)).
+4. Verify that the title in the new page is "Business Term" (Assertion [#1](#test-assertion-4211)). 
+5. He clicks the "New Business Term" button from the right above on the "Business Term" page. 
+6. He put the required inputs for Business Term, then "Create" will be enabled. 
+7. He clicks the "Create" button. Repeat the steps 5-7 a few times to create several business terms.
+8. Verify that those business terms are listed in the "Business Term" page (Assertion [#2](#test-assertion-4212)). 
+9. Repeat the step 5-6, but don't provide the required input for Business Term or External Reference URI on step 6. 
+10. Verify that "Create" button is still disabled. (Assertion [#3](#test-assertion-4213)). 
+11. The end user will go back to "Business Term" page.
+12. He will search the newly created business terms by putting some common word in the "Term" field and click Search button. 
+13. Verify that only business terms containing the search word are listed in the table (Assertion [#4](#test-assertion-4214)). 
+14. He will search the newly created business terms by putting the external reference URI field and click Search button.
+15. Verify that only business terms containing the search URI are listed in the table (Assertion [#5](#test-assertion-4215))
+16. He clicks on any newly created business term in the table and the Edit Business Term page will open. He can modify any fields except "Definition", and the Update button will be enabled after modification. He clicks on the Update button and the page will go back to Business Term page. 
+17. Verify that the updated business term can be filtered based on the updated field information by searching on the new information. (Assertion [#6](#test-assertion-4216))
+18. He clicks on any newly created business term in "Business Term" page and the Edit Business Term page will open. Verify that the "Definition" field is not editable. (Assertion [#7](#test-assertion-4217)).
+19. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
+20. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button in "Create Business Term" page, he will get a pop up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#8](#test-assertion-4218)).
+21. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
+22. He selects a business term which has been assigned to some BIEs. He clicks on the Discard button and he will get an error message: Discard's forbidden! The business term is used. (Assertion [#9](#test-assertion-4219)).
+23. He selects a business term without any assignments. He clicks on the Discard button and he will get a confirmation dialog which reminds that the business term will be permanently removed. He confirms by clicking on the Discard button on the confirmation dialog. Verify that the businss term is discarded from the table. (Assertion [#10](#test-assertion-42110)).
 
 ## Test Case 42.2
 
