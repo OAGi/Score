@@ -3,10 +3,7 @@ package org.oagi.score.e2e.page.bie;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 /**
  * An interface of 'Edit BIE' page.
@@ -40,13 +37,6 @@ public interface EditBIEPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
-
-    /**
-     *
-     * @param nodeName
-     * @return the UI checkbox element of the tree node
-     */
-    WebElement getCheckboxByNodeName(String nodeName);
 
     /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
@@ -311,7 +301,6 @@ public interface EditBIEPage extends Page {
         WebElement getUsedCheckbox();
 
         void toggleUsed();
-
 
         /**
          * Return the UI element of the 'Nillable' checkbox.

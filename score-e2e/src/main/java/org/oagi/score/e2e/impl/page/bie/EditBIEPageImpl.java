@@ -186,13 +186,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public WebElement getCheckboxByNodeName(String nodeName){
-
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav-container//span[contains(text(), \"" + nodeName + "\")]//preceding-sibling::mat-checkbox[1]"));
-
-    }
-
-    @Override
     public boolean isDeprecated(WebElement node) {
         try {
             return node.findElement(By.xpath("//*[contains(@class, \"deprecated\")]")).isDisplayed();
