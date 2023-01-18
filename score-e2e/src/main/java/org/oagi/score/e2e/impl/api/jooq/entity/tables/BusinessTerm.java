@@ -106,7 +106,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
      * The column <code>oagi.business_term.external_ref_uri</code>. TODO:
      * Definition is missing.
      */
-    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_URI = createField(DSL.name("external_ref_uri"), SQLDataType.CLOB, this, "TODO: Definition is missing.");
+    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_URI = createField(DSL.name("external_ref_uri"), SQLDataType.CLOB.nullable(false), this, "TODO: Definition is missing.");
 
     /**
      * The column <code>oagi.business_term.external_ref_id</code>. TODO:

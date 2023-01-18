@@ -219,7 +219,27 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement getMoveToQAButton(boolean enabled);
 
+    /**
+     * Make the ACC to the QA state. It works only if the ACC is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the ACC is not in the WIP state or the 'Update' button is enabled.
+     */
     void moveToQA();
+
+    /**
+     * Return the UI element of the 'Back to WIP' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Back to WIP' button
+     */
+    WebElement getBackToWIPButton(boolean enabled);
+
+    /**
+     * Make the ACC back to the WIP state. It works only if the ACC is in the Draft/QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the ACC is not in the Draft/QA state.
+     */
+    void backToWIP();
 
     /**
      * Return the UI element of the 'Move to Production' button.
@@ -229,6 +249,11 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement getMoveToProductionButton(boolean enabled);
 
+    /**
+     * Make the ACC to the Production state. It works only if the ACC is in the QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the ACC is not in the QA state.
+     */
     void moveToProduction();
 
 }

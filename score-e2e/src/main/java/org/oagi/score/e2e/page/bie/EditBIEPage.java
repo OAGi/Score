@@ -10,31 +10,11 @@ import org.openqa.selenium.WebElement;
  */
 public interface EditBIEPage extends Page {
 
-    String getObjectClassTermFieldLabel();
-    void setNamespace(String namespace);
-    void getExtendBIELocallyOptionForNode(String path);
-    WebElement getSourceDefinitionField();
-    WebElement getDefinitionField();
-    WebElement getRevisionField();
-    WebElement getBNamespaceSelectField();
-
-    String getDENFieldLabel();
-
-    WebElement getObjectClassTermField();
-
-    SelectAssociationDialog appendPropertyAtLast(String path);
-
-    ACCExtensionViewEditPage extendBIELocallyOnNode(String path);
-
-    WebElement getDENField();
-
     WebElement getSearchField();
 
     WebElement getSearchButton();
 
     void clickOnDropDownMenuByPath(String path);
-
-    ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
 
     /**
      * Return the panel for 'Top-Level ASBIEP' node.
@@ -120,6 +100,11 @@ public interface EditBIEPage extends Page {
      */
     WebElement getMoveToQAButton(boolean enabled);
 
+    /**
+     * Make the BIE to the QA state. It works only if the BIE is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the WIP state or the 'Update' button is enabled.
+     */
     void moveToQA();
 
     /**
@@ -130,6 +115,11 @@ public interface EditBIEPage extends Page {
      */
     WebElement getBackToWIPButton(boolean enabled);
 
+    /**
+     * Make the BIE back to the WIP state. It works only if the BIE is in the QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state.
+     */
     void backToWIP();
 
     /**
@@ -140,12 +130,44 @@ public interface EditBIEPage extends Page {
      */
     WebElement getMoveToProductionButton(boolean enabled);
 
+    /**
+     * Make the BIE to the Production state. It works only if the BIE is in the QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state.
+     */
     void moveToProduction();
 
-    String getAtentionDialogMessage();
+    /**
+     * Make the local user extension on the 'Extension' node.
+     *
+     * @param path the path of the 'Extension' node.
+     * @return the local user extension page
+     */
+    ACCExtensionViewEditPage extendBIELocallyOnNode(String path);
 
-    void getExtendBIEGloballyOptionForNode(String path);
+    /**
+     * Make the global user extension on the 'Extension' node.
+     *
+     * @param path the path of the 'Extension' node.
+     * @return the global user extension page
+     */
+    ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
 
+    /**
+     * Return the attention message in the warning dialog.
+     * This happens when the user attempts to make the user extension,
+     * but another user is working on that extension.
+     *
+     * @return the attention message in the warning dialog
+     */
+    String getAttentionDialogMessage();
+
+    /**
+     * Continue to extend the 'Extension' BIE after it gets the attention message.
+     *
+     * @see #getAttentionDialogMessage()
+     * @return the local/global user extension page
+     */
     ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
     /**

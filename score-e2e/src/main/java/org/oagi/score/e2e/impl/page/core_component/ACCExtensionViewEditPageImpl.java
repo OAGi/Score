@@ -61,6 +61,9 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
 
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
+
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
 
@@ -289,6 +292,22 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     @Override
     public void moveToQA() {
         click(getMoveToQAButton(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+    }
+
+    @Override
+    public WebElement getBackToWIPButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void backToWIP() {
+        click(getBackToWIPButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
     }
