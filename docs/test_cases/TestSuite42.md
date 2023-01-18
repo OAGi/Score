@@ -144,7 +144,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #42.3.1
-From View/Edit BIE page, select the desired BIE, select the desired node under the BIE, the end user can click the button "Show Business Terms" to view all the business term assignments for that node. 
+The end user can see all business terms assigned to a descendant BIE node.  
 
 #### Test Assertion #42.3.2
 
