@@ -183,4 +183,6 @@ public interface ACCViewEditPage extends Page {
     String getDenFieldLabelForBCC();
 
     String getDENFieldLabelDT();
+
+    void hitAmendButton();
 }
