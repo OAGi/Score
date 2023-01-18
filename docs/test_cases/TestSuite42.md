@@ -148,7 +148,7 @@ The end user can see all business terms assigned to a descendant BIE node.
 
 #### Test Assertion #42.3.2
 
-From View/Edit BIE page, select the desired BIE, select the desired node under the BIE, the end user can hover over the button "Show Business Terms" without clicking, the business term assignments for that node will show up. 
+Hovering over the "Show Business Terms" button in the detail pane of a descendant BIE node shows up to five business term assigned to that node. 
 
 #### Test Assertion #42.3.3
 
