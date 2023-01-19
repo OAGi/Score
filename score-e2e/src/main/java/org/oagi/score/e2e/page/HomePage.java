@@ -242,6 +242,16 @@ public interface HomePage extends Page {
 
     TotalUEsByStatesPanel openTotalUEsByStatesPanel();
 
+    interface MyUEsByStatesPanel {
+
+        WebElement getStateProgressBarByState(String state);
+
+        ViewEditCoreComponentPage clickStateProgressBar(String state);
+
+    }
+
+    MyUEsByStatesPanel openMyUEsByStatesPanel();
+
     interface UEsByUsersAndStatesPanel {
 
         /**
@@ -302,5 +312,21 @@ public interface HomePage extends Page {
     }
 
     UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
+
+    interface MyUnusedUEsInBIEsPanel {
+
+
+        /**
+         * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
+         *
+         * @param ueName user extension
+         * @param assocDEN Association DEN
+         * @return the 'View/Edit Core Component' page object
+         */
+        ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN);
+
+    }
+
+    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
 
 }
