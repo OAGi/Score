@@ -146,8 +146,11 @@ the "Create" button will be enabled. He can put a type code and click "Create" t
 20. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
 21. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
 the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
-22.  The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-23. He will select any BIE from the "Business Term Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred Business Term". 
+22. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+23. He will select any BIE from the "Business Term Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-42210)).
+24. Repeat step 23, if no true value in the column titled with "Preferred Business Term". Click any BIE to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally click "Update" button. 
+25. Repeat step 23, verify that only one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-42210)).
+26. Repeat step 23, click any BIE with the false value in the column titled with "Preferred Business Term" to open the "Edit Business Term Assignment" page, then click teh checkbox: Preferred Business Term. Finally click "Update: button. Verify that a warning dialog will pop up with the message: Overwrite previous preferred business term?The preferred business term already exists for selected BIE and type code. Are you sure you want to do the update and overwrite the previous preferred business term assignment? (Assertion [#10](#test-assertion-42210)).
 
 ## Test Case 42.3
 
