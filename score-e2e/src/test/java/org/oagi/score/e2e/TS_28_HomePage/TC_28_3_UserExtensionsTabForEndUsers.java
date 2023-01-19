@@ -218,8 +218,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
                 selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
+                accExtensionViewEditPage.getNamespaceField().clear();
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
+
 
                 accExtensionViewEditPage.moveToQA();
 
