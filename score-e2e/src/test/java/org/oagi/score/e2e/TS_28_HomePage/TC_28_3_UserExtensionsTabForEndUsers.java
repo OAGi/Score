@@ -173,6 +173,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         private NamespaceObject userNamespace;
         int numberOfProductionUEGs;
         private Map<TopLevelASBIEPObject, BCCPObject> bieBCCPMap = new HashMap<>();
+        private Map<ASCCPObject, BCCPObject> ueBCCPMap = new HashMap<>();
 
         public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
             this(appUser, release, namespace, nextInt(2, 5));
@@ -209,6 +210,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
 
                 bieBCCPMap.put(topLevelAsbiep, bccpToAppend);
+                ueBCCPMap.put(asccp, bccpToAppend);
                 BIEMenu bieMenu = homePage.getBIEMenu();
                 ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
@@ -644,31 +646,35 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         //check the random BCCP nodes for each BIE
         TopLevelASBIEPObject topBIE;
         BCCPObject randomBCCP;
+        int loop = 2; //loop twice to check and uncheck the random BCCP nodes for the selected BIE
 
-        for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
-            topBIE = bieBccpEntry.getKey();
-            randomBCCP = bieBccpEntry.getValue();
-            BIEMenu bieMenu = homePage.getBIEMenu();
-            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
-            getDriver().manage().window().maximize();
-            WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
-            assertTrue(node.isDisplayed());
-            WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
-            click(checkBoxForNode);
-            editBIEPage.hitUpdateButton();
+        while (loop > 0){
+            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
+                topBIE = bieBccpEntry.getKey();
+                randomBCCP = bieBccpEntry.getValue();
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
+                getDriver().manage().window().maximize();
+                WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
+                assertTrue(node.isDisplayed());
+                WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
+                click(checkBoxForNode);
+                editBIEPage.hitUpdateButton();
+            }
+
+            loop--;
+
         }
-
-        //uncheck the random BCCP nodes for each BIE
-
-
-        //need to select the random bccps, then update
-
-
+        ASCCPObject randomASCCP;
         // verify MyUnusedUEsInBIEsPanel have those random BCCPs
-
-
-
+        for (Map.Entry<ASCCPObject, BCCPObject> ueBccpEntry : ueContainer.ueBCCPMap.entrySet()) {
+            randomASCCP = ueBccpEntry.getKey();
+            String ueName = randomASCCP.getPropertyTerm() + " User Extension Group. Details";
+            randomBCCP = ueBccpEntry.getValue();
+            ViewEditCoreComponentPage viewEditCoreComponentPage = myUnusedUEsInBIEsPanel.openViewEditCCPageByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
+            assertTrue(viewEditCoreComponentPage.isOpened());
+        }
 
     }
 
