@@ -672,8 +672,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             randomASCCP = ueBccpEntry.getKey();
             String ueName = randomASCCP.getPropertyTerm() + " User Extension Group. Details";
             randomBCCP = ueBccpEntry.getValue();
-            ViewEditCoreComponentPage viewEditCoreComponentPage = myUnusedUEsInBIEsPanel.openViewEditCCPageByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
-            assertTrue(viewEditCoreComponentPage.isOpened());
+            WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
+            assertTrue(td.isDisplayed());
         }
 
     }
