@@ -140,11 +140,18 @@ For each BIE, there can only be one preferred business term assignment.
 16. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
 17. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
 the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
-
+18. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+19. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
+the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using the same type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+20. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+21. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
+the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+22.  The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+23. He will select any BIE from the "Business Term Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred Business Term". 
 
 ## Test Case 42.3
 
-**Business Term from BIE detail page**
+**Load Business Term from BIE detail page**
 
 Pre-condition: N/A
 
