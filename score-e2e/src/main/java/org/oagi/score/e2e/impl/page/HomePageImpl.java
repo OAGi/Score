@@ -473,8 +473,13 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
 
         @Override
+        public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN){
+            return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\""+ueName+"\")]//ancestor::tr//td[6]//*[contains(text(),\""+assocDEN+"\")]"));
+        }
+
+        @Override
         public ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN) {
-            WebElement td = visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\""+ueName+"\")]//ancestor::tr//td[6]//*[contains(text(),\""+assocDEN+"\")]"));
+            WebElement td = getTableRecordByUEAndDEN(ueName, assocDEN);
             click(td.findElement(By.tagName("a")));
             waitFor(ofMillis(500L));
 

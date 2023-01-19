@@ -315,11 +315,18 @@ public interface HomePage extends Page {
 
     interface MyUnusedUEsInBIEsPanel {
 
+        /**Return the table record in the table based on the user extension name and association DEN
+         *
+         * @param ueName  user extension name
+         * @param assocDEN Association DEN
+         * @return the table record UI element
+         */
+        WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN);
 
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
          *
-         * @param ueName user extension
+         * @param ueName user extension name
          * @param assocDEN Association DEN
          * @return the 'View/Edit Core Component' page object
          */
