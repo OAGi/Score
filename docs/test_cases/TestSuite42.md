@@ -137,11 +137,9 @@ For each BIE, there can only be one preferred business term assignment.
 13. Verify the search results match the business term asssignments in preconditions(Assertion [#8](#test-assertion-4228)).
 14. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
 15. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4229)).
-
-
-14. The end user goes back to "Business Term Assignments" from the BIE dropdown list. 
-15.He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". 
-He will select any business term in the new table, put a type code and clicks on "Create" button. Then repeat the whole process for the same BIE with the same business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+16. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+17. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
+the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
 
 
 ## Test Case 42.3
