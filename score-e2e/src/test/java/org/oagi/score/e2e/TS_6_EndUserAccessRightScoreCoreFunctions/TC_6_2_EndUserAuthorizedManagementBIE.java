@@ -1993,8 +1993,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_6_2_TA_14_2")
-    public void test_TA_14_2() {
+    @DisplayName("TC_6_2_TA_14_and_TA_14_1")
+    public void test_TA_14_and_TA_14_1() {
         ASCCPObject asccp;
         ACCObject acc;
         BCCPObject bccp;
@@ -2027,7 +2027,10 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccp.getDen(), this.release);
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByDENAndReleaseNum(asccp.getDen(), this.release);
-
+        /**
+         * The end user ASCCP is in Production State
+         */
+        assertEquals("Production", asccp.getState());
         /**
          * Assert descendent nodes are editable
          */
@@ -2079,7 +2082,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         /**
-         * Assert descendent nodes are disabled
+         * f the end user ASCCP is amended (i.e., moved to WIP state), the BIE cannot be edited. The fields of the BIE nodes are disabled including the “Used” checkbox.
          */
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
