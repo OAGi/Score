@@ -48,24 +48,24 @@ The end user can discard a Business Term in View/Edit Business Term page if it i
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks the "View/Edit Business Term" from the dropdown list.
 4. Verify that the title in the new page is "Business Term" (Assertion [#1](#test-assertion-4211)). 
-5. He clicks the "New Business Term" button from the right above on the "Business Term" page. 
-6. He put the required inputs for Business Term, then "Create" will be enabled. 
-7. He clicks the "Create" button. Repeat the steps 5-7 a few times to create several business terms.
+5. He clicks on the "New Business Term" button from the right above on the "Business Term" page. 
+6. He provides the required inputs for Business Term, then "Create" button will be enabled. 
+7. He clicks on the "Create" button. Repeat the steps 5-7 a few times to create several business terms.
 8. Verify that those business terms are listed in the "Business Term" page (Assertion [#2](#test-assertion-4212)). 
 9. Repeat the step 5-6, but don't provide the required input for Business Term or External Reference URI on step 6. 
 10. Verify that "Create" button is still disabled. (Assertion [#3](#test-assertion-4213)). 
 11. The end user will go back to "Business Term" page.
-12. He will search the newly created business terms by putting some common word in the "Term" field and click Search button. 
+12. He will search the newly created business terms by putting some common word in the "Term" field and hits Search button. 
 13. Verify that only business terms containing the search word are listed in the table (Assertion [#4](#test-assertion-4214)). 
-14. He will search the newly created business terms by putting the external reference URI field and click Search button.
+14. He will search the newly created business terms by putting the external reference URI field and hits Search button.
 15. Verify that only business terms containing the search URI are listed in the table (Assertion [#5](#test-assertion-4215))
-16. He clicks on any newly created business term in the table and the Edit Business Term page will open. He can modify any fields except "Definition", and the Update button will be enabled after modification. He clicks on the Update button and the page will go back to Business Term page. 
+16. He clicks on any newly created business term in the table and the "Edit Business Term" page will open. He can modify any fields except "Definition", and the Update button will be enabled after modification. He clicks on the Update button and the page will go back to Business Term page. 
 17. Verify that the updated business term can be filtered based on the updated field information by searching on the new information. (Assertion [#6](#test-assertion-4216))
-18. He clicks on any newly created business term in "Business Term" page and the Edit Business Term page will open. Verify that the "Definition" field is not editable. (Assertion [#7](#test-assertion-4217)).
+18. He clicks on any newly created business term in "Business Term" page and the "Edit Business Term" page will open. Verify that the "Definition" field is not editable. (Assertion [#7](#test-assertion-4217)).
 19. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
-20. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button in "Create Business Term" page, he will get a pop up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#8](#test-assertion-4218)).
+20. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button on "Create Business Term" page, he will get a pop-up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#8](#test-assertion-4218)).
 21. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
-22. He selects a business term which has been assigned to some BIEs. He clicks on the Discard button and he will get an error message: Discard's forbidden! The business term is used. (Assertion [#9](#test-assertion-4219)).
+22. He selects a business term which has been assigned to some BIEs. He clicks on the Discard button. Verify that he will get an error message: Discard's forbidden! The business term is used. (Assertion [#9](#test-assertion-4219)).
 23. He selects a business term without any assignments. He clicks on the Discard button and he will get a confirmation dialog which reminds that the business term will be permanently removed. He confirms by clicking on the Discard button on the confirmation dialog. Verify that the businss term is discarded from the table. (Assertion [#10](#test-assertion-42110)).
 
 ## Test Case 42.2
@@ -82,7 +82,7 @@ The "Business Term Assignment" menu should open the page titled with "Business T
 On Business Term Assignment page, the end user can view all the business terms with assignments. 
 
 #### Test Assertion #42.2.3
-On Business Term Assignment page, the end user can click on the "Assign Business Term" button to view the ASBIEs, BBIEs and Top-Level BIEs available for Business Term assignments. 
+On Business Term Assignment page, the end user can view the ASBIEs, BBIEs and Top-Level BIEs available for Business Term assignments. 
 
 #### Test Assertion #42.2.4
 On Business Term Assignment page, the end user can search business term assignments by BIE type and den, business term, URI and type code. 
@@ -91,7 +91,7 @@ On Business Term Assignment page, the end user can search business term assignme
 On Business Term Assignment page, the end user can filter only preferred business terms.  
 
 #### Test Assertion #42.2.6
-On Business Term Assignment page, the end user can select a BIE in the table and click "Search by Selected BIE" to view all the business term assignments for that BIE. 
+On Business Term Assignment page, the end user can select a BIE in the table and view all the business term assignments for that BIE. 
 
 #### Test Assertion #42.2.7
 On Assign Business Term page, the end user can select any BIE to view all the Business Terms available for assignments. 
@@ -123,7 +123,7 @@ For each BIE, there can only be one preferred business term assignment.
 
 1. An end user logins.
 2. He visits the Home page and clicks on the BIE tab.
-3. He clicks on the "Business Term Assignments" from the dropdown list.
+3. He clicks on the "Business Term Assignment" from the dropdown list.
 4. Verify that the title in the open page is "Business Term Assignment". (Assertion [#1] (#test-assertion-4221))
 5. Verify that three business terms in the table. (Assertion [#2] (#test-assertion-4222)).
 6. He clicks on the "Assign Business Term" button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#3] (#test-assertion-4223)).
@@ -132,24 +132,21 @@ For each BIE, there can only be one preferred business term assignment.
 9. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (Assertion [#5](#test-assertion-4225)).
 10. He selects any BIE in the "Businss Term Assignment" page, then clicks on the "Search by Selected BIE", verify that only business terms for the selected BIE are listed. (Assertion [#6](#test-assertion-4226)).
 11. He clicks on the "Assign Business Term" button. Then select any BIE in the new table and click "Next". Verify that he can see all the busines terms available for assignment. (Assertion [#7](#test-assertion-4227)).
-12. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then click "Search" button. 
+12. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then hits "Search" button. 
 13. Verify the search results match the business term asssignments in preconditions(Assertion [#8](#test-assertion-4228)).
 14. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-15. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4229)).
+15. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4229)).
 16. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-17. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
-the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+17. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term but using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
 18. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-19. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
-the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using the same type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+19. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using the same type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
 20. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-21. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,
-the "Create" button will be enabled. He can put a type code and click "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
+21. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4229)).
 22. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
 23. He will select any BIE from the "Business Term Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-42210)).
-24. Repeat step 23, if no true value in the column titled with "Preferred Business Term". Click any BIE to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally click "Update" button. 
+24. Repeat step 23, if no true value in the column titled with "Preferred Business Term". Click any BIE to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally hits "Update" button. 
 25. Repeat step 23, verify that only one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-42210)).
-26. Repeat step 23, click any BIE with the false value in the column titled with "Preferred Business Term" to open the "Edit Business Term Assignment" page, then click teh checkbox: Preferred Business Term. Finally click "Update: button. Verify that a warning dialog will pop up with the message: Overwrite previous preferred business term?The preferred business term already exists for selected BIE and type code. Are you sure you want to do the update and overwrite the previous preferred business term assignment? (Assertion [#10](#test-assertion-42210)).
+26. Repeat step 23, click any BIE with the false value in the column titled with "Preferred Business Term" to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally hits "Update: button. Verify that a warning dialog will pop up with the message: Overwrite previous preferred business term?The preferred business term already exists for selected BIE and type code. Are you sure you want to do the update and overwrite the previous preferred business term assignment? (Assertion [#10](#test-assertion-42210)).
 
 ## Test Case 42.3
 
@@ -187,7 +184,7 @@ The end user can assign business terms to a descendant BIE node in the BIE detai
 8. He closes the new window and goes back to previous window.
 9. He will hover over "Show Business Terms" button without clicking. A hint bar will display to show the number of business terms assigned to the node. Verify the number is the same as in the previosu step. (Assertion [#2](#test-assertion-4232)).
 10. He will click on the "Assign Business Term" button right next to the "Show Business Terms" button on the same page.
-11. He will select any availabe business term in the new window,  set the Type Code, and on "Create" button.
+11. He will select any availabe business term in the new window,  set the Type Code, and click on "Create" button.
 12. He will close the new window and go back to previous window. 
 13. He will hover over "Show Business Terms" button without clicking again. Verify the number in the hint bar is increased by one. (Assertion [#3](#test-asssertion-4233)).
 
@@ -229,9 +226,9 @@ N/A
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks on the "View/Edit Business Term" from the dropdown list.
 4. He clicks on the "Upload Business Terms" button. 
-5. On the "Upload Business Terms" page, he will click on "Download template" in the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4241)).
+5. On the "Upload Business Terms" page, he will click on "Download template" on the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4241)).
 6. On the same page, he will click on the attach button. An window will open for the end user to select the updated csv files with all the business term information for upload. He will select that file to upload. 
-7. Verify that all the business terms in the uploaded csv file are listed in the table. (Assertion [#2](#test-assertion-4242)).
+7. Verify that all the business terms in the uploaded csv file are listed in the table after uploaded. (Assertion [#2](#test-assertion-4242)).
 8. Verify that a warning message will pop up if the csv file does not follow the format as specified in the template. (Assertion [#3](#test-assertion-4243)).
 9. The end user will fix the format errors in the csv file and re-upload. 
 10. Verify that a new business term is created in the table if the external reference uri is new in the uploaded csv file. (Assertion [#4](#test-assertion-4244)).
