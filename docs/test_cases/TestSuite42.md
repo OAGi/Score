@@ -106,7 +106,7 @@ On the Select Business Term step/page of the business term assignment, the appli
 Business Term     | Type Code     | Dis/Allow 
 Same              |  Same         | Disallow
 Same              |  Diff         | Allow
-Diff              |  Same         | Disallow  
+Diff              |  Same         | Allow  
 Diff              |  Diff         | Allow
  
 
@@ -129,8 +129,7 @@ For each BIE, there can only be one preferred business term assignment.
 6. He clicks on the "Assign Business Term" button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#3] (#test-assertion-4223)).
 7. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
 8. Verify that he can search the business term assignments based on BIE DEN, business term, extenal reference URI or type code. (Assertion [#4](#test-assertion-4224)).
-9. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (
-    Assertion [#5](#test-assertion-4225)).
+9. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (Assertion [#5](#test-assertion-4225)).
 10. He selects any BIE in the "Businss Term Assignment" page, then clicks on the "Search by Selected BIE", verify that only business terms for the selected BIE are listed. (Assertion [#6](#test-assertion-4226)).
 11. He clicks on the "Assign Business Term" button. Then select any BIE in the new table and click "Next". Verify that he can see all the busines terms available for assignment. (Assertion [#7](#test-assertion-4227)).
 12. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then click "Search" button. 
@@ -154,7 +153,7 @@ the "Create" button will be enabled. He can put a type code and click "Create" t
 
 ## Test Case 42.3
 
-**Load Business Term from BIE detail page**
+**Business Term from BIE detail page**
 
 Pre-condition: N/A
 
@@ -169,7 +168,7 @@ Hovering over the "Show Business Terms" button in the detail pane of a descendan
 
 #### Test Assertion #42.3.3
 
-The end user can assign business terms to a descendant BIE node in the BIE detail page by clicking the "Assign New Business Term" button in BIE detail pane. 
+The end user can assign business terms to a descendant BIE node in the BIE detail page by clicking the "Assign Business Term" button in BIE detail pane. 
 
 
 ### Test Step Pre-condition:
@@ -182,13 +181,13 @@ The end user can assign business terms to a descendant BIE node in the BIE detai
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks on the "View/Edit BIE" from the dropdown list.
 4. He clicks on any BIE from the table. The BIE detail page will open.
-5. He expands the root level in the left sidenav tree and clicks on any used node in the second level, the detail for that node will disply on the right.
+5. He expands the root level in the left sidenav tree and clicks on any used node in the second level, the detail for that node will display on the right.
 6. He will click on "Show Business Terms" button to view all the business terms that already assigned to that node.
 7. Verify that the list of business terms in the new window is indeed assigned to the selected node (Assertion [#1](#test-assertion-4231)).
 8. He closes the new window and goes back to previous window.
 9. He will hover over "Show Business Terms" button without clicking. A hint bar will display to show the number of business terms assigned to the node. Verify the number is the same as in the previosu step. (Assertion [#2](#test-assertion-4232)).
-10. He will clicks on the "Assign New Business Term" button right next to "Show Business Term" button on the same page.
-11. He will select any availabe business term in the new window,  set the Type Code, check or uncheck the Preferred Business term. Then clicks on "Create".
+10. He will click on the "Assign Business Term" button right next to the "Show Business Terms" button on the same page.
+11. He will select any availabe business term in the new window,  set the Type Code, and on "Create" button.
 12. He will close the new window and go back to previous window. 
 13. He will hover over "Show Business Terms" button without clicking again. Verify the number in the hint bar is increased by one. (Assertion [#3](#test-asssertion-4233)).
 
@@ -202,17 +201,21 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #42.4.1
-Under BIE, find View/Edit Business Term,  the end user can click "Upload Business Terms", and then they can click the "Download template" from the "Upload Business Terms from File" page.
+The end user can download a template for the external csv file to be uploaded from "Business Term" page. 
 
 #### Test Assertion #42.4.2
 
-Under BIE, find View/Edit Business Term,  the end user can click "Upload Business Terms", and then they can click on the Attach button and choose the file from the computer, and the file should be uploaded. 
+The end user can upload and attach the csv file with the correct format as specified in the template from "Business Term" page. 
 
 #### Test Assertion #42.4.3
 
-For bulk upload through "Upload Business Terms", if the business term is uploaded with new externalReferenceUri, a new business term will be created. 
+The end user can not upload a csv file if the csv file does not obey the format as specified in the template such as missing columns, missing header row, extra columns and invalid data format. 
 
 #### Test Assertion #42.4.4
+
+For bulk upload through "Upload Business Terms", if the business term is uploaded with new externalReferenceUri, a new business term will be created. 
+
+#### Test Assertion #42.4.5
 
 For bulk upload through "Upload Business Terms", if the business term is uploaded with an existent externalReferenceUri, the previous business term with the same URI will be updated with the new information. 
 
@@ -226,10 +229,12 @@ N/A
 2. He visits the Home page and clicks on the BIE tab.
 3. He clicks on the "View/Edit Business Term" from the dropdown list.
 4. He clicks on the "Upload Business Terms" button. 
-5. On the "Upload Business Terms" page, he will click on "Download template" on the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4241)).
+5. On the "Upload Business Terms" page, he will click on "Download template" in the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4241)).
 6. On the same page, he will click on the attach button. An window will open for the end user to select the updated csv files with all the business term information for upload. He will select that file to upload. 
 7. Verify that all the business terms in the uploaded csv file are listed in the table. (Assertion [#2](#test-assertion-4242)).
-8. Verify that a new business term is created in the table if the external reference uri is new in the uploaded csv file. (Assertion [#3](#test-assertion-4243)).
-9. Verify that an existent business term is updated with the new information if the external reference uri is the same as the exitent one in the uploaded csv file. 
-(Assertion [#4](#test-assertion-4244)).
-10. Re-upload the same csv file for a second time. Verify that no more changes in all business terms. 
+8. Verify that a warning message will pop up if the csv file does not follow the format as specified in the template. (Assertion [#3](#test-assertion-4243)).
+9. The end user will fix the format errors in the csv file and re-upload. 
+10. Verify that a new business term is created in the table if the external reference uri is new in the uploaded csv file. (Assertion [#4](#test-assertion-4244)).
+11. Verify that an existent business term is updated with the new information if the external reference uri is the same as the exitent one in the uploaded csv file. 
+(Assertion [#5](#test-assertion-4245)).
+12. Re-upload the same csv file for a second time. Verify that no more changes in all business terms. 
