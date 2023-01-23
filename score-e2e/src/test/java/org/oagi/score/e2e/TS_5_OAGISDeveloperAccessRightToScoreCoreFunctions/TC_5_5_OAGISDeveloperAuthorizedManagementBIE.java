@@ -1,25 +1,28 @@
 package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.*;
@@ -2512,18 +2515,482 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_30")
-    public void test_TA_30() {
+    @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Updater/Name field)")
+    public void test_search_feature_using_updater_name_field_in_create_bie_business_contexts() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        List<BusinessContextObject> businessContexts = IntStream.range(0, 5)
+                .mapToObj(idx -> getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer))
+                .collect(Collectors.toList());
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+
+        // Test 'Updater' field
+        createBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
+        for (BusinessContextObject businessContext : businessContexts) {
+            createBIEForSelectBusinessContextsPage.setName(businessContext.getName());
+            createBIEForSelectBusinessContextsPage.hitSearchButton();
+            assertBusinessContextNameInTheSearchResultsAtFirst(
+                    createBIEForSelectBusinessContextsPage, businessContext.getName());
+        }
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_31")
-    public void test_TA_31() {
+    @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Update Start/End Date fields)")
+    public void test_search_feature_using_date_fields_in_create_bie_business_contexts() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        List<BusinessContextObject> businessContexts = IntStream.range(0, 5)
+                .mapToObj(idx -> {
+                    BusinessContextObject randomBusinessContext = BusinessContextObject.createRandomBusinessContext(developer);
+                    randomBusinessContext.setCreationTimestamp(LocalDateTime.of(
+                            2000 + (idx * 2),
+                            RandomUtils.nextInt(1, 13),
+                            RandomUtils.nextInt(1, 29),
+                            RandomUtils.nextInt(0, 24),
+                            RandomUtils.nextInt(0, 60),
+                            RandomUtils.nextInt(0, 60)
+                    ));
+                    randomBusinessContext.setLastUpdateTimestamp(LocalDateTime.of(
+                            2000 + ((idx * 2) + 1),
+                            RandomUtils.nextInt(1, 13),
+                            RandomUtils.nextInt(1, 29),
+                            RandomUtils.nextInt(0, 24),
+                            RandomUtils.nextInt(0, 60),
+                            RandomUtils.nextInt(0, 60)
+                    ));
+                    return getAPIFactory().getBusinessContextAPI()
+                            .createBusinessContext(randomBusinessContext);
+                })
+                .collect(Collectors.toList());
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+
+        // Test 'Update Start Date'/'Update End Date' field
+        for (BusinessContextObject businessContext : businessContexts) {
+            homePage.openPage();
+            CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                    homePage.getBIEMenu().openCreateBIESubMenu();
+            createBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
+            createBIEForSelectBusinessContextsPage.setUpdatedStartDate(businessContext.getCreationTimestamp());
+            createBIEForSelectBusinessContextsPage.setUpdatedEndDate(businessContext.getLastUpdateTimestamp());
+            createBIEForSelectBusinessContextsPage.hitSearchButton();
+            assertBusinessContextNameInTheSearchResultsAtFirst(
+                    createBIEForSelectBusinessContextsPage, businessContext.getName());
+        }
+    }
+
+    private void assertBusinessContextNameInTheSearchResultsAtFirst(
+            CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage, String name) {
+        retry(() -> {
+            WebElement tr = createBIEForSelectBusinessContextsPage.getTableRecordAtIndex(1);
+            WebElement td = createBIEForSelectBusinessContextsPage.getColumnByName(tr, "name");
+            assertEquals(name, td.findElement(By.cssSelector("a")).getText());
+        });
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_32")
-    public void test_TA_32() {
+    @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - DEN field)")
+    public void test_search_feature_using_den_field_in_create_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
+        createBIEForSelectTopLevelConceptPage.setDEN("\"Cancel Test Results. Cancel Test Results\"");
+        createBIEForSelectTopLevelConceptPage.hitSearchButton();
+
+        assertAsccpDenInTheSearchResultsAtFirst(createBIEForSelectTopLevelConceptPage,
+                "Cancel Test Results. Cancel Test Results");
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Definition field)")
+    public void test_search_feature_using_definition_field_in_create_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
+        createBIEForSelectTopLevelConceptPage.setDefinition("test result cancel");
+        createBIEForSelectTopLevelConceptPage.hitSearchButton();
+
+        assertAsccpDenInTheSearchResultsAtFirst(createBIEForSelectTopLevelConceptPage,
+                "Cancel Test Results. Cancel Test Results");
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Module field)")
+    public void test_search_feature_using_module_field_in_create_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
+        createBIEForSelectTopLevelConceptPage.setModule("Model\\Platform\\2_7\\Nouns\\CodeList");
+        createBIEForSelectTopLevelConceptPage.hitSearchButton();
+
+        assertAsccpDenInTheSearchResultsAtFirst(createBIEForSelectTopLevelConceptPage,
+                "Code List. Code List");
+    }
+
+    private void assertAsccpDenInTheSearchResultsAtFirst(
+            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage, String den) {
+        retry(() -> {
+            WebElement tr = createBIEForSelectTopLevelConceptPage.getTableRecordAtIndex(1);
+            WebElement td = createBIEForSelectTopLevelConceptPage.getColumnByName(tr, "den");
+            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+        });
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_31 (View BIE - State field)")
+    public void test_search_feature_using_state_field_in_bie_list() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                        developer, "QA");
+        TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                        developer, "Production");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setState("WIP");
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_WIP.getDen());
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setState("QA");
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_QA.getDen());
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setState("Production");
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_Production.getDen());
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_31 (View BIE - Update Start/End Date fields)")
+    public void test_search_feature_using_date_fields_in_bie_list() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setUpdatedStartDate(topLevelASBIEP_WIP.getLastUpdateTimestamp());
+        viewEditBIEPage.setUpdatedEndDate(topLevelASBIEP_WIP.getLastUpdateTimestamp());
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_WIP.getDen());
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_31 (View BIE - DEN field)")
+    public void test_search_feature_using_den_field_in_bie_list() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setDEN(topLevelASBIEP_WIP.getDen());
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_WIP.getDen());
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_31 (View BIE - Updater/Name field Business Context field)")
+    public void test_search_feature_using_business_context_field_in_bie_list() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.setBusinessContext(businessContext.getName());
+        viewEditBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_WIP.getDen());
+    }
+
+    private void assertBieDenInTheSearchResultsAtFirst(
+            ViewEditBIEPage viewEditBIEPage, String den) {
+        retry(() -> {
+            WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+            WebElement td = viewEditBIEPage.getColumnByName(tr, "den");
+            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+        });
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Updater/Name field)")
+    public void test_search_feature_using_updater_name_field_in_copy_bie_business_contexts() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        List<BusinessContextObject> businessContexts = IntStream.range(0, 5)
+                .mapToObj(idx -> getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer))
+                .collect(Collectors.toList());
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCopyBIESubMenu();
+
+        // Test 'Updater' field
+        copyBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
+        for (BusinessContextObject businessContext : businessContexts) {
+            copyBIEForSelectBusinessContextsPage.setName(businessContext.getName());
+            copyBIEForSelectBusinessContextsPage.hitSearchButton();
+            assertBusinessContextNameInTheSearchResultsAtFirst(
+                    copyBIEForSelectBusinessContextsPage, businessContext.getName());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Update Start/End Date fields)")
+    public void test_search_feature_using_date_fields_in_copy_bie_business_contexts() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        List<BusinessContextObject> businessContexts = IntStream.range(0, 5)
+                .mapToObj(idx -> {
+                    BusinessContextObject randomBusinessContext = BusinessContextObject.createRandomBusinessContext(developer);
+                    randomBusinessContext.setCreationTimestamp(LocalDateTime.of(
+                            2000 + (idx * 2),
+                            RandomUtils.nextInt(1, 13),
+                            RandomUtils.nextInt(1, 29),
+                            RandomUtils.nextInt(0, 24),
+                            RandomUtils.nextInt(0, 60),
+                            RandomUtils.nextInt(0, 60)
+                    ));
+                    randomBusinessContext.setLastUpdateTimestamp(LocalDateTime.of(
+                            2000 + ((idx * 2) + 1),
+                            RandomUtils.nextInt(1, 13),
+                            RandomUtils.nextInt(1, 29),
+                            RandomUtils.nextInt(0, 24),
+                            RandomUtils.nextInt(0, 60),
+                            RandomUtils.nextInt(0, 60)
+                    ));
+                    return getAPIFactory().getBusinessContextAPI()
+                            .createBusinessContext(randomBusinessContext);
+                })
+                .collect(Collectors.toList());
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+
+        // Test 'Update Start Date'/'Update End Date' field
+        for (BusinessContextObject businessContext : businessContexts) {
+            homePage.openPage();
+            CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                    homePage.getBIEMenu().openCopyBIESubMenu();
+            copyBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
+            copyBIEForSelectBusinessContextsPage.setUpdatedStartDate(businessContext.getCreationTimestamp());
+            copyBIEForSelectBusinessContextsPage.setUpdatedEndDate(businessContext.getLastUpdateTimestamp());
+            copyBIEForSelectBusinessContextsPage.hitSearchButton();
+            assertBusinessContextNameInTheSearchResultsAtFirst(
+                    copyBIEForSelectBusinessContextsPage, businessContext.getName());
+        }
+    }
+
+    private void assertBusinessContextNameInTheSearchResultsAtFirst(
+            CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage, String name) {
+        retry(() -> {
+            WebElement tr = copyBIEForSelectBusinessContextsPage.getTableRecordAtIndex(1);
+            WebElement td = copyBIEForSelectBusinessContextsPage.getColumnByName(tr, "name");
+            assertEquals(name, td.findElement(By.cssSelector("a")).getText());
+        });
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - DEN field)")
+    public void test_search_feature_using_den_field_in_copy_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCopyBIESubMenu();
+        CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
+                copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.setBranch("10.8.5");
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.setDEN(topLevelASBIEP_WIP.getDen());
+        copyBIEForSelectBIEPage.hitSearchButton();
+
+        assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_WIP.getDen());
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - Business Context field)")
+    public void test_search_feature_using_business_context_field_in_copy_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCopyBIESubMenu();
+        CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
+                copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.setBranch("10.8.5");
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.setBusinessContext(businessContext.getName());
+        copyBIEForSelectBIEPage.hitSearchButton();
+
+        assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_WIP.getDen());
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - State field)")
+    public void test_search_feature_using_state_field_in_copy_bie_top_level_concept() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                        developer, "QA");
+        TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                        developer, "Production");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCopyBIESubMenu();
+        CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
+                copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.setBranch("10.8.5");
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.setState("WIP");
+        copyBIEForSelectBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_WIP.getDen());
+
+        copyBIEForSelectBIEPage.openPage();
+        copyBIEForSelectBIEPage.setBranch("10.8.5");
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.setState("QA");
+        copyBIEForSelectBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_QA.getDen());
+
+        copyBIEForSelectBIEPage.openPage();
+        copyBIEForSelectBIEPage.setBranch("10.8.5");
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.setState("Production");
+        copyBIEForSelectBIEPage.hitSearchButton();
+        assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_Production.getDen());
+    }
+
+    private void assertBieDenInTheSearchResultsAtFirst(
+            CopyBIEForSelectBIEPage copyBIEForSelectBIEPage, String den) {
+        retry(() -> {
+            WebElement tr = copyBIEForSelectBIEPage.getTableRecordAtIndex(1);
+            WebElement td = copyBIEForSelectBIEPage.getColumnByName(tr, "den");
+            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+        });
     }
 
     @Test

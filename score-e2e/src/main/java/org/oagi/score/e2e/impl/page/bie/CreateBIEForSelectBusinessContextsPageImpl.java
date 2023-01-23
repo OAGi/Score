@@ -9,11 +9,25 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl implements CreateBIEForSelectBusinessContextsPage {
+
+    private static final By UPDATER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
+
+    private static final By UPDATED_START_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+
+    private static final By UPDATED_END_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
@@ -55,13 +69,63 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
     }
 
     @Override
+    public WebElement getUpdaterSelectField() {
+        return visibilityOfElementLocated(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setUpdater(String updater) {
+        click(getUpdaterSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
+    }
+
+    @Override
+    public WebElement getUpdatedStartDateField() {
+        return visibilityOfElementLocated(getDriver(), UPDATED_START_DATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setUpdatedStartDate(LocalDateTime updatedStartDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedStartDateField(), formatter.format(updatedStartDate));
+    }
+
+    @Override
+    public WebElement getUpdatedEndDateField() {
+        return visibilityOfElementLocated(getDriver(), UPDATED_END_DATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setUpdatedEndDate(LocalDateTime updatedEndDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
+    }
+
+    @Override
     public WebElement getNameField() {
         return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
     }
 
     @Override
+    public void setName(String name) {
+        sendKeys(getNameField(), name);
+    }
+
+    @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitSearchButton() {
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(Duration.ofMillis(500L));
+        });
     }
 
     @Override
@@ -82,7 +146,8 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
     @Override
     public void selectBusinessContext(BusinessContextObject businessContext) {
         sendKeys(getNameField(), businessContext.getName());
-        click(getSearchButton());
+        hitSearchButton();
+
         retry(() -> {
             WebElement tr = getTableRecordByValue(businessContext.getName());
             WebElement td = getColumnByName(tr, "select");
