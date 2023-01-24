@@ -27,14 +27,6 @@ public interface BusinessContextAPI {
     BusinessContextObject createRandomBusinessContext(AppUserObject creator);
 
     /**
-     * Create the business context as requested.
-     *
-     * @param businessContext business context object
-     * @return a created business context object
-     */
-    BusinessContextObject createBusinessContext(BusinessContextObject businessContext);
-
-    /**
      * Create a random business context with the given name prefix.
      *
      * @param creator    account who creates this business context
