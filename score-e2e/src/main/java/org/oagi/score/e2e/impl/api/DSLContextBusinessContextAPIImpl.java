@@ -50,22 +50,26 @@ public class DSLContextBusinessContextAPIImpl implements BusinessContextAPI {
     public BusinessContextObject createRandomBusinessContext(AppUserObject creator, String namePrefix) {
         BusinessContextObject randomBusinessContext =
                 BusinessContextObject.createRandomBusinessContext(creator, namePrefix);
+        return createBusinessContext(randomBusinessContext);
+    }
 
+    @Override
+    public BusinessContextObject createBusinessContext(BusinessContextObject businessContext) {
         BizCtxRecord bizCtxRecord = new BizCtxRecord();
-        bizCtxRecord.setGuid(randomBusinessContext.getGuid());
-        bizCtxRecord.setName(randomBusinessContext.getName());
-        bizCtxRecord.setCreatedBy(ULong.valueOf(randomBusinessContext.getCreatedBy()));
-        bizCtxRecord.setLastUpdatedBy(ULong.valueOf(randomBusinessContext.getLastUpdatedBy()));
-        bizCtxRecord.setCreationTimestamp(randomBusinessContext.getCreationTimestamp());
-        bizCtxRecord.setLastUpdateTimestamp(randomBusinessContext.getLastUpdateTimestamp());
+        bizCtxRecord.setGuid(businessContext.getGuid());
+        bizCtxRecord.setName(businessContext.getName());
+        bizCtxRecord.setCreatedBy(ULong.valueOf(businessContext.getCreatedBy()));
+        bizCtxRecord.setLastUpdatedBy(ULong.valueOf(businessContext.getLastUpdatedBy()));
+        bizCtxRecord.setCreationTimestamp(businessContext.getCreationTimestamp());
+        bizCtxRecord.setLastUpdateTimestamp(businessContext.getLastUpdateTimestamp());
 
         ULong businessContextId = dslContext.insertInto(BIZ_CTX)
                 .set(bizCtxRecord)
                 .returning(BIZ_CTX.BIZ_CTX_ID)
                 .fetchOne().getBizCtxId();
 
-        randomBusinessContext.setBusinessContextId(businessContextId.toBigInteger());
-        return randomBusinessContext;
+        businessContext.setBusinessContextId(businessContextId.toBigInteger());
+        return businessContext;
     }
 
     @Override
