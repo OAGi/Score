@@ -169,6 +169,13 @@ public interface ViewEditBIEPage extends Page {
     void setItemsPerPage(int items);
 
     /**
+     * Return the total number of items being paged.
+     *
+     * @return the total number of items being paged
+     */
+    int getTotalNumberOfItems();
+
+    /**
      * Open the 'Transfer BIE Ownership' dialog.
      *
      * @param tr the table record
