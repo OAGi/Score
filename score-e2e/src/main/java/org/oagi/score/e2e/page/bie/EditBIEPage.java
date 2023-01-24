@@ -3,18 +3,41 @@ package org.oagi.score.e2e.page.bie;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 /**
  * An interface of 'Edit BIE' page.
  */
 public interface EditBIEPage extends Page {
 
+    String getObjectClassTermFieldLabel();
+    void setNamespace(String namespace);
+    void getExtendBIELocallyOptionForNode(String path);
+    WebElement getSourceDefinitionField();
+    WebElement getDefinitionField();
+    WebElement getRevisionField();
+    WebElement getBNamespaceSelectField();
+
+    String getDENFieldLabel();
+
+    WebElement getObjectClassTermField();
+
+    SelectAssociationDialog appendPropertyAtLast(String path);
+
+    ACCExtensionViewEditPage extendBIELocallyOnNode(String path);
+
+    WebElement getDENField();
+
     WebElement getSearchField();
 
     WebElement getSearchButton();
 
     void clickOnDropDownMenuByPath(String path);
+
+    ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
 
     /**
      * Return the panel for 'Top-Level ASBIEP' node.
@@ -37,6 +60,13 @@ public interface EditBIEPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
+
+    /**
+     *
+     * @param nodeName
+     * @return the UI checkbox element of the tree node
+     */
+    WebElement getCheckboxByNodeName(String nodeName);
 
     /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
@@ -100,11 +130,6 @@ public interface EditBIEPage extends Page {
      */
     WebElement getMoveToQAButton(boolean enabled);
 
-    /**
-     * Make the BIE to the QA state. It works only if the BIE is in the WIP state and the 'Update' button is disabled.
-     *
-     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the WIP state or the 'Update' button is enabled.
-     */
     void moveToQA();
 
     /**
@@ -115,11 +140,6 @@ public interface EditBIEPage extends Page {
      */
     WebElement getBackToWIPButton(boolean enabled);
 
-    /**
-     * Make the BIE back to the WIP state. It works only if the BIE is in the QA state.
-     *
-     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state.
-     */
     void backToWIP();
 
     /**
@@ -130,44 +150,12 @@ public interface EditBIEPage extends Page {
      */
     WebElement getMoveToProductionButton(boolean enabled);
 
-    /**
-     * Make the BIE to the Production state. It works only if the BIE is in the QA state.
-     *
-     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state.
-     */
     void moveToProduction();
 
-    /**
-     * Make the local user extension on the 'Extension' node.
-     *
-     * @param path the path of the 'Extension' node.
-     * @return the local user extension page
-     */
-    ACCExtensionViewEditPage extendBIELocallyOnNode(String path);
+    String getAtentionDialogMessage();
 
-    /**
-     * Make the global user extension on the 'Extension' node.
-     *
-     * @param path the path of the 'Extension' node.
-     * @return the global user extension page
-     */
-    ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
+    void getExtendBIEGloballyOptionForNode(String path);
 
-    /**
-     * Return the attention message in the warning dialog.
-     * This happens when the user attempts to make the user extension,
-     * but another user is working on that extension.
-     *
-     * @return the attention message in the warning dialog
-     */
-    String getAttentionDialogMessage();
-
-    /**
-     * Continue to extend the 'Extension' BIE after it gets the attention message.
-     *
-     * @see #getAttentionDialogMessage()
-     * @return the local/global user extension page
-     */
     ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
     /**
@@ -301,6 +289,7 @@ public interface EditBIEPage extends Page {
         WebElement getUsedCheckbox();
 
         void toggleUsed();
+
 
         /**
          * Return the UI element of the 'Nillable' checkbox.
@@ -491,13 +480,6 @@ public interface EditBIEPage extends Page {
          */
         WebElement getComponentDefinitionField();
 
-        void setBusinessTerm(String business_term);
-
-        void hitResetButton();
-
-        void confirmToReset();
-
-        String getResetDialogMessage();
     }
 
     BBIESCPanel getBBIESCPanel(WebElement bdtScNode);

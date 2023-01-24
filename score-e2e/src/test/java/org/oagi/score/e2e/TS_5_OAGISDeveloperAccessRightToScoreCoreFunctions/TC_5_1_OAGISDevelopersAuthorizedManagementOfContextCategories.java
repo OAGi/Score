@@ -349,11 +349,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
     @Test
     @DisplayName("TC_5_1_TA_11 (Update Start/End Date fields)")
-    @Disabled
     public void test_search_feature_using_date_fields() {
-        /* TODO:
-         * Score does not allow to input texts to <mat-datepicker>.
-         */
         ContextCategoryObject randomContextCategory = ContextCategoryObject.newRandomContextCategory(appUser);
         randomContextCategory.setCreationTimestamp(LocalDateTime.of(
                 RandomUtils.nextInt(2000, 2011),
