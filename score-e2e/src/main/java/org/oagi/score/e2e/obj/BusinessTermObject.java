@@ -11,7 +11,7 @@ import static org.apache.commons.lang3.RandomStringUtils.*;
 
 @Data
 public class BusinessTermObject {
-    private String businessTermId;
+    private BigInteger businessTermId;
 
     private String businessTerm;
 
@@ -37,7 +37,6 @@ public class BusinessTermObject {
 
     public static BusinessTermObject createRandomBusinessTerm(AppUserObject creator, String namePrefix) {
         BusinessTermObject businessTerm = new BusinessTermObject();
-        businessTerm.setBusinessTermId(randomNumeric(8,15));
         businessTerm.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
         businessTerm.setBusinessTerm(namePrefix + "_" + randomAlphanumeric(5, 10));
         businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com" + businessTerm.getExternalReferenceId());
