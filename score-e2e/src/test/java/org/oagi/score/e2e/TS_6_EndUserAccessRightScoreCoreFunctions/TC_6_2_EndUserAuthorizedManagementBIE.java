@@ -168,7 +168,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIE);
         assertEquals("WIP", userbBIE.getState());
         accExtensionViewEditPage =
-                editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         /**
          * Display a dialog indicating “The core component is being extended by “ + [the owner of the UEGACC] or similar.
          */
