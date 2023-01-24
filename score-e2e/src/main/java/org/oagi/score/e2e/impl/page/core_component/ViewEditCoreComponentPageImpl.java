@@ -166,7 +166,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     private String getDENFieldFromTheTable(WebElement tableData) {
-        WebElement span = tableData.findElement(By.cssSelector("div.den span"));
+        WebElement span = tableData.findElement(By.cssSelector("span.den"));
         return span.getAttribute("innerHTML");
     }
 
