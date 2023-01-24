@@ -227,6 +227,14 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     }
 
     @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
     public WebElement getCopyButton() {
         return elementToBeClickable(getDriver(), COPY_BUTTON_LOCATOR);
     }

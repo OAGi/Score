@@ -220,6 +220,14 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     }
 
     @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
     public TransferBIEOwnershipDialog openTransferBIEOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
         click(td.findElement(By.tagName("button")));

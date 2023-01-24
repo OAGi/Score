@@ -3,12 +3,15 @@ package org.oagi.score.e2e.impl.page.bie;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
+import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
+
+import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -442,9 +445,29 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public WebElement getBusinessContextField() {
-            return visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-chip-list[contains(@aria-label, \"Business Contexts\")]"));
+        public List<WebElement> getBusinessContextList() {
+            return visibilityOfAllElementsLocatedBy(getDriver(),
+                    By.xpath("//mat-chip-list[contains(@aria-label, \"Business Contexts\")]//mat-chip"));
+        }
+
+        @Override
+        public void addBusinessContext(BusinessContextObject businessContext) {
+            addBusinessContext(businessContext.getName());
+        }
+
+        @Override
+        public void addBusinessContext(String businessContextName) {
+            WebElement businessContextInput = elementToBeClickable(getDriver(),
+                    By.xpath("//input[@placeholder = \"Business Context\"]"));
+            // TODO:
+            // The <mat-chip-list> for the business context field is not working without clicking the field and typing characters.
+            {
+                click(businessContextInput);
+            }
+            sendKeys(businessContextInput, businessContextName.substring(0, 3));
+            WebElement businessContextButton = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + businessContextName + "\")]"));
+            click(businessContextButton);
         }
 
         @Override

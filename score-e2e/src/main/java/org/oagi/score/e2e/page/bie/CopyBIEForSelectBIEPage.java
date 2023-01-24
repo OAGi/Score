@@ -174,6 +174,13 @@ public interface CopyBIEForSelectBIEPage extends Page {
     void setItemsPerPage(int items);
 
     /**
+     * Return the total number of items being paged.
+     *
+     * @return the total number of items being paged
+     */
+    int getTotalNumberOfItems();
+
+    /**
      * Return the UI element of the 'Copy' button.
      *
      * @return the UI element of the 'Copy' button
