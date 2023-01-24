@@ -2528,32 +2528,146 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_33")
-    public void test_TA_33() {
+    public void issue_653() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Tool Actual. Tool Actual", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        WebElement identifier1st =
+                editBIEPage.getNodeByPath("/" + topLevelASBIEP_WIP.getPropertyTerm() + "/Identifier");
+        assertTrue(identifier1st.isDisplayed());
+        WebElement identifierSet1st =
+                editBIEPage.getNodeByPath("/" + topLevelASBIEP_WIP.getPropertyTerm() + "/Identifier Set");
+        assertTrue(identifierSet1st.isDisplayed());
+        //check that the second Identifier is not expanded automatically
+        WebElement identifier2nd = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[text() = \"Identifier\"]//ancestor::div[@data-level = \"2\"]/button/span/mat-icon[contains(text(), \"chevron_right\")]"
+        ));
+        assertTrue(identifier2nd.isDisplayed());
+        WebElement typeCode =
+                editBIEPage.getNodeByPath("/" + topLevelASBIEP_WIP.getPropertyTerm() + "/Identifier Set/Identifier/Type Code");
+        assertTrue(typeCode.isDisplayed());
     }
 
     @Test
     @DisplayName("TC_5_5_TA_34")
-    public void test_TA_34() {
+    public void the_number_of_bies_in_copy_bie_page_are_the_same_with_the_number_of_the_bies_displayed_on_the_right_bottom_index_of_the_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                        developer, "QA");
+        TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                        developer, "Production");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        viewEditBIEPage.hitSearchButton();
+        int totalNumberOfItemsInBIEs = viewEditBIEPage.getTotalNumberOfItems();
+
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCopyBIESubMenu();
+        CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
+                copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.setBranch(releaseNum);
+        copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
+        copyBIEForSelectBIEPage.hitSearchButton();
+        int totalNumberOfItemsInCopyBIEs = copyBIEForSelectBIEPage.getTotalNumberOfItems();
+
+        assertEquals(totalNumberOfItemsInBIEs, totalNumberOfItemsInCopyBIEs);
     }
 
     @Test
     @DisplayName("TC_5_5_TA_35")
-    public void test_TA_35() {
-    }
+    public void developer_can_assign_multiple_business_contexts_to_BIE_during_BIE_creation() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
-    @Test
-    @DisplayName("TC_5_5_TA_40")
-    public void test_TA_40() {
-    }
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
+        );
 
-    @Test
-    @DisplayName("TC_5_5_TA_42")
-    public void test_TA_42() {
+        String asccpDen = "Accounting Period. Accounting Period";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(businessContexts);
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccpDen, releaseNum);
+
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(releaseNum);
+        viewEditBIEPage.setOwner(developer.getLoginId());
+        for (BusinessContextObject businessContext : businessContexts) {
+            viewEditBIEPage.setBusinessContext(businessContext.getName());
+            viewEditBIEPage.hitSearchButton();
+
+            assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, asccpDen);
+        }
     }
 
     @Test
     @DisplayName("TC_5_5_TA_36")
     public void test_TA_36() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
+        );
+
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.addBusinessContext(businessContexts.get(1));
+        topLevelASBIEPPanel.addBusinessContext(businessContexts.get(2));
+
+        String businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
     }
 
     @Test
@@ -2569,6 +2683,16 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_5_5_TA_39")
     public void test_TA_39() {
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_40")
+    public void test_TA_40() {
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_42")
+    public void test_TA_42() {
     }
 
     @Test

@@ -1,9 +1,13 @@
 package org.oagi.score.e2e.page.bie;
 
+import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.WebElement;
+
+
+import java.util.List;
 
 /**
  * An interface of 'Edit BIE' page.
@@ -197,11 +201,25 @@ public interface EditBIEPage extends Page {
         WebElement getOwnerField();
 
         /**
-         * Return the UI element of the 'Business Context' field.
+         * Return the UI elements of the 'Business Context' list.
          *
-         * @return the UI element of the 'Business Context' field
+         * @return the UI elements of the 'Business Context' list
          */
-        WebElement getBusinessContextField();
+        List<WebElement> getBusinessContextList();
+
+        /**
+         * Add a business context.
+         *
+         * @param businessContext a business context
+         */
+        void addBusinessContext(BusinessContextObject businessContext);
+
+        /**
+         * Add a business context by name.
+         *
+         * @param businessContextName a business context name
+         */
+        void addBusinessContext(String businessContextName);
 
         /**
          * Return the UI element of the 'Business Term' field.
