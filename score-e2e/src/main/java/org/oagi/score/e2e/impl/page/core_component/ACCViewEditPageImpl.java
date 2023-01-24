@@ -70,6 +70,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
 
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+
 
     private final ACCObject acc;
 
@@ -282,6 +285,37 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
         } else {
             return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedCheckbox());
+    }
+
+    @Override
+    public WebElement getDeprecatedCheckbox() {
+        return getCheckboxByName("Deprecated");
+    }
+
+    private WebElement getCheckboxByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        retry(() -> click(getUpdateButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
         }
     }
 }

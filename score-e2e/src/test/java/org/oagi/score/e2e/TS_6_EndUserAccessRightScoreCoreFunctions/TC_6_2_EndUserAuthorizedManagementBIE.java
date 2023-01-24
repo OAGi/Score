@@ -2215,6 +2215,119 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertDisabled(bbiePanel.getBusinessTermField());
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_14_3")
+    public void test_TA_14_3() {
+        ASCCPObject asccp;
+        ACCObject acc;
+        BCCPObject bccp;
+        AppUserObject usera;
+        AppUserObject userb;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+        }
+
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccp.getDen(), this.release);
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByDENAndReleaseNum(asccp.getDen(), this.release);
+        /**
+         * The end user ASCCP is in Production State
+         */
+        assertEquals("Production", asccp.getState());
+        /**
+         * Assert descendent nodes are editable
+         */
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
+
+        assertEnabled(ASBIEPanel.getRemarkField());
+        assertEnabled(ASBIEPanel.getContextDefinitionField());
+
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertEnabled(ASBIEPanel.getBusinessTermField());
+
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        assertEnabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getCardinalityMinField());
+        assertEnabled(bbiePanel.getCardinalityMaxField());
+        assertEnabled(bbiePanel.getRemarkField());
+        assertEnabled(bbiePanel.getExampleField());
+        assertEnabled(bbiePanel.getValueConstraintSelectField());
+        assertEnabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertEnabled(bbiePanel.getValueDomainField());
+        assertEnabled(bbiePanel.getContextDefinitionField());
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertEnabled(bbiePanel.getBusinessTermField());
+        homePage.logout();
+
+        /**
+         * The end user ASCCP is deprecated
+         */
+        loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), this.release);
+        accViewEditPage.hitAmendButton();
+        accViewEditPage.toggleDeprecated();
+        accViewEditPage.hitUpdateButton();
+        homePage.logout();
+
+        loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        homePage.getBIEMenu();
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        /**
+         * f the end user ASCCP is deprecated, the BIE cannot be edited. The fields of the BIE nodes are disabled including the “Used” checkbox.
+         */
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        bbiePanel = editBIEPage.getBBIEPanel(node);
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertDisabled(bbiePanel.getRemarkField());
+        assertDisabled(bbiePanel.getExampleField());
+        assertDisabled(bbiePanel.getValueConstraintSelectField());
+        assertDisabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertDisabled(bbiePanel.getValueDomainField());
+        assertDisabled(bbiePanel.getContextDefinitionField());
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertDisabled(bbiePanel.getBusinessTermField());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
