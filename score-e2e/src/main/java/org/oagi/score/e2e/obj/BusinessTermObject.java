@@ -46,6 +46,7 @@ public class BusinessTermObject {
         businessTerm.setComment(randomPrint(20,50).trim());
         businessTerm.setCreatedBy(creator.getAppUserId());
         businessTerm.setLastUpdatedBy(creator.getAppUserId());
+        businessTerm.setLastUpdateTimestamp(LocalDateTime.now());
         return businessTerm;
     }
 
