@@ -72,6 +72,20 @@ public interface EditBusinessTermPage extends Page {
     String getExternalReferenceIDFieldText();
 
     /**
+     * Return the UI element of the 'Definition' field.
+     *
+     * @return the UI element of the 'Definition' field
+     */
+    WebElement getDefinitionField();
+
+    /**
+     * Return the text of the 'Definition' field.
+     *
+     * @return the text of the 'Definition' field
+     */
+    String getDefinitionFieldText();
+
+    /**
      * Return the UI element of the 'Comment' field.
      *
      * @return the UI element of the 'Comment' field
