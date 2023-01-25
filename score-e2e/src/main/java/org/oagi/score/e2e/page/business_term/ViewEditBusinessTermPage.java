@@ -17,5 +17,5 @@ public interface ViewEditBusinessTermPage extends Page {
     /**
      * Hit the 'New Business Term' button
      */
-    void hitNewBusinessTermButton();
+    CreateBusinessTermPage hitNewBusinessTermButton();
 }

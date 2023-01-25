@@ -10,6 +10,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.hitNewBusinessTermButton();
+
+
 
 
 

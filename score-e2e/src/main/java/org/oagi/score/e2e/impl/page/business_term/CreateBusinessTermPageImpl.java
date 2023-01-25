@@ -28,4 +28,6 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
     }
+
+
 }
