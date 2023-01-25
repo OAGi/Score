@@ -104,7 +104,7 @@ public interface EditBusinessTermPage extends Page {
      *
      * @return the text of the 'Comment' field
      */
-    WebElement getCommentFieldText();
+    String getCommentFieldText();
 
     /**
      * Return the UI element of the 'Update' button.
