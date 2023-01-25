@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.menu;
 
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -120,6 +121,20 @@ public interface BIEMenu {
      * @return the 'View/Edit Business Term' page object
      */
     ViewEditBusinessTermPage openViewEditBusinessTermSubMenu();
+
+    /**
+     * Return the UI element of the 'Business Term Assignment' submenu.
+     *
+     * @return the UI element of the 'Business Term Assignment' submenu
+     */
+    WebElement getBusinessTermAssignmentSubMenu();
+
+    /**
+     * Open the 'Business Term Assignment' submenu to enter the page.
+     *
+     * @return the 'Business Term Assignment' page object
+     */
+    BusinessTermAssignmentPage openBusinessTermAssignmentSubMenu();
 
     /**
      * Return the UI element of the 'View/Edit Code List' submenu.
