@@ -6,10 +6,12 @@ import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEditBusinessTermPage {
+
+    private static final By NEW_BUSINESS_TERM_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"New Business Term\")]//ancestor::button[1]");
     public ViewEditBusinessTermPageImpl(BasePage parent){ super(parent);}
 
     @Override
@@ -27,6 +29,17 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("title"));
+    }
+
+    @Override
+    public WebElement getNewBusinessTermButton() {
+        return elementToBeClickable(getDriver(), NEW_BUSINESS_TERM_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitNewBusinessTermButton() {
+        click(getNewBusinessTermButton());
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
 }
