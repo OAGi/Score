@@ -1,8 +1,11 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.context.CreateContextCategoryPageImpl;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -40,6 +43,14 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
     public void hitNewBusinessTermButton() {
         click(getNewBusinessTermButton());
         invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public CreateBusinessTermPage openCreateBusinessTermPage() {
+        click(getNewBusinessTermButton());
+        CreateBusinessTermPage createBusinessTermPage = new CreateBusinessTermPageImpl(this);
+        assert createBusinessTermPage.isOpened();
+        return createBusinessTermPage;
     }
 
 }

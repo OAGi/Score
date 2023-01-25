@@ -9,6 +9,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.BusinessTermObject;
+import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
@@ -16,6 +18,7 @@ import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -54,7 +57,15 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
-        CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.hitNewBusinessTermButton();
+        CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.openCreateBusinessTermPage();
+
+        BusinessTermObject businessTerm = new BusinessTermObject();
+        businessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
+        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
+
+
+
 
 
 

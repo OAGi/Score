@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -17,5 +18,12 @@ public interface ViewEditBusinessTermPage extends Page {
     /**
      * Hit the 'New Business Term' button
      */
-    CreateBusinessTermPage hitNewBusinessTermButton();
+    void hitNewBusinessTermButton();
+
+    /**
+     * Open the 'Create Business Term' page.
+     *
+     * @return the 'Create Business Term' page object
+     */
+    CreateBusinessTermPage openCreateBusinessTermPage();
 }
