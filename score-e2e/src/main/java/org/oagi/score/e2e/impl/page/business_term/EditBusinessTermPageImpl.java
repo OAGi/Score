@@ -5,6 +5,7 @@ import org.oagi.score.e2e.impl.page.context.ViewEditContextCategoryPageImpl;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -85,12 +86,22 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     public void setExternalReferenceURI(String externalReferenceURI){sendKeys(getExternalReferenceURIField(), externalReferenceURI);}
 
     @Override
+    public String getExternalReferenceURIFieldText() {
+        return getText(getExternalReferenceURIField());
+    }
+
+    @Override
     public WebElement getExternalReferenceIDField() {
         return visibilityOfElementLocated(getDriver(), EXTERNAL_REFERENCE_ID_FIELD_LOCATOR);
     }
 
     @Override
     public void setExternalReferenceID(String externalReferenceID){sendKeys(getExternalReferenceURIField(), externalReferenceID);}
+
+    @Override
+    public String getExternalReferenceIDFieldText() {
+        return getText(getExternalReferenceIDField());
+    }
 
     @Override
     public WebElement getDefinitionField() {
@@ -122,9 +133,11 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
-    public void updateContextCategory(ContextCategoryObject contextCategory) {
-        setName(contextCategory.getName());
-        setDescription(contextCategory.getDescription());
+    public void updateBusinessTerm(BusinessTermObject businessTerm) {
+        setBusinessTerm(businessTerm.getBusinessTerm());
+        setExternalReferenceURI(businessTerm.getExternalReferenceUri());
+        setExternalReferenceID(businessTerm.getExternalReferenceId());
+        setComment(businessTerm.getComment());
         click(getUpdateButton());
         assert getSnackBar(getDriver(), "Updated").isEnabled();
     }
@@ -135,7 +148,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
-    public ViewEditContextCategoryPage discardContextCategory() {
+    public ViewEditBusinessTermPage discardBusinessTerm() {
         click(getDiscardButton());
         click(elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
         assert getSnackBar(getDriver(), "Discarded").isDisplayed();
