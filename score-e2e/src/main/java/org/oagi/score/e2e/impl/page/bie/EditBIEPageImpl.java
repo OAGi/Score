@@ -68,6 +68,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By RESET_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
+    private static final By DEPRECATED_FLAG_LOCATOR =
+            By.xpath("//span[contains(@class,'deprecated')]");
+
     private final TopLevelASBIEPObject asbiep;
 
     public EditBIEPageImpl(BasePage parent, TopLevelASBIEPObject asbiep) {
@@ -147,6 +150,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public WebElement getSearchField() {
         return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDeprecatedFlag() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_FLAG_LOCATOR);
     }
 
     private WebElement goToNode(String path) {

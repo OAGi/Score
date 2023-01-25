@@ -7,8 +7,8 @@ import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
@@ -48,6 +48,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
             By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
+    public static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
 
 
     private final BCCPObject bccp;
@@ -200,4 +205,9 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR).findElement(By.tagName("mat-label")).getText();
     }
 
+    @Override
+    public void hitAmendButton() {
+        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+    }
 }

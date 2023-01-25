@@ -170,4 +170,22 @@ public interface ASCCPViewEditPage extends Page {
     String getDefinitionFieldValue();
 
     String getDENFieldLabel();
+
+    void hitAmendButton();
+
+    void moveToQA();
+
+    void toggleDeprecated();
+
+    void hitUpdateButton();
+
+    void moveToProduction();
+
+    WebElement getMoveToQAButton(boolean enabled);
+
+    WebElement getMoveToProduction(boolean enabled);
+
+    WebElement getDeprecatedCheckbox();
+
+    WebElement getUpdateButton(boolean enabled);
 }

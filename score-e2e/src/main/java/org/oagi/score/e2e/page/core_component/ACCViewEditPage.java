@@ -186,15 +186,9 @@ public interface ACCViewEditPage extends Page {
 
     void hitAmendButton();
 
+    void moveToProduction();
+
     void moveToQA();
-
+    WebElement getMoveToProduction(boolean enabled);
     WebElement getMoveToQAButton(boolean enabled);
-
-    void toggleDeprecated();
-
-    WebElement getDeprecatedCheckbox();
-
-    void hitUpdateButton();
-
-    WebElement getUpdateButton(boolean enabled);
 }

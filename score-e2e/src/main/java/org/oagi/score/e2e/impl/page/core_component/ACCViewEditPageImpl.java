@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
@@ -60,19 +61,15 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By DEN_COMPONENT_LOCATOR_FOR_DT =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input[@Value=\"DT\"]" +
                     "//ancestor::mat-tab-group//descendant::mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
-
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
-
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
-
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
 
     private final ACCObject acc;
 
@@ -200,12 +197,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public void hitAmendButton() {
-        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
-        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
-    }
-
-    @Override
     public String getObjectClassTermFieldValue() {
         return getText(getObjectClassTermField());
     }
@@ -272,6 +263,20 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public void hitAmendButton() {
+        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+    }
+
+    @Override
+    public void moveToProduction() {
+        click(getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
     public void moveToQA() {
         click(getMoveToQAButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
@@ -280,42 +285,20 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public WebElement getMoveToProduction(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
     public WebElement getMoveToQAButton(boolean enabled) {
         if (enabled) {
             return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
         } else {
             return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public void toggleDeprecated() {
-        click(getDeprecatedCheckbox());
-    }
-
-    @Override
-    public WebElement getDeprecatedCheckbox() {
-        return getCheckboxByName("Deprecated");
-    }
-
-    private WebElement getCheckboxByName(String name) {
-        return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
-    }
-
-    @Override
-    public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
-        invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-    }
-
-    @Override
-    public WebElement getUpdateButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
         }
     }
 }

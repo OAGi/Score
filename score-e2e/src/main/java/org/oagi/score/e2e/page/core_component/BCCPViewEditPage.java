@@ -173,4 +173,5 @@ public interface BCCPViewEditPage extends Page {
 
     WebElement getPropertyTermComponent();
 
+    void hitAmendButton();
 }

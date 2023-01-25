@@ -16,6 +16,8 @@ public interface EditBIEPage extends Page {
 
     WebElement getSearchField();
 
+    WebElement getDeprecatedFlag();
+
     WebElement getSearchButton();
 
     void clickOnDropDownMenuByPath(String path);
