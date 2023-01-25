@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
@@ -10,6 +11,7 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
@@ -95,7 +97,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.cssSelector("mat-tab-header div.mat-tab-label"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("mat-tab-header div.mat-tab-label"));
     }
 
     @Override
@@ -115,23 +119,26 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
-        waitFor(ofMillis(500L));
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-        assert ACCExtensionViewEditPage.isOpened();
-        return ACCExtensionViewEditPage;
+        return retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+            waitFor(ofMillis(500L));
+            ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            assert ACCExtensionViewEditPage.isOpened();
+            return ACCExtensionViewEditPage;
+        });
     }
 
     @Override
     public ACCExtensionViewEditPage extendBIELocallyOnNode(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
-        waitFor(ofMillis(500L));
-        invisibilityOfLoadingContainerElement(getDriver());
-        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-        assert accExtensionViewEditPage.isOpened();
-        return accExtensionViewEditPage;
+        return retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            waitFor(ofMillis(500L));
+            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            assert accExtensionViewEditPage.isOpened();
+            return accExtensionViewEditPage;
+        });
     }
 
     @Override
@@ -301,29 +308,38 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ASBIEPanel getASBIEPanel(WebElement asccpNode) {
-        click(asccpNode);
-        String nodeText = getText(asccpNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new ASBIEPanelImpl();
+        return retry(() -> {
+            click(asccpNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(asccpNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new ASBIEPanelImpl();
+        });
     }
 
     @Override
     public BBIEPanel getBBIEPanel(WebElement bccpNode) {
-        click(bccpNode);
-        String nodeText = getText(bccpNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new BBIEPanelImpl();
+        return retry(() -> {
+            click(bccpNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(bccpNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new BBIEPanelImpl();
+        });
     }
 
     @Override
     public BBIESCPanel getBBIESCPanel(WebElement bdtScNode) {
-        click(bdtScNode);
-        String nodeText = getText(bdtScNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new BBIESCPanelImpl();
+        return retry(() -> {
+            click(bdtScNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(bdtScNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new BBIESCPanelImpl();
+        });
     }
 
     private WebElement getInputFieldByName(String name) {
