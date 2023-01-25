@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -9,6 +10,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
@@ -87,6 +91,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         String url = getPageUrl();
         getDriver().get(url);
         assert "ACC".equals(getCoreComponentTypeFieldValue());
+    }
+
+    @Override
+    public WebElement getTitle() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("mat-tab-header div.mat-tab-label"));
     }
 
     @Override
@@ -227,11 +238,6 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
-    public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.cssSelector("mat-tab-header div.mat-tab-label"));
-    }
-
-    @Override
     public SelectAssociationDialog appendPropertyAtLast(String path) {
         clickOnDropDownMenuByPath(path);
         click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
@@ -248,6 +254,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         String nodeName = nodes[nodes.length - 1];
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
     }
 
     @Override

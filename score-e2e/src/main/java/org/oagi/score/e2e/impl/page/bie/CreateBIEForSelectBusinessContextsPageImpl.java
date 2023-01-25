@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl implements CreateBIEForSelectBusinessContextsPage {
@@ -124,7 +125,7 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
-            waitFor(Duration.ofMillis(500L));
+            waitFor(ofMillis(500L));
         });
     }
 
@@ -169,7 +170,8 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
             selectBusinessContext(businessContext);
         }
         click(getNextButton());
-        waitFor(Duration.ofMillis(2000));
+        waitFor(ofMillis(2000L));
+
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 new CreateBIEForSelectTopLevelConceptPageImpl(this, businessContexts);
         assert createBIEForSelectTopLevelConceptPage.isOpened();
