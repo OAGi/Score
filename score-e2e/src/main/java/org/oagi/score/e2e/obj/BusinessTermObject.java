@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.*;

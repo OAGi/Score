@@ -55,6 +55,13 @@ public interface APIFactory extends AutoCloseable {
     BusinessContextValueAPI getBusinessContextValueAPI();
 
     /**
+     * Return the business term management API.
+     *
+     * @return the business term management API
+     */
+    BusinessTermAPI getBusinessTermAPI();
+
+    /**
      * Return the agency ID list management API.
      *
      * @return the agency ID list management API

@@ -65,6 +65,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public BusinessTermAPI getBusinessTermAPI() {
+        return new DSLContextBusinessTermAPIImpl(dslContext, this);
+    }
+
+    @Override
     public AgencyIDListAPI getAgencyIDListAPI() {
         return new DSLContextAgencyIDListAPIImpl(dslContext);
     }
