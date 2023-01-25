@@ -38,8 +38,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        String createBIEPageTitle = getText(bieMenu.openCreateBIESubMenu().getTitle());
-        assertEquals("Create BIE (Profiled Component, Noun, BOD)", createBIEPageTitle);
+        String viewEditBusinessTermPageTitle = getText(bieMenu.openViewEditBusinessTermSubMenu().getTitle());
+        assertEquals("Business Term", viewEditBusinessTermPageTitle);
 
     }
 
