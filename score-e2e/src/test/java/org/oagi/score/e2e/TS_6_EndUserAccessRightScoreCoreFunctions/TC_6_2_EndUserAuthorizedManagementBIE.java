@@ -2691,6 +2691,80 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          */
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_14_6")
+    @Disabled
+    public void test_TA_14_6() {
+        ASCCPObject asccpTopLevel;
+        BCCPObject bccp_ACCTopLevel;
+        ASCCPObject asccp;
+        ACCObject accGroupType;
+        BCCPObject bccpFromtheGroup;
+        AppUserObject usera;
+        AppUserObject userb;
+        BusinessContextObject context;
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
+
+            accGroupType = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "QA");
+            bccpFromtheGroup = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(accGroupType, bccpFromtheGroup, "Production");
+            asccp = coreComponentAPI.createRandomASCCP(accGroupType, usera, namespace, "Production");
+            coreComponentAPI.appendASCC(accTopLevel,asccp, "Production");
+
+            asccpTopLevel = coreComponentAPI.createRandomASCCP(accTopLevel, usera, namespace, "Production");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+        }
+
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccpTopLevel.getDen(), this.release);
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByDENAndReleaseNum(asccpTopLevel.getDen(), this.release);
+        /**
+         * The end user ACC is group type and not in Production State
+         */
+        assertNotEquals("Production", accGroupType.getState());
+        /**
+         * If any child or descendant properties are from group and the group is not in Production state, those properties have to be locked in the BIE.
+         */
+        assertThrows(TimeoutException.class, ()->{
+            editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccpFromtheGroup.getPropertyTerm());
+        });
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + bccpFromtheGroup.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        waitFor(Duration.ofMillis(2000));
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertDisabled(bbiePanel.getRemarkField());
+        assertDisabled(bbiePanel.getExampleField());
+        assertDisabled(bbiePanel.getValueConstraintSelectField());
+        assertDisabled(bbiePanel.getValueDomainRestrictionSelectField());
+        assertDisabled(bbiePanel.getValueDomainField());
+        assertDisabled(bbiePanel.getContextDefinitionField());
+        //TODO
+        // Check if Business Term functionality is enabled. Currently, it is disabled.
+        assertDisabled(bbiePanel.getBusinessTermField());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
