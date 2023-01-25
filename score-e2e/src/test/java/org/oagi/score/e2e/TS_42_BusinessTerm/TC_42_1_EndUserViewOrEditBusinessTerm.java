@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,9 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +67,9 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
 
-
-
-
-
-
-
-
-
-
-
+        EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditContextCategoryPageByContextCategoryName(contextCategory.getName());
+        assertEquals(businessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
+        assertTrue(StringUtils.isEmpty(editBusinessTermPage.getDefinitionFieldText()));
     }
 
     @Test
