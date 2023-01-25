@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage {
@@ -212,11 +213,11 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
         click(itemsPerPageField);
-        waitFor(Duration.ofMillis(500L));
+        waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
         click(itemField);
-        waitFor(Duration.ofMillis(500L));
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -246,10 +247,14 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public CreateBIEForSelectBusinessContextsPage openCreateBIEPage() {
         click(getNewBIEButton());
-        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
-                new CreateBIEForSelectBusinessContextsPageImpl(this);
-        assert createBIEForSelectBusinessContextsPage.isOpened();
-        return createBIEForSelectBusinessContextsPage;
+        waitFor(ofMillis(500L));
+
+        return retry(() -> {
+            CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                    new CreateBIEForSelectBusinessContextsPageImpl(this);
+            assert createBIEForSelectBusinessContextsPage.isOpened();
+            return createBIEForSelectBusinessContextsPage;
+        });
     }
 
     @Override
@@ -275,6 +280,8 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
+            waitFor(ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
             assert editBIEPage.isOpened();
@@ -322,7 +329,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         hitSearchButton();
 
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(Duration.ofMillis(500L));
+        waitFor(ofMillis(500L));
 
         WebElement tr = getTableRecordByValue(topLevelASBIEP.getPropertyTerm());
         WebElement td = getColumnByName(tr, "select");

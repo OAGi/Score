@@ -684,7 +684,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setReleaseId(release.getReleaseId());
 
         BccpRecord bccpRecord = new BccpRecord();
-        bccpRecord.setGuid(bccp.getDen());
+        bccpRecord.setGuid(bccp.getGuid());
         bccpRecord.setPropertyTerm(bccp.getPropertyTerm());
         bccpRecord.setRepresentationTerm(bccp.getRepresentationTerm());
         bccpRecord.setBdtId(ULong.valueOf(bccp.getBdtId()));
