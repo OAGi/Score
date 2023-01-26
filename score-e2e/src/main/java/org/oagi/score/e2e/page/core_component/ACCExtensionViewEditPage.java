@@ -192,7 +192,13 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     SelectAssociationDialog appendPropertyAtLast(String path);
 
-    void clickOnDropDownMenuByPath(String path);
+    /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPath(String path);
 
     WebElement getSearchField();
 
