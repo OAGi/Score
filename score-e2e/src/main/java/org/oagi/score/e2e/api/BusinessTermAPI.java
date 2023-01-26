@@ -2,6 +2,7 @@ package org.oagi.score.e2e.api;
 
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
+import org.oagi.score.e2e.obj.ContextCategoryObject;
 
 import java.math.BigInteger;
 
@@ -41,6 +42,16 @@ public interface BusinessTermAPI {
      * @return a created business term object
      */
     BusinessTermObject createRandomBusinessTerm(AppUserObject creator, String namePrefix);
+
+    /**
+     * Create the business term as requested.
+     *
+     * @param businessTerm business term object
+     * @param creator         account who creates this context category
+     * @return a created business term object
+     */
+    BusinessTermObject createRandomBusinessTerm(BusinessTermObject businessTerm,
+                                                AppUserObject creator);
 
     void deleteBusinessTermById(BigInteger businessTerm);
 

@@ -20,7 +20,9 @@ import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
 import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.retry;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
@@ -98,11 +101,52 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_4")
     public void enduser_can_search_for_business_term_based_only_on_its_term() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
+        getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage;
+
+        // Test 'Updater' field
+        homePage.openPage();
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        viewEditBusinessTermPage.setTerm(randomBusinessTerm.getBusinessTerm());
+        viewEditBusinessTermPage.hitSearchButton();
+        assertBusinessTermNameInTheSearchResultsAtFirst(
+                viewEditBusinessTermPage, randomBusinessTerm.getBusinessTerm(), "Term");
+
     }
 
     @Test
     @DisplayName("TC_42_1_5")
     public void enduser_can_search_for_business_term_based_on_external_reference_uri() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
+        getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage;
+
+        // Test 'Updater' field
+        homePage.openPage();
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        viewEditBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
+        viewEditBusinessTermPage.hitSearchButton();
+        assertBusinessTermNameInTheSearchResultsAtFirst(
+                viewEditBusinessTermPage, randomBusinessTerm.getBusinessTerm(), "External Reference URI");
+    }
+
+    private void assertBusinessTermNameInTheSearchResultsAtFirst(ViewEditBusinessTermPage viewEditBusinessTermPage, String searchString, String columnName) {
+        retry(() -> {
+            WebElement tr = viewEditBusinessTermPage.getTableRecordAtIndex(1);
+            WebElement td = viewEditBusinessTermPage.getColumnByName(tr, columnName);
+            assertEquals(searchString, td.findElement(By.cssSelector("a > span")).getText());
+        });
     }
 
     @Test

@@ -5,6 +5,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.BusinessTermAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BusinessTermRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxCategoryRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 
@@ -77,17 +78,30 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
     }
 
     @Override
+    public BusinessTermObject createRandomBusinessTerm(BusinessTermObject businessTerm,
+                                                AppUserObject creator){
+        BusinessTermRecord bizTermRecord = new BusinessTermRecord();
+        bizTermRecord.setGuid(businessTerm.getGuid());
+        bizTermRecord.setExternalRefUri(businessTerm.getExternalReferenceUri());
+        bizTermRecord.setExternalRefId(businessTerm.getExternalReferenceId());
+        bizTermRecord.setBusinessTerm(businessTerm.getBusinessTerm());
+        bizTermRecord.setDefinition(businessTerm.getDefinition());
+        bizTermRecord.setComment(businessTerm.getComment());
+        bizTermRecord.setCreatedBy(ULong.valueOf(creator.getAppUserId()));
+        bizTermRecord.setLastUpdatedBy(ULong.valueOf(creator.getAppUserId()));
+        bizTermRecord.setLastUpdateTimestamp(businessTerm.getLastUpdateTimestamp());
+        ULong businessTermId = dslContext.insertInto(BUSINESS_TERM)
+                .set(bizTermRecord)
+                .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
+                .fetchOne().getBusinessTermId();
+        businessTerm.setBusinessTermId(businessTermId.toBigInteger());
+        return businessTerm;
+    }
+
+    @Override
     public void deleteBusinessTermById(BigInteger businessTermId) {
         ULong btIDLong = ULong.valueOf(businessTermId);
         dslContext.deleteFrom(BUSINESS_TERM).where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(btIDLong)).execute();
-    }
-
-    private void deleteBusinessContextValuesAndAssignments(ULong bizCtxId) {
-        dslContext.deleteFrom(BIZ_CTX_ASSIGNMENT).where(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(bizCtxId)).execute();
-        dslContext.deleteFrom(BIZ_CTX_VALUE)
-                .where(BIZ_CTX_VALUE.BIZ_CTX_ID.eq(bizCtxId))
-                .execute();
-        dslContext.deleteFrom(BIZ_CTX).where(BIZ_CTX.BIZ_CTX_ID.eq(bizCtxId)).execute();
     }
 
 }
