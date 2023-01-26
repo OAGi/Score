@@ -9,6 +9,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
@@ -16,14 +17,16 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
 import org.oagi.score.e2e.page.context.EditContextCategoryPage;
+import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -75,6 +78,21 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_3")
     public void enduser_cannot_create_business_term_if_any_required_field_missing() {
+
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.openCreateBusinessTermPage();
+
+        BusinessTermObject businessTerm1 = new BusinessTermObject();
+        businessTerm1.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
+        assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm1));
+
+        BusinessTermObject businessTerm2 = new BusinessTermObject();
+        businessTerm2.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm2));
     }
 
     @Test
