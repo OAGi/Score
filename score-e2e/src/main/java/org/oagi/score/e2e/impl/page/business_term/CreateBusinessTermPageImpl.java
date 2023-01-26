@@ -26,7 +26,7 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/business_term/create").toString();
+        return getConfig().getBaseUrl().resolve("/business_term_management/business_term/create").toString();
     }
 
     @Override

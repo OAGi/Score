@@ -54,7 +54,7 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/business_term").toString();
+        return getConfig().getBaseUrl().resolve("/business_term_management/business_term").toString();
     }
 
     @Override
