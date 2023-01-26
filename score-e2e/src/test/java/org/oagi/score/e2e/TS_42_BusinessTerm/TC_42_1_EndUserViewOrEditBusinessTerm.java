@@ -113,7 +113,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         viewEditBusinessTermPage.setTerm(randomBusinessTerm.getBusinessTerm());
         viewEditBusinessTermPage.hitSearchButton();
         assertBusinessTermNameInTheSearchResultsAtFirst(
-                viewEditBusinessTermPage, randomBusinessTerm.getBusinessTerm(), "Term");
+                viewEditBusinessTermPage, randomBusinessTerm.getBusinessTerm(), "businessTerm");
 
     }
 

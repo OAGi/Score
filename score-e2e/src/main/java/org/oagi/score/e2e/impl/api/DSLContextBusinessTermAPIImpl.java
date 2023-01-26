@@ -89,6 +89,7 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
         bizTermRecord.setComment(businessTerm.getComment());
         bizTermRecord.setCreatedBy(ULong.valueOf(creator.getAppUserId()));
         bizTermRecord.setLastUpdatedBy(ULong.valueOf(creator.getAppUserId()));
+        bizTermRecord.setCreationTimestamp(businessTerm.getCreationTimestamp());
         bizTermRecord.setLastUpdateTimestamp(businessTerm.getLastUpdateTimestamp());
         ULong businessTermId = dslContext.insertInto(BUSINESS_TERM)
                 .set(bizTermRecord)

@@ -24,6 +24,8 @@ public class BusinessTermObject {
 
     private String guid;
 
+    private LocalDateTime creationTimestamp;
+
     private LocalDateTime lastUpdateTimestamp;
 
     private BigInteger createdBy;
@@ -44,6 +46,7 @@ public class BusinessTermObject {
         businessTerm.setComment(randomPrint(20,50).trim());
         businessTerm.setCreatedBy(creator.getAppUserId());
         businessTerm.setLastUpdatedBy(creator.getAppUserId());
+        businessTerm.setCreationTimestamp(LocalDateTime.now());
         businessTerm.setLastUpdateTimestamp(LocalDateTime.now());
         return businessTerm;
     }
