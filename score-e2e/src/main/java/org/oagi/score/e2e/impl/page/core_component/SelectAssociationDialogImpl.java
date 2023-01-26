@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class SelectAssociationDialogImpl implements SelectAssociationDialog {
@@ -240,7 +241,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     @Override
     public void hitSearchButton() {
         click(getSearchButton());
-        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -263,11 +264,11 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
         click(itemsPerPageField);
-        waitFor(Duration.ofMillis(500L));
+        waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
         click(itemField);
-        waitFor(Duration.ofMillis(500L));
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -314,7 +315,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
             click(getSelectButton());
 
             assert parent.isOpened();
-            waitFor(Duration.ofMillis(500));
+            waitFor(ofMillis(500));
         });
     }
 
