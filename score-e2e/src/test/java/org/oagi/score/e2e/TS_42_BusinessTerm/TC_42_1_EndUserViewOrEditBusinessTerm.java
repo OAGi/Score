@@ -9,17 +9,12 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
-import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
-import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
-import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
-import org.oagi.score.e2e.page.context.EditContextCategoryPage;
-import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -70,7 +65,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         BusinessTermObject businessTerm = new BusinessTermObject();
         businessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
-        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
 
         EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditBusinessTermPageByTerm(businessTerm.getBusinessTerm());
@@ -94,7 +89,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm1));
 
         BusinessTermObject businessTerm2 = new BusinessTermObject();
-        businessTerm2.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        businessTerm2.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm2));
     }
 
@@ -158,6 +153,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @DisplayName("TC_42_1_7")
     public void enduser_cannot_change_definition_field_in_edit_business_term_page() {
     }
+
     @Test
     @DisplayName("TC_42_1_8")
     public void enduser_cannot_save_business_term_if_an_already_existing_term_and_uri_in_edit_business_term_page() {
