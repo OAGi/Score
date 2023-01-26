@@ -67,7 +67,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
 
-        EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditContextCategoryPageByContextCategoryName(contextCategory.getName());
+        EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditBusinessTermPageByTerm(businessTerm.getBusinessTerm());
         assertEquals(businessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
         assertTrue(StringUtils.isEmpty(editBusinessTermPage.getDefinitionFieldText()));
     }

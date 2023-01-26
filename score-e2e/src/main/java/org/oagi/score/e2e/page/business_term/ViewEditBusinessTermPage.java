@@ -183,4 +183,5 @@ public interface ViewEditBusinessTermPage extends Page {
      */
     EditBusinessTermPage openEditBusinessTermPageByTerm(String businessTermName)
             throws NoSuchElementException;
+
 }
