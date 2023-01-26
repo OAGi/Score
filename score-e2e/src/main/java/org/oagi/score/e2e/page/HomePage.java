@@ -176,7 +176,7 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit BIE' page by clicking the cell in the table based on the username and the column name.
          *
-         * @param user the username
+         * @param user       the username
          * @param columnName "WIP", "QA", "Production", and "total"
          * @return the 'View/Edit BIE' page object
          */
@@ -303,7 +303,7 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the username and the column name.
          *
-         * @param user the username
+         * @param user       the username
          * @param columnName "WIP", "QA", "Production", "Deleted" and "total"
          * @return the 'View/Edit Core Component' page object
          */
@@ -315,9 +315,10 @@ public interface HomePage extends Page {
 
     interface MyUnusedUEsInBIEsPanel {
 
-        /**Return the table record in the table based on the user extension name and association DEN
+        /**
+         * Return the table record in the table based on the user extension name and association DEN
          *
-         * @param ueName  user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the table record UI element
          */
@@ -326,7 +327,7 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
          *
-         * @param ueName user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the 'View/Edit Core Component' page object
          */

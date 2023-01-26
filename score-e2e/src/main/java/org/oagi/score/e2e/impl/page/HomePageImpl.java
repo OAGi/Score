@@ -119,7 +119,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     }
 
     @Override
-    public WebElement getUserExtensionsTab(){
+    public WebElement getUserExtensionsTab() {
         return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"User Extensions\")]"));
     }
 
@@ -473,8 +473,8 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
 
         @Override
-        public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN){
-            return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\""+ueName+"\")]//ancestor::tr//td[6]//*[contains(text(),\""+assocDEN+"\")]"));
+        public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
+            return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\"" + ueName + "\")]//ancestor::tr//td[6]//*[contains(text(),\"" + assocDEN + "\")]"));
         }
 
         @Override
