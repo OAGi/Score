@@ -17,8 +17,6 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.*;
@@ -269,7 +267,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         WebElement qaStateInTotalTab = totalUEsByStatesPanel.getStateProgressBarByState("QA");
         assertTrue(qaStateInTotalTab.isDisplayed());
-        assertTrue(container1.numberOfQAUEGs  <= extractNumberFromText(getText(qaStateInTotalTab)));
+        assertTrue(container1.numberOfQAUEGs <= extractNumberFromText(getText(qaStateInTotalTab)));
 
         WebElement productionStateInTotalTab = totalUEsByStatesPanel.getStateProgressBarByState("Production");
         assertTrue(productionStateInTotalTab.isDisplayed());
@@ -367,12 +365,11 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         WebElement qaStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("QA");
         assertTrue(qaStateInTotalTab.isDisplayed());
-        assertTrue(container1.numberOfQAUEGs  <= extractNumberFromText(getText(qaStateInTotalTab)));
+        assertTrue(container1.numberOfQAUEGs <= extractNumberFromText(getText(qaStateInTotalTab)));
 
         WebElement productionStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("Production");
         assertTrue(productionStateInTotalTab.isDisplayed());
         assertTrue(container1.numberOfProductionUEGs <= extractNumberFromText(getText(productionStateInTotalTab)));
-
 
 
     }
@@ -648,8 +645,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         BCCPObject randomBCCP;
         int loop = 2; //loop twice to check and uncheck the random BCCP nodes for the selected BIE
 
-        while (loop > 0){
-            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
+        while (loop > 0) {
+            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()) {
                 topBIE = bieBccpEntry.getKey();
                 randomBCCP = bieBccpEntry.getValue();
                 BIEMenu bieMenu = homePage.getBIEMenu();
@@ -702,8 +699,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         BCCPObject randomBCCP;
         int loop = 2; //loop twice to check and uncheck the random BCCP nodes for the selected BIE
 
-        while (loop > 0){
-            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()){
+        while (loop > 0) {
+            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()) {
                 topBIE = bieBccpEntry.getKey();
                 randomBCCP = bieBccpEntry.getValue();
                 BIEMenu bieMenu = homePage.getBIEMenu();
