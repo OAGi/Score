@@ -86,8 +86,6 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
     public ViewEditBusinessTermPage createBusinessTerm(BusinessTermObject businessTerm) {
         setBusinessTerm(businessTerm.getBusinessTerm());
         setExternalReferenceURI(businessTerm.getExternalReferenceUri());
-        setExternalReferenceID(businessTerm.getExternalReferenceId());
-        setComment(businessTerm.getComment());
         click(getCreateButton());
         assert getSnackBar(getDriver(), "Created").isDisplayed();
         return this.parent;

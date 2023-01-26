@@ -214,7 +214,7 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
             WebElement td;
             try {
                 WebElement tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "Term");
+                td = getColumnByName(tr, "businessTerm");
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a business term using " + businessTermName, e);
             }
