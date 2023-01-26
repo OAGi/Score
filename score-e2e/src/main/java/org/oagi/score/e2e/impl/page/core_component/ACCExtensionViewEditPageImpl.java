@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -7,8 +8,13 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
@@ -87,6 +93,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         String url = getPageUrl();
         getDriver().get(url);
         assert "ACC".equals(getCoreComponentTypeFieldValue());
+    }
+
+    @Override
+    public WebElement getTitle() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("mat-tab-header div.mat-tab-label"));
     }
 
     @Override
@@ -218,23 +231,28 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         return getText(getDefinitionField());
     }
 
-    @Override
-    public WebElement getContextMenuIconByNodeName(String nodeName) {
+    public WebElement getNodeByName(String name) {
         return elementToBeClickable(getDriver(), By.xpath(
-                "//cdk-virtual-scroll-viewport//*[contains(text(), \"" + nodeName + "\")]" +
-                        "//ancestor::div[contains(@class, \"mat-tree-node\")]" +
-                        "//mat-icon[contains(text(), \"more_vert\")]"));
+                "//cdk-virtual-scroll-viewport//*[contains(text(), \"" + name + "\")]" +
+                        "//ancestor::div[contains(@class, \"mat-tree-node\")]"));
     }
 
     @Override
-    public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.cssSelector("mat-tab-header div.mat-tab-label"));
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        WebElement node = getNodeByName(nodeName);
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
     public SelectAssociationDialog appendPropertyAtLast(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
         assert selectAssociationDialog.isOpened();
@@ -242,12 +260,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
-    public void clickOnDropDownMenuByPath(String path) {
+    public WebElement clickOnDropDownMenuByPath(String path) {
         goToNode(path);
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return getNodeByName(nodeName);
     }
 
     @Override

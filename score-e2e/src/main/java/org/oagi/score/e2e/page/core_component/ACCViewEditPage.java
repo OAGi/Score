@@ -185,4 +185,8 @@ public interface ACCViewEditPage extends Page {
     String getDENFieldLabelDT();
 
     void hitAmendButton();
+
+    void moveToQA();
+
+    WebElement getMoveToQAButton(boolean enabled);
 }

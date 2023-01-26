@@ -214,16 +214,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         bccp.setNillable(false);
         coreComponentAPI.updateBCCP(bccp);
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(dataType.getGuid(), nextRelease.getReleaseNumber());
-        BCCPObject revisedBccp = coreComponentAPI.createRevisedBCCP(bccp, nextDataType, developer, nextRelease, "Published");
-        revisedBccp.setNillable(true);
-        coreComponentAPI.updateBCCP(revisedBccp);
-
-        ACCObject acc = coreComponentAPI.createRandomACC(developer, nextRelease, namespace, "Published");
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
         ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
         BCCObject bcc = coreComponentAPI.appendBCC(
-                acc, revisedBccp, "Published");
+                acc, bccp, "Published");
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
@@ -232,16 +226,43 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP);
+
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+
+        EditBIEPage.BBIEPanel BBIEPanel = editBIEPage.getBBIEPanel(node);
+        WebElement nillable = BBIEPanel.getNillableCheckbox();
+        assertNotChecked(nillable);
+        assertDisabled(nillable);
+
+        // Move to next release for the revised BCCP
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
+        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(dataType.getGuid(), nextRelease.getReleaseNumber());
+        BCCPObject revisedBccp = coreComponentAPI.createRevisedBCCP(bccp, nextDataType, developer, nextRelease, "Published");
+        revisedBccp.setNillable(true);
+        coreComponentAPI.updateBCCP(revisedBccp);
+
+        ACCObject newAcc = coreComponentAPI.createRandomACC(developer, nextRelease, namespace, "Published");
+        ASCCPObject newAsccp = coreComponentAPI.createRandomASCCP(newAcc, developer, namespace, "Published");
+        BCCObject newBcc = coreComponentAPI.appendBCC(
+                newAcc, revisedBccp, "Published");
+
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), newAsccp, developer, "WIP");
+
         EditBIEPage editBIEPageForRevised = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP);
 
-        WebElement node = editBIEPageForRevised.getNodeByPath(
-                "/" + asccp.getPropertyTerm() + "/" + revisedBccp.getPropertyTerm());
+        node = editBIEPageForRevised.getNodeByPath(
+                "/" + newAsccp.getPropertyTerm() + "/" + revisedBccp.getPropertyTerm());
         assertTrue(node.isDisplayed());
 
-        EditBIEPage.BBIEPanel BBIEPanel = editBIEPageForRevised.getBBIEPanel(node);
-        WebElement nillable = BBIEPanel.getNillableCheckbox();
-        assertNotChecked(nillable);
+        BBIEPanel = editBIEPageForRevised.getBBIEPanel(node);
+        nillable = BBIEPanel.getNillableCheckbox();
+        assertChecked(nillable);
         assertDisabled(nillable);
     }
 
@@ -845,6 +866,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         assertEquals("WIP", getText(topLevelASBIEPPanel.getStateField()));
         editBIEPage.moveToQA();
+
+        // Refresh the page to make sure to check the final state
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("QA", getText(topLevelASBIEPPanel.getStateField()));
     }
 
@@ -903,6 +928,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("QA", getText(topLevelASBIEPPanel.getStateField()));
         editBIEPage.backToWIP();
+
+        // Refresh the page to make sure to check the final state
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("WIP", getText(topLevelASBIEPPanel.getStateField()));
     }
 
@@ -927,6 +956,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("QA", getText(topLevelASBIEPPanel.getStateField()));
         editBIEPage.moveToProduction();
+
+        // Refresh the page to make sure to check the final state
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("Production", getText(topLevelASBIEPPanel.getStateField()));
     }
 
@@ -1373,20 +1406,24 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         bbiePanel.toggleUsed();
 
         sendKeys(bbiePanel.getCardinalityMinField(), "");
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"Cardinality Min is\")]")).isDisplayed());
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
         sendKeys(bbiePanel.getCardinalityMinField(), randStrForCardinalityMin);
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"'" + randStrForCardinalityMin + "' is not allowed for Cardinality Min\")]")).isDisplayed());
 
         sendKeys(bbiePanel.getCardinalityMaxField(), "");
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"Cardinality Max is\")]")).isDisplayed());
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());
     }
@@ -1416,20 +1453,24 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         bbieScPanel.toggleUsed();
 
         sendKeys(bbieScPanel.getCardinalityMinField(), "");
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"Cardinality Min is\")]")).isDisplayed());
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMinField(), randStrForCardinalityMin);
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"'" + randStrForCardinalityMin + "' is not allowed for Cardinality Min\")]")).isDisplayed());
 
         sendKeys(bbieScPanel.getCardinalityMaxField(), "");
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"Cardinality Max is\")]")).isDisplayed());
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMaxField(), randStrForCardinalityMax);
+        waitFor(ofMillis(500L)); // wait for popping the error message up
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());
     }
@@ -2288,9 +2329,6 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         SelectAssociationDialog selectAssociationDialog =
                 ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectAssociationDialog.selectAssociation("Validation Indicator. Indicator");
@@ -2363,9 +2401,6 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         SelectAssociationDialog selectAssociationDialog =
                 ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectAssociationDialog.selectAssociation("Validation Indicator. Indicator");

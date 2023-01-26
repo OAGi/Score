@@ -8,11 +8,11 @@ import org.oagi.score.e2e.page.bie.CopyBIEForSelectBusinessContextsPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl implements CopyBIEForSelectBusinessContextsPage {
@@ -121,7 +121,7 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
-            waitFor(Duration.ofMillis(500L));
+            waitFor(ofMillis(500L));
         });
     }
 
@@ -163,6 +163,8 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
             selectBusinessContext(businessContext);
         }
         click(getNextButton());
+        waitFor(ofMillis(2000L));
+
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 new CopyBIEForSelectBIEPageImpl(this, businessContexts);
         assert copyBIEForSelectBIEPage.isOpened();

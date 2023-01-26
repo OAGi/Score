@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -7,8 +8,10 @@ import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
@@ -72,7 +75,9 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.cssSelector("div.mat-tab-list div.mat-tab-label"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("div.mat-tab-list div.mat-tab-label"));
     }
 
     @Override

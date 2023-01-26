@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
@@ -8,21 +9,15 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
-
-    private static final By DEN_COMPONENT_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
-
-    private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
 
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
@@ -32,9 +27,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Globally\")]");
-
-    private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
@@ -63,22 +55,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
-    private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
-    private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
-    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Definition Source\")]//ancestor::div[1]/input");
-
-    private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Definition\")]//ancestor::div[1]/textarea");
-
-    private static final By ATENTION_DIALOG_MESSAGE_LOCATOR =
+    private static final By ATTENTION_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
     private static final By YES_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Yes\")]//ancestor::button/span");
+
+    private static final By RESET_BUTTON_LOCATOR =
+            By.xpath("//button[@mattooltip=\"Reset detail\"]");
+
+    private static final By CONTINUE_RESET_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Reset\")]//ancestor::button/span");
+
+    private static final By RESET_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
 
     private final TopLevelASBIEPObject asbiep;
 
@@ -107,52 +97,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.cssSelector("mat-tab-header div.mat-tab-label"));
-    }
-
-    @Override
-    public String getObjectClassTermFieldLabel() {
-        return getObjectClassTermField().getAttribute("data-placeholder");
-    }
-
-    @Override
-    public WebElement getSourceDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
-    }
-
-    @Override
-    public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
-    }
-
-    @Override
-    public String getDENFieldLabel() {
-        return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR).findElement(By.tagName("mat-label")).getText();
-    }
-
-    @Override
-    public WebElement getObjectClassTermField() {
-        return visibilityOfElementLocated(getDriver(), OBJECT_CLASS_TERM_FIELD_LOCATOR);
-    }
-
-    @Override
-    public void setNamespace(String namespace) {
-        retry(() -> {
-            click(getBNamespaceSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + namespace + "\"]"));
-            click(optionField);
-        });
-    }
-
-    @Override
-    public WebElement getBNamespaceSelectField() {
-        return visibilityOfElementLocated(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
-    }
-
-    @Override
-    public WebElement getRevisionField() {
-        return visibilityOfElementLocated(getDriver(), REVISION_FIELD_LOCATOR);
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("mat-tab-header div.mat-tab-label"));
     }
 
     @Override
@@ -172,59 +119,36 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
-        waitFor(ofMillis(500L));
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-        assert ACCExtensionViewEditPage.isOpened();
-        return ACCExtensionViewEditPage;
-    }
-
-    @Override
-    public SelectAssociationDialog appendPropertyAtLast(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
-        SelectAssociationDialog selectAssociationDialog =
-                new SelectAssociationDialogImpl(this, "Append Property at Last");
-        assert selectAssociationDialog.isOpened();
-        return selectAssociationDialog;
+        return retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+            waitFor(ofMillis(500L));
+            ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            assert ACCExtensionViewEditPage.isOpened();
+            return ACCExtensionViewEditPage;
+        });
     }
 
     @Override
     public ACCExtensionViewEditPage extendBIELocallyOnNode(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
-        waitFor(ofMillis(500L));
-        invisibilityOfLoadingContainerElement(getDriver());
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-        assert ACCExtensionViewEditPage.isOpened();
-        return ACCExtensionViewEditPage;
+        return retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            waitFor(ofMillis(500L));
+            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            assert accExtensionViewEditPage.isOpened();
+            return accExtensionViewEditPage;
+        });
     }
 
-    @Override
-    public void getExtendBIELocallyOptionForNode(String path){
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
-    }
     @Override
     public ACCExtensionViewEditPage continueToExtendBIEOnNode() {
         click(elementToBeClickable(getDriver(), YES_BUTTON_IN_DIALOG_LOCATOR));
         waitFor(ofMillis(500L));
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
         switchToNextTab(getDriver());
-        assert ACCExtensionViewEditPage.isOpened();
-        return ACCExtensionViewEditPage;
-    }
-
-    @Override
-    public void getExtendBIEGloballyOptionForNode(String path) {
-        clickOnDropDownMenuByPath(path);
-        click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
-    }
-
-    @Override
-    public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR);
+        assert accExtensionViewEditPage.isOpened();
+        return accExtensionViewEditPage;
     }
 
     @Override
@@ -270,13 +194,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         goToNode(path);
         String[] nodes = path.split("/");
         return getNodeByName(nodes[nodes.length - 1]);
-    }
-
-    @Override
-    public WebElement getCheckboxByNodeName(String nodeName){
-
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav-container//span[contains(text(), \"" + nodeName + "\")]//preceding-sibling::mat-checkbox[1]"));
-
     }
 
     @Override
@@ -347,6 +264,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(getMoveToQAButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -363,6 +281,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(getBackToWIPButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -379,38 +298,48 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(getMoveToProductionButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
-    public String getAtentionDialogMessage() {
-        return visibilityOfElementLocated(getDriver(), ATENTION_DIALOG_MESSAGE_LOCATOR).getText();
+    public String getAttentionDialogMessage() {
+        return visibilityOfElementLocated(getDriver(), ATTENTION_DIALOG_MESSAGE_LOCATOR).getText();
     }
 
     @Override
     public ASBIEPanel getASBIEPanel(WebElement asccpNode) {
-        click(asccpNode);
-        String nodeText = getText(asccpNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new ASBIEPanelImpl();
+        return retry(() -> {
+            click(asccpNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(asccpNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new ASBIEPanelImpl();
+        });
     }
 
     @Override
     public BBIEPanel getBBIEPanel(WebElement bccpNode) {
-        click(bccpNode);
-        String nodeText = getText(bccpNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new BBIEPanelImpl();
+        return retry(() -> {
+            click(bccpNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(bccpNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new BBIEPanelImpl();
+        });
     }
 
     @Override
     public BBIESCPanel getBBIESCPanel(WebElement bdtScNode) {
-        click(bdtScNode);
-        String nodeText = getText(bdtScNode);
-        String panelTitle = getText(getTitle());
-        assert nodeText.contains(panelTitle);
-        return new BBIESCPanelImpl();
+        return retry(() -> {
+            click(bdtScNode);
+            waitFor(ofMillis(500L));
+            String nodeText = getText(bdtScNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new BBIESCPanelImpl();
+        });
     }
 
     private WebElement getInputFieldByName(String name) {
@@ -774,6 +703,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             return getTextAreaFieldByName("Component Definition");
         }
 
+        @Override
+        public void setBusinessTerm(String business_term) {
+            sendKeys(getBusinessTermField(), business_term);
+        }
+
+        @Override
+        public void hitResetButton() {
+            click(elementToBeClickable(getDriver(), RESET_BUTTON_LOCATOR));
+        }
+
+        @Override
+        public void confirmToReset() {
+            click(elementToBeClickable(getDriver(), CONTINUE_RESET_BUTTON_IN_DIALOG_LOCATOR));
+        }
+
+        @Override
+        public String getResetDialogMessage() {
+            return visibilityOfElementLocated(getDriver(), RESET_DIALOG_MESSAGE_LOCATOR).getText();
+        }
     }
 
     private class BBIESCPanelImpl implements BBIESCPanel {
