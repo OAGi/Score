@@ -45,6 +45,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     public void enduser_should_open_page_titled_business_term_under_bie_menu() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+        getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         String viewEditBusinessTermPageTitle = getText(bieMenu.openViewEditBusinessTermSubMenu().getTitle());
@@ -147,6 +148,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_6")
     public void enduser_can_click_business_term_to_update_its_details_in_edit_business_term_page() {
+
     }
 
     @Test

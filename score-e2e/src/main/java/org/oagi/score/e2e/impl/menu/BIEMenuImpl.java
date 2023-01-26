@@ -42,7 +42,7 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
             By.xpath("//button[contains(text(), \"Reuse Report\")]");
 
     private final By VIEW_EDIT_BUSINESS_TERM_SUB_MENU_LOCATOR =
-            By.xpath("/button[contains(text(), \"View/Edit Business Term\")]");
+            By.xpath("//button[contains(text(), \"View/Edit Business Term\")]");
 
     private final By BUSINESS_TERM_ASSIGNMENT_SUB_MENU_LOCATOR =
             By.xpath("/button[contains(text(), \"Business Term Assignment\")]");
