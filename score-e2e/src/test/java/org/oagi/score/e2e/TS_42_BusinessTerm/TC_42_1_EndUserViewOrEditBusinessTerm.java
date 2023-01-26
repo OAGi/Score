@@ -124,7 +124,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
         getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
-
+        getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditBusinessTermPage viewEditBusinessTermPage;
 
@@ -135,7 +135,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         viewEditBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
         viewEditBusinessTermPage.hitSearchButton();
         assertBusinessTermNameInTheSearchResultsAtFirst(
-                viewEditBusinessTermPage, randomBusinessTerm.getBusinessTerm(), "External Reference URI");
+                viewEditBusinessTermPage, randomBusinessTerm.getExternalReferenceUri(), "externalReferenceUri");
     }
 
     private void assertBusinessTermNameInTheSearchResultsAtFirst(ViewEditBusinessTermPage viewEditBusinessTermPage, String searchString, String columnName) {
