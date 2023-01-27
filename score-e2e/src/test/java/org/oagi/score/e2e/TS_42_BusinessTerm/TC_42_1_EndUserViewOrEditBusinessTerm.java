@@ -227,16 +227,15 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         createBusinessTermPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         createBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
         click(createBusinessTermPage.getCreateButton());
-
-
-
-
-
+        assertTrue(getDriver().findElement(
+                        By.xpath("//*[contains(text(), \"Another business term with the same business term and external reference URI already exists!\")]"))
+                .isDisplayed());
     }
 
     @Test
     @DisplayName("TC_42_1_9")
     public void enduser_cannot_discard_business_term_in_edit_business_term_page_if_it_is_used_in_assignments() {
+
     }
 
     @Test
