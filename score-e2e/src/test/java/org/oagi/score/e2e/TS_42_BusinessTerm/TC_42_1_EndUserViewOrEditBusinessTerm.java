@@ -199,6 +199,19 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_7")
     public void enduser_cannot_change_definition_field_in_edit_business_term_page() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm =
+                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        getDriver().manage().window().maximize();
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        EditBusinessTermPage editBusinessTermPage =
+                bieMenu.openViewEditBusinessTermSubMenu()
+                        .openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+
+        WebElement definitionField = editBusinessTermPage.getDefinitionField();
+        assertTrue(definitionField.getAttribute("readonly").equals("true"));
     }
 
     @Test
