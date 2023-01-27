@@ -17,15 +17,13 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
 
     private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::mat-form-field//input[1]");
 
-    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::mat-form-field//input[1]");
+    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::mat-form-field//input[1]");
 
     private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::mat-form-field//input[1]");
 
     private static final By DEFINITION_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea[1]");
 
-    private static final By COMMENT_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Comment\")]//ancestor::mat-form-field//input[1]");
-
-
+    private static final By COMMENT_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
 
@@ -96,7 +94,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
-    public void setExternalReferenceID(String externalReferenceID){sendKeys(getExternalReferenceURIField(), externalReferenceID);}
+    public void setExternalReferenceID(String externalReferenceID){sendKeys(getExternalReferenceIDField(), externalReferenceID);}
 
     @Override
     public String getExternalReferenceIDFieldText() {

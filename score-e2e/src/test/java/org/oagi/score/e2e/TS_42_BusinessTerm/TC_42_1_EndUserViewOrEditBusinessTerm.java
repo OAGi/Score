@@ -168,6 +168,10 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         randomBusinessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
         assertFalse(oldTermName.equals(randomBusinessTerm.getBusinessTerm()));
 
+        String oldExternalRefUri = randomBusinessTerm.getExternalReferenceUri();
+        randomBusinessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        assertFalse(oldExternalRefUri.equals(randomBusinessTerm.getExternalReferenceUri()));
+
         String oldExternalRefID = randomBusinessTerm.getExternalReferenceId();
         randomBusinessTerm.setExternalReferenceId(randomNumeric(1,10));
         assertFalse(oldExternalRefID.equals(randomBusinessTerm.getExternalReferenceId()));
@@ -186,7 +190,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
         assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
-        assertEquals(randomBusinessTerm.getExternalReferenceId(), editBusinessTermPage.getExternalReferenceIDField());
+        assertEquals(randomBusinessTerm.getExternalReferenceUri(), editBusinessTermPage.getExternalReferenceURIFieldText());
+        assertEquals(randomBusinessTerm.getExternalReferenceId(), editBusinessTermPage.getExternalReferenceIDFieldText());
         assertEquals(randomBusinessTerm.getComment(),  editBusinessTermPage.getCommentFieldText());
 
     }
