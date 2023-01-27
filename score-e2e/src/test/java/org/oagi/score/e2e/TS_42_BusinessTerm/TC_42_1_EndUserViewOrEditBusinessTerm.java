@@ -28,8 +28,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.retry;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
@@ -217,6 +216,22 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_8")
     public void enduser_cannot_save_business_term_if_an_already_existing_term_and_uri_in_edit_business_term_page() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm =
+                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        getDriver().manage().window().maximize();
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        CreateBusinessTermPage createBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openCreateBusinessTermPage();
+        createBusinessTermPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        createBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
+        click(createBusinessTermPage.getCreateButton());
+
+
+
+
+
     }
 
     @Test
