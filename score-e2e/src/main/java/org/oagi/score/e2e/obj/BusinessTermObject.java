@@ -40,7 +40,7 @@ public class BusinessTermObject {
         BusinessTermObject businessTerm = new BusinessTermObject();
         businessTerm.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
         businessTerm.setBusinessTerm(namePrefix + "_" + randomAlphanumeric(5, 10));
-        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com" + businessTerm.getExternalReferenceId());
+        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
         businessTerm.setExternalReferenceId(randomNumeric(1,10));
         businessTerm.setDefinition(randomPrint(50, 100).trim());
         businessTerm.setComment(randomPrint(20,50).trim());

@@ -39,6 +39,7 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
         businessTerm.setComment(bizTerm.getComment());
         businessTerm.setCreatedBy(bizTerm.getCreatedBy().toBigInteger());
         businessTerm.setLastUpdatedBy(bizTerm.getLastUpdatedBy().toBigInteger());
+        businessTerm.setCreationTimestamp(bizTerm.getCreationTimestamp());
         businessTerm.setLastUpdateTimestamp(bizTerm.getLastUpdateTimestamp());
         return businessTerm;
     }
@@ -66,6 +67,7 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
         bizTermRecord.setComment(businessTerm.getComment());
         bizTermRecord.setCreatedBy(ULong.valueOf(businessTerm.getCreatedBy()));
         bizTermRecord.setLastUpdatedBy(ULong.valueOf(businessTerm.getLastUpdatedBy()));
+        bizTermRecord.setCreationTimestamp(businessTerm.getCreationTimestamp());
         bizTermRecord.setLastUpdateTimestamp(businessTerm.getLastUpdateTimestamp());
 
         ULong businessTermId = dslContext.insertInto(BUSINESS_TERM)

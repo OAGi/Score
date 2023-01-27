@@ -9,13 +9,17 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
+import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -149,6 +153,41 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_6")
     public void enduser_can_click_business_term_to_update_its_details_in_edit_business_term_page() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm =
+                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        getDriver().manage().window().maximize();
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        EditBusinessTermPage editBusinessTermPage =
+                bieMenu.openViewEditBusinessTermSubMenu()
+                        .openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+
+        String oldTermName = randomBusinessTerm.getBusinessTerm();
+        randomBusinessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
+        assertFalse(oldTermName.equals(randomBusinessTerm.getBusinessTerm()));
+
+        String oldExternalRefID = randomBusinessTerm.getExternalReferenceId();
+        randomBusinessTerm.setExternalReferenceId(randomNumeric(1,10));
+        assertFalse(oldExternalRefID.equals(randomBusinessTerm.getExternalReferenceId()));
+
+        String oldComment = randomBusinessTerm.getComment();
+        randomBusinessTerm.setComment(randomPrint(20,50).trim());
+        assertFalse(oldComment.equals(randomBusinessTerm.getComment()));
+
+        editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
+
+        assertThrows(NoSuchElementException.class, () ->
+                bieMenu.openViewEditBusinessTermSubMenu()
+                        .openEditBusinessTermPageByTerm(oldTermName));
+
+        editBusinessTermPage =
+                bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+
+        assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
+        assertEquals(randomBusinessTerm.getExternalReferenceId(), editBusinessTermPage.getExternalReferenceIDField());
+        assertEquals(randomBusinessTerm.getComment(),  editBusinessTermPage.getCommentFieldText());
 
     }
 
