@@ -236,11 +236,25 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @DisplayName("TC_42_1_9")
     public void enduser_cannot_discard_business_term_in_edit_business_term_page_if_it_is_used_in_assignments() {
 
+        //create random business term
+        //create random BBIE or ABIE
+        //create random assigned business term
+        // try click "discard" button
+        // assert Forbidden message is displayed
+
     }
 
     @Test
     @DisplayName("TC_42_1_10")
     public void enduser_can_discard_business_term_in_edit_business_term_page_if_not_used_in_any_assignments() {
+        //create random business term
+        //create random BBIE or ABIE
+        //create random assigned business term
+        // try click "discard" button
+        // assert Forbidden message is displayed
+        //delete the assignment
+        // re-click "discard" button
+        // assert the business term is permanently removed.
     }
 
     @AfterEach

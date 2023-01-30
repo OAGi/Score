@@ -5,6 +5,8 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.AssignedBusinessTermObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 
+import java.math.BigInteger;
+
 /**
  * APIs for the business term assignment.
  */
@@ -18,6 +20,13 @@ public interface AssignedBusinessTermAPI {
     AssignedBusinessTermObject getAssignedBusinessTermByName(String businessTermName);
 
     /**
+     * Return the assigned business term associated with the given BIE name
+     * @param bieName BIE name
+     * @return a list of assigned business term object
+     */
+    AssignedBusinessTermObject[] getAssignedBusinessTermByBIE(String bieName);
+
+    /**
      * Create the assigned business term as requested
      * @param businessTerm business term object
      * @param aBIE  ABIE or BBIE object
@@ -26,5 +35,8 @@ public interface AssignedBusinessTermAPI {
      */
     AssignedBusinessTermObject createRandomAssignedBusinessTerm(BusinessTermObject businessTerm, ABIEObject aBIE,
                                                 AppUserObject creator);
+
+
+    void deleteAssignedBusinessTermById(BigInteger businessTerm);
 
 }
