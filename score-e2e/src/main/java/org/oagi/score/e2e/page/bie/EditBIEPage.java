@@ -518,6 +518,8 @@ public interface EditBIEPage extends Page {
         void confirmToReset();
 
         String getResetDialogMessage();
+
+        String getValueDomainWarningMessage(String valueDomain);
     }
 
     BBIESCPanel getBBIESCPanel(WebElement bdtScNode);

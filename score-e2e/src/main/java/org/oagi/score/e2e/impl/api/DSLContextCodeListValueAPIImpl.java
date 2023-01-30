@@ -8,6 +8,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CodeListValueRecor
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.CodeListValueObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -150,4 +151,17 @@ public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
         return codeListValue;
     }
 
+    @Override
+    public void addCodeListValueToAnotherRelease(CodeListValueObject codeListValue, CodeListObject codeList, AppUserObject creator, BigInteger newCodeListManifestId, ReleaseObject release) {
+        CodeListValueManifestRecord codeListValueManifestRecord = new CodeListValueManifestRecord();
+        codeListValueManifestRecord.setBasedCodeListValueManifestId(ULong.valueOf(codeListValue.getBasedCodeListValueManifestId()));
+        codeListValueManifestRecord.setCodeListManifestId(ULong.valueOf(newCodeListManifestId));
+        codeListValueManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
+        codeListValueManifestRecord.setCodeListValueId(ULong.valueOf(codeListValue.getCodeListValueId()));
+
+        ULong codeListValueManifestId = dslContext.insertInto(CODE_LIST_VALUE_MANIFEST)
+                .set(codeListValueManifestRecord)
+                .returning(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID)
+                .fetchOne().getCodeListValueManifestId();
+    }
 }
