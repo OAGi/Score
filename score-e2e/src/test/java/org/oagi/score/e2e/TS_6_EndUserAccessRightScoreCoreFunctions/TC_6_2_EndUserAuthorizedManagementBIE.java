@@ -2718,7 +2718,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
-            accGroupType = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "QA");
+            accGroupType = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "WIP");
             bccpFromtheGroup = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accGroupType, bccpFromtheGroup, "Production");
             asccp = coreComponentAPI.createRandomASCCP(accGroupType, usera, namespace, "Production");
