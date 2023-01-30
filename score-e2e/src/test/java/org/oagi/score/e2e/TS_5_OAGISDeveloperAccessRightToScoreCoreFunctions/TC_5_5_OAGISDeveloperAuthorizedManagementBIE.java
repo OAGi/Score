@@ -2329,9 +2329,6 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         SelectAssociationDialog selectAssociationDialog =
                 ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectAssociationDialog.selectAssociation("Validation Indicator. Indicator");
@@ -2404,9 +2401,6 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         SelectAssociationDialog selectAssociationDialog =
                 ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectAssociationDialog.selectAssociation("Validation Indicator. Indicator");
