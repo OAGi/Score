@@ -47,7 +47,7 @@ public interface BusinessTermAPI {
      * Create the business term as requested.
      *
      * @param businessTerm business term object
-     * @param creator         account who creates this context category
+     * @param creator         account who creates this business term
      * @return a created business term object
      */
     BusinessTermObject createRandomBusinessTerm(BusinessTermObject businessTerm,
