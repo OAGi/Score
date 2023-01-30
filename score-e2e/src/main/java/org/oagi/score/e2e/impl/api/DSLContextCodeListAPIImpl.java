@@ -320,7 +320,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                         .fetchOneInto(ULong.class);
 
         CodeListManifestRecord codeListManifestRecord = new CodeListManifestRecord();
-        codeListManifestRecord.setBasedCodeListManifestId(ULong.valueOf(codeList.getBasedCodeListManifestId()));
+        codeListManifestRecord.setBasedCodeListManifestId(codeList.getBasedCodeListManifestId() != null ? ULong.valueOf(codeList.getBasedCodeListManifestId()) : null);
         codeListManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
         codeListManifestRecord.setCodeListId(ULong.valueOf(codeList.getCodeListId()));
         codeListManifestRecord.setAgencyIdListValueManifestId(agencyIdListValueManifestId);

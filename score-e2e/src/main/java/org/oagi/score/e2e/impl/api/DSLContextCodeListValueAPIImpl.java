@@ -154,7 +154,7 @@ public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
     @Override
     public void addCodeListValueToAnotherRelease(CodeListValueObject codeListValue, CodeListObject codeList, AppUserObject creator, BigInteger newCodeListManifestId, ReleaseObject release) {
         CodeListValueManifestRecord codeListValueManifestRecord = new CodeListValueManifestRecord();
-        codeListValueManifestRecord.setBasedCodeListValueManifestId(ULong.valueOf(codeListValue.getBasedCodeListValueManifestId()));
+        codeListValueManifestRecord.setBasedCodeListValueManifestId(codeListValue.getBasedCodeListValueManifestId() != null ? ULong.valueOf(codeListValue.getBasedCodeListValueManifestId()) : null);
         codeListValueManifestRecord.setCodeListManifestId(ULong.valueOf(newCodeListManifestId));
         codeListValueManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
         codeListValueManifestRecord.setCodeListValueId(ULong.valueOf(codeListValue.getCodeListValueId()));
