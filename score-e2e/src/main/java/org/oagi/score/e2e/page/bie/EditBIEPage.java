@@ -203,6 +203,13 @@ public interface EditBIEPage extends Page {
         WebElement getOwnerField();
 
         /**
+         * Return the UI element of the 'Business Context' input field.
+         *
+         * @return the UI element of the 'Business Context' input field
+         */
+        WebElement getBusinessContextInputField();
+
+        /**
          * Return the UI elements of the 'Business Context' list.
          *
          * @return the UI elements of the 'Business Context' list
@@ -222,6 +229,20 @@ public interface EditBIEPage extends Page {
          * @param businessContextName a business context name
          */
         void addBusinessContext(String businessContextName);
+
+        /**
+         * Remove a business context.
+         *
+         * @param businessContext a business context
+         */
+        void removeBusinessContext(BusinessContextObject businessContext);
+
+        /**
+         * Remove a business context by name.
+         *
+         * @param businessContextName a business context name
+         */
+        void removeBusinessContext(String businessContextName);
 
         /**
          * Return the UI element of the 'Business Term' field.

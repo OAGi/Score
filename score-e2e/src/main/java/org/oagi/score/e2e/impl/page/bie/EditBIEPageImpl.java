@@ -383,6 +383,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
+        public WebElement getBusinessContextInputField() {
+            return elementToBeClickable(getDriver(),
+                    By.xpath("//input[@placeholder = \"Business Context\"]"));
+        }
+
+        @Override
         public List<WebElement> getBusinessContextList() {
             return visibilityOfAllElementsLocatedBy(getDriver(),
                     By.xpath("//mat-chip-list[contains(@aria-label, \"Business Contexts\")]//mat-chip"));
@@ -395,8 +401,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public void addBusinessContext(String businessContextName) {
-            WebElement businessContextInput = elementToBeClickable(getDriver(),
-                    By.xpath("//input[@placeholder = \"Business Context\"]"));
+            WebElement businessContextInput = getBusinessContextInputField();
             // TODO:
             // The <mat-chip-list> for the business context field is not working without clicking the field and typing characters.
             {
@@ -406,6 +411,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             WebElement businessContextButton = elementToBeClickable(getDriver(),
                     By.xpath("//mat-option//span[contains(text(), \"" + businessContextName + "\")]"));
             click(businessContextButton);
+        }
+
+        @Override
+        public void removeBusinessContext(BusinessContextObject businessContext) {
+            removeBusinessContext(businessContext.getName());
+        }
+
+        @Override
+        public void removeBusinessContext(String businessContextName) {
+            WebElement businessContextChipCancelButton = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-chip-list[contains(@aria-label, \"Business Contexts\")]" +
+                            "//mat-chip[contains(text(), \"" + businessContextName + "\")]/mat-icon[text() = \"cancel\"]"));
+            click(businessContextChipCancelButton);
+            assert "Updated".equals(getSnackBarMessage(getDriver()));
         }
 
         @Override
