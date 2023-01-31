@@ -2,12 +2,15 @@ package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -586,6 +589,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private class BBIEPanelImpl implements BBIEPanel {
 
+
         @Override
         public WebElement getBusinessTermField() {
             return getInputFieldByName("Business Term");
@@ -599,6 +603,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getAssignBusinessTermButton(){
             return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]"));
+        }
+
+        @Override
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
+            click(getShowBusinessTermsButton());
+            waitFor(ofMillis(500L));
+            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl((BasePage) this);
+            assert businessTermAssignmentPage.isOpened();
+            return businessTermAssignmentPage;
+
         }
 
         @Override

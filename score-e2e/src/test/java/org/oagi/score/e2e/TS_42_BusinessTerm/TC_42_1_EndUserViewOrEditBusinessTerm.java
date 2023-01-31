@@ -15,6 +15,7 @@ import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
@@ -331,6 +332,10 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         //Assign business term to pre-existing, used BBIE node
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+
+
+
 
 
 
