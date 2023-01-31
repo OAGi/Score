@@ -8,6 +8,8 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.AssignedBusinessTermObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 
+import java.math.BigInteger;
+
 public class DSLContextAssignedBusinessTermAPIImpl implements AssignedBusinessTermAPI {
     private final DSLContext dslContext;
 
@@ -33,6 +35,11 @@ public class DSLContextAssignedBusinessTermAPIImpl implements AssignedBusinessTe
     public AssignedBusinessTermObject createRandomAssignedBusinessTerm(BusinessTermObject businessTerm, ABIEObject aBIE,
                                                                        AppUserObject creator){
         return null;
+    }
+
+    @Override
+    public void deleteAssignedBusinessTermById(BigInteger businessTermID){
+
     }
 
 }

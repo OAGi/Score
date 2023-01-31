@@ -8,7 +8,7 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import java.math.BigInteger;
 
 /**
- * APIs for the business term assignment.
+ * APIs for the assigned business term assignment.
  */
 public interface AssignedBusinessTermAPI {
     /**
@@ -37,6 +37,6 @@ public interface AssignedBusinessTermAPI {
                                                 AppUserObject creator);
 
 
-    void deleteAssignedBusinessTermById(BigInteger businessTerm);
+    void deleteAssignedBusinessTermById(BigInteger businessTermID);
 
 }
