@@ -14,6 +14,7 @@ import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
@@ -311,17 +312,28 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm =
                 getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        //generate random ABIE object
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-        UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(endUser, release);
-        TopLevelASBIEPObject randomASBIE = container.randomTopLevelASBIEs.get(0);
-        //generate random AssignedBusinessTerm object
-        AssignedBusinessTermObject randomAssignedBusinessTerm = getAPIFactory().getAssignedBusinessTermAPI().createRandomAssignedBusinessTerm(
-                randomBusinessTerm, randomASBIE, endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
-        getDriver().manage().window().maximize();
-        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        //Assign business term to pre-existing, used BBIE node
+
+
+
 
 
 
