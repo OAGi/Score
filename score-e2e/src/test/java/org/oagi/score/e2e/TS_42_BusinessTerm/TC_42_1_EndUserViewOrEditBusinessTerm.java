@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.TS_28_HomePage.TC_28_1_BIEsTab;
+import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
@@ -57,7 +59,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         int numberOfQABIEs;
         int numberOfProductionBIEs;
 
-        private List<String> recentBIEs = new ArrayList<>();
+        private List<TopLevelASBIEPObject> randomTopLevelASBIEs = new ArrayList<>();
 
         public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
             this(appUser, release, nextInt(1, 3), nextInt(1, 3), nextInt(1, 3));
@@ -74,21 +76,18 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
             for (int i = 0; i < numberOfWIPBIEs; ++i) {
                 String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "WIP");
+                TopLevelASBIEPObject topLevelASBIEP = createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP, release, "WIP");
+                randomTopLevelASBIEs.add(topLevelASBIEP);
             }
             for (int i = 0; i < numberOfQABIEs; ++i) {
                 String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "QA");
+                TopLevelASBIEPObject topLevelASBIEP = createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP, release, "QA");
+                randomTopLevelASBIEs.add(topLevelASBIEP);
             }
             for (int i = 0; i < numberOfProductionBIEs; ++i) {
                 String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "Production");
+                TopLevelASBIEPObject topLevelASBIEP = createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP, release, "Production");
+                randomTopLevelASBIEs.add(topLevelASBIEP);
             }
         }
 
@@ -306,10 +305,16 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         //create random assigned business term
         // try click "discard" button
         // assert Forbidden message is displayed
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm =
                 getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        //generate random ABIE object
+
+
+
         getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
