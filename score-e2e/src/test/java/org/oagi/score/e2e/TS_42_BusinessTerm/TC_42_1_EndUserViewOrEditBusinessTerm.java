@@ -10,9 +10,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.ContextMenu;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.BusinessTermObject;
-import org.oagi.score.e2e.obj.ContextCategoryObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
@@ -24,9 +22,11 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.*;
+import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -41,6 +41,71 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
+    }
+
+    private class UserTopLevelASBIEPContainer {
+        static List<String> SAMPLED_ASCCP_DEN_LIST = Arrays.asList(
+                "Coordinate Reference. Sequenced Identifiers",
+                "Account Identifiers. Named Identifiers",
+                "Customer Item Identification. Item Identification",
+                "Change Product Availability. Change Product Availability",
+                "Collaboration Message. Collaboration Message",
+                "Production Data. Production Data");
+        private AppUserObject appUser;
+        private int yieldPointer = 0;
+        int numberOfWIPBIEs;
+        int numberOfQABIEs;
+        int numberOfProductionBIEs;
+
+        private List<String> recentBIEs = new ArrayList<>();
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
+            this(appUser, release, nextInt(1, 3), nextInt(1, 3), nextInt(1, 3));
+        }
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,
+                                           int numberOfWIPBIEs, int numberOfQABIEs, int numberOfProductionBIEs) {
+            this.appUser = appUser;
+            this.numberOfWIPBIEs = numberOfWIPBIEs;
+            this.numberOfQABIEs = numberOfQABIEs;
+            this.numberOfProductionBIEs = numberOfProductionBIEs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+
+            for (int i = 0; i < numberOfWIPBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "WIP");
+            }
+            for (int i = 0; i < numberOfQABIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "QA");
+            }
+            for (int i = 0; i < numberOfProductionBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "Production");
+            }
+        }
+
+        String nextRandomASCCP() {
+            if (this.yieldPointer == SAMPLED_ASCCP_DEN_LIST.size()) {
+                this.yieldPointer = 0;
+            }
+            return SAMPLED_ASCCP_DEN_LIST.get(this.yieldPointer++);
+        }
+    }
+
+    private TopLevelASBIEPObject createTopLevelASBIEPByDEN(AppUserObject creator, BusinessContextObject businessContext,
+                                                           String den, ReleaseObject release, String state) {
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(den, release.getReleaseNumber());
+        return getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext), asccp, creator, state);
     }
 
     @Test
@@ -241,6 +306,15 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         //create random assigned business term
         // try click "discard" button
         // assert Forbidden message is displayed
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm =
+                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        getDriver().manage().window().maximize();
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+
+
 
     }
 
