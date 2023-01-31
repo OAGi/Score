@@ -6,6 +6,13 @@ package org.oagi.score.e2e.api;
 public interface APIFactory extends AutoCloseable {
 
     /**
+     * Return the application settings API.
+     *
+     * @return the application settings API
+     */
+    ApplicationSettingsAPI getApplicationSettingsAPI();
+
+    /**
      * Return the account management API.
      *
      * @return the account management API
