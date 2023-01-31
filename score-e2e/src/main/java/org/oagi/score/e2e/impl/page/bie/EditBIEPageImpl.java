@@ -592,6 +592,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
+        public WebElement getShowBusinessTermsButton(){
+            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
+        }
+
+        @Override
+        public WebElement getAssignBusinessTermButton(){
+            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]"));
+        }
+
+        @Override
         public WebElement getUsedCheckbox() {
             return getCheckboxByName("Used");
         }

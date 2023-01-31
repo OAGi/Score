@@ -437,6 +437,10 @@ public interface EditBIEPage extends Page {
 
         WebElement getBusinessTermField();
 
+        WebElement getShowBusinessTermsButton();
+
+        WebElement getAssignBusinessTermButton();
+
         void toggleUsed();
 
         /**
