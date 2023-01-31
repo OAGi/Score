@@ -312,8 +312,12 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermObject randomBusinessTerm =
                 getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
         //generate random ABIE object
-
-
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(endUser, release);
+        TopLevelASBIEPObject randomASBIE = container.randomTopLevelASBIEs.get(0);
+        //generate random AssignedBusinessTerm object
+        AssignedBusinessTermObject randomAssignedBusinessTerm = getAPIFactory().getAssignedBusinessTermAPI().createRandomAssignedBusinessTerm(
+                randomBusinessTerm, randomASBIE, endUser);
 
         getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
