@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_6_EndUserAccessRightScoreCoreFunctions;
 
+import org.jooq.DataType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -17,6 +18,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
 
@@ -1785,15 +1787,17 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             });
         }
     }
+
     @Test
-    @DisplayName("TC_6_2_TA_8_1")
-    public void test_TA_8_1() {
+    @DisplayName("TC_6_2_TA_8_1_and_TA_8_3")
+    public void test_TA_8_1_and_TA_8_3() {
         ArrayList<CodeListObject> codeListsForTesting = new ArrayList<>();
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         ASCCPObject asccp;
         AppUserObject usera;
         TopLevelASBIEPObject useraBIE;
-        BCCPObject bccp;
+        Map<BCCPObject, DTObject> bccpDTMap = new HashMap<>();
+        ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
         {
             /**
              * Production developer Code List for the latest and older release
@@ -1840,9 +1844,16 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, olderRelease, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Production");
-            coreComponentAPI.appendBCC(acc, bccp, "Production");
+            DTObject dataType_bccp_a = coreComponentAPI.getBDTByGuidAndReleaseNum("f1bf224d9da94fbea2d8e98af95c7a0b", olderRelease.getReleaseNumber());
+            DTObject dataType_bccp_b = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
+            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(dataType_bccp_a, endUserForCC, namespace, "Production");
+            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(dataType_bccp_b, endUserForCC, namespace, "Production");
+            bccpForTesting.add(bccp_a);
+            bccpForTesting.add(bccp_b);
+            bccpDTMap.put(bccp_a, dataType_bccp_a);
+            bccpDTMap.put(bccp_b, dataType_bccp_b);
+            coreComponentAPI.appendBCC(acc, bccp_a, "Production");
+            coreComponentAPI.appendBCC(acc, bccp_b, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -1856,38 +1867,51 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         getDriver().manage().window().maximize();
-        WebElement node = editBIEPage.getNodeByPath(
-                "/" + bccp.getPropertyTerm());
-        assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
-        bbiePanel.toggleUsed();
-        bbiePanel.setValueDomainRestriction("Code");
-        String BIEreleaseNumber = useraBIE.getReleaseNumber();
-        for(CodeListObject codeList : codeListsForTesting){
-            /**
-             * Only production, compatible code lists in the same release as the BIE shall be included, i.e., a code list exists only in a newer release shall not be included.
-             */
-            Boolean exists = getAPIFactory().getCodeListAPI().doesCodeListExistInTheRelease(codeList, BIEreleaseNumber);
-            if(codeList.getState().equals("Production") && exists){
-                bbiePanel.setValueDomain(codeList.getName());
-            }else{
-                assertThrows(TimeoutException.class, () -> {
-                    bbiePanel.setValueDomain(codeList.getName());
-                });
-                escape(getDriver());
+        for (BCCPObject bccp: bccpForTesting){
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            bbiePanel.toggleUsed();
+            bbiePanel.setValueDomainRestriction("Code");
+            String BIEreleaseNumber = useraBIE.getReleaseNumber();
+            DTObject dataType = bccpDTMap.get(bccp);
+            ArrayList<CodeListObject> defaultCodeLists = getAPIFactory().getCoreComponentAPI().getDefaultCodeListsForDT(dataType.getGuid(), dataType.getReleaseId());
+            if (!defaultCodeLists.isEmpty()) {
+                for (CodeListObject cl : defaultCodeLists) {
+                    bbiePanel.setValueDomain(cl.getName());
+                }
+            } else {
+                for (CodeListObject codeList : codeListsForTesting) {
+                    /**
+                     * Only production, compatible code lists in the same release as the BIE shall be included, i.e., a code list exists only in a newer release shall not be included.
+                     */
+
+                    Boolean exists = getAPIFactory().getCodeListAPI().doesCodeListExistInTheRelease(codeList, BIEreleaseNumber);
+                    if (codeList.getState().equals("Production") && exists) {
+                        bbiePanel.setValueDomain(codeList.getName());
+                    } else {
+                        assertThrows(TimeoutException.class, () -> {
+                            bbiePanel.setValueDomain(codeList.getName());
+                        });
+                        escape(getDriver());
+                    }
+
+                }
             }
         }
     }
 
     @Test
-    @DisplayName("TC_6_2_TA_8_2")
-    public void test_TA_8_2() {
+    @DisplayName("TC_6_2_TA_8_2_and_TA_8_3")
+    public void test_TA_8_2_and_TA_8_3() {
         ArrayList<CodeListObject> codeListsForTesting = new ArrayList<>();
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         ASCCPObject asccp;
         AppUserObject usera;
         TopLevelASBIEPObject useraBIE;
-        BCCPObject bccp;
+        Map<BCCPObject, DTObject> bccpDTMap = new HashMap<>();
+        ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
         {
             /**
              * Developer Code List for the latest and older release in WIP state
@@ -1949,9 +1973,16 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, olderRelease, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Production");
-            coreComponentAPI.appendBCC(acc, bccp, "Production");
+            DTObject dataType_bccp_a = coreComponentAPI.getBDTByGuidAndReleaseNum("f1bf224d9da94fbea2d8e98af95c7a0b", olderRelease.getReleaseNumber());
+            DTObject dataType_bccp_b = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
+            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(dataType_bccp_a, endUserForCC, namespace, "Production");
+            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(dataType_bccp_b, endUserForCC, namespace, "Production");
+            bccpForTesting.add(bccp_a);
+            bccpForTesting.add(bccp_b);
+            bccpDTMap.put(bccp_a, dataType_bccp_a);
+            bccpDTMap.put(bccp_b, dataType_bccp_b);
+            coreComponentAPI.appendBCC(acc, bccp_a, "Production");
+            coreComponentAPI.appendBCC(acc, bccp_b, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -1965,186 +1996,51 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         getDriver().manage().window().maximize();
-        WebElement node = editBIEPage.getNodeByPath(
-                "/" + bccp.getPropertyTerm());
-        assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
-        bbiePanel.toggleUsed();
-        bbiePanel.setValueDomainRestriction("Code");
-        String BIEreleaseNumber = useraBIE.getReleaseNumber();
-        for(CodeListObject codeList : codeListsForTesting){
-            Boolean exists = getAPIFactory().getCodeListAPI().doesCodeListExistInTheRelease(codeList, BIEreleaseNumber);
-            if(exists){
-                if (codeList.getState().equals("QA") || codeList.getState().equals("WIP")){
-                    /**
-                     * if it is in the WIP or QA state, flag that the code list is being changed (maybe use dark yellow and italicized font – yellow
-                     * like a warning light) (the meaning is the code list is usable but unstable.
-                     */
-                    assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                    escape(getDriver());
+
+        for (BCCPObject bccp : bccpForTesting){
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            bbiePanel.toggleUsed();
+            bbiePanel.setValueDomainRestriction("Code");
+            String BIEreleaseNumber = useraBIE.getReleaseNumber();
+            DTObject dataType = bccpDTMap.get(bccp);
+            ArrayList<CodeListObject> defaultCodeLists = getAPIFactory().getCoreComponentAPI().getDefaultCodeListsForDT(dataType.getGuid(), dataType.getReleaseId());
+            if (!defaultCodeLists.isEmpty()) {
+                for (CodeListObject cl : defaultCodeLists) {
+                    bbiePanel.setValueDomain(cl.getName());
                 }
-                if(codeList.getState().equals("Deleted")){
-                    /**
-                     * If the code list is in Deleted state use Strikethrough font.
-                     */
-                    assertEquals("This code list is deleted", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                    escape(getDriver());
+            } else {
+                /**
+                 * If there is no default code list, all developer code lists in the published state in the same release and end user code lists in the same release shall be
+                 * included. End user code lists shall be displayed in the same way as described in 8.2.
+                 */
+                for (CodeListObject codeList : codeListsForTesting) {
+                    Boolean exists = getAPIFactory().getCodeListAPI().doesCodeListExistInTheRelease(codeList, BIEreleaseNumber);
+                    if (exists) {
+                        if (codeList.getState().equals("QA") || codeList.getState().equals("WIP")) {
+                            /**
+                             * if it is in the WIP or QA state, flag that the code list is being changed (maybe use dark yellow and italicized font – yellow
+                             * like a warning light) (the meaning is the code list is usable but unstable.
+                             */
+                            assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
+                            escape(getDriver());
+                        }
+                        if (codeList.getState().equals("Deleted")) {
+                            /**
+                             * If the code list is in Deleted state use Strikethrough font.
+                             */
+                            assertEquals("This code list is deleted", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
+                            escape(getDriver());
+                        }
+                    } else {
+                        assertThrows(TimeoutException.class, () -> {
+                            bbiePanel.setValueDomain(codeList.getName());
+                        });
+                        escape(getDriver());
+                    }
                 }
-            }else{
-                assertThrows(TimeoutException.class, () -> {
-                    bbiePanel.setValueDomain(codeList.getName());
-                });
-                escape(getDriver());
-            }
-        }
-    }
-
-    @Test
-    @DisplayName("TC_6_2_TA_8_3")
-    public void test_TA_8_3() {
-        ArrayList<CodeListObject> codeListsForTesting = new ArrayList<>();
-        Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
-        ASCCPObject asccp;
-        AppUserObject usera;
-        TopLevelASBIEPObject useraBIE;
-        BCCPObject bccp;
-        {
-            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-            AppUserObject developerUserForCodeList = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerUserForCodeList);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerUserForCodeList);
-            /**
-             * Production developer Code List for the latest and older release
-             */
-
-            CodeListObject developerCodeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, latestRelease, "Production");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(developerCodeListLatestRelease, developerUserForCodeList);
-            getAPIFactory().getCodeListAPI().addCodeListToAnotherRelease(developerCodeListLatestRelease, olderRelease, developerUserForCodeList);
-            codeListsForTesting.add(developerCodeListLatestRelease);
-            codeListReleaseMap.put(developerCodeListLatestRelease, latestRelease);
-
-            CodeListObject developerCodeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, olderRelease, "Production");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(developerCodeListOlderRelease, developerUserForCodeList);
-            codeListsForTesting.add(developerCodeListOlderRelease);
-            codeListReleaseMap.put(developerCodeListOlderRelease, olderRelease);
-
-            /**
-             * Developer Code List for the latest and older release in WIP state
-             */
-            CodeListObject developerWIPCodeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, latestRelease, "WIP");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(developerWIPCodeListLatestRelease, developerUserForCodeList);
-            codeListsForTesting.add(developerWIPCodeListLatestRelease);
-            codeListReleaseMap.put(developerWIPCodeListLatestRelease, latestRelease);
-
-            CodeListObject developerWIPCodeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, olderRelease, "WIP");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(developerWIPCodeListOlderRelease, developerUserForCodeList);
-            codeListsForTesting.add(developerWIPCodeListOlderRelease);
-            codeListReleaseMap.put(developerWIPCodeListOlderRelease, olderRelease);
-
-            /**
-             * Production end-user Code List for the latest and older release
-             */
-            AppUserObject endUserForCodeList = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(endUserForCodeList);
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserForCodeList);
-
-            CodeListObject endUserCodeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, latestRelease, "Production");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserCodeListLatestRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserCodeListLatestRelease);
-            codeListReleaseMap.put(endUserCodeListLatestRelease, latestRelease);
-
-            CodeListObject endUserCodeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, olderRelease, "Production");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserCodeListOlderRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserCodeListOlderRelease);
-            codeListReleaseMap.put(endUserCodeListOlderRelease, olderRelease);
-
-            /**
-             * End-user Code List for the latest and older release in QA state
-             */
-            CodeListObject endUserWIPCodeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, latestRelease, "QA");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserWIPCodeListLatestRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserWIPCodeListLatestRelease);
-            codeListReleaseMap.put(endUserWIPCodeListLatestRelease, latestRelease);
-            getAPIFactory().getCodeListAPI().addCodeListToAnotherRelease(endUserWIPCodeListLatestRelease, olderRelease, endUserForCodeList);
-
-            CodeListObject endUserWIPCodeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, olderRelease, "QA");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserWIPCodeListOlderRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserWIPCodeListOlderRelease);
-            codeListReleaseMap.put(endUserWIPCodeListOlderRelease, olderRelease);
-
-            /**
-             * Deleted end-user Code List for the latest and older release
-             */
-            CodeListObject endUserDeletedCodeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, olderRelease, "Deleted");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserDeletedCodeListOlderRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserDeletedCodeListOlderRelease);
-            codeListReleaseMap.put(endUserDeletedCodeListOlderRelease, olderRelease);
-
-            CodeListObject endUserDeletedCodeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserForCodeList, namespace, latestRelease, "Deleted");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(endUserDeletedCodeListLatestRelease, developerUserForCodeList);
-            codeListsForTesting.add(endUserDeletedCodeListLatestRelease);
-            codeListReleaseMap.put(endUserDeletedCodeListLatestRelease, latestRelease);
-
-            /**
-             * Create CC and BIE
-             */
-            AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(endUserForCC);
-
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-            ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, olderRelease, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Production");
-            coreComponentAPI.appendBCC(acc, bccp, "Production");
-            asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
-
-            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(usera);
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-
-        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
-        getDriver().manage().window().maximize();
-        WebElement node = editBIEPage.getNodeByPath(
-                "/" + bccp.getPropertyTerm());
-        assertTrue(node.isDisplayed());
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
-        bbiePanel.toggleUsed();
-        bbiePanel.setValueDomainRestriction("Code");
-        String BIEreleaseNumber = useraBIE.getReleaseNumber();
-        for(CodeListObject codeList : codeListsForTesting){
-            Boolean exists = getAPIFactory().getCodeListAPI().doesCodeListExistInTheRelease(codeList, BIEreleaseNumber);
-            if(exists){
-                if(codeList.getState().equals("Production")){
-                    bbiePanel.setValueDomain(codeList.getName());
-                }
-                if (codeList.getState().equals("QA") || codeList.getState().equals("WIP")){
-                    /**
-                     * if it is in the WIP or QA state, flag that the code list is being changed (maybe use dark yellow and italicized font – yellow
-                     * like a warning light) (the meaning is the code list is usable but unstable.
-                     */
-                    assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                    escape(getDriver());
-                }
-                if(codeList.getState().equals("Deleted")){
-                    /**
-                     * If the code list is in Deleted state use Strikethrough font.
-                     */
-                    assertEquals("This code list is deleted", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                    escape(getDriver());
-                }
-            }else{
-                assertThrows(TimeoutException.class, () -> {
-                    bbiePanel.setValueDomain(codeList.getName());
-                });
-                escape(getDriver());
             }
         }
     }
@@ -2167,7 +2063,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
-            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ;
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -2204,7 +2101,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
-            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);;
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ;
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -2379,7 +2277,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
-            coreComponentAPI.appendASCC(accTopLevel,asccp, "Production");
+            coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
 
             asccpTopLevel = coreComponentAPI.createRandomASCCP(accTopLevel, usera, namespace, "Production");
 
@@ -2519,7 +2417,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
-            coreComponentAPI.appendASCC(accTopLevel,asccp, "Production");
+            coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
 
             asccpTopLevel = coreComponentAPI.createRandomASCCP(accTopLevel, usera, namespace, "Production");
 
@@ -2660,7 +2558,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
-            coreComponentAPI.appendASCC(accTopLevel,asccp, "Production");
+            coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
 
             asccpTopLevel = coreComponentAPI.createRandomASCCP(accTopLevel, usera, namespace, "Production");
 
@@ -3085,7 +2983,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bccpFromtheGroup = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accGroupType, bccpFromtheGroup, "Production");
             asccp = coreComponentAPI.createRandomASCCP(accGroupType, usera, namespace, "Production");
-            coreComponentAPI.appendASCC(accTopLevel,asccp, "Production");
+            coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
 
             asccpTopLevel = coreComponentAPI.createRandomASCCP(accTopLevel, usera, namespace, "Production");
 
@@ -3105,7 +3003,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         /**
          * If any child or descendant properties are from group and the group is not in Production state, those properties have to be locked in the BIE.
          */
-        assertThrows(TimeoutException.class, ()->{
+        assertThrows(TimeoutException.class, () -> {
             editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccpFromtheGroup.getPropertyTerm());
         });
         WebElement node = editBIEPage.getNodeByPath(
