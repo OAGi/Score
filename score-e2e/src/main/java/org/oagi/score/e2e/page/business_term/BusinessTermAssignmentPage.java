@@ -1,7 +1,4 @@
 package org.oagi.score.e2e.page.business_term;
-
-import org.oagi.score.e2e.obj.AssignedBusinessTermObject;
-import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -62,9 +59,11 @@ public interface BusinessTermAssignmentPage extends Page {
     WebElement getTypeField();
 
     /**
-     * Set the 'Type' field
+     * Set the 'Type' select field with the given text.
+     *
+     * @param bieType BBIE or ASBIE
      */
-    void setType();
+    void setType(String bieType);
 
     /**
      *Return the UI element of the 'BIE DEN' field
@@ -188,8 +187,8 @@ public interface BusinessTermAssignmentPage extends Page {
     /**
      * Discard the business term.
      *
-     * @return 'View/Edit Business Term' page object
+     * @return 'Business Term Assignment' page object
      */
-    ViewEditBusinessTermPage discardBusinessTerm();
+    BusinessTermAssignmentPage discardBusinessTerm();
 
 }
