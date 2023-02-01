@@ -20,9 +20,9 @@ public interface AssignBusinessTermPage extends BasePage {
     /**
      * Set the 'Branch' select field
      *
-     * @param
+     * @param branch Branch name
      */
-    void setBranch();
+    void setBranch(String branch);
 
     /**
      * Return the UI element of the 'State' select field.
