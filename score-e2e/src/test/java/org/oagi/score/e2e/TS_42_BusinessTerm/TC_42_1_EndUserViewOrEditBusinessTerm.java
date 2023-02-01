@@ -338,6 +338,18 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
         click(assignBusinessTermBTPage.getCreateButton());
 
+        businessTermAssignmentPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        click(businessTermAssignmentPage.getSearchButton());
+        businessTermAssignmentPage.getSelectCheckboxAtIndex(0);
+        assertTrue(businessTermAssignmentPage.getDiscardButton().isEnabled());
+        click(businessTermAssignmentPage.getDiscardButton());
+
+        assertTrue(getDriver().findElement(
+                        By.xpath("//*[contains(text(), \"The business term is used.\")]"))
+                .isDisplayed());
+
+
+
 
 
     }

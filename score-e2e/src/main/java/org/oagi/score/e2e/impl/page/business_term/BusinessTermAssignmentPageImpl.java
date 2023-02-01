@@ -237,4 +237,21 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
         assert getSnackBar(getDriver(), "Discarded").isDisplayed();
         return this;
     }
+
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public WebElement getSelectCheckboxAtIndex(int idx) {
+        WebElement tr = getTableRecordAtIndex(idx);
+        WebElement td = getColumnByName(tr, "select");
+        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+    }
 }

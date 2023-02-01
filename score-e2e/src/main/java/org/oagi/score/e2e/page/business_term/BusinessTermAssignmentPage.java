@@ -191,4 +191,28 @@ public interface BusinessTermAssignmentPage extends Page {
      */
     BusinessTermAssignmentPage discardBusinessTerm();
 
+    /**
+     * Return the UI element of the table record at the given index, which starts from 1.
+     *
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
+     */
+    WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Return the UI element of the column of the given table record with the column name.
+     *
+     * @param tableRecord the table record
+     * @param columnName  the column name
+     * @return the UI element of the column
+     */
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    /**
+     * Return the UI checkbox for select at given index
+     * @param idx index
+     * @return the UI checkbox element
+     */
+    WebElement getSelectCheckboxAtIndex(int idx);
+
 }
