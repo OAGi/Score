@@ -217,8 +217,8 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
         click(getAssignBusinessTermButton());
         AssignBusinessTermPage assignBusinessTermPage =
                 new AssignBusinessTermPageImpl(this);
-        assert AssignBusinessTermPage.isOpened();
-        return AssignBusinessTermPage;
+        assert assignBusinessTermPage.isOpened();
+        return assignBusinessTermPage;
 
     }
 
