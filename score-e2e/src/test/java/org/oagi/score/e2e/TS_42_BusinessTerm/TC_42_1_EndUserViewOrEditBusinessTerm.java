@@ -330,11 +330,12 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
         click(assignBusinessTermBIEPage.getSearchButton());
-        WebElement tr = assignBusinessTermBIEPage.getTableRecordAtIndex(0);
-        WebElement td = assignBusinessTermBIEPage.getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(0));
 
-
+        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
+        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        click(assignBusinessTermBTPage.getSearchButton());
+        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
 
 
 

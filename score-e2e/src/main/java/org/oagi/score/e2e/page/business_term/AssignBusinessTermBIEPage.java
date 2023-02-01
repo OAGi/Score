@@ -189,6 +189,13 @@ public interface AssignBusinessTermBIEPage extends BasePage {
     WebElement getCheckboxByName(String name);
 
     /**
+     * Return the UI checkbox for select at given index
+     * @param idx index
+     * @return the UI checkbox element
+     */
+    WebElement getSelectCheckboxAtIndex(int idx);
+
+    /**
      * Move the table to the next page via the pagination.
      */
     void goToNextPage();

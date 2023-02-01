@@ -126,6 +126,13 @@ public interface AssignBusinessTermBTPage extends BasePage {
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
     /**
+     * Return the UI checkbox for select at given index
+     * @param idx index
+     * @return the UI checkbox element
+     */
+    WebElement getSelectCheckboxAtIndex(int idx);
+
+    /**
      * Move the table to the next page via the pagination.
      */
     void goToNextPage();
