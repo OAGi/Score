@@ -109,21 +109,29 @@ public interface HomePage extends Page {
 
     void setBranch(String branch);
 
+    TotalBIEsByStatesPanel openTotalBIEsByStatesPanel();
+
+    MyBIEsByStatesPanel openMyBIEsByStatesPanel();
+
+    BIEsByUsersAndStatesPanel openBIEsByUsersAndStatesPanel();
+
+    MyRecentBIEsPanel openMyRecentBIEsPanel();
+
+    TotalUEsByStatesPanel openTotalUEsByStatesPanel();
+
+    UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
+
     interface TotalBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
         ViewEditBIEPage clickStateProgressBar(String state);
     }
 
-    TotalBIEsByStatesPanel openTotalBIEsByStatesPanel();
-
     interface MyBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
         ViewEditBIEPage clickStateProgressBar(String state);
     }
-
-    MyBIEsByStatesPanel openMyBIEsByStatesPanel();
 
     interface BIEsByUsersAndStatesPanel {
 
@@ -176,15 +184,13 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit BIE' page by clicking the cell in the table based on the username and the column name.
          *
-         * @param user the username
+         * @param user       the username
          * @param columnName "WIP", "QA", "Production", and "total"
          * @return the 'View/Edit BIE' page object
          */
         ViewEditBIEPage openViewEditBIEPageByUsernameAndColumnName(String user, String columnName);
 
     }
-
-    BIEsByUsersAndStatesPanel openBIEsByUsersAndStatesPanel();
 
     interface MyRecentBIEsPanel {
 
@@ -230,8 +236,6 @@ public interface HomePage extends Page {
 
     }
 
-    MyRecentBIEsPanel openMyRecentBIEsPanel();
-
     interface TotalUEsByStatesPanel {
 
         WebElement getStateProgressBarByState(String state);
@@ -239,8 +243,6 @@ public interface HomePage extends Page {
         ViewEditCoreComponentPage clickStateProgressBar(String state);
 
     }
-
-    TotalUEsByStatesPanel openTotalUEsByStatesPanel();
 
     interface UEsByUsersAndStatesPanel {
 
@@ -293,14 +295,12 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the username and the column name.
          *
-         * @param user the username
+         * @param user       the username
          * @param columnName "WIP", "QA", "Production", "Deleted" and "total"
          * @return the 'View/Edit Core Component' page object
          */
         ViewEditCoreComponentPage openViewEditCCPageByUsernameAndColumnName(String user, String columnName);
 
     }
-
-    UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
 
 }

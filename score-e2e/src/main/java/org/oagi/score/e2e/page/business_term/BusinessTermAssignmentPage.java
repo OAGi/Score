@@ -169,7 +169,7 @@ public interface BusinessTermAssignmentPage extends Page {
      *
      * @return 'Assign Business Term' page object
      */
-    AssignBusinessTermPage assignBusinessTerm();
+    AssignBusinessTermBIEPage assignBusinessTerm();
 
     /**
      * Return the UI element of the 'Search By Selected BIE' button

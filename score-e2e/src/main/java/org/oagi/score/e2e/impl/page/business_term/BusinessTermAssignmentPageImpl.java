@@ -2,10 +2,8 @@ package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.business_term.AssignBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
-import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
-import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -213,10 +211,10 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     }
 
     @Override
-    public AssignBusinessTermPage assignBusinessTerm() {
+    public AssignBusinessTermBIEPage assignBusinessTerm() {
         click(getAssignBusinessTermButton());
-        AssignBusinessTermPage assignBusinessTermPage =
-                new AssignBusinessTermPageImpl(this);
+        AssignBusinessTermBIEPage assignBusinessTermPage =
+                new AssignBusinessTermBIEPageImpl(this);
         assert assignBusinessTermPage.isOpened();
         return assignBusinessTermPage;
 

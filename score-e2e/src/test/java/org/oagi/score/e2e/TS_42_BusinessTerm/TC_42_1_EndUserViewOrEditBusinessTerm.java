@@ -8,18 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.TS_28_HomePage.TC_28_1_BIEsTab;
-import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
-import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
-import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
-import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
-import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
-import org.oagi.score.e2e.page.context.EditContextCategoryPage;
+import org.oagi.score.e2e.page.business_term.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -333,6 +326,10 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         bbiePanel.toggleUsed();
         //Assign business term to pre-existing, used BBIE node
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
+        AssignBusinessTermBIEPage assignBusinessTermPage = businessTermAssignmentPage.assignBusinessTerm();
+
+
 
 
 

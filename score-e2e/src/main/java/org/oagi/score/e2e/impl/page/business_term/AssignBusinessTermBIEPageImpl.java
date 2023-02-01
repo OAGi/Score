@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.page.business_term.AssignBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class AssignBusinessTermPageImpl extends BasePageImpl implements AssignBusinessTermPage {
+public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements AssignBusinessTermBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::div[1]/mat-select[1]");
@@ -51,7 +51,7 @@ public class AssignBusinessTermPageImpl extends BasePageImpl implements AssignBu
 
     private final BusinessTermAssignmentPageImpl parent;
 
-    public AssignBusinessTermPageImpl(BusinessTermAssignmentPageImpl parent) {
+    public AssignBusinessTermBIEPageImpl(BusinessTermAssignmentPageImpl parent) {
         super(parent);
         this.parent = parent;
     }

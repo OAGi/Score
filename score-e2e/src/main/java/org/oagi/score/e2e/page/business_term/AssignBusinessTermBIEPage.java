@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * An interface for 'Assign Business Term' page
  */
-public interface AssignBusinessTermPage extends BasePage {
+public interface AssignBusinessTermBIEPage extends BasePage {
 
     /**
      * Return the UI element of the 'Branch' select field.
