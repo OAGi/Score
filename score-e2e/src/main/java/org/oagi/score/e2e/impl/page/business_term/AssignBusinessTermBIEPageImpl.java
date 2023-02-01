@@ -64,12 +64,17 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
         String url = getPageUrl();
         getDriver().get(url);
         assert "Assign Business Term".equals(getText(getTitle()));
+        assert "Select BIE".equals(getText(getSubTitle()));
 
     }
 
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+    }
+
+    public WebElement getSubTitle() {
+        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
     }
 
     @Override
