@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -49,6 +50,9 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+
+    private static final By NEXT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
 
     private final BusinessTermAssignmentPageImpl parent;
 
@@ -230,6 +234,12 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     }
 
     @Override
+    public WebElement getCheckboxByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+    }
+
+    @Override
     public void goToNextPage() {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
@@ -241,5 +251,21 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
+    }
+
+    @Override
+    public WebElement getNextButton() {
+        return elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public AssignBusinessTermBTPage hitNextButton() {
+        click(getNextButton());
+        waitFor(ofMillis(500L));
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(this);
+        assert assignBusinessTermBTPage.isOpened();
+        return assignBusinessTermBTPage;
     }
 }

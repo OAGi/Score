@@ -1,9 +1,12 @@
 package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.page.BasePage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
+
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 /**
  * An interface for 'Assign Business Term' page
@@ -179,6 +182,13 @@ public interface AssignBusinessTermBIEPage extends BasePage {
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
     /**
+     * Return the UI checkbox element in front of the given name
+     * @param name
+     * @return the UI checkbox element
+     */
+    WebElement getCheckboxByName(String name);
+
+    /**
      * Move the table to the next page via the pagination.
      */
     void goToNextPage();
@@ -187,5 +197,18 @@ public interface AssignBusinessTermBIEPage extends BasePage {
      * Move the table to the previous page via the pagination.
      */
     void goToPreviousPage();
+
+    /**
+     * Return the UI element of the 'Next' button.
+     *
+     * @return the UI element of the 'Next' button
+     */
+    WebElement getNextButton();
+
+    /**
+     * Return Assign Business Term page with subtitle: Select Business Term
+     * @return Assign Business Term page
+     */
+    AssignBusinessTermBTPage hitNextButton();
 
 }

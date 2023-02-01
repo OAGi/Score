@@ -328,18 +328,11 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-
-
-
-
-
-
-
-
-
-
-
-
+        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
+        click(assignBusinessTermBIEPage.getSearchButton());
+        WebElement tr = assignBusinessTermBIEPage.getTableRecordAtIndex(0);
+        WebElement td = assignBusinessTermBIEPage.getColumnByName(tr, "select");
+        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
 
 
 
