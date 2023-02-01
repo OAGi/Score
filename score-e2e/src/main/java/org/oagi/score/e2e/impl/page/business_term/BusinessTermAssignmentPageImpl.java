@@ -69,7 +69,7 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/assign_business_term").toString();
+        return getConfig().getBaseUrl().resolve("/business_term_management/assign_business_term").toString();
     }
 
     @Override
