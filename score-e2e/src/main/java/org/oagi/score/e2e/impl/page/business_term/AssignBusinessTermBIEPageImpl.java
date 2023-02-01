@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.business_term;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -55,8 +56,10 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
         super(parent);
         this.parent = parent;
     }
+
     @Override
-    protected String getPageUrl() {return getConfig().getBaseUrl().resolve("/business_term_management/assign_business_term/create").toString();
+    protected String getPageUrl() {
+        return getConfig().getBaseUrl().resolve("/business_term_management/assign_business_term/create").toString();
     }
 
     @Override
@@ -214,5 +217,29 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void goToNextPage() {
+        ((JavascriptExecutor) getDriver())
+                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Next page']")));
+    }
+
+    @Override
+    public void goToPreviousPage() {
+        ((JavascriptExecutor) getDriver())
+                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
     }
 }

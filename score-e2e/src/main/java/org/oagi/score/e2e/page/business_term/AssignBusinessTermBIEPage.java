@@ -161,4 +161,31 @@ public interface AssignBusinessTermBIEPage extends BasePage {
      */
     WebElement getSearchButton();
 
+    /**
+     * Return the UI element of the table record at the given index, which starts from 1.
+     *
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
+     */
+    WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Return the UI element of the column of the given table record with the column name.
+     *
+     * @param tableRecord the table record
+     * @param columnName  the column name
+     * @return the UI element of the column
+     */
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    /**
+     * Move the table to the next page via the pagination.
+     */
+    void goToNextPage();
+
+    /**
+     * Move the table to the previous page via the pagination.
+     */
+    void goToPreviousPage();
+
 }

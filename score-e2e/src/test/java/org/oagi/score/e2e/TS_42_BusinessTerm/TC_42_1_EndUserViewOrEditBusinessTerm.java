@@ -327,7 +327,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         //Assign business term to pre-existing, used BBIE node
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
-        AssignBusinessTermBIEPage assignBusinessTermPage = businessTermAssignmentPage.assignBusinessTerm();
+        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
+
 
 
 
