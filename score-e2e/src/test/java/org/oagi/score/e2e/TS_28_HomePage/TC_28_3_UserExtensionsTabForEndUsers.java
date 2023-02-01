@@ -692,8 +692,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
 
         click(homePage.getScoreLogo()); // to go to the home page again.
-
-        //check the random BCCP nodes for each BIE
         TopLevelASBIEPObject topBIE;
         BCCPObject randomBCCP;
         int loop = 2; //loop twice to check and uncheck the random BCCP nodes for the selected BIE
