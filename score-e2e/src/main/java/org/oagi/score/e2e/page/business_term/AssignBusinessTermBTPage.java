@@ -141,4 +141,31 @@ public interface AssignBusinessTermBTPage extends BasePage {
      * Move the table to the previous page via the pagination.
      */
     void goToPreviousPage();
+
+    /**
+     * Return the UI element of the 'Type Code' field.
+     *
+     * @return the UI element of the 'Type Code' field
+     */
+    WebElement getTypeCodeField();
+
+    /**
+     * Set the 'Type Code' field with the given text.
+     *
+     * @param typeCode Type Code
+     */
+    void setTypeCode(String typeCode);
+
+    /**
+     * Return the UI element of the 'Preferred Business Term' checkbox.
+     * @return the UI element of the 'Preferred Business Term' checkbox
+     */
+    WebElement getPreferredBusinessTermCheckbox();
+
+    /**
+     * Return the UI element of the 'Create' button.
+     *
+     * @return the UI element of the 'Create' button
+     */
+    WebElement getCreateButton();
 }
