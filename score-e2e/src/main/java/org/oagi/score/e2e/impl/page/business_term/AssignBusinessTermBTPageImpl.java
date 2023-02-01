@@ -47,6 +47,9 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
     private static final By PREFERRED_BUSINESS_TERM_CHECKBOX_LOCATOR =
             By.xpath("//span[contains(text(), \"Preferred Business Term\")]//ancestor::mat-checkbox[1]");
 
+    private static final By CREATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
+
     private final AssignBusinessTermBIEPage parent;
 
     public AssignBusinessTermBTPageImpl(AssignBusinessTermBIEPage parent) {
@@ -192,21 +195,21 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
 
     @Override
     public WebElement getTypeCodeField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), TYPE_CODE_FIELD_LOCATOR);
     }
 
     @Override
     public void setTypeCode(String typeCode) {
-
+        sendKeys(getTypeCodeField(), typeCode);
     }
 
     @Override
     public WebElement getPreferredBusinessTermCheckbox() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), PREFERRED_BUSINESS_TERM_CHECKBOX_LOCATOR);
     }
 
     @Override
     public WebElement getCreateButton() {
-        return null;
+        return elementToBeClickable(getDriver(), CREATE_BUTTON_LOCATOR);
     }
 }
