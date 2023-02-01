@@ -723,8 +723,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             ViewEditCoreComponentPage viewEditCoreComponentPage = myUnusedUEsInBIEsPanel.openViewEditCCPageByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
             assertTrue(viewEditCoreComponentPage.isOpened());
         }
-
-
     }
 
     @AfterEach
