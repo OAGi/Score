@@ -348,6 +348,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                         By.xpath("//*[contains(text(), \"The business term is used.\")]"))
                 .isDisplayed());
 
+        assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
+
 
 
 
