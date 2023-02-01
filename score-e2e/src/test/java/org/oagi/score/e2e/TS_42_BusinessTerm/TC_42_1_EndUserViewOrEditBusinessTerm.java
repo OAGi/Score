@@ -336,6 +336,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         click(assignBusinessTermBTPage.getSearchButton());
         click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBTPage.getCreateButton());
 
 
 
