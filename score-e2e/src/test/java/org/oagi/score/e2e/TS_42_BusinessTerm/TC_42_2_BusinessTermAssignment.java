@@ -26,8 +26,53 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_33_1_1")
-    public void developer_can_not_use_this_functionality() {
+    @DisplayName("TC_42_2_1")
+    public void enduser_should_open_page_titled_business_term_assignment_under_bie_menu() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_2")
+    public void enduser_can_view_all_business_terms_with_assignments_on_business_term_assignment_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_3")
+    public void enduser_can_view_asbies_bbies_and_toplevelbies_on_business_term_assignment_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_4")
+    public void enduser_can_search_business_term_assignments_by_bietype_and_den_or_business_term_or_uri_or_typecode_on_business_term_assigment_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_5")
+    public void enduser_can_filter_only_preferred_business_terms_on_business_term_assignment_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_6")
+    public void enduser_can_select_bie_to_view_all_business_term_assignments_assigned_for_that_bie_on_business_term_assignment_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_7")
+    public void enduser_can_select_bie_to_view_all_business_term_not_assigned_but_available_for_that_bie_on_assign_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_8")
+    public void enduser_can_filter_business_terms_already_assigned_to_the_same_core_component_on_assign_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_9")
+    public void enduser_can_assign_duplicate_business_term_and_type_code_based_on_mixed_conditions_on_assign_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_2_10")
+    public void enduser_can_only_set_one_preferred_business_term_assignment_for_each_bie_on_assign_business_term_page() {
     }
 
     @AfterEach
