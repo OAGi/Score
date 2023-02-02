@@ -167,6 +167,8 @@ public interface ViewEditBusinessTermPage extends Page {
      */
     WebElement getDiscardButton();
 
+
+
     /**
      * Open the 'Create Business Term' page.
      *

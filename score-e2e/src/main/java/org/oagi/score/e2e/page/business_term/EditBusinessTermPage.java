@@ -2,6 +2,7 @@ package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -126,6 +127,13 @@ public interface EditBusinessTermPage extends Page {
      * @return the UI element of the 'Discard' button
      */
     WebElement getDiscardButton();
+
+    /**
+     * Discard the business term
+     *
+     * @return 'View/Edit Business Term' page object
+     */
+    ViewEditBusinessTermPage discard();
 
     /**
      * Discard the business term.

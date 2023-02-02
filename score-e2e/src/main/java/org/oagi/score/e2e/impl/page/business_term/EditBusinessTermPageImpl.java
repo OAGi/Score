@@ -7,6 +7,7 @@ import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
+import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -143,6 +144,16 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     @Override
     public WebElement getDiscardButton() {
         return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public ViewEditBusinessTermPage discard() {
+        click(getDiscardButton());
+        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardButton);
+        return this.parent;
     }
 
     @Override

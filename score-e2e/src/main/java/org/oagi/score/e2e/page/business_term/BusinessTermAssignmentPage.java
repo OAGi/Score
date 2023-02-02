@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.business_term;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -183,6 +184,7 @@ public interface BusinessTermAssignmentPage extends Page {
      * @return the UI element of the 'Discard' button
      */
     WebElement getDiscardButton();
+
 
     /**
      * Discard the business term.

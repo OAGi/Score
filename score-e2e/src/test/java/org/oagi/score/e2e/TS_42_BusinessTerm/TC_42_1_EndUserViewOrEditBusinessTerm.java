@@ -9,10 +9,12 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.business_term.*;
+import org.oagi.score.e2e.page.context.EditContextSchemePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -294,12 +296,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_9")
     public void enduser_cannot_discard_business_term_in_edit_business_term_page_if_it_is_used_in_assignments() {
-
-        //create random business term
-        //create random BBIE or ASBIE
-        //create random assigned business term
-        // try click "discard" button
-        // assert Forbidden message is displayed
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -338,22 +334,13 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
         click(assignBusinessTermBTPage.getCreateButton());
 
-        businessTermAssignmentPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        click(businessTermAssignmentPage.getSearchButton());
-        businessTermAssignmentPage.getSelectCheckboxAtIndex(0);
-        assertTrue(businessTermAssignmentPage.getDiscardButton().isEnabled());
-        click(businessTermAssignmentPage.getDiscardButton());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        EditBusinessTermPage editBusinessTermPage =
+                bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
-        assertTrue(getDriver().findElement(
-                        By.xpath("//*[contains(text(), \"The business term is used.\")]"))
-                .isDisplayed());
+        assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
 
         assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
-
-
-
-
-
     }
 
     @Test
