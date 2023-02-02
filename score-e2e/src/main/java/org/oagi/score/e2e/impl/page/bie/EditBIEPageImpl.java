@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.bie;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
+import org.oagi.score.e2e.impl.page.business_term.ViewEditBusinessTermPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
@@ -75,10 +76,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             By.xpath("//mat-dialog-container//p");
 
     private final TopLevelASBIEPObject asbiep;
+    private BasePage parent;
 
     public EditBIEPageImpl(BasePage parent, TopLevelASBIEPObject asbiep) {
         super(parent);
         this.asbiep = asbiep;
+        this.parent = parent;
     }
 
     @Override
@@ -588,8 +591,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private class BBIEPanelImpl implements BBIEPanel {
-
-
         @Override
         public WebElement getBusinessTermField() {
             return getInputFieldByName("Business Term");
@@ -606,13 +607,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton(String bieDen) {
             click(getShowBusinessTermsButton());
             waitFor(ofMillis(500L));
-            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl((BasePage) this);
+            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent);
+            businessTermAssignmentPage.setBIEDenField(bieDen);
+            click(businessTermAssignmentPage.getSearchButton());
             assert businessTermAssignmentPage.isOpened();
             return businessTermAssignmentPage;
-
         }
 
         @Override

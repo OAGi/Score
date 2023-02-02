@@ -308,7 +308,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
-
+        getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP);
@@ -319,7 +319,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         //Assign business term to pre-existing, used BBIE node
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton(bbieNode.getText());
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
@@ -369,7 +369,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         //Assign business term to pre-existing, used BBIE node
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton(bbieNode.getText());
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());

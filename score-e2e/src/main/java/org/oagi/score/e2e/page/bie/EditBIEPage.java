@@ -442,7 +442,7 @@ public interface EditBIEPage extends Page {
 
         WebElement getAssignBusinessTermButton();
 
-        BusinessTermAssignmentPage clickShowBusinessTermsButton();
+        BusinessTermAssignmentPage clickShowBusinessTermsButton(String bieDen);
 
         void toggleUsed();
 
