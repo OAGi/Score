@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
@@ -613,14 +614,17 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public BusinessTermAssignmentPage clickShowBusinessTermsButton(String bieDen) {
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
             click(getShowBusinessTermsButton());
             waitFor(ofMillis(500L));
             BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent);
-            businessTermAssignmentPage.setBIEDenField(bieDen);
-            click(businessTermAssignmentPage.getSearchButton());
             assert businessTermAssignmentPage.isOpened();
             return businessTermAssignmentPage;
+        }
+
+        @Override
+        public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
+            return null;
         }
 
         @Override

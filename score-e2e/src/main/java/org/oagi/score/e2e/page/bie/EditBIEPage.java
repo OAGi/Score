@@ -2,6 +2,7 @@ package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
@@ -442,7 +443,9 @@ public interface EditBIEPage extends Page {
 
         WebElement getAssignBusinessTermButton(boolean enabled);
 
-        BusinessTermAssignmentPage clickShowBusinessTermsButton(String bieDen);
+        BusinessTermAssignmentPage clickShowBusinessTermsButton();
+
+        AssignBusinessTermBTPage clickAssignBusinessTermButton();
 
         void toggleUsed();
 

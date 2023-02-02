@@ -321,8 +321,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         editBIEPage.hitUpdateButton();
         //Assign business term to pre-existing, used BBIE node
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-
-
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
         click(assignBusinessTermBIEPage.getSearchButton());
@@ -371,7 +371,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         //Assign business term to pre-existing, used BBIE node
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton(bbieNode.getText());
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
