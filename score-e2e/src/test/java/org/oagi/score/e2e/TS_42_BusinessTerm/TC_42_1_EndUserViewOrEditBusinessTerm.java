@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.business_term.*;
 import org.oagi.score.e2e.page.context.EditContextSchemePage;
+import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -346,14 +347,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     @Test
     @DisplayName("TC_42_1_10")
     public void enduser_can_discard_business_term_in_edit_business_term_page_if_not_used_in_any_assignments() {
-        //create random business term
-        //create random BBIE or ABIE
-        //create random assigned business term
-        // try click "discard" button
-        // assert Forbidden message is displayed
-        //delete the assignment
-        // re-click "discard" button
-        // assert the business term is permanently removed.
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -397,6 +390,13 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
         assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
+
+        //remove the assignment
+        businessTermAssignmentPage.discardAssignment(bbieNode.getText(), randomBusinessTerm, "");
+        ViewEditBusinessTermPage viewEditBusinessTermPage = editBusinessTermPage.discardBusinessTerm();
+        assertThrows(NoSuchElementException.class, () -> {
+            viewEditBusinessTermPage.openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+        });
 
     }
 
