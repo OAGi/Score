@@ -173,7 +173,6 @@ public interface ACCViewEditPage extends Page {
 
     public void expandTree(String nodeName);
 
-
     void goToNode(String nodeName);
 
     String getCardinalityLabel();
@@ -189,4 +188,5 @@ public interface ACCViewEditPage extends Page {
     void moveToQA();
 
     WebElement getMoveToQAButton(boolean enabled);
+
 }

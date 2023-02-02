@@ -3,7 +3,6 @@ package org.oagi.score.e2e.impl.page.bie;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
-import org.oagi.score.e2e.impl.page.core_component.SelectAssociationDialogImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -20,17 +19,17 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
-    private static final By SEARCH_FIELD_LOCATOR =
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
     private static final By ABIE_LOCAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Locally\")]");
 
     private static final By ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Globally\")]");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
     private static final By SETTINGS_ICON_LOCATOR =
             By.xpath("//mat-icon[text() = \"settings\"]");
@@ -174,16 +173,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public WebElement getSearchField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+    public WebElement getSearchInputTextField() {
+        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
+        click(getSearchInputTextField());
+        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchField());
+        clear(getSearchInputTextField());
         return node;
     }
 
