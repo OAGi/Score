@@ -75,6 +75,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By RESET_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
+    private static final By ASSIGN_BUSINESS_TERM_LOCATOR = By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]");
+
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
 
@@ -602,8 +604,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public WebElement getAssignBusinessTermButton(){
-            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]"));
+        public WebElement getAssignBusinessTermButton(boolean enabled){
+            if (enabled) {
+                return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            } else {
+                return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            }
         }
 
         @Override

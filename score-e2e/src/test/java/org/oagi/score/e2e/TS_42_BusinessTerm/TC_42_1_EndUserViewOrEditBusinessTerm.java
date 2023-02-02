@@ -318,9 +318,11 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
         //Assign business term to pre-existing, used BBIE node
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton(bbieNode.getText());
-        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+
+
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
         click(assignBusinessTermBIEPage.getSearchButton());
