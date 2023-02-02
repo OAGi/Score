@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
@@ -10,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
 
@@ -226,21 +228,40 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     }
 
     @Override
-    public WebElement getDiscardButton() {
-        return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+    public WebElement getDiscardButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), DISCARD_BUTTON_LOCATOR);
+        }
     }
 
     @Override
-    public BusinessTermAssignmentPage discardBusinessTerm() {
-        click(getDiscardButton());
-        click(elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
-        assert getSnackBar(getDriver(), "Discarded").isDisplayed();
-        return this;
+    public void discardAssignment(String bieDEN, BusinessTermObject businessTerm, String typeCode) {
+        setBIEDenField(bieDEN);
+        setBusinessTerm(businessTerm.getBusinessTerm());
+        setTypeCodeField(typeCode);
+        click(getSearchButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+        WebElement tr = getTableRecordByValue(businessTerm.getBusinessTerm());
+        WebElement td = getColumnByName(tr, "select");
+        click(td);
+        click(getDiscardButton(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
+
+        assert "Discarded".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override

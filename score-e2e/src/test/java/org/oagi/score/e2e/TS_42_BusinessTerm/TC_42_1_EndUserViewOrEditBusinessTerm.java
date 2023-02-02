@@ -354,6 +354,50 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         //delete the assignment
         // re-click "discard" button
         // assert the business term is permanently removed.
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm =
+                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        //Assign business term to pre-existing, used BBIE node
+        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
+        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
+        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
+        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
+        click(assignBusinessTermBIEPage.getSearchButton());
+        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(0));
+
+        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
+        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        click(assignBusinessTermBTPage.getSearchButton());
+        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBTPage.getCreateButton());
+
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        EditBusinessTermPage editBusinessTermPage =
+                bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+
+        assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
+
     }
 
     @AfterEach

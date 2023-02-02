@@ -1,4 +1,5 @@
 package org.oagi.score.e2e.page.business_term;
+import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
@@ -181,17 +182,18 @@ public interface BusinessTermAssignmentPage extends Page {
     /**
      * Return the UI element of the 'Discard' button.
      *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
      * @return the UI element of the 'Discard' button
      */
-    WebElement getDiscardButton();
-
+    WebElement getDiscardButton(boolean enabled);
 
     /**
-     * Discard the business term.
-     *
-     * @return 'Business Term Assignment' page object
+     * remove the assignment of businessTerm from the given BIE
+     * @param bieDEN BIE Dictionary Entry Name
+     * @param businessTerm Business Term Object
+     * @param typeCode Type Code set in the Assign Business Term page
      */
-    BusinessTermAssignmentPage discardBusinessTerm();
+    void discardAssignment(String bieDEN, BusinessTermObject businessTerm, String typeCode);
 
     /**
      * Return the UI element of the table record at the given index, which starts from 1.
@@ -200,6 +202,14 @@ public interface BusinessTermAssignmentPage extends Page {
      * @return the UI element of the table record at the given index
      */
     WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Return the UI element of the table record containing the given value.
+     *
+     * @param value value
+     * @return the UI element of the table record
+     */
+    WebElement getTableRecordByValue(String value);
 
     /**
      * Return the UI element of the column of the given table record with the column name.
