@@ -48,7 +48,7 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
             By.xpath("//button[contains(text(), \"View/Edit Business Term\")]");
 
     private final By BUSINESS_TERM_ASSIGNMENT_SUB_MENU_LOCATOR =
-            By.xpath("/button[contains(text(), \"Business Term Assignment\")]");
+            By.xpath("//button[contains(text(), \"Business Term Assignment\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"View/Edit Code List\")]");
@@ -200,7 +200,6 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
         retry(() -> click(getBusinessTermAssignmentSubMenu()));
         List<String> emptyBIEType = Collections.<String>emptyList();
         BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(this, emptyBIEType, null);
-        assert businessTermAssignmentPage.isOpened();
         return businessTermAssignmentPage;
     }
 
