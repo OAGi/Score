@@ -16,6 +16,9 @@ import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.util.Collections;
+import java.util.List;
+
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
@@ -195,7 +198,8 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
     @Override
     public BusinessTermAssignmentPage openBusinessTermAssignmentSubMenu() {
         retry(() -> click(getBusinessTermAssignmentSubMenu()));
-        BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(this);
+        List<String> emptyBIEType = Collections.<String>emptyList();
+        BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(this, emptyBIEType, null);
         assert businessTermAssignmentPage.isOpened();
         return businessTermAssignmentPage;
     }

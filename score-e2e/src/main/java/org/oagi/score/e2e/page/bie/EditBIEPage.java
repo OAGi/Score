@@ -8,6 +8,7 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.WebElement;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -439,6 +440,10 @@ public interface EditBIEPage extends Page {
 
     interface BBIEPanel {
 
+        BusinessTermAssignmentPage clickShowBusinessTermsButton(List<String> bieTypes, BigInteger bieId);
+
+        AssignBusinessTermBTPage clickAssignBusinessTermButton();
+
         /**
          * Return the UI element of the 'Used' checkbox.
          *
@@ -452,9 +457,7 @@ public interface EditBIEPage extends Page {
 
         WebElement getAssignBusinessTermButton(boolean enabled);
 
-        BusinessTermAssignmentPage clickShowBusinessTermsButton();
-
-        AssignBusinessTermBTPage clickAssignBusinessTermButton();
+        AssignBusinessTermBTPage clickAssignBusinessTermButton(List<String> bieTypes, BigInteger bieId);
 
         void toggleUsed();
 

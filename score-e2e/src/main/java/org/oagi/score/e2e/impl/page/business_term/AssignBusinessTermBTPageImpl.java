@@ -52,6 +52,8 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
 
     private final AssignBusinessTermBIEPage parent;
 
+
+
     public AssignBusinessTermBTPageImpl(AssignBusinessTermBIEPage parent) {
         super(parent);
         this.parent = parent;
