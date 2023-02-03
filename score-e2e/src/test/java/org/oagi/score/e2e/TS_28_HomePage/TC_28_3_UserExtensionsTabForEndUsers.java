@@ -710,9 +710,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 click(checkBoxForNode);
                 editBIEPage.hitUpdateButton();
             }
-
             loop--;
-
         }
         ASCCPObject randomASCCP;
         // verify MyUnusedUEsInBIEsPanel have those random BCCPs
