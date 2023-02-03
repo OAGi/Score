@@ -14,7 +14,9 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
 import java.time.LocalDateTime;
@@ -3678,12 +3680,61 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_50")
-    public void test_TA_50() {
+    public void default_value_of_the_primitive_date_time_BCCPs_should_be_date_time() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time");
+        EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
+        assertEquals("Primitive", getText(creationDateTimePanel.getValueDomainRestrictionSelectField()));
+        assertEquals("date time", getText(creationDateTimePanel.getValueDomainField()));
+
+        WebElement lastModificationDateTimeNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Data Area/Table/Last Modification Date Time");
+        EditBIEPage.BBIEPanel lastModificationDateTimePanel = editBIEPage.getBBIEPanel(lastModificationDateTimeNode);
+        assertEquals("Primitive", getText(lastModificationDateTimePanel.getValueDomainRestrictionSelectField()));
+        assertEquals("date time", getText(lastModificationDateTimePanel.getValueDomainField()));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_51")
-    public void test_TA_51() {
+    public void developer_cannot_create_new_BIE_from_ASCCP_whose_ACC_has_group_component_type() {
+        String groupAsccpDen = "Entity Identifiers Group. Entity Identifiers Group";
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage =
+                viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(groupAsccpDen, release.getReleaseNumber());
+        WebElement node = asccpViewEditPage.getNodeByPath("/Entity Identifiers Group/Entity Identifiers Group. Details");
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(node);
+        assertEquals("Semantic Group", getText(accPanel.getComponentTypeSelectField()));
+
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(Arrays.asList(randomBusinessContext));
+        assertThrows(NoSuchElementException.class, () ->
+                createBIEForSelectTopLevelConceptPage.createBIE(groupAsccpDen, release.getReleaseNumber()));
     }
 
     @Test

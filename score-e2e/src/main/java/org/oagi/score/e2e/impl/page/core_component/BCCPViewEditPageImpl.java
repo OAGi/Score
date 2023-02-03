@@ -4,8 +4,10 @@ import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
@@ -15,43 +17,11 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
-    private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
 
-    private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
-
-    private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
-
-    private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
-
-    private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
-
-    private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
-
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
-
-    private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
-
-    private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
-
-    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
-
-    private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-    private static final By DEN_COMPONENT_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
-    private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
-            By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
-
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
     private final BCCPObject bccp;
 
@@ -69,7 +39,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "BCCP".equals(getCoreComponentTypeFieldValue());
+        assert "BCCP".equals(getBCCPPanel());
         assert getText(getTitle()).equals(bccp.getDen());
     }
 
@@ -81,128 +51,536 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
-    public WebElement getCoreComponentTypeField() {
-        return visibilityOfElementLocated(getDriver(), CORE_COMPONENT_FIELD_LOCATOR);
+    public WebElement getSearchInputTextField() {
+        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
-    public String getCoreComponentTypeFieldValue() {
-        return getText(getCoreComponentTypeField());
+    public WebElement getSearchButton() {
+        return visibilityOfElementLocated(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
-    public WebElement getReleaseField() {
-        return visibilityOfElementLocated(getDriver(), RELEASE_FIELD_LOCATOR);
+    public WebElement getNodeByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        return getNodeByName(nodes[nodes.length - 1]);
+    }
+
+    private WebElement goToNode(String path) {
+        click(getSearchInputTextField());
+        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        node.sendKeys(Keys.ENTER);
+        click(node);
+        clear(getSearchInputTextField());
+        return node;
+    }
+
+    private WebElement getNodeByName(String nodeName) {
+        By nodeLocator = By.xpath(
+                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+        return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
     @Override
-    public String getReleaseFieldValue() {
-        return getText(getReleaseField());
+    public BCCPPanel getBCCPPanel() {
+        return getBCCPPanel(null);
     }
 
     @Override
-    public WebElement getRevisionField() {
-        return visibilityOfElementLocated(getDriver(), REVISION_FIELD_LOCATOR);
+    public BCCPPanel getBCCPPanel(WebElement bccpNode) {
+        return retry(() -> {
+            if (bccpNode != null) {
+                click(bccpNode);
+                waitFor(ofMillis(500L));
+            }
+            return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+        });
     }
 
     @Override
-    public String getRevisionFieldValue() {
-        return getText(getRevisionField());
+    public ACCPanel getACCPanel(WebElement accNode) {
+        return retry(() -> {
+            click(accNode);
+            waitFor(ofMillis(500L));
+            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+        });
     }
 
     @Override
-    public WebElement getStateField() {
-        return visibilityOfElementLocated(getDriver(), STATE_FIELD_LOCATOR);
+    public ASCCPanelContainer getASCCPanelContainer(WebElement asccNode) {
+        return retry(() -> {
+            click(asccNode);
+            waitFor(ofMillis(500L));
+            return new ASCCPanelContainer() {
+                @Override
+                public ASCCPanel getASCCPanel() {
+                    return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                }
+                @Override
+                public ASCCPPanel getASCCPPanel() {
+                    return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+            };
+        });
     }
 
     @Override
-    public String getStateFieldValue() {
-        return getText(getStateField());
+    public BCCPanelContainer getBCCPanelContainer(WebElement bccNode) {
+        return retry(() -> {
+            click(bccNode);
+            waitFor(ofMillis(500L));
+            return new BCCPanelContainer() {
+                @Override
+                public BCCPanel getBCCPanel() {
+                    return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                }
+                @Override
+                public BCCPPanel getBCCPPanel() {
+                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+            };
+        });
     }
 
-    @Override
-    public WebElement getOwnerField() {
-        return visibilityOfElementLocated(getDriver(), OWNER_FIELD_LOCATOR);
+    private WebElement getInputFieldByName(String baseXPath, String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
     }
 
-    @Override
-    public String getOwnerFieldValue() {
-        return getText(getOwnerField());
+    private WebElement getSelectFieldByName(String baseXPath, String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
     }
 
-    @Override
-    public WebElement getGUIDField() {
-        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+    private WebElement getCheckboxByName(String baseXPath, String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
     }
 
-    @Override
-    public String getGUIDFieldValue() {
-        return getText(getGUIDField());
+    private WebElement getTextAreaFieldByName(String baseXPath, String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
     }
 
-    @Override
-    public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    private class ACCPanelImpl implements ACCPanel {
+
+        private final String baseXPath;
+
+        public ACCPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getObjectClassTermField() {
+            return getInputFieldByName(baseXPath, "Object Class Term");
+        }
+
+        @Override
+        public WebElement getComponentTypeSelectField() {
+            return getSelectFieldByName(baseXPath, "Component Type");
+        }
+
+        @Override
+        public WebElement getAbstractCheckbox() {
+            return getCheckboxByName(baseXPath, "Abstract");
+        }
+
+        @Override
+        public WebElement getDeprecatedCheckbox() {
+            return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public WebElement getNamespaceSelectField() {
+            return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
     }
 
-    @Override
-    public String getDENFieldValue() {
-        return getText(getDENField());
+    private class ASCCPanelImpl implements ASCCPanel {
+
+        private final String baseXPath;
+
+        private ASCCPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getCardinalityMinField() {
+            return getInputFieldByName(baseXPath, "Cardinality Min");
+        }
+
+        @Override
+        public WebElement getCardinalityMaxField() {
+            return getInputFieldByName(baseXPath, "Cardinality Max");
+        }
+
+        @Override
+        public WebElement getDeprecatedCheckbox() {
+            return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
     }
 
-    @Override
-    public WebElement getPropertyTermField() {
-        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+    private class ASCCPPanelImpl implements ASCCPPanel {
+
+        private final String baseXPath;
+
+        private ASCCPPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public String getDENFieldLabel() {
+            return getText(getDENField().findElement(By.xpath("parent::div//label")));
+        }
+
+        @Override
+        public WebElement getPropertyTermField() {
+            return getInputFieldByName(baseXPath, "Property Term");
+        }
+
+        @Override
+        public String getPropertyTermFieldLabel() {
+            return getText(getPropertyTermField().findElement(By.xpath("parent::div//label")));
+        }
+
+        @Override
+        public WebElement getReusableCheckbox() {
+            return getCheckboxByName(baseXPath, "Reusable");
+        }
+
+        @Override
+        public WebElement getNillableCheckbox() {
+            return getCheckboxByName(baseXPath, "Nillable");
+        }
+
+        @Override
+        public WebElement getDeprecatedCheckbox() {
+            return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public WebElement getNamespaceSelectField() {
+            return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
     }
 
-    @Override
-    public WebElement getPropertyTermComponent() {
-        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_COMPONENT_LOCATOR);
+    private class BCCPanelImpl implements BCCPanel {
+
+        private final String baseXPath;
+
+        private BCCPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getCardinalityMinField() {
+            return getInputFieldByName(baseXPath, "Cardinality Min");
+        }
+
+        @Override
+        public WebElement getCardinalityMaxField() {
+            return getInputFieldByName(baseXPath, "Cardinality Max");
+        }
+
+        @Override
+        public WebElement getEntityTypeSelectField() {
+            return getSelectFieldByName(baseXPath, "Entity Type");
+        }
+
+        @Override
+        public WebElement getDeprecatedCheckbox() {
+            return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public WebElement getValueConstraintSelectField() {
+            return getSelectFieldByName(baseXPath, "Value Constraint");
+        }
+
+        @Override
+        public WebElement getFixedValueField() {
+            return getInputFieldByName(baseXPath, "Fixed Value");
+        }
+
+        @Override
+        public WebElement getDefaultValueField() {
+            return getInputFieldByName(baseXPath, "Default Value");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
     }
 
-    @Override
-    public String getPropertyTermFieldLabel() {
-        return getPropertyTermComponent().getText();
-    }
+    private class BCCPPanelImpl implements BCCPPanel {
 
-    @Override
-    public String getPropertyTermFieldValue() {
-        return getText(getPropertyTermField());
-    }
+        private final String baseXPath;
 
-    @Override
-    public WebElement getNamespaceField() {
-        return visibilityOfElementLocated(getDriver(), NAMESPACE_FIELD_LOCATOR);
-    }
+        private BCCPPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
 
-    @Override
-    public String getNamespaceFieldValue() {
-        return getText(getNamespaceField());
-    }
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
 
-    @Override
-    public WebElement getDefinitionSourceField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
-    }
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
 
-    @Override
-    public String getDefinitionSourceFieldValue() {
-        return getText(getDefinitionSourceField());
-    }
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
 
-    @Override
-    public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
-    }
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
 
-    @Override
-    public String getDefinitionFieldValue() {
-        return getText(getDefinitionField());
-    }
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
 
-    @Override
-    public String getDENFieldLabel() {
-        return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR).findElement(By.tagName("mat-label")).getText();
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getPropertyTermField() {
+            return getInputFieldByName(baseXPath, "Property Term");
+        }
+
+        @Override
+        public String getPropertyTermFieldLabel() {
+            return getText(getPropertyTermField().findElement(By.xpath("parent::div//label")));
+        }
+
+        @Override
+        public WebElement getNillableCheckbox() {
+            return getCheckboxByName(baseXPath, "Nillable");
+        }
+
+        @Override
+        public WebElement getValueConstraintSelectField() {
+            return getSelectFieldByName(baseXPath, "Value Constraint");
+        }
+
+        @Override
+        public WebElement getFixedValueField() {
+            return getInputFieldByName(baseXPath, "Fixed Value");
+        }
+
+        @Override
+        public WebElement getDefaultValueField() {
+            return getInputFieldByName(baseXPath, "Default Value");
+        }
+
+        @Override
+        public WebElement getDeprecatedCheckbox() {
+            return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public WebElement getNamespaceSelectField() {
+            return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
     }
 
 }
