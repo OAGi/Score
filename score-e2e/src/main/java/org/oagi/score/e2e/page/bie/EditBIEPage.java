@@ -5,7 +5,6 @@ import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.WebElement;
 
 
@@ -16,8 +15,18 @@ import java.util.List;
  */
 public interface EditBIEPage extends Page {
 
-    WebElement getSearchField();
+    /**
+     * Return the UI element of the input text field for searching nodes.
+     *
+     * @return the UI element of the input text field for searching nodes
+     */
+    WebElement getSearchInputTextField();
 
+    /**
+     * Return the UI element of the 'Search' button.
+     *
+     * @return the UI element of the 'Search' button
+     */
     WebElement getSearchButton();
 
     /**

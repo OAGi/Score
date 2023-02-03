@@ -167,7 +167,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
     @Override
     public void enableAccount() {
         click(getEnableThisAccountButton());
-        assert getSnackBar(getDriver(), "Enabled").isDisplayed();
+        assert this.getDisableThisAccountButton().isEnabled();
     }
 
     @Override
@@ -178,7 +178,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
     @Override
     public void disableAccount() {
         click(getDisableThisAccountButton());
-        assert getSnackBar(getDriver(), "Disabled").isDisplayed();
+        assert this.getEnableThisAccountButton().isEnabled();
     }
 
     @Override

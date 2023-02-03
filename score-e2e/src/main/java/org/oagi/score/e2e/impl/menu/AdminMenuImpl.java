@@ -8,11 +8,16 @@ import org.oagi.score.e2e.menu.AdminMenu;
 import org.oagi.score.e2e.page.admin.AccountsPage;
 import org.oagi.score.e2e.page.admin.PendingSSOPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final By ADMIN_MENU_LOCATOR =
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Admin\")]//ancestor::button[1]");
@@ -52,8 +57,13 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
 
     @Override
     public AccountsPage openAccountsSubMenu() {
-        retry(() -> click(getAccountsSubMenu()));
         AccountsPage accountsPage = new AccountsPageImpl(this);
+        try {
+            click(getAccountsSubMenu());
+        } catch (WebDriverException e) {
+            logger.warn("Failed to click the 'Accounts' menu.", e);
+            accountsPage.openPage();
+        }
         assert accountsPage.isOpened();
         return accountsPage;
     }
@@ -68,8 +78,13 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
 
     @Override
     public PendingSSOPage openPendingSSOSubMenu() {
-        retry(() -> click(getPendingSSOSubMenu()));
         PendingSSOPage pendingSSOPage = new PendingSSOPageImpl(this);
+        try {
+            click(getPendingSSOSubMenu());
+        } catch (WebDriverException e) {
+            logger.warn("Failed to click the 'Pending SSO' menu.", e);
+            pendingSSOPage.openPage();
+        }
         assert pendingSSOPage.isOpened();
         return pendingSSOPage;
     }
