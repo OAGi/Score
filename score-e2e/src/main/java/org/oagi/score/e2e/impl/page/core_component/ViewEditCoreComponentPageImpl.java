@@ -45,6 +45,21 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public WebElement getBranchSelectField() {
+        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setBranch(String branch) {
+        retry(() -> {
+            click(getBranchSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+            click(optionField);
+        });
+    }
+
+    @Override
     public WebElement getDENField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"DEN\")]"));
     }
@@ -52,6 +67,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public String getDENFieldLabel() {
         return getDENField().getAttribute("data-placeholder");
+    }
+
+    @Override
+    public void setDEN(String den) {
+        sendKeys(getDENField(), den);
     }
 
     @Override
@@ -65,8 +85,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
-    public WebElement getBranchSelectField() {
-        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+    public void setModule(String module) {
+        sendKeys(getModuleField(), module);
     }
 
     @Override
@@ -136,16 +156,6 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
-    public void setBranch(String branch) {
-        retry(() -> {
-            click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
-        });
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.oagi.score.e2e.page.bie;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.WebElement;
 
 
@@ -14,11 +13,35 @@ import java.util.List;
  */
 public interface EditBIEPage extends Page {
 
-    WebElement getSearchField();
+    /**
+     * Return the UI element of the input text field for searching nodes.
+     *
+     * @return the UI element of the input text field for searching nodes
+     */
+    WebElement getSearchInputTextField();
 
+    /**
+     * Return the UI element of the 'Search' button.
+     *
+     * @return the UI element of the 'Search' button
+     */
     WebElement getSearchButton();
 
-    void clickOnDropDownMenuByPath(String path);
+    /**
+     * Return the UI element of the 'Context Menu' icon for the node.
+     *
+     * @param nodeName Node name
+     * @return the UI element of the 'Context Menu' icon
+     */
+    WebElement getContextMenuIconByNodeName(String nodeName);
+
+    /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPath(String path);
 
     /**
      * Return the panel for 'Top-Level ASBIEP' node.
@@ -201,6 +224,13 @@ public interface EditBIEPage extends Page {
         WebElement getOwnerField();
 
         /**
+         * Return the UI element of the 'Business Context' input field.
+         *
+         * @return the UI element of the 'Business Context' input field
+         */
+        WebElement getBusinessContextInputField();
+
+        /**
          * Return the UI elements of the 'Business Context' list.
          *
          * @return the UI elements of the 'Business Context' list
@@ -220,6 +250,20 @@ public interface EditBIEPage extends Page {
          * @param businessContextName a business context name
          */
         void addBusinessContext(String businessContextName);
+
+        /**
+         * Remove a business context.
+         *
+         * @param businessContext a business context
+         */
+        void removeBusinessContext(BusinessContextObject businessContext);
+
+        /**
+         * Remove a business context by name.
+         *
+         * @param businessContextName a business context name
+         */
+        void removeBusinessContext(String businessContextName);
 
         /**
          * Return the UI element of the 'Business Term' field.

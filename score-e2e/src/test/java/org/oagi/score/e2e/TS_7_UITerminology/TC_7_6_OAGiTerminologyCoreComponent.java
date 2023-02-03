@@ -209,11 +209,12 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
-        String propertyTermFieldLabel = asccpViewEditPage.getPropertyTermFieldLabel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+        String propertyTermFieldLabel = asccpPanel.getPropertyTermFieldLabel();
         assertEquals("Property Term (Component Name)", propertyTermFieldLabel);
 
-        String denFieldACCPageTitle = asccpViewEditPage.getDENFieldLabel();
-        assertEquals("DEN (Dictionary Entry Name)", denFieldACCPageTitle);
+        String denFieldLabel = asccpPanel.getDENFieldLabel();
+        assertEquals("DEN (Dictionary Entry Name)", denFieldLabel);
     }
 
     @Test
@@ -248,7 +249,9 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
-        String propertyTermFieldLabel = bccpViewEditPage.getPropertyTermFieldLabel();
+
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanel();
+        String propertyTermFieldLabel = bccpPanel.getPropertyTermFieldLabel();
         assertEquals("Property Term (Field Name)", propertyTermFieldLabel);
     }
 

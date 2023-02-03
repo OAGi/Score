@@ -229,6 +229,20 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     }
 
     @Override
+    public WebElement getPreviousPageButton() {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                        "//button[@aria-label = \"Previous page\"]"));
+    }
+
+    @Override
+    public WebElement getNextPageButton() {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                        "//button[@aria-label = \"Next page\"]"));
+    }
+
+    @Override
     public TransferBIEOwnershipDialog openTransferBIEOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
         click(td.findElement(By.tagName("button")));
