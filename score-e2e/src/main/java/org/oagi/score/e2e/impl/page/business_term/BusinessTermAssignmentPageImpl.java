@@ -8,8 +8,12 @@ import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -63,13 +67,28 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
 
-    public BusinessTermAssignmentPageImpl(BasePage parent) {
+    private List<String> bieTypes;
+
+    private BigInteger bieId;
+
+    public BusinessTermAssignmentPageImpl(BasePage parent, List<String> bieTypes, BigInteger bieId) {
         super(parent);
+        this.bieTypes = bieTypes;
+        this.bieId = bieId;
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/business_term_management/assign_business_term").toString();
+        List<String> queries = new ArrayList<>();
+        if (bieId != null){
+            queries.add("bieId=" + this.bieId);
+        }
+        queries.add("bieType=" + String.join(",", this.bieTypes));
+        String path = "/business_term_management/assign_business_term";
+        if (!queries.isEmpty()){
+            path += "?" + queries.stream().collect(Collectors.joining("&"));
+        }
+        return getConfig().getBaseUrl().resolve(path).toString();
     }
 
     @Override
