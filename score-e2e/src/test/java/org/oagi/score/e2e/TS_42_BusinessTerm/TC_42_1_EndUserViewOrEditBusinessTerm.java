@@ -390,7 +390,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
 
-        //remove the assignment
         businessTermAssignmentPage.discardAssignment(bbieNode.getText(), randomBusinessTerm, "");
         ViewEditBusinessTermPage viewEditBusinessTermPage = editBusinessTermPage.discardBusinessTerm();
         assertThrows(NoSuchElementException.class, () -> {
