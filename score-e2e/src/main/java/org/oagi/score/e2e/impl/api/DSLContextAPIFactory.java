@@ -30,6 +30,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public ApplicationSettingsAPI getApplicationSettingsAPI() {
+        return new DSLContextApplicationSettingsAPIImpl(dslContext);
+    }
+
+    @Override
     public AppUserAPI getAppUserAPI() {
         return new DSLContextAppUserAPIImpl(dslContext);
     }

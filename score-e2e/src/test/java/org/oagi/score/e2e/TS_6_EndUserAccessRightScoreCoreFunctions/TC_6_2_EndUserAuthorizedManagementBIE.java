@@ -317,11 +317,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-        getDriver().manage().window().maximize();
         assertEquals("WIP", useraBIEWIP.getState());
+
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.selectAssociation(asccpToAppend.getDen());
         ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
@@ -346,9 +344,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertDisabled(ASBIEPanel.getAssociationDefinitionField());
         assertDisabled(ASBIEPanel.getComponentDefinitionField());
         assertDisabled(ASBIEPanel.getTypeDefinitionField());
-        //TODO
-        // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertDisabled(ASBIEPanel.getBusinessTermField());
+
+        if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+            // TODO:
+            // Check business term abilities are disabled
+        } else {
+            assertDisabled(ASBIEPanel.getBusinessTermField());
+        }
 
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm() + "/" +
@@ -370,9 +372,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertDisabled(BBIEPPanel.getContextDefinitionField());
         assertDisabled(BBIEPPanel.getAssociationDefinitionField());
         assertDisabled(BBIEPPanel.getComponentDefinitionField());
-        //TODO
-        // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertDisabled(BBIEPPanel.getBusinessTermField());
+
+        if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+            // TODO:
+            // Check business term abilities are disabled
+        } else {
+            assertDisabled(BBIEPPanel.getBusinessTermField());
+        }
 
         node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Extension/" + bccpToAppend.getPropertyTerm());
@@ -393,10 +399,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertDisabled(BBIEPPanel.getContextDefinitionField());
         assertDisabled(BBIEPPanel.getAssociationDefinitionField());
         assertDisabled(BBIEPPanel.getComponentDefinitionField());
-        //TODO
-        // Check if Business Term functionality is enabled. Currently, it is disabled.
-        assertDisabled(BBIEPPanel.getBusinessTermField());
 
+        if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+            // TODO:
+            // Check business term abilities are disabled
+        } else {
+            assertDisabled(BBIEPPanel.getBusinessTermField());
+        }
     }
 
     @Test

@@ -10,6 +10,7 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 import java.util.List;
@@ -112,20 +113,35 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public void clickOnDropDownMenuByPath(String path) {
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]" +
+                        "//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
         goToNode(path);
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
-        By menuLocator = By.xpath(
-                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"more_vert\")]");
-        click(visibilityOfElementLocated(getDriver(), menuLocator));
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return getNodeByName(nodeName);
     }
 
     @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
         return retry(() -> {
-            clickOnDropDownMenuByPath(path);
-            click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+            }
             waitFor(ofMillis(500L));
             ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert ACCExtensionViewEditPage.isOpened();
@@ -136,8 +152,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public ACCExtensionViewEditPage extendBIELocallyOnNode(String path) {
         return retry(() -> {
-            clickOnDropDownMenuByPath(path);
-            click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            }
             waitFor(ofMillis(500L));
             ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert accExtensionViewEditPage.isOpened();
