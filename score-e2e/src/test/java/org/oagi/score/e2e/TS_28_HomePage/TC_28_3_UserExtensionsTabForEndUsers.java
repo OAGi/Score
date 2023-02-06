@@ -22,7 +22,8 @@ import org.openqa.selenium.WebElement;
 import java.util.*;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -671,7 +672,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
             assertTrue(td.isDisplayed());
         }
-
     }
 
     @Test
