@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
@@ -13,9 +14,12 @@ import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
@@ -75,6 +79,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             By.xpath("//mat-dialog-container//p");
 
     private static final By ASSIGN_BUSINESS_TERM_LOCATOR = By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]");
+
+    private static final By TURNOFF_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
 
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
@@ -618,11 +625,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
             click(getShowBusinessTermsButton());
-            waitFor(ofMillis(500L));
-            //pull from current URL
-            //use setter and getter in BusinessTermAssignmentPage
-            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent, bieTypes, bieId);
+            for (String winHandle: getDriver().getWindowHandles()){
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieType=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
             assert businessTermAssignmentPage.isOpened();
             return businessTermAssignmentPage;
         }
