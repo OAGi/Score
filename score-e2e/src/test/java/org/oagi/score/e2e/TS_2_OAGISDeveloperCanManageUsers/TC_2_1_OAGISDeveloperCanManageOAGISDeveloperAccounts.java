@@ -11,7 +11,7 @@ import org.oagi.score.e2e.menu.LoginIDMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
-import org.oagi.score.e2e.page.SettingsPage;
+import org.oagi.score.e2e.page.SettingsPasswordPage;
 import org.oagi.score.e2e.page.admin.AccountsPage;
 import org.oagi.score.e2e.page.admin.EditAccountPage;
 import org.oagi.score.e2e.page.admin.NewAccountPage;
@@ -198,10 +198,10 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = "dev_" + randomAlphanumeric(5, 10);
-        settingsPage.updatePassword(appUser.getPassword(), newPassword);
+        settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword);
 
         homePage.logout();
         homePage = loginPage().signIn(appUser.getLoginId(), newPassword);
@@ -219,14 +219,14 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String wrongOldPassword = "dev_" + randomAlphanumeric(5, 10);
         assertFalse(wrongOldPassword.equals(appUser.getPassword()));
 
         String newPassword = "dev_" + randomAlphanumeric(5, 10);
         AccountUpdateException error = assertThrows(AccountUpdateException.class, () ->
-                settingsPage.updatePassword(wrongOldPassword, newPassword));
+                settingsPasswordPage.updatePassword(wrongOldPassword, newPassword));
 
         assertEquals("Invalid old password", error.getMessage());
     }
@@ -241,13 +241,13 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = randomAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
-                settingsPage.updatePassword(appUser.getPassword(), newPassword));
+                settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword));
 
-        assertEquals("Password must be at least 5 characters.", settingsPage.getPasswordErrorMessage());
+        assertEquals("Password must be at least 5 characters.", settingsPasswordPage.getPasswordErrorMessage());
     }
 
     @Test
@@ -260,14 +260,14 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = "dev_" + randomAlphanumeric(5, 10);
         String confirmNewPassword = "dev_" + randomAlphanumeric(5, 10);
         assertFalse(newPassword.equals(confirmNewPassword));
 
         assertThrows(TimeoutException.class, () ->
-                settingsPage.updatePassword(appUser.getPassword(), newPassword, confirmNewPassword));
+                settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword, confirmNewPassword));
     }
 
     @Test
