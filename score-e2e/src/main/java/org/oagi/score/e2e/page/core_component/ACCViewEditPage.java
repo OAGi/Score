@@ -188,29 +188,6 @@ public interface ACCViewEditPage extends Page {
     void moveToProduction();
 
     void moveToQA();
-
     WebElement getMoveToProduction(boolean enabled);
-
     WebElement getMoveToQAButton(boolean enabled);
-
-    void backToWIP();
-
-    WebElement getBackToWIPButton(boolean enabled);
-
-
-    WebElement getCardinalityMaxField();
-
-    void setCardinalityMax(int cardinalityMax);
-
-    void hitUpdateButton();
-
-    WebElement getUpdateButton(boolean enabled);
-
-    void moveToDraft();
-
-    void moveToCandidate();
-
-    WebElement getMoveToDraft(boolean enabled);
-
-    WebElement getMoveToCandidate(boolean enabled);
 }

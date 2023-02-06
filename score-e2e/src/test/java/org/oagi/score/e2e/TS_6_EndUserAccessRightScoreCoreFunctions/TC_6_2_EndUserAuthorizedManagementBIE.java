@@ -2073,6 +2073,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ;
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -2110,6 +2111,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ;
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());

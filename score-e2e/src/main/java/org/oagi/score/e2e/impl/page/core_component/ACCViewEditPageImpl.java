@@ -52,7 +52,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-    private static final By CARDINALITY_COMPONENT_LOCATOR =
+    private static final By CARDINALITY_COMPONENT_LOCATOR=
             By.xpath("//span[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
 
     public static final By DEN_COMPONENT_LOCATOR_FOR_ASCC =
@@ -73,15 +73,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
-    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
-    private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
-    private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
-
 
     private final ACCObject acc;
 
@@ -89,7 +80,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         super(parent);
         this.acc = acc;
     }
-
+ 
     @Override
     protected String getPageUrl() {
         return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
@@ -196,7 +187,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public String getDenFieldLabelForASCC() {
+    public String getDenFieldLabelForASCC(){
         return visibilityOfElementLocated(getDriver(), DEN_COMPONENT_LOCATOR_FOR_ASCC).findElement(By.tagName("mat-label")).getText();
     }
 
@@ -315,85 +306,4 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
         }
     }
-    @Override
-    public void backToWIP() {
-        click(getBackToWIPButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-    }
-
-    @Override
-    public WebElement getBackToWIPButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public WebElement getCardinalityMaxField() {
-        return getInputFieldByName("Cardinality Max");
-    }
-    @Override
-    public void setCardinalityMax(int cardinalityMax) {
-        sendKeys(getCardinalityMaxField(), Integer.toString(cardinalityMax));
-    }
-
-    private WebElement getInputFieldByName(String name) {
-        return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
-    }
-
-    @Override
-    public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
-        invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-    }
-
-    @Override
-    public WebElement getUpdateButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public void moveToDraft() {
-        click(getMoveToDraft(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-    }
-
-    @Override
-    public void moveToCandidate() {
-        click(getMoveToCandidate(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-    }
-
-    @Override
-    public WebElement getMoveToDraft(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public WebElement getMoveToCandidate(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
-        }
-    }
-
 }
