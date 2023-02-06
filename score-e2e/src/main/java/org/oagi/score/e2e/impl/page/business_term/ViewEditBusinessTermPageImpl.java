@@ -157,6 +157,13 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
     }
 
     @Override
+    public WebElement getSelectCheckboxAtIndex(int idx) {
+        WebElement tr = getTableRecordAtIndex(idx);
+        WebElement td = getColumnByName(tr, "select");
+        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+    }
+
+    @Override
     public void goToNextPage() {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");

@@ -227,15 +227,15 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertFalse(oldTermName.equals(randomBusinessTerm.getBusinessTerm()));
 
         String oldExternalRefUri = randomBusinessTerm.getExternalReferenceUri();
-        randomBusinessTerm.setExternalReferenceUri("http://www." + randomAscii(3,8) + ".com");
+        randomBusinessTerm.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
         assertFalse(oldExternalRefUri.equals(randomBusinessTerm.getExternalReferenceUri()));
 
         String oldExternalRefID = randomBusinessTerm.getExternalReferenceId();
-        randomBusinessTerm.setExternalReferenceId(randomNumeric(1,10));
+        randomBusinessTerm.setExternalReferenceId(randomNumeric(1, 10));
         assertFalse(oldExternalRefID.equals(randomBusinessTerm.getExternalReferenceId()));
 
         String oldComment = randomBusinessTerm.getComment();
-        randomBusinessTerm.setComment(randomPrint(20,50).trim());
+        randomBusinessTerm.setComment(randomPrint(20, 50).trim());
         assertFalse(oldComment.equals(randomBusinessTerm.getComment()));
 
         editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
@@ -250,7 +250,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
         assertEquals(randomBusinessTerm.getExternalReferenceUri(), editBusinessTermPage.getExternalReferenceURIFieldText());
         assertEquals(randomBusinessTerm.getExternalReferenceId(), editBusinessTermPage.getExternalReferenceIDFieldText());
-        assertEquals(randomBusinessTerm.getComment(),  editBusinessTermPage.getCommentFieldText());
+        assertEquals(randomBusinessTerm.getComment(), editBusinessTermPage.getCommentFieldText());
 
     }
 
@@ -364,7 +364,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
-
+        getDriver().manage().window().maximize();
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP);
@@ -374,7 +374,9 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
         //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
@@ -392,12 +394,35 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         EditBusinessTermPage editBusinessTermPage =
                 bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
-        businessTermAssignmentPage.discardAssignment(bbieNode.getText(), randomBusinessTerm, "");
-        ViewEditBusinessTermPage viewEditBusinessTermPage = editBusinessTermPage.discardBusinessTerm();
-        assertThrows(NoSuchElementException.class, () -> {
-            viewEditBusinessTermPage.openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
-        });
+        click(editBusinessTermPage.getDiscardButton());
+        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardButton);
+        assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
 
+        BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bieMenu.openBusinessTermAssignmentSubMenu();
+        businessTermAssignmentPageForDiscard.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        click(businessTermAssignmentPageForDiscard.getSearchButton());
+        click(businessTermAssignmentPageForDiscard.getSelectCheckboxAtIndex(1));
+        click(businessTermAssignmentPageForDiscard.getDiscardButton(true));
+        WebElement confirmDiscardAssignmentButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardAssignmentButton);
+
+        ViewEditBusinessTermPage viewEditBusinessTermPageForDiscard = bieMenu.openViewEditBusinessTermSubMenu();
+        viewEditBusinessTermPageForDiscard.setTerm(randomBusinessTerm.getBusinessTerm());
+        viewEditBusinessTermPageForDiscard.hitSearchButton();
+        click(viewEditBusinessTermPageForDiscard.getSelectCheckboxAtIndex(1));
+        click(viewEditBusinessTermPageForDiscard.getDiscardButton());
+        WebElement confirmDiscardTermButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardTermButton);
+        assertThrows(NoSuchElementException.class, () -> {
+            viewEditBusinessTermPageForDiscard.openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+        });
     }
 
     @AfterEach

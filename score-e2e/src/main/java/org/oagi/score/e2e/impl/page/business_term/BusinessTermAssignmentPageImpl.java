@@ -51,7 +51,7 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//span[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//mat-icon[contains(text(), \"search\")]//ancestor::button[1]");
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
 
