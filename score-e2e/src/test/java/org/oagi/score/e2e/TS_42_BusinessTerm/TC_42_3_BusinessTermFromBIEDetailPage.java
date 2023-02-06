@@ -26,8 +26,18 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_33_1_1")
-    public void developer_can_not_use_this_functionality() {
+    @DisplayName("TC_42_3_1")
+    public void end_user_can_see_all_business_terms_assigned_to_the_descendant_bie_node() {
+    }
+
+    @Test
+    @DisplayName("TC_42_3_2")
+    public void end_user_can_hover_over_show_business_terms_button_view_up_to_five_business_term_assigned_in_the_descendent_bie_panel() {
+    }
+
+    @Test
+    @DisplayName("TC_42_3_3")
+    public void end_user_can_click_assign_business_term_button_in_descendent_bie_panel_assign_business_terms() {
     }
 
     @AfterEach

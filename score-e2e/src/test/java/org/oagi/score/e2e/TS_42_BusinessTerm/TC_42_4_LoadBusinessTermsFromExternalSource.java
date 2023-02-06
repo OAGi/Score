@@ -26,8 +26,28 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_33_1_1")
-    public void developer_can_not_use_this_functionality() {
+    @DisplayName("TC_42_4_1")
+    public void end_user_can_download_a_template_for_external_csv_file_to_be_uploaded_in_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_4_2")
+    public void end_user_can_upload_and_attach_the_csv_file_with_correct_format_in_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_4_3")
+    public void end_user_cannot_upload_the_csv_file_with_incorrect_format_in_business_term_page() {
+    }
+
+    @Test
+    @DisplayName("TC_42_4_4")
+    public void new_business_term_will_be_created_if_the_business_term_is_uploaded_with_new_external_reference_uri() {
+    }
+
+    @Test
+    @DisplayName("TC_42_4_5")
+    public void previous_business_term_will_be_updated_with_new_information_if_the_business_term_is_uploaded_with_an_exitent_external_reference_uri() {
     }
 
     @AfterEach
