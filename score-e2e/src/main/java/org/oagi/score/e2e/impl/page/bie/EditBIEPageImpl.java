@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.bie;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
@@ -641,7 +642,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
-            return null;
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
+            click(getShowBusinessTermsButton());
+            for (String winHandle: getDriver().getWindowHandles()){
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieType=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            assert assignBusinessTermBTPage.isOpened();
+            return assignBusinessTermBTPage;
         }
 
         @Override

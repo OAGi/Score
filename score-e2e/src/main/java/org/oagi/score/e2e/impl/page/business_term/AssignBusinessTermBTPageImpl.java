@@ -1,14 +1,19 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -50,18 +55,31 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
-    private final AssignBusinessTermBIEPage parent;
+    private final BasePage parent;
 
+    private List<String> bieTypes;
 
+    private BigInteger bieId;
 
-    public AssignBusinessTermBTPageImpl(AssignBusinessTermBIEPage parent) {
+    public AssignBusinessTermBTPageImpl(BasePage parent, List<String> bieTypes, BigInteger bieId){
         super(parent);
         this.parent = parent;
+        this.bieTypes = bieTypes;
+        this.bieId = bieId;
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/business_term_management/assign_business_term/create/bt").toString();
+        List<String> queries = new ArrayList<>();
+        if (bieId != null){
+            queries.add("bieId=" + this.bieId);
+        }
+        queries.add("bieType=" + String.join(",", this.bieTypes));
+        String path = "/business_term_management/assign_business_term/create/bt";
+        if (!queries.isEmpty()){
+            path += "?" + queries.stream().collect(Collectors.joining("&"));
+        }
+        return getConfig().getBaseUrl().resolve(path).toString();
     }
 
     @Override
