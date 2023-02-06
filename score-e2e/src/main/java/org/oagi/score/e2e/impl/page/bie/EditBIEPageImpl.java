@@ -617,9 +617,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public BusinessTermAssignmentPage clickShowBusinessTermsButton(List<String> bieTypes, BigInteger bieId) {
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
             click(getShowBusinessTermsButton());
             waitFor(ofMillis(500L));
+            //pull from current URL
+            //use setter and getter in BusinessTermAssignmentPage
             BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent, bieTypes, bieId);
             assert businessTermAssignmentPage.isOpened();
             return businessTermAssignmentPage;

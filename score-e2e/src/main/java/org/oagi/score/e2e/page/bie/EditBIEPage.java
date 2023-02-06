@@ -440,7 +440,7 @@ public interface EditBIEPage extends Page {
 
     interface BBIEPanel {
 
-        BusinessTermAssignmentPage clickShowBusinessTermsButton(List<String> bieTypes, BigInteger bieId);
+        BusinessTermAssignmentPage clickShowBusinessTermsButton();
 
         AssignBusinessTermBTPage clickAssignBusinessTermButton();
 

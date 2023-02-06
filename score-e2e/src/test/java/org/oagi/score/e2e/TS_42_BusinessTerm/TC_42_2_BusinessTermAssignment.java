@@ -45,6 +45,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_2")
     public void enduser_can_view_all_business_terms_with_assignments_on_business_term_assignment_page() {
+
+
     }
 
     @Test
