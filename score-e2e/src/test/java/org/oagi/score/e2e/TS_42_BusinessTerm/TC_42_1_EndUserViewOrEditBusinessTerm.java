@@ -326,21 +326,25 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
         click(assignBusinessTermBIEPage.getSearchButton());
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
 
         AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
         assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         click(assignBusinessTermBTPage.getSearchButton());
-        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
         click(assignBusinessTermBTPage.getCreateButton());
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage =
                 bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
-        assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
-
+        click(editBusinessTermPage.getDiscardButton());
+        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardButton);
         assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
+
     }
 
     @Test
@@ -376,19 +380,17 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
         click(assignBusinessTermBIEPage.getSearchButton());
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
 
         AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
         assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         click(assignBusinessTermBTPage.getSearchButton());
-        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(0));
+        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
         click(assignBusinessTermBTPage.getCreateButton());
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage =
                 bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
-
-        assertThrows(TimeoutException.class, () -> editBusinessTermPage.discard());
 
         businessTermAssignmentPage.discardAssignment(bbieNode.getText(), randomBusinessTerm, "");
         ViewEditBusinessTermPage viewEditBusinessTermPage = editBusinessTermPage.discardBusinessTerm();
