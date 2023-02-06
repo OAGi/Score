@@ -10,7 +10,7 @@ import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.menu.LoginIDMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.SettingsPage;
+import org.oagi.score.e2e.page.SettingsPasswordPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -46,7 +46,7 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     public void login_ID_field_must_not_be_present_in_settings_page() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         By loginIDFieldLocator =
                 By.xpath("//mat-label[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
@@ -59,10 +59,10 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     public void end_user_can_update_password_of_self() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = "eu_" + randomAlphanumeric(5, 10);
-        settingsPage.updatePassword(appUser.getPassword(), newPassword);
+        settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword);
 
         homePage.logout();
         homePage = loginPage().signIn(appUser.getLoginId(), newPassword);
@@ -75,13 +75,13 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     public void end_user_cannot_update_password_of_self_with_short_password() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = randomAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
-                settingsPage.updatePassword(appUser.getPassword(), newPassword));
+                settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword));
 
-        assertEquals("Password must be at least 5 characters.", settingsPage.getPasswordErrorMessage());
+        assertEquals("Password must be at least 5 characters.", settingsPasswordPage.getPasswordErrorMessage());
     }
 
     @Test
@@ -89,14 +89,14 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     public void cannot_update_password_of_self_with_wrong_old_password() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String wrongOldPassword = "eu_" + randomAlphanumeric(5, 10);
         assertFalse(wrongOldPassword.equals(appUser.getPassword()));
 
         String newPassword = "eu_" + randomAlphanumeric(5, 10);
         AccountUpdateException error = assertThrows(AccountUpdateException.class, () ->
-                settingsPage.updatePassword(wrongOldPassword, newPassword));
+                settingsPasswordPage.updatePassword(wrongOldPassword, newPassword));
 
         assertEquals("Invalid old password", error.getMessage());
     }
@@ -106,14 +106,14 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     public void end_user_cannot_update_password_of_self_with_wrong_confirm_new_password() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
 
         String newPassword = "eu_" + randomAlphanumeric(5, 10);
         String confirmNewPassword = "eu_" + randomAlphanumeric(5, 10);
         assertFalse(newPassword.equals(confirmNewPassword));
 
         assertThrows(TimeoutException.class, () ->
-                settingsPage.updatePassword(appUser.getPassword(), newPassword, confirmNewPassword));
+                settingsPasswordPage.updatePassword(appUser.getPassword(), newPassword, confirmNewPassword));
     }
 
     @Test

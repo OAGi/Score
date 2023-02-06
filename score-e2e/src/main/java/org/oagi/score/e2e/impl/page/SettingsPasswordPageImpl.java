@@ -3,14 +3,14 @@ package org.oagi.score.e2e.impl.page;
 import org.oagi.score.e2e.AccountUpdateException;
 import org.oagi.score.e2e.impl.menu.LoginIDMenuImpl;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.SettingsPage;
+import org.oagi.score.e2e.page.SettingsPasswordPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class SettingsPageImpl extends BasePageImpl implements SettingsPage {
+public class SettingsPasswordPageImpl extends BasePageImpl implements SettingsPasswordPage {
 
     private static final By OLD_PASSWORD_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Old password\")]//ancestor::div[1]/input");
@@ -26,14 +26,14 @@ public class SettingsPageImpl extends BasePageImpl implements SettingsPage {
 
     private final LoginIDMenuImpl loginIDMenuPage;
 
-    public SettingsPageImpl(LoginIDMenuImpl parent) {
+    public SettingsPasswordPageImpl(LoginIDMenuImpl parent) {
         super(parent);
         this.loginIDMenuPage = parent;
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/settings").toString();
+        return getConfig().getBaseUrl().resolve("/settings/password").toString();
     }
 
     @Override

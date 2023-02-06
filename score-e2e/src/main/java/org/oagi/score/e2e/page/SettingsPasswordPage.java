@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 /**
  * An interface of Settings page.
  */
-public interface SettingsPage extends Page {
+public interface SettingsPasswordPage extends Page {
 
     /**
      * Return the UI element of 'Old Password' field.
