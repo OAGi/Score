@@ -20,11 +20,15 @@ public interface EditBIEPage extends Page {
      */
     WebElement getSearchInputTextField();
 
+
     /**
      * Return the UI element of the 'Search' button.
      *
      * @return the UI element of the 'Search' button
      */
+
+    WebElement getDeprecatedFlag();
+
     WebElement getSearchButton();
 
     /**
@@ -560,6 +564,8 @@ public interface EditBIEPage extends Page {
         void confirmToReset();
 
         String getResetDialogMessage();
+
+        String getValueDomainWarningMessage(String valueDomain);
     }
 
     BBIESCPanel getBBIESCPanel(WebElement bdtScNode);

@@ -1,8 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.JSON;
+import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
@@ -359,6 +358,49 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                                      NamespaceObject namespace, String state) {
         return createRandomACC(creator, release, namespace, state, SEMANTIC_GROUP, null);
     }
+
+    @Override
+    public ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId) {
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(CODE_LIST.fields()));
+        List<Result<Record>> records =  dslContext.select(fields)
+                .from(BDT_PRI_RESTRI)
+                .join(DT_MANIFEST).on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(CODE_LIST_MANIFEST).on(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.isNotNull().and(DT.GUID.eq(guid).and(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))))
+                .fetchMany();
+        return codeListMapper(records);
+    }
+
+    private ArrayList<CodeListObject> codeListMapper(List<Result<Record>> records) {
+        ArrayList<CodeListObject> codeLists = new ArrayList<>();
+        for (Result result : records){
+            CodeListObject codeList = new CodeListObject();
+            if (result.isNotEmpty()){
+                Record record = (Record) result.get(0);
+                codeList.setCodeListId(record.get(CODE_LIST.CODE_LIST_ID).toBigInteger());
+                codeList.setName(record.get(CODE_LIST.NAME));
+                codeList.setGuid(record.get(CODE_LIST.GUID));
+                codeList.setEnumTypeGuid(record.get(CODE_LIST.ENUM_TYPE_GUID));
+                codeList.setListId(record.get(CODE_LIST.LIST_ID));
+                codeList.setVersionId(record.get(CODE_LIST.VERSION_ID));
+                codeList.setDefinition(record.get(CODE_LIST.DEFINITION));
+                codeList.setRemark(record.get(CODE_LIST.REMARK));
+                codeList.setDefinitionSource(record.get(CODE_LIST.DEFINITION_SOURCE));
+                codeList.setNamespaceId(record.get(CODE_LIST.NAMESPACE_ID).toBigInteger());
+                codeList.setCreatedBy(record.get(CODE_LIST.CREATED_BY).toBigInteger());
+                codeList.setOwnerUserId(record.get(CODE_LIST.OWNER_USER_ID).toBigInteger());
+                codeList.setLastUpdatedBy(record.get(CODE_LIST.LAST_UPDATED_BY).toBigInteger());
+                codeList.setState(record.get(CODE_LIST.STATE));
+                codeLists.add(codeList);
+            }
+        }
+        return  codeLists;
+    }
+
 
     @Override
     public ASCCPObject createRandomASCCP(ACCObject roleOfAcc, AppUserObject creator,

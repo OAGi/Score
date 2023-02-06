@@ -70,6 +70,10 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By RESET_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
+    private static final By DEPRECATED_FLAG_LOCATOR =
+            By.xpath("//span[contains(@class,'deprecated')]");
+
+
     private final TopLevelASBIEPObject asbiep;
 
     public EditBIEPageImpl(BasePage parent, TopLevelASBIEPObject asbiep) {
@@ -175,6 +179,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public WebElement getSearchInputTextField() {
         return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDeprecatedFlag() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_FLAG_LOCATOR);
     }
 
     private WebElement goToNode(String path) {
@@ -761,6 +770,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public String getResetDialogMessage() {
             return visibilityOfElementLocated(getDriver(), RESET_DIALOG_MESSAGE_LOCATOR).getText();
+        }
+
+        @Override
+        public String getValueDomainWarningMessage(String valueDomain) {
+            click(getValueDomainField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
+            WebElement valueDomainElement = findElement(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
+            String message = valueDomainElement.getAttribute("ng-reflect-message");
+            return message;
         }
     }
 

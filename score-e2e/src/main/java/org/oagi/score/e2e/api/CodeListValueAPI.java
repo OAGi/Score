@@ -3,6 +3,7 @@ package org.oagi.score.e2e.api;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.CodeListValueObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -19,4 +20,5 @@ public interface CodeListValueAPI {
     CodeListValueObject createDerivedCodeListValue(CodeListValueObject baseCodeListValue,
                                                    CodeListObject codeList, AppUserObject creator);
 
+    void addCodeListValueToAnotherRelease(CodeListValueObject codeListValue, CodeListObject codeList, AppUserObject creator, BigInteger newCodeListManifestId, ReleaseObject release);
 }
