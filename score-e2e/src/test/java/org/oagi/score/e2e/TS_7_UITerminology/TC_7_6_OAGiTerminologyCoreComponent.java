@@ -16,12 +16,16 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
@@ -290,8 +294,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(accFrom.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
-        accViewEditPage.expandTree(accFrom.getDen());
-        accViewEditPage.goToNode(accTo.getObjectClassTerm());
+
+        WebElement node = accViewEditPage.getNodeByPath("/" + accFrom.getDen() + "/" + accTo.getObjectClassTerm());
+        click(node);
+        waitFor(ofMillis(500L));
         String denFieldTitleForASCC = accViewEditPage.getDenFieldLabelForASCC();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleForASCC);
         String cardinalityMaxTitle = accViewEditPage.getCardinalityLabel();
@@ -332,8 +338,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
-        accViewEditPage.expandTree(acc.getDen());
-        accViewEditPage.goToNode(bccp.getPropertyTerm());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        click(bccNode);
+        waitFor(ofMillis(500L));
         String denFieldTitleForBCC = accViewEditPage.getDenFieldLabelForBCC();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleForBCC);
         String cardinalityMaxTitle = accViewEditPage.getCardinalityLabel();
@@ -367,19 +375,24 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
-        accViewEditPage.expandTree(acc.getDen());
-        accViewEditPage.expandTree(bccp.getPropertyTerm());
-        accViewEditPage.goToNode("Identifier. Scheme Version. Identifier");
+
+        WebElement bdtScNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm() + "/" + "Identifier. Scheme Version. Identifier");
+        click(bdtScNode);
+        waitFor(ofMillis(500L));
         String cardinalityMaxTitle = accViewEditPage.getCardinalityLabel();
         assertEquals("Cardinality Max (-1 for unbounded)", cardinalityMaxTitle);
         String denFieldTitleSuplementary = accViewEditPage.getDENFieldLabel();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleSuplementary);
-        accViewEditPage.goToNode(bccp.getPropertyTerm());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        click(bccNode);
+        waitFor(ofMillis(500L));
         String denFieldTitleDT = accViewEditPage.getDENFieldLabelDT();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleDT);
     }

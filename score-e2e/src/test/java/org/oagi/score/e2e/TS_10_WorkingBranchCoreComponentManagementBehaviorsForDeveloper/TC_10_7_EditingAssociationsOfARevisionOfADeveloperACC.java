@@ -11,23 +11,21 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseTest {
 
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -41,54 +39,58 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
 
     @Test
     @DisplayName("TC_10_7_TA_4")
-    public void test_TA_4() {
-        AppUserObject developer;
-        NamespaceObject namespace;
-        ReleaseObject release;
+    public void issue_1386() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
         ASCCPObject asccp;
         BCCPObject bccp;
         ACCObject acc;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
-            thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Candidate");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Candidate");
-            coreComponentAPI.appendBCC(acc, bccp, "Candidate");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
 
-            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Candidate");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Candidate");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Candidate");
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Candidate");
-            coreComponentAPI.appendASCC(acc, asccp, "Candidate");
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            coreComponentAPI.appendASCC(acc, asccp, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.backToWIP();
+        accViewEditPage.hitReviseButton();
 
-        accViewEditPage.expandTree(acc.getDen());
-        accViewEditPage.goToNode(bccp.getPropertyTerm());
-        accViewEditPage.setCardinalityMax(5);
-        accViewEditPage.hitUpdateButton();
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
-        accViewEditPage.backToWIP();
+        accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+        int originalCardinalityMax = Integer.valueOf(getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
+        assertEquals(1, originalCardinalityMax);
+
         accViewEditPage.setCardinalityMax(-1);
         accViewEditPage.hitUpdateButton();
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
-        accViewEditPage.backToWIP();
-        accViewEditPage.setCardinalityMax(6);
+        assertEquals("unbounded", getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
+
+        // refresh the page to check the changed cardinality max
+        accViewEditPage.openPage();
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+
+        accViewEditPage.setCardinalityMax(originalCardinalityMax);
         accViewEditPage.hitUpdateButton();
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
+        assertEquals(Integer.toString(originalCardinalityMax), getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
     }
 
     @AfterEach
