@@ -259,4 +259,89 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                 .where(RELEASE.RELEASE_NUM.eq(releaseNum))
                 .fetchOneInto(ULong.class);
     }
+
+    @Override
+    public Boolean doesCodeListExistInTheRelease(CodeListObject codeList, String release) {
+        return dslContext.fetchExists(
+                dslContext.selectFrom(CODE_LIST_MANIFEST).where(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())).
+                        and(CODE_LIST_MANIFEST.RELEASE_ID.eq(getReleaseIdByReleaseNum(release)))));
+    }
+
+    @Override
+    public void addCodeListToAnotherRelease(CodeListObject codeList, ReleaseObject release, AppUserObject creator) {
+        CodeListRecord codeListRecord = new CodeListRecord();
+        codeListRecord.setGuid(codeList.getGuid());
+        codeListRecord.setName(codeList.getName());
+        codeListRecord.setListId(codeList.getListId());
+        codeListRecord.setVersionId(codeList.getVersionId());
+        codeListRecord.setDefinition(codeList.getDefinition());
+        codeListRecord.setDefinitionSource(codeList.getDefinitionSource());
+        codeListRecord.setRemark(codeList.getRemark());
+        codeListRecord.setExtensibleIndicator((byte) (codeList.isExtensibleIndicator() ? 1 : 0));
+        codeListRecord.setIsDeprecated((byte) (codeList.isDeprecated() ? 1 : 0));
+        codeListRecord.setState(codeList.getState());
+        codeListRecord.setOwnerUserId(ULong.valueOf(codeList.getOwnerUserId()));
+        codeListRecord.setCreatedBy(ULong.valueOf(codeList.getCreatedBy()));
+        codeListRecord.setLastUpdatedBy(ULong.valueOf(codeList.getLastUpdatedBy()));
+        codeListRecord.setCreationTimestamp(codeList.getCreationTimestamp());
+        codeListRecord.setLastUpdateTimestamp(codeList.getLastUpdateTimestamp());
+
+        LogRecord dummyLogRecord = new LogRecord();
+        dummyLogRecord.setHash(UUID.randomUUID().toString().replaceAll("-", ""));
+        dummyLogRecord.setRevisionNum(UInteger.valueOf(1));
+        dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+        dummyLogRecord.setLogAction("Added");
+        dummyLogRecord.setReference(codeListRecord.getGuid());
+        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
+        dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
+
+        ULong logId = dslContext.insertInto(LOG)
+                .set(dummyLogRecord)
+                .returning(LOG.LOG_ID)
+                .fetchOne().getLogId();
+
+        String agencyIdListValueName;
+        if (creator.isDeveloper()) {
+            agencyIdListValueName = "OAGi (Open Applications Group, Incorporated)";
+        } else {
+            agencyIdListValueName = "Mutually defined";
+        }
+
+        ULong agencyIdListValueManifestId =
+                dslContext.select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                        .from(AGENCY_ID_LIST_VALUE_MANIFEST)
+                        .join(AGENCY_ID_LIST_VALUE)
+                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                        .where(and(
+                                AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                AGENCY_ID_LIST_VALUE.NAME.eq(agencyIdListValueName)
+                        ))
+                        .fetchOneInto(ULong.class);
+
+        CodeListManifestRecord codeListManifestRecord = new CodeListManifestRecord();
+        codeListManifestRecord.setBasedCodeListManifestId(codeList.getBasedCodeListManifestId() != null ? ULong.valueOf(codeList.getBasedCodeListManifestId()) : null);
+        codeListManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
+        codeListManifestRecord.setCodeListId(ULong.valueOf(codeList.getCodeListId()));
+        codeListManifestRecord.setAgencyIdListValueManifestId(agencyIdListValueManifestId);
+        codeListManifestRecord.setLogId(logId);
+
+        ULong newCodeListManifestId = dslContext.insertInto(CODE_LIST_MANIFEST)
+                .set(codeListManifestRecord)
+                .returning(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                .fetchOne().getCodeListManifestId();
+
+        addCodeListValuesToAnotherRelease(codeList, creator, release, newCodeListManifestId.toBigInteger());
+    }
+
+    private void addCodeListValuesToAnotherRelease(CodeListObject codeList, AppUserObject creator, ReleaseObject release, BigInteger newCodeListManifestId) {
+        List<CodeListValueObject> codeListValueList =
+                this.apiFactory.getCodeListValueAPI().getCodeListValuesByCodeListManifestId(codeList.getCodeListManifestId());
+
+        for (CodeListValueObject codeListValue : codeListValueList) {
+            this.apiFactory.getCodeListValueAPI().addCodeListValueToAnotherRelease(codeListValue, codeList, creator, newCodeListManifestId, release);
+        }
+    }
+
+
 }

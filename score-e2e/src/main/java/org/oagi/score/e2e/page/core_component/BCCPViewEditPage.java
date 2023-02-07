@@ -645,4 +645,5 @@ public interface BCCPViewEditPage extends Page {
 
     }
 
+    void hitAmendButton();
 }

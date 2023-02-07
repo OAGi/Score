@@ -23,4 +23,7 @@ public interface CodeListAPI {
                                          AppUserObject creator, NamespaceObject namespace,
                                          ReleaseObject release, String state);
 
+    Boolean doesCodeListExistInTheRelease(CodeListObject codeList, String release);
+
+    void addCodeListToAnotherRelease(CodeListObject codeList, ReleaseObject release, AppUserObject creator);
 }

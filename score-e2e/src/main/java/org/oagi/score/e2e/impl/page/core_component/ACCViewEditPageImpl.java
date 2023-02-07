@@ -64,16 +64,15 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By DEN_COMPONENT_LOCATOR_FOR_DT =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input[@Value=\"DT\"]" +
                     "//ancestor::mat-tab-group//descendant::mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
-
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
-
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
 
     private final ACCObject acc;
 
@@ -203,12 +202,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public void hitAmendButton() {
-        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
-        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
-    }
-
-    @Override
     public String getObjectClassTermFieldValue() {
         return getText(getObjectClassTermField());
     }
@@ -275,11 +268,34 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public void hitAmendButton() {
+        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+    }
+
+    @Override
+    public void moveToProduction() {
+        click(getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
     public void moveToQA() {
         click(getMoveToQAButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getMoveToProduction(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        }
     }
 
     @Override
