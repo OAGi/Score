@@ -33,7 +33,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
 
     @Test
     @DisplayName("TC_42_2_1")
-    public void enduser_should_open_page_titled_business_term_assignment_under_bie_menu() {
+    public void enduser_should_open_page_titled_business_term_assignment_on_edit_bie_page() {
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
 
     @Test
     @DisplayName("TC_42_2_3")
-    public void enduser_can_view_asbies_bbies_and_toplevelbies_on_business_term_assignment_page() {
+    public void enduser_can_view_asbies_bbies_on_business_term_assignment_page() {
     }
 
     @Test
