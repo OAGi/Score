@@ -635,7 +635,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             String url = getDriver().getCurrentUrl();
             String bieTypes = StringUtils.substringAfter(url, "bieType=");
             Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
-            BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            BusinessTermAssignmentPage businessTermAssignmentPage =
+                    new BusinessTermAssignmentPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
             assert businessTermAssignmentPage.isOpened();
             return businessTermAssignmentPage;
         }

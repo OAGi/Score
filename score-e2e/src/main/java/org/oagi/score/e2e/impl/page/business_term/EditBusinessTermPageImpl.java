@@ -1,18 +1,13 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.context.ViewEditContextCategoryPageImpl;
 import org.oagi.score.e2e.obj.BusinessTermObject;
-import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
-import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
-import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getSnackBar;
 
 public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusinessTermPage {
 
@@ -38,7 +33,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     private final BusinessTermObject businessTerm;
 
     public EditBusinessTermPageImpl(ViewEditBusinessTermPageImpl parent,
-                                       BusinessTermObject businessTerm) {
+                                    BusinessTermObject businessTerm) {
         super(parent);
         this.parent = parent;
         this.businessTerm = businessTerm;
@@ -82,7 +77,9 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
-    public void setExternalReferenceURI(String externalReferenceURI){sendKeys(getExternalReferenceURIField(), externalReferenceURI);}
+    public void setExternalReferenceURI(String externalReferenceURI) {
+        sendKeys(getExternalReferenceURIField(), externalReferenceURI);
+    }
 
     @Override
     public String getExternalReferenceURIFieldText() {
@@ -95,7 +92,9 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
-    public void setExternalReferenceID(String externalReferenceID){sendKeys(getExternalReferenceIDField(), externalReferenceID);}
+    public void setExternalReferenceID(String externalReferenceID) {
+        sendKeys(getExternalReferenceIDField(), externalReferenceID);
+    }
 
     @Override
     public String getExternalReferenceIDFieldText() {
@@ -106,6 +105,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
+
     @Override
     public String getDefinitionFieldText() {
         return getText(getDefinitionField());

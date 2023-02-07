@@ -14,7 +14,8 @@ import java.util.List;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);

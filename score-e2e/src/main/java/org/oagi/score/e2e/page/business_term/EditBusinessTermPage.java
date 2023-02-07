@@ -2,13 +2,13 @@ package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
-import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
 
 /**
  * An interface of 'Edit Business Term' page.
  */
 public interface EditBusinessTermPage extends Page {
+
     /**
      * Return the UI element of the 'Business Term' field.
      *

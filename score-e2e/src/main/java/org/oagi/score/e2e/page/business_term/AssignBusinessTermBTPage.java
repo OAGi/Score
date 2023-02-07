@@ -1,11 +1,13 @@
 package org.oagi.score.e2e.page.business_term;
 
+import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 
 public interface AssignBusinessTermBTPage extends BasePage {
+
     /**
      * Return the UI element of the 'Updater' select field.
      *
@@ -92,6 +94,7 @@ public interface AssignBusinessTermBTPage extends BasePage {
 
     /**
      * Return the UI element of the 'Filter by same CC' checkbox.
+     *
      * @return the UI element of the 'Filter by same CC' checkbox
      */
     WebElement getFilterBySameCCCheckbox();
@@ -127,6 +130,7 @@ public interface AssignBusinessTermBTPage extends BasePage {
 
     /**
      * Return the UI checkbox for select at given index
+     *
      * @param idx index
      * @return the UI checkbox element
      */
@@ -158,6 +162,7 @@ public interface AssignBusinessTermBTPage extends BasePage {
 
     /**
      * Return the UI element of the 'Preferred Business Term' checkbox.
+     *
      * @return the UI element of the 'Preferred Business Term' checkbox
      */
     WebElement getPreferredBusinessTermCheckbox();
@@ -168,4 +173,11 @@ public interface AssignBusinessTermBTPage extends BasePage {
      * @return the UI element of the 'Create' button
      */
     WebElement getCreateButton();
+
+    /**
+     * Create a new assignment with given business term.
+     *
+     * @param businessTerm business term object
+     */
+    void create(BusinessTermObject businessTerm);
 }
