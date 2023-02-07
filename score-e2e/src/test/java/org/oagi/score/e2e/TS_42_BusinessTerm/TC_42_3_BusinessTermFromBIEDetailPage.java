@@ -108,22 +108,20 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         editBIEPage.hitUpdateButton();
         //Assign business term to pre-existing, used BBIE node
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
-        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
-        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
-        assignBusinessTermBIEPage.hitSearchButton();
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
-
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 7 random business terms to selected BIE for testing purpose
         ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
-        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
         for (int i = 0; i < 7; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-
-            assignBusinessTermBTPage.create(randomBusinessTerm);
+            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPage.hitSearchButton();
+            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
         }
+        //verify hovering display up to 5 business terms if assigned to selected BIE
     }
 
     @Test
