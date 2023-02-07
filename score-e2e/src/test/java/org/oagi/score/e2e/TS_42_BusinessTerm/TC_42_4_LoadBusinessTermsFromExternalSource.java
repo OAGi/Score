@@ -7,10 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
+import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
@@ -29,6 +37,15 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
     @Test
     @DisplayName("TC_42_4_1")
     public void end_user_can_download_a_template_for_external_csv_file_to_be_uploaded_in_business_term_page() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+        click(uploadBusinssTermsPage.getDownloadTemplateButton());
+
     }
 
     @Test

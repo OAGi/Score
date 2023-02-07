@@ -5,6 +5,7 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.*;
 
@@ -195,9 +196,11 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
     }
 
     @Override
-    public void hitUploadBusinessTermsButton() {
+    public UploadBusinssTermsPage hitUploadBusinessTermsButton() {
         click(getUploadBusinessTermsButton());
-        invisibilityOfLoadingContainerElement(getDriver());
+        UploadBusinssTermsPage uploadBusinssTermsPage = new UploadBusinessTermsPageImpl(this);
+        assert uploadBusinssTermsPage.isOpened();
+        return uploadBusinssTermsPage;
     }
 
     @Override

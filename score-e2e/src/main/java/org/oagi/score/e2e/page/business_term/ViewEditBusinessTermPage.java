@@ -163,9 +163,10 @@ public interface ViewEditBusinessTermPage extends Page {
     WebElement getUploadBusinessTermsButton();
 
     /**
-     * Hit the 'Upload Business Terms' button
+     * Click on the UI element of the 'Upload Business Terms' button
+     * @return Upload Business Terms page
      */
-    void hitUploadBusinessTermsButton();
+    UploadBusinssTermsPage hitUploadBusinessTermsButton();
 
     /**
      * Return the UI element of the 'Discard' button.
