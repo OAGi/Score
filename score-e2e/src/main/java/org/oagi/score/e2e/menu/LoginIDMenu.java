@@ -2,7 +2,7 @@ package org.oagi.score.e2e.menu;
 
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
-import org.oagi.score.e2e.page.SettingsPage;
+import org.oagi.score.e2e.page.SettingsPasswordPage;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -94,7 +94,7 @@ public interface LoginIDMenu {
      *
      * @return the 'Settings' page object
      */
-    SettingsPage openSettingsSubMenu();
+    SettingsPasswordPage openSettingsSubMenu();
 
     /**
      * Return the UI element of the 'Logout' button.
