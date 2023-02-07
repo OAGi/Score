@@ -86,46 +86,6 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
 
     @Test
     @DisplayName("TC_42_3_2")
-    public void end_user_can_hover_over_show_business_terms_button_view_up_to_five_business_term_assigned_in_the_descendent_bie_panel() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(endUser);
-        //use pre-existing BBIE node
-        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
-
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
-
-        String path = "/" + asccp.getPropertyTerm() + "/Note";
-        WebElement bbieNode = editBIEPage.getNodeByPath(path);
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-
-        bbiePanel.toggleUsed();
-        editBIEPage.hitUpdateButton();
-        //Assign business term to pre-existing, used BBIE node
-        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
-        //assign up to 7 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-            businessTerms.add(randomBusinessTerm);
-            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-            assignBusinessTermBTPage.hitSearchButton();
-            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-            click(assignBusinessTermBTPage.getCreateButton());
-            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
-            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
-        }
-        //verify hovering display up to 5 business terms if assigned to selected BIE
-    }
-
-    @Test
-    @DisplayName("TC_42_3_3")
     public void end_user_can_click_assign_business_term_button_in_descendent_bie_panel_assign_business_terms() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
