@@ -165,6 +165,11 @@ public interface AssignBusinessTermBIEPage extends BasePage {
     WebElement getSearchButton();
 
     /**
+     * Hit the 'Search' button.
+     */
+    void hitSearchButton();
+
+    /**
      * Return the UI element of the table record at the given index, which starts from 1.
      *
      * @param idx The index of the table record.

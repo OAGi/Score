@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
 
 public class BusinessTermAssignmentPageImpl extends BasePageImpl implements BusinessTermAssignmentPage {
+
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
@@ -67,9 +67,9 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
 
-    private List<String> bieTypes;
+    private final List<String> bieTypes;
 
-    private BigInteger bieId;
+    private final BigInteger bieId;
 
     public BusinessTermAssignmentPageImpl(BasePage parent, List<String> bieTypes, BigInteger bieId) {
         super(parent);
@@ -80,12 +80,12 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     @Override
     protected String getPageUrl() {
         List<String> queries = new ArrayList<>();
-        if (bieId != null){
+        if (bieId != null) {
             queries.add("bieId=" + this.bieId);
         }
         queries.add("bieType=" + String.join(",", this.bieTypes));
         String path = "/business_term_management/assign_business_term";
-        if (!queries.isEmpty()){
+        if (!queries.isEmpty()) {
             path += "?" + queries.stream().collect(Collectors.joining("&"));
         }
         return getConfig().getBaseUrl().resolve(path).toString();
@@ -101,6 +101,16 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("title"));
+    }
+
+    @Override
+    public List<String> getBIETypes() {
+        return this.bieTypes;
+    }
+
+    @Override
+    public BigInteger getBIEId() {
+        return this.bieId;
     }
 
     @Override
@@ -202,13 +212,13 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     }
 
     @Override
-    public String getTypeCodeFieldText() {
-        return getText(getTypeCodeField());
+    public void setTypeCodeField(String typeCode) {
+        sendKeys(getTypeCodeField(), typeCode);
     }
 
     @Override
-    public void setTypeCodeField(String typeCode) {
-        sendKeys(getTypeCodeField(), typeCode);
+    public String getTypeCodeFieldText() {
+        return getText(getTypeCodeField());
     }
 
     @Override
@@ -219,6 +229,11 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitSearchButton() {
+        retry(() -> click(getSearchButton()));
     }
 
     @Override

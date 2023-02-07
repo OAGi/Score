@@ -8,6 +8,7 @@ import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -230,6 +231,7 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
+            waitFor(Duration.ofMillis(500L));
 
             BusinessTermObject businessTerm =
                     getAPIFactory().getBusinessTermAPI().getBusinessTermByName(businessTermName);

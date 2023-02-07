@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,7 +25,8 @@ import static org.oagi.score.e2e.impl.PageHelper.click;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
@@ -43,17 +45,13 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         //use pre-existing BBIE node
-        BusinessContextObject randomBusinessContext =
-                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
-        getDriver().manage().window().maximize();
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
-                .openEditBIEPage(topLevelASBIEP);
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -67,23 +65,24 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
-        click(assignBusinessTermBIEPage.getSearchButton());
+        assignBusinessTermBIEPage.hitSearchButton();
         click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
+
         //assign up to 7 random business terms to selected BIE for testing purpose
         ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
         AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
-        for (int i=0; i < 7; i++){
-            BusinessTermObject randomBusinessTerm =
-                    getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        for (int i = 0; i < 7; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-            click(assignBusinessTermBTPage.getSearchButton());
+            assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
             click(assignBusinessTermBTPage.getCreateButton());
         }
+
         //verify end user can see all random business terms assigned to the selected BIE
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = bbiePanel.clickShowBusinessTermsButton();
-        for (int i=0; i < businessTerms.size(); i++){
+        for (int i = 0; i < businessTerms.size(); i++) {
             btAssignmentPageForSelectedBIE.setBusinessTerm(businessTerms.get(i).getBusinessTerm());
             click(btAssignmentPageForSelectedBIE.getSearchButton());
             assertTrue(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
@@ -98,17 +97,13 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         //use pre-existing BBIE node
-        BusinessContextObject randomBusinessContext =
-                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
-        getDriver().manage().window().maximize();
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
-                .openEditBIEPage(topLevelASBIEP);
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -122,22 +117,18 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
         assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
-        click(assignBusinessTermBIEPage.getSearchButton());
+        assignBusinessTermBIEPage.hitSearchButton();
         click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
+
         //assign up to 7 random business terms to selected BIE for testing purpose
         ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
         AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
-        for (int i=0; i < 7; i++){
-            BusinessTermObject randomBusinessTerm =
-                    getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        for (int i = 0; i < 7; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-            click(assignBusinessTermBTPage.getSearchButton());
-            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-            click(assignBusinessTermBTPage.getCreateButton());
+
+            assignBusinessTermBTPage.create(randomBusinessTerm);
         }
-
-
     }
 
     @Test
@@ -148,19 +139,14 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         //use pre-existing BBIE node
-        BusinessContextObject randomBusinessContext =
-                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        BusinessTermObject randomBusinessTerm =
-                getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
-        getDriver().manage().window().maximize();
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
-                .openEditBIEPage(topLevelASBIEP);
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -171,14 +157,11 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         //Assign business term to pre-existing, used BBIE node
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
-        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        click(assignBusinessTermBTPage.getSearchButton());
-        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-        click(assignBusinessTermBTPage.getCreateButton());
+        assignBusinessTermBTPage.create(randomBusinessTerm);
 
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = bbiePanel.clickShowBusinessTermsButton();
         btAssignmentPageForSelectedBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        click(btAssignmentPageForSelectedBIE.getSearchButton());
+        btAssignmentPageForSelectedBIE.hitSearchButton();
         assertTrue(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
     }
 

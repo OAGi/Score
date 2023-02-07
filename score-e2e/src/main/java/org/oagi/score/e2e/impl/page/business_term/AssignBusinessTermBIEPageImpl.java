@@ -15,44 +15,31 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements AssignBusinessTermBIEPage {
 
-    private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::div[1]/mat-select[1]");
+    private static final By BRANCH_SELECT_FIELD_LOCATOR = By.xpath("//*[contains(text(), \"Branch\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
+    private static final By STATE_SELECT_FIELD_LOCATOR = By.xpath("//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+    private static final By OWNER_SELECT_FIELD_LOCATOR = By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+    private static final By UPDATER_SELECT_FIELD_LOCATOR = By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR = By.xpath("//input[@aria-label=\"dropdown search\"]");
 
-    private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+    private static final By UPDATED_START_DATE_FIELD_LOCATOR = By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
 
-    private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+    private static final By UPDATED_END_DATE_FIELD_LOCATOR = By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
-    private static final By TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+    private static final By TYPE_SELECT_FIELD_LOCATOR = By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
+    private static final By DEN_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
 
-    private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::div[1]/input");
+    private static final By BUSINESS_CONTEXT_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::div[1]/input");
 
-    private static final By TOP_LEVEL_BIE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Top Level BIE\")]//ancestor::div[1]/input");
+    private static final By TOP_LEVEL_BIE_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Top Level BIE\")]//ancestor::div[1]/input");
 
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By SEARCH_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
-    private static final By NEXT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
+    private static final By NEXT_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
 
     private final BusinessTermAssignmentPageImpl parent;
 
@@ -93,8 +80,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
+            WebElement optionField = visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
             click(optionField);
             waitFor(ofMillis(500L));
         });
@@ -109,8 +95,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setState(String state) {
         click(getUpdaterSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), state);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -124,8 +109,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setOwner(String owner) {
         click(getUpdaterSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -139,8 +123,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setUpdater(String updater) {
         click(getUpdaterSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
 
@@ -175,8 +158,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setType(String bieType) {
         click(getUpdaterSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), bieType);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + bieType + "\")]"));
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + bieType + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -224,6 +206,11 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     }
 
     @Override
+    public void hitSearchButton() {
+        retry(() -> click(getSearchButton()));
+    }
+
+    @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
     }
@@ -235,8 +222,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
 
     @Override
     public WebElement getCheckboxByName(String name) {
-        return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
     }
 
     @Override
@@ -248,15 +234,13 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
 
     @Override
     public void goToNextPage() {
-        ((JavascriptExecutor) getDriver())
-                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Next page']")));
     }
 
     @Override
     public void goToPreviousPage() {
-        ((JavascriptExecutor) getDriver())
-                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
     }
 
@@ -271,7 +255,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
         waitFor(ofMillis(500L));
         invisibilityOfLoadingContainerElement(getDriver());
 
-        AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(this);
+        AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(this, parent.getBIETypes(), parent.getBIEId());
         assert assignBusinessTermBTPage.isOpened();
         return assignBusinessTermBTPage;
     }

@@ -4,12 +4,28 @@ import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * An interface for 'Business Term Assignment' page
  */
 public interface BusinessTermAssignmentPage extends Page {
+
+    /**
+     * Return the list of BIE types.
+     *
+     * @return the list of BIE types
+     */
+    List<String> getBIETypes();
+
+    /**
+     * return the BIE ID.
+     *
+     * @return the BIE ID
+     */
+    BigInteger getBIEId();
 
     /**
      * Return the UI element of the 'Updater' select field.
@@ -68,7 +84,8 @@ public interface BusinessTermAssignmentPage extends Page {
     void setType(String bieType);
 
     /**
-     *Return the UI element of the 'BIE DEN' field
+     * Return the UI element of the 'BIE DEN' field.
+     *
      * @return the UI element of the 'BIE DEN' field
      */
     WebElement getBIEDenField();
@@ -136,12 +153,14 @@ public interface BusinessTermAssignmentPage extends Page {
 
     /**
      * Set {@code typeCode} text to the 'Type Code' field.
+     *
      * @param typeCode input for 'Type Code' field
      */
     void setTypeCodeField(String typeCode);
 
     /**
      * Return the UI element of the 'Preferred Only' checkbox.
+     *
      * @return the UI element of the 'Preferred Only' checkbox
      */
     WebElement getPreferredOnlyCheckbox();
@@ -154,7 +173,13 @@ public interface BusinessTermAssignmentPage extends Page {
     WebElement getSearchButton();
 
     /**
+     * Hit the 'Search' button.
+     */
+    void hitSearchButton();
+
+    /**
      * Return the UI element of the 'Turn Off' button.
+     *
      * @return the UI element of the 'Turn Off' button
      */
     WebElement getTurnOffButton();
@@ -162,6 +187,7 @@ public interface BusinessTermAssignmentPage extends Page {
 
     /**
      * Return the UI element of the 'Assign Business Term' button.
+     *
      * @return the UI element of the 'Assign Business Term' button.
      */
     WebElement getAssignBusinessTermButton();
@@ -174,8 +200,9 @@ public interface BusinessTermAssignmentPage extends Page {
     AssignBusinessTermBIEPage assignBusinessTerm();
 
     /**
-     * Return the UI element of the 'Search By Selected BIE' button
-     * @return the UI element of the 'Search By Selected BIE' button.
+     * Return the UI element of the 'Search By Selected BIE' button.
+     *
+     * @return the UI element of the 'Search By Selected BIE' button
      */
     WebElement getSearchBySelectedBIEButton();
 
@@ -188,7 +215,8 @@ public interface BusinessTermAssignmentPage extends Page {
     WebElement getDiscardButton(boolean enabled);
 
     /**
-     * remove the assignment of businessTerm from the given BIE
+     * Remove the assignment of business term from the given BIE.
+     *
      * @param bieDEN BIE Dictionary Entry Name
      * @param businessTerm Business Term Object
      * @param typeCode Type Code set in the Assign Business Term page
@@ -221,7 +249,8 @@ public interface BusinessTermAssignmentPage extends Page {
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
     /**
-     * Return the UI checkbox for select at given index
+     * Return the UI checkbox for select at given index.
+     *
      * @param idx index
      * @return the UI checkbox element
      */

@@ -19,7 +19,8 @@ import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_2_BusinessTermAssignment extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
@@ -35,7 +36,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     public void enduser_should_open_page_titled_business_term_assignment_under_bie_menu() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        getDriver().manage().window().maximize();
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         String businessTermAssignmentPageTitle = getText(bieMenu.openBusinessTermAssignmentSubMenu().getTitle());
@@ -45,9 +46,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_2")
     public void enduser_can_view_all_business_terms_with_assignments_on_business_term_assignment_page() {
-
-
-
     }
 
     @Test
