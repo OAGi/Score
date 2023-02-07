@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
+import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,12 +15,12 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 
+import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
@@ -46,6 +48,16 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
         click(uploadBusinssTermsPage.getDownloadTemplateButton());
 
+        //Call Awaitility library for asysnc download wait
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        ConditionFactory await = Awaitility.await().atMost(Duration.ofSeconds(1));
+        File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
+        await.until(() -> csvFile.exists());
+    }
+
+    private static String getDownloadPath(){
+        File fileDestination = new File(System.getProperty("user.home"), "Downloads");
+        return fileDestination.getAbsolutePath();
     }
 
     @Test
