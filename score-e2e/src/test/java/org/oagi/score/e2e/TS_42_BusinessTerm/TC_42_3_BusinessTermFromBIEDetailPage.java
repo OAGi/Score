@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,16 +60,9 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         editBIEPage.hitUpdateButton();
         //Assign business term to pre-existing, used BBIE node
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
-        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
-        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
-        assignBusinessTermBIEPage.hitSearchButton();
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
-
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 7 random business terms to selected BIE for testing purpose
         ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
-        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
         for (int i = 0; i < 7; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
@@ -78,10 +70,13 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
             click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
         }
 
         //verify end user can see all random business terms assigned to the selected BIE
-        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = bbiePanel.clickShowBusinessTermsButton();
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
         for (int i = 0; i < businessTerms.size(); i++) {
             btAssignmentPageForSelectedBIE.setBusinessTerm(businessTerms.get(i).getBusinessTerm());
             click(btAssignmentPageForSelectedBIE.getSearchButton());

@@ -645,13 +645,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
             //Store the current window handle
             String winHandleBefore = getDriver().getWindowHandle();
-            click(getShowBusinessTermsButton());
+            click(getAssignBusinessTermButton(true));
             for (String winHandle: getDriver().getWindowHandles()){
                 getDriver().switchTo().window(winHandle);
             }
             String url = getDriver().getCurrentUrl();
-            String bieTypes = StringUtils.substringAfter(url, "bieType=");
-            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            String bieTypes = StringUtils.substringAfter(url, "bieTypes=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieIds=", "&"));
             AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
             assert assignBusinessTermBTPage.isOpened();
             return assignBusinessTermBTPage;
