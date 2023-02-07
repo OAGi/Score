@@ -3,21 +3,16 @@ package org.oagi.score.e2e.impl.menu;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.HomePageImpl;
 import org.oagi.score.e2e.impl.page.bie.*;
-import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.ViewEditBusinessTermPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.UpliftCodeListPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.ViewEditCodeListPageImpl;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.page.bie.*;
-import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -46,9 +41,6 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
 
     private final By VIEW_EDIT_BUSINESS_TERM_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"View/Edit Business Term\")]");
-
-    private final By BUSINESS_TERM_ASSIGNMENT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Business Term Assignment\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"View/Edit Code List\")]");
@@ -185,22 +177,6 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
         ViewEditBusinessTermPage viewEditBusinessTermPage = new ViewEditBusinessTermPageImpl(this);
         assert viewEditBusinessTermPage.isOpened();
         return viewEditBusinessTermPage;
-    }
-
-    @Override
-    public WebElement getBusinessTermAssignmentSubMenu() {
-        if (!isExpanded()) {
-            expandBIEMenu();
-        }
-        return elementToBeClickable(getDriver(), BUSINESS_TERM_ASSIGNMENT_SUB_MENU_LOCATOR);
-    }
-
-    @Override
-    public BusinessTermAssignmentPage openBusinessTermAssignmentSubMenu() {
-        retry(() -> click(getBusinessTermAssignmentSubMenu()));
-        List<String> emptyBIEType = Collections.<String>emptyList();
-        BusinessTermAssignmentPage businessTermAssignmentPage = new BusinessTermAssignmentPageImpl(this, emptyBIEType, null);
-        return businessTermAssignmentPage;
     }
 
     @Override
