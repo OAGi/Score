@@ -154,7 +154,8 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         assignBusinessTermBTPage.create(randomBusinessTerm);
 
-        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = bbiePanel.clickShowBusinessTermsButton();
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
         btAssignmentPageForSelectedBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         btAssignmentPageForSelectedBIE.hitSearchButton();
         assertTrue(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
