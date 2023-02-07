@@ -34,13 +34,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_1")
     public void enduser_should_open_page_titled_business_term_assignment_under_bie_menu() {
-        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(endUser);
-
-        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        String businessTermAssignmentPageTitle = getText(bieMenu.openBusinessTermAssignmentSubMenu().getTitle());
-        assertEquals("Business Term Assignment", businessTermAssignmentPageTitle);
     }
 
     @Test

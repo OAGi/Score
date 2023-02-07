@@ -302,7 +302,10 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         click(confirmDiscardButton);
         assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
 
-        BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bieMenu.openBusinessTermAssignmentSubMenu();
+        EditBIEPage editBIEPageForDiscard = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        WebElement bbieNodeForDiscard = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanelForDiscard = editBIEPage.getBBIEPanel(bbieNodeForDiscard);
+        BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bbiePanelForDiscard.clickShowBusinessTermsButton();
         businessTermAssignmentPageForDiscard.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         businessTermAssignmentPageForDiscard.hitSearchButton();
         click(businessTermAssignmentPageForDiscard.getSelectCheckboxAtIndex(1));
