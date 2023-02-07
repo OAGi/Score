@@ -8,9 +8,11 @@ import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditContextCategoryPageImpl extends BasePageImpl implements ViewEditContextCategoryPage {
@@ -127,7 +129,10 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
 
     @Override
     public void hitSearchButton() {
-        retry(() -> click(getSearchButton()));
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(500L));
+        });
     }
 
     @Override
@@ -175,9 +180,10 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     @Override
     public EditContextCategoryPage openEditContextCategoryPageByContextCategoryName(String contextCategoryName) throws NoSuchElementException {
         setName(contextCategoryName);
-        hitSearchButton();
 
         return retry(() -> {
+            hitSearchButton();
+
             WebElement td;
             try {
                 WebElement tr = getTableRecordAtIndex(1);
@@ -190,6 +196,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
+            waitFor(ofMillis(500L));
 
             ContextCategoryObject contextCategory =
                     getAPIFactory().getContextCategoryAPI().getContextCategoryByName(contextCategoryName);
