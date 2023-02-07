@@ -59,7 +59,8 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         BusinessContextObject randomBusinessContext = BusinessContextObject.createRandomBusinessContext(appUser);
         viewEditBusinessContextPage = createBusinessContextPage.createBusinessContext(randomBusinessContext);
 
-        EditBusinessContextPage editBusinessContextPage = viewEditBusinessContextPage.openEditBusinessContextPageByBusinessContextName(randomBusinessContext.getName());
+        EditBusinessContextPage editBusinessContextPage = viewEditBusinessContextPage
+                .openEditBusinessContextPageByBusinessContextName(randomBusinessContext.getName());
         assertEquals(randomBusinessContext.getName(), getText(editBusinessContextPage.getNameField()));
     }
 

@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditBusinessContextPageImpl extends BasePageImpl implements ViewEditBusinessContextPage {
@@ -114,7 +115,10 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
 
     @Override
     public void hitSearchButton() {
-        retry(() -> click(getSearchButton()));
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(500L));
+        });
     }
 
     @Override
@@ -157,9 +161,10 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
     @Override
     public EditBusinessContextPage openEditBusinessContextPageByBusinessContextName(String businessContextName) throws NoSuchElementException {
         setName(businessContextName);
-        hitSearchButton();
 
         return retry(() -> {
+            hitSearchButton();
+
             WebElement td;
             try {
                 WebElement tr = getTableRecordAtIndex(1);
@@ -172,6 +177,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
+            waitFor(ofMillis(500L));
 
             BusinessContextObject businessContext =
                     getAPIFactory().getBusinessContextAPI().getBusinessContextByName(businessContextName);
@@ -211,7 +217,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
             click(getDialogButtonByName(getDriver(), "Discard"));
             assert "Discarded".equals(getSnackBarMessage(getDriver()));
 
-            waitFor(Duration.ofMillis(500));
+            waitFor(ofMillis(500));
         });
     }
 

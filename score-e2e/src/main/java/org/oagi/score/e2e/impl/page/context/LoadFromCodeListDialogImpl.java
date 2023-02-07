@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
@@ -152,9 +153,12 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
     }
 
     @Override
-    public void clickSearch() {
-        retry(() -> click(getSearchButton()));
-        invisibilityOfLoadingContainerElement(getDriver());
+    public void hitSearchButton() {
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
+        });
     }
 
     @Override
@@ -190,9 +194,10 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
     public void selectCodeListByCodeListNameAndBranch(String codeListName, String branch) {
         setBranch(branch);
         setName(codeListName);
-        clickSearch();
 
         retry(() -> {
+            hitSearchButton();
+
             WebElement tr;
             WebElement td;
             try {
@@ -214,7 +219,7 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
             click(getSelectButton());
 
             assert parent.isOpened();
-            waitFor(Duration.ofMillis(500));
+            waitFor(ofMillis(500));
         });
     }
 }

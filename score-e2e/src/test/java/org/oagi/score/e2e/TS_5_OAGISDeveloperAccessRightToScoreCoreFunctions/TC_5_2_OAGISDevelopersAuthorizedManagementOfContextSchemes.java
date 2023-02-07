@@ -60,9 +60,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         ContextMenu contextMenu = homePage.getContextMenu();
         ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
         viewEditContextSchemePage.setName(contextScheme.getSchemeName());
-        viewEditContextSchemePage.hitSearchButton();
 
         retry(() -> {
+            viewEditContextSchemePage.hitSearchButton();
+
             WebElement tr = viewEditContextSchemePage.getTableRecordAtIndex(1);
             WebElement td = viewEditContextSchemePage.getColumnByName(tr, "schemeName");
             assertEquals(contextScheme.getSchemeName(), td.findElement(By.cssSelector("a > span")).getText());
@@ -182,8 +183,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         assertEquals(contextScheme.getSchemeVersionId(), editContextSchemePage.getVersionField().getAttribute("value"));
         assertEquals(contextScheme.getDescription(), editContextSchemePage.getDescriptionField().getAttribute("value"));
 
-        assertThrows(TimeoutException.class, () -> assertContextSchemeValue(editContextSchemePage, contextSchemeValueList.get(0)));
-        assertThrows(TimeoutException.class, () -> assertContextSchemeValue(editContextSchemePage, contextSchemeValueList.get(1)));
+        assertThrows(NoSuchElementException.class, () -> assertContextSchemeValue(editContextSchemePage, contextSchemeValueList.get(0)));
+        assertThrows(NoSuchElementException.class, () -> assertContextSchemeValue(editContextSchemePage, contextSchemeValueList.get(1)));
         assertContextSchemeValue(editContextSchemePage, contextSchemeValueList.get(2));
     }
 
@@ -1460,11 +1461,6 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         assertEquals(agencyIdListValue.getValue(), getText(createContextSchemePage.getAgencyIDField()));
         assertEquals(randomCodeList.getVersionId(), getText(createContextSchemePage.getVersionField()));
 
-        // TODO:
-        // When it loads the code list, all checkboxes in the context scheme values are checked by default.
-        for (CodeListValueObject codeListValue : randomCodeListValues) {
-            createContextSchemePage.toggleContextSchemeValue(codeListValue.getValue());
-        }
         for (CodeListValueObject codeListValue : randomCodeListValues) {
             createContextSchemePage.removeContextSchemeValue(codeListValue.getValue());
         }
@@ -1479,7 +1475,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         assertEquals(randomContextCategory.getName(), getText(editContextSchemePage.getContextCategorySelectField()));
         assertEquals(name, getText(editContextSchemePage.getNameField()));
         for (CodeListValueObject codeListValue : randomCodeListValues) {
-            assertThrows(TimeoutException.class, () -> {
+            assertThrows(NoSuchElementException.class, () -> {
                 editContextSchemePage.openContextSchemeValueDialogByValue(codeListValue.getValue());
             });
         }

@@ -9,6 +9,7 @@ import org.openqa.selenium.*;
 
 import java.time.Duration;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditContextSchemePageImpl extends BasePageImpl implements EditContextSchemePage {
@@ -221,12 +222,16 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     @Override
     public ContextSchemeValueDialog openContextSchemeValueDialogByValue(String value) {
         try {
-            WebElement td = elementToBeClickable(getDriver(), By.xpath("//tbody//td[contains(text(), \"" + value + "\")]"));
-            click(td);
-            ContextSchemeValueDialog contextSchemeValueDialog = new ContextSchemeValueDialogImpl(this);
-            assert contextSchemeValueDialog.isOpened();
-            return contextSchemeValueDialog;
-        }catch (TimeoutException e){
+            return retry(() -> {
+                WebElement td = elementToBeClickable(getDriver(), By.xpath("//tbody//td[contains(text(), \"" + value + "\")]"));
+                click(td);
+                waitFor(ofMillis(500L));
+
+                ContextSchemeValueDialog contextSchemeValueDialog = new ContextSchemeValueDialogImpl(this);
+                assert contextSchemeValueDialog.isOpened();
+                return contextSchemeValueDialog;
+            });
+        } catch (TimeoutException e) {
             throw new NoSuchElementException("Cannot locate a context scheme value using " + value, e);
         }
     }
