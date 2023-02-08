@@ -515,6 +515,89 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_8")
     public void enduser_can_filter_business_terms_already_assigned_to_the_same_core_component_on_assign_business_term_page() {
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        //BBIE
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsBBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPage.hitSearchButton();
+            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+        //ASBIE node
+        ASCCPObject asccp2 = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        EditBIEPage editBIEPage2 = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2);
+
+        String path2 = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        WebElement asbieNode = editBIEPage2.getNodeByPath(path2);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage2.getASBIEPanel(asbieNode);
+
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used ASBIE node
+        assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsASBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPageASBIE.hitSearchButton();
+            click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPageASBIE.getCreateButton());
+            WebElement asbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2).getNodeByPath(path2);
+            assignBusinessTermBTPageASBIE = editBIEPage.getASBIEPanel(asbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+
+        //Search based on CC only
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        AssignBusinessTermBTPage assignBTPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickAssignBusinessTermButton();
+        click(assignBTPageForSelectedBIE.getFilterBySameCCCheckbox());
+        click(assignBTPageForSelectedBIE.getSearchButton());
+        //business term with the same CC are displayed
+        for (int i = 0; i < businessTermsBBIE.size(); i++) {
+            assignBTPageForSelectedBIE.setBusinessTerm(businessTermsBBIE.get(i).getBusinessTerm());
+            click(assignBTPageForSelectedBIE.getSearchButton());
+            assertTrue(assignBTPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
+
+        for (int i = 0; i < businessTermsASBIE.size(); i++) {
+            assignBTPageForSelectedBIE.setBusinessTerm(businessTermsASBIE.get(i).getBusinessTerm());
+            click(assignBTPageForSelectedBIE.getSearchButton());
+            assertFalse(assignBTPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
+
     }
 
     @Test
