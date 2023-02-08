@@ -603,6 +603,58 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_9")
     public void enduser_can_assign_duplicate_business_term_and_type_code_based_on_mixed_conditions_on_assign_business_term_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        //ASBIE node
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        WebElement asbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used ASBIE node
+        assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
+        //assign the same random business term with different type code to selected BIE for testing purpose
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        for (int i = 0; i < 2; i++) {
+            assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPageASBIE.hitSearchButton();
+            click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
+            if (i == 1){assignBusinessTermBTPageASBIE.setTypeCode("type code 1");}
+            else if (i == 2){assignBusinessTermBTPageASBIE.setTypeCode("type code 2");}
+            click(assignBusinessTermBTPageASBIE.getCreateButton());
+            WebElement asbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPageASBIE = editBIEPage.getASBIEPanel(asbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+
+        //Verify the same business terms with different type code in business term assignment page
+        WebElement asbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage businessTermAssignmentPageForSelectBIE = editBIEPage.getBBIEPanel(asbieNodeForCheck).clickShowBusinessTermsButton();
+        assertTrue(businessTermAssignmentPageForSelectBIE.getTurnOffButton().isEnabled());
+
+        //Search the same business with different type code
+        businessTermAssignmentPageForSelectBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        businessTermAssignmentPageForSelectBIE.setTypeCodeField("type code 1");
+        click(businessTermAssignmentPageForSelectBIE.getSearchButton());
+        assertTrue(businessTermAssignmentPageForSelectBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+
+        businessTermAssignmentPageForSelectBIE.setTypeCodeField("type code 2");
+        click(businessTermAssignmentPageForSelectBIE.getSearchButton());
+        assertTrue(businessTermAssignmentPageForSelectBIE.getSelectCheckboxAtIndex(1).isDisplayed());
     }
 
     @Test
