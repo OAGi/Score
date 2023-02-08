@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
-import net.bytebuddy.implementation.auxiliary.MethodCallProxy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,11 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.openqa.selenium.By;
@@ -25,7 +22,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_2_BusinessTermAssignment extends BaseTest {
@@ -328,7 +324,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-            if (i == 0){click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());}//set preferred business term
+            if (i == 0) {
+                click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());
+            }//set preferred business term
             click(assignBusinessTermBTPage.getCreateButton());
             WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
             assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
@@ -634,8 +632,11 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
             click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
-            if (i == 1){assignBusinessTermBTPageASBIE.setTypeCode("type code 1");}
-            else if (i == 2){assignBusinessTermBTPageASBIE.setTypeCode("type code 2");}
+            if (i == 1) {
+                assignBusinessTermBTPageASBIE.setTypeCode("type code 1");
+            } else if (i == 2) {
+                assignBusinessTermBTPageASBIE.setTypeCode("type code 2");
+            }
             click(assignBusinessTermBTPageASBIE.getCreateButton());
             WebElement asbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
             assignBusinessTermBTPageASBIE = editBIEPage.getASBIEPanel(asbieNodeForLoop).clickAssignBusinessTermButton();
@@ -656,6 +657,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         click(businessTermAssignmentPageForSelectBIE.getSearchButton());
         assertTrue(businessTermAssignmentPageForSelectBIE.getSelectCheckboxAtIndex(1).isDisplayed());
     }
+
     @Test
     @DisplayName("TC_42_2_10")
     public void enduser_can_only_set_one_preferred_business_term_assignment_for_each_bie_on_assign_business_term_page() {
@@ -689,8 +691,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-            if (i == 0){click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());}//set preferred business term
-            else if (i==2){
+            if (i == 0) {
+                click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());
+            }//set preferred business term
+            else if (i == 2) {
                 click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());
                 click(assignBusinessTermBTPage.getCreateButton());
                 assertTrue(getDriver().findElement(By.xpath(
