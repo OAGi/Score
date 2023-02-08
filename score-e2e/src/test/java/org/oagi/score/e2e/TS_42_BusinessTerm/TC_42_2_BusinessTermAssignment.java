@@ -290,14 +290,59 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         btAssignmentPageForSelectedBIE.setTypeCodeField("random type code");
         click(btAssignmentPageForSelectedBIE.getSearchButton());
         WebElement trASBIE = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
-        WebElement tdASBIE = trBBIE.findElement(By.xpath("//span[contains(text(), \"ASBIE\")]"));
+        WebElement tdASBIE = trASBIE.findElement(By.xpath("//span[contains(text(), \"ASBIE\")]"));
         assertTrue(tdASBIE.isDisplayed());
-
     }
 
     @Test
     @DisplayName("TC_42_2_5")
     public void enduser_can_filter_only_preferred_business_terms_on_business_term_assignment_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        //BBIE
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTerms.add(randomBusinessTerm);
+            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPage.hitSearchButton();
+            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+            if (i == 0){click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());}//set preferred business term
+            click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+        //set one of business terms as preferred
+        String preferredBusinessTerm = businessTerms.get(0).getBusinessTerm();
+        //Search Preferred only
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
+        click(btAssignmentPageForSelectedBIE.getPreferredOnlyCheckbox());
+        click(btAssignmentPageForSelectedBIE.getSearchButton());
+        WebElement trPreferred = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
+        WebElement tdPreferred = trPreferred.findElement(By.xpath("//span[contains(text(), \"" + preferredBusinessTerm + "\")]"));
+        assertTrue(tdPreferred.isDisplayed());
     }
 
     @Test
