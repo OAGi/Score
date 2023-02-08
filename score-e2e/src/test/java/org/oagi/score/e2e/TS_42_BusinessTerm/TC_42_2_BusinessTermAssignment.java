@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
+import net.bytebuddy.implementation.auxiliary.MethodCallProxy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.openqa.selenium.By;
@@ -21,8 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -348,11 +349,167 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_6")
     public void enduser_can_select_bie_to_view_all_business_term_assignments_assigned_for_that_bie_on_business_term_assignment_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        //BBIE
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsBBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPage.hitSearchButton();
+            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+        //ASBIE node
+        ASCCPObject asccp2 = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        EditBIEPage editBIEPage2 = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2);
+
+        String path2 = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        WebElement asbieNode = editBIEPage2.getNodeByPath(path2);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage2.getASBIEPanel(asbieNode);
+
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used ASBIE node
+        assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsASBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPageASBIE.hitSearchButton();
+            click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPageASBIE.getCreateButton());
+            WebElement asbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2).getNodeByPath(path2);
+            assignBusinessTermBTPageASBIE = editBIEPage.getASBIEPanel(asbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+        //verify all random business terms assigned to the selected BIE are displayed in Business Term Assignment page
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
+        for (int i = 0; i < businessTermsBBIE.size(); i++) {
+            btAssignmentPageForSelectedBIE.setBusinessTerm(businessTermsBBIE.get(i).getBusinessTerm());
+            click(btAssignmentPageForSelectedBIE.getSearchButton());
+            assertTrue(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
+
+        for (int i = 0; i < businessTermsASBIE.size(); i++) {
+            btAssignmentPageForSelectedBIE.setBusinessTerm(businessTermsASBIE.get(i).getBusinessTerm());
+            click(btAssignmentPageForSelectedBIE.getSearchButton());
+            assertFalse(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
     }
 
     @Test
     @DisplayName("TC_42_2_7")
-    public void enduser_can_select_bie_to_view_all_business_term_not_assigned_but_available_for_that_bie_on_assign_business_term_page() {
+    public void enduser_can_select_bie_to_view_all_business_term_available_for_that_bie_on_assign_business_term_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        //BBIE
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsBBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPage.hitSearchButton();
+            click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPage.getCreateButton());
+            WebElement bbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+            assignBusinessTermBTPage = editBIEPage.getBBIEPanel(bbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+        //ASBIE node
+        ASCCPObject asccp2 = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        EditBIEPage editBIEPage2 = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2);
+
+        String path2 = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        WebElement asbieNode = editBIEPage2.getNodeByPath(path2);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage2.getASBIEPanel(asbieNode);
+
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used ASBIE node
+        assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
+        //assign up to 3 random business terms to selected BIE for testing purpose
+        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            businessTermsASBIE.add(randomBusinessTerm);
+            assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+            assignBusinessTermBTPageASBIE.hitSearchButton();
+            click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
+            click(assignBusinessTermBTPageASBIE.getCreateButton());
+            WebElement asbieNodeForLoop = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2).getNodeByPath(path2);
+            assignBusinessTermBTPageASBIE = editBIEPage.getASBIEPanel(asbieNodeForLoop).clickAssignBusinessTermButton();
+        }
+
+        //Verify all 6 random business terms available in the Assign Business Term page
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        AssignBusinessTermBTPage assignBTPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickAssignBusinessTermButton();
+        for (int i = 0; i < businessTermsBBIE.size(); i++) {
+            assignBTPageForSelectedBIE.setBusinessTerm(businessTermsBBIE.get(i).getBusinessTerm());
+            click(assignBTPageForSelectedBIE.getSearchButton());
+            assertTrue(assignBTPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
+
+        for (int i = 0; i < businessTermsASBIE.size(); i++) {
+            assignBTPageForSelectedBIE.setBusinessTerm(businessTermsASBIE.get(i).getBusinessTerm());
+            click(assignBTPageForSelectedBIE.getSearchButton());
+            assertTrue(assignBTPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+        }
     }
 
     @Test
