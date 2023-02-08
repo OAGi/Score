@@ -4,6 +4,8 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.IOException;
@@ -26,8 +28,7 @@ public class Configuration {
     }
 
     public static Configuration load() {
-        try (InputStream inputStream = Configuration.class.getClassLoader()
-                .getResourceAsStream(SCORE_E2E_PROPERTY_FILENAME)) {
+        try (InputStream inputStream = Configuration.class.getClassLoader().getResourceAsStream(SCORE_E2E_PROPERTY_FILENAME)) {
             return new Configuration(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -62,25 +63,46 @@ public class Configuration {
 
     private WebDriver newLocalWebDriver() {
         String browser = getProperty("org.oagi.score.e2e.browser");
-        if (browser.equals("chrome")) {
-            return new ChromeDriver((ChromeOptions) newCapabilities());
+        switch (browser) {
+            case "chrome":
+                return new ChromeDriver((ChromeOptions) newCapabilities());
+            case "edge":
+                return new EdgeDriver((EdgeOptions) newCapabilities());
         }
         throw new IllegalArgumentException("Unsupported browser: " + browser);
     }
 
-    public Capabilities newCapabilities() {
+    private Capabilities newCapabilities() {
         String browser = getProperty("org.oagi.score.e2e.browser");
-        if (browser.equals("chrome")) {
-            ChromeOptions chromeOptions = new ChromeOptions();
-            if (getBooleanProperty("org.oagi.score.e2e.chrome.headless")) {
-                chromeOptions.addArguments("--headless");
-            }
-            if (getBooleanProperty("org.oagi.score.e2e.chrome.disable-gpu")) {
-                chromeOptions.addArguments("--disable-gpu");
-            }
-            return chromeOptions;
+        switch (browser) {
+            case "chrome":
+                return newChromeCapabilities();
+            case "edge":
+                return newEdgeCapabilities();
         }
         throw new IllegalArgumentException("Unsupported browser: " + browser);
+    }
+
+    private Capabilities newChromeCapabilities() {
+        ChromeOptions chromeOptions = new ChromeOptions();
+        if (getBooleanProperty("org.oagi.score.e2e.chrome.headless")) {
+            chromeOptions.addArguments("--headless");
+        }
+        if (getBooleanProperty("org.oagi.score.e2e.chrome.disable-gpu")) {
+            chromeOptions.addArguments("--disable-gpu");
+        }
+        return chromeOptions;
+    }
+
+    private EdgeOptions newEdgeCapabilities() {
+        EdgeOptions edgeOptions = new EdgeOptions();
+        if (getBooleanProperty("org.oagi.score.e2e.edge.headless")) {
+            edgeOptions.addArguments("--headless");
+        }
+        if (getBooleanProperty("org.oagi.score.e2e.edge.disable-gpu")) {
+            edgeOptions.addArguments("--disable-gpu");
+        }
+        return edgeOptions;
     }
 
     public String getProperty(String key) {

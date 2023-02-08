@@ -8,9 +8,11 @@ import org.oagi.score.e2e.page.context.EditContextSchemePage;
 import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditContextSchemePageImpl extends BasePageImpl implements ViewEditContextSchemePage {
@@ -114,7 +116,10 @@ public class ViewEditContextSchemePageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void hitSearchButton() {
-        retry(() -> click(getSearchButton()));
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(500L));
+        });
     }
 
     @Override
@@ -162,9 +167,10 @@ public class ViewEditContextSchemePageImpl extends BasePageImpl implements ViewE
     @Override
     public EditContextSchemePage openEditContextSchemePageByContextSchemeName(String contextSchemeName) throws NoSuchElementException {
         setName(contextSchemeName);
-        hitSearchButton();
 
         return retry(() -> {
+            hitSearchButton();
+
             WebElement td;
             try {
                 WebElement tr = getTableRecordAtIndex(1);
@@ -177,6 +183,7 @@ public class ViewEditContextSchemePageImpl extends BasePageImpl implements ViewE
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
+            waitFor(ofMillis(2000L));
 
             ContextSchemeObject contextScheme =
                     getAPIFactory().getContextSchemeAPI().getContextSchemeByName(contextSchemeName);
