@@ -223,6 +223,76 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_4")
     public void enduser_can_search_business_term_assignments_by_bietype_and_den_or_business_term_or_uri_or_typecode_on_business_term_assigment_page() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        //use pre-existing BBIE node
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        //BBIE
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used BBIE node
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageBBIE = bbiePanel.clickAssignBusinessTermButton();
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        assignBusinessTermBTPageBBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        assignBusinessTermBTPageBBIE.hitSearchButton();
+        click(assignBusinessTermBTPageBBIE.getSelectCheckboxAtIndex(1));
+        click(assignBusinessTermBTPageBBIE.getCreateButton());
+
+        //ASBIE node
+        ASCCPObject asccp2 = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        EditBIEPage editBIEPage2 = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2);
+
+        String path2 = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        WebElement asbieNode = editBIEPage2.getNodeByPath(path2);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage2.getASBIEPanel(asbieNode);
+
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+        //Assign business term to pre-existing, used ASBIE node
+        assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
+        BusinessTermObject randomBusinessTerm2 = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm2.getBusinessTerm());
+        assignBusinessTermBTPageASBIE.setTypeCode("random type code");
+        assignBusinessTermBTPageASBIE.hitSearchButton();
+        click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
+        click(assignBusinessTermBTPageASBIE.getCreateButton());
+
+        //Search based on BIE type and DEN, Business Term, External Reference URI, Type Code
+        WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
+        BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
+        click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
+        //Search by external reference URI
+        btAssignmentPageForSelectedBIE.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
+        click(btAssignmentPageForSelectedBIE.getSearchButton());
+        WebElement trBBIE = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
+        WebElement tdBBIE = trBBIE.findElement(By.xpath("//span[contains(text(), \"BBIE\")]"));
+        assertTrue(tdBBIE.isDisplayed());
+        //Search by type code
+        btAssignmentPageForSelectedBIE.setTypeCodeField("random type code");
+        click(btAssignmentPageForSelectedBIE.getSearchButton());
+        WebElement trASBIE = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
+        WebElement tdASBIE = trBBIE.findElement(By.xpath("//span[contains(text(), \"ASBIE\")]"));
+        assertTrue(tdASBIE.isDisplayed());
+
     }
 
     @Test
