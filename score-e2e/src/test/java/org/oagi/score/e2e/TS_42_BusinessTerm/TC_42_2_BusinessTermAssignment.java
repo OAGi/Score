@@ -618,12 +618,12 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         //ASBIE node
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
                 .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, endUser, "WIP");
 
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
@@ -663,6 +663,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         click(businessTermAssignmentPageForSelectBIE.getSearchButton());
         assertTrue(businessTermAssignmentPageForSelectBIE.getSelectCheckboxAtIndex(1).isDisplayed());
 
+        businessTermAssignmentPageForSelectBIE.getTypeCodeField().clear();
+        click(businessTermAssignmentPageForSelectBIE.getSearchButton());
         businessTermAssignmentPageForSelectBIE.setTypeCodeField("type code 2");
         click(businessTermAssignmentPageForSelectBIE.getSearchButton());
         assertTrue(businessTermAssignmentPageForSelectBIE.getSelectCheckboxAtIndex(1).isDisplayed());
@@ -680,9 +682,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         //BBIE
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -708,7 +710,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
                 click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());
                 click(assignBusinessTermBTPage.getCreateButton());
                 assertTrue(getDriver().findElement(By.xpath(
-                        "//*[contains(text(), \"Overwrite previous preferred business terms?\n\")]")).isDisplayed());
+                        "//*[contains(text(), \"Overwrite previous preferred business terms?\")]")).isDisplayed());
                 break;
             }
             click(assignBusinessTermBTPage.getCreateButton());
