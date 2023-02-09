@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +18,10 @@ import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.WebElement;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +68,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_2")
-    public void end_user_can_upload_and_attach_the_csv_file_with_correct_format_in_business_term_page() {
-        //prepare test business terms to be written into csv file for bulk upload
-        List<String[]> businessTermsForUpload = new ArrayList<>();
-        businessTermsForUpload.add(new String[] {"bt_bulk_upload1", "http://btupload1.com", "1", "business term 1 through bulk upload","business term 1 through bulk upload" });
-        businessTermsForUpload.add(new String[] {"bt_bulk_upload2", "http://btupload2.com", "2", "business term 2 through bulk upload","business term 2 through bulk upload" });
-        businessTermsForUpload.add(new String[] {"bt_bulk_upload3", "http://btupload1.com", "3", "business term 3 through bulk upload","business term 3 through bulk upload" });
-
+    public void end_user_can_upload_and_attach_the_csv_file_with_correct_format_in_business_term_page() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -81,20 +80,30 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         //Download csv file template
         click(uploadBusinssTermsPage.getDownloadTemplateButton());
 
-        //Call Awaitility library for asysnc download wait
+        //Call Awaitility library for async download wait
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         ConditionFactory await = Awaitility.await().atMost(Duration.ofSeconds(1));
         File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
         await.until(() -> csvFile.exists());
 
         //write test business terms into csv file and save into a different name for upload
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload.csv");
+        try(
+            BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
 
+            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                    .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"));
+        ){
+            csvPrinter.printRecord("bt_bulk_upload1", "http://btupload1.com", "1", "business term 1 through bulk upload","business term 1 through bulk upload" );
+            csvPrinter.printRecord("bt_bulk_upload2", "http://btupload2.com", "2", "business term 2 through bulk upload","business term 2 through bulk upload" );
+            csvPrinter.printRecord("bt_bulk_upload3", "http://btupload3.com", "3", "business term 3 through bulk upload","business term 3 through bulk upload");
+
+            csvPrinter.flush();
+        }
 
         //upload the modified csv file
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload.csv");
         WebElement chooseFile = click(uploadBusinssTermsPage.getAttachButton());
         chooseFile.sendKeys(csvFileForUpload.getAbsolutePath());
-
         //Verify that all test business terms have been saved through bulk upload
         ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
 
