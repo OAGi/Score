@@ -298,6 +298,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     }
 
     @Test
+    @DisabledIfBusinessTermProperty(value = false)
     @DisplayName("TC_42_2_5")
     public void enduser_can_filter_only_preferred_business_terms_on_business_term_assignment_page() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -309,9 +310,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         //BBIE
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -351,6 +352,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     }
 
     @Test
+    @DisabledIfBusinessTermProperty(value = false)
     @DisplayName("TC_42_2_6")
     public void enduser_can_select_bie_to_view_all_business_term_assignments_assigned_for_that_bie_on_business_term_assignment_page() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -362,9 +364,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         //BBIE
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
@@ -391,11 +393,11 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         ASCCPObject asccp2 = getAPIFactory().getCoreComponentAPI()
                 .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp2, endUser, "WIP");
 
         EditBIEPage editBIEPage2 = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP2);
 
-        String path2 = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
+        String path2 = "/" + asccp2.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis";
         WebElement asbieNode = editBIEPage2.getNodeByPath(path2);
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage2.getASBIEPanel(asbieNode);
 
@@ -427,9 +429,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         }
 
         for (int i = 0; i < businessTermsASBIE.size(); i++) {
-            btAssignmentPageForSelectedBIE.setBusinessTerm(businessTermsASBIE.get(i).getBusinessTerm());
+            String businessTermName = businessTermsASBIE.get(i).getBusinessTerm();
+            btAssignmentPageForSelectedBIE.setBusinessTerm(businessTermName);
             click(btAssignmentPageForSelectedBIE.getSearchButton());
-            assertFalse(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());
+            assertEquals(0, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + businessTermName + "\")]")).size());
         }
     }
 
