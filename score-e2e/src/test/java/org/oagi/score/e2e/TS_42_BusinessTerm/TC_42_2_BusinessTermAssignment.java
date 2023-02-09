@@ -638,7 +638,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         //assign the same random business term with different type code to selected BIE for testing purpose
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
             click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
@@ -709,8 +709,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
             else if (i == 2) {
                 click(assignBusinessTermBTPage.getPreferredBusinessTermCheckbox());
                 click(assignBusinessTermBTPage.getCreateButton());
-                assertTrue(getDriver().findElement(By.xpath(
-                        "//*[contains(text(), \"Overwrite previous preferred business terms?\")]")).isDisplayed());
+                assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Overwrite previous preferred business terms?\")]")).isDisplayed());
                 break;
             }
             click(assignBusinessTermBTPage.getCreateButton());
