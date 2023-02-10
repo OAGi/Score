@@ -31,9 +31,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
+    }
+    private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
+        this.randomBusinessTerms.add(businessTerm);
     }
 
     @BeforeEach
@@ -68,7 +72,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         businessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
         businessTerm.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
-
+        thisRandomBusinessTermWillBeDeletedAfterTests(businessTerm);
         EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditBusinessTermPageByTerm(businessTerm.getBusinessTerm());
         assertEquals(businessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
         assertTrue(StringUtils.isEmpty(editBusinessTermPage.getDefinitionFieldText()));
@@ -100,6 +104,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -117,6 +122,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
         getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -163,6 +169,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
 
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
+
         assertThrows(NoSuchElementException.class, () -> bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(oldTermName));
 
         editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
@@ -179,6 +187,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -195,6 +204,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -215,15 +225,16 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
                 .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+                .generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
@@ -264,13 +275,14 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, developer, "WIP");
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
@@ -332,6 +344,11 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
+        });
+
+        // Delete random business terms
+        this.randomBusinessTerms.forEach(randomBusinessTerm -> {
+            getAPIFactory().getBusinessTermAPI().deleteBusinessTermById(randomBusinessTerm.getBusinessTermId());
         });
     }
 

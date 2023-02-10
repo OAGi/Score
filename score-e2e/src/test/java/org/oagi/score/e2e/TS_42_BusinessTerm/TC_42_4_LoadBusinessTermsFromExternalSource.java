@@ -16,6 +16,8 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -26,6 +28,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -106,7 +109,11 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         //upload the modified csv file
         WebElement chooseFile = click(uploadBusinssTermsPage.getAttachButton());
-        chooseFile.sendKeys(csvFileForUpload.getAbsolutePath());
+        getDriver().switchTo().activeElement();
+        chooseFile.findElement(By.xpath("//input[@type='file']")).sendKeys(csvFileForUpload.getAbsolutePath());
+        chooseFile.sendKeys(Keys.ENTER);
+        getDriver().manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
+
         //Verify that all test business terms have been saved through bulk upload
         ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
         viewEditBusinessTermPageForCheck.setTerm("bt_bulk_upload1");
