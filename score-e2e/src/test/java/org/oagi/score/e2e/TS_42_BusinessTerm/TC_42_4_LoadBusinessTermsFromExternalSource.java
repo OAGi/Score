@@ -108,10 +108,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         }
 
         //upload the modified csv file
-        WebElement chooseFile = click(uploadBusinssTermsPage.getAttachButton());
-        getDriver().switchTo().activeElement();
-        chooseFile.findElement(By.xpath("//input[@type='file']")).sendKeys(csvFileForUpload.getAbsolutePath());
-        chooseFile.sendKeys(Keys.ENTER);
+        uploadBusinssTermsPage.getAttachButton().sendKeys(csvFileForUpload.getAbsolutePath());
         getDriver().manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
 
         //Verify that all test business terms have been saved through bulk upload
