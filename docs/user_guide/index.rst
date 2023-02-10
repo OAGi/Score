@@ -8813,15 +8813,27 @@ applies to the agency ID list.
 
 Manage Business Terms
 ---------------------
-Currently, Score only provides this business term functionality to the end
-users. Developers won't see this functionality once logins as deverloper 
+Currently, Score provides this business term functionality to the end
+users only. Developers won't see this functionality once logins as developer 
 accounts. The end users can view, create, edit or discard business terms through the 
-View/Edit Business Term menu under the BIE menu. The end users can assign 
-business terms to BIEs only through the BIE detail page. At current version, 
-the end users can assign business terms to only two BIE types: ASBIE and BBIE. 
+View/Edit Business Term menu under the BIE menu. The only way to assign 
+business terms to BIEs is through the BIE detail page. At current version, 
+the end users can assign business terms to two BIE types: ASBIE and BBIE. 
 
 Create a Business Term
 ~~~~~~~~~~~~~~~~~~~~~~~
+To create a business term:
+
+1. On the top menu of the page, click "BIE".
+2. Choose "View/Edit Business Term" from the drop-down list.
+3. On the returned "Business Term" page, click "New Business Term" located at the top-right
+   of the page. 
+4. On the returned "Create Business Term" page, fill out the following fields:
+   1. Business Term (Mandatory) the main name of the business term
+   2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
+   3. External Reference Id(Optional) 
+   4. Comment(Optional) This is free-form text field for documentint what the business term is, its purpsoses, etc. 
+5. Click the "Create" button. 
 
 Edit a Business Term
 ~~~~~~~~~~~~~~~~~~~~
