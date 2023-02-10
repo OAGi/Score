@@ -653,10 +653,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
                 getDriver().manage().window().maximize();
-                WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
-                assertTrue(node.isDisplayed());
-                WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
-                click(checkBoxForNode);
+                WebElement bieNode = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
+                EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bieNode);
+
+                bbiePanel.toggleUsed();
                 editBIEPage.hitUpdateButton();
             }
 
@@ -704,10 +704,9 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
                 getDriver().manage().window().maximize();
-                WebElement node = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
-                assertTrue(node.isDisplayed());
-                WebElement checkBoxForNode = editBIEPage.getCheckboxByNodeName(randomBCCP.getPropertyTerm());
-                click(checkBoxForNode);
+                WebElement bieNode = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
+                EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bieNode);
+                bbiePanel.toggleUsed();
                 editBIEPage.hitUpdateButton();
             }
             loop--;
