@@ -195,7 +195,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
                     NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
                     ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
@@ -218,10 +217,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
                 selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
-                accExtensionViewEditPage.getNamespaceField().clear();
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
-
 
                 accExtensionViewEditPage.moveToQA();
 
@@ -624,54 +621,73 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_8")
     public void end_user_can_see_associations_of_user_extensions_that_he_owns_and_not_used_in_bies_in_my_unused_extensions_in_bies_panel() {
-        AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(endUser1);
-
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        ASCCPObject asccp;
+        AppUserObject usera;
+        TopLevelASBIEPObject useraBIEWIP;
+        ASCCPObject asccpToAppend;
+        BCCPObject bccpToAppend;
+        ACCObject accToAppend;
+        Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
+        {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-        UserExtensionGroupContainer ueContainer = new UserExtensionGroupContainer(endUser1, release, endUserNamespace);
+            ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
-        HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
-        homePage.setBranch(release.getReleaseNumber());
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
 
-        HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
 
-        click(homePage.getScoreLogo()); // to go to the home page again.
+            accToAppend = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
+            accBCCPMap.put(accToAppend, bccp);
+            asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
-        //check the random BCCP nodes for each BIE
-        TopLevelASBIEPObject topBIE;
-        BCCPObject randomBCCP;
-        int loop = 2; //loop twice to check and uncheck the random BCCP nodes for the selected BIE
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        assertEquals("WIP", useraBIEWIP.getState());
 
-        while (loop > 0) {
-            for (Map.Entry<TopLevelASBIEPObject, BCCPObject> bieBccpEntry : ueContainer.bieBCCPMap.entrySet()) {
-                topBIE = bieBccpEntry.getKey();
-                randomBCCP = bieBccpEntry.getValue();
-                BIEMenu bieMenu = homePage.getBIEMenu();
-                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topBIE);
-                getDriver().manage().window().maximize();
-                WebElement bieNode = editBIEPage.getNodeByPath("/Extension/" + randomBCCP.getPropertyTerm());
-                EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bieNode);
+        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(asccpToAppend.getDen());
+        ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
-                bbiePanel.toggleUsed();
-                editBIEPage.hitUpdateButton();
-            }
+        int loop =2;
+        while (loop > 0){
+            bieMenu.openViewEditBIESubMenu();
+            viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
+            ASBIEPanel.toggleUsed();
+            editBIEPage.hitUpdateButton();
             loop--;
 
         }
-        ASCCPObject randomASCCP;
-        // verify MyUnusedUEsInBIEsPanel have those random BCCPs
-        for (Map.Entry<ASCCPObject, BCCPObject> ueBccpEntry : ueContainer.ueBCCPMap.entrySet()) {
-            randomASCCP = ueBccpEntry.getKey();
-            String ueName = randomASCCP.getPropertyTerm() + " User Extension Group. Details";
-            randomBCCP = ueBccpEntry.getValue();
-            WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, randomBCCP.getPropertyTerm());
-            assertTrue(td.isDisplayed());
-        }
+        homePage.setBranch(release.getReleaseNumber());
+        HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
+        click(homePage.getScoreLogo()); // to go to the home page again.
+        String ueName = asccp.getPropertyTerm() + " User Extension Group. Details";
+        WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getPropertyTerm());
+        assertTrue(td.isDisplayed());
+
     }
 
     @Test
