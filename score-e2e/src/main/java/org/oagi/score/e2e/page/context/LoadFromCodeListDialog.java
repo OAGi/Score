@@ -104,7 +104,7 @@ public interface LoadFromCodeListDialog extends Dialog {
     /**
      * Click the 'Search' button.
      */
-    void clickSearch();
+    void hitSearchButton();
 
     /**
      * Return the UI element of the table record at the given index, which starts from 1.

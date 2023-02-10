@@ -1,17 +1,26 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
+import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
+import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
+import java.math.BigInteger;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
@@ -70,11 +79,21 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By RESET_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
+    private static final By DEPRECATED_FLAG_LOCATOR =
+            By.xpath("//span[contains(@class,'deprecated')]");
+
+    private static final By ASSIGN_BUSINESS_TERM_LOCATOR = By.xpath("//span[contains(text(), \"Assign Business Term\")]//ancestor::button[1]");
+
+    private static final By TURNOFF_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
+    
     private final TopLevelASBIEPObject asbiep;
+    private BasePage parent;
 
     public EditBIEPageImpl(BasePage parent, TopLevelASBIEPObject asbiep) {
         super(parent);
         this.asbiep = asbiep;
+        this.parent = parent;
     }
 
     @Override
@@ -175,6 +194,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public WebElement getSearchInputTextField() {
         return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDeprecatedFlag() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_FLAG_LOCATOR);
     }
 
     private WebElement goToNode(String path) {
@@ -584,10 +608,61 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private class BBIEPanelImpl implements BBIEPanel {
-
         @Override
         public WebElement getBusinessTermField() {
             return getInputFieldByName("Business Term");
+        }
+
+        @Override
+        public WebElement getShowBusinessTermsButton(){
+            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
+        }
+
+        @Override
+        public WebElement getAssignBusinessTermButton(boolean enabled){
+            if (enabled) {
+                return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            } else {
+                return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            }
+        }
+
+        @Override
+        public AssignBusinessTermBTPage clickAssignBusinessTermButton(List<String> bieTypes, BigInteger bieId) {
+            return null;
+        }
+
+        @Override
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
+            click(getShowBusinessTermsButton());
+            for (String winHandle: getDriver().getWindowHandles()){
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieType=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            BusinessTermAssignmentPage businessTermAssignmentPage =
+                    new BusinessTermAssignmentPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            assert businessTermAssignmentPage.isOpened();
+            return businessTermAssignmentPage;
+        }
+
+        @Override
+        public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
+            click(getShowBusinessTermsButton());
+            for (String winHandle: getDriver().getWindowHandles()){
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieType=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            assert assignBusinessTermBTPage.isOpened();
+            return assignBusinessTermBTPage;
         }
 
         @Override
@@ -761,6 +836,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public String getResetDialogMessage() {
             return visibilityOfElementLocated(getDriver(), RESET_DIALOG_MESSAGE_LOCATOR).getText();
+        }
+
+        @Override
+        public String getValueDomainWarningMessage(String valueDomain) {
+            click(getValueDomainField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
+            WebElement valueDomainElement = findElement(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
+            String message = valueDomainElement.getAttribute("ng-reflect-message");
+            return message;
         }
     }
 

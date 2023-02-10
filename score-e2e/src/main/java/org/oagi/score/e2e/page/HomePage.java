@@ -109,21 +109,29 @@ public interface HomePage extends Page {
 
     void setBranch(String branch);
 
+    TotalBIEsByStatesPanel openTotalBIEsByStatesPanel();
+
+    MyBIEsByStatesPanel openMyBIEsByStatesPanel();
+
+    BIEsByUsersAndStatesPanel openBIEsByUsersAndStatesPanel();
+
+    MyRecentBIEsPanel openMyRecentBIEsPanel();
+
+    TotalUEsByStatesPanel openTotalUEsByStatesPanel();
+
+    UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
+
     interface TotalBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
         ViewEditBIEPage clickStateProgressBar(String state);
     }
 
-    TotalBIEsByStatesPanel openTotalBIEsByStatesPanel();
-
     interface MyBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
         ViewEditBIEPage clickStateProgressBar(String state);
     }
-
-    MyBIEsByStatesPanel openMyBIEsByStatesPanel();
 
     interface BIEsByUsersAndStatesPanel {
 
@@ -184,8 +192,6 @@ public interface HomePage extends Page {
 
     }
 
-    BIEsByUsersAndStatesPanel openBIEsByUsersAndStatesPanel();
-
     interface MyRecentBIEsPanel {
 
         /**
@@ -230,8 +236,6 @@ public interface HomePage extends Page {
 
     }
 
-    MyRecentBIEsPanel openMyRecentBIEsPanel();
-
     interface TotalUEsByStatesPanel {
 
         WebElement getStateProgressBarByState(String state);
@@ -239,18 +243,6 @@ public interface HomePage extends Page {
         ViewEditCoreComponentPage clickStateProgressBar(String state);
 
     }
-
-    TotalUEsByStatesPanel openTotalUEsByStatesPanel();
-
-    interface MyUEsByStatesPanel {
-
-        WebElement getStateProgressBarByState(String state);
-
-        ViewEditCoreComponentPage clickStateProgressBar(String state);
-
-    }
-
-    MyUEsByStatesPanel openMyUEsByStatesPanel();
 
     interface UEsByUsersAndStatesPanel {
 
@@ -310,31 +302,5 @@ public interface HomePage extends Page {
         ViewEditCoreComponentPage openViewEditCCPageByUsernameAndColumnName(String user, String columnName);
 
     }
-
-    UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
-
-    interface MyUnusedUEsInBIEsPanel {
-
-        /**
-         * Return the table record in the table based on the user extension name and association DEN
-         *
-         * @param ueName   user extension name
-         * @param assocDEN Association DEN
-         * @return the table record UI element
-         */
-        WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN);
-
-        /**
-         * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
-         *
-         * @param ueName   user extension name
-         * @param assocDEN Association DEN
-         * @return the 'View/Edit Core Component' page object
-         */
-        ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN);
-
-    }
-
-    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
 
 }

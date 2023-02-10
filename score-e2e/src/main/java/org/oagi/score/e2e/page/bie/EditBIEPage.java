@@ -2,10 +2,13 @@ package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
+import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.WebElement;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -20,11 +23,15 @@ public interface EditBIEPage extends Page {
      */
     WebElement getSearchInputTextField();
 
+
     /**
      * Return the UI element of the 'Search' button.
      *
      * @return the UI element of the 'Search' button
      */
+
+    WebElement getDeprecatedFlag();
+
     WebElement getSearchButton();
 
     /**
@@ -437,6 +444,10 @@ public interface EditBIEPage extends Page {
 
     interface BBIEPanel {
 
+        BusinessTermAssignmentPage clickShowBusinessTermsButton();
+
+        AssignBusinessTermBTPage clickAssignBusinessTermButton();
+
         /**
          * Return the UI element of the 'Used' checkbox.
          *
@@ -445,6 +456,12 @@ public interface EditBIEPage extends Page {
         WebElement getUsedCheckbox();
 
         WebElement getBusinessTermField();
+
+        WebElement getShowBusinessTermsButton();
+
+        WebElement getAssignBusinessTermButton(boolean enabled);
+
+        AssignBusinessTermBTPage clickAssignBusinessTermButton(List<String> bieTypes, BigInteger bieId);
 
         void toggleUsed();
 
@@ -560,6 +577,8 @@ public interface EditBIEPage extends Page {
         void confirmToReset();
 
         String getResetDialogMessage();
+
+        String getValueDomainWarningMessage(String valueDomain);
     }
 
     BBIESCPanel getBBIESCPanel(WebElement bdtScNode);

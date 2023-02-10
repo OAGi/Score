@@ -1,21 +1,20 @@
-package org.oagi.score.e2e.impl.page.context;
+package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.obj.ContextCategoryObject;
+import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
-import org.oagi.score.e2e.page.context.EditContextCategoryPage;
-import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
+import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ViewEditContextCategoryPageImpl extends BasePageImpl implements ViewEditContextCategoryPage {
+public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEditBusinessTermPage {
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
@@ -29,35 +28,41 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
+    private static final By TERM_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Term\")]//ancestor::div[1]/input");
 
-    private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Description\")]//ancestor::div[1]/input");
+    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
+
+    private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"External Reference ID\")]//ancestor::div[1]/input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By NEW_BUSINESS_TERM_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"New Business Term\")]//ancestor::button[1]");
 
-    private static final By NEW_CONTEXT_CATEGORY_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"New Context Category\")]//ancestor::button[1]");
+    private static final By UPLOAD_BUSINESS_TERMS_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Upload Business Terms\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
-    public ViewEditContextCategoryPageImpl(BasePage parent) {
+
+    public ViewEditBusinessTermPageImpl(BasePage parent) {
         super(parent);
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/context_management/context_category").toString();
+        return getConfig().getBaseUrl().resolve("/business_term_management/business_term").toString();
     }
 
     @Override
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "Context Category".equals(getText(getTitle()));
+        assert "Business Term".equals(getText(getTitle()));
     }
 
     @Override
@@ -103,23 +108,33 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     }
 
     @Override
-    public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+    public WebElement getTermField() {
+        return visibilityOfElementLocated(getDriver(), TERM_FIELD_LOCATOR);
     }
 
     @Override
-    public void setName(String name) {
-        sendKeys(getNameField(), name);
+    public void setTerm(String termName) {
+        sendKeys(getTermField(), termName);
     }
 
     @Override
-    public WebElement getDescriptionField() {
-        return visibilityOfElementLocated(getDriver(), DESCRIPTION_FIELD_LOCATOR);
+    public WebElement getExternalReferenceURIField() {
+        return visibilityOfElementLocated(getDriver(), EXTERNAL_REFERENCE_URI_FIELD_LOCATOR);
     }
 
     @Override
-    public void setDescription(String description) {
-        sendKeys(getDescriptionField(), description);
+    public void setExternalReferenceURI(String externalReferenceURI) {
+        sendKeys(getExternalReferenceURIField(), externalReferenceURI);
+    }
+
+    @Override
+    public WebElement getExternalReferenceIDField() {
+        return visibilityOfElementLocated(getDriver(), EXTERNAL_REFERENCE_ID_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setExternalReferenceID(String externalReferenceID) {
+        sendKeys(getExternalReferenceIDField(), externalReferenceID);
     }
 
     @Override
@@ -129,10 +144,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
 
     @Override
     public void hitSearchButton() {
-        retry(() -> {
-            click(getSearchButton());
-            waitFor(ofMillis(500L));
-        });
+        retry(() -> click(getSearchButton()));
     }
 
     @Override
@@ -143,6 +155,13 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public WebElement getSelectCheckboxAtIndex(int idx) {
+        WebElement tr = getTableRecordAtIndex(idx);
+        WebElement td = getColumnByName(tr, "select");
+        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
     }
 
     @Override
@@ -160,8 +179,25 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     }
 
     @Override
-    public WebElement getNewContextCategoryButton() {
-        return elementToBeClickable(getDriver(), NEW_CONTEXT_CATEGORY_BUTTON_LOCATOR);
+    public WebElement getNewBusinessTermButton() {
+        return elementToBeClickable(getDriver(), NEW_BUSINESS_TERM_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitNewBusinessTermButton() {
+        click(getNewBusinessTermButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getUploadBusinessTermsButton() {
+        return elementToBeClickable(getDriver(), UPLOAD_BUSINESS_TERMS_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitUploadBusinessTermsButton() {
+        click(getUploadBusinessTermsButton());
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -170,40 +206,39 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     }
 
     @Override
-    public CreateContextCategoryPage openCreateContextCategoryPage() {
-        click(getNewContextCategoryButton());
-        CreateContextCategoryPage createContextCategoryPage = new CreateContextCategoryPageImpl(this);
-        assert createContextCategoryPage.isOpened();
-        return createContextCategoryPage;
+    public CreateBusinessTermPage openCreateBusinessTermPage() {
+        click(getNewBusinessTermButton());
+        CreateBusinessTermPage createBusinessTermPage = new CreateBusinessTermPageImpl(this);
+        assert createBusinessTermPage.isOpened();
+        return createBusinessTermPage;
     }
 
     @Override
-    public EditContextCategoryPage openEditContextCategoryPageByContextCategoryName(String contextCategoryName) throws NoSuchElementException {
-        setName(contextCategoryName);
+    public EditBusinessTermPage openEditBusinessTermPageByTerm(String businessTermName) throws NoSuchElementException {
+        setTerm(businessTermName);
+        hitSearchButton();
 
         return retry(() -> {
-            hitSearchButton();
-
             WebElement td;
             try {
                 WebElement tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "name");
+                td = getColumnByName(tr, "businessTerm");
             } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a context category using " + contextCategoryName, e);
+                throw new NoSuchElementException("Cannot locate a business term using " + businessTermName, e);
             }
-            if (!contextCategoryName.equals(getText(td.findElement(By.cssSelector("a > span"))))) {
-                throw new NoSuchElementException("Cannot locate a context category using " + contextCategoryName);
+            if (!businessTermName.equals(getText(td.findElement(By.cssSelector("a > span"))))) {
+                throw new NoSuchElementException("Cannot locate a business term using " + businessTermName);
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
-            waitFor(ofMillis(500L));
+            waitFor(Duration.ofMillis(500L));
 
-            ContextCategoryObject contextCategory =
-                    getAPIFactory().getContextCategoryAPI().getContextCategoryByName(contextCategoryName);
-            EditContextCategoryPage editContextCategoryPage =
-                    new EditContextCategoryPageImpl(this, contextCategory);
-            assert editContextCategoryPage.isOpened();
-            return editContextCategoryPage;
+            BusinessTermObject businessTerm =
+                    getAPIFactory().getBusinessTermAPI().getBusinessTermByName(businessTermName);
+            EditBusinessTermPage editBusinessTermPage =
+                    new EditBusinessTermPageImpl(this, businessTerm);
+            assert editBusinessTermPage.isOpened();
+            return editBusinessTermPage;
         });
     }
 
