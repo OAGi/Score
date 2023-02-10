@@ -8815,11 +8815,28 @@ Manage Business Terms
 ---------------------
 Currently, Score only provides this business term functionality to the end
 users. Developers won't see this functionality once logins as deverloper 
-accounts. The end users can view, edit or discard business terms through the 
+accounts. The end users can view, create, edit or discard business terms through the 
 View/Edit Business Term menu under the BIE menu. The end users can assign 
 business terms to BIEs only through the BIE detail page. At current version, 
 the end users can assign business terms to only two BIE types: ASBIE and BBIE. 
 
+Create a Business Term
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit a Business Term
+~~~~~~~~~~~~~~~~~~~~
+
+Discard a Business Term
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Assign business terms to BIEs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Business term assignments to selected BIE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Load Business Terms from external source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Common functions
