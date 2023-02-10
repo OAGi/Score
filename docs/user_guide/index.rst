@@ -8811,6 +8811,17 @@ Environment Code to a target node with Action code, the issue will be
 reported because the two codes are not compatible. The same logic
 applies to the agency ID list.
 
+Manage Business Terms
+---------------------
+Currently, Score only provides this business term functionality to the end
+users. Developers won't see this functionality once logins as deverloper 
+accounts. The end users can view, edit or discard business terms through the 
+View/Edit Business Term menu under the BIE menu. The end users can assign 
+business terms to BIEs only through the BIE detail page. At current version, 
+the end users can assign business terms to only two BIE types: ASBIE and BBIE. 
+
+
+
 Common functions
 ----------------
 
