@@ -8897,19 +8897,47 @@ The second method is:
 5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
    will not remove it. All the assignments for it must be removed first. 
    
-
 Assign business terms to BIEs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Current Score version supports the assignment of business terms to two BIE types: ASBIE and BBIE.
 
+To assign a business term to a BIE:
 
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit BIE" from the drop-down list. 
+   
+3. Locate the BIE you want to assign. Use the *DEN*, *Business Context*, *Branch*, *State*, *Owner*, *Updater*, 
+   *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
+   Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
+4. Expand the root node on the BCC (for BBIE) or ACC (for ASBIE) tree in the left navigation panel. 
+   
+5. Select a child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
+   The detail for that child node is displayed on the right panel. Check the *Used* checkbox. The "Assign Business Temr"
+   button will be enabled. 
 
+6. Click "Assign Business Term" button. 
 
-
+7. On the newly-opened "Assign Business Term" page, locate the business term to be assigned. Use the *Business Term*, 
+   *External Reference URI*, *External Reference ID*, *Updater*, *Updated start date* or *Updated end date* search filters
+   to help located the desired business term. 
+   
+8. Select the desired business term. Provide a Type Code (optional). 
+   
+9. Check or Uncheck the Preferred Business Term checkbox. Note only one business term can be preferred for each selected BIE. 
+    
+10. Click "Create" button. 
 
 Business term assignments to selected BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
 
 Load Business Terms from external source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
