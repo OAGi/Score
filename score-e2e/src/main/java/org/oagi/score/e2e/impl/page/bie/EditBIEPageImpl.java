@@ -86,7 +86,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
-    
+
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
 
