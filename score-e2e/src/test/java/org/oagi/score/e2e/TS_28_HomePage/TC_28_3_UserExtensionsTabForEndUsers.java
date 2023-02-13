@@ -656,6 +656,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        NamespaceObject userNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -667,10 +668,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
-        bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-        editBIEPage.moveToQA();
-        editBIEPage.moveToProduction();
+        ACCExtensionViewEditPage.setNamespace(userNamespace);
+        ACCExtensionViewEditPage.hitUpdateButton();
+        ACCExtensionViewEditPage.moveToQA();
+        ACCExtensionViewEditPage.moveToProduction();
 
         int loop =2;
         while (loop > 0){
@@ -686,6 +687,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             loop--;
 
         }
+        click(homePage.getScoreLogo());
         homePage.setBranch(release.getReleaseNumber());
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         click(homePage.getScoreLogo()); // to go to the home page again.
