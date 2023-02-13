@@ -1,4 +1,4 @@
-package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper;
+package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
-public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseTest {
-
+public class TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
+    private String release = "10.8.4";
 
     @BeforeEach
     public void init() {
@@ -38,12 +37,12 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
     }
 
     @Test
-    @DisplayName("TC_10_7_TA_4")
+    @DisplayName("TC_15_9_TA_3")
     public void issue_1386() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
-        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
         ASCCPObject asccp;
@@ -53,28 +52,28 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
+            ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
-            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.hitReviseButton();
+        accViewEditPage.hitAmendButton();
 
         accViewEditPage.openPage(); // refresh the page to erase the snackbar message
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -113,7 +112,6 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
         assertEquals(Integer.toString(originalCardinalityMax), getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
     }
 
-
     @AfterEach
     public void tearDown() {
         super.tearDown();
@@ -122,4 +120,5 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
     }
+
 }
