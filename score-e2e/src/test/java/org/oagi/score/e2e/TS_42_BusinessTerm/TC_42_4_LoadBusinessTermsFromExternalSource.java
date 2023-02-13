@@ -2,8 +2,6 @@ package org.oagi.score.e2e.TS_42_BusinessTerm;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.awaitility.Awaitility;
-import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,10 +12,8 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
+import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -30,9 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
+import static org.apache.commons.lang3.RandomStringUtils.*;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
@@ -51,23 +52,27 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
     @Test
     @DisplayName("TC_42_4_1")
     public void end_user_can_download_a_template_for_external_csv_file_to_be_uploaded_in_business_term_page() {
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
+        if (csvFile.exists()) {
+            csvFile.delete();
+        }
+
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
-        UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
-        click(uploadBusinssTermsPage.getDownloadTemplateButton());
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+        click(uploadBusinessTermsPage.getDownloadTemplateButton());
 
-        //Call Awaitility library for asysnc download wait
-        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
-        ConditionFactory await = Awaitility.await().atMost(Duration.ofSeconds(1));
-        File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
-        await.until(() -> csvFile.exists());
+        // Call Awaitility library for async download wait
+        await().atMost(Duration.ofSeconds(1))
+                .until(() -> csvFile.exists());
     }
 
-    private static String getDownloadPath(){
+    private static String getDownloadPath() {
         File fileDestination = new File(System.getProperty("user.home"), "Downloads");
         return fileDestination.getAbsolutePath();
     }
@@ -81,47 +86,48 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
-        UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
-        //Download csv file template
-        click(uploadBusinssTermsPage.getDownloadTemplateButton());
-
-        //Call Awaitility library for async download wait
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
-        ConditionFactory await = Awaitility.await().atMost(Duration.ofSeconds(1));
-        File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
-        await.until(() -> csvFile.exists());
-
-        //write test business terms into csv file and save into a different name for upload
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload.csv");
-        try(
-            BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
-
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
-                    .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"));
-        ){
-            csvPrinter.printRecord("bt_bulk_upload1", "http://btupload1.com", "1", "business term 1 through bulk upload","business term 1 through bulk upload" );
-            csvPrinter.printRecord("bt_bulk_upload2", "http://btupload2.com", "2", "business term 2 through bulk upload","business term 2 through bulk upload" );
-            csvPrinter.printRecord("bt_bulk_upload3", "http://btupload3.com", "3", "business term 3 through bulk upload","business term 3 through bulk upload");
-
-            csvPrinter.flush();
+        // write test business terms into csv file and save into a different name for upload
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
         }
 
-        //upload the modified csv file
-        uploadBusinssTermsPage.getAttachButton().sendKeys(csvFileForUpload.getAbsolutePath());
-        getDriver().manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
+                csvPrinter.printRecord("bt_bulk_upload1", "http://btupload1.com", "1", "business term 1 through bulk upload", "business term 1 through bulk upload");
+                csvPrinter.printRecord("bt_bulk_upload2", "http://btupload2.com", "2", "business term 2 through bulk upload", "business term 2 through bulk upload");
+                csvPrinter.printRecord("bt_bulk_upload3", "http://btupload3.com", "3", "business term 3 through bulk upload", "business term 3 through bulk upload");
 
-        //Verify that all test business terms have been saved through bulk upload
-        ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
-        viewEditBusinessTermPageForCheck.setTerm("bt_bulk_upload1");
-        viewEditBusinessTermPageForCheck.hitSearchButton();
-        assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-        viewEditBusinessTermPageForCheck.setExternalReferenceURI("http://btupload2.com");
-        viewEditBusinessTermPageForCheck.hitSearchButton();
-        assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-        viewEditBusinessTermPageForCheck.setTerm("bt_bulk_upload3");
-        viewEditBusinessTermPageForCheck.hitSearchButton();
-        assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+                csvPrinter.flush();
+            }
+
+            // upload the modified csv file
+            uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
+            waitFor(ofSeconds(2L));
+
+            //Verify that all test business terms have been saved through bulk upload
+            ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+            viewEditBusinessTermPageForCheck.setTerm("bt_bulk_upload1");
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+
+            viewEditBusinessTermPageForCheck.openPage();
+            viewEditBusinessTermPageForCheck.setExternalReferenceURI("http://btupload2.com");
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+
+            viewEditBusinessTermPageForCheck.openPage();
+            viewEditBusinessTermPageForCheck.setTerm("bt_bulk_upload3");
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+        } finally {
+            csvFileForUpload.delete();
+        }
     }
 
     @Test
@@ -138,7 +144,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
-        UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
 
@@ -160,7 +166,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         }
 
         //upload the modified csv file
-        WebElement chooseFile = click(uploadBusinssTermsPage.getAttachButton());
+        WebElement chooseFile = click(uploadBusinessTermsPage.getAttachButton());
         chooseFile.sendKeys(csvFileForUpload.getAbsolutePath());
         //Verify that all test business terms have been saved through bulk upload
         ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
@@ -185,7 +191,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
-        UploadBusinssTermsPage uploadBusinssTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
 
@@ -207,7 +213,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         }
 
         //upload the modified csv file
-        WebElement chooseFile = click(uploadBusinssTermsPage.getAttachButton());
+        WebElement chooseFile = click(uploadBusinessTermsPage.getAttachButton());
         chooseFile.sendKeys(csvFileForUpload.getAbsolutePath());
         //Verify that all test business terms have been saved through bulk upload
         ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();

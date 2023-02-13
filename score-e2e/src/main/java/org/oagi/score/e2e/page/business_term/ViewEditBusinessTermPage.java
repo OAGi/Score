@@ -1,8 +1,6 @@
 package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.page.Page;
-import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
-import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -163,10 +161,11 @@ public interface ViewEditBusinessTermPage extends Page {
     WebElement getUploadBusinessTermsButton();
 
     /**
-     * Click on the UI element of the 'Upload Business Terms' button
+     * Click on the UI element of the 'Upload Business Terms' button.
+     *
      * @return Upload Business Terms page
      */
-    UploadBusinssTermsPage hitUploadBusinessTermsButton();
+    UploadBusinessTermsPage hitUploadBusinessTermsButton();
 
     /**
      * Return the UI element of the 'Discard' button.
@@ -174,7 +173,6 @@ public interface ViewEditBusinessTermPage extends Page {
      * @return the UI element of the 'Discard' button
      */
     WebElement getDiscardButton();
-
 
 
     /**

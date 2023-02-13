@@ -1,17 +1,22 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.page.business_term.UploadBusinssTermsPage;
+import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadBusinssTermsPage {
+public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadBusinessTermsPage {
 
-    private static final By DOWNLOAD_TEMPLATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Download template\")]//ancestor::button[1]");
+    private static final By DOWNLOAD_TEMPLATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Download template\")]//ancestor::button[1]");
 
-    private static final By ATTACH_BUTTON_LOCATOR = By.xpath("//mat-icon[contains(text(), \"attach_file\")]//ancestor::button[1]");
+    private static final By FILE_UPLOAD_INPUT_LOCATOR =
+            By.xpath("//input[contains(@class, \"file-input\")]");
+
+    private static final By ATTACH_BUTTON_LOCATOR =
+            By.xpath("//mat-icon[contains(text(), \"attach_file\")]//ancestor::button[1]");
 
     private final ViewEditBusinessTermPageImpl parent;
 
@@ -40,6 +45,11 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
     @Override
     public WebElement getDownloadTemplateButton() {
         return elementToBeClickable(getDriver(), DOWNLOAD_TEMPLATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getFileUploadInput() {
+        return findElement(getDriver(), FILE_UPLOAD_INPUT_LOCATOR);
     }
 
     @Override
