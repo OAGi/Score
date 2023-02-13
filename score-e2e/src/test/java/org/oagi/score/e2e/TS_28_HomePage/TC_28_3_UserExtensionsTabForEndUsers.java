@@ -667,6 +667,11 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 
+        bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
+
         int loop =2;
         while (loop > 0){
             bieMenu.openViewEditBIESubMenu();
