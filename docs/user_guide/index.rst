@@ -8825,24 +8825,88 @@ Create a Business Term
 To create a business term:
 
 1. On the top menu of the page, click "BIE".
+   
 2. Choose "View/Edit Business Term" from the drop-down list.
+   
 3. On the returned "Business Term" page, click "New Business Term" located at the top-right
    of the page. 
+
 4. On the returned "Create Business Term" page, fill out the following fields:
    1. Business Term (Mandatory) the main name of the business term
    2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
    3. External Reference Id(Optional) 
    4. Comment(Optional) This is free-form text field for documentint what the business term is, its purpsoses, etc. 
+   
 5. Click the "Create" button. 
 
 Edit a Business Term
 ~~~~~~~~~~~~~~~~~~~~
+To edit a business term:
+
+1. Open the top menu fo the page, click "BIE".
+   
+2. Click "View/Edit Business Term" menu item.
+   
+3. Use the *Term* or *External Reference URI* to find the desired business term.  
+   Open its "Edit Business Term" page by clicking the Business Term column. See
+   also `How to use the Search field in general <#how-to-use-the-search-field-in-general>`__. 
+   
+4. You can change the *Business Term*, *External Reference URI*, *External Reference ID* and *Comments*
+   fields. 
+
+5. You cannot change the *Definition* field, which is only updated through upload from external file.
+   
+6. Click the "Update" button. 
+
 
 Discard a Business Term
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+Note that a buiness term can only be discarded if it is not assigned to any BIE. Otherwize, you have to 
+discard the assignment first. 
+
+There are two methods for discarding a Business Term. The first one is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. Locate the Business Term you want to discard. Use the *Term*, *External Reference URI*, *External Reference ID*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired Business Term. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the checkbox right before the desired 
+   business term name. 
+
+4. Click "Discard" on the top-right of the page. 
+
+5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
+   will not remove it. All the assignments for it must be removed first. 
+   
+The second method is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. Locate the Business Term you want to discard. Use the *Term*, *External Reference URI*, *External Reference ID*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired Business Term. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the Business Term Name to open its
+   "Edit Business Term" page. 
+
+4. Click the "Discard" button. 
+
+5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
+   will not remove it. All the assignments for it must be removed first. 
+   
+
 Assign business terms to BIEs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
 
 Business term assignments to selected BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
