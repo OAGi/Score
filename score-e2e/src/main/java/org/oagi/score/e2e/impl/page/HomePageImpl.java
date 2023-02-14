@@ -119,7 +119,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     }
 
     @Override
-    public WebElement getUserExtensionsTab(){
+    public WebElement getUserExtensionsTab() {
         return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"User Extensions\")]"));
     }
 
@@ -201,7 +201,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getStateProgressBarByState(String state) {
-            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[1]//div[contains(text(), \"" + state + "\")]"));
+            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[2]//div[contains(text(), \"" + state + "\")]"));
 
         }
 
@@ -365,6 +365,39 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         return new TotalUEsByStatesPanelImpl(this);
     }
 
+    private class MyUEsByStatesPanelImpl implements MyUEsByStatesPanel {
+
+        private BasePage parent;
+
+        MyUEsByStatesPanelImpl(BasePage parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public WebElement getStateProgressBarByState(String state) {
+            return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-body/div[1]/div[1]/div[2]//div[contains(text(), \"" + state + "\")]"));
+        }
+
+        @Override
+        public ViewEditCoreComponentPage clickStateProgressBar(String state) {
+            return retry(() -> {
+                WebElement stateProgressBar = getStateProgressBarByState(state);
+                click(stateProgressBar);
+
+                waitFor(ofMillis(500L));
+                ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+                assert viewEditCoreComponentPage.isOpened();
+                return viewEditCoreComponentPage;
+            });
+        }
+    }
+
+    @Override
+    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new MyUEsByStatesPanelImpl(this);
+    }
+
 
     private class UEsByUsersAndStatesPanelImpl implements UEsByUsersAndStatesPanel {
 
@@ -429,6 +462,37 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     public UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel() {
         click(getUserExtensionsTab());
         return new UEsByUsersAndStatesPanelImpl(this);
+    }
+
+    private class MyUnusedUEsInBIEsPanelImpl implements MyUnusedUEsInBIEsPanel {
+
+        private BasePage parent;
+
+        MyUnusedUEsInBIEsPanelImpl(BasePage parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
+            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis'][contains(text(), \"" + assocDEN + "\")]//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
+        }
+
+        @Override
+        public ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN) {
+            WebElement td = getTableRecordByUEAndDEN(ueName, assocDEN);
+            click(td.findElement(By.tagName("a")));
+            waitFor(ofMillis(500L));
+
+            ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+            assert viewEditCoreComponentPage.isOpened();
+            return viewEditCoreComponentPage;
+        }
+    }
+
+    @Override
+    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
+        click(getUserExtensionsTab());
+        return new MyUnusedUEsInBIEsPanelImpl(this);
     }
 
 }

@@ -262,4 +262,12 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     void moveToProduction();
 
+    /**
+     * Return the UI element of the 'Amend' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Amend' button
+     */
+    WebElement getAmendButton(boolean enabled);
+
 }
