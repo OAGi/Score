@@ -770,6 +770,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";
         WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
+        ACCExtensionViewEditPage accExtensionViewEditPage = (ACCExtensionViewEditPage)click(td);
+        assertTrue(accExtensionViewEditPage.getAmendButton(true).isDisplayed());
     }
 
     @AfterEach
