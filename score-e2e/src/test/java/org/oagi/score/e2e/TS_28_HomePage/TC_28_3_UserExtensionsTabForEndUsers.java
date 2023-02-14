@@ -679,7 +679,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
             WebElement node = editBIEPage.getNodeByPath(
-                    "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
+                    "/" + asccp.getPropertyTerm() + "/Extension/" + bccpToAppend.getPropertyTerm());
             assertTrue(node.isDisplayed());
             EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
             ASBIEPanel.toggleUsed();
@@ -692,7 +692,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         click(homePage.getScoreLogo()); // to go to the home page again.
         String ueName = asccp.getPropertyTerm() + " User Extension Group. Details";
-        WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getPropertyTerm());
+        WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
         assertTrue(td.isDisplayed());
 
     }

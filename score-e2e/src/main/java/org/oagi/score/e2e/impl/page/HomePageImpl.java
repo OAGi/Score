@@ -474,7 +474,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"My unused extensions in BIEs\")]//ancestor::div[2]//*[contains(text(),\"" + ueName + "\")]//ancestor::tr//td[6]//*[contains(text(),\"" + assocDEN + "\")]"));
+            return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\"" + ueName + "\")]//ancestor::tr//td[6]//*[contains(text(),\"" + assocDEN + "\")]"));
         }
 
         @Override
