@@ -691,7 +691,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         homePage.setBranch(release.getReleaseNumber());
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         click(homePage.getScoreLogo()); // to go to the home page again.
-        String ueName = asccp.getPropertyTerm() + " User Extension Group. Details";
+        String ueName = asccp.getPropertyTerm() + " User Extension Group";
         WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
         assertTrue(td.isDisplayed());
 
