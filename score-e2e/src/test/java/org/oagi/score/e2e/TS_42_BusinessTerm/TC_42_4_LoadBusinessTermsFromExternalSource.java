@@ -15,6 +15,7 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -31,8 +32,7 @@ import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.*;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
@@ -213,7 +213,6 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         }
 
     }
-
     @Test
     @DisplayName("TC_42_4_5")
     public void previous_business_term_will_be_updated_with_new_information_if_the_business_term_is_uploaded_with_an_existent_external_reference_uri() throws IOException {
@@ -264,12 +263,17 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(2).getBusinessTerm());
             viewEditBusinessTermPageForCheck.hitSearchButton();
             assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+
+            viewEditBusinessTermPageForCheck.openPage();
             viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(1).getExternalReferenceUri());
             viewEditBusinessTermPageForCheck.hitSearchButton();
             assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-            assertThrows(NoSuchElementException.class, () -> {
-                viewEditBusinessTermPageForCheck.openEditBusinessTermPageByTerm(businessTerms.get(0).getBusinessTerm());
-            });
+
+            viewEditBusinessTermPageForCheck.openPage();
+            String oldBusinessTermName = businessTerms.get(0).getBusinessTerm();
+            viewEditBusinessTermPageForCheck.setTerm(oldBusinessTermName);
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertEquals(0, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
         } finally {
             csvFileForUpload.delete();
         }
