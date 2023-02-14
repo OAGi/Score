@@ -8933,14 +8933,29 @@ To assign a business term to a BIE:
 Business term assignments to selected BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+To view all the business terms currently assigned to a BIE:
 
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit BIE" from the drop-down list. 
+   
+3. Locate the BIE you want to assign. Use the *DEN*, *Business Context*, *Branch*, *State*, *Owner*, *Updater*, 
+   *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
+   Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
+4. Expand the root node on the BCC (for BBIE) or ACC (for ASBIE) tree in the left navigation panel.  
 
+5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
+   The detail for that child node is displayed on the right panel. The *Used* checkbox must be checked. 
 
-
+6. Click "Show Business Terms" button on the right panel.
+   
+7. On the newly-opened "Business Term Assignement" page, the selected BIE is displayed right before the "Turn off" button. 
+   All the business terms assigned for the selected BIE are displayed in the table below the "Search" button. 
 
 Load Business Terms from external source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 Common functions
