@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 /**
  * An interface of 'Upload Business Terms' page.
  */
-public interface UploadBusinssTermsPage extends Page {
+public interface UploadBusinessTermsPage extends Page {
 
     /**
      * Return the UI element of the 'Download template' button.
@@ -15,6 +15,12 @@ public interface UploadBusinssTermsPage extends Page {
      */
     WebElement getDownloadTemplateButton();
 
+    /**
+     * Return the input element for a file upload.
+     *
+     * @return the input element for a file upload
+     */
+    WebElement getFileUploadInput();
 
     /**
      * Return the UI element of the 'Attach' button with Paper Clip icon.
@@ -22,4 +28,5 @@ public interface UploadBusinssTermsPage extends Page {
      * @return the UI element of the 'Attach' button
      */
     WebElement getAttachButton();
+
 }

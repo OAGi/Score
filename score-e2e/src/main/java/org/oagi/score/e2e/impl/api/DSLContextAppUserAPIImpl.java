@@ -132,6 +132,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
             ULong appUserId = ULong.valueOf(appUserIdBigInteger);
 
+            deleteBusinessTermByAppUserId(txContext, appUserId);
             deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
             deleteCoreComponentByAppUserId(txContext, appUserId);
             deleteCodeListByAppUserId(txContext, appUserId);
@@ -146,6 +147,49 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
             txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
         });
+    }
+
+    private void deleteBusinessTermByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> businessTermIdList = dslContext.select(BUSINESS_TERM.BUSINESS_TERM_ID)
+                .from(BUSINESS_TERM)
+                .where(or(
+                        BUSINESS_TERM.CREATED_BY.eq(appUserId),
+                        BUSINESS_TERM.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchInto(ULong.class);
+        if (businessTermIdList.isEmpty()) {
+            return;
+        }
+
+        List<ULong> asccBiztermIdList = dslContext.select(ASCC_BIZTERM.ASCC_BIZTERM_ID)
+                .from(ASCC_BIZTERM)
+                .where(ASCC_BIZTERM.BUSINESS_TERM_ID.in(businessTermIdList))
+                .fetchInto(ULong.class);
+        if (!asccBiztermIdList.isEmpty()) {
+            dslContext.deleteFrom(ASBIE_BIZTERM)
+                    .where(ASBIE_BIZTERM.ASCC_BIZTERM_ID.in(asccBiztermIdList))
+                    .execute();
+            dslContext.deleteFrom(ASCC_BIZTERM)
+                    .where(ASCC_BIZTERM.ASCC_BIZTERM_ID.in(asccBiztermIdList))
+                    .execute();
+        }
+
+        List<ULong> bccBiztermIdList = dslContext.select(BCC_BIZTERM.BCC_BIZTERM_ID)
+                .from(BCC_BIZTERM)
+                .where(BCC_BIZTERM.BUSINESS_TERM_ID.in(businessTermIdList))
+                .fetchInto(ULong.class);
+        if (!bccBiztermIdList.isEmpty()) {
+            dslContext.deleteFrom(BBIE_BIZTERM)
+                    .where(BBIE_BIZTERM.BCC_BIZTERM_ID.in(bccBiztermIdList))
+                    .execute();
+            dslContext.deleteFrom(BCC_BIZTERM)
+                    .where(BCC_BIZTERM.BCC_BIZTERM_ID.in(bccBiztermIdList))
+                    .execute();
+        }
+
+        dslContext.deleteFrom(BUSINESS_TERM)
+                .where(BUSINESS_TERM.BUSINESS_TERM_ID.in(businessTermIdList))
+                .execute();
     }
 
     private void deleteBusinessInformationEntityByAppUserId(DSLContext dslContext, ULong appUserId) {
