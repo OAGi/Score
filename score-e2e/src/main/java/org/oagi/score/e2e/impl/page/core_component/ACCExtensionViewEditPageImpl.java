@@ -11,6 +11,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 
@@ -72,6 +73,9 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
+
+    private static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
     public ACCExtensionViewEditPageImpl(BasePage parent) {
         super(parent);
@@ -347,5 +351,14 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         click(getMoveToProductionButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+    }
+
+    @Override
+    public WebElement getAmendButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), AMEND_BUTTON_LOCATOR);
+        }
     }
 }
