@@ -126,19 +126,12 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
-            viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(0).getBusinessTerm());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(1).getExternalReferenceUri());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(2).getBusinessTerm());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+            for (int i=0; i < 3; i++){
+                viewEditBusinessTermPageForCheck.openPage();
+                viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(i).getBusinessTerm());
+                viewEditBusinessTermPageForCheck.hitSearchButton();
+                assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+            }
         } finally {
             csvFileForUpload.delete();
         }
