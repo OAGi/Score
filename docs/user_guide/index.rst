@@ -8930,7 +8930,7 @@ To assign a business term to a BIE:
     
 10. Click "Create" button. 
 
-Business term assignments to selected BIE
+Business term assignments For selected BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To view all the business terms currently assigned to a BIE:
@@ -8956,7 +8956,35 @@ To view all the business terms currently assigned to a BIE:
 Load Business Terms from external source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This is the preferred way for the end user to create business terms in Score. This method allows the end user to bulk upload 
+business terms from an external csv file. 
 
+To upload from an external file:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. On the returned "Business Term" page, click "Upload Business Terms" button at the top right corner of the page. 
+   
+4. On the returned "Upload Business Terms" page, click "Download template" button at the top right corner of the page. 
+   A csv template file named "businessTermTemplateWithExample" will be saved into your "Download" folder on your local 
+   computer. 
+
+5. Type all your business terms in the downloaded csv file. Make sure that the format for each column is correct for each 
+   business term. Note that *businessTerm* and *externalReferenceUri* columns are required. Save all your changes. 
+
+6. Go back to "Upload Business Term" page, click the attach button (paper clipper icon) and choose the modified csv file
+   in the pop up choose-file window. Finally click "Open" button in the pop-up window. 
+
+7. An "Uploaded" message will be displayed for confirmation. 
+   
+8. Go back to the top menu of the page, click "BIE". 
+
+9. Choose "View/Edit Business Term" from the drop-down list. 
+    
+10. On the returned "Business Term" page, you can locate the uploaded business terms using the search filters: *Term*, 
+    *External Reference URI*, *External Reference ID*, *Updater*, *Updated start date* or *Updated end date*. 
 
 Common functions
 ----------------
