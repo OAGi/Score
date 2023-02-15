@@ -362,6 +362,10 @@ public interface EditBIEPage extends Page {
 
     interface ASBIEPanel {
 
+        BusinessTermAssignmentPage clickShowBusinessTermsButton();
+
+        AssignBusinessTermBTPage clickAssignBusinessTermButton();
+
         /**
          * Return the UI element of the 'Used' checkbox.
          *
@@ -438,6 +442,10 @@ public interface EditBIEPage extends Page {
         WebElement getTypeDefinitionField();
 
         WebElement getBusinessTermField();
+
+        WebElement getShowBusinessTermsButton();
+
+        WebElement getAssignBusinessTermButton(boolean enabled);
     }
 
     BBIEPanel getBBIEPanel(WebElement bccpNode);
@@ -460,8 +468,6 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
-
-        AssignBusinessTermBTPage clickAssignBusinessTermButton(List<String> bieTypes, BigInteger bieId);
 
         void toggleUsed();
 

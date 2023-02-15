@@ -15,8 +15,6 @@ import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -527,6 +525,39 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private class ASBIEPanelImpl implements ASBIEPanel {
 
         @Override
+        public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
+            click(getShowBusinessTermsButton());
+            for (String winHandle : getDriver().getWindowHandles()) {
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieType=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            BusinessTermAssignmentPage businessTermAssignmentPage =
+                    new BusinessTermAssignmentPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            assert businessTermAssignmentPage.isOpened();
+            return businessTermAssignmentPage;
+        }
+
+        @Override
+        public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
+            //Store the current window handle
+            String winHandleBefore = getDriver().getWindowHandle();
+            click(getAssignBusinessTermButton(true));
+            for (String winHandle : getDriver().getWindowHandles()) {
+                getDriver().switchTo().window(winHandle);
+            }
+            String url = getDriver().getCurrentUrl();
+            String bieTypes = StringUtils.substringAfter(url, "bieTypes=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieIds=", "&"));
+            AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
+            assert assignBusinessTermBTPage.isOpened();
+            return assignBusinessTermBTPage;
+        }
+
+        @Override
         public WebElement getUsedCheckbox() {
             return getCheckboxByName("Used");
         }
@@ -605,6 +636,19 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         public WebElement getBusinessTermField() {
             return getInputFieldByName("Business Term");
         }
+
+        public WebElement getShowBusinessTermsButton() {
+            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
+        }
+
+        @Override
+        public WebElement getAssignBusinessTermButton(boolean enabled) {
+            if (enabled) {
+                return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            } else {
+                return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
+            }
+        }
     }
 
     private class BBIEPanelImpl implements BBIEPanel {
@@ -614,12 +658,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public WebElement getShowBusinessTermsButton(){
+        public WebElement getShowBusinessTermsButton() {
             return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
         }
 
         @Override
-        public WebElement getAssignBusinessTermButton(boolean enabled){
+        public WebElement getAssignBusinessTermButton(boolean enabled) {
             if (enabled) {
                 return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
             } else {
@@ -628,16 +672,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public AssignBusinessTermBTPage clickAssignBusinessTermButton(List<String> bieTypes, BigInteger bieId) {
-            return null;
-        }
-
-        @Override
         public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
             //Store the current window handle
             String winHandleBefore = getDriver().getWindowHandle();
             click(getShowBusinessTermsButton());
-            for (String winHandle: getDriver().getWindowHandles()){
+            for (String winHandle : getDriver().getWindowHandles()) {
                 getDriver().switchTo().window(winHandle);
             }
             String url = getDriver().getCurrentUrl();
@@ -653,13 +692,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
             //Store the current window handle
             String winHandleBefore = getDriver().getWindowHandle();
-            click(getShowBusinessTermsButton());
-            for (String winHandle: getDriver().getWindowHandles()){
+            click(getAssignBusinessTermButton(true));
+            for (String winHandle : getDriver().getWindowHandles()) {
                 getDriver().switchTo().window(winHandle);
             }
             String url = getDriver().getCurrentUrl();
-            String bieTypes = StringUtils.substringAfter(url, "bieType=");
-            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
+            String bieTypes = StringUtils.substringAfter(url, "bieTypes=");
+            Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieIds=", "&"));
             AssignBusinessTermBTPage assignBusinessTermBTPage = new AssignBusinessTermBTPageImpl(parent, Arrays.asList(bieTypes), BigInteger.valueOf(bieId.intValue()));
             assert assignBusinessTermBTPage.isOpened();
             return assignBusinessTermBTPage;

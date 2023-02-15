@@ -37,7 +37,7 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
 
     private static final By SEARCH_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
-    private static final By TYPE_CODE_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
+    private static final By TYPE_CODE_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
 
     private static final By PREFERRED_BUSINESS_TERM_CHECKBOX_LOCATOR = By.xpath("//span[contains(text(), \"Preferred Business Term\")]//ancestor::mat-checkbox[1]");
 
