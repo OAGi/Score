@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 import java.io.BufferedWriter;
 import java.io.File;
