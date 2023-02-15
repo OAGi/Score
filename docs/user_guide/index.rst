@@ -8912,7 +8912,7 @@ To assign a business term to a BIE:
    *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
    Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ACC (for ASBIE) tree in the left navigation panel. 
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel. 
    
 5. Select a child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
    The detail for that child node is displayed in the right panel. Check the *Used* checkbox if it is unchecked and 
@@ -8944,7 +8944,7 @@ To view all the business terms currently assigned to a BIE:
    *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
    (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ACC (for ASBIE) tree in the left navigation panel.  
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
 
 5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
    The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
@@ -8971,7 +8971,7 @@ To discard the assignment of a busienss term from a BIE:
    *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
    (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ACC (for ASBIE) tree in the left navigation panel.  
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
 
 5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
    The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
