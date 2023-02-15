@@ -8864,7 +8864,7 @@ Discard a Business Term
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that a buiness term can only be discarded if it is not assigned to any BIE. Otherwize, you have to 
-discard the assignment first (see `Discard the assignment of a business term from a BIE <#Discard-the-assignment-of-a-business-term-from-a-BIE>`__). 
+discard the assignment first (see :ref:`Discard-the-assignment-of-a-business-term-from-a-BIE`). 
 
 There are two methods for discarding a Business Term. The first one is:
 
@@ -8955,6 +8955,8 @@ To view all the business terms currently assigned to a BIE:
 7. On the newly-opened "Business Term Assignement" page, the selected BIE is displayed right before the "Turn off" button. 
    All the business terms assigned for the selected BIE are displayed in the table below the "Search" button. 
 
+.. _Discard-the-assignment-of-a-business-term-from-a-BIE:
+
 Discard the assignment of a business term from a BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8962,7 +8964,7 @@ Discard the assignment of a business term from a BIE is to remove the associatio
 The prerequisite for permantently removing a business term from Score is to discard all the assignments for that business term
 first. 
 
-To discard the assignment of a busienss term from a BIE:
+To discard the assignment of a business term from a BIE:
 
 1. On the top menu of the page, click "BIE".
    
