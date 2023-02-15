@@ -8832,6 +8832,7 @@ To create a business term:
    of the page. 
 
 4. On the returned "Create Business Term" page, fill out the following fields:
+   
    1. Business Term (Mandatory) the main name of the business term
    2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
    3. External Reference Id(Optional) 
