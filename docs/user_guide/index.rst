@@ -8863,7 +8863,7 @@ Discard a Business Term
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that a buiness term can only be discarded if it is not assigned to any BIE. Otherwize, you have to 
-discard the assignment first. 
+discard the assignment first (see `Discard the assignment of a business term from a BIE <#Discard-the-assignment-of-a-business-term-from-a-BIE>`__). 
 
 There are two methods for discarding a Business Term. The first one is:
 
