@@ -128,7 +128,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
             for (int i=0; i < 3; i++){
                 viewEditBusinessTermPageForCheck.openPage();
-                viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(i).getBusinessTerm());
+                viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(i).getBusinessTerm());
                 viewEditBusinessTermPageForCheck.hitSearchButton();
                 assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
             }
@@ -188,7 +188,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
             for (int i = 0; i < 3; i++) {
                 viewEditBusinessTermPageForCheck.openPage();
-                viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(i).getExternalReferenceUri());
+                viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(i).getExternalReferenceUri());
                 viewEditBusinessTermPageForCheck.hitSearchButton();
                 assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
             }
