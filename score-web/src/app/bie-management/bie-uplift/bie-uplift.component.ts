@@ -1,4 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {faRecycle, faCircleExclamation} from '@fortawesome/free-solid-svg-icons';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {forkJoin} from 'rxjs';
@@ -64,6 +65,8 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
 })
 export class BieUpliftComponent implements OnInit {
 
+  faRecycle = faRecycle;
+  faCircleExclamation = faCircleExclamation;
   subtitle = 'Verify BIE';
   loading: boolean = false;
 
@@ -159,19 +162,19 @@ export class BieUpliftComponent implements OnInit {
         this.targetDataSource.init();
 
         this.bieUpliftService.getUpliftBieMap(this.topLevelAsbiepId, this.targetReleaseId).subscribe(bieUpliftMap => {
-          const sourceData = [];
+          let sourceData = [];
           let sourceStack = [this.sourceDataSource.data[0], ];
           while (sourceStack.length > 0) {
-            const item = sourceStack.shift();
-            sourceData.push(item);
-            if (item.expandable && item.children.length === 0) {
-              this.sourceDataSource.database.loadChildren(item);
+            const sourceItem = sourceStack.shift();
+            sourceData.push(sourceItem);
+            if (sourceItem.expandable && sourceItem.children.length === 0) {
+              this.sourceDataSource.database.loadChildren(sourceItem);
             }
-            sourceStack = item.children.filter(e => (e as BieUpliftSourceFlatNode).used)
+            sourceStack = sourceItem.children.filter(e => (e as BieUpliftSourceFlatNode).used)
               .concat(sourceStack) as BieUpliftSourceFlatNode[];
           }
 
-          const targetData = [];
+          let targetData = [];
           let targetStack = [this.targetDataSource.data[0], ];
           while (targetStack.length > 0) {
             const targetItem = targetStack.shift();
@@ -190,12 +193,15 @@ export class BieUpliftComponent implements OnInit {
             }
           }
 
+          sourceData = sourceData.filter(e => !e.isGroup);
+          targetData = targetData.filter(e => !e.isGroup);
+
           this.initMapping(sourceData, targetData, bieUpliftMap);
           this.sourceDataSource.collapse(this.sourceDataSource.data[0]);
           this.targetDataSource.collapse(this.targetDataSource.data[0]);
 
           sourceData[0].target = targetData[0];
-          this.unmatchedSource = this.sourceDataSource.data.filter(e => !e.isMapped);
+          this.unmatchedSource = sourceData.filter(e => !e.isMapped);
           if (this.unmatchedSource.length > 0) {
             this.unmatchedSource.forEach(e => this.sourceDataSource.expand(e));
             this.currentUnmatchedSource = this.unmatchedSource[0];
@@ -430,7 +436,7 @@ export class BieUpliftComponent implements OnInit {
       this.sourceDataSource.toggleNode(currentNode.parent as BieUpliftSourceFlatNode, true);
       currentNode = currentNode.parent as BieUpliftSourceFlatNode;
     }
-    this.scrollTree(this.sourceVirtualScroll, index);
+    this.scrollTree(this.sourceVirtualScroll, index, 500);
   }
 
   scrollToTargetNode(node: BieUpliftTargetFlatNode) {
@@ -444,7 +450,7 @@ export class BieUpliftComponent implements OnInit {
       this.targetDataSource.toggleNode(currentNode.parent as BieUpliftTargetFlatNode, true);
       currentNode = currentNode.parent as BieUpliftTargetFlatNode;
     }
-    this.scrollTree(this.targetVirtualScroll, index);
+    this.scrollTree(this.targetVirtualScroll, index, 500);
   }
 
   onSourceBreadCrumbClick(node: BieFlatNode) {
@@ -459,11 +465,18 @@ export class BieUpliftComponent implements OnInit {
     this.scrollToTargetNode(targetNode);
   }
 
-  scrollTree(scroll: CdkVirtualScrollViewport, index: number) {
+  scrollTree(virtualScroll: CdkVirtualScrollViewport, index: number, delay?: number) {
     if (index < 0) {
       return;
     }
-    scroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+
+    if (delay) {
+      setTimeout(() => {
+        virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+      }, delay);
+    } else {
+      virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+    }
   }
 
   isSource(node: BieFlatNode): boolean {

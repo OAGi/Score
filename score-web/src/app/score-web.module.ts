@@ -31,6 +31,7 @@ import {MessageManagementModule} from './message-management/message-management.m
 import {RouterModule} from '@angular/router';
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
 import {MatIconRegistry} from '@angular/material/icon';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -82,7 +83,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     NamespaceManagementModule,
     ReleaseManagementModule,
     ModuleManagementModule,
-    MessageManagementModule
+    MessageManagementModule,
+    FontAwesomeModule
   ],
   declarations: [
     ScoreWebComponent

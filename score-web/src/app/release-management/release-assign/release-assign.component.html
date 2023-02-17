@@ -77,18 +77,16 @@
                 Modified
               </span>
               <span class="drop-box-head-icon">
-                <mat-icon matTooltip="Assign All"
-                          fontSet="fontawesome"
-                          fontIcon="fa-angle-double-right"
-                          class="pointer ml-2"
-                          (click)="assignAll()"></mat-icon>
+                <fa-icon [icon]="faAngleDoubleRight"
+                         matTooltip="Assign All"
+                         class="pointer ml-2"
+                         (click)="assignAll()"></fa-icon>
               </span>
               <span class="drop-box-head-icon float-right">
-                <mat-icon matTooltip="Sort"
-                          fontSet="fontawesome"
-                          fontIcon="fa-sort"
-                          class="pointer"
-                          (click)="sortList(itemsList.assignableList)"></mat-icon>
+                <fa-icon [icon]="faSort"
+                         matTooltip="Sort"
+                         class="pointer"
+                         (click)="sortList(itemsList.assignableList)"></fa-icon>
               </span>
             </div>
             <div class="drop-box-content"
@@ -139,11 +137,10 @@
           <div class="drop-box">
             <div class="drop-box-head">
               <span class="drop-box-head-icon">
-                <mat-icon matTooltip="Unassign All"
-                          fontSet="fontawesome"
-                          fontIcon="fa-angle-double-left"
-                          class="pointer"
-                          (click)="unassignAll()"></mat-icon>
+                <fa-icon [icon]="faAngleDoubleLeft"
+                         matTooltip="Unassign All"
+                         class="pointer"
+                         (click)="unassignAll()"></fa-icon>
               </span>
               <span class="drop-box-head-badge ml-2">
                 {{ count(itemsList.assignedList) }}
@@ -152,11 +149,10 @@
                 Assigned
               </span>
               <span class="drop-box-head-icon float-right">
-                <mat-icon matTooltip="Sort"
-                          fontSet="fontawesome"
-                          fontIcon="fa-sort"
-                          class="pointer"
-                          (click)="sortList(itemsList.assignedList)"></mat-icon>
+                <fa-icon [icon]="faSort"
+                         matTooltip="Sort"
+                         class="pointer"
+                         (click)="sortList(itemsList.assignedList)"></fa-icon>
               </span>
             </div>
             <div class="drop-box-content"

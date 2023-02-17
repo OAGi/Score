@@ -22,8 +22,6 @@ export class ScoreWebComponent implements OnInit {
         families: ['Roboto']
       }
     });
-
-    this.matIconRegistry.registerFontClassAlias('fontawesome', 'fa');
   }
 
   isAuthenticated() {

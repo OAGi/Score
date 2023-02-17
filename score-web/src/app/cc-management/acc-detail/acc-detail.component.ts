@@ -2,6 +2,7 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
@@ -60,7 +61,7 @@ import {CcList} from '../cc-list/domain/cc-list';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
-import {Clipboard} from "@angular/cdk/clipboard";
+import {Clipboard} from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'score-acc-detail',
@@ -68,6 +69,7 @@ import {Clipboard} from "@angular/cdk/clipboard";
   styleUrls: ['./acc-detail.component.css']
 })
 export class AccDetailComponent implements OnInit {
+  faFlask = faFlask;
   title: string;
   _innerHeight: number = window.innerHeight;
   paddingPixel = 12;
@@ -96,12 +98,12 @@ export class AccDetailComponent implements OnInit {
   commentControl: CommentControl;
 
   hasBasedAcc: boolean;
-  initialExpandDepth: number = 10;
+  initialExpandDepth = 10;
 
   contextMenuItem: CcFlatNode;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize: number = 33;
+  virtualScrollItemSize = 33;
 
   get minBufferPx(): number {
     return 10000 * this.virtualScrollItemSize;
@@ -245,8 +247,8 @@ export class AccDetailComponent implements OnInit {
     comment.isNew = true;
 
     if (comment.prevCommentId) {
-      let idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
-      let childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
+      const idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
+      const childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
       this.commentControl.comments.splice(idx + childrenCnt + 1, 0, comment);
     } else {
       this.commentControl.comments.push(comment);
@@ -382,7 +384,7 @@ export class AccDetailComponent implements OnInit {
       return true;
     }
     return !this.hasRevisionAssociation(node);
-  };
+  }
 
   onClick(node: CcFlatNode, $event?: MouseEvent) {
     if (!!$event) {
@@ -834,7 +836,7 @@ export class AccDetailComponent implements OnInit {
       } else if ((child as CcFlatNode).type === 'BCCP' && (child as BccpFlatNode).detail) {
         ((child as BccpFlatNode).detail as CcBccpNodeDetail).bcc.state = state;
       }
-    })
+    });
   }
 
   makeNewRevision() {
@@ -1012,7 +1014,7 @@ export class AccDetailComponent implements OnInit {
     }
     const isWhitespace = control.value.toString().trim().length === 0;
     const isValid = !isWhitespace;
-    return isValid ? null : {'whitespace': true};
+    return isValid ? null : {whitespace: true};
   }
 
   _setCardinalityMinFormControl(node?: CcFlatNode) {
@@ -1546,7 +1548,7 @@ export class AccDetailComponent implements OnInit {
           accManifestId: parentAccManifestId,
           title: node.name,
           type: associationType,
-          targetManifestId: targetManifestId
+          targetManifestId
         },
         width: '100%',
         maxWidth: '100%',
@@ -1557,7 +1559,7 @@ export class AccDetailComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(accManifestId => {
         if (accManifestId) {
-            this.reload("Refactored.");
+            this.reload('Refactored.');
         }
       });
     }

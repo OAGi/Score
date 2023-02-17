@@ -35,6 +35,7 @@ import {BieEditService} from './bie-edit/domain/bie-edit.service';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -129,7 +130,8 @@ const routes: Routes = [
     MatBadgeModule,
     MatDialogModule,
     NgxMatSelectSearchModule,
-    AngularSplitModule
+    AngularSplitModule,
+    FontAwesomeModule
   ],
   declarations: [
     BieCreateBizCtxComponent,

@@ -80,11 +80,11 @@
     <mat-divider *ngIf="request.release.releaseNum === workingRelease.releaseNum"></mat-divider>
     <button mat-menu-item (click)="createBOD()"
             *ngIf="request.release.releaseNum === workingRelease.releaseNum">
-      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi BOD Component</span>
+      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
     </button>
     <button mat-menu-item (click)="createAsccp('Verb')"
             *ngIf="request.release.releaseNum === workingRelease.releaseNum">
-      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Verb Component</span>
+      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
     </button>
   </mat-menu>
 

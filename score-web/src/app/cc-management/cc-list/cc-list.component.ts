@@ -1,5 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
@@ -50,6 +51,7 @@ import {saveAs} from 'file-saver';
 })
 export class CcListComponent implements OnInit {
 
+  faFlask = faFlask;
   title = 'Core Component';
 
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT', 'ASCC', 'BCC'];

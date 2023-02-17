@@ -1,6 +1,7 @@
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {Component, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
+import {faAngleDoubleLeft, faAngleDoubleRight, faSort} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
@@ -27,6 +28,9 @@ import {filter, hashCode} from '../../common/utility';
 })
 export class ReleaseAssignComponent implements OnInit {
 
+  faAngleDoubleLeft = faAngleDoubleLeft;
+  faAngleDoubleRight = faAngleDoubleRight;
+  faSort = faSort;
   title = 'Releases Assign';
   $hashCode: string;
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'DT'];

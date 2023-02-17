@@ -325,7 +325,7 @@
                     </button>
                     <button mat-menu-item (click)="createExtensionComponent()"
                             *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isExtendable && userRoles.includes('developer')">
-                      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Extension Component</span>
+                      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Extension Component</span>
                     </button>
                     <button mat-menu-item (click)="appendAssociation(contextMenuItem, 0)"
                             *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable">

@@ -1,4 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -53,6 +54,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 })
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
+  faRecycle = faRecycle;
   loading = false;
   paddingPixel = 12;
 
@@ -209,9 +211,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.loading = false;
       return;
     }, err => {
-        this.snackBar.open('Something\'s wrong.', '', {
-          duration: 3000
-        });
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000
+      });
     });
   }
 

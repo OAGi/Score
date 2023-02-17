@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>2.4.0</version>
+    <version>2.4.1</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>2.7.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -26,19 +26,20 @@
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.8</aspectj.version>
         <lettuce.version>6.2.1.RELEASE</lettuce.version>
-        <redisson.version>3.17.7</redisson.version>
-        <netty.version>4.1.84.Final</netty.version>
+        <redisson.version>3.18.1</redisson.version>
+        <netty.version>4.1.89.Final</netty.version>
         <lombok.version>1.18.24</lombok.version>
         <mysql-connector-java.version>8.0.31</mysql-connector-java.version>
         <log4j.version>2.19.0</log4j.version>
-        <jOOQ.version>3.17.4</jOOQ.version>
+        <jOOQ.version>3.17.5</jOOQ.version>
         <guava.version>31.1-jre</guava.version>
-        <gson.version>2.9.1</gson.version>
+        <gson.version>2.10</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
         <commons-io.version>2.11.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.2.3</poi.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
         <saxon.version>10.6</saxon.version>
     </properties>
 
@@ -46,7 +47,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-service</artifactId>
-            <version>2.4.0</version>
+            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -164,6 +165,11 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
             <version>${jdom2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

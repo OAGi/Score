@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -37,6 +38,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 })
 export class CodeListUpliftComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Code List';
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];

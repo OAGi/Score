@@ -14,6 +14,7 @@ import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dia
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -24,15 +25,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    TranslateModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        TranslateModule,
+        ScoreCommonModule,
+        FontAwesomeModule
+    ],
   declarations: [
     CcListComponent,
     CreateAsccpDialogComponent,

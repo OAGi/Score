@@ -14,6 +14,7 @@ import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -29,20 +30,21 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    MatInputModule,
-    CommonModule,
-    TranslateModule,
-    ScoreCommonModule,
-    SearchOptionsDialogModule,
-    FindUsagesDialogModule,
-    DragDropModule,
-    AngularSplitModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        MatInputModule,
+        CommonModule,
+        TranslateModule,
+        ScoreCommonModule,
+        SearchOptionsDialogModule,
+        FindUsagesDialogModule,
+        DragDropModule,
+        AngularSplitModule,
+        FontAwesomeModule
+    ],
   declarations: [
     AccDetailComponent,
     AppendAssociationDialogComponent,

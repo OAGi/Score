@@ -352,8 +352,14 @@
                   <span
                     class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                   </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30GetTemplate || option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
+                                class="generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
+                  </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
-                                [disabled]="option.openAPI30GetTemplate != true"
+                                [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
                                 class="generate-second-option"
                                 (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
@@ -362,7 +368,7 @@
                     class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
-                                [disabled]="option.openAPI30GetTemplate != true"
+                                [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
                                 class="generate-second-option"
                                 (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
                                              'includePaginationResponseForJsonForOpenAPI30GetTemplate',
@@ -381,8 +387,14 @@
                   <span
                     class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                   </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
+                                class="generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
+                  </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
-                                [disabled]="option.openAPI30PostTemplate != true"
+                                [disabled]="option.openAPI30PostTemplate != true || option.suppressRootPropertyForOpenAPI30PostTemplate"
                                 class="generate-second-option"
                                 (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
@@ -413,7 +425,8 @@
             <div class="option-body">
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
                 <mat-radio-button class="option-radio-button" value="ALL"
-                                  [disabled]="option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)">
+                                  [disabled]="(option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)) ||
+                                              (option.expressionOption === 'ODF')">
                   Put all schemas in the same file
                 </mat-radio-button>
                 <mat-radio-button class="option-radio-button" value="EACH">

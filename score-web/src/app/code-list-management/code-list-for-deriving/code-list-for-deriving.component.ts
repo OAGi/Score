@@ -4,6 +4,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -25,6 +26,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class CodeListForDerivingComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Derive Code List';
   workingRelease = WorkingRelease;
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];

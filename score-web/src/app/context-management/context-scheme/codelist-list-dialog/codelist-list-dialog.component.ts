@@ -7,6 +7,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -27,6 +28,7 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 })
 export class CodelistListDialogComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Code List';
   workingRelease = WorkingRelease;
   releaseStateList = ['Published', 'Production'];

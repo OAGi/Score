@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {AccountList} from '../../account-management/domain/accounts';
 import {
   TransferOwnershipDialogComponent
@@ -41,6 +42,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 })
 export class CodeListListComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Code List';
   workingRelease = WorkingRelease;
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
