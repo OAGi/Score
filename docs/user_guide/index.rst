@@ -8877,7 +8877,7 @@ There are two methods for discarding a Business Term. The first one is:
    (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the checkbox right before the desired 
    business term name. 
 
-4. Click "Discard" on the top-right of the page. 
+4. Click "Discard" at the top-right of the page. 
 
 5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
    will not remove it. All the assignments for it must be removed first. 
