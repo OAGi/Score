@@ -9252,14 +9252,6 @@ To dissociate a tenant and business context:
 3. Click the Remove button for the appropriate business context (a search or paging may be required).
 
 
-Multi-tenant authorization
---------------------------
-
-
-
-
-
-
 Multi-tenant mode feature restrictions
 ---------------------------------------
 
