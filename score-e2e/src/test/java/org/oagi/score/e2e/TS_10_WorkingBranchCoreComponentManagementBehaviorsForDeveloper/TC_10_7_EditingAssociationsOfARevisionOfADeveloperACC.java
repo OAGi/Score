@@ -113,6 +113,13 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
         assertEquals(Integer.toString(originalCardinalityMax), getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
     }
 
+    @Test
+    @DisplayName("TC_10_9_TA_1")
+    public void manual_tests() {
+
+
+    }
+
 
     @AfterEach
     public void tearDown() {
