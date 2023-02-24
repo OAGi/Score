@@ -9144,31 +9144,6 @@ and this BIE is reused by another BIE. In this case, Score displays a
 notification at the bottom of the page and keeps a more detail log which
 is accessible via the notification page.
 
-.. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
-   :width: 6.5in
-   :height: 2.48611in
-.. |image1| image:: media/image6.png
-   :width: 2.74814in
-   :height: 1.95383in
-.. |image2| image:: media/image7.png
-   :width: 2.33321in
-   :height: 1.93231in
-.. |image3| image:: media/image12.png
-   :width: 0.24997in
-   :height: 0.19789in
-.. |image4| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image5| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image6| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image7| image:: media/image14.png
-   :width: 0.19168in
-   :height: 0.20835in
-
 Multi-tenant management
 =======================
 
@@ -9286,3 +9261,30 @@ Features with restricted behavior
 * Manage context: Restricted to admin users.
 
 * Transfer BIE ownership: Users to whom the BIE ownership may be transferred are limited to users associated with tenants associated with BCs associated with the BIE (other than the current owner — doesn’t make sense for an owner to transfer ownership to themself).
+
+
+.. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
+   :width: 6.5in
+   :height: 2.48611in
+.. |image1| image:: media/image6.png
+   :width: 2.74814in
+   :height: 1.95383in
+.. |image2| image:: media/image7.png
+   :width: 2.33321in
+   :height: 1.93231in
+.. |image3| image:: media/image12.png
+   :width: 0.24997in
+   :height: 0.19789in
+.. |image4| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image5| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image6| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image7| image:: media/image14.png
+   :width: 0.19168in
+   :height: 0.20835in
+
