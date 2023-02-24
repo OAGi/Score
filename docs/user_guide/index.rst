@@ -9168,3 +9168,58 @@ is accessible via the notification page.
 .. |image7| image:: media/image14.png
    :width: 0.19168in
    :height: 0.20835in
+
+Multi-tenant management
+=======================
+
+Multi-tenant mode
+-----------------
+Score multi-tenant feature enables OAGi to offer Score-based BIE-development services to 
+multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant)
+
+Enable multi-tenant mode
+~~~~~~~~~~~~~~~~~~~~~~~~
+By default Score does not use multi-tenant mode. To enable multi-tenant mode:
+
+1. Click on your username (top-right), | Settings | Application settings.
+
+2. Under the Multi-tenant mode label click the Enable button.
+
+Add a tenant
+~~~~~~~~~~~~~
+To add a tenant:
+
+1. Choose the Admin | Tenant menu item.
+
+2. Click the New Tenant button.
+
+3. Enter a name for the new tenant and click the Create button.
+
+
+Manage tenant-user associations
+-------------------------------
+
+
+
+
+
+
+
+
+Manage tenant-business context associations
+-------------------------------------------
+
+
+
+
+
+Multi-tenant authorization
+--------------------------
+
+
+
+
+
+
+Multi-tenant mode feature restrictions
+---------------------------------------
