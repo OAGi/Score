@@ -9156,19 +9156,16 @@ Enable multi-tenant mode
 ~~~~~~~~~~~~~~~~~~~~~~~~
 By default Score does not use multi-tenant mode. To enable multi-tenant mode:
 
-1. Click on your username (top-right), | Settings | Application settings.
-
-2. Under the Multi-tenant mode label click the Enable button.
+1. Click on your username (top-right) | "Settings" | "Application settings".
+2. Under the Multi-tenant mode label click the "Enable" button.
 
 Add a tenant
 ~~~~~~~~~~~~~
 To add a tenant:
 
-1. Choose the Admin | Tenant menu item.
-
-2. Click the New Tenant button.
-
-3. Enter a name for the new tenant and click the Create button.
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "New Tenant" button.
+3. Enter a name for the new tenant and click the "Create" button.
 
 
 Manage tenant-user associations
@@ -9179,24 +9176,19 @@ Associate a tenant and user
 
 To associate a tenant and user:
 
-1. Choose the Admin | Tenant menu item.
-
-2. Click the Manage Users button for the appropriate tenant (a search or paging may be required).
-
-3. Click the Add User button (top-right).
-
-4. Click the Add button for the appropriate user (a search or paging may be required).
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Users" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Add User" button (top-right).
+4. Click the "Add" button for the appropriate user (a search or paging may be required).
 
 Dissociate a tenant and user
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To dissociate a tenant and user:
 
-1. Choose the Admin | Tenant menu item.
-
-2. Click the Manage Users button for the appropriate tenant (a search or paging may be required).
-
-3. Click the Remove button for the appropriate user (a search or paging may be required).
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Users" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Remove" button for the appropriate user (a search or paging may be required).
 
 
 Manage tenant-business context associations
@@ -9207,24 +9199,19 @@ Associate a tenant and business context
 
 To associate a tenant and business context:
 
-1. Choose the Admin | Tenant menu item.
-
-2. Click the Manage Business Context button for the appropriate tenant (a search or paging may be required).
-
-3. Click the Add User button (top-right).
-
-4. Click the Add button for the appropriate business context (a search or paging may be required).
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Business Context" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Add User" button (top-right).
+4. Click the "Add" button for the appropriate business context (a search or paging may be required).
 
 Dissociate a tenant and business context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To dissociate a tenant and business context:
 
-1. Choose the Admin | Tenant menu item.
-
-2. Click the Manage Business Context button for the appropriate tenant (a search or paging may be required).
-
-3. Click the Remove button for the appropriate business context (a search or paging may be required).
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Business Context" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Remove" button for the appropriate business context (a search or paging may be required).
 
 
 Multi-tenant mode feature restrictions
@@ -9236,30 +9223,21 @@ Features not available
 The following features are not available to users in multi-tenant mode:
 
 * Manage modules
-
 * Manage core components
-
 * Make BIE reusable
-
 * Create ABIE extension locally
-
-* Create ABI extension globally
+* Create ABIE extension globally
 
 Features with restricted behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Create BIE: A user must be associated with a tenant to be able to create a BIE.
-
-* Manage associations between business contexts (BCs) and BIEs: 
-  
+* Manage associations between business contexts (BCs) and BIEs:
 
    * The BCs available to the user are limited by their tenancy. Users not associated with a tenant cannot create a BIE since they would not be able to assign a BC on BIE creation (all the BCs would all be filtered out). However, it would make sense to alert the user, perhaps on login, that they can’t do anything useful in Score until they have been assigned to a tenant.
-
    * Note that Admins have no special authorization in this case.
-  
 
 * Manage context: Restricted to admin users.
-
 * Transfer BIE ownership: Users to whom the BIE ownership may be transferred are limited to users associated with tenants associated with BCs associated with the BIE (other than the current owner — doesn’t make sense for an owner to transfer ownership to themself).
 
 
