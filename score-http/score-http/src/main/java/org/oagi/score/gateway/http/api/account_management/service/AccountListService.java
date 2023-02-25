@@ -6,7 +6,7 @@ import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppOauth2UserRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
@@ -42,10 +42,10 @@ public class AccountListService {
 
     @Autowired
     private DSLContext dslContext;
-    
+
     @Autowired
-    private ConfigurationService configService;
-    
+    private ApplicationConfigurationService configService;
+
     @Autowired
     private TenantService tenantService;
 
@@ -106,8 +106,8 @@ public class AccountListService {
         if (excludeRequester != null && excludeRequester == true) {
             conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
-        
-		if (configService.isTenantInstance()) {
+
+		if (configService.isTenantEnabled()) {
 			BigInteger tenantId = request.getTenantId();
 			boolean notConnectedToTenant = request.isNotConnectedToTenant();
 			if (tenantId != null && !notConnectedToTenant) {
@@ -125,7 +125,7 @@ public class AccountListService {
 						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.in(businessCtxIds))));
 			}
 		}
-        
+
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 
         PageRequest pageRequest = request.getPageRequest();
@@ -166,7 +166,7 @@ public class AccountListService {
         }
 
         SelectWithTiesAfterOffsetStep<Record6<ULong, String, String, Byte, String, ULong>> offsetStep = null;
-        
+
         int pageCount = dslContext.fetchCount(conditionStep);
         if (sortField != null) {
             offsetStep = conditionStep.orderBy(sortField)

@@ -7,6 +7,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.graph.data.FindUsagesResponse;
 import org.oagi.score.gateway.http.api.graph.data.Graph;
 import org.oagi.score.gateway.http.api.graph.data.Node;
+import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
@@ -19,7 +20,6 @@ import org.oagi.score.service.corecomponent.seqkey.SeqKeySupportable;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,12 +37,16 @@ public class CoreComponentGraphContext implements GraphContext {
     private Map<ULong, List<AccManifest>> accManifestMapByBasedAccManifestId;
     private Map<ULong, Set<AccManifest>> accManifestMapByToAsccpManifestId;
     private Map<ULong, Set<AccManifest>> accManifestMapByToBccpManifestId;
+    private Map<ULong, List<ShortTag>> accManifestTagMap;
     private Map<ULong, AsccpManifest> asccpManifestMap;
     private Map<ULong, List<AsccpManifest>> asccpManifestMapByRoleOfAccManifestId;
+    private Map<ULong, List<ShortTag>> asccpManifestTagMap;
     private Map<ULong, BccpManifest> bccpManifestMap;
+    private Map<ULong, List<ShortTag>> bccpManifestTagMap;
     private Map<ULong, List<AsccManifest>> asccManifestMap;
     private Map<ULong, List<BccManifest>> bccManifestMap;
     private Map<ULong, DtManifest> dtManifestMap;
+    private Map<ULong, List<ShortTag>> dtManifestTagMap;
     private Map<ULong, List<DtScManifest>> dtScManifestMap;
 
     @Data
@@ -183,6 +187,14 @@ public class CoreComponentGraphContext implements GraphContext {
                 .filter(e -> e.getBasedAccManifestId() != null)
                 .collect(groupingBy(AccManifest::getBasedAccManifestId));
 
+        accManifestTagMap = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(TAG)
+                .join(ACC_MANIFEST_TAG).on(TAG.TAG_ID.eq(ACC_MANIFEST_TAG.TAG_ID))
+                .join(ACC_MANIFEST).on(ACC_MANIFEST_TAG.ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .where(ACC_MANIFEST.RELEASE_ID.eq(this.releaseId))
+                .fetchGroups(ACC_MANIFEST.ACC_MANIFEST_ID, ShortTag.class);
+
         List<AsccpManifest> asccpManifestList =
                 dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID,
                         ASCCP.PROPERTY_TERM, ASCCP.STATE, ASCCP.GUID, ASCCP.IS_DEPRECATED,
@@ -205,6 +217,14 @@ public class CoreComponentGraphContext implements GraphContext {
         asccpManifestMapByRoleOfAccManifestId = asccpManifestList.stream()
                 .collect(groupingBy(AsccpManifest::getRoleOfAccManifestId));
 
+        asccpManifestTagMap = dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(TAG)
+                .join(ASCCP_MANIFEST_TAG).on(TAG.TAG_ID.eq(ASCCP_MANIFEST_TAG.TAG_ID))
+                .join(ASCCP_MANIFEST).on(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .where(ASCCP_MANIFEST.RELEASE_ID.eq(this.releaseId))
+                .fetchGroups(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ShortTag.class);
+
         bccpManifestMap =
                 dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BDT_MANIFEST_ID,
                         BCCP.PROPERTY_TERM, BCCP.REPRESENTATION_TERM, BCCP.STATE, BCCP.GUID, BCCP.IS_DEPRECATED,
@@ -224,6 +244,14 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
                         )).stream()
                         .collect(Collectors.toMap(BccpManifest::getBccpManifestId, Function.identity()));
+
+        bccpManifestTagMap = dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(TAG)
+                .join(BCCP_MANIFEST_TAG).on(TAG.TAG_ID.eq(BCCP_MANIFEST_TAG.TAG_ID))
+                .join(BCCP_MANIFEST).on(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .where(BCCP_MANIFEST.RELEASE_ID.eq(this.releaseId))
+                .fetchGroups(BCCP_MANIFEST.BCCP_MANIFEST_ID, ShortTag.class);
 
         List<AsccManifest> asccManifestList =
                 dslContext.select(
@@ -329,6 +357,15 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(DT_MANIFEST.PREV_DT_MANIFEST_ID)
                         )).stream()
                         .collect(Collectors.toMap(DtManifest::getDtManifestId, Function.identity()));
+
+        dtManifestTagMap = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(TAG)
+                .join(DT_MANIFEST_TAG).on(TAG.TAG_ID.eq(DT_MANIFEST_TAG.TAG_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST_TAG.DT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .where(DT_MANIFEST.RELEASE_ID.eq(this.releaseId))
+                .fetchGroups(DT_MANIFEST.DT_MANIFEST_ID, ShortTag.class);
+
         dtScManifestMap =
                 dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID,
                         DT_SC.OBJECT_CLASS_TERM, DT_SC.PROPERTY_TERM, DT_SC.REPRESENTATION_TERM, DT.STATE,
@@ -594,6 +631,7 @@ public class CoreComponentGraphContext implements GraphContext {
                 CcState.valueOf(accManifest.getState()));
         node.setBasedManifestId(accManifest.getBasedAccManifestId());
         node.setPrevManifestId(accManifest.getPrevAccManifestId());
+        node.setTagList(accManifestTagMap.getOrDefault(accManifest.getAccManifestId(), Collections.emptyList()));
         node.put("state", accManifest.getState());
         node.put("deprecated", accManifest.getIsDeprecated() == 1);
         node.put("guid", accManifest.getGuid());
@@ -608,6 +646,7 @@ public class CoreComponentGraphContext implements GraphContext {
                 CcState.valueOf(asccpManifest.getState()));
         node.setLinkedManifestId(asccpManifest.getRoleOfAccManifestId());
         node.setPrevManifestId(asccpManifest.getPrevAsccpManifestId());
+        node.setTagList(asccpManifestTagMap.getOrDefault(asccpManifest.getAsccpManifestId(), Collections.emptyList()));
         node.put("state", asccpManifest.getState());
         node.put("deprecated", asccpManifest.getIsDeprecated() == 1);
         node.put("guid", asccpManifest.getGuid());
@@ -620,6 +659,7 @@ public class CoreComponentGraphContext implements GraphContext {
                 CcState.valueOf(bccpManifest.getState()));
         node.setLinkedManifestId(bccpManifest.getBdtManifestId());
         node.setPrevManifestId(bccpManifest.getPrevBccpManifestId());
+        node.setTagList(bccpManifestTagMap.getOrDefault(bccpManifest.getBccpManifestId(), Collections.emptyList()));
         node.put("state", bccpManifest.getState());
         node.put("deprecated", bccpManifest.getIsDeprecated() == 1);
         node.put("guid", bccpManifest.getGuid());
@@ -656,6 +696,7 @@ public class CoreComponentGraphContext implements GraphContext {
         Node node = Node.toNode(Node.NodeType.DT, dtManifest.getDtManifestId(),
                 CcState.valueOf(dtManifest.getState()));
         node.setPrevManifestId(dtManifest.getPrevDtManifestId());
+        node.setTagList(dtManifestTagMap.getOrDefault(dtManifest.getDtManifestId(), Collections.emptyList()));
         node.put("state", dtManifest.getState());
         node.put("deprecated", dtManifest.getIsDeprecated() == 1);
         node.put("dataTypeTerm", dtManifest.getDataTypeTerm());

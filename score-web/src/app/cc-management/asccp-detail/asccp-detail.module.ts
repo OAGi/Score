@@ -40,7 +40,7 @@ const routes: Routes = [
     AngularSplitModule
   ],
   declarations: [
-    AsccpDetailComponent,
+    AsccpDetailComponent
   ]
 })
 export class AsccpDetailModule {

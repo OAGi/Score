@@ -28,7 +28,7 @@ mat-chip-list:focus {
 }
 
 .btn-comment {
-  padding-left: 10px;
+  margin-left: 10px;
   cursor: pointer;
 }
 

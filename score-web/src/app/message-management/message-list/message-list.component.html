@@ -62,7 +62,8 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadMessageList();">
           <mat-icon>search</mat-icon>
           Search
         </button>
@@ -71,7 +72,8 @@
 
     <mat-card-content class="mat-card-container">
       <div class="mat-elevation-z1">
-        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+        <table mat-table
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <!-- Checkbox Column -->

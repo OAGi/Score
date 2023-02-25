@@ -4,6 +4,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -25,6 +26,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class CodeListForDerivingComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Derive Code List';
   workingRelease = WorkingRelease;
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
@@ -70,7 +72,7 @@ export class CodeListForDerivingComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCodeList();
     });
 
     this.releases = [];
@@ -97,21 +99,18 @@ export class CodeListForDerivingComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.onChange();
+      this.loadCodeList(true);
     });
   }
 
   onPageChange(event: PageEvent) {
-    this.loadCodeList(true);
+    this.loadCodeList();
   }
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadCodeList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

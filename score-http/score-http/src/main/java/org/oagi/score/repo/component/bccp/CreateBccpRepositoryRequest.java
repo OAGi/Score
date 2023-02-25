@@ -12,6 +12,7 @@ public class CreateBccpRepositoryRequest extends RepositoryRequest {
     private final BigInteger releaseId;
 
     private String initialPropertyTerm = "Property Term";
+    private String tag;
 
     public CreateBccpRepositoryRequest(AuthenticatedPrincipal user,
                                        BigInteger bdtManifestId, BigInteger releaseId) {
@@ -42,5 +43,13 @@ public class CreateBccpRepositoryRequest extends RepositoryRequest {
 
     public void setInitialPropertyTerm(String initialPropertyTerm) {
         this.initialPropertyTerm = initialPropertyTerm;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

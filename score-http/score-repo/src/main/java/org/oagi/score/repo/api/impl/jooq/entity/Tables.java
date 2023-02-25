@@ -7,6 +7,7 @@ package org.oagi.score.repo.api.impl.jooq.entity;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Abie;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Acc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdList;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValue;
@@ -14,18 +15,24 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValueManifest
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbie;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asccp;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule;
@@ -35,6 +42,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxAssignment;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContent;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContentManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BusinessTerm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPriXpsTypeMap;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtPri;
@@ -53,6 +61,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxScheme;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
@@ -76,6 +85,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
@@ -125,6 +135,11 @@ public class Tables {
     public static final AccManifest ACC_MANIFEST = AccManifest.ACC_MANIFEST;
 
     /**
+     * The table <code>oagi.acc_manifest_tag</code>.
+     */
+    public static final AccManifestTag ACC_MANIFEST_TAG = AccManifestTag.ACC_MANIFEST_TAG;
+
+    /**
      * The AGENCY_ID_LIST table stores information about agency identification
      * lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE.
      */
@@ -163,6 +178,12 @@ public class Tables {
     public static final Asbie ASBIE = Asbie.ASBIE;
 
     /**
+     * The asbie_bizterm table stores information about the aggregation between
+     * the ascc_bizterm and ASBIE. TODO: Placeholder, definition is missing.
+     */
+    public static final AsbieBizterm ASBIE_BIZTERM = AsbieBizterm.ASBIE_BIZTERM;
+
+    /**
      * ASBIEP represents a role in a usage of an ABIE. It is a contextualization
      * of an ASCCP.
      */
@@ -173,6 +194,12 @@ public class Tables {
      * ASCCP. 
      */
     public static final Ascc ASCC = Ascc.ASCC;
+
+    /**
+     * The ascc_bizterm table stores information about the aggregation between
+     * the business term and ASCC. TODO: Placeholder, definition is missing.
+     */
+    public static final AsccBizterm ASCC_BIZTERM = AsccBizterm.ASCC_BIZTERM;
 
     /**
      * The table <code>oagi.ascc_manifest</code>.
@@ -191,6 +218,11 @@ public class Tables {
     public static final AsccpManifest ASCCP_MANIFEST = AsccpManifest.ASCCP_MANIFEST;
 
     /**
+     * The table <code>oagi.asccp_manifest_tag</code>.
+     */
+    public static final AsccpManifestTag ASCCP_MANIFEST_TAG = AsccpManifestTag.ASCCP_MANIFEST_TAG;
+
+    /**
      * A BBIE represents a relationship/association between an ABIE and a BBIEP.
      * It is a contextualization of a BCC. The BBIE table also stores some
      * information about the specific constraints related to the BDT associated
@@ -200,6 +232,12 @@ public class Tables {
      * column among the three can have a value in a particular record.
      */
     public static final Bbie BBIE = Bbie.BBIE;
+
+    /**
+     * The bbie_bizterm table stores information about the aggregation between
+     * the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing.
+     */
+    public static final BbieBizterm BBIE_BIZTERM = BbieBizterm.BBIE_BIZTERM;
 
     /**
      * Because there is no single table that is a contextualized counterpart of
@@ -222,6 +260,12 @@ public class Tables {
     public static final Bcc BCC = Bcc.BCC;
 
     /**
+     * The bcc_bizterm table stores information about the aggregation between
+     * the business term and BCC. TODO: Placeholder, definition is missing.
+     */
+    public static final BccBizterm BCC_BIZTERM = BccBizterm.BCC_BIZTERM;
+
+    /**
      * The table <code>oagi.bcc_manifest</code>.
      */
     public static final BccManifest BCC_MANIFEST = BccManifest.BCC_MANIFEST;
@@ -236,6 +280,11 @@ public class Tables {
      * The table <code>oagi.bccp_manifest</code>.
      */
     public static final BccpManifest BCCP_MANIFEST = BccpManifest.BCCP_MANIFEST;
+
+    /**
+     * The table <code>oagi.bccp_manifest_tag</code>.
+     */
+    public static final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
 
     /**
      * This table captures the allowed primitives for a BDT. The allowed
@@ -317,6 +366,13 @@ public class Tables {
      * The table <code>oagi.blob_content_manifest</code>.
      */
     public static final BlobContentManifest BLOB_CONTENT_MANIFEST = BlobContentManifest.BLOB_CONTENT_MANIFEST;
+
+    /**
+     * The Business Term table stores information about the business term, which
+     * is usually associated to BIE or CC. TODO: Placeeholder, definition is
+     * missing.
+     */
+    public static final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
 
     /**
      * This table capture allowed primitives of the CDT?s Content Component. 
@@ -443,6 +499,11 @@ public class Tables {
     public static final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
 
     /**
+     * The table <code>oagi.dt_manifest_tag</code>.
+     */
+    public static final DtManifestTag DT_MANIFEST_TAG = DtManifestTag.DT_MANIFEST_TAG;
+
+    /**
      * This table represents the supplementary component (SC) of a DT. Revision
      * is not tracked at the supplementary component. It is considered intrinsic
      * part of the DT. In other words, when a new revision of a DT is created a
@@ -567,12 +628,17 @@ public class Tables {
     public static final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
+     * The table <code>oagi.tag</code>.
+     */
+    public static final Tag TAG = Tag.TAG;
+
+    /**
      * This table about the user tenant role.
      */
     public static final Tenant TENANT = Tenant.TENANT;
 
     /**
-     * This table captures the tenant role and theirs bussiness contexts.
+     * This table captures the tenant role and theirs business contexts.
      */
     public static final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
 

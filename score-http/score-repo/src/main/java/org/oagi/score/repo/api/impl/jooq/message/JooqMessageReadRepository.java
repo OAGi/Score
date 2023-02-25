@@ -75,7 +75,8 @@ public class JooqMessageReadRepository
                 APP_USER.as("sender").LOGIN_ID.as("sender_login_id"),
                 APP_USER.as("sender").IS_DEVELOPER.as("sender_is_developer"))
                 .from(MESSAGE)
-                .join(APP_USER.as("sender")).on(MESSAGE.SENDER_ID.eq(APP_USER.as("sender").APP_USER_ID));
+                .join(APP_USER.as("sender")).on(MESSAGE.SENDER_ID.eq(APP_USER.as("sender").APP_USER_ID))
+                .join(APP_USER.as("recipient")).on(MESSAGE.RECIPIENT_ID.eq(APP_USER.as("recipient").APP_USER_ID));
     }
 
     private RecordMapper<Record, MessageList> mapper() {
@@ -97,6 +98,8 @@ public class JooqMessageReadRepository
 
     private Collection<Condition> getConditions(GetMessageListRequest request) {
         List<Condition> conditions = new ArrayList();
+
+        conditions.add(APP_USER.as("recipient").APP_USER_ID.eq(ULong.valueOf(request.getRequester().getUserId())));
 
         if (!request.getSenderUsernameList().isEmpty()) {
             conditions.add(APP_USER.as("sender").LOGIN_ID.in(

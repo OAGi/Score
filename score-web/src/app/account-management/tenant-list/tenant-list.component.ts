@@ -49,14 +49,13 @@ export class TenantListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadTenantList();
     });
+
     this.loadTenantList(true);
   }
 
   onChange(property?: string, source?) {
-    this.paginator.pageIndex = 0;
-    this.loadTenantList();
   }
 
   onPageChange(event: PageEvent) {
@@ -65,6 +64,7 @@ export class TenantListComponent implements OnInit {
 
   loadTenantList(isInit?: boolean) {
     this.loading = true;
+
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);

@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig, MatDialogRef} from '@angular/material/dialog';
 import {ConfirmDialogConfig} from './confirm-dialog.domain';
 import {ConfirmDialogComponent} from './confirm-dialog.component';
-import {MatDialogRef} from '@angular/material/dialog/dialog-ref';
 
 @Injectable()
 export class ConfirmDialogService {

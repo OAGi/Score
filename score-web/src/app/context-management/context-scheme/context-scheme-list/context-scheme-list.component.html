@@ -37,7 +37,7 @@
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                       [max]="request.updatedDate.end"
                        (dateInput)="onDateEvent('startDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
@@ -54,7 +54,7 @@
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                       [min]="request.updatedDate.start"
                        (dateInput)="onDateEvent('endDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
@@ -73,7 +73,10 @@
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="request.filters.name" (keyup.enter)="onChange()" placeholder="Name">
+                  <input matInput [(ngModel)]="request.filters.name"
+                         (ngModelChange)="onChange('filters.name', request.filters.name)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadContextSchemeList();"
+                         placeholder="Name">
                 </mat-form-field>
               </div>
             </div>
@@ -81,7 +84,8 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadContextSchemeList();">
           <mat-icon>search</mat-icon>
           Search
         </button>
@@ -90,7 +94,8 @@
 
     <mat-card-content class="mat-card-container">
       <div class="mat-elevation-z1">
-        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+        <table mat-table
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <!-- Checkbox Column -->
@@ -114,12 +119,12 @@
           <ng-container matColumnDef="schemeName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
             <td mat-cell *matCellDef="let element">
-              <a routerLink="{{ element.contextSchemeId }}">
-                <span>{{ element.schemeName }}</span>
-                <div class="description ellipsis">
-                  {{ element.guid }}
-                </div>
-              </a>
+              <div class="schemeName word-break-all">
+                <a routerLink="{{ element.contextSchemeId }}">
+                  <span>{{ element.schemeName }}</span>
+                </a>
+              </div>
+              <div class="description">{{ element.guid }}</div>
             </td>
           </ng-container>
 
@@ -140,33 +145,34 @@
                 <a target="_blank" rel="noopener noreferrer"
                    href="/code_list/{{ element.codeListId }}">
                   <span>{{ element.codeListName }}</span>
-                  <div class="description ellipsis">
-                    {{ element.schemeId }}
-                  </div>
+                  <span class="description word-break-all">{{ element.schemeId }}</span>
                 </a>
               </div>
               <div *ngIf="!element.codeListId">
-                <span>{{ element.schemeId }}</span>
+                <span class="word-break-all">{{ element.schemeId }}</span>
               </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="schemeAgencyId">
             <th mat-header-cell *matHeaderCellDef> Agency ID</th>
-            <td mat-cell *matCellDef="let element"> {{ element.schemeAgencyId }}</td>
+            <td mat-cell *matCellDef="let element">
+              <span class="word-break-all">{{ element.schemeAgencyId }}</span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="schemeVersionId">
             <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element"> {{ element.schemeVersionId }}</td>
+            <td mat-cell *matCellDef="let element">
+              <span class="word-break-all">{{ element.schemeVersionId }}</span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdatedBy.username }}</b>
-              </div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
             </td>
           </ng-container>
 

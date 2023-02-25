@@ -18,7 +18,7 @@ public class BusinessContext extends Auditable implements Serializable {
     private List<BusinessContextValue> businessContextValueList = Collections.emptyList();
 
     private boolean used;
-    
+
     private String connectedTenantNames;
 
     public BigInteger getBusinessContextId() {

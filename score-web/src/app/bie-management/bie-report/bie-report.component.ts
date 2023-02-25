@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {AuthService} from '../../authentication/auth.service';
 import {base64Encode} from '../../common/utility';
 import {BieReportService} from './domain/bie-report.service';
@@ -13,6 +14,8 @@ import {saveAs} from 'file-saver';
   styleUrls: ['./bie-report.component.css']
 })
 export class BieReportComponent implements OnInit {
+
+  faRecycle = faRecycle;
   title = 'Reuse Report';
 
   displayedColumns: string[] = [

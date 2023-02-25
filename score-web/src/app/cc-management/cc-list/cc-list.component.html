@@ -80,11 +80,11 @@
     <mat-divider *ngIf="request.release.releaseNum === workingRelease.releaseNum"></mat-divider>
     <button mat-menu-item (click)="createBOD()"
             *ngIf="request.release.releaseNum === workingRelease.releaseNum">
-      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi BOD Component</span>
+      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
     </button>
     <button mat-menu-item (click)="createAsccp('Verb')"
             *ngIf="request.release.releaseNum === workingRelease.releaseNum">
-      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Verb Component</span>
+      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
     </button>
   </mat-menu>
 
@@ -96,7 +96,9 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Branch</mat-label>
-                <mat-select [(ngModel)]="request.release" (ngModelChange)="onChange('branch', request.release)">
+                <mat-select [(ngModel)]="request.release"
+                            (ngModelChange)="onChange('branch', request.release);
+                                            this.paginator.pageIndex = 0; this.loadCcList();">
                   <mat-select-trigger class="d-flex">
                     <span>{{ request.release.releaseNum }}</span>
                     <span class="f12 ml-auto {{request.release.state}}"
@@ -200,7 +202,7 @@
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                       [max]="request.updatedDate.end"
                        (dateInput)="onDateEvent('startDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
@@ -217,7 +219,7 @@
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                       [min]="request.updatedDate.start"
                        (dateInput)="onDateEvent('endDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
@@ -237,21 +239,27 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.den" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.den"
+                       (ngModelChange)="onChange('filters.den', request.filters.den)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
                        placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
               </mat-form-field>
             </div>
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.definition" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.definition"
+                       (ngModelChange)="onChange('filters.definition', request.filters.definition)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
                        placeholder="Definition">
               </mat-form-field>
             </div>
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.module" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.module"
+                       (ngModelChange)="onChange('filters.module', request.filters.module)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
                        placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
               </mat-form-field>
             </div>
@@ -261,6 +269,16 @@
                 <mat-select [(ngModel)]="request.componentTypes" multiple>
                   <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType">
                     {{componentType.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Tag</mat-label>
+                <mat-select [(ngModel)]="request.tags" multiple>
+                  <mat-option *ngFor="let tag of tags" [value]="tag.name">
+                    {{tag.name}}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -275,7 +293,7 @@
                               (ngModelChange)="onChange('fuzzySearch', request.fuzzySearch)">Fuzzy Search</mat-slide-toggle>
           </div>
           <div class="col-md-3 col-sm-12 pb-md-0 pb-3">
-            <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+            <button mat-raised-button color="primary" type="submit" (click)="this.paginator.pageIndex = 0; this.loadCcList();">
               <mat-icon>search</mat-icon>
               Search
             </button>
@@ -291,7 +309,7 @@
 
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <!-- Checkbox Column -->
@@ -331,12 +349,18 @@
           <ng-container matColumnDef="den">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
             <td mat-cell *matCellDef="let element">
-              <div class="den ellipsis" style="margin-right: 10px;">
-                <a routerLink="/core_component/{{ getRouterLink(element) }}">
-                  <span class="pointer">{{ element.den }}</span>
+              <div class="den word-break-all">
+                <a routerLink="/core_component/{{ getRouterLink(element) }}"
+                   matTooltip="{{ element.den }}">
+                  <span>{{ element.den }}</span>
                 </a>
+                <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of element.tagList"
+                       [style.background-color]="tag.backgroundColor"
+                       [style.color]="tag.textColor">{{ tag.name }}</span>
+                </div>
               </div>
-              <div class="description ellipsis">{{ element.guid }}</div>
+              <div class="description">{{ element.guid }}</div>
             </td>
           </ng-container>
 
@@ -348,7 +372,7 @@
           </ng-container>
 
           <ng-container matColumnDef="sixDigitId">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Six Hexadecimal Identifier</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Six Hexadecimal ID</th>
             <td mat-cell *matCellDef="let element">
               {{element.sixDigitId}}
             </td>
@@ -364,7 +388,7 @@
           <ng-container matColumnDef="owner">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Owner</th>
             <td mat-cell *matCellDef="let element" class="ellipsis">
-              <span matTooltip="{{ element.owner }}">{{ element.owner }}</span>
+              <span [matTooltip]="element.owner">{{ element.owner }}</span>
             </td>
           </ng-container>
 
@@ -390,8 +414,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
-              </div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
             </td>
           </ng-container>
 

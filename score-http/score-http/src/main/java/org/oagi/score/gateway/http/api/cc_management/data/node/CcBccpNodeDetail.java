@@ -24,6 +24,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private int cardinalityMin;
         private int cardinalityMax;
         private boolean deprecated;
+        private BigInteger replacementBccManifestId;
+        private Bcc replacement;
         private boolean nillable;
         private String defaultValue;
         private String fixedValue;
@@ -48,6 +50,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private String den;
         private boolean nillable;
         private boolean deprecated;
+        private BigInteger replacementBccpManifestId;
+        private Bccp replacement;
         private BigInteger namespaceId = BigInteger.ZERO;
         private String defaultValue;
         private String fixedValue;

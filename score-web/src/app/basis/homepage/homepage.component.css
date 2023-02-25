@@ -160,6 +160,14 @@ a {
   width: 70px;
 }
 
+.mat-column-businessContexts {
+  width: 15%;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child)::after {
+  content: ', ';
+}
+
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }

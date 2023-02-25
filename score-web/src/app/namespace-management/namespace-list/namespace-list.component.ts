@@ -73,7 +73,7 @@ export class NamespaceListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadNamespaceList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -107,9 +107,7 @@ export class NamespaceListComponent implements OnInit {
     }
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadNamespaceList();
+  onChange(property?: string, source?) {
   }
 
   loadNamespaceList(isInit?: boolean) {

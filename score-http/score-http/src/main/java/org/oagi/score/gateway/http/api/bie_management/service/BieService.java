@@ -7,9 +7,10 @@ import org.oagi.score.data.BizCtx;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
+import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.CoreComponentRepository;
@@ -85,12 +86,12 @@ public class BieService {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-    
+
     @Autowired
     private TenantService tenantService;
-    
+
     @Autowired
-    private ConfigurationService configurationService;
+    private ApplicationConfigurationService applicationConfigurationService;
 
     @Transactional
     public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
@@ -200,7 +201,7 @@ public class BieService {
             getBusinessContextListRequest.setPageSize(-1);
 
             GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                    .getBusinessContextList(getBusinessContextListRequest, configurationService.isTenantInstance());
+                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
             bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
             bieList.setAccess(
@@ -258,6 +259,55 @@ public class BieService {
         });
 
         response.setList(bieLists);
+        response.setLength(result.getPageCount());
+        return response;
+    }
+
+    public PageResponse<AsbieListRecord> getAsbieAndBbieList(AuthenticatedPrincipal user, BieListRequest request) {
+        PageRequest pageRequest = request.getPageRequest();
+        AppUser requester = sessionService.getAppUserByUsername(user);
+
+        PaginationResponse<AsbieListRecord> result = bieRepository.selectBieLists()
+                .setPropertyTerm(request.getPropertyTerm())
+                .setBusinessContext(request.getBusinessContext())
+                .setStates(request.getStates())
+                .setBieIdAndType(request.getBieId(), request.getTypes())
+                .setReleaseId(request.getReleaseId())
+                .setOwnerLoginIds(request.getOwnerLoginIds())
+                .setUpdaterLoginIds(request.getUpdaterLoginIds())
+                .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
+                .setAsccBccDen(request.getAsccBccDen())
+                .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
+                .setOwnedByDeveloper(request.getOwnedByDeveloper())
+                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
+                .fetchAsbieBbieInto(request.getTypes(), AsbieListRecord.class);
+
+        List<AsbieListRecord> bieLists = result.getResult();
+        bieLists.forEach(bieList -> {
+            GetBusinessContextListRequest getBusinessContextListRequest =
+                    new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
+                            .withTopLevelAsbiepIdList(
+                                    (bieList.getTopLevelAsbiepId() == null) ?
+                                            Collections.emptyList() : Arrays.asList(bieList.getTopLevelAsbiepId()))
+                            .withName(request.getBusinessContext());
+
+            getBusinessContextListRequest.setPageIndex(-1);
+            getBusinessContextListRequest.setPageSize(-1);
+
+            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                    .getBusinessContextList(getBusinessContextListRequest, false);
+
+            bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieList.setAccess(
+                    AccessPrivilege.toAccessPrivilege(requester, bieList.getOwnerUserId(), bieList.getState())
+            );
+        });
+
+        PageResponse<AsbieListRecord> response = new PageResponse();
+        response.setList(bieLists);
+        response.setPage(pageRequest.getPageIndex());
+        response.setSize(pageRequest.getPageSize());
         response.setLength(result.getPageCount());
         return response;
     }

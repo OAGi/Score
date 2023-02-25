@@ -4,10 +4,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {
-  BusinessContext,
-  BusinessContextListRequest
-} from '../../context-management/business-context/domain/business-context';
+import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
@@ -45,7 +42,7 @@ export class BieCopyBizCtxComponent implements OnInit {
 
   constructor(private bizCtxService: BusinessContextService,
               private accountService: AccountListService,
-              private authServer: AuthService,
+              private authService: AuthService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -55,7 +52,7 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.request = new BusinessContextListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('name', 'asc', 0, 10));
 
-    if(this.isTenantInstance()) {
+    if (this.isTenantEnabled) {
       this.request.filters.isBieEditing = true;
     }
 
@@ -67,7 +64,7 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBusinessContextList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -82,9 +79,7 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.loadBusinessContextList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessContextList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -170,9 +165,9 @@ export class BieCopyBizCtxComponent implements OnInit {
     this.router.navigate(['/profile_bie/copy/bie'], {queryParams: {bizCtxIds: selectedBizCtxIds}});
   }
 
-  isTenantInstance() {
-    const userToken = this.authServer.getUserToken();
-    return userToken.isTenantInstance;
+  get isTenantEnabled(): boolean {
+    const userToken = this.authService.getUserToken();
+    return userToken.tenant.enabled;
   }
 
 }

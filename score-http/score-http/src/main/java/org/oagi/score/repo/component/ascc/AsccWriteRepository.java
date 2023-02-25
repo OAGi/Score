@@ -1,6 +1,7 @@
 package org.oagi.score.repo.component.ascc;
 
 import org.jooq.DSLContext;
+import org.jooq.Record2;
 import org.jooq.UpdateSetFirstStep;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.ULong;
@@ -88,32 +89,33 @@ public class AsccWriteRepository {
         );
     }
 
-    private void ensureNoConflictInBackward(AccManifestRecord fromAccManifestRecord, AsccpRecord asccpRecord) {
-        List<AccManifestRecord> childAccManifestRecords = dslContext.selectFrom(ACC_MANIFEST)
-                .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(fromAccManifestRecord.getAccManifestId()))
-                .fetchInto(AccManifestRecord.class);
-        if (childAccManifestRecords.isEmpty()) {
+    private void ensureNoConflictInBackward(ULong fromAccManifestId, AsccpRecord asccpRecord) {
+        List<ULong> childAccManifestIdList = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                .from(ACC_MANIFEST)
+                .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(fromAccManifestId))
+                .fetchInto(ULong.class);
+        if (childAccManifestIdList.isEmpty()) {
             return;
         }
 
-        for (AccManifestRecord childAccManifestRecord : childAccManifestRecords) {
-            String accDen = dslContext.select(ACC.DEN)
-                    .from(ASCC_MANIFEST)
-                    .join(ACC_MANIFEST).on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
-                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                    .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
-                    .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                    .where(and(
-                            ASCC_MANIFEST.RELEASE_ID.eq(childAccManifestRecord.getReleaseId()),
-                            ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(childAccManifestRecord.getAccManifestId()),
-                            ASCCP.ASCCP_ID.eq(asccpRecord.getAsccpId())
-                    ))
-                    .fetchOptionalInto(String.class).orElse(null);
+        for (Record2<ULong, String> record : dslContext.select(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC.DEN)
+                .from(ASCC_MANIFEST)
+                .join(ACC_MANIFEST).on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .where(and(
+                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.in(childAccManifestIdList),
+                        ASCCP.ASCCP_ID.eq(asccpRecord.getAsccpId())
+                ))
+                .fetch()) {
+
+            String accDen = record.get(ACC.DEN);
             if (accDen != null) {
                 throw new IllegalArgumentException("ACC [" + accDen + "] already has ASCCP [" + asccpRecord.getDen() + "]");
             }
 
-            ensureNoConflictInBackward(childAccManifestRecord, asccpRecord);
+            ensureNoConflictInBackward(record.get(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID), asccpRecord);
         }
     }
 
@@ -148,7 +150,7 @@ public class AsccWriteRepository {
 
         // Issue #1192
         ensureNoConflictInForward(accManifestRecord, asccpRecord);
-        ensureNoConflictInBackward(accManifestRecord, asccpRecord);
+        ensureNoConflictInBackward(accManifestRecord.getAccManifestId(), asccpRecord);
 
         if (dslContext.selectCount()
                 .from(ASCCP_MANIFEST)

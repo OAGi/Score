@@ -155,12 +155,23 @@ public class AsbieReadRepository {
                 ASBIE.HASH_PATH,
                 ASBIE.BASED_ASCC_MANIFEST_ID,
                 ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id"),
-                ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.as("ref_top_level_asbiep_id"))
+                ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.as("ref_top_level_asbiep_id"),
+                TOP_LEVEL_ASBIEP.INVERSE_MODE)
                 .from(ASBIE)
                 .join(ASBIEP).on(
                         and(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID),
                             ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)))
+                .join(TOP_LEVEL_ASBIEP).on(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
-                .fetchInto(BieEditRef.class);
+                .fetch(record -> {
+                    BieEditRef bieEditRef = new BieEditRef();
+                    bieEditRef.setAsbieId(record.get(ASBIE.ASBIE_ID).toBigInteger());
+                    bieEditRef.setBasedAsccManifestId(record.get(ASBIE.BASED_ASCC_MANIFEST_ID).toBigInteger());
+                    bieEditRef.setHashPath(record.get(ASBIE.HASH_PATH));
+                    bieEditRef.setTopLevelAsbiepId(record.get(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id")).toBigInteger());
+                    bieEditRef.setRefTopLevelAsbiepId(record.get(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.as("ref_top_level_asbiep_id")).toBigInteger());
+                    bieEditRef.setRefInverseMode(record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) == 1);
+                    return bieEditRef;
+                });
     }
 }

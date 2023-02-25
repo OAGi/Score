@@ -1,7 +1,7 @@
 import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {hashCode4String, loadBooleanProperty, sha256} from '../../common/utility';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
-import {BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
+import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
@@ -14,6 +14,7 @@ export interface BieFlatNode extends FlatNode {
   bieType: string;
   topLevelAsbiepId: number;
   deprecated: boolean;
+  rootNode: BieEditAbieNode;
   inverseMode: boolean;
 
   used: boolean | undefined;
@@ -179,8 +180,17 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   }
 
   get hashCode() {
-    // return ((!!this.bieId) ? this.bieId : 0) + ((this._used === undefined) ? 0 : ((this._used) ? 1231 : 1237));
-    return ((!!this.bieId) ? this.bieId : 0) + ((this._used) ? 1231 : 1237);
+    let hashCode = 7;
+    hashCode = 31 * hashCode + hashCode4String(this.hashPath);
+    if (!!this.bieId) {
+      hashCode = 31 * hashCode + this.bieId;
+    }
+    if (this._used === undefined) {
+      hashCode = 31 * hashCode + 0;
+    } else {
+      hashCode = 31 * hashCode + ((this._used) ? 1231 : 1237);
+    }
+    return hashCode;
   }
 
   get isChanged(): boolean {
@@ -306,7 +316,10 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
     if (this._children.length === 0) {
       this.dataSource.database.loadChildren(this);
     }
-    return this.children.length > 0;
+    this._expandable = this._children.length !== 0;
+    // for 'hideUnused'
+    this._expandable = this.dataSource.database.children(this).length > 0;
+    return this._expandable;
   }
 
   set expandable(expandable: boolean) {
@@ -844,6 +857,10 @@ export class WrappedBieFlatNode implements BieFlatNode {
 
   get inverseMode(): boolean {
     return this._node.inverseMode;
+  }
+
+  get rootNode(): BieEditAbieNode {
+    return this._node.rootNode;
   }
 
   get cardinalityMin(): number {
@@ -2087,7 +2104,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   private _ccGraph: CcGraph;
   private _topLevelAsbiepId: number;
-  private _asccpManifestId: number;
+  private _abieNode: BieEditAbieNode;
   private _validState: string[];
 
   private _usedAsbieMap = {};
@@ -2097,13 +2114,18 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   dataSource: BieFlatNodeDataSource<T>;
 
-  constructor(ccGraph: CcGraph, asccpManifestId: number, topLevelAsbiepId: number,
+  constructor(ccGraph: CcGraph, abieNode: BieEditAbieNode, topLevelAsbiepId: number,
               usedBieList: UsedBie[], refBieList: RefBie[]) {
     this._ccGraph = ccGraph;
-    this._asccpManifestId = asccpManifestId;
+    this._abieNode = abieNode;
     this._topLevelAsbiepId = topLevelAsbiepId;
     this._validState = ['Published', 'Production'];
 
+    this.setUsedBieList(usedBieList);
+    this._refBieList = refBieList;
+  }
+
+  setUsedBieList(usedBieList: UsedBie[]) {
     this._usedAsbieMap = usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
@@ -2116,7 +2138,6 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
-    this._refBieList = refBieList;
   }
 
   children(node: T): T[] {
@@ -2183,13 +2204,21 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         return bbieScNode;
       }).sort((a, b) => a.name.localeCompare(b.name));
     }
-
-    if (node.children.length === 0) {
-      node.expandable = false;
-    }
   }
 
   afterAsbiepFlatNode(node: AsbiepFlatNode) {
+    let derived = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
+    if (!!derived && derived.length > 0) {
+      derived = derived.filter(u => u.hashPath === node.asbieHashPath);
+    }
+    node.derived = !!derived && derived.length > 0;
+    if (node.derived) {
+      node.topLevelAsbiepId = derived[0].refTopLevelAsbiepId;
+      node.rootNode = new BieEditAbieNode();
+      node.rootNode.topLevelAsbiepId = derived[0].refTopLevelAsbiepId;
+      node.rootNode.inverseMode = derived[0].refInverseMode;
+    }
+
     let used = this._usedAsbieMap[node.asccNode.manifestId];
     if (!!used && used.length > 0) {
       used = used.filter(u => {
@@ -2209,13 +2238,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       }
     }
 
-    let derived = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
-    if (!!derived && derived.length > 0) {
-      derived = derived.filter(u => u.hashPath === node.asbieHashPath);
-    }
-    node.derived = !!derived && derived.length > 0;
-    if (node.derived) {
-      node.topLevelAsbiepId = derived[0].refTopLevelAsbiepId;
+    if (!node.rootNode) {
+      node.rootNode = node.parent.rootNode;
     }
   }
 
@@ -2231,6 +2255,10 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMax = used[0].cardinalityMax;
       }
     }
+
+    if (!node.rootNode) {
+      node.rootNode = node.parent.rootNode;
+    }
   }
 
   afterBbieScFlatNode(node: BbieScFlatNode) {
@@ -2244,6 +2272,10 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
       }
+    }
+
+    if (!node.rootNode) {
+      node.rootNode = (node.parent as BieFlatNodeImpl).rootNode;
     }
   }
 
@@ -2329,8 +2361,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   get rootNode(): T {
-    const node = this.toAbieNode('ASCCP-' + this._asccpManifestId);
+    const node = this.toAbieNode('ASCCP-' + this._abieNode.asccpManifestId);
     node.topLevelAsbiepId = this._topLevelAsbiepId;
+    node.rootNode = this._abieNode;
     return node as unknown as T;
   }
 
@@ -2481,6 +2514,62 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     }
   }
 
+  update(updateResponse: BieDetailUpdateResponse) {
+    this.data.forEach(node => {
+      if (node.bieType === 'ABIE') {
+        const abieNode = node as unknown as AbieFlatNode;
+        const abieDetail = updateResponse.abieDetailMap[node.hashPath];
+        if (abieDetail) {
+          abieNode.abieId = abieDetail.abieId;
+          if (abieNode.detail) {
+            (abieNode.detail as BieEditAbieNodeDetail).abie.abieId = abieDetail.abieId;
+          }
+        }
+      } else if (node.bieType === 'ASBIEP') {
+        const asbiepNode = node as unknown as AsbiepFlatNode;
+        const asbieDetail = updateResponse.asbieDetailMap[asbiepNode.asbieHashPath];
+        if (asbieDetail) {
+          asbiepNode.asbieId = asbieDetail.asbieId;
+          if (asbiepNode.detail) {
+            (asbiepNode.detail as BieEditAsbiepNodeDetail).asbie.asbieId = asbieDetail.asbieId;
+          }
+        }
+        const asbiepDetail = updateResponse.asbiepDetailMap[asbiepNode.asbiepHashPath];
+        if (asbiepDetail) {
+          asbiepNode.asbiepId = asbieDetail.asbiepId;
+          if (asbiepNode.detail) {
+            (asbiepNode.detail as BieEditAsbiepNodeDetail).asbiep.asbiepId = asbieDetail.asbiepId;
+          }
+        }
+      } else if (node.bieType === 'BBIEP') {
+        const bbiepNode = node as unknown as BbiepFlatNode;
+        const bbieDetail = updateResponse.bbieDetailMap[bbiepNode.bbieHashPath];
+        if (bbieDetail) {
+          bbiepNode.bbieId = bbieDetail.bbieId;
+          if (bbiepNode.detail) {
+            (bbiepNode.detail as BieEditBbiepNodeDetail).bbie.bbieId = bbieDetail.bbieId;
+          }
+        }
+        const bbiepDetail = updateResponse.bbiepDetailMap[bbiepNode.bbiepHashPath];
+        if (bbiepDetail) {
+          bbiepNode.bbiepId = bbieDetail.bbiepId;
+          if (bbiepNode.detail) {
+            (bbiepNode.detail as BieEditBbiepNodeDetail).bbiep.bbiepId = bbieDetail.bbiepId;
+          }
+        }
+      } else if (node.bieType === 'BBIE_SC') {
+        const bbieScNode = node as unknown as BbieScFlatNode;
+        const bbieScDetail = updateResponse.bbieScDetailMap[bbieScNode.bbieScHashPath];
+        if (bbieScDetail) {
+          bbieScNode.bbieScId = bbieScDetail.bbieScId;
+          if (bbieScNode.detail) {
+            (bbieScNode.detail as BieEditBbieScNodeDetail).bbieSc.bbieScId = bbieScDetail.bbieScId;
+          }
+        }
+      }
+    });
+  }
+
   getChanged(): T[] {
     if (!this.data || this.data.length === 0) {
       return [];
@@ -2530,12 +2619,12 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     }
 
     this._hideUnused = hideUnused;
+    this.data.forEach(e => {
+      e.expandable = undefined;
+    });
     if (hideUnused) {
       this.data = this.data.filter(e => e.used);
     } else {
-      this.data.forEach(e => {
-        (e as BieFlatNode).expandable = undefined;
-      });
       const expandedData = this.data.filter(e => this.isExpanded(e));
       this.collapse(this.data[0] as T);
       this.data = [this.data[0], ];

@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {BieExpressOption} from './generate-expression';
-import {HttpParams} from '../../../../../node_modules/@angular/common/http';
 import {Observable} from 'rxjs';
 import {base64Encode} from '../../../common/utility';
 

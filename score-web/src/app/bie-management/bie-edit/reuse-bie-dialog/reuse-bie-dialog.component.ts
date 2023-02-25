@@ -71,7 +71,7 @@ export class ReuseBieDialogComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -80,7 +80,7 @@ export class ReuseBieDialogComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
 
-    this.loadBieList();
+    this.loadBieList(true);
   }
 
   get isDeveloper() {
@@ -92,9 +92,11 @@ export class ReuseBieDialogComponent implements OnInit {
     this.loadBieList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
+  onChange(property?: string, source?) {
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -119,7 +121,7 @@ export class ReuseBieDialogComponent implements OnInit {
     }
   }
 
-  loadBieList() {
+  loadBieList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(

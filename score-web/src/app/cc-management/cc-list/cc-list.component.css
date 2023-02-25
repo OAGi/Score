@@ -81,12 +81,20 @@ mat-toolbar > .mat-icon-button {
 }
 
 .mat-column-owner {
-  width: 12%;
+  width: 140px;
   font-size: 13px;
 }
 
 .den {
   font-size: 13px;
+}
+
+.mat-column-valueDomain {
+  width: 130px;
+}
+
+.mat-column-sixDigitId {
+  width: 130px;
 }
 
 .mat-column-module {
@@ -95,14 +103,6 @@ mat-toolbar > .mat-icon-button {
 }
 
 .mat-column-lastUpdateTimestamp {
-  width: 160px;
-}
-
-.mat-column-valueDomain {
-  width: 160px;
-}
-
-.mat-column-sixDigitId {
   width: 160px;
 }
 
@@ -147,4 +147,15 @@ mat-toolbar .mat-icon {
   /*width: 27px;*/
   /*height: 27px;*/
   /*line-height: 27px;*/
+}
+
+.tag-list {
+  display: inline-block;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
 }

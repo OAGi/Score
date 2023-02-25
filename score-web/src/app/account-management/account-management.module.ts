@@ -4,12 +4,10 @@ import {AccountListDialogComponent} from './account-list-dialog/account-list-dia
 import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
-import {SettingsComponent} from './settings/settings.component';
 import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanActivateUser} from '../authentication/auth.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {SettingsService} from './settings/domain/settings.service';
 import {AccountListComponent} from './account-list/account-list.component';
 import {AccountListService} from './domain/account-list.service';
 import {AccountDetailComponent} from './account-detail/account-detail.component';
@@ -23,11 +21,6 @@ import {UpdateTenantComponent} from './tenant-update/tenant-update.component';
 
 
 const routes: Routes = [
-  {
-    path: 'settings',
-    component: SettingsComponent,
-    canActivate: [CanActivateUser]
-  },
   {
     path: 'account',
     component: AccountListComponent,
@@ -89,7 +82,6 @@ const routes: Routes = [
     CommonModule
   ],
   declarations: [
-    SettingsComponent,
     AccountListComponent,
     AccountDetailComponent,
     AccountCreateComponent,
@@ -103,7 +95,6 @@ const routes: Routes = [
     UpdateTenantComponent
   ],
   providers: [
-    SettingsService,
     AccountListService,
     PendingListService,
     CanActivateUser,

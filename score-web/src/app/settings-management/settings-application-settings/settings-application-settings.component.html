@@ -1,0 +1,60 @@
+<div class="context-section">
+  <div class="settings-layout">
+    <score-settings-menu active="ApplicationSettings"></score-settings-menu>
+    <div class="layout-main">
+      <div class="context-section">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>{{ title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              <div>
+                <div class="subhead">
+                  <h4 class="subhead-heading">Multi-tenant mode</h4>
+                </div>
+                <div class="actions">
+                  <button mat-raised-button color="primary"
+                          (click)="updateTenantConfiguration(true)"
+                          [disabled]="isTenantEnabled">
+                    Enable
+                  </button>
+                  <button mat-raised-button color="warn"
+                          (click)="updateTenantConfiguration(false)"
+                          [disabled]="!isTenantEnabled">
+                    Disable
+                  </button>
+                </div>
+              </div>
+              <div class="mt-4">
+                <div class="subhead">
+                  <h4 class="subhead-heading">Business term function</h4>
+                </div>
+                <div class="actions">
+                  <button mat-raised-button color="primary"
+                          (click)="updateBusinessTermConfiguration(true)"
+                          [disabled]="isBusinessTermEnabled">
+                    Enable
+                  </button>
+                  <button mat-raised-button color="warn"
+                          (click)="updateBusinessTermConfiguration(false)"
+                          [disabled]="!isBusinessTermEnabled">
+                    Disable
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-card>
+
+        <div class="row action-group m-0">
+          <div class="col-12 actions-wrap">
+            <div class="actions">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

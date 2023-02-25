@@ -30,6 +30,7 @@ export class BieExpressOption {
   openAPIExpressionFormat: string;
   openAPI30GetTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30GetTemplate: boolean;
+  suppressRootPropertyForOpenAPI30GetTemplate: boolean;
   includeMetaHeaderForJsonForOpenAPI30GetTemplate: boolean;
   metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate: number;
   includePaginationResponseForJsonForOpenAPI30GetTemplate: boolean;
@@ -37,6 +38,7 @@ export class BieExpressOption {
 
   openAPI30PostTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30PostTemplate: boolean;
+  suppressRootPropertyForOpenAPI30PostTemplate: boolean;
   includeMetaHeaderForJsonForOpenAPI30PostTemplate: boolean;
   metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate: number;
 

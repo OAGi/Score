@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.context_management.controller;
 
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
@@ -31,10 +31,10 @@ public class BusinessContextController {
 
     @Autowired
     private BusinessContextService businessContextService;
-    
+
     @Autowired
-    private ConfigurationService configService;
-    
+    private ApplicationConfigurationService configService;
+
     @Autowired
     private TenantService tenantService;
 
@@ -79,23 +79,23 @@ public class BusinessContextController {
         request.setTenantId(tenantId);
         request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
         request.setBieEditing(isBieEditing != null ? isBieEditing : false);
-        
-        if (configService.isTenantInstance() && request.isBieEditing()) {
+
+        if (configService.isTenantEnabled() && request.isBieEditing()) {
             List<ULong> userTenantIds = tenantService.getUserTenantsRoleByUserId(request.getRequester().getUserId());
         	List<Long> mappedIds = new ArrayList<>();
         	userTenantIds.forEach(i -> mappedIds.add(i.longValue()));
         	request.setUserTenantIds(mappedIds);
         }
-        
+
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
         request.setSortActive(sortActive);
         request.setSortDirection("asc".equalsIgnoreCase(sortDirection) ? ASC : DESC);
 
-        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, configService.isTenantInstance());
+        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, configService.isTenantEnabled());
 
 		List<BusinessContext> ctxs = response.getResults();
-        if (configService.isTenantInstance()) {
+        if (configService.isTenantEnabled()) {
             ctxs.forEach(c -> {
                 List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId());
                 String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));

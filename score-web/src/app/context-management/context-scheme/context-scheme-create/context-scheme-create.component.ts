@@ -283,8 +283,8 @@ export class ContextSchemeCreateComponent implements OnInit {
       contextSchemeValue = new ContextSchemeValue();
       contextSchemeValue.meaning = codelistvalue.meaning;
       contextSchemeValue.value = codelistvalue.value;
+      contextSchemeValue.guid = uuid();
       contextSchemeValueList.push(contextSchemeValue);
-      this.selection.select(contextSchemeValue);
     }
     return contextSchemeValueList;
   }

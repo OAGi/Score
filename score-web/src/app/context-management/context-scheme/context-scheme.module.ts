@@ -12,6 +12,7 @@ import {ContextSchemeListComponent} from './context-scheme-list/context-scheme-l
 import {ContextSchemeCreateComponent} from './context-scheme-create/context-scheme-create.component';
 import {ContextSchemeDetailComponent} from './context-scheme-detail/context-scheme-detail.component';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -37,15 +38,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        FontAwesomeModule
+    ],
   declarations: [
     ContextSchemeListComponent,
     ContextSchemeCreateComponent,

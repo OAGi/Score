@@ -14,7 +14,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 
 
 /**
- * This table captures the tenant role and theirs bussiness contexts.
+ * This table captures the tenant role and theirs business contexts.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessCtxRecord> implements Record3<ULong, ULong, ULong> {
@@ -53,7 +53,7 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
 
     /**
      * Setter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * bussiness contaxt for the company.
+     * business context for the company.
      */
     public void setBizCtxId(ULong value) {
         set(2, value);
@@ -61,7 +61,7 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
 
     /**
      * Getter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * bussiness contaxt for the company.
+     * business context for the company.
      */
     public ULong getBizCtxId() {
         return (ULong) get(2);
