@@ -11,17 +11,13 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_1_Core_Component_Access extends BaseTest {
@@ -167,72 +163,73 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-        ASCCPObject asccp;
-        BCCPObject bccp;
-        ACCObject acc;
+        RandomCoreComponentContainer randomCoreComponentContainer = new RandomCoreComponentContainer(developer, release, namespace);
 
-        {
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        AppUserObject developer2 = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer2);
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
-            bcc.setCardinalityMax(1);
-            coreComponentAPI.updateBCC(bcc);
-
-            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
-
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
-            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
-            ascc.setCardinalityMax(1);
-            coreComponentAPI.updateASCC(ascc);
-        }
-
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage homePage = loginPage().signIn(developer2.getLoginId(), developer2.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.hitReviseButton();
+        int numOfWIPACCs = randomCoreComponentContainer.arrayWIPACCs.size();
+        for(int i=0; i < numOfWIPACCs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayWIPACCs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
+        int numOfWIPASCCPs = randomCoreComponentContainer.arrayWIPASCCPs.size();
+        for(int i=0; i < numOfWIPASCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayWIPASCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
 
-        accViewEditPage.openPage(); // refresh the page to erase the snackbar message
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
-        ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-        int originalCardinalityMax = Integer.valueOf(getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
-        assertEquals(1, originalCardinalityMax);
+        int numOfWIPBCCPs = randomCoreComponentContainer.arrayWIPBCCPs.size();
+        for(int i=0; i < numOfWIPBCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayWIPBCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
 
-        accViewEditPage.setCardinalityMax(-1);
-        accViewEditPage.hitUpdateButton();
-        assertEquals("unbounded", getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
+        int numOfDraftACCs = randomCoreComponentContainer.arrayDraftACCs.size();
+        for(int i=0; i < numOfDraftACCs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayDraftACCs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
 
-        // refresh the page to check the changed cardinality max
-        accViewEditPage.openPage();
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
-        bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+        int numOfDraftASCCPs = randomCoreComponentContainer.arrayDraftASCCPs.size();
+        for(int i=0; i < numOfDraftASCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayDraftASCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
 
-        accViewEditPage.setCardinalityMax(originalCardinalityMax);
-        accViewEditPage.hitUpdateButton();
-        assertEquals(Integer.toString(originalCardinalityMax), getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
+        int numOfDraftBCCPs = randomCoreComponentContainer.arrayDraftBCCPs.size();
+        for(int i=0; i < numOfDraftBCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayDraftBCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
 
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
-        originalCardinalityMax = Integer.valueOf(getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
-        assertEquals(1, originalCardinalityMax);
-
-        accViewEditPage.setCardinalityMax(-1);
-        accViewEditPage.hitUpdateButton();
-        assertEquals("unbounded", getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
-
-        accViewEditPage.openPage();
-        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
-
-        accViewEditPage.setCardinalityMax(originalCardinalityMax);
-        accViewEditPage.hitUpdateButton();
-        assertEquals(Integer.toString(originalCardinalityMax), getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
-
+        int numOfCandidateACCs = randomCoreComponentContainer.arrayCandidateACCs.size();
+        for(int i=0; i < numOfCandidateACCs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayCandidateACCs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
+        int numOfCandidateASCCPs = randomCoreComponentContainer.arrayCandidateASCCPs.size();
+        for(int i=0; i < numOfCandidateASCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayCandidateASCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
+        int numOfCandidateBCCPs = randomCoreComponentContainer.arrayCandidateBCCPs.size();
+        for(int i=0; i < numOfCandidateBCCPs; i++){
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setDEN(randomCoreComponentContainer.arrayCandidateBCCPs.get(i).getDen());
+            assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+        }
     }
 
     @Test
