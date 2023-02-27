@@ -1019,7 +1019,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
         AppUserObject usera;
         NamespaceObject useraNamespace;
-
+        Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
+        Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
@@ -1034,9 +1035,18 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.appendExtension(accReleaseOne, developer, namespace, "Published");
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
+            DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", this.release);
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
+            bccReleaseOne.setDefinitionSource("bcc definition source");
+            bccReleaseOne.setCardinalityMax(5);
+            bccReleaseOne.setCardinalityMin(1);
+            coreComponentAPI.updateBCC(bccReleaseOne);
+            bccpBCCMap.put(bccpReleaseOne, bccReleaseOne);
 
             ASCCPObject asccpReleaseOne = coreComponentAPI.createRandomASCCP(accReleaseOne, developer, namespace, "Published");
             asccpReleaseOne.setDefinition(accReleaseOne.getDefinition());
+            asccpBCCPMap.put(asccpReleaseOne, bccpReleaseOne);
             coreComponentAPI.updateASCCP(asccpReleaseOne);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -1060,9 +1070,18 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.appendExtension(accReleaseTwo, developer, namespace, "Published");
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
+            DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
+            bccReleaseTwo.setDefinitionSource("bcc definition source");
+            bccReleaseTwo.setCardinalityMax(3);
+            bccReleaseTwo.setCardinalityMin(3);
+            coreComponentAPI.updateBCC(bccReleaseTwo);
+            bccpBCCMap.put(bccpReleaseTwo, bccReleaseTwo);
 
             ASCCPObject asccpReleaseTwo = coreComponentAPI.createRandomASCCP(accReleaseTwo, developer, namespace, "Published");
             asccpReleaseTwo.setDefinition(accReleaseTwo.getDefinition());
+            asccpBCCPMap.put(asccpReleaseTwo, bccpReleaseTwo);
             coreComponentAPI.updateASCCP(asccpReleaseTwo);
 
             TopLevelASBIEPObject useraBIEWIPReleaseTwo = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpReleaseTwo, usera, "WIP");
@@ -1091,6 +1110,16 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
+            BCCPObject bccp = asccpBCCPMap.get(asccp);
+            BCCObject bcc = bccpBCCMap.get(bccp);
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            int originalCardinalityMin = Integer.valueOf(getText(bbiePanel.getCardinalityMinField()));
+            int originalCardinalityMax = Integer.valueOf(getText(bbiePanel.getCardinalityMaxField()));
+            assertEquals(bcc.getCardinalityMin(), originalCardinalityMin);
+            assertEquals(bcc.getCardinalityMax(), originalCardinalityMax);
             if (topLevelAsbiep.getState().equals("WIP")) {
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
@@ -1098,6 +1127,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 assertEquals("1", revision);
 
                 accExtensionViewEditPage.setNamespace(useraNamespace);
+                accExtensionViewEditPage.setDefinition(ASCCPDefinition);
                 accExtensionViewEditPage.hitUpdateButton();
 
                 accExtensionViewEditPage.moveToQA();
@@ -1107,6 +1137,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 accExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 revision = getText(accExtensionViewEditPage.getRevisionField());
                 assertEquals("2", revision);
+                assertEquals(ASCCPDefinition, getText(accExtensionViewEditPage.getDefinitionField()));
             } else {
                 EditBIEPage finalEditBIEPage = editBIEPage;
                 assertThrows(Exception.class, () -> {
