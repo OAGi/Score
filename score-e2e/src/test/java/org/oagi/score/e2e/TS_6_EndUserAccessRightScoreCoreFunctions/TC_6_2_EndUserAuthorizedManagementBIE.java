@@ -1512,6 +1512,208 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_6_2_TA_6_4")
+    public void test_TA_6_4() {
+        Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
+        Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
+        Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccpToAppend;
+        BCCPObject bccpToAppend;
+        ACCObject accToAppend;
+        Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
+        {
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject accReleaseOne = coreComponentAPI.createRandomACC(developer, releaseOne, namespace, "Published");
+            coreComponentAPI.appendExtension(accReleaseOne, developer, namespace, "Published");
+            accReleaseOne.setDefinition("definition 1");
+            coreComponentAPI.updateACC(accReleaseOne);
+            DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseOne.getReleaseNumber());
+            DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
+            bccReleaseOne.setCardinalityMax(5);
+            bccReleaseOne.setCardinalityMin(1);
+            coreComponentAPI.updateBCC(bccReleaseOne);
+            bccpBCCMap.put(bccpReleaseOne, bccReleaseOne);
+
+            ASCCPObject asccpReleaseOne = coreComponentAPI.createRandomASCCP(accReleaseOne, developer, namespace, "Published");
+            asccpReleaseOne.setDefinition(accReleaseOne.getDefinition());
+            asccpBCCPMap.put(asccpReleaseOne, bccpReleaseOne);
+            coreComponentAPI.updateASCCP(asccpReleaseOne);
+
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIEWIPReleaseOne = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpReleaseOne, usera, "WIP");
+            biesForTesting.add(useraBIEWIPReleaseOne);
+            bieASCCPMap.put(useraBIEWIPReleaseOne, asccpReleaseOne);
+
+            accToAppend = coreComponentAPI.createRandomACC(developer, releaseOne, namespace, "Published");
+            ACCObject accToAppendRevised = coreComponentAPI.createRevisedACC(accToAppend, developer, releaseTwo, "Published");
+
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccpRevised = coreComponentAPI.createRevisedBCCP(bccp, dataTypeReleaseTwo, developer, releaseTwo, "Published");
+            coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
+            coreComponentAPI.appendBCC(accToAppendRevised, bccpRevised, "Published");
+            accBCCPMap.put(accToAppend, bccp);
+            accBCCPMap.put(accToAppendRevised, bccpRevised);
+            asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
+            coreComponentAPI.createRevisedASCCP(asccpToAppend, accToAppendRevised, developer, releaseTwo, "Published");
+
+            bccpToAppend = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+
+            coreComponentAPI.createRevisedBCCP(bccpToAppend, dataTypeReleaseTwo, developer, releaseTwo, "Published");
+
+            // create the revision in another release
+            ACCObject accReleaseTwo = coreComponentAPI.createRevisedACC(accReleaseOne, developer, releaseTwo, "Published");
+            coreComponentAPI.appendExtension(accReleaseTwo, developer, namespace, "Published");
+            accReleaseTwo.setDefinition("definition 2");
+            coreComponentAPI.updateACC(accReleaseTwo);
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
+            bccReleaseTwo.setDefinitionSource("bcc definition source");
+            bccReleaseTwo.setCardinalityMax(3);
+            bccReleaseTwo.setCardinalityMin(3);
+            coreComponentAPI.updateBCC(bccReleaseTwo);
+            bccpBCCMap.put(bccpReleaseTwo, bccReleaseTwo);
+
+            ASCCPObject asccpReleaseTwo = coreComponentAPI.createRandomASCCP(accReleaseTwo, developer, namespace, "Published");
+            asccpReleaseTwo.setDefinition(accReleaseTwo.getDefinition());
+            asccpBCCPMap.put(asccpReleaseTwo, bccpReleaseTwo);
+            coreComponentAPI.updateASCCP(asccpReleaseTwo);
+
+            TopLevelASBIEPObject useraBIEWIPReleaseTwo = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpReleaseTwo, usera, "WIP");
+            biesForTesting.add(useraBIEWIPReleaseTwo);
+            bieASCCPMap.put(useraBIEWIPReleaseTwo, asccpReleaseTwo);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        getDriver().manage().window().maximize();
+        for (TopLevelASBIEPObject useraBIEWIP: biesForTesting){
+            BIEMenu bieMenu = homePage.getBIEMenu();
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+            assertEquals("WIP", useraBIEWIP.getState());
+            ASCCPObject asccp = bieASCCPMap.get(useraBIEWIP);
+            /**
+             * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
+             * Note that there are two ASCCPs in two releases having different definitions
+             */
+            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            assertEquals(asccp.getDefinition(), ASCCPDefinition);
+            BCCPObject bccp = asccpBCCPMap.get(asccp);
+            BCCObject bcc = bccpBCCMap.get(bccp);
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            int originalCardinalityMin = Integer.valueOf(getText(bbiePanel.getCardinalityMinField()));
+            int originalCardinalityMax = Integer.valueOf(getText(bbiePanel.getCardinalityMaxField()));
+            assertEquals(bcc.getCardinalityMin(), originalCardinalityMin);
+            assertEquals(bcc.getCardinalityMax(), originalCardinalityMax);
+
+            ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+            selectCCPropertyPage.selectAssociation(asccpToAppend.getDen());
+            waitFor(Duration.ofMillis(2000));
+            ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+            selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
+            bieMenu.openViewEditBIESubMenu();
+            viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+
+            node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
+
+            /**
+             * Assert that all options are disabled.
+             */
+            assertDisabled(ASBIEPanel.getNillableCheckbox());
+            assertDisabled(ASBIEPanel.getUsedCheckbox());
+            assertDisabled(ASBIEPanel.getCardinalityMinField());
+            assertDisabled(ASBIEPanel.getCardinalityMaxField());
+            assertDisabled(ASBIEPanel.getRemarkField());
+            assertDisabled(ASBIEPanel.getContextDefinitionField());
+            assertDisabled(ASBIEPanel.getAssociationDefinitionField());
+            assertDisabled(ASBIEPanel.getComponentDefinitionField());
+            assertDisabled(ASBIEPanel.getTypeDefinitionField());
+
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(ASBIEPanel.getBusinessTermField());
+            }
+
+            node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm() + "/" +
+                            accBCCPMap.get(accToAppend).getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+            /**
+             * Assert that all options are disabled.
+             */
+            assertDisabled(BBIEPPanel.getNillableCheckbox());
+            assertDisabled(BBIEPPanel.getUsedCheckbox());
+            assertDisabled(BBIEPPanel.getCardinalityMinField());
+            assertDisabled(BBIEPPanel.getCardinalityMaxField());
+            assertDisabled(BBIEPPanel.getRemarkField());
+            assertDisabled(BBIEPPanel.getExampleField());
+            assertDisabled(BBIEPPanel.getValueConstraintSelectField());
+            assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
+            assertDisabled(BBIEPPanel.getValueDomainField());
+            assertDisabled(BBIEPPanel.getContextDefinitionField());
+            assertDisabled(BBIEPPanel.getAssociationDefinitionField());
+            assertDisabled(BBIEPPanel.getComponentDefinitionField());
+
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(BBIEPPanel.getBusinessTermField());
+            }
+
+            node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/Extension/" + bccpToAppend.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            BBIEPPanel = editBIEPage.getBBIEPanel(node);
+            /**
+             * Assert that all options are disabled.
+             */
+            assertDisabled(BBIEPPanel.getNillableCheckbox());
+            assertDisabled(BBIEPPanel.getUsedCheckbox());
+            assertDisabled(BBIEPPanel.getCardinalityMinField());
+            assertDisabled(BBIEPPanel.getCardinalityMaxField());
+            assertDisabled(BBIEPPanel.getRemarkField());
+            assertDisabled(BBIEPPanel.getExampleField());
+            assertDisabled(BBIEPPanel.getValueConstraintSelectField());
+            assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
+            assertDisabled(BBIEPPanel.getValueDomainField());
+            assertDisabled(BBIEPPanel.getContextDefinitionField());
+            assertDisabled(BBIEPPanel.getAssociationDefinitionField());
+            assertDisabled(BBIEPPanel.getComponentDefinitionField());
+
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(BBIEPPanel.getBusinessTermField());
+            }
+        }
+    }
+
+    @Test
     @DisplayName("TC_6_2_TA_7_1")
     public void test_TA_7_1() {
         ASCCPObject asccp;
