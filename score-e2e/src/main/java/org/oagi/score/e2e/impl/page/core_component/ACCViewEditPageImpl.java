@@ -732,6 +732,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public WebElement getPropertyTermField(){
+            return getInputFieldByName(baseXPath, "Property Term");
+        }
+
+        @Override
         public WebElement getCardinalityMinField() {
             return getInputFieldByName(baseXPath, "Cardinality Min");
         }
@@ -754,6 +759,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public WebElement getValueConstraintSelectField() {
             return getSelectFieldByName(baseXPath, "Value Constraint");
+        }
+
+        @Override
+        public WebElement getNamespaceSelectField(){
+            return getSelectFieldByName(baseXPath, "Namespace");
         }
 
         @Override

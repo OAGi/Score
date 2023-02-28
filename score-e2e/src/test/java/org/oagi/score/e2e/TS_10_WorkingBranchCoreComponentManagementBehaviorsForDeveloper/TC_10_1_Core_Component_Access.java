@@ -11,13 +11,19 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_1_Core_Component_Access extends BaseTest {
@@ -236,6 +242,81 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_2")
     public void test_TA_2(){
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        /**
+         * developer can edit the details of a CC that is in WIP state and owned by him
+         */
+
+        assertEquals("WIP", getText(accViewEditPage.getStateField()));
+        assertDisabled(accViewEditPage.getStateField());
+        assertDisabled(accViewEditPage.getGUIDField());
+        assertDisabled(accViewEditPage.getDENField());
+        assertEnabled(accViewEditPage.getObjectClassTermField());
+        assertEnabled(accViewEditPage.getDefinitionField());
+        assertEnabled(accViewEditPage.getDefinitionSourceField());
+        assertEnabled(accViewEditPage.getNamespaceField());
+        assertEnabled(accViewEditPage.getCoreComponentTypeField());
+
+        accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+        assertEquals("WIP", getText(bccPanelContainer.getBCCPanel().getStateField()));
+        assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
+
+        accViewEditPage.openPage();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+
+        assertEquals("WIP", getText(asccPanelContainer.getASCCPanel().getStateField()));
+        assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+        assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
+        assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
+        assertEnabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
+        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
     }
 
     @Test

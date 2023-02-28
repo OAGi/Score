@@ -729,6 +729,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getDENField();
 
         /**
+         * Return the UI element of the 'Property Term' field.
+         *
+         * @return the UI element of the 'Property Term' field
+         */
+        WebElement getPropertyTermField();
+
+        /**
          * Return the UI element of the 'Cardinality Min' field.
          *
          * @return the UI element of the 'Cardinality Min' field
@@ -776,6 +783,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Default Value' field
          */
         WebElement getDefaultValueField();
+
+        /**
+         * Return the UI element of the 'Namespace' select field.
+         *
+         * @return the UI element of the 'Namespace' select field
+         */
+        WebElement getNamespaceSelectField();
 
         /**
          * Return the UI element of the 'Definition Source' field.
