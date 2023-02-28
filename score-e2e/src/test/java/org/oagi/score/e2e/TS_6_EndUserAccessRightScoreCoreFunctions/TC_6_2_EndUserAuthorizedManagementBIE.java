@@ -1149,6 +1149,242 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_6_2_TA_6_2")
+    public void test_TA_6_2() {
+        Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
+        AppUserObject usera;
+        AppUserObject userb;
+        TopLevelASBIEPObject useraBIEReleaseOne;
+        TopLevelASBIEPObject userbBIEReleaseOne;
+        TopLevelASBIEPObject useraBIEReleaseTwo;
+        TopLevelASBIEPObject userbBIEReleaseTwo;
+        NamespaceObject useraNamespace;
+        Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
+        Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
+        {
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject accReleaseOne = coreComponentAPI.createRandomACC(developer, releaseOne, namespace, "Published");
+            coreComponentAPI.appendExtension(accReleaseOne, developer, namespace, "Published");
+            accReleaseOne.setDefinition("definition 1");
+            coreComponentAPI.updateACC(accReleaseOne);
+            DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", this.release);
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
+            bccReleaseOne.setCardinalityMax(5);
+            bccReleaseOne.setCardinalityMin(1);
+            coreComponentAPI.updateBCC(bccReleaseOne);
+            bccpBCCMap.put(bccpReleaseOne, bccReleaseOne);
+
+            ASCCPObject asccpReleaseOne = coreComponentAPI.createRandomASCCP(accReleaseOne, developer, namespace, "Published");
+            asccpReleaseOne.setDefinition(accReleaseOne.getDefinition());
+            asccpBCCPMap.put(asccpReleaseOne, bccpReleaseOne);
+            coreComponentAPI.updateASCCP(asccpReleaseOne);
+
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            BusinessContextObject contextFirstUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            useraBIEReleaseOne = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextFirstUser), asccpReleaseOne, usera, "WIP");
+            bieASCCPMap.put(useraBIEReleaseOne, asccpReleaseOne);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            BusinessContextObject contextSecondUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            userbBIEReleaseOne = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextSecondUser), asccpReleaseOne, userb, "WIP");
+            bieASCCPMap.put(userbBIEReleaseOne, asccpReleaseOne);
+
+            // create the revision in another release
+            ACCObject accReleaseTwo = coreComponentAPI.createRevisedACC(accReleaseOne, developer, releaseTwo, "Published");
+            coreComponentAPI.appendExtension(accReleaseTwo, developer, namespace, "Published");
+            accReleaseTwo.setDefinition("definition 2");
+            coreComponentAPI.updateACC(accReleaseTwo);
+            DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
+            bccReleaseTwo.setDefinitionSource("bcc definition source");
+            bccReleaseTwo.setCardinalityMax(3);
+            bccReleaseTwo.setCardinalityMin(3);
+            coreComponentAPI.updateBCC(bccReleaseTwo);
+            bccpBCCMap.put(bccpReleaseTwo, bccReleaseTwo);
+
+            ASCCPObject asccpReleaseTwo = coreComponentAPI.createRandomASCCP(accReleaseTwo, developer, namespace, "Published");
+            asccpReleaseTwo.setDefinition(accReleaseTwo.getDefinition());
+            asccpBCCPMap.put(asccpReleaseTwo, bccpReleaseTwo);
+            coreComponentAPI.updateASCCP(asccpReleaseTwo);
+
+            useraBIEReleaseTwo = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextFirstUser), asccpReleaseTwo, usera, "WIP");
+            bieASCCPMap.put(useraBIEReleaseTwo, asccpReleaseTwo);
+            userbBIEReleaseTwo = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextSecondUser), asccpReleaseTwo, userb, "WIP");
+            bieASCCPMap.put(userbBIEReleaseTwo, asccpReleaseTwo);
+
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEReleaseOne);
+        getDriver().manage().window().maximize();
+        assertEquals("WIP", useraBIEReleaseOne.getState());
+        ASCCPObject asccp = bieASCCPMap.get(useraBIEReleaseOne);
+        /**
+         * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
+         * Note that there are two ASCCPs in two releases having different definitions
+         */
+        String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        assertEquals(asccp.getDefinition(), ASCCPDefinition);
+        BCCPObject bccp = asccpBCCPMap.get(asccp);
+        BCCObject bcc = bccpBCCMap.get(bccp);
+        WebElement node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        int originalCardinalityMin = Integer.valueOf(getText(bbiePanel.getCardinalityMinField()));
+        int originalCardinalityMax = Integer.valueOf(getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals(bcc.getCardinalityMin(), originalCardinalityMin);
+        assertEquals(bcc.getCardinalityMax(), originalCardinalityMax);
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        accExtensionViewEditPage.setNamespace(useraNamespace);
+        accExtensionViewEditPage.setDefinition(ASCCPDefinition);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
+        homePage.logout();
+
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIEReleaseOne);
+        assertEquals("WIP", userbBIEReleaseOne.getState());
+        editBIEPage.getExtendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        /**
+         * Display a dialog indicating “The core component is being extended by “ + [the owner of the UEGACC] or similar.
+         */
+        assertEquals("Another user is working on the extension.",
+                editBIEPage.getAttentionDialogMessage());
+        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.continueToExtendBIEOnNode();
+        /**
+         * If the UEGACC is in QA state, the end user can view its details but cannot make any change.
+         */
+        assertEquals("QA", ACCExtensionViewEditPage.getStateFieldValue());
+        assertEquals(ASCCPDefinition, getText(ACCExtensionViewEditPage.getDefinitionField()));
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPage.getUpdateButton(false);
+        });
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPage.getMoveToQAButton(false);
+        });
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPage.getMoveToProductionButton(false);
+        });
+        assertEquals(usera.getLoginId(), ACCExtensionViewEditPage.getOwnerFieldValue());
+        assertDisabled(ACCExtensionViewEditPage.getDefinitionField());
+        assertDisabled(ACCExtensionViewEditPage.getObjectClassTermField());
+        assertDisabled(ACCExtensionViewEditPage.getDefinitionSourceField());
+        getDriver().close();
+        switchToMainTab(getDriver());
+        homePage.logout();
+
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEReleaseOne);
+        ACCExtensionViewEditPage ACCExtensionViewEditPageTwo = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        editBIEPage.backToWIP();
+        homePage.logout();
+
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIEReleaseOne);
+        editBIEPage.getExtendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        assertEquals("Editing extension already exist.", getSnackBarMessage(getDriver()));
+
+        //Try everything with the another release
+
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIEReleaseTwo);
+
+        assertEquals("WIP", userbBIEReleaseTwo.getState());
+        asccp = bieASCCPMap.get(userbBIEReleaseTwo);
+        /**
+         * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
+         * Note that there are two ASCCPs in two releases having different definitions
+         */
+        ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        assertEquals(asccp.getDefinition(), ASCCPDefinition);
+        bccp = asccpBCCPMap.get(asccp);
+        bcc = bccpBCCMap.get(bccp);
+        node = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        assertTrue(node.isDisplayed());
+        bbiePanel = editBIEPage.getBBIEPanel(node);
+        originalCardinalityMin = Integer.valueOf(getText(bbiePanel.getCardinalityMinField()));
+        originalCardinalityMax = Integer.valueOf(getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals(bcc.getCardinalityMin(), originalCardinalityMin);
+        assertEquals(bcc.getCardinalityMax(), originalCardinalityMax);
+        ACCExtensionViewEditPage ACCExtensionViewEditPageThree =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPageThree.setNamespace(useraNamespace);
+        ACCExtensionViewEditPageThree.setDefinition(ASCCPDefinition);
+        ACCExtensionViewEditPageThree.hitUpdateButton();
+        ACCExtensionViewEditPageThree.moveToQA();
+        assertEquals("QA", ACCExtensionViewEditPageThree.getStateFieldValue());
+        homePage.logout();
+
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEReleaseTwo);
+        assertEquals("WIP", useraBIEReleaseTwo.getState());
+        editBIEPage.getExtendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        /**
+         * Display a dialog indicating “The core component is being extended by “ + [the owner of the UEGACC] or similar.
+         */
+        assertEquals("Another user is working on the extension.",
+                editBIEPage.getAttentionDialogMessage());
+        ACCExtensionViewEditPage ACCExtensionViewEditPageFour = editBIEPage.continueToExtendBIEOnNode();
+        /**
+         * If the UEGACC is in QA state, the end user can view its details but cannot make any change.
+         */
+        assertEquals("QA", ACCExtensionViewEditPageFour.getStateFieldValue());
+        assertEquals(ASCCPDefinition, getText(ACCExtensionViewEditPageFour.getDefinitionField()));
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPageFour.getUpdateButton(false);
+        });
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPageFour.getMoveToQAButton(false);
+        });
+        assertThrows(TimeoutException.class, () -> {
+            ACCExtensionViewEditPageFour.getMoveToProductionButton(false);
+        });
+        assertEquals(userb.getLoginId(), ACCExtensionViewEditPageFour.getOwnerFieldValue());
+        assertDisabled(ACCExtensionViewEditPageFour.getDefinitionField());
+        assertDisabled(ACCExtensionViewEditPageFour.getObjectClassTermField());
+        assertDisabled(ACCExtensionViewEditPageFour.getDefinitionSourceField());
+        getDriver().close();
+        switchToMainTab(getDriver());
+        homePage.logout();
+
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(userbBIEReleaseTwo);
+        ACCExtensionViewEditPage ACCExtensionViewEditPageFive = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        editBIEPage.backToWIP();
+        homePage.logout();
+
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEReleaseTwo);
+        editBIEPage.getExtendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        assertEquals("Editing extension already exist.", getSnackBarMessage(getDriver()));
+
+    }
+
+    @Test
     @DisplayName("TC_6_2_TA_7_1")
     public void test_TA_7_1() {
         ASCCPObject asccp;
