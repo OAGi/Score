@@ -186,6 +186,13 @@ public interface ACCViewEditPage extends Page {
     String getDefinitionFieldValue();
 
     /**
+     * Return the UI element of the 'Comment' Icon
+     *
+     * @return the UI element of the 'Comment' Icon
+     */
+    WebElement getCommentsIcon();
+
+    /**
      * Return the UI element of the 'Revise' button.
      *
      * @return the UI element of the 'Revise' button
@@ -664,6 +671,13 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
+        /**
+         * Return the UI element of the 'Comment' Icon.
+         *
+         * @return the UI element of the 'Comment' Icon
+         */
+        WebElement getCommentsIcon();
+
     }
 
     interface BCCPanelContainer {
@@ -804,6 +818,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * Return the UI element of the 'Comment' Icon.
+         *
+         * @return the UI element of the 'Comment' Icon
+         */
+        WebElement getCommentsIcon();
 
     }
 

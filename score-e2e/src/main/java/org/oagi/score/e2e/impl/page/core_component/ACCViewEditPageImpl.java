@@ -82,6 +82,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
 
+    private static final By COMMENTS_ICON_LOCATOR =
+            By.xpath("//mat-icon[contains(text(), \"comments\")]");
+
 
     private final ACCObject acc;
 
@@ -253,6 +256,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public String getDefinitionFieldValue() {
         return getText(getDefinitionField());
+    }
+    @Override
+    public WebElement getCommentsIcon(){
+        return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
     }
 
     @Override
@@ -686,6 +693,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+        @Override
+        public WebElement getCommentsIcon(){
+            return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
+        }
     }
 
     private class BCCPanelImpl implements BCCPanel {
@@ -784,6 +795,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+        @Override
+        public WebElement getCommentsIcon(){
+            return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
 
