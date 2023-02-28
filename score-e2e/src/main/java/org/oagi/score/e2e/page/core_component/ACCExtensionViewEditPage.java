@@ -270,4 +270,5 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement getAmendButton(boolean enabled);
 
+    void setDefinition(String asccpDefinition);
 }
