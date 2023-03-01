@@ -25,6 +25,9 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//span[contains(text(),\"ACC, ASCCP, BCCP, CDT, BDT\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
+    private static final By STATE_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
@@ -67,6 +70,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public WebElement getTypeSelectField(){
         return visibilityOfElementLocated(getDriver(), CC_TYPE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getStateSelectField(){
+        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
 
     @Override

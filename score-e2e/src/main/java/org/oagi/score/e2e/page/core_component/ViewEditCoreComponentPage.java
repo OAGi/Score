@@ -30,6 +30,13 @@ public interface ViewEditCoreComponentPage extends Page {
     WebElement getTypeSelectField();
 
     /**
+     * Return the UI element of the 'State' select field.
+     *
+     * @return the UI element of the 'State' select field
+     */
+    WebElement getStateSelectField();
+
+    /**
      * Return the UI element of the 'DEN' field.
      *
      * @return the UI element of the 'DEN' field

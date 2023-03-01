@@ -982,16 +982,62 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         }
 
     }
-
     @Test
     @DisplayName("TC_10_1_TA_12")
     public void test_TA_12(){
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        AppUserObject developer2 = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer2);
+
+        HomePage homePage = loginPage().signIn(developer2.getLoginId(), developer2.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            /**
+             * developer can filter Core Components based on their Type.
+             */
+            viewEditCoreComponentPage.getStateSelectField().click();
+            List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+
+            // search by state
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.getStateSelectField().click();
+            List<WebElement> stateOption = options.stream().filter(e -> state.equals(getText(e))).collect(Collectors.toList());
+            stateOption.get(0).click();
+            click(viewEditCoreComponentPage.getSearchButton());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
+
+        }
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_13")
     public void test_TA_13(){
+
 
     }
     @Test
