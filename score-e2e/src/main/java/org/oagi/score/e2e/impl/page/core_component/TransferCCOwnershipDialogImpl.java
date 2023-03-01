@@ -1,16 +1,15 @@
-package org.oagi.score.e2e.impl.page.bie;
+package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.impl.page.admin.EditAccountPageImpl;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.page.admin.EditAccountPage;
-import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
+import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
+import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialog {
+public class TransferCCOwnershipDialogImpl implements TransferCCOwnershipDialog {
 
     private static final By LOGIN_ID_FIELD_LOCATOR
             = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
@@ -30,9 +29,9 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
-    private ViewEditBIEPageImpl parent;
+    private ViewEditCoreComponentPageImpl parent;
 
-    public TransferBIEOwnershipDialogImpl(ViewEditBIEPageImpl parent) {
+    public TransferCCOwnershipDialogImpl(ViewEditCoreComponentPageImpl parent) {
         this.parent = parent;
     }
 

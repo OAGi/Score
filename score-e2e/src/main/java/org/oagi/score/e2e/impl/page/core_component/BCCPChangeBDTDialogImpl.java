@@ -1,19 +1,16 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.obj.BCCPObject;
-import org.oagi.score.e2e.page.core_component.BCCPCreateDialog;
+import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class BCCPCreateDialogImpl implements BCCPCreateDialog {
+public class BCCPChangeBDTDialogImpl implements BCCPChangeBDTDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
@@ -54,16 +51,13 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
-    private static final By CREATE_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]");
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]");
 
-    private ViewEditCoreComponentPageImpl parent;
+    private BCCPViewEditPageImpl parent;
 
-    private String branch;
-
-    public BCCPCreateDialogImpl(ViewEditCoreComponentPageImpl parent, String branch) {
+    public BCCPChangeBDTDialogImpl(BCCPViewEditPageImpl parent) {
         this.parent = parent;
-        this.branch = branch;
     }
 
     private WebDriver getDriver() {
@@ -78,7 +72,7 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select BDT to create BCCP".equals(getText(title));
+        assert "Select BDT to update BCCP".equals(getText(title));
         return true;
     }
 
@@ -253,19 +247,19 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
     }
 
     @Override
-    public ViewEditCoreComponentPage cancel() {
+    public BCCPViewEditPage cancel() {
         click(getCancelButton());
         return parent;
     }
 
     @Override
-    public WebElement getCreateButton() {
-        return elementToBeClickable(getDriver(), CREATE_BUTTON_LOCATOR);
+    public WebElement getUpdateButton() {
+        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
     }
 
     @Override
-    public BCCPViewEditPage create(String den) {
-        setDEN(den);
+    public BCCPViewEditPage update(String bdtDen) {
+        setDEN(bdtDen);
         hitSearchButton();
 
         retry(() -> {
@@ -275,25 +269,23 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
                 tr = getTableRecordAtIndex(1);
                 td = getColumnByName(tr, "den");
             } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a DT using " + den, e);
+                throw new NoSuchElementException("Cannot locate a DT using " + bdtDen, e);
             }
             String denColumn = getText(td.findElement(By.tagName("span")));
-            if (!denColumn.contains(den)) {
-                throw new NoSuchElementException("Cannot locate a DT using " + den);
+            if (!denColumn.contains(bdtDen)) {
+                throw new NoSuchElementException("Cannot locate a DT using " + bdtDen);
             }
             WebElement select = getColumnByName(tr, "select");
             click(select);
         });
 
-        click(getCreateButton());
-        waitFor(ofMillis(1000L));
+        click(getUpdateButton());
+        waitFor(ofMillis(500L));
 
-        String url = getDriver().getCurrentUrl();
-        BigInteger bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        invisibilityOfLoadingContainerElement(getDriver());
 
-        BCCPObject bccp = parent.getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
-        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(parent, bccp);
-        assert bccpViewEditPage.isOpened();
-        return bccpViewEditPage;
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        return parent;
     }
+
 }

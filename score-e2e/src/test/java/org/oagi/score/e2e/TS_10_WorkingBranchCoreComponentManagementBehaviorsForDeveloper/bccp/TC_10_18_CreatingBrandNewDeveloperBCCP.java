@@ -57,7 +57,7 @@ public class TC_10_18_CreatingBrandNewDeveloperBCCP extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("Tax_ Code");
-        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanel();
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals(branch, getText(bccpPanel.getReleaseField()));
         assertEquals("1", getText(bccpPanel.getRevisionField()));
         assertEquals("WIP", getText(bccpPanel.getStateField()));

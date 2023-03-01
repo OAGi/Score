@@ -1,10 +1,12 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.bie.TransferBIEOwnershipDialogImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -138,6 +140,17 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
+        WebElement td = getColumnByName(tr, "transferOwnership");
+        click(td.findElement(By.tagName("button")));
+
+        TransferCCOwnershipDialog transferCCOwnershipDialog =
+                new TransferCCOwnershipDialogImpl(this);
+        assert transferCCOwnershipDialog.isOpened();
+        return transferCCOwnershipDialog;
+    }
+
     private WebElement getCreateComponentButton() {
         return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Create Component\")]"));
     }
@@ -213,8 +226,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     private void openCoreComponentByDen(String den) {
         sendKeys(getDENField(), den);
-        click(getSearchButton());
-        invisibilityOfLoadingContainerElement(getDriver());
+        hitSearchButton();
+
         retry(() -> {
             WebElement td;
             WebElement tr;
@@ -240,6 +253,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public void hitSearchButton() {
+        retry(() -> click(getSearchButton()));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
     public WebElement getTableRecordAtIndex(int idx) {
         defaultWait(getDriver());
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
@@ -257,8 +276,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     private String getDENFieldFromTheTable(WebElement tableData) {
-        WebElement span = tableData.findElement(By.cssSelector("span.den"));
-        return span.getAttribute("innerHTML");
+        return getText(tableData.findElement(By.cssSelector("div.den")));
     }
 
     @Override

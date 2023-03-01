@@ -5,10 +5,13 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -21,6 +24,9 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+
+    private static final By CHANGE_BDT_OPTION_LOCATOR =
+            By.xpath("//button/span[contains(text(), \"Change BDT\")]");
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
@@ -67,6 +73,9 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+
     private final BCCPObject bccp;
 
     public BCCPViewEditPageImpl(BasePage parent, BCCPObject bccp) {
@@ -83,7 +92,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "BCCP".equals(getBCCPPanel());
+        assert "BCCP".equals(getBCCPPanelContainer().getBCCPPanel());
         assert getText(getTitle()).equals(bccp.getDen());
     }
 
@@ -111,6 +120,86 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         return getNodeByName(nodes[nodes.length - 1]);
     }
 
+    @Override
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]" +
+                        "//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return getNodeByName(nodeName);
+    }
+
+    @Override
+    public BCCPChangeBDTDialog openChangeBDTDialog() {
+        return retry(() -> {
+            String propertyTerm = getText(getBCCPPanelContainer().getBCCPPanel().getPropertyTermField());
+            WebElement node = clickOnDropDownMenuByPath("/" + propertyTerm);
+            try {
+                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+            }
+            waitFor(ofMillis(500L));
+            BCCPChangeBDTDialog bccpChangeBDTDialog = new BCCPChangeBDTDialogImpl(this);
+            assert bccpChangeBDTDialog.isOpened();
+            return bccpChangeBDTDialog;
+        });
+    }
+
+    @Override
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        retry(() -> click(getUpdateButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public BCCPPanelContainer getBCCPPanelContainer() {
+        return getBCCPPanelContainer(null);
+    }
+
+    @Override
+    public BCCPPanelContainer getBCCPPanelContainer(WebElement bccpNode) {
+        return retry(() -> {
+            if (bccpNode != null) {
+                click(bccpNode);
+                waitFor(ofMillis(500L));
+            }
+            return new BCCPPanelContainer() {
+                @Override
+                public BCCPPanel getBCCPPanel() {
+                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+
+                @Override
+                public DTPanel getDTPanel() {
+                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
+                }
+            };
+        });
+    }
+
     private WebElement goToNode(String path) {
         click(getSearchInputTextField());
         WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
@@ -124,22 +213,6 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         By nodeLocator = By.xpath(
                 "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
-    }
-
-    @Override
-    public BCCPPanel getBCCPPanel() {
-        return getBCCPPanel(null);
-    }
-
-    @Override
-    public BCCPPanel getBCCPPanel(WebElement bccpNode) {
-        return retry(() -> {
-            if (bccpNode != null) {
-                click(bccpNode);
-                waitFor(ofMillis(500L));
-            }
-            return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
-        });
     }
 
     @Override
@@ -182,6 +255,10 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+                @Override
+                public DTPanel getDTPanel() {
+                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
                 }
             };
         });
@@ -582,6 +659,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         }
 
         @Override
+        public void setPropertyTerm(String propertyTerm) {
+            sendKeys(getPropertyTermField(), propertyTerm);
+        }
+
+        @Override
         public String getPropertyTermFieldLabel() {
             return getText(getPropertyTermField().findElement(By.xpath("parent::div//label")));
         }
@@ -592,8 +674,20 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         }
 
         @Override
+        public void toggleNillable() {
+            click(getNillableCheckbox());
+        }
+
+        @Override
         public WebElement getValueConstraintSelectField() {
             return getSelectFieldByName(baseXPath, "Value Constraint");
+        }
+
+        @Override
+        public void setValueConstraint(String value) {
+            click(getValueConstraintSelectField());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + value + "\")]//ancestor::mat-option[1]")));
         }
 
         @Override
@@ -602,8 +696,18 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         }
 
         @Override
+        public void setFixedValue(String fixedValue) {
+            sendKeys(getFixedValueField(), fixedValue);
+        }
+
+        @Override
         public WebElement getDefaultValueField() {
             return getInputFieldByName(baseXPath, "Default Value");
+        }
+
+        @Override
+        public void setDefaultValue(String defaultValue) {
+            sendKeys(getDefaultValueField(), defaultValue);
         }
 
         @Override
@@ -614,6 +718,89 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         @Override
         public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public void setNamespace(String namespace) {
+            click(getNamespaceSelectField());
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+            click(option);
+            assert getText(getNamespaceSelectField()).equals(namespace);
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public void setDefinitionSource(String definitionSource) {
+            sendKeys(getDefinitionSourceField(), definitionSource);
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+
+        @Override
+        public void setDefinition(String definition) {
+            sendKeys(getDefinitionField(), definition);
+        }
+    }
+
+    private class DTPanelImpl implements DTPanel {
+
+        private final String baseXPath;
+
+        private DTPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getDataTypeTermField() {
+            return getInputFieldByName(baseXPath, "Data Type Term");
+        }
+
+        @Override
+        public WebElement getQualifierField() {
+            return getInputFieldByName(baseXPath, "Qualifier");
         }
 
         @Override

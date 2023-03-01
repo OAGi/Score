@@ -6,6 +6,7 @@ import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -158,6 +159,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+
+                @Override
+                public DTPanel getDTPanel() {
+                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
                 }
             };
         });
@@ -585,6 +591,70 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         @Override
         public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+    }
+
+    private class DTPanelImpl implements DTPanel {
+
+        private final String baseXPath;
+
+        private DTPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
+
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
+
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getDataTypeTermField() {
+            return getInputFieldByName(baseXPath, "Data Type Term");
+        }
+
+        @Override
+        public WebElement getQualifierField() {
+            return getInputFieldByName(baseXPath, "Qualifier");
         }
 
         @Override

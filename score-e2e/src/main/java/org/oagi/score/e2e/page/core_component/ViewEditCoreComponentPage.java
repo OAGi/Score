@@ -79,6 +79,11 @@ public interface ViewEditCoreComponentPage extends Page {
     WebElement getSearchButton();
 
     /**
+     * Hit the 'Search' button.
+     */
+    void hitSearchButton();
+
+    /**
      * Open the page of the ACC filtered by `den` and `branch`.
      *
      * @param den DEN text
@@ -113,6 +118,14 @@ public interface ViewEditCoreComponentPage extends Page {
      * @return the DT page object
      */
     DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the 'Transfer CC Ownership' dialog.
+     *
+     * @param tr the table record
+     * @return the 'Transfer CC Ownership' dialog object
+     */
+    TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr);
 
     /**
      * Return the UI element of the 'Create ACC' button.

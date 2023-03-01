@@ -254,7 +254,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
-        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanel();
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         String propertyTermFieldLabel = bccpPanel.getPropertyTermFieldLabel();
         assertEquals("Property Term (Field Name)", propertyTermFieldLabel);
     }

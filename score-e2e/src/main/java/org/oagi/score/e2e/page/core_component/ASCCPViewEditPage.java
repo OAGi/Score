@@ -398,6 +398,8 @@ public interface ASCCPViewEditPage extends Page {
 
         BCCPPanel getBCCPPanel();
 
+        DTPanel getDTPanel();
+
     }
 
     /**
@@ -621,6 +623,90 @@ public interface ASCCPViewEditPage extends Page {
          * @return the UI element of the 'Namespace' select field
          */
         WebElement getNamespaceSelectField();
+
+        /**
+         * Return the UI element of the 'Definition Source' field.
+         *
+         * @return the UI element of the 'Definition Source' field
+         */
+        WebElement getDefinitionSourceField();
+
+        /**
+         * Return the UI element of the 'Definition' field.
+         *
+         * @return the UI element of the 'Definition' field
+         */
+        WebElement getDefinitionField();
+
+    }
+
+    /**
+     * An interface of the DT panel
+     */
+    interface DTPanel {
+
+        /**
+         * Return the UI element of the 'Core Component' field.
+         *
+         * @return the UI element of the 'Core Component' field
+         */
+        WebElement getCoreComponentField();
+
+        /**
+         * Return the UI element of the 'Release' field.
+         *
+         * @return the UI element of the 'Release' field
+         */
+        WebElement getReleaseField();
+
+        /**
+         * Return the UI element of the 'Revision' field.
+         *
+         * @return the UI element of the 'Revision' field
+         */
+        WebElement getRevisionField();
+
+        /**
+         * Return the UI element of the 'State' field.
+         *
+         * @return the UI element of the 'State' field
+         */
+        WebElement getStateField();
+
+        /**
+         * Return the UI element of the 'Owner' field.
+         *
+         * @return the UI element of the 'Owner' field
+         */
+        WebElement getOwnerField();
+
+        /**
+         * Return the UI element of the 'GUID' field.
+         *
+         * @return the UI element of the 'GUID' field
+         */
+        WebElement getGUIDField();
+
+        /**
+         * Return the UI element of the 'DEN' field.
+         *
+         * @return the UI element of the 'DEN' field
+         */
+        WebElement getDENField();
+
+        /**
+         * Return the UI element of the 'Data Type Term' field.
+         *
+         * @return the UI element of the 'Data Type Term' field
+         */
+        WebElement getDataTypeTermField();
+
+        /**
+         * Return the UI element of the 'Qualifier' field.
+         *
+         * @return the UI element of the 'Qualifier' field
+         */
+        WebElement getQualifierField();
 
         /**
          * Return the UI element of the 'Definition Source' field.
