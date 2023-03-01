@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -644,6 +643,15 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_6")
     public void test_TA_6(){
 
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch("Working");
+        By ADD_CC_ICON_LOCATOR =
+                By.xpath("//mat-icon[contains(text(), \"add\")]");
+        assertEquals(0, getDriver().findElements(ADD_CC_ICON_LOCATOR).size());
 
     }
 
@@ -651,11 +659,95 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_7")
     public void test_TA_7(){
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("Deleted");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        AppUserObject developer2 = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer2);
+
+        HomePage homePage = loginPage().signIn(developer2.getLoginId(), developer2.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+            /**
+             * developer can view but CANNOT edit the details of a CC that is in WIP state and owned by another developer
+             * However, he can add comments.
+             */
+
+            By COMMENT_FIELD_LOCATOR =
+                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+
+            assertEquals(state, getText(accViewEditPage.getStateField()));
+            assertDisabled(accViewEditPage.getStateField());
+            assertDisabled(accViewEditPage.getGUIDField());
+            assertDisabled(accViewEditPage.getDENField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDefinitionField());
+            assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getNamespaceField());
+            assertDisabled(accViewEditPage.getCoreComponentTypeField());
+            click(accViewEditPage.getCommentsIcon());
+            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+
+
+            accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
+            assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
+            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
+            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+
+            accViewEditPage.openPage();
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+            asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+
+            assertEquals(state, getText(asccPanelContainer.getASCCPanel().getStateField()));
+            assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+            assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
+            assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
+            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
+            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+        }
+
+
     }
 
     @Test
     @DisplayName("TC_10_1_TA_8")
     public void test_TA_8(){
+
+
 
     }
 

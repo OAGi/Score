@@ -5,7 +5,6 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
