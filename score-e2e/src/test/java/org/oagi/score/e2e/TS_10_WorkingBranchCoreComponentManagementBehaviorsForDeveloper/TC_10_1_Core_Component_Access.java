@@ -16,10 +16,8 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
@@ -916,11 +914,72 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     public void test_TA_10(){
 
 
-
     }
     @Test
     @DisplayName("TC_10_1_TA_11")
     public void test_TA_11(){
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        AppUserObject developer2 = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer2);
+
+        HomePage homePage = loginPage().signIn(developer2.getLoginId(), developer2.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            /**
+             * developer can filter Core Components based on their Type.
+             */
+            viewEditCoreComponentPage.getTypeSelectField().click();
+            List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+                List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+                result.get(0).click();
+            }
+            // search by "ACC" type
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.getTypeSelectField().click();
+            List<WebElement> accOption = options.stream().filter(e -> "ACC".equals(getText(e))).collect(Collectors.toList());
+            accOption.get(0).click();
+            click(viewEditCoreComponentPage.getSearchButton());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
+
+            // search by "ASCCP" type
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.getTypeSelectField().click();
+            List<WebElement> asccpOption = options.stream().filter(e -> "ASCCP".equals(getText(e))).collect(Collectors.toList());
+            asccpOption.get(0).click();
+            click(viewEditCoreComponentPage.getSearchButton());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
+
+            // search by "BCCP" type
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.getTypeSelectField().click();
+            List<WebElement> bccpOption = options.stream().filter(e -> "BCCP".equals(getText(e))).collect(Collectors.toList());
+            bccpOption.get(0).click();
+            click(viewEditCoreComponentPage.getSearchButton());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
+        }
 
     }
 

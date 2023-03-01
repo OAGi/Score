@@ -23,6 +23,13 @@ public interface ViewEditCoreComponentPage extends Page {
     void setBranch(String branch);
 
     /**
+     * Return the UI element of the 'Type' select field.
+     *
+     * @return the UI element of the 'Type' select field
+     */
+    WebElement getTypeSelectField();
+
+    /**
      * Return the UI element of the 'DEN' field.
      *
      * @return the UI element of the 'DEN' field
