@@ -108,6 +108,66 @@ public interface ViewEditCoreComponentPage extends Page {
     DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch);
 
     /**
+     * Return the UI element of the 'Create ACC' button.
+     *
+     * @return the UI element of the 'Create ACC' button
+     */
+    WebElement getCreateACCButton();
+
+    /**
+     * Create a new ACC.
+     *
+     * @param branch Branch text
+     * @return the ACC page object
+     */
+    ACCViewEditPage createACC(String branch);
+
+    /**
+     * Return the UI element of the 'Create ASCCP' button.
+     *
+     * @return the UI element of the 'Create ASCCP' button
+     */
+    WebElement getCreateASCCPButton();
+
+    /**
+     * Open the 'Select ACC to create ASCCP' dialog.
+     *
+     * @param branch Branch text
+     * @return the 'Select ACC to create ASCCP' dialog
+     */
+    ASCCPCreateDialog openASCCPCreateDialog(String branch);
+
+    /**
+     * Return the UI element of the 'Create BCCP' button.
+     *
+     * @return the UI element of the 'Create BCCP' button
+     */
+    WebElement getCreateBCCPButton();
+
+    /**
+     * Open the 'Select BDT to create BCCP' dialog.
+     *
+     * @param branch Branch text
+     * @return the 'Select BDT to create BCCP' dialog
+     */
+    BCCPCreateDialog openBCCPCreateDialog(String branch);
+
+    /**
+     * Return the UI element of the 'Create DT' button.
+     *
+     * @return the UI element of the 'Create DT' button
+     */
+    WebElement getCreateDTButton();
+
+    /**
+     * Open the 'Select based DT to create BDT' dialog.
+     *
+     * @param branch Branch text
+     * @return the 'Select based DT to create BDT' dialog
+     */
+    DTCreateDialog openDTCreateDialog(String branch);
+
+    /**
      * Return the UI element of the table record at the given index, which starts from 1.
      *
      * @param idx The index of the table record.

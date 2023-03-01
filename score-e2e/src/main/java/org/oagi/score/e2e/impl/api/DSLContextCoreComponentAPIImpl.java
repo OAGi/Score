@@ -74,7 +74,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setDen(record.get(ACC.DEN));
         acc.setDefinition(record.get(ACC.DEFINITION));
         acc.setDefinitionSource(record.get(ACC.DEFINITION_SOURCE));
-        acc.setNamespaceId(record.get(ACC.NAMESPACE_ID).toBigInteger());
+        if (record.get(ACC.NAMESPACE_ID) != null) {
+            acc.setNamespaceId(record.get(ACC.NAMESPACE_ID).toBigInteger());
+        }
         acc.setAbstract(record.get(ACC.IS_ABSTRACT) == 1);
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
@@ -127,7 +129,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccp.setDefinition(record.get(ASCCP.DEFINITION));
         asccp.setDefinitionSource(record.get(ASCCP.DEFINITION_SOURCE));
         asccp.setRoleOfAccManifestId(record.get(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID).toBigInteger());
-        asccp.setNamespaceId(record.get(ASCCP.NAMESPACE_ID).toBigInteger());
+        if (record.get(ASCCP.NAMESPACE_ID) != null) {
+            asccp.setNamespaceId(record.get(ASCCP.NAMESPACE_ID).toBigInteger());
+        }
         asccp.setState(record.get(ASCCP.STATE));
         asccp.setDeprecated(record.get(ASCCP.IS_DEPRECATED) == 1);
         asccp.setOwnerUserId(record.get(ASCCP.OWNER_USER_ID).toBigInteger());
@@ -179,7 +183,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setDen(record.get(BCCP.DEN));
         bccp.setDefinition(record.get(BCCP.DEFINITION));
         bccp.setDefinitionSource(record.get(BCCP.DEFINITION_SOURCE));
-        bccp.setNamespaceId(record.get(BCCP.NAMESPACE_ID).toBigInteger());
+        if (record.get(BCCP.NAMESPACE_ID) != null) {
+            bccp.setNamespaceId(record.get(BCCP.NAMESPACE_ID).toBigInteger());
+        }
         bccp.setState(record.get(BCCP.STATE));
         bccp.setDeprecated(record.get(BCCP.IS_DEPRECATED) == 1);
         bccp.setOwnerUserId(record.get(BCCP.OWNER_USER_ID).toBigInteger());

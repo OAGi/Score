@@ -130,6 +130,79 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         throw new UnsupportedOperationException();
     }
 
+    private WebElement getCreateComponentButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Create Component\")]"));
+    }
+
+    @Override
+    public WebElement getCreateACCButton() {
+        click(getCreateComponentButton());
+        return elementToBeClickable(getDriver(),
+                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ACC\"]"));
+    }
+
+    @Override
+    public ACCViewEditPage createACC(String branch) {
+        setBranch(branch);
+        click(getCreateACCButton());
+
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term", branch);
+        ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
+        assert accViewEditPage.isOpened();
+        return accViewEditPage;
+    }
+
+    @Override
+    public WebElement getCreateASCCPButton() {
+        click(getCreateComponentButton());
+        return elementToBeClickable(getDriver(),
+                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ASCCP\"]"));
+    }
+
+    @Override
+    public ASCCPCreateDialog openASCCPCreateDialog(String branch) {
+        setBranch(branch);
+        click(getCreateASCCPButton());
+
+        ASCCPCreateDialog asccpCreateDialog = new ASCCPCreateDialogImpl(this, branch);
+        assert asccpCreateDialog.isOpened();
+        return asccpCreateDialog;
+    }
+
+    @Override
+    public WebElement getCreateBCCPButton() {
+        click(getCreateComponentButton());
+        return elementToBeClickable(getDriver(),
+                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"BCCP\"]"));
+    }
+
+    @Override
+    public BCCPCreateDialog openBCCPCreateDialog(String branch) {
+        setBranch(branch);
+        click(getCreateBCCPButton());
+
+        BCCPCreateDialog bccpCreateDialog = new BCCPCreateDialogImpl(this, branch);
+        assert bccpCreateDialog.isOpened();
+        return bccpCreateDialog;
+    }
+
+    @Override
+    public WebElement getCreateDTButton() {
+        click(getCreateComponentButton());
+        return elementToBeClickable(getDriver(),
+                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"DT\"]"));
+    }
+
+    @Override
+    public DTCreateDialog openDTCreateDialog(String branch) {
+        setBranch(branch);
+        click(getCreateDTButton());
+
+        DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
+        assert dtCreateDialog.isOpened();
+        return dtCreateDialog;
+    }
+
     private void openCoreComponentByDen(String den) {
         sendKeys(getDENField(), den);
         click(getSearchButton());
