@@ -8811,6 +8811,221 @@ Environment Code to a target node with Action code, the issue will be
 reported because the two codes are not compatible. The same logic
 applies to the agency ID list.
 
+Manage Business Terms
+---------------------
+Currently, Score provides the business term functionality to end users only. 
+Developers won't see this functionality once login as developer 
+accounts. The end users can view, create, edit or discard business terms through the 
+View/Edit Business Term menu under the BIE menu. The only way to assign 
+business terms to BIEs is through the BIE detail page. At current version, 
+the end users can assign business terms to two BIE types: ASBIE and BBIE. 
+
+Create a Business Term
+~~~~~~~~~~~~~~~~~~~~~~~
+To create a business term:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit Business Term" from the drop-down list.
+   
+3. On the returned "Business Term" page, click "New Business Term" located at the top-right
+   of the page. 
+
+4. On the returned "Create Business Term" page, fill out the following fields:
+   
+   1. Business Term (Mandatory) the main name of the business term
+   2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
+   3. External Reference Id(Optional) 
+   4. Comment(Optional) This is free-form text field for document what the business term is, its purposes, etc. 
+   
+5. Click the "Create" button. 
+
+Edit a Business Term
+~~~~~~~~~~~~~~~~~~~~
+To edit a business term:
+
+1. Open the top menu fo the page, click "BIE".
+   
+2. Click "View/Edit Business Term" menu item.
+   
+3. Use the *Term* or *External Reference URI* to find the desired business term.  
+   Open its "Edit Business Term" page by clicking the business term name in Term column. See
+   also `How to use the Search field in general <#how-to-use-the-search-field-in-general>`__. 
+   
+4. You can change the *Business Term*, *External Reference URI*, *External Reference ID* and *Comments*
+   fields. 
+
+5. You cannot change the *Definition* field, which is only updated through upload from external file.
+   
+6. Click the "Update" button. 
+
+
+Discard a Business Term
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that a buiness term can only be discarded if it is not assigned to any BIE. Otherwize, you have to 
+discard the assignment first (see `Discard the assignment of a business term from a BIE <#discard-the-assignment-of-a-business-term-from-a-bie>`__ ). 
+
+There are two methods for discarding a Business Term. The first one is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. Locate the Business Term you want to discard. Use the *Term*, *External Reference URI*, *External Reference ID*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired Business Term. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the checkbox right before the desired 
+   business term name. 
+
+4. Click "Discard" at the top-right of the page. 
+
+5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
+   will not remove it. All the assignments for it must be removed first. 
+   
+The second method is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. Locate the Business Term you want to discard. Use the *Term*, *External Reference URI*, *External Reference ID*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired Business Term. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the Business Term Name to open its
+   "Edit Business Term" page. 
+
+4. Click the "Discard" button. 
+
+5. A dialog is open where you can confirm or cancel the request. If the Business Term is assigned to a BIE, the system
+   will not remove it. All the assignments for it must be removed first. 
+   
+Assign business terms to BIEs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Current Score version supports the assignment of business terms to two BIE types: ASBIE and BBIE.
+
+To assign a business term to a BIE:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit BIE" from the drop-down list. 
+   
+3. Locate the BIE you want to assign. Use the *DEN*, *Business Context*, *Branch*, *State*, *Owner*, *Updater*, 
+   *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
+   Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
+
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel. 
+   
+5. Select a child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
+   The detail for that child node is displayed in the right panel. Check the *Used* checkbox if it is unchecked and 
+   click "Update" button at the top-right of the page. The "Assign Business Term" button will be enabled. 
+
+6. Click "Assign Business Term" button. 
+
+7. On the newly-opened "Assign Business Term" page, locate the business term to be assigned. Use the *Business Term*, 
+   *External Reference URI*, *External Reference ID*, *Updater*, *Updated start date* or *Updated end date* search filters
+   to help locate the desired business term. 
+   
+8. Select the desired business term. Fill out the Type Code (optional). Note that the same business term with different Type 
+   Code can be assigned to the same BIE. 
+   
+9. Check or Uncheck the Preferred Business Term checkbox. Note only one business term can be preferred for each selected BIE. 
+    
+10. Click "Create" button. 
+
+Business term assignments For selected BIE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To view all the business terms currently assigned to a BIE:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit BIE" from the drop-down list. 
+   
+3. Locate the BIE you want to see the business term assignments. Use the *DEN*, *Business Context*, *Branch*, *State*,
+   *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
+
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
+
+5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
+   The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
+
+6. Click "Show Business Terms" button in the right panel.
+   
+7. On the newly-opened "Business Term Assignement" page, the selected BIE is displayed right before the "Turn off" button. 
+   All the business terms assigned for the selected BIE are displayed in the table below the "Search" button. 
+
+
+Discard the assignment of a business term from a BIE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Discard the assignment of a business term from a BIE is to remove the association of the business term from the given BIE. 
+The prerequisite for permantently removing a business term from Score is to discard all the assignments for that business term
+first. 
+
+To discard the assignment of a business term from a BIE:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit BIE" from the drop-down list. 
+   
+3. Locate the BIE you want to see the business term assignments. Use the *DEN*, *Business Context*, *Branch*, *State*,
+   *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
+
+4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
+
+5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
+   The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
+
+6. Click "Show Business Terms" button in the right panel.
+   
+7. On the newly-opened "Business Term Assignement" page, the selected BIE is displayed right before the "Turn off" button. 
+   All the business terms assigned for the selected BIE are displayed in the table below the "Search" button. 
+
+8. Located the business term to be discarded from the assignment. Use the *Business Term*, *External Reference URI*, *Type Code*
+   , *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired business term. 
+   Note that *Preferred Only* checkbox can help filter efficiency too. 
+
+9. Click "Search" button. 
+    
+10. Select the desired business term. The "Discard" button at the top right of the page will be enabled. Click "Discard",  and a 
+    dialog is open where you can confirm or cancel the request. Only the assignment for this given BIE is permanently removed. 
+    The business term is still displayed in "View/Edit Business Term" page. 
+
+Load Business Terms from external source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the preferred way for the end users to create business terms in Score. This method allows the end users to bulk upload 
+business terms from an external csv file. 
+
+To upload from an external file:
+
+1. On the top menu of the page, click "BIE".
+   
+2. Choose "View/Edit Business Term" from the drop-down list. 
+
+3. On the returned "Business Term" page, click "Upload Business Terms" button at the top right corner of the page. 
+   
+4. On the returned "Upload Business Terms" page, click "Download template" button at the top right corner of the page. 
+   A csv template file named "businessTermTemplateWithExample" will be saved into your "Download" folder on your local 
+   computer. 
+
+5. Fill out all your business terms in the downloaded csv file. Make sure that the format for each column is correct for each 
+   business term. Note that *businessTerm* and *externalReferenceUri* columns are required. Save all your changes. 
+
+6. Go back to "Upload Business Term" page, click the attach button (paper clipper icon) and choose the modified csv file
+   in the pop up choose-file window. Finally click "Open" button in the pop-up window. 
+
+7. An "Uploaded" message will be displayed for confirmation. 
+   
+8. Go back to the top menu of the page, click "BIE". 
+
+9. Choose "View/Edit Business Term" from the drop-down list. 
+    
+10. On the returned "Business Term" page, you can locate the uploaded business terms using the search filters: *Term*, 
+    *External Reference URI*, *External Reference ID*, *Updater*, *Updated start date* or *Updated end date*. 
+
 Common functions
 ----------------
 
@@ -8929,6 +9144,103 @@ and this BIE is reused by another BIE. In this case, Score displays a
 notification at the bottom of the page and keeps a more detail log which
 is accessible via the notification page.
 
+Multi-tenant management
+=======================
+
+Multi-tenant mode
+-----------------
+Score multi-tenant feature enables OAGi to offer Score-based BIE-development services to 
+multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant)
+
+Enable multi-tenant mode
+~~~~~~~~~~~~~~~~~~~~~~~~
+By default Score does not use multi-tenant mode. To enable multi-tenant mode:
+
+1. Click on your username (top-right) | "Settings" | "Application settings".
+2. Under the Multi-tenant mode label click the "Enable" button.
+
+Add a tenant
+~~~~~~~~~~~~~
+To add a tenant:
+
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "New Tenant" button.
+3. Enter a name for the new tenant and click the "Create" button.
+
+
+Manage tenant-user associations
+-------------------------------
+
+Associate a tenant and user
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To associate a tenant and user:
+
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Users" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Add User" button (top-right).
+4. Click the "Add" button for the appropriate user (a search or paging may be required).
+
+Dissociate a tenant and user
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To dissociate a tenant and user:
+
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Users" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Remove" button for the appropriate user (a search or paging may be required).
+
+
+Manage tenant-business context associations
+-------------------------------------------
+
+Associate a tenant and business context
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To associate a tenant and business context:
+
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Business Context" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Add User" button (top-right).
+4. Click the "Add" button for the appropriate business context (a search or paging may be required).
+
+Dissociate a tenant and business context
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To dissociate a tenant and business context:
+
+1. Choose the "Admin" | "Tenant" menu item.
+2. Click the "Manage Business Context" button for the appropriate tenant (a search or paging may be required).
+3. Click the "Remove" button for the appropriate business context (a search or paging may be required).
+
+
+Multi-tenant mode feature restrictions
+---------------------------------------
+
+Features not available
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The following features are not available to users in multi-tenant mode:
+
+* Manage modules
+* Manage core components
+* Make BIE reusable
+* Create ABIE extension locally
+* Create ABIE extension globally
+
+Features with restricted behavior
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Create BIE: A user must be associated with a tenant to be able to create a BIE.
+* Manage associations between business contexts (BCs) and BIEs:
+
+   * The BCs available to the user are limited by their tenancy. Users not associated with a tenant cannot create a BIE since they would not be able to assign a BC on BIE creation (all the BCs would all be filtered out). However, it would make sense to alert the user, perhaps on login, that they can’t do anything useful in Score until they have been assigned to a tenant.
+   * Note that Admins have no special authorization in this case.
+
+* Manage context: Restricted to admin users.
+* Transfer BIE ownership: Users to whom the BIE ownership may be transferred are limited to users associated with tenants associated with BCs associated with the BIE (other than the current owner — doesn’t make sense for an owner to transfer ownership to themself).
+
+
 .. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
    :width: 6.5in
    :height: 2.48611in
@@ -8953,3 +9265,4 @@ is accessible via the notification page.
 .. |image7| image:: media/image14.png
    :width: 0.19168in
    :height: 0.20835in
+
