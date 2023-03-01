@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Score User Guide'
-copyright = u'2022, NIST'
+copyright = u'2023, NIST'
 author = u'NIST'
 
 # The short X.Y version
