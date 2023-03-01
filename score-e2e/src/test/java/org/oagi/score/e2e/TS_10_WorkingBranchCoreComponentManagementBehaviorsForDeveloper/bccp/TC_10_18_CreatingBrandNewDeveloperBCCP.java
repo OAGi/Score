@@ -11,13 +11,13 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.BCCPCreateDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -79,6 +79,18 @@ public class TC_10_18_CreatingBrandNewDeveloperBCCP extends BaseTest {
 
         String definitionSourceText = getText(bccpPanel.getDefinitionSourceField());
         assertTrue(isEmpty(definitionSourceText));
+    }
+
+    @Test
+    public void test_TA_10_18_2() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "10.8.4";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.openBCCPCreateDialog(branch));
     }
 
 }
