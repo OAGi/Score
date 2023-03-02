@@ -2499,7 +2499,7 @@ have to be its owner. To do that:
 2. `Open detail page of an ACC <#view-detail-of-an-acc>`__ in the
    Published state.
 
-3. Click the Revise button at the top-right corner of the page. The ACC
+3. Click the "Revise" button at the top-right corner of the page. The ACC
    goes into the WIP state and its revision number increases by 1.
 
 4. Only the following fields in the ACC detail pane on the right may be
@@ -3087,7 +3087,7 @@ the ownership. To restore a CC.
 
       3. Select the icon.
 
-   2. Restore CC individually"
+   2. Restore CC individually:
 
       1. Click on the DEN of a deleted CC to open its detail page.
 
@@ -3611,7 +3611,7 @@ code list value:
    the dialog without saving the changes, hit the ESC button or click
    outside of the dialog.
 
-4. Click the "Update button at the top of the page.
+4. Click the "Update" button at the top of the page.
 
 Delete a brand-new code list
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -4015,7 +4015,7 @@ detail of an Agency ID List value:
    the dialog without saving the changes, hit the ESC button or click
    outside of the dialog.
 
-4. Click the "Update button at the top of the page.
+4. Click the "Update" button at the top of the page.
 
 Delete a brand-new Agency ID List
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -5003,7 +5003,7 @@ He/she does not have to be its owner. To do that:
 2. `Open detail page of a DT <#view-detail-of-a-dt-1>`__ in the
    Production state.
 
-3. Click the Amend button at the top-right corner of the page. The DT
+3. Click the "Amend" button at the top-right corner of the page. The DT
    goes into the WIP state; and its revision number increases by 1.
 
 4. Only the following fields in the DT detail pane on the right may be
@@ -6017,7 +6017,7 @@ follows.
 5. The Deprecated checkboxes are unchecked and locked. See `Edit detail
    of a brand-new code list <#_Edit_detail_of_7>`__.
 
-6. Click the Update button at the top right to save changes.
+6. Click the "Update" button at the top right to save changes.
 
 7. It should be noted that a code list value derived from another code
    list cannot be edited. Apart from that, the end user may perform
@@ -6072,7 +6072,7 @@ code list:
    List page <#view-detail-of-a-code-list-1>`__ of a code list in the
    Production state.
 
-2. Click the Amend button at the top-right corner of the page.
+2. Click the "Amend" button at the top-right corner of the page.
 
 3. The "Edit Code List" page is refreshed with the code list whose
    revision number is incremented by 1.
@@ -6166,7 +6166,7 @@ list <#restore-a-deleted-code-list-1>`__. To delete a code list:
       2. The "Delete" button at top-right corner of the page is
          activated.
 
-      3. Click the Delete button.
+      3. Click the "Delete" button.
 
    2. Delete a code list individually.
 
@@ -8469,7 +8469,7 @@ To make a BIE reusable:
 
 4. Click on the "Make BIE Reusable" option.
 
-5. Click the "Create" button in the returned confirmation dialog
+5. Click the "Make" button in the returned confirmation dialog
 
 At this point the BIE list page is returned where you can see the new
 BIE listed. Until this BIE is successfully created, it is in the
@@ -8478,8 +8478,7 @@ Once the creation process is finished, the BIE goes to the WIP state
 (refresh the page or click "Search" button to see if the creation is
 done). This BIE inherits the Business Contexts and release association
 of its source top-level BIE. At this stage, the user can still make
-changes to the BIE. Until the BIE has been moved to the Production
-state, it is not reusable.
+changes to the BIE.
 
 BIE expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
