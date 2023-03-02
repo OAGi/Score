@@ -1104,12 +1104,22 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_14")
     public void test_TA_14(){
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setDEN("\"Action Code\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Code", "oagis").isDisplayed());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Corrective Action Type Code. Code", "oagis").isDisplayed());
     }
 
     @Test
     @DisplayName("TC_10_1_TA_15")
     public void test_TA_15(){
+
 
     }
 
