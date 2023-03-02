@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,6 +39,11 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
+
+    private static String getDownloadPath() {
+        File fileDestination = new File(System.getProperty("user.home"), "Downloads");
+        return fileDestination.getAbsolutePath();
+    }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
@@ -75,11 +79,6 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         // Call Awaitility library for async download wait
         await().atMost(Duration.ofSeconds(1))
                 .until(() -> csvFile.exists());
-    }
-
-    private static String getDownloadPath() {
-        File fileDestination = new File(System.getProperty("user.home"), "Downloads");
-        return fileDestination.getAbsolutePath();
     }
 
     @Test
@@ -126,7 +125,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
-            for (int i=0; i < 3; i++){
+            for (int i = 0; i < 3; i++) {
                 viewEditBusinessTermPageForCheck.openPage();
                 viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(i).getBusinessTerm());
                 viewEditBusinessTermPageForCheck.hitSearchButton();
@@ -240,9 +239,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
                 csvPrinter.flush();
             }
 
-            //upload the modified csv file
-            WebElement chooseFile = click(uploadBusinessTermsPage.getAttachButton());
-            chooseFile.sendKeys(csvFileForUpload.getAbsolutePath());
+            // upload the modified CSV file
+            uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
+            waitFor(ofSeconds(2L));
+
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
             viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(2).getBusinessTerm());
