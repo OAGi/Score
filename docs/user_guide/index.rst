@@ -9159,10 +9159,18 @@ is accessible via the notification page.
 Multi-tenant management
 =======================
 
+Multi-tenant mode should be enabled at the first deployment of Score. And while it is possible to switch on or off
+the multi-tenant mode, it is not recommended to go back and forth between the two modes. 
+
+
 Multi-tenant mode
 -----------------
-Score multi-tenant feature enables OAGi to offer Score-based BIE-development services to 
-multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant)
+ *Multi-tenant Management functions are available only to Developer user with Admin right*. 
+
+Score multi-tenant feature enables standard development organizations like OAGi to offer Score-based BIE-development services to 
+multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant). The visibility is restricted by the 
+business context associated with the BIE and the tenant. In other words, if the BIE has a business context that is associated with 
+the tenant, then end users in that tenant can see the BIE. Users can also see BIEs whose business context don't belong to any tenant. 
 
 Enable multi-tenant mode
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9232,7 +9240,7 @@ Multi-tenant mode feature restrictions
 Features not available
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The following features are not available to users in multi-tenant mode:
+The following features are not available to users when Score is in the multi-tenant mode:
 
 * Manage modules
 * Manage core components
@@ -9249,8 +9257,9 @@ Features with restricted behavior
    * The BCs available to the user are limited by their tenancy. Users not associated with a tenant cannot create a BIE since they would not be able to assign a BC on BIE creation (all the BCs would all be filtered out). However, it would make sense to alert the user, perhaps on login, that they can’t do anything useful in Score until they have been assigned to a tenant.
    * Note that Admins have no special authorization in this case.
 
-* Manage context: Restricted to admin users.
+* Manage context: Restricted to admin developer users.
 * Transfer BIE ownership: Users to whom the BIE ownership may be transferred are limited to users associated with tenants associated with BCs associated with the BIE (other than the current owner — doesn’t make sense for an owner to transfer ownership to themself).
+* This is not restricted in the application, but the admin developer perhaps should not create any end user with admin right in the Score multi-tenant mode.
 
 
 .. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
