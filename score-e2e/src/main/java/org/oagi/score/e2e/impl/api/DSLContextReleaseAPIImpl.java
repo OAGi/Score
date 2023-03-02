@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.ReleaseAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
@@ -30,6 +31,17 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
     public ReleaseObject getReleaseByReleaseNumber(String releaseNumber) {
         ReleaseRecord release = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_NUM.eq(releaseNumber))
+                .fetchOptional().orElse(null);
+        return mapper(release);
+    }
+
+    @Override
+    public ReleaseObject getTheLatestRelease() {
+        ULong maxReleaseId = dslContext.select(DSL.max(RELEASE.RELEASE_ID))
+                .from(RELEASE)
+                .fetchOneInto(ULong.class);;
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(maxReleaseId))
                 .fetchOptional().orElse(null);
         return mapper(release);
     }
