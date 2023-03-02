@@ -2,7 +2,7 @@
 
 ## Learn about Score
   - [Read installation guide and component architecture](https://github.com/OAGi/Score/wiki/Basic-Installation-Guide-using-Docker-for-Score-Application-Release-1.1.2-and-up)
-  - [Read user guide or at least read its content.](./user_guide/index.rst) and/or [Test Case Document](./test_cases/) particularly if you are modifying an existing functionality. Even if you are modifying a certain functionality or adding a new, it might impact other functionalities as well, so it is good to know overall Score behavior. Get advise from the community how changes or additions may impact other functionalities will help speed up the development.
+  - [Read user guide or at least read its content.](./user_guide/ScoreUserGuide.rst) and/or [Test Case Document](./test_cases/) particularly if you are modifying an existing functionality. Even if you are modifying a certain functionality or adding a new, it might impact other functionalities as well, so it is good to know overall Score behavior. Get advise from the community how changes or additions may impact other functionalities will help speed up the development.
   - [Overview of database structure](https://oagiscore.atlassian.net/wiki/spaces/SCORE/pages/4403363841/Overview+of+Score+Database+Structure)
   - How to set up Score development environment (I think this should be included in the Development Environment Requirement or the other way around)
     - How to initialize database with OAGIS data (for development testing and acceptance testing).

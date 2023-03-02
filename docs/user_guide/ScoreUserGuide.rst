@@ -1,24 +1,19 @@
-Score User Guide
-================
+.. Score User Guide documentation master file, created by
+   sphinx-quickstart on Fri Oct  5 17:04:12 2018.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-About this Guide
-----------------
+Welcome to Score User Guide!
+==========================================
 
-How to use this guide
----------------------
+.. toctree::
+   :maxdepth: 6
 
-Use the menu on the left to browse through sections.
+   ScoreUserGuide <ScoreUserGuide.rst>
 
-The content of the user guide is on one HTML page. Use the browser’s
-text search to find content on this page.
 
-Due to limited development resources, the user guide is designed to
-minimize its maintenance due to UI changes. Therefore, it contains
-minimal UI graphics. It is recommended that the user guide is read along
-with the tool. Follow the instruction along with the tool interactions.
-
-Nomenclature 
--------------
+Indices and tables
+==================
 
 +-------------------------+--------------------------------------------+
 | Structural Format       | Meaning                                    |
@@ -2499,7 +2494,7 @@ have to be its owner. To do that:
 2. `Open detail page of an ACC <#view-detail-of-an-acc>`__ in the
    Published state.
 
-3. Click the "Revise" button at the top-right corner of the page. The ACC
+3. Click the Revise button at the top-right corner of the page. The ACC
    goes into the WIP state and its revision number increases by 1.
 
 4. Only the following fields in the ACC detail pane on the right may be
@@ -3087,7 +3082,7 @@ the ownership. To restore a CC.
 
       3. Select the icon.
 
-   2. Restore CC individually:
+   2. Restore CC individually"
 
       1. Click on the DEN of a deleted CC to open its detail page.
 
@@ -3611,7 +3606,7 @@ code list value:
    the dialog without saving the changes, hit the ESC button or click
    outside of the dialog.
 
-4. Click the "Update" button at the top of the page.
+4. Click the "Update button at the top of the page.
 
 Delete a brand-new code list
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -4015,7 +4010,7 @@ detail of an Agency ID List value:
    the dialog without saving the changes, hit the ESC button or click
    outside of the dialog.
 
-4. Click the "Update" button at the top of the page.
+4. Click the "Update button at the top of the page.
 
 Delete a brand-new Agency ID List
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -5003,7 +4998,7 @@ He/she does not have to be its owner. To do that:
 2. `Open detail page of a DT <#view-detail-of-a-dt-1>`__ in the
    Production state.
 
-3. Click the "Amend" button at the top-right corner of the page. The DT
+3. Click the Amend button at the top-right corner of the page. The DT
    goes into the WIP state; and its revision number increases by 1.
 
 4. Only the following fields in the DT detail pane on the right may be
@@ -6017,7 +6012,7 @@ follows.
 5. The Deprecated checkboxes are unchecked and locked. See `Edit detail
    of a brand-new code list <#_Edit_detail_of_7>`__.
 
-6. Click the "Update" button at the top right to save changes.
+6. Click the Update button at the top right to save changes.
 
 7. It should be noted that a code list value derived from another code
    list cannot be edited. Apart from that, the end user may perform
@@ -6072,7 +6067,7 @@ code list:
    List page <#view-detail-of-a-code-list-1>`__ of a code list in the
    Production state.
 
-2. Click the "Amend" button at the top-right corner of the page.
+2. Click the Amend button at the top-right corner of the page.
 
 3. The "Edit Code List" page is refreshed with the code list whose
    revision number is incremented by 1.
@@ -6166,7 +6161,7 @@ list <#restore-a-deleted-code-list-1>`__. To delete a code list:
       2. The "Delete" button at top-right corner of the page is
          activated.
 
-      3. Click the "Delete" button.
+      3. Click the Delete button.
 
    2. Delete a code list individually.
 
@@ -8469,7 +8464,7 @@ To make a BIE reusable:
 
 4. Click on the "Make BIE Reusable" option.
 
-5. Click the "Make" button in the returned confirmation dialog
+5. Click the "Create" button in the returned confirmation dialog
 
 At this point the BIE list page is returned where you can see the new
 BIE listed. Until this BIE is successfully created, it is in the
@@ -8478,7 +8473,8 @@ Once the creation process is finished, the BIE goes to the WIP state
 (refresh the page or click "Search" button to see if the creation is
 done). This BIE inherits the Business Contexts and release association
 of its source top-level BIE. At this stage, the user can still make
-changes to the BIE.
+changes to the BIE. Until the BIE has been moved to the Production
+state, it is not reusable.
 
 BIE expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8815,12 +8811,24 @@ applies to the agency ID list.
 
 Manage Business Terms
 ---------------------
+Business term management functionality allows end users to create or import business terms
+from another data dictionary applications such as an enterprise data dictionary management
+and assign those business terms to data elements in the data exchange standard. It is not 
+intended to be a data dictionary management itself. This is the reason each business term 
+entity in Score has only a few fields mainly for representing the identity of the business term. 
+
 Currently, Score provides the business term functionality to end users only. 
-Developers won't see this functionality once login as developer 
-accounts. The end users can view, create, edit or discard business terms through the 
-View/Edit Business Term menu under the BIE menu. The only way to assign 
-business terms to BIEs is through the BIE detail page. At current version, 
-the end users can assign business terms to two BIE types: ASBIE and BBIE. 
+Developers won't see this functionality once login as developer. The end users can view, create,
+edit or discard business terms through the View/Edit Business Term menu under the BIE menu. The only way to assign 
+business terms to BIEs is through the BIE detail page. Note that in the current version, 
+business term assignment to the root BIE node is not supported. In addition, business
+terms are assigned/associated to two BIE types, ASBIE and BBIE, from the data standpoint, 
+to allow for the most precise contextual assignment. In other words, it means that the 
+business terms are applicable to the ASBIEP and ABIE underneath the ASBIE within the context
+of the ABIE owner for the ASBIE and applicable to the BBIEP underneath the BBIE within
+the context of the ABIE owner of the BBIE. Consequently, all business terms assigned to 
+the ASBIEs or BBIEs that reference the same ASCC and BCC can be inferred as business terms 
+of the ASCCP and ACC and the BCCP under the ASCC and BCC as well. 
 
 Create a Business Term
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -8838,7 +8846,8 @@ To create a business term:
    1. Business Term (Mandatory) the main name of the business term
    2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
    3. External Reference Id(Optional) 
-   4. Comment(Optional) This is free-form text field for document what the business term is, its purposes, etc. 
+   4. Comment(Optional) This is free-form text field for adding information about the business term in the context of the Score tool. An example comment may be
+      "This business term is not from the enterprise data dictionary."
    
 5. Click the "Create" button. 
 
@@ -8846,7 +8855,7 @@ Edit a Business Term
 ~~~~~~~~~~~~~~~~~~~~
 To edit a business term:
 
-1. Open the top menu fo the page, click "BIE".
+1. On the top menu of the page, click "BIE".
    
 2. Click "View/Edit Business Term" menu item.
    
@@ -8903,23 +8912,20 @@ The second method is:
 Assign business terms to BIEs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Current Score version supports the assignment of business terms to two BIE types: ASBIE and BBIE.
-
 To assign a business term to a BIE:
 
 1. On the top menu of the page, click "BIE".
    
 2. Choose "View/Edit BIE" from the drop-down list. 
    
-3. Locate the BIE you want to assign. Use the *DEN*, *Business Context*, *Branch*, *State*, *Owner*, *Updater*, 
+3. Locate the desired top-level BIE. Use the *DEN*, *Business Context*, *Branch*, *State*, *Owner*, *Updater*, 
    *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
    Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel. 
+4. Expand the tree structure until reaching the desired BIE node in the left navigation panel. 
    
-5. Select a child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
-   The detail for that child node is displayed in the right panel. Check the *Used* checkbox if it is unchecked and 
-   click "Update" button at the top-right of the page. The "Assign Business Term" button will be enabled. 
+5. Select the desired BIE node. The detail for that node is displayed in the right panel. Check the *Used* checkbox if 
+   it is unchecked and click "Update" button at the top-right of the page. The "Assign Business Term" button will be enabled. 
 
 6. Click "Assign Business Term" button. 
 
@@ -8930,12 +8936,12 @@ To assign a business term to a BIE:
 8. Select the desired business term. Fill out the Type Code (optional). Note that the same business term with different Type 
    Code can be assigned to the same BIE. 
    
-9. Check or Uncheck the Preferred Business Term checkbox. Note only one business term can be preferred for each selected BIE. 
+9.  Check or Uncheck the Preferred Business Term checkbox. Note only one business term can be preferred for each selected BIE. 
     
 10. Click "Create" button. 
 
-Business term assignments For selected BIE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+View Business Term Assignments of a BIE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To view all the business terms currently assigned to a BIE:
 
@@ -8943,14 +8949,14 @@ To view all the business terms currently assigned to a BIE:
    
 2. Choose "View/Edit BIE" from the drop-down list. 
    
-3. Locate the BIE you want to see the business term assignments. Use the *DEN*, *Business Context*, *Branch*, *State*,
+3. Locate the desired top-level BIE. Use the *DEN*, *Business Context*, *Branch*, *State*,
    *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
    (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
+4. Expand the tree structure until reaching the desired BIE node in the left navigation panel. 
 
-5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
-   The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
+5. Select the desired BIE node, and the detail for that BIE node is displayed in the right panel. Only the *Used* node has business term 
+   assignments. 
 
 6. Click "Show Business Terms" button in the right panel.
    
@@ -8958,8 +8964,8 @@ To view all the business terms currently assigned to a BIE:
    All the business terms assigned for the selected BIE are displayed in the table below the "Search" button. 
 
 
-Discard the assignment of a business term from a BIE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Discard a business term from a BIE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Discard the assignment of a business term from a BIE is to remove the association of the business term from the given BIE. 
 The prerequisite for permantently removing a business term from Score is to discard all the assignments for that business term
@@ -8971,14 +8977,14 @@ To discard the assignment of a business term from a BIE:
    
 2. Choose "View/Edit BIE" from the drop-down list. 
    
-3. Locate the BIE you want to see the business term assignments. Use the *DEN*, *Business Context*, *Branch*, *State*,
+3. Locate the desired top-level BIE. Use the *DEN*, *Business Context*, *Branch*, *State*,
    *Owner*, *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. 
    (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the BIE DEN to open its "Edit BIE" page. 
 
-4. Expand the root node on the BCC (for BBIE) or ASCC (for ASBIE) tree in the left navigation panel.  
+4. Expand the tree to find the desired BIE node in the left navigation panel. 
 
-5. Select a desired child property node (an ASCCP node in bolded blue font or a BCCP node in regular green font). 
-   The detail for that child node is displayed in the right panel. The *Used* checkbox must be checked. 
+5. Select the desired BIE node, and the detail for that node is displayed in the right panel. Only the *Used* node has business term 
+   assignments for removal. 
 
 6. Click "Show Business Terms" button in the right panel.
    
@@ -8993,7 +8999,7 @@ To discard the assignment of a business term from a BIE:
     
 10. Select the desired business term. The "Discard" button at the top right of the page will be enabled. Click "Discard",  and a 
     dialog is open where you can confirm or cancel the request. Only the assignment for this given BIE is permanently removed. 
-    The business term is still displayed in "View/Edit Business Term" page. 
+    The Business Term Assignment page of that BIE node is still displayed. More assignments can be discarded. 
 
 Load Business Terms from external source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9013,8 +9019,10 @@ To upload from an external file:
    A csv template file named "businessTermTemplateWithExample" will be saved into your "Download" folder on your local 
    computer. 
 
-5. Fill out all your business terms in the downloaded csv file. Make sure that the format for each column is correct for each 
-   business term. Note that *businessTerm* and *externalReferenceUri* columns are required. Save all your changes. 
+5. Use the template as the format to upload business terms to Score. Vocabulary exported from another application needs to be 
+   formatted into this template. Note that businessTerm and externalReferenceUri columns are required. The externalReferenceUri 
+   will be used as the key for the business term. If an externalReferenceUri entry already exists in Score, the information for that 
+   business term will be updated. If not, a new business term will be created in Score. 
 
 6. Go back to "Upload Business Term" page, click the attach button (paper clipper icon) and choose the modified csv file
    in the pop up choose-file window. Finally click "Open" button in the pop-up window. 
@@ -9023,7 +9031,7 @@ To upload from an external file:
    
 8. Go back to the top menu of the page, click "BIE". 
 
-9. Choose "View/Edit Business Term" from the drop-down list. 
+9.  Choose "View/Edit Business Term" from the drop-down list. 
     
 10. On the returned "Business Term" page, you can locate the uploaded business terms using the search filters: *Term*, 
     *External Reference URI*, *External Reference ID*, *Updater*, *Updated start date* or *Updated end date*. 
@@ -9149,10 +9157,18 @@ is accessible via the notification page.
 Multi-tenant management
 =======================
 
+Multi-tenant mode should be enabled at the first deployment of Score. And while it is possible to switch on or off
+the multi-tenant mode, it is not recommended to go back and forth between the two modes. 
+
+
 Multi-tenant mode
 -----------------
-Score multi-tenant feature enables OAGi to offer Score-based BIE-development services to 
-multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant)
+ *Multi-tenant Management functions are available only to Developer user with Admin right*. 
+
+Score multi-tenant feature enables standard development organizations like OAGi to offer Score-based BIE-development services to 
+multiple members on a single instance with visibility of BIEs managed by the member (i.e. tenant). The visibility is restricted by the 
+business context associated with the BIE and the tenant. In other words, if the BIE has a business context that is associated with 
+the tenant, then end users in that tenant can see the BIE. Users can also see BIEs whose business context don't belong to any tenant. 
 
 Enable multi-tenant mode
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9222,7 +9238,7 @@ Multi-tenant mode feature restrictions
 Features not available
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The following features are not available to users in multi-tenant mode:
+The following features are not available to users when Score is in the multi-tenant mode:
 
 * Manage modules
 * Manage core components
@@ -9239,8 +9255,9 @@ Features with restricted behavior
    * The BCs available to the user are limited by their tenancy. Users not associated with a tenant cannot create a BIE since they would not be able to assign a BC on BIE creation (all the BCs would all be filtered out). However, it would make sense to alert the user, perhaps on login, that they can’t do anything useful in Score until they have been assigned to a tenant.
    * Note that Admins have no special authorization in this case.
 
-* Manage context: Restricted to admin users.
+* Manage context: Restricted to admin developer users.
 * Transfer BIE ownership: Users to whom the BIE ownership may be transferred are limited to users associated with tenants associated with BCs associated with the BIE (other than the current owner — doesn’t make sense for an owner to transfer ownership to themself).
+* This is not restricted in the application, but the admin developer perhaps should not create any end user with admin right in the Score multi-tenant mode.
 
 
 .. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
@@ -9267,4 +9284,6 @@ Features with restricted behavior
 .. |image7| image:: media/image14.png
    :width: 0.19168in
    :height: 0.20835in
+
+
 
