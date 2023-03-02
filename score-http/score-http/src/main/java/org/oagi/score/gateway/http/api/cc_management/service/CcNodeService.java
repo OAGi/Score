@@ -261,23 +261,103 @@ public class CcNodeService extends EventHandler {
     }
 
     public CcAccNodeDetail getAccNodeDetail(AuthenticatedPrincipal user, CcAccNode accNode) {
-        return repository.getAccNodeDetail(user, accNode);
+        CcAccNodeDetail accNodeDetail = repository.getAccNodeDetail(user, accNode);
+        if (accNodeDetail == null) {
+            return accNodeDetail;
+        }
+
+        if (accNodeDetail.getReplacementAccManifestId() != null) {
+            CcAccNode replacementAccNode = new CcAccNode();
+            replacementAccNode.setManifestId(accNodeDetail.getReplacementAccManifestId());
+            accNodeDetail.setReplacement(repository.getAccNodeDetail(user, replacementAccNode));
+        }
+        return accNodeDetail;
     }
 
     public CcAsccpNodeDetail getAsccpNodeDetail(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
-        return repository.getAsccpNodeDetail(user, asccpNode);
+        CcAsccpNodeDetail asccpNodeDetail = repository.getAsccpNodeDetail(user, asccpNode);
+        if (asccpNodeDetail == null) {
+            return asccpNodeDetail;
+        }
+
+        if ((asccpNodeDetail.getAscc() != null && asccpNodeDetail.getAscc().getReplacementAsccManifestId() != null) ||
+            (asccpNodeDetail.getAsccp() != null && asccpNodeDetail.getAsccp().getReplacementAsccpManifestId() != null)) {
+
+            CcAsccpNode replacementAsccpNode = new CcAsccpNode();
+            if (asccpNodeDetail.getAscc() != null) {
+                replacementAsccpNode.setAsccManifestId(asccpNodeDetail.getAscc().getReplacementAsccManifestId());
+            }
+            if (asccpNodeDetail.getAsccp() != null) {
+                replacementAsccpNode.setManifestId(asccpNodeDetail.getAsccp().getReplacementAsccpManifestId());
+            }
+
+            CcAsccpNodeDetail replacement = repository.getAsccpNodeDetail(user, replacementAsccpNode);
+
+            if (asccpNodeDetail.getAscc() != null) {
+                asccpNodeDetail.getAscc().setReplacement(replacement.getAscc());
+            }
+            if (asccpNodeDetail.getAsccp() != null) {
+                asccpNodeDetail.getAsccp().setReplacement(replacement.getAsccp());
+            }
+        }
+        return asccpNodeDetail;
     }
 
     public CcBccpNodeDetail getBccpNodeDetail(AuthenticatedPrincipal user, CcBccpNode bccpNode) {
-        return repository.getBccpNodeDetail(user, bccpNode);
+        CcBccpNodeDetail bccpNodeDetail = repository.getBccpNodeDetail(user, bccpNode);
+        if (bccpNodeDetail == null) {
+            return bccpNodeDetail;
+        }
+
+        if ((bccpNodeDetail.getBcc() != null && bccpNodeDetail.getBcc().getReplacementBccManifestId() != null) ||
+            (bccpNodeDetail.getBccp() != null && bccpNodeDetail.getBccp().getReplacementBccpManifestId() != null)) {
+
+            CcBccpNode replacementBccpNode = new CcBccpNode();
+            if (bccpNodeDetail.getBcc() != null) {
+                replacementBccpNode.setBccManifestId(bccpNodeDetail.getBcc().getReplacementBccManifestId());
+            }
+            if (bccpNodeDetail.getBccp() != null) {
+                replacementBccpNode.setManifestId(bccpNodeDetail.getBccp().getReplacementBccpManifestId());
+            }
+
+            CcBccpNodeDetail replacement = repository.getBccpNodeDetail(user, replacementBccpNode);
+
+            if (bccpNodeDetail.getBcc() != null) {
+                bccpNodeDetail.getBcc().setReplacement(replacement.getBcc());
+            }
+            if (bccpNodeDetail.getBccp() != null) {
+                bccpNodeDetail.getBccp().setReplacement(replacement.getBccp());
+            }
+        }
+        return bccpNodeDetail;
     }
 
     public CcBdtNodeDetail getBdtNodeDetail(AuthenticatedPrincipal user, CcBdtNode bdtNode) {
-        return repository.getBdtNodeDetail(user, bdtNode);
+        CcBdtNodeDetail bdtNodeDetail = repository.getBdtNodeDetail(user, bdtNode);
+        if (bdtNodeDetail == null) {
+            return bdtNodeDetail;
+        }
+
+        if (bdtNodeDetail.getReplacementDtManifestId() != null) {
+            CcBdtNode replacementDtNode = new CcBdtNode();
+            replacementDtNode.setManifestId(bdtNodeDetail.getReplacementDtManifestId());
+            bdtNodeDetail.setReplacement(repository.getBdtNodeDetail(user, replacementDtNode));
+        }
+        return bdtNodeDetail;
     }
 
     public CcBdtScNodeDetail getBdtScNodeDetail(AuthenticatedPrincipal user, CcBdtScNode bdtScNode) {
-        return repository.getBdtScNodeDetail(user, bdtScNode);
+        CcBdtScNodeDetail bdtScNodeDetail = repository.getBdtScNodeDetail(user, bdtScNode);
+        if (bdtScNodeDetail == null) {
+            return bdtScNodeDetail;
+        }
+
+        if (bdtScNodeDetail.getReplacementDtScManifestId() != null) {
+            CcBdtScNode replacementDtScNode = new CcBdtScNode();
+            replacementDtScNode.setManifestId(bdtScNodeDetail.getReplacementDtScManifestId());
+            bdtScNodeDetail.setReplacement(repository.getBdtScNodeDetail(user, replacementDtScNode));
+        }
+        return bdtScNodeDetail;
     }
 
     public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpId) {
@@ -311,6 +391,7 @@ public class CcNodeService extends EventHandler {
 
         if (request.getAsccpType() != null) {
             repositoryRequest.setInitialType(CcASCCPType.valueOf(request.getAsccpType()));
+            repositoryRequest.setTag(repositoryRequest.getInitialType().name());
         }
 
         CreateAsccpRepositoryResponse repositoryResponse =
@@ -1065,7 +1146,7 @@ public class CcNodeService extends EventHandler {
                 BigInteger lastAsccId = getLastPublishedCcId(asccManifestRecord.getAsccId().toBigInteger(), CcType.ASCC);
                 if (lastAsccId != null) {
                     CcAsccNode ascc = new CcAsccNode();
-                    AsccRecord asccRecord = ccRepository.getAsccById(asccManifestRecord.getAsccId());
+                    AsccRecord asccRecord = ccRepository.getAsccById(ULong.valueOf(lastAsccId));
                     ascc.setAsccId(asccRecord.getAsccId().toBigInteger());
                     ascc.setCardinalityMin(BigInteger.valueOf(asccRecord.getCardinalityMin()));
                     ascc.setCardinalityMax(BigInteger.valueOf(asccRecord.getCardinalityMax()));
@@ -1079,7 +1160,7 @@ public class CcNodeService extends EventHandler {
                 BigInteger lastBccId = getLastPublishedCcId(bccManifestRecord.getBccId().toBigInteger(), CcType.BCC);
                 if (lastBccId != null) {
                     CcBccNode bcc = new CcBccNode();
-                    BccRecord bccRecord = ccRepository.getBccById(bccManifestRecord.getBccId());
+                    BccRecord bccRecord = ccRepository.getBccById(ULong.valueOf(lastBccId));
                     bcc.setBccId(bccRecord.getBccId().toBigInteger());
                     bcc.setCardinalityMin(BigInteger.valueOf(bccRecord.getCardinalityMin()));
                     bcc.setCardinalityMax(BigInteger.valueOf(bccRecord.getCardinalityMax()));
@@ -1381,6 +1462,7 @@ public class CcNodeService extends EventHandler {
                 CreateAsccpRepositoryRequest bodAsccpRequest = new CreateAsccpRepositoryRequest(user, bodAccManifestId, releaseId);
                 bodAsccpRequest.setInitialPropertyTerm(bodAccRequest.getInitialObjectClassTerm());
                 bodAsccpRequest.setNamespaceId(namespaceId);
+                bodAsccpRequest.setTag("BOD");
                 BigInteger bodAsccpManifestId = asccpWriteRepository.createAsccp(bodAsccpRequest).getAsccpManifestId();
                 bodManifestIdList.add(bodAsccpManifestId);
             }
@@ -1418,7 +1500,6 @@ public class CcNodeService extends EventHandler {
         }
         BigInteger namespaceId = verbRecord.getNamespaceId().toBigInteger();
 
-
         CreateAccRepositoryRequest verbAccRequest = new CreateAccRepositoryRequest(user, releaseId);
         verbAccRequest.setBasedAccManifestId(request.getBasedVerbAccManifestId());
         verbAccRequest.setInitialComponentType(OagisComponentType.Semantics);
@@ -1429,6 +1510,7 @@ public class CcNodeService extends EventHandler {
         CreateAsccpRepositoryRequest verbAsccpRequest = new CreateAsccpRepositoryRequest(user, verbAccManifestId, releaseId);
         verbAsccpRequest.setInitialPropertyTerm(request.getInitialPrpertyTerm());
         verbAsccpRequest.setNamespaceId(namespaceId);
+        verbAsccpRequest.setTag("Verb");
         BigInteger verbAsccpManifestId = asccpWriteRepository.createAsccp(verbAsccpRequest).getAsccpManifestId();
 
         return verbAsccpManifestId;

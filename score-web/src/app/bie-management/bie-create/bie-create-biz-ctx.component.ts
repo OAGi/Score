@@ -4,10 +4,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {
-  BusinessContext,
-  BusinessContextListRequest
-} from '../../context-management/business-context/domain/business-context';
+import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
@@ -45,7 +42,7 @@ export class BieCreateBizCtxComponent implements OnInit {
 
   constructor(private bizCtxService: BusinessContextService,
               private accountService: AccountListService,
-              private authServer: AuthService,
+              private authService: AuthService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -63,7 +60,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBusinessContextList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -78,9 +75,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.loadBusinessContextList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessContextList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -111,9 +106,9 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-      if (this.isTenantInstance()) {
-        this.request.filters.isBieEditing = true;
-      }
+    if (this.isTenantEnabled) {
+      this.request.filters.isBieEditing = true;
+    }
 
     this.bizCtxService.getBusinessContextList(this.request).pipe(
       finalize(() => {
@@ -169,9 +164,9 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {businessContextIdList: selectedBizCtxIds}});
   }
 
-  isTenantInstance() {
-    const userToken = this.authServer.getUserToken();
-    return userToken.isTenantInstance;
+  get isTenantEnabled(): boolean {
+    const userToken = this.authService.getUserToken();
+    return userToken.tenant.enabled;
   }
 
 }

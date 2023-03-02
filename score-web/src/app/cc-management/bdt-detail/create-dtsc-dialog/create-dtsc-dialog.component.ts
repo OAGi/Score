@@ -67,7 +67,7 @@ export class CreateDtscDialogComponent implements OnInit {
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.request.types = ['DT'];
-    this.request.dtTypes = ["Core"];
+    this.request.dtTypes = ['Core'];
     this.request.states = ['Published'];
     this.request.excludes = this.data.excludes ? this.data.excludes : [];
     this.request.states = [];
@@ -80,7 +80,7 @@ export class CreateDtscDialogComponent implements OnInit {
     this.sort.direction = 'desc';
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCcList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -88,36 +88,11 @@ export class CreateDtscDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.loadCcList(true);
   }
 
-  onPageChange(event: PageEvent) {
-    this.onChange();
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onChange() {
+  loadCcList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
@@ -145,6 +120,49 @@ export class CreateDtscDialogComponent implements OnInit {
       this.dataSource.data = list;
       this.loading = false;
     });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.loadCcList();
+  }
+
+  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = new Date(event.value);
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = new Date(event.value);
+        break;
+    }
+  }
+
+  reset(type: string) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = null;
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = null;
+        break;
+    }
+  }
+
+  onChange(property?: string, source?) {
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
+
+    if (property === 'fuzzySearch') {
+      if (this.request.fuzzySearch) {
+        this.sort.active = '';
+        this.sort.direction = '';
+      } else {
+        this.sort.active = 'lastUpdateTimestamp';
+        this.sort.direction = 'desc';
+      }
+    }
   }
 
   onNoClick(): void {

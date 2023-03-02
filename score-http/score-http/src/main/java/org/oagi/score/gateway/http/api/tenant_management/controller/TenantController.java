@@ -4,7 +4,7 @@ import org.oagi.score.gateway.http.api.tenant_management.data.Tenant;
 import org.oagi.score.gateway.http.api.tenant_management.data.TenantInfo;
 import org.oagi.score.gateway.http.api.tenant_management.data.TenantListRequest;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class TenantController {
     private TenantService tenantService;
 
     @Autowired
-    private ConfigurationService configService;
+    private ApplicationConfigurationService configService;
 
     @RequestMapping(value = "/tenants", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,7 +33,7 @@ public class TenantController {
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize) {
 
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
 
@@ -52,7 +52,7 @@ public class TenantController {
     @RequestMapping(value = "/tenants", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createTenant(@RequestBody String name) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (!name.isBlank()) {
@@ -66,7 +66,7 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteTenantInfo(@PathVariable("tenantId") BigInteger tenantId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
 
@@ -78,7 +78,7 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateTenantInfo(@PathVariable("tenantId") BigInteger tenantId,
                                            @RequestBody String name) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (!name.isBlank()) {
@@ -92,7 +92,7 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantInfo getTenantInfo(@PathVariable("tenantId") BigInteger tenantId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         return tenantService.getTenantById(tenantId);
@@ -102,7 +102,7 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity connectUserToTenant(@PathVariable("tenantId") BigInteger tenantId,
                                               @RequestBody BigInteger appUserId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (appUserId != null) {
@@ -116,7 +116,7 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity disconnectUserFromTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                    @RequestBody BigInteger appUserId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (appUserId != null) {
@@ -130,7 +130,7 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity connectBusinessCtxToTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                      @RequestBody BigInteger businessCtxId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (businessCtxId != null) {
@@ -144,7 +144,7 @@ public class TenantController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity disconnectBusinessCtxFromTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                           @RequestBody BigInteger businessCtxId) {
-        if (!configService.isTenantInstance()) {
+        if (!configService.isTenantEnabled()) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
         if (businessCtxId != null) {

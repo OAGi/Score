@@ -59,9 +59,7 @@ export class PendingListComponent implements OnInit {
     this.loadPendingList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadPendingList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

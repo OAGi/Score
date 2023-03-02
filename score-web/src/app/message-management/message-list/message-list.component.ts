@@ -61,7 +61,7 @@ export class MessageListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadMessageList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -76,9 +76,7 @@ export class MessageListComponent implements OnInit {
     this.loadMessageList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadMessageList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

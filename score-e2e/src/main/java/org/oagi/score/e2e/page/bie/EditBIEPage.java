@@ -204,6 +204,10 @@ public interface EditBIEPage extends Page {
      */
     ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
+    void getExtendBIELocallyOnNode(String path);
+
+    String getTypeDefinitionValue();
+
     /**
      * An interface of the panel for 'Top-Level ASBIEP' node.
      */
@@ -357,6 +361,8 @@ public interface EditBIEPage extends Page {
         WebElement getTypeDefinitionField();
 
     }
+
+    WebElement getTypeDefinitionField();
 
     ASBIEPanel getASBIEPanel(WebElement asccpNode);
 

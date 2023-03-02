@@ -72,7 +72,7 @@ public class BieODFSpreadsheetGenerationExpression implements BieGenerateExpress
 
     @Override
     public void reset() throws Exception {
-        rowRecords = null;
+        this.afterPropertiesSet();
     }
 
     @Override

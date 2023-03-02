@@ -10,7 +10,7 @@ public class AccessControlException extends ScoreDataAccessException {
     }
 
     public AccessControlException(ScoreUser requester) {
-        super(String.format("'%s' account does not have a permission to access.", requester.getUsername()));
+        super(String.format("'%s' account does not have a right permission to access the function.", requester.getUsername()));
     }
 
 }

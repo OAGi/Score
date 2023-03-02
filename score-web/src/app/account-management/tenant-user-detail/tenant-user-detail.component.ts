@@ -58,7 +58,7 @@ export class TenantUserDetailComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadAccounts();
     });
     this.loading = true;
 
@@ -73,6 +73,8 @@ export class TenantUserDetailComponent implements OnInit {
   }
 
   getTenantInfo(tenantId: number) {
+    this.loading = true;
+
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;
@@ -86,6 +88,8 @@ export class TenantUserDetailComponent implements OnInit {
   }
 
   loadAccounts(isInit?: boolean) {
+    this.loading = true;
+
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
@@ -110,12 +114,12 @@ export class TenantUserDetailComponent implements OnInit {
     this.loadAccounts();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
+  onChange(property?: string, source?) {
   }
 
   removeUser(userId: number) {
+    this.loading = true;
+
     this.service.deleteTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;
@@ -142,6 +146,8 @@ export class TenantUserDetailComponent implements OnInit {
   }
 
   addUser(userId: number) {
+    this.loading = true;
+
     this.service.addTenantUser(this.tenantId, userId).pipe(
       finalize(() => {
         this.loading = false;

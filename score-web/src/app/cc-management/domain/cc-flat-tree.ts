@@ -14,6 +14,7 @@ import {CcNodeService} from './core-component-node.service';
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 import {BehaviorSubject, empty, Observable} from 'rxjs';
 import {sha256} from '../../common/utility';
+import {ShortTag} from "../../tag-management/domain/tag";
 
 export interface CcFlatNode extends FlatNode {
   type: string;
@@ -27,6 +28,8 @@ export interface CcFlatNode extends FlatNode {
 
   cardinalityMin: number;
   cardinalityMax: number;
+
+  tagList: ShortTag[];
 
   isCycle: boolean;
   isChanged: boolean;
@@ -65,6 +68,8 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
 
   abstract get cardinalityMin(): number;
   abstract get cardinalityMax(): number;
+
+  abstract get tagList(): ShortTag[];
 
   get expanded(): boolean {
     return this._expanded || false;
@@ -278,6 +283,14 @@ export class AccFlatNode extends CcFlatNodeImpl {
   get cardinalityMax(): number {
     return undefined;
   }
+
+  set tagList(tagList: ShortTag[]) {
+    this.accNode.tagList = tagList;
+  }
+
+  get tagList(): ShortTag[] {
+    return this.accNode.tagList;
+  }
 }
 
 export class AsccpFlatNode extends CcFlatNodeImpl {
@@ -399,6 +412,14 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
 
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
+  }
+
+  set tagList(tagList: ShortTag[]) {
+    this.asccpNode.tagList = tagList;
+  }
+
+  get tagList(): ShortTag[] {
+    return this.asccpNode.tagList;
   }
 }
 
@@ -534,6 +555,14 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
   }
+
+  set tagList(tagList: ShortTag[]) {
+    this.bccpNode.tagList = tagList;
+  }
+
+  get tagList(): ShortTag[] {
+    return this.bccpNode.tagList;
+  }
 }
 
 export class DtFlatNode extends CcFlatNodeImpl {
@@ -612,6 +641,14 @@ export class DtFlatNode extends CcFlatNodeImpl {
 
   get cardinalityMax(): number {
     return undefined;
+  }
+
+  set tagList(tagList: ShortTag[]) {
+    this.dtNode.tagList = tagList;
+  }
+
+  get tagList(): ShortTag[] {
+    return this.dtNode.tagList;
   }
 }
 
@@ -720,6 +757,13 @@ export class DtScFlatNode extends CcFlatNodeImpl {
 
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
+  }
+
+  set tagList(tagList: ShortTag[]) {
+  }
+
+  get tagList(): ShortTag[] {
+    return [];
   }
 }
 

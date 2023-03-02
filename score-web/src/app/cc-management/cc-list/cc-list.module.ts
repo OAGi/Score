@@ -14,6 +14,8 @@ import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dia
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {TagService} from '../../tag-management/domain/tag.service';
 
 const routes: Routes = [
   {
@@ -31,7 +33,8 @@ const routes: Routes = [
     MaterialModule,
     CommonModule,
     TranslateModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    FontAwesomeModule
   ],
   declarations: [
     CcListComponent,
@@ -50,7 +53,8 @@ const routes: Routes = [
   ],
   providers: [
     CcListService,
-    CcNodeService
+    CcNodeService,
+    TagService
   ]
 })
 export class CcListModule {

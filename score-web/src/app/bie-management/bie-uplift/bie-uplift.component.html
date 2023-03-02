@@ -1,7 +1,6 @@
 <div class="context-section">
   <mat-card class="pt-4 pb-2">
     <mat-card-header>
-
       <mat-card-title-group>
         <mat-card-title>{{ "BIE_UPLIFT.TITLE" | translate }}</mat-card-title>
         <mat-card-subtitle>Verification</mat-card-subtitle>
@@ -143,10 +142,10 @@
                       {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                     </span>
 
-                    <mat-icon matTooltip="Reused"
-                              fontSet="fontawesome"
-                              fontIcon="fa-recycle"
-                              class="pointer" *ngIf="node.derived"></mat-icon>
+                    <fa-icon [icon]="faRecycle"
+                             matTooltip="Reused"
+                             [class]="['pl-3', 'pointer']" class="pointer"
+                             *ngIf="node.derived"></fa-icon>
                     <mat-icon class="align-self-center ml-auto"
                               *ngIf="sourceDataSource.isExpandable(node)"
                               [matMenuTriggerFor]="contextMenu"
@@ -275,14 +274,16 @@
                       {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                     </span>
 
-                    <mat-icon matTooltip="Select BIE"
-                              (click)="matchReused(node)"
-                              class="pointer" *ngIf="node.source && node.source.derived && !node.reusedTopLevelAsbiepId">priority_high</mat-icon>
-                    <mat-icon matTooltip="Reused"
-                              fontSet="fontawesome"
-                              fontIcon="fa-recycle"
-                              (click)="matchReused(node)"
-                              class="pointer" *ngIf="node.reusedTopLevelAsbiepId"></mat-icon>
+                    <fa-icon [icon]="faCircleExclamation"
+                             matTooltip="Select BIE"
+                             (click)="matchReused(node)"
+                             [class]="['pl-3', 'pointer', 'warn']" class="pointer"
+                             *ngIf="node.source && node.source.derived && !node.reusedTopLevelAsbiepId"></fa-icon>
+                    <fa-icon [icon]="faRecycle"
+                             matTooltip="Reused"
+                             (click)="matchReused(node)"
+                             [class]="['pl-3', 'pointer']" class="pointer"
+                             *ngIf="node.reusedTopLevelAsbiepId"></fa-icon>
                     <mat-icon class="align-self-center ml-auto"
                               *ngIf="targetDataSource.isExpandable(node)"
                               [matMenuTriggerFor]="contextMenu"

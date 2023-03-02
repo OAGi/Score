@@ -22,19 +22,25 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.loginId" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.loginId"
+                       (ngModelChange)="onChange('filters.loginId', request.filters.loginId)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
                        placeholder="Login ID">
               </mat-form-field>
             </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.name" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.name"
+                       (ngModelChange)="onChange('filters.name', request.filters.name)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
                        placeholder="Name">
               </mat-form-field>
             </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.organization" (keyup.enter)="onChange()"
+                <input matInput [(ngModel)]="request.filters.organization"
+                       (ngModelChange)="onChange('filters.organization', request.filters.organization)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
                        placeholder="Organization">
               </mat-form-field>
             </div>
@@ -55,7 +61,8 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadAccounts();">
           <mat-icon>search</mat-icon>
           Search
         </button>
@@ -67,7 +74,8 @@
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
       <div class="mat-elevation-z1">
-        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+        <table mat-table
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <ng-container matColumnDef="loginId">

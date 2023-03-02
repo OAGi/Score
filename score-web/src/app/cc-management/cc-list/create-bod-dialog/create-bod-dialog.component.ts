@@ -74,9 +74,9 @@ export class CreateBodDialogComponent implements OnInit {
     this.nounRequest.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.verbRequest.types = ['ASCCP'];
-    this.verbRequest.asccpTypes = ['Verb'];
+    this.verbRequest.tags = ['Verb'];
     this.nounRequest.types = ['ASCCP'];
-    this.nounRequest.asccpTypes = ['Default'];
+    this.nounRequest.tags = ['Noun'];
 
     this.verbPaginator.pageIndex = 0;
     this.verbPaginator.pageSize = 10;
@@ -86,18 +86,18 @@ export class CreateBodDialogComponent implements OnInit {
     this.nounPaginator.pageSize = 10;
     this.nounPaginator.length = 0;
 
-    this.verbSort.active = 'lastUpdateTimestamp';
-    this.verbSort.direction = 'desc';
+    this.verbSort.active = '';
+    this.verbSort.direction = '';
     this.verbSort.sortChange.subscribe(() => {
       this.verbPaginator.pageIndex = 0;
-      this.onChange('verb');
+      this.loadCcList('verb');
     });
 
     this.nounSort.active = 'lastUpdateTimestamp';
     this.nounSort.direction = 'desc';
     this.nounSort.sortChange.subscribe(() => {
       this.nounPaginator.pageIndex = 0;
-      this.onChange('noun');
+      this.loadCcList('noun');
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -106,37 +106,11 @@ export class CreateBodDialogComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
 
-    this.onChange('verb');
-    this.onChange('noun');
+    this.loadCcList('verb');
+    this.loadCcList('noun');
   }
 
-  onPageChange(event: PageEvent, type: string) {
-    this.onChange(type);
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.nounRequest.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.nounRequest.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.nounRequest.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.nounRequest.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onChange(type: string) {
+  loadCcList(type: string) {
     this.loading = true;
 
     if (!type || 'verb' === type) {
@@ -215,6 +189,66 @@ export class CreateBodDialogComponent implements OnInit {
         }
         this.loading = false;
       });
+    }
+  }
+
+  onPageChange(event: PageEvent, type: string) {
+    this.loadCcList(type);
+  }
+
+  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    switch (type) {
+      case 'startDate':
+        this.nounRequest.updatedDate.start = new Date(event.value);
+        break;
+      case 'endDate':
+        this.nounRequest.updatedDate.end = new Date(event.value);
+        break;
+    }
+  }
+
+  reset(type: string) {
+    switch (type) {
+      case 'startDate':
+        this.nounRequest.updatedDate.start = null;
+        break;
+      case 'endDate':
+        this.nounRequest.updatedDate.end = null;
+        break;
+    }
+  }
+
+  onChange(type: string, property?: string, source?) {
+    if (type === 'verb') {
+      if (property === 'filters.den') {
+        this.verbSort.active = '';
+        this.verbSort.direction = '';
+      }
+
+      if (property === 'fuzzySearch') {
+        if (this.verbRequest.fuzzySearch) {
+          this.verbSort.active = '';
+          this.verbSort.direction = '';
+        } else {
+          this.verbSort.active = 'lastUpdateTimestamp';
+          this.verbSort.direction = 'desc';
+        }
+      }
+    } else if (type === 'noun') {
+      if (property === 'filters.den') {
+        this.nounSort.active = '';
+        this.nounSort.direction = '';
+      }
+
+      if (property === 'fuzzySearch') {
+        if (this.nounRequest.fuzzySearch) {
+          this.nounSort.active = '';
+          this.nounSort.direction = '';
+        } else {
+          this.nounSort.active = 'lastUpdateTimestamp';
+          this.nounSort.direction = 'desc';
+        }
+      }
     }
   }
 

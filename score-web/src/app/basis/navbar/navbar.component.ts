@@ -5,11 +5,10 @@ import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
 import {base64Encode} from '../../common/utility';
 import {MessageService} from '../../message-management/domain/message.service';
-import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {RxStompService} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {Router} from '@angular/router';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
 
 @Component({
   selector: 'score-navbar',
@@ -20,8 +19,6 @@ export class NavbarComponent implements OnInit {
 
   private _notiCount: number = -1;
   public notiMatIcon: string = 'notifications_none';
-  public isTenant: boolean = false;
-  public hasTenantRole: boolean = false;
 
   constructor(private auth: AuthService,
               private router: Router,
@@ -36,14 +33,27 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  get isTenantEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.tenant.enabled;
+  }
+
+  get hasTenantRole(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.tenant.roles !== undefined && userToken.tenant.roles.length > 0;
+  }
+
+  get isBusinessTermEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.businessTerm.enabled;
+  }
+
   ngOnInit() {
     this.reloadNotiCount();
 
     // subscribe an event
     const userToken = this.auth.getUserToken();
     if (userToken) {
-      this.isTenant = userToken.isTenantInstance;
-      this.hasTenantRole = userToken.tenantRoles !== undefined && userToken.tenantRoles.length > 0;
       this.stompService.watch('/topic/message/' + userToken.username).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (!!data.messageId) {
@@ -91,7 +101,7 @@ export class NavbarComponent implements OnInit {
   }
 
   showContextButton() {
-    if (this.isTenant) {
+    if (this.isTenantEnabled) {
       return this.auth.isAdmin();
     }
     return true;
@@ -128,9 +138,9 @@ export class NavbarComponent implements OnInit {
   }
 
   showTermsAndCodeListButton() {
-    if (this.isTenant) {
+    if (this.isTenantEnabled) {
       return !this.auth.isAdmin();
     }
-    return false; 
+    return false;
   }
 }

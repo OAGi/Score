@@ -30,6 +30,8 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private String propertyTerm;
     private String representationTerm;
     private Boolean deprecated;
+    private BigInteger replacementDtScManifestId;
+    private CcBdtScNodeDetail replacement;
 
     private CcState state;
     private String owner;

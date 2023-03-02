@@ -70,7 +70,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadModuleSetReleaseList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -113,9 +113,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
     }
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadModuleSetReleaseList();
+  onChange(property?: string, source?) {
   }
 
   onPageChange(event: PageEvent) {

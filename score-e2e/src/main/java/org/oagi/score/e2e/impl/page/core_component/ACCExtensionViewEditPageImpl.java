@@ -216,6 +216,12 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
+    public void setDefinition(String definition) {
+        clear(getDefinitionField());
+        sendKeys(getDefinitionField(), definition);
+    }
+
+    @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
     }

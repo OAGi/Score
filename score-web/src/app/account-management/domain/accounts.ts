@@ -46,7 +46,7 @@ export class AccountListRequest {
       organization: params.get('organization') || '',
       status: (params.get('status')) ? Array.from(params.get('status').split(',')) : [],
       roles: (params.get('roles')) ? Array.from(params.get('roles').split(',')) : [],
-      excludeSSO: false, 
+      excludeSSO: false,
       tenantId: Number(params.get('tenantId')) || null,
       notConnectedToTenant: false,
       businessCtxIds: (params.get('businessCtxIds')) ? Array.from(params.get('businessCtxIds').split(',')) : [],

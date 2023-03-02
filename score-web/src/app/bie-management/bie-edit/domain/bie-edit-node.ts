@@ -25,6 +25,7 @@ export class BieEditNode {
   locked: boolean;
   derived: boolean;
   topLevelAsbiepState: string;
+  inverseMode: boolean;
   private $hashCode: number;
   private _version: string;
   private _status: string;
@@ -43,6 +44,7 @@ export class BieEditNode {
     this.required = obj && obj.required || false;
     this.locked = obj && obj.locked || false;
     this.topLevelAsbiepState = obj && obj.topLevelAsbiepState || '';
+    this.inverseMode = obj && obj.inverseMode || false;
     this.releaseNum = obj && obj.releaseNum || '';
     this.loginId = obj && obj.loginId || '';
     this.version = obj && obj.version || '';
@@ -234,6 +236,15 @@ export class BieDetailUpdateRequest {
     this.bbieScDetails = [];
   }
 
+  get length(): number {
+    return this.abieDetails.length +
+      this.asbieDetails.length +
+      this.asbiepDetails.length +
+      this.bbieDetails.length +
+      this.bbiepDetails.length +
+      this.bbieScDetails.length;
+  }
+
   get json(): any {
     return {
       topLevelAsbiepDetail: this.topLevelAsbiepDetail ? {
@@ -289,4 +300,5 @@ export class RefBie {
   hashPath: string;
   topLevelAsbiepId: number;
   refTopLevelAsbiepId: number;
+  refInverseMode: boolean;
 }

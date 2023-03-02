@@ -58,7 +58,7 @@ export class ContextCategoryListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadContextCategoryList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -66,16 +66,14 @@ export class ContextCategoryListComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
 
-    this.onChange();
-  }
-
-  onPageChange(event: PageEvent) {
     this.loadContextCategoryList(true);
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
+  onPageChange(event: PageEvent) {
     this.loadContextCategoryList();
+  }
+
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

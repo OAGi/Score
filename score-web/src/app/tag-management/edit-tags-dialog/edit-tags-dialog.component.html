@@ -1,0 +1,117 @@
+<div class="row action-group m-0">
+  <div class="col-3 title-wrap p-0">
+    <span class="title">Edit Tags</span>
+  </div>
+</div>
+
+<mat-dialog-content class="pt-2 pb-2 mat-card-container">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card *ngFor="let tag of tagList">
+    <mat-card-content>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-2">
+            <mat-label class="font-weight-bold">Tag preview</mat-label>
+            <span class="tag ml-2"
+                  [style.background-color]="tag.backgroundColor"
+                  [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Name" [(ngModel)]="tag.name" maxlength="100"/>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Text Color" [(ngModel)]="tag.textColor" maxlength="10"/>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Background Color" [(ngModel)]="tag.backgroundColor"
+                     maxlength="10"/>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field>
+              <input matInput placeholder="Description (Optional)" [(ngModel)]="tag.description"/>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button mat-raised-button color="primary" (click)="update(tag)"
+                    [disabled]="!tag.name || !tag.textColor || !tag.backgroundColor">
+              Update
+            </button>
+            <button mat-raised-button class="ml-2" color="warn" (click)="discard(tag)">
+              Discard
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-2">
+            <mat-label class="font-weight-bold">Tag preview</mat-label>
+            <span class="tag ml-2"
+                  [style.background-color]="newTag.backgroundColor"
+                  [style.color]="newTag.textColor">{{ newTag.name }}</span>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Name" [(ngModel)]="newTag.name" maxlength="100"/>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Text Color" [(ngModel)]="newTag.textColor" maxlength="10"/>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <input matInput required placeholder="Background Color" [(ngModel)]="newTag.backgroundColor"
+                     maxlength="10"/>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field>
+              <input matInput placeholder="Description (Optional)" [(ngModel)]="newTag.description"/>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button mat-raised-button color="primary" (click)="add(newTag)"
+                    [disabled]="!newTag.name || !newTag.textColor || !newTag.backgroundColor">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</mat-dialog-content>
+
+<div class="row action-group m-0">
+  <div class="col-12 actions-wrap p-0">
+    <div class="actions">
+      <button mat-raised-button color="warn" (click)="onNoClick()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

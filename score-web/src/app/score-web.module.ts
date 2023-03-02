@@ -1,17 +1,18 @@
 import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {MatIconRegistry} from '@angular/material/icon';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MarkdownModule, MarkedOptions} from 'ngx-markdown';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {RxStompService, rxStompServiceFactory} from './common/score-rx-stomp';
 
-import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
 import {AgencyIdListModule} from './agency-id-list-management/agency-id-list.module';
-import {scoreRxStompConfig} from './common/score-rx-stomp-config';
-
 import {AuthService, ErrorAlertInterceptor, XhrInterceptor} from './authentication/auth.service';
 import {LogManagementModule} from './log-management/log-management.module';
 
@@ -27,10 +28,10 @@ import {NamespaceManagementModule} from './namespace-management/namespace-manage
 import {ReleaseManagementModule} from './release-management/release-management.module';
 import {ModuleManagementModule} from './module-management/module-management.module';
 import {MessageManagementModule} from './message-management/message-management.module';
+import {BusinessTermManagementModule} from './business-term-management/business-term-management.module';
 
-import {RouterModule} from '@angular/router';
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
-import {MatIconRegistry} from '@angular/material/icon';
+import {SettingsManagementModule} from './settings-management/settings-management.module';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -73,6 +74,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
     BasisModule,
     AccountManagementModule,
+    SettingsManagementModule,
     BieManagementModule,
     ContextManagementModule,
     CcManagementModule,
@@ -82,7 +84,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     NamespaceManagementModule,
     ReleaseManagementModule,
     ModuleManagementModule,
-    MessageManagementModule
+    MessageManagementModule,
+    BusinessTermManagementModule,
+    FontAwesomeModule
   ],
   declarations: [
     ScoreWebComponent
@@ -92,14 +96,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     AuthService,
     httpInterceptorsProviders,
     {
-      provide: InjectableRxStompConfig,
-      useValue: scoreRxStompConfig
-    },
-    {
       provide: RxStompService,
-      useFactory: rxStompServiceFactory,
-      deps: [InjectableRxStompConfig]
-    },
+      useFactory: rxStompServiceFactory
+    }
   ],
   bootstrap: [
     ScoreWebComponent

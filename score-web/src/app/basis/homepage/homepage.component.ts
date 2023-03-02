@@ -63,9 +63,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   releaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   selectedRelease: SimpleRelease;
 
-  isDeveloper: boolean;
-  isTenantInstance: boolean;
-
   myRecentBIEs = new MatTableDataSource<BieList>();
   @ViewChild('myRecentBIEsSort', {static: false})
   myRecentBIEsSort: MatSort;
@@ -104,9 +101,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const userToken = this.authService.getUserToken();
-    this.isDeveloper = userToken.roles.includes('developer');
-    this.isTenantInstance = userToken.isTenantInstance;
-
     this.releaseService.getSimpleReleases().subscribe(resp => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
       this.releaseListFilterCtrl.valueChanges
@@ -133,6 +127,16 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.initSummaryBIEs(userToken);
       this.initSummaryUserExtensions(userToken);
     });
+  }
+
+  get isDeveloper(): boolean {
+    const userToken = this.authService.getUserToken();
+    return userToken.roles.includes('developer');
+  }
+
+  get isTenantEnabled(): boolean {
+    const userToken = this.authService.getUserToken();
+    return userToken.tenant.enabled;
   }
 
   onChangeRelease() {

@@ -59,10 +59,10 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     public final TableField<UserTenantRecord, ULong> USER_TENANT_ID = createField(DSL.name("user_tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.user_tenant.tenant_id</code>. Assigned tenat to the
-     * user.
+     * The column <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
+     * the user.
      */
-    public final TableField<UserTenantRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Assigned tenat to the user.");
+    public final TableField<UserTenantRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Assigned tenant to the user.");
 
     /**
      * The column <code>oagi.user_tenant.app_user_id</code>. Application user.
