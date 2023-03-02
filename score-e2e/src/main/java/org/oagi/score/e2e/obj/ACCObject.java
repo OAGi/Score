@@ -56,7 +56,7 @@ public class ACCObject {
         String randomObjectClassTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
         randomObjectClassTerm = Character.toUpperCase(randomObjectClassTerm.charAt(0)) + randomObjectClassTerm.substring(1).toLowerCase();
         acc.setObjectClassTerm("Test Object " + randomObjectClassTerm);
-        acc.setComponentType(ComponentType.SEMANTICS);
+        acc.setComponentType(ComponentType.Semantics);
         acc.setDen(acc.getObjectClassTerm() + ". Details");
         acc.setDefinition(randomPrint(50, 100).trim());
         acc.setDefinitionSource(randomPrint(50, 100).trim());

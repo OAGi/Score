@@ -286,16 +286,12 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setReleaseId(release.getReleaseId());
         AccRecord accRecord = new AccRecord();
         accRecord.setGuid(acc.getGuid());
-        if (type == EXTENSION) {
+        accRecord.setOagisComponentType(type.getValue());
+        if (type == Extension) {
             accRecord.setType("Extension");
-            accRecord.setOagisComponentType(2);
             basedAcc = getACCByDENAndReleaseNum("All Extension. Details", release.getReleaseNumber());
-        } if (type == SEMANTIC_GROUP) {
-            accRecord.setType("SEMANTIC_GROUP");
-            accRecord.setOagisComponentType(3);
-        }else {
+        } else {
             accRecord.setType("Default");
-            accRecord.setOagisComponentType(1);
         }
         accRecord.setObjectClassTerm(acc.getObjectClassTerm());
         accRecord.setDen(acc.getDen());
@@ -356,13 +352,13 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     @Override
     public ACCObject createRandomACC(AppUserObject creator, ReleaseObject release,
                                      NamespaceObject namespace, String state) {
-        return createRandomACC(creator, release, namespace, state, SEMANTICS, null);
+        return createRandomACC(creator, release, namespace, state, Semantics, null);
     }
 
     @Override
     public ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,
-                                     NamespaceObject namespace, String state) {
-        return createRandomACC(creator, release, namespace, state, SEMANTIC_GROUP, null);
+                                                      NamespaceObject namespace, String state) {
+        return createRandomACC(creator, release, namespace, state, SemanticGroup, null);
     }
 
     @Override
@@ -417,7 +413,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         AsccpRecord asccpRecord = new AsccpRecord();
         asccpRecord.setRoleOfAccId(ULong.valueOf(roleOfAcc.getAccId()));
         asccpRecord.setGuid(asccp.getGuid());
-        if (roleOfAcc.getComponentType() == EXTENSION) {
+        if (roleOfAcc.getComponentType() == Extension) {
             asccpRecord.setType("Extension");
             asccp.setPropertyTerm("Extension");
             asccp.setDen(asccp.getPropertyTerm() + ". " + roleOfAcc.getObjectClassTerm());
@@ -543,6 +539,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setGuid(prevAcc.getGuid());
         acc.setObjectClassTerm(prevAcc.getObjectClassTerm());
         acc.setDen(prevAcc.getDen());
+        acc.setComponentType(prevAcc.getComponentType());
         acc.setDefinition(prevAcc.getDefinition());
         acc.setDefinitionSource(prevAcc.getDefinitionSource());
         acc.setNamespaceId(prevAcc.getNamespaceId());
@@ -562,7 +559,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         accRecord.setDen(acc.getDen());
         accRecord.setDefinition(acc.getDefinition());
         accRecord.setDefinitionSource(acc.getDefinitionSource());
-        accRecord.setOagisComponentType(1);
+        accRecord.setOagisComponentType(acc.getComponentType().getValue());
         accRecord.setNamespaceId(ULong.valueOf(acc.getNamespaceId()));
         accRecord.setIsAbstract((byte) (acc.isAbstract() ? 1 : 0));
         accRecord.setIsDeprecated((byte) (acc.isDeprecated() ? 1 : 0));
@@ -908,7 +905,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         ReleaseObject release = apiFactory.getReleaseAPI().getReleaseById(fromAcc.getReleaseId());
 
         ACCObject extensionAcc = createRandomACC(creator, release, namespace, state,
-                EXTENSION, fromAcc.getObjectClassTerm() + " Extension");
+                Extension, fromAcc.getObjectClassTerm() + " Extension");
         ASCCPObject extensionAsccp = createRandomASCCP(extensionAcc, creator, namespace, state);
         return appendASCC(fromAcc, extensionAsccp, state);
     }
