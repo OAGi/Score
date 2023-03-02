@@ -1120,7 +1120,22 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_15")
     public void test_TA_15(){
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setDefinition("Notice Document");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Show Receive Delivery. Show Receive Delivery", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.setDefinition("\"Notice Document\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Show Receive Delivery. Show Receive Delivery", "oagis").isDisplayed());
     }
 
     @Test

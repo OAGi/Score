@@ -123,6 +123,16 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Definition\")]"));
+    }
+
+    @Override
+    public void setDefinition(String definition) {
+        sendKeys(getDENField(), definition);
+    }
+
+    @Override
     public WebElement getModuleField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Module\")]"));
     }

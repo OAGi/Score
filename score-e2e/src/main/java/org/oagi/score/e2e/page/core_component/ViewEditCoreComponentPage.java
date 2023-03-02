@@ -88,6 +88,20 @@ public interface ViewEditCoreComponentPage extends Page {
     void setDEN(String den);
 
     /**
+     * Return the UI element of the 'Definition' field.
+     *
+     * @return the UI element of the 'Definition' field
+     */
+    WebElement getDefinitionField();
+
+    /**
+     * Set the 'Definition' field with given text.
+     *
+     * @param definition Definition text
+     */
+    void setDefinition(String definition);
+
+    /**
      * Return the UI element of the 'Module' field.
      *
      * @return the UI element of the 'Module' field
