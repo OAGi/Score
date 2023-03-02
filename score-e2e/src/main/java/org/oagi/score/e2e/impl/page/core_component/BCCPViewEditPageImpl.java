@@ -64,15 +64,16 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
             By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
+    public static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
-
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
-
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
 
@@ -815,8 +816,28 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
+    public WebElement getReviseButton() {
+        return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitReviseButton() {
+        click(getReviseButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getAmendButton() {
+        return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+    }
+
+    @Override
     public void hitAmendButton() {
-        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
+        click(getAmendButton());
         click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 }

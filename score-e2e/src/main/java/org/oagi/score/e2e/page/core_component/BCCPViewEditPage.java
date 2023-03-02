@@ -827,5 +827,28 @@ public interface BCCPViewEditPage extends Page {
 
     }
 
+    /**
+     * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.
+     *
+     * @return the UI element of the 'Revise' button
+     */
+    WebElement getReviseButton();
+
+    /**
+     * Hit the 'Revise' button.
+     */
+    void hitReviseButton();
+
+    /**
+     * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
+     *
+     * @return the UI element of the 'Amend' button
+     */
+    WebElement getAmendButton();
+
+    /**
+     * Hit the 'Amend' button.
+     */
     void hitAmendButton();
+
 }
