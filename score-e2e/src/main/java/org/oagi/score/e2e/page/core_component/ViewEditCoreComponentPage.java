@@ -123,6 +123,13 @@ public interface ViewEditCoreComponentPage extends Page {
     void setModule(String module);
 
     /**
+     * Return the UI element of the 'Component Type' select field.
+     *
+     * @return the UI element of the 'Component Type' select field
+     */
+    WebElement getComponentTypeSelectField();
+
+    /**
      * Return the UI element of the 'Search' button.
      *
      * @return the UI element of the 'Search' button

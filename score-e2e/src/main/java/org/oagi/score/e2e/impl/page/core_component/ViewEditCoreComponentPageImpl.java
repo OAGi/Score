@@ -30,6 +30,9 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
+    private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(),\"Component Type\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
 
@@ -145,6 +148,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void setModule(String module) {
         sendKeys(getModuleField(), module);
+    }
+
+    @Override
+    public WebElement getComponentTypeSelectField(){
+        return visibilityOfElementLocated(getDriver(), COMPONENT_TYPE_SELECT_FIELD_LOCATOR);
     }
 
     @Override

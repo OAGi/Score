@@ -1157,10 +1157,88 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-chip[.=\"BCC\"]")).size());
     }
-
     @Test
     @DisplayName("TC_10_1_TA_17")
     public void test_TA_17(){
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        List<WebElement> baseOption = options.stream().filter(e -> "Base (Abstract)".equals(getText(e))).collect(Collectors.toList());
+        baseOption.get(0).click();
+        viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Identification. Details", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options2 = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList( "Base (Abstract)", "Semantics")){
+            List<WebElement> result = options2.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Identification. Details", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options3 = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList( "Extension", "Semantics")){
+            List<WebElement> result = options3.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Extension. Details", "oagis").isDisplayed());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options4 = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList( "Extension", "Semantics")){
+            List<WebElement> result = options4.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        viewEditCoreComponentPage.setDEN("\"Transaction\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Inventory Transaction Group. Details", "oagis").isDisplayed());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Payment Transaction Extension. Details", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options5 = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList( "OAGIS10 Nouns", "Semantic Group")){
+            List<WebElement> result = options5.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        viewEditCoreComponentPage.setDEN("\"Transaction\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Payment Transaction Extension. Details", "oagis").isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        List<WebElement> options6 = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList( "OAGIS10 Nouns", "OAGIS10 BODs")){
+            List<WebElement> result = options6.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        viewEditCoreComponentPage.setDEN("\"Transaction\"");
+        click(viewEditCoreComponentPage.getSearchButton());
+        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Payment Transaction Extension. Details", "oagis").isDisplayed());
 
     }
 
