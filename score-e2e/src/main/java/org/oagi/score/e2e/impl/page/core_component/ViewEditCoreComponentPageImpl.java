@@ -14,6 +14,8 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -27,6 +29,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+
+    private static final By UPDATED_START_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+
+    private static final By UPDATED_END_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -75,6 +83,28 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public WebElement getStateSelectField(){
         return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getUpdatedStartDateField() {
+        return visibilityOfElementLocated(getDriver(), UPDATED_START_DATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setUpdatedStartDate(LocalDateTime updatedStartDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedStartDateField(), formatter.format(updatedStartDate));
+    }
+
+    @Override
+    public WebElement getUpdatedEndDateField() {
+        return visibilityOfElementLocated(getDriver(), UPDATED_END_DATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setUpdatedEndDate(LocalDateTime updatedEndDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
     }
 
     @Override

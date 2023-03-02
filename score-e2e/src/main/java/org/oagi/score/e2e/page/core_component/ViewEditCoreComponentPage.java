@@ -3,6 +3,8 @@ package org.oagi.score.e2e.page.core_component;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
+import java.time.LocalDateTime;
+
 /**
  * An interface of 'View/Edit Core Component' page.
  */
@@ -35,6 +37,34 @@ public interface ViewEditCoreComponentPage extends Page {
      * @return the UI element of the 'State' select field
      */
     WebElement getStateSelectField();
+
+    /**
+     * Return the UI element of the 'Updated Start Date' field.
+     *
+     * @return the UI element of the 'Updated Start Date' field
+     */
+    WebElement getUpdatedStartDateField();
+
+    /**
+     * Set the 'Updated Start Date' field with the given date.
+     *
+     * @param updatedStartDate Updated Start Date
+     */
+    void setUpdatedStartDate(LocalDateTime updatedStartDate);
+
+    /**
+     * Return the UI element of the 'Updated End Date' field.
+     *
+     * @return the UI element of the 'Updated End Date' field
+     */
+    WebElement getUpdatedEndDateField();
+
+    /**
+     * Set the 'Updated End Date' field with the given date.
+     *
+     * @param updatedEndDate Updated End Date
+     */
+    void setUpdatedEndDate(LocalDateTime updatedEndDate);
 
     /**
      * Return the UI element of the 'DEN' field.

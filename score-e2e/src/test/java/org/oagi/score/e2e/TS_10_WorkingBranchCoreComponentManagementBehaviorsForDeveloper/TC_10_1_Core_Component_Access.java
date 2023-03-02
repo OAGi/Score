@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1033,13 +1035,71 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         }
 
     }
-
     @Test
     @DisplayName("TC_10_1_TA_13")
     public void test_TA_13(){
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            /**
+             * developer can filter Core Components based on their Updated Date.
+             */
+            LocalDateTime creationTime = LocalDateTime.of(
+                    2018,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+            LocalDateTime updateTime = LocalDateTime.of(
+                    2019,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+            acc.setCreationTimestamp(creationTime);
+            acc.setLastUpdateTimestamp(updateTime);
+            asccp.setCreationTimestamp(creationTime);
+            asccp.setLastUpdateTimestamp(updateTime);
+            bccp.setCreationTimestamp(creationTime);
+            bccp.setLastUpdateTimestamp(updateTime);
+
+            // search by Updated date
+            viewEditCoreComponentPage.openPage();
+            viewEditCoreComponentPage.setUpdatedStartDate(creationTime);
+            viewEditCoreComponentPage.setUpdatedEndDate(updateTime);
+            click(viewEditCoreComponentPage.getSearchButton());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
+            assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
+
+        }
     }
     @Test
     @DisplayName("TC_10_1_TA_14")
