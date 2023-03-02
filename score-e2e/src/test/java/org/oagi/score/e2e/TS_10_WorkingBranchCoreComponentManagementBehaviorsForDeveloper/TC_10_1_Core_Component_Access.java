@@ -1137,7 +1137,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
         assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Show Receive Delivery. Show Receive Delivery", "oagis").isDisplayed());
     }
-
     @Test
     @DisplayName("TC_10_1_TA_16")
     public void test_TA_16(){
