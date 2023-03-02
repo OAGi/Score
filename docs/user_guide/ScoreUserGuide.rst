@@ -8568,11 +8568,7 @@ To generate a BIE expression:
 
 8. *Select the Expression*. Choose the desired syntax to express the
    BIE.  
-   
-.. image:: media/expressionFormat_Options.JPG
-   :width: 5.95885in
-   :height: 3.21695in   
-    
+     
     -  *XML Schema*: This expression option generates the semantics of the BIE into the legacy OAGIS XML format.  This is a common format for message oriented middleware and file transfers.
 
     -  *JSON Schema*: This expression option generates the semantics of the BIE into JSON Schema Draft 4 format, which is the widely accepted JSON Schema format.  This is a common format for message oriented middleware and file transfers.
