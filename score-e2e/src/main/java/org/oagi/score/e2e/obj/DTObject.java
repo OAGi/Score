@@ -25,8 +25,12 @@ public class DTObject {
 
     private String den;
 
+    private String qualifier;
+
     private String definition;
 
     private String definitionSource;
+
+    private String state;
 
 }
