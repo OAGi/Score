@@ -270,6 +270,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void hitReviseButton() {
         click(getReviseButton());
         click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
     }
 
@@ -282,6 +283,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void hitAmendButton() {
         click(getAmendButton());
         click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

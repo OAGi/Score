@@ -23,6 +23,130 @@ public interface ASCCPViewEditPage extends Page {
     WebElement getSearchButton();
 
     /**
+     * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.
+     *
+     * @return the UI element of the 'Revise' button
+     */
+    WebElement getReviseButton();
+
+    /**
+     * Hit the 'Revise' button.
+     */
+    void hitReviseButton();
+
+    /**
+     * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
+     *
+     * @return the UI element of the 'Amend' button
+     */
+    WebElement getAmendButton();
+
+    /**
+     * Hit the 'Amend' button.
+     */
+    void hitAmendButton();
+
+    /**
+     * Return the UI element of the 'Move to QA' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to QA' button
+     */
+    WebElement getMoveToQAButton(boolean enabled);
+
+    /**
+     * Make the component to the QA state. It works only if the component is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the component is not in the WIP state or the 'Update' button is enabled.
+     */
+    void moveToQA();
+
+    /**
+     * Return the UI element of the 'Back to WIP' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Back to WIP' button
+     */
+    WebElement getBackToWIPButton(boolean enabled);
+
+    /**
+     * Make the component back to the WIP state. It works only if the component is in the QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the component is not in the QA state.
+     */
+    void backToWIP();
+
+    /**
+     * Return the UI element of the 'Move to Production' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to Production' button
+     */
+    WebElement getMoveToProduction(boolean enabled);
+
+    /**
+     * Make the component to the Production state. It works only if the component is in the QA state.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the component is not in the QA state.
+     */
+    void moveToProduction();
+
+    /**
+     * Return the UI element of the 'Move to Draft' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to Draft' button
+     */
+    WebElement getMoveToDraft(boolean enabled);
+
+    /**
+     * Make the component to the Draft state. It works only if the component is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the component is not in the WIP state or the 'Update' button is enabled.
+     */
+    void moveToDraft();
+
+    /**
+     * Return the UI element of the 'Move to Candidate' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to Candidate' button
+     */
+    WebElement getMoveToCandidate(boolean enabled);
+
+    /**
+     * Make the component to the Candidate state. It works only if the component is in the Draft state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the component is not in the Draft state or the 'Update' button is enabled.
+     */
+    void moveToCandidate();
+
+    /**
+     * Return the UI element of the 'Update' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Update' button
+     */
+    WebElement getUpdateButton(boolean enabled);
+
+    /**
+     * Hit the 'Update' button.
+     */
+    void hitUpdateButton();
+
+    /**
+     * Return the UI element of the 'Deprecated' checkbox.
+     *
+     * @return the UI element of the 'Deprecated' checkbox
+     */
+    WebElement getDeprecatedCheckbox();
+
+    /**
+     * Toggle the 'Deprecated' checkbox.
+     */
+    void toggleDeprecated();
+
+    /**
      * Return the UI element of the tree node by the node path.
      *
      * @param path the node path
@@ -724,21 +848,4 @@ public interface ASCCPViewEditPage extends Page {
 
     }
 
-    void hitAmendButton();
-
-    void moveToQA();
-
-    void toggleDeprecated();
-
-    void hitUpdateButton();
-
-    void moveToProduction();
-
-    WebElement getMoveToQAButton(boolean enabled);
-
-    WebElement getMoveToProduction(boolean enabled);
-
-    WebElement getDeprecatedCheckbox();
-
-    WebElement getUpdateButton(boolean enabled);
 }

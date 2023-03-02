@@ -193,7 +193,7 @@ public interface ACCViewEditPage extends Page {
     WebElement getCommentsIcon();
 
     /**
-     * Return the UI element of the 'Revise' button.
+     * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.
      *
      * @return the UI element of the 'Revise' button
      */
@@ -205,7 +205,7 @@ public interface ACCViewEditPage extends Page {
     void hitReviseButton();
 
     /**
-     * Return the UI element of the 'Amend' button.
+     * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
      *
      * @return the UI element of the 'Amend' button
      */
