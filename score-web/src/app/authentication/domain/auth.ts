@@ -4,21 +4,36 @@ export class ScoreUser {
   roles: string[];
 }
 
+export class BusinessTermProperties {
+  enabled: boolean;
+}
+
+export class TenantProperties {
+  enabled: boolean;
+  roles: string[];
+}
+
 export class UserToken {
   username: string;
   roles: string[];
   authentication: string;
   enabled: boolean;
-  isTenantInstance: boolean;
-  tenantRoles: string[];
+
+  tenant: TenantProperties;
+  businessTerm: BusinessTermProperties;
 
   constructor() {
     this.roles = ['',];
     this.authentication = '';
     this.username = 'unknown';
     this.enabled = false;
-    this.isTenantInstance = false;
-    this.tenantRoles = [];
+
+    this.tenant = new TenantProperties();
+    this.tenant.enabled = false;
+    this.tenant.roles = [];
+
+    this.businessTerm = new BusinessTermProperties();
+    this.businessTerm.enabled = false;
   }
 }
 

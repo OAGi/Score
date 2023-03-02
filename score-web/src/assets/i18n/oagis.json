@@ -86,6 +86,9 @@
   "MODULE_NAV": {
     "TITLE": "Manage Physical File Information"
   },
+  "BIZTERM_NAV": {
+    "VIEW": "Manage Business Term"
+  },
   "ASCCP_CREATE": {
     "TITLE": "Create an ASCCP",
     "SUBTITLE": "Select an ACC to create a new ASCCP"

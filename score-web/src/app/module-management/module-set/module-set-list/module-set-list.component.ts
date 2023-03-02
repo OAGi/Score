@@ -71,7 +71,7 @@ export class ModuleSetListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadModuleSetList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -114,9 +114,7 @@ export class ModuleSetListComponent implements OnInit {
     }
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadModuleSetList();
+  onChange(property?: string, source?) {
   }
 
   onPageChange(event: PageEvent) {

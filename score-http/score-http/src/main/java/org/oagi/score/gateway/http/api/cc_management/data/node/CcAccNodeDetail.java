@@ -19,6 +19,8 @@ public class CcAccNodeDetail implements CcNodeDetail {
     private String definition;
     private String definitionSource;
     private BigInteger manifestId;
+    private BigInteger replacementAccManifestId;
+    private CcAccNodeDetail replacement;
     private BigInteger namespaceId;
 
     private CcState state;

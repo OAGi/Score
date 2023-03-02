@@ -1,12 +1,15 @@
 package org.oagi.score.gateway.http.api.cc_management.data;
 
 import lombok.Data;
+import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -41,6 +44,8 @@ public class CcList {
     private BigInteger basedManifestId;
     private String sixDigitId;
     private String defaultValueDomain;
+
+    private List<ShortTag> tagList = Collections.emptyList();
 
     public CcList() {
     }

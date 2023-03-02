@@ -15,6 +15,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {CcListModule} from './cc-list/cc-list.module';
 import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
 import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
+import {EditTagsDialogModule} from "../tag-management/edit-tags-dialog/edit-tags-dialog.module";
 
 @NgModule({
   imports: [
@@ -33,6 +34,7 @@ import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
     TranslateModule,
     CommonModule,
     ScoreCommonModule,
+    EditTagsDialogModule
   ],
   declarations: []
 })

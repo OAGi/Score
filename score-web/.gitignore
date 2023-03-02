@@ -1,16 +1,15 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-.angular
 /dist
 /tmp
 /out-tsc
 
 # dependencies
-/node_modules
+/node_modules*
 
 # IDEs and editors
-.idea
+/.idea
 .project
 .classpath
 .c9/
@@ -36,7 +35,12 @@ testem.log
 /typings
 package-lock.json
 yarn.lock
+/misc
+/docker/docs
+/docker/score-web
+.angular
 
 # System Files
 .DS_Store
 Thumbs.db
+/backup

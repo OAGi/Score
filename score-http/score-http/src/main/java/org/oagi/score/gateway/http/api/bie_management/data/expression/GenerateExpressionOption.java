@@ -36,22 +36,42 @@ public class GenerateExpressionOption {
     private boolean openAPICodeGenerationFriendly;
     private boolean openAPI30GetTemplate;
     private boolean arrayForJsonExpressionForOpenAPI30GetTemplate;
+    private boolean suppressRootPropertyForOpenAPI30GetTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30GetTemplate;
+
+    public boolean isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate() {
+        if (isSuppressRootPropertyForOpenAPI30GetTemplate()) {
+            return false;
+        }
+        return includeMetaHeaderForJsonForOpenAPI30GetTemplate;
+    }
+
     private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate;
     private boolean includePaginationResponseForJsonForOpenAPI30GetTemplate;
+
+    public boolean isIncludePaginationResponseForJsonForOpenAPI30GetTemplate() {
+        if (isSuppressRootPropertyForOpenAPI30GetTemplate()) {
+            return false;
+        }
+        return includePaginationResponseForJsonForOpenAPI30GetTemplate;
+    }
+
     private BigInteger paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate;
 
     private boolean isOnlyBCCPsForOpenDocumentFormat = true;
     private String odfExpressionFormat = "ODS";
 
     public boolean hasOpenAPI30GetTemplateOptions() {
-        if (arrayForJsonExpressionForOpenAPI30GetTemplate) {
+        if (isArrayForJsonExpressionForOpenAPI30GetTemplate()) {
             return true;
         }
-        if (includeMetaHeaderForJsonForOpenAPI30GetTemplate) {
+        if (isSuppressRootPropertyForOpenAPI30GetTemplate()) {
             return true;
         }
-        if (includePaginationResponseForJsonForOpenAPI30GetTemplate) {
+        if (isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()) {
+            return true;
+        }
+        if (isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
             return true;
         }
         return false;
@@ -59,14 +79,40 @@ public class GenerateExpressionOption {
 
     private boolean openAPI30PostTemplate;
     private boolean arrayForJsonExpressionForOpenAPI30PostTemplate;
+    private boolean suppressRootPropertyForOpenAPI30PostTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30PostTemplate;
     private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate;
 
     public boolean hasOpenAPI30PostTemplateOptions() {
-        if (arrayForJsonExpressionForOpenAPI30PostTemplate) {
+        if (isArrayForJsonExpressionForOpenAPI30PostTemplate()) {
             return true;
         }
-        if (includeMetaHeaderForJsonForOpenAPI30PostTemplate) {
+        if (isSuppressRootPropertyForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        if (isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isGetTemplateAndPostTemplateOptionDifferent() {
+        if (isOpenAPI30GetTemplate() != isOpenAPI30PostTemplate()) {
+            return false;
+        }
+        if (isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
+            return true;
+        }
+        if (isArrayForJsonExpressionForOpenAPI30GetTemplate() !=
+                isArrayForJsonExpressionForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        if (isSuppressRootPropertyForOpenAPI30GetTemplate() !=
+                isSuppressRootPropertyForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        if (isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate() !=
+                isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
             return true;
         }
         return false;

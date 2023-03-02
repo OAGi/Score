@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.menu;
 
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.WebElement;
@@ -105,6 +106,20 @@ public interface BIEMenu {
      * @return the 'Reuse Report' page object
      */
     ReuseReportPage openReuseReportSubMenu();
+
+    /**
+     * Return the UI element of the 'View/Edit Business Term' submenu.
+     *
+     * @return the UI element of the 'View/Edit Business Term' submenu
+     */
+    WebElement getViewEditBusinessTermSubMenu();
+
+    /**
+     * Open the 'View/Edit Business Term' submenu to enter the page.
+     *
+     * @return the 'View/Edit Business Term' page object
+     */
+    ViewEditBusinessTermPage openViewEditBusinessTermSubMenu();
 
     /**
      * Return the UI element of the 'View/Edit Code List' submenu.

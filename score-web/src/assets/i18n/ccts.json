@@ -91,6 +91,9 @@
   "MODULE_NAV": {
     "TITLE": ""
   },
+  "BIZTERM_NAV": {
+    "VIEW": ""
+  },
   "ASCCP_CREATE": {
     "TITLE": "Create an ASCCP",
     "SUBTITLE": "Select an ACC to create a new ASCCP"

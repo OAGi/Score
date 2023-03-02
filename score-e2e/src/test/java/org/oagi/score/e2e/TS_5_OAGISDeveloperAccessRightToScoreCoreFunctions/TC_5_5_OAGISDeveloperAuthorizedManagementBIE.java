@@ -14,12 +14,15 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -2007,7 +2010,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_22_1")
-    public void only_published_compatible_code_lists_in_the_same_release_as_the_bie_shall_be_included() {
+    public void only_published_compatible_code_lists_in_the_same_release_as_the_BIE_shall_be_included() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2551,7 +2554,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Updater/Name field)")
-    public void test_search_feature_using_updater_name_field_in_create_bie_business_contexts() {
+    public void test_search_feature_using_updater_name_field_in_create_BIE_business_contexts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2575,7 +2578,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_create_bie_business_contexts() {
+    public void test_search_feature_using_date_fields_in_create_BIE_business_contexts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2630,7 +2633,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - DEN field)")
-    public void test_search_feature_using_den_field_in_create_bie_top_level_concept() {
+    public void test_search_feature_using_den_field_in_create_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2652,7 +2655,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Definition field)")
-    public void test_search_feature_using_definition_field_in_create_bie_top_level_concept() {
+    public void test_search_feature_using_definition_field_in_create_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2674,7 +2677,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Module field)")
-    public void test_search_feature_using_module_field_in_create_bie_top_level_concept() {
+    public void test_search_feature_using_module_field_in_create_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2705,7 +2708,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - State field)")
-    public void test_search_feature_using_state_field_in_bie_list() {
+    public void test_search_feature_using_state_field_in_BIE_list() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2753,7 +2756,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_bie_list() {
+    public void test_search_feature_using_date_fields_in_BIE_list() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2778,7 +2781,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - DEN field)")
-    public void test_search_feature_using_den_field_in_bie_list() {
+    public void test_search_feature_using_den_field_in_BIE_list() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2802,7 +2805,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - Updater/Name field Business Context field)")
-    public void test_search_feature_using_business_context_field_in_bie_list() {
+    public void test_search_feature_using_business_context_field_in_BIE_list() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2835,7 +2838,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Updater/Name field)")
-    public void test_search_feature_using_updater_name_field_in_copy_bie_business_contexts() {
+    public void test_search_feature_using_updater_name_field_in_copy_BIE_business_contexts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2859,7 +2862,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_copy_bie_business_contexts() {
+    public void test_search_feature_using_date_fields_in_copy_BIE_business_contexts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2914,7 +2917,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - DEN field)")
-    public void test_search_feature_using_den_field_in_copy_bie_top_level_concept() {
+    public void test_search_feature_using_den_field_in_copy_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2942,7 +2945,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - Business Context field)")
-    public void test_search_feature_using_business_context_field_in_copy_bie_top_level_concept() {
+    public void test_search_feature_using_business_context_field_in_copy_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2970,7 +2973,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - State field)")
-    public void test_search_feature_using_state_field_in_copy_bie_top_level_concept() {
+    public void test_search_feature_using_state_field_in_copy_BIE_top_level_concept() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3064,7 +3067,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_34")
-    public void the_number_of_bies_in_copy_bie_page_are_the_same_with_the_number_of_the_bies_displayed_on_the_right_bottom_index_of_the_page() {
+    public void the_number_of_bies_in_copy_BIE_page_are_the_same_with_the_number_of_the_bies_displayed_on_the_right_bottom_index_of_the_page() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3140,7 +3143,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_36")
-    public void test_TA_36() {
+    public void developer_can_assign_multiple_business_contexts_to_BIE_in_WIP_state_he_owns_via_updating_it() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3170,76 +3173,568 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(businessContexts.stream()
                         .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
                 businessContextTexts);
+
+        // refresh the page to check the changes were updated.
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
     }
 
     @Test
     @DisplayName("TC_5_5_TA_37")
-    public void test_TA_37() {
+    public void developer_cannot_assign_multiple_business_contexts_to_BIE_not_WIP_state() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
+        );
+
+        TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "QA");
+
+        TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                        developer, "Production");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_QA);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_QA = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1)));
+
+        editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_Production);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_Production = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(1)));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_38")
-    public void test_TA_38() {
+    public void developer_cannot_assign_multiple_business_contexts_to_BIE_in_not_WIP_state_and_he_does_not_own_via_updating_it() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        AppUserObject enduser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(enduser);
+
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser)
+        );
+
+        TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        enduser, "QA");
+
+        TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                        enduser, "Production");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_QA);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_QA = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1)));
+
+        editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_Production);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_Production = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(1)));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_39")
-    public void test_TA_39() {
+    public void developer_cannot_assign_the_same_business_context_more_than_one_times_in_BIE() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
+        );
+
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel.addBusinessContext(businessContexts.get(0)));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_40")
-    public void test_TA_40() {
-    }
+    public void developer_can_remove_an_assigned_business_context_from_BIE_in_WIP_state_he_owns() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
-    @Test
-    @DisplayName("TC_5_5_TA_42")
-    public void test_TA_42() {
+        String releaseNum = "10.8.5";
+        List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
+        );
+
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(businessContexts,
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.removeBusinessContext(businessContexts.get(0));
+
+        String businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.subList(1, businessContexts.size()).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
+
+        topLevelASBIEPPanel.removeBusinessContext(businessContexts.get(1));
+        businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.subList(2, businessContexts.size()).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
+
+        // refresh the page to check the changes were updated.
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.subList(2, businessContexts.size()).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
     }
 
     @Test
     @DisplayName("TC_5_5_TA_41")
-    public void test_TA_41() {
+    public void developer_cannot_remove_all_business_contexts_from_BIE_there_must_be_at_least_one_business_context_assigned() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel.removeBusinessContext(businessContext));
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_42")
+    public void example_input_text_field_should_exist_in_BBIEPs_and_BBIE_SC_where_example_of_data_of_node_can_be_inserted() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        WebElement bccpNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bccpNode);
+        bbiePanel.toggleUsed();
+        assertTrue(bbiePanel.getExampleField().isEnabled());
+        bbiePanel.setExample("example_" + randomAlphanumeric(5, 10));
+        editBIEPage.hitUpdateButton();
+
+        WebElement bdtScNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier/Scheme Identifier");
+        EditBIEPage.BBIESCPanel bbieScPanel = editBIEPage.getBBIESCPanel(bdtScNode);
+        bbieScPanel.toggleUsed();
+        assertTrue(bbieScPanel.getExampleField().isEnabled());
+        bbieScPanel.setExample("example_" + randomAlphanumeric(5, 10));
+        editBIEPage.hitUpdateButton();
     }
 
     @Test
     @DisplayName("TC_5_5_TA_43")
-    public void test_TA_43() {
+    public void fixed_and_default_values_should_be_mutually_exclusive() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        // Testing for BBIE Node
+        String bccpNodePath = "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier";
+        WebElement bccpNode = editBIEPage.getNodeByPath(bccpNodePath);
+        EditBIEPage.BBIEPanel bbiePanel_1 = editBIEPage.getBBIEPanel(bccpNode);
+        bbiePanel_1.toggleUsed();
+        String randomFixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
+        bbiePanel_1.setValueConstraint("Fixed Value");
+        bbiePanel_1.setFixedValue(randomFixedValue);
+        editBIEPage.hitUpdateButton();
+
+        // refresh the page to check whether the BBIE has a valid fixed value or not.
+        editBIEPage.openPage();
+        bccpNode = editBIEPage.getNodeByPath(bccpNodePath);
+        EditBIEPage.BBIEPanel bbiePanel_2 = editBIEPage.getBBIEPanel(bccpNode);
+        assertEquals(randomFixedValue, getText(bbiePanel_2.getFixedValueField()));
+        assertThrows(TimeoutException.class, () -> bbiePanel_2.getDefaultValueField());
+
+        String randomDefaultValue = "default_value_" + randomAlphanumeric(5, 10);
+        bbiePanel_2.setValueConstraint("Default Value");
+        bbiePanel_2.setDefaultValue(randomDefaultValue);
+        editBIEPage.hitUpdateButton();
+
+        // refresh the page to check whether the BBIE has a valid default value or not.
+        editBIEPage.openPage();
+        bccpNode = editBIEPage.getNodeByPath(bccpNodePath);
+        EditBIEPage.BBIEPanel bbiePanel_3 = editBIEPage.getBBIEPanel(bccpNode);
+        assertEquals(randomDefaultValue, getText(bbiePanel_3.getDefaultValueField()));
+        assertThrows(TimeoutException.class, () -> bbiePanel_3.getFixedValueField());
+
+        // Testing for BBIE_SC Node
+        String bdtScNodePath = "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier/Scheme Identifier";
+        WebElement bdtScNode = editBIEPage.getNodeByPath(bdtScNodePath);
+        EditBIEPage.BBIESCPanel bbieScPanel_1 = editBIEPage.getBBIESCPanel(bdtScNode);
+        bbieScPanel_1.toggleUsed();
+        randomFixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
+        bbieScPanel_1.setValueConstraint("Fixed Value");
+        bbieScPanel_1.setFixedValue(randomFixedValue);
+        editBIEPage.hitUpdateButton();
+
+        // refresh the page to check whether the BBIE_SC has a valid fixed value or not.
+        editBIEPage.openPage();
+        bdtScNode = editBIEPage.getNodeByPath(bdtScNodePath);
+        EditBIEPage.BBIESCPanel bbieScPanel_2 = editBIEPage.getBBIESCPanel(bdtScNode);
+        assertEquals(randomFixedValue, getText(bbieScPanel_2.getFixedValueField()));
+        assertThrows(TimeoutException.class, () -> bbieScPanel_2.getDefaultValueField());
+
+        randomDefaultValue = "default_value_" + randomAlphanumeric(5, 10);
+        bbieScPanel_2.setValueConstraint("Default Value");
+        bbieScPanel_2.setDefaultValue(randomDefaultValue);
+        editBIEPage.hitUpdateButton();
+
+        // refresh the page to check whether the BBIE_SC has a valid default value or not.
+        editBIEPage.openPage();
+        bdtScNode = editBIEPage.getNodeByPath(bdtScNodePath);
+        EditBIEPage.BBIESCPanel bbieScPanel_3 = editBIEPage.getBBIESCPanel(bdtScNode);
+        assertEquals(randomDefaultValue, getText(bbieScPanel_3.getDefaultValueField()));
+        assertThrows(TimeoutException.class, () -> bbieScPanel_3.getFixedValueField());
     }
 
     @Test
     @DisplayName("TC_5_5_TA_44")
-    public void test_TA_44() {
+    public void cardinality_min_is_greater_than_zero_in_bcc_or_ascc_they_must_be_enabled_and_they_cannot_be_disabled_unused() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        WebElement applicationAreaNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area");
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationAreaNode);
+        applicationAreaPanel.toggleUsed();
+        assertEquals("1", getText(applicationAreaPanel.getCardinalityMinField()));
+
+        WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time"); // required BBIE field.
+        EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
+        assertDisabled(creationDateTimePanel.getUsedCheckbox());
+        assertChecked(creationDateTimePanel.getUsedCheckbox());
+
+        WebElement dataAreaNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Data Area"); // required ASBIE field.
+        EditBIEPage.ASBIEPanel dataAreaPanel = editBIEPage.getASBIEPanel(dataAreaNode);
+        assertDisabled(dataAreaPanel.getUsedCheckbox());
+        assertChecked(dataAreaPanel.getUsedCheckbox());
     }
 
     @Test
     @DisplayName("TC_5_5_TA_45")
-    public void test_TA_45() {
+    public void developer_can_select_BIE_from_BIE_List_page_navigate_thought_different_paginator_pages_while_the_forenamed_BIE_remains_checked() {
+        List<String> asccpDens = Arrays.asList("Acknowledge Allocate Resource. Acknowledge Allocate Resource",
+                "Acknowledge Batch Certificate Of Analysis. Acknowledge Batch Certificate Of Analysis",
+                "Acknowledge BOM. Acknowledge BOM",
+                "Acknowledge Carrier Route. Acknowledge Carrier Route",
+                "Acknowledge Catalog. Acknowledge Catalog",
+                "Acknowledge Chart Of Accounts. Acknowledge Chart Of Accounts",
+                "Acknowledge Code List. Acknowledge Code List",
+                "Acknowledge Commercial Invoice. Acknowledge Commercial Invoice",
+                "Acknowledge Configuration. Acknowledge Configuration",
+                "Acknowledge Confirm WIP. Acknowledge Confirm WIP",
+                "Acknowledge Corrective Action Plan. Acknowledge Corrective Action Plan",
+                "Acknowledge Corrective Action Request. Acknowledge Corrective Action Request",
+                "Acknowledge Corrective Action. Acknowledge Corrective Action",
+                "Acknowledge Credit Status. Acknowledge Credit Status",
+                "Acknowledge Credit Transfer. Acknowledge Credit Transfer");
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.1");
+        List<TopLevelASBIEPObject> topLevelASBIEPs = asccpDens.stream().map(den -> {
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum(den, release.getReleaseNumber());
+            return getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+        }).collect(Collectors.toList());
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(release.getReleaseNumber());
+        viewEditBIEPage.hitSearchButton();
+
+        assertTrue(viewEditBIEPage.getTotalNumberOfItems() >= topLevelASBIEPs.size());
+        WebElement firstRecord = viewEditBIEPage.getTableRecordAtIndex(1);
+        WebElement firstRecordCheckbox = viewEditBIEPage.getColumnByName(firstRecord, "select");
+        click(firstRecordCheckbox);
+
+        click(viewEditBIEPage.getNextPageButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        WebElement firstRecordInSecondPage = viewEditBIEPage.getTableRecordAtIndex(1);
+        WebElement firstRecordCheckboxInSecondPage = viewEditBIEPage.getColumnByName(firstRecordInSecondPage, "select");
+        click(firstRecordCheckboxInSecondPage);
+
+        click(viewEditBIEPage.getPreviousPageButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        firstRecord = viewEditBIEPage.getTableRecordAtIndex(1);
+        firstRecordCheckbox = viewEditBIEPage.getColumnByName(firstRecord, "select");
+        assertEnabled(firstRecordCheckbox);
     }
 
     @Test
     @DisplayName("TC_5_5_TA_46")
-    public void test_TA_46() {
+    public void developer_can_neither_create_local_or_global_extension_to_the_BIE() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String extensionPath = "/" + asccp.getPropertyTerm() + "/Application Area/Extension";
+        assertThrows(WebDriverException.class, () -> editBIEPage.extendBIELocallyOnNode(extensionPath));
+        WebElement createABIEExtensionLocallyButton = visibilityOfElementLocated(getDriver(),
+                By.xpath("//span[text() = \"Create ABIE Extension Locally\"]/ancestor::button"));
+        assertFalse(createABIEExtensionLocallyButton.isEnabled());
+
+        assertThrows(WebDriverException.class, () -> editBIEPage.extendBIEGloballyOnNode(extensionPath));
+        WebElement createABIEExtensionGloballyButton = visibilityOfElementLocated(getDriver(),
+                By.xpath("//span[text() = \"Create ABIE Extension Globally\"]/ancestor::button"));
+        assertFalse(createABIEExtensionGloballyButton.isEnabled());
     }
 
     @Test
     @DisplayName("TC_5_5_TA_47")
-    public void test_TA_47() {
+    public void developer_cannot_create_BIE_without_business_context_assigned() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+
+        assertThrows(TimeoutException.class, () -> createBIEForSelectBusinessContextsPage.next(Collections.emptyList()));
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_48_and_TA_49")
-    public void test_TA_48_and_TA_49() {
+    @DisplayName("TC_5_5_TA_48")
+    public void developer_can_set_the_Version_metadata_field_and_automatically_the_Fixed_Value_of_the_Version_Identifier_node_is_synchronized() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get BOM. Get BOM", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        String version = "version_" + randomAlphanumeric(5, 10);
+        topLevelASBIEPPanel.setVersion(version);
+        String versionIdentifierPath = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        WebElement versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
+        EditBIEPage.BBIEPanel versionIdentifierPanel = editBIEPage.getBBIEPanel(versionIdentifierNode);
+        versionIdentifierPanel.toggleUsed();
+
+        assertEquals("Synchronized \'Version\' value with the the fixed value.", getSnackBarMessage(getDriver()));
+        assertEquals("Fixed Value", getText(versionIdentifierPanel.getValueConstraintSelectField()));
+        assertEquals(version, getText(versionIdentifierPanel.getFixedValueField()));
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_49")
+    public void developer_can_change_the_Fixed_Value_of_the_Version_Identifier_node_even_if_it_was_previously_synchronized() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Get BOM. Get BOM", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        String version = "version_" + randomAlphanumeric(5, 10);
+        topLevelASBIEPPanel.setVersion(version);
+        String versionIdentifierPath = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        WebElement versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
+        EditBIEPage.BBIEPanel versionIdentifierPanel = editBIEPage.getBBIEPanel(versionIdentifierNode);
+        versionIdentifierPanel.toggleUsed();
+
+        assertEquals("Synchronized \'Version\' value with the the fixed value.", getSnackBarMessage(getDriver()));
+        assertEquals("Fixed Value", getText(versionIdentifierPanel.getValueConstraintSelectField()));
+        assertEquals(version, getText(versionIdentifierPanel.getFixedValueField()));
+        waitFor(ofMillis(3000L)); // wait until the snack-bar disappears
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
+        versionIdentifierPanel = editBIEPage.getBBIEPanel(versionIdentifierNode);
+        String anotherVersion = "version_" + randomAlphanumeric(5, 10);
+        versionIdentifierPanel.setFixedValue(anotherVersion);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        assertEquals(version, getText(topLevelASBIEPPanel.getVersionField()));
+        assertNotEquals(anotherVersion, getText(topLevelASBIEPPanel.getVersionField()));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_50")
-    public void test_TA_50() {
+    public void default_value_of_the_primitive_date_time_BCCPs_should_be_date_time() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time");
+        EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
+        assertEquals("Primitive", getText(creationDateTimePanel.getValueDomainRestrictionSelectField()));
+        assertEquals("date time", getText(creationDateTimePanel.getValueDomainField()));
+
+        WebElement lastModificationDateTimeNode = editBIEPage.getNodeByPath(
+                "/" + asccp.getPropertyTerm() + "/Data Area/Table/Last Modification Date Time");
+        EditBIEPage.BBIEPanel lastModificationDateTimePanel = editBIEPage.getBBIEPanel(lastModificationDateTimeNode);
+        assertEquals("Primitive", getText(lastModificationDateTimePanel.getValueDomainRestrictionSelectField()));
+        assertEquals("date time", getText(lastModificationDateTimePanel.getValueDomainField()));
     }
 
     @Test
     @DisplayName("TC_5_5_TA_51")
-    public void test_TA_51() {
+    public void developer_cannot_create_new_BIE_from_ASCCP_whose_ACC_has_group_component_type() {
+        String groupAsccpDen = "Entity Identifiers Group. Entity Identifiers Group";
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage =
+                viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(groupAsccpDen, release.getReleaseNumber());
+        WebElement node = asccpViewEditPage.getNodeByPath("/Entity Identifiers Group/Entity Identifiers Group. Details");
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(node);
+        assertEquals("Semantic Group", getText(accPanel.getComponentTypeSelectField()));
+
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
+                homePage.getBIEMenu().openCreateBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
+                createBIEForSelectBusinessContextsPage.next(Arrays.asList(randomBusinessContext));
+        assertThrows(NoSuchElementException.class, () ->
+                createBIEForSelectTopLevelConceptPage.createBIE(groupAsccpDen, release.getReleaseNumber()));
     }
 
     @Test

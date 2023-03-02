@@ -13,6 +13,7 @@ public class CreateBdtRepositoryRequest extends RepositoryRequest {
     private final BigInteger specId;
 
     private String initialPropertyTerm = "Property Term";
+    private String tag;
 
     public CreateBdtRepositoryRequest(AuthenticatedPrincipal user,
                                       BigInteger basedDdtManifestId, BigInteger releaseId, BigInteger specId) {
@@ -40,5 +41,13 @@ public class CreateBdtRepositoryRequest extends RepositoryRequest {
 
     public void setInitialPropertyTerm(String initialPropertyTerm) {
         this.initialPropertyTerm = initialPropertyTerm;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

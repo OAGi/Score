@@ -141,7 +141,7 @@ public abstract class PageHelper {
             element.sendKeys(Keys.BACK_SPACE);
             element.clear();
             if (!StringUtils.isEmpty(element.getText())) {
-                waitFor(ofMillis(500));
+                waitFor(ofMillis(500L));
                 element.sendKeys(Keys.CONTROL + "a");
                 element.sendKeys(Keys.BACK_SPACE);
             }

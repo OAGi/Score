@@ -78,6 +78,7 @@ export class ReleaseListComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
       initFilter(this.creatorIdListFilterCtrl, this.filteredCreatorIdList, this.loginIdList);
     });
+
     this.loadReleases(true);
   }
 
@@ -86,12 +87,10 @@ export class ReleaseListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadReleases();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadReleases();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

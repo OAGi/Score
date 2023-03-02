@@ -20,10 +20,12 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {base64Decode, initFilter, loadBranch, saveBooleanProperty, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
+import {Tag} from '../../tag-management/domain/tag';
+import {TagService} from '../../tag-management/domain/tag.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -61,17 +63,21 @@ export class BieCreateAsccpComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  tags: Tag[] = [];
 
   workingRelease = WorkingRelease;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
+  HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
+
   constructor(private bizCtxService: BusinessContextService,
               private releaseService: ReleaseService,
               private ccListService: CcListService,
               private accountService: AccountListService,
               private service: BieCreateService,
+              private tagService: TagService,
               private auth: AuthService,
               private location: Location,
               private router: Router,
@@ -104,11 +110,14 @@ export class BieCreateAsccpComponent implements OnInit {
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.tagService.getTags()
+    ]).subscribe(([loginIds, releases, tags]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+      this.tags = tags;
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       if (this.releases.length > 0) {
@@ -179,9 +188,10 @@ export class BieCreateAsccpComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadData();
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
   }
 
   loadData(isInit?: boolean) {
@@ -253,7 +263,11 @@ export class BieCreateAsccpComponent implements OnInit {
           duration: 3000,
         });
 
-        this.router.navigateByUrl('/profile_bie/' + resp['topLevelAsbiepId']);
+        // Issue #1366
+        // 'Hide Unused' option must be turned off after BIE creation.
+        saveBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
+
+        this.router.navigateByUrl('/profile_bie/' + resp.topLevelAsbiepId);
       });
   }
 

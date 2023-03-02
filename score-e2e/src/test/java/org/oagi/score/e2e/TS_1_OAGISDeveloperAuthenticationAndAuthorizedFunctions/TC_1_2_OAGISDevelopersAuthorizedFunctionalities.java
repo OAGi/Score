@@ -12,7 +12,7 @@ import org.oagi.score.e2e.menu.*;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
-import org.oagi.score.e2e.page.SettingsPage;
+import org.oagi.score.e2e.page.SettingsPasswordPage;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -454,14 +454,14 @@ public class TC_1_2_OAGISDevelopersAuthorizedFunctionalities extends BaseTest {
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         assertTrue(loginIDMenu.getSettingsSubMenu().isEnabled());
 
-        SettingsPage settingsPage = loginIDMenu.openSettingsSubMenu();
-        WebElement title = settingsPage.getTitle();
+        SettingsPasswordPage settingsPasswordPage = loginIDMenu.openSettingsSubMenu();
+        WebElement title = settingsPasswordPage.getTitle();
         assertTrue(title.isDisplayed());
         String titleText = title.getText();
 
         homePage.openPage();
-        settingsPage.openPage();
-        assertEquals(settingsPage.getTitle().getText(), titleText);
+        settingsPasswordPage.openPage();
+        assertEquals(settingsPasswordPage.getTitle().getText(), titleText);
     }
 
     @Test

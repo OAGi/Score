@@ -107,11 +107,11 @@ The relationships between `xbt`columns uses [XML Schema Data Types](https://www.
 | 6 | 4 (Amount. Type, Integer) | 23 (xsd:positiveInteger) | 0 (False) |
 | 7 | 4 (Amount. Type, Integer) | 22 (xsd:nonNegativeInteger) | 0 (False) |
 
-| **cdt\_sc\_awd\_pri\_xps\_type\_map\_id** | **cdt\_sc\_awd\_pri\_id** | **xbt\_id** |
-| ------------------------------ | ----------------- | ------ |
-| 1 | 1 (Amount. Currency. Code, NormalizedString) | 13 (xsd:normalizedString) |
-| 2 | 2 (Amount. Currency. Code, String) | 12 (xsd:string) |
-| 3 | 3 (Amount. Currency. Code, Token) | 14 (xsd:token) |
+| **cdt\_sc\_awd\_pri\_xps\_type\_map\_id** | **cdt\_sc\_awd\_pri\_id** | **xbt\_id** | **is\_default |
+| ------------------------------ | ----------------- | ------ | ---------- |
+| 1 | 1 (Amount. Currency. Code, NormalizedString) | 13 (xsd:normalizedString) | 0 (False) |
+| 2 | 2 (Amount. Currency. Code, String) | 12 (xsd:string) | 0 (False) |
+| 3 | 3 (Amount. Currency. Code, Token) | 14 (xsd:token) | 1 (True) |
 
 * Finally, `bdt_pri_restri` and `bdt_sc_pri_restri` tables have the domain restrictions of BDTs to define value domains of `BBIE` and `BBIE_SC`.
 
@@ -205,7 +205,7 @@ Moreover, each BIE table is associated with these manifest tables, not directly 
 
 ## Module
 
-Module is an entity representing a directory and file structure that Score uses to express schemas into a file system. From this definition, each module has two types: ‘File’ and ‘Directory’, and only ‘File’ type modules can contain components, and ‘Directory’ type modules can contain ‘File’ modules. A set of modules can be used in one or more releases, so each module set is associated with release manifests. The following diagram shows these relationships.
+Module is an entity representing a directory and file structure that Score uses to express schemas into a file system. From this definition, each module has two types: ‘File’ and ‘Directory’, and only ‘File’ type modules can contain components, and ‘Directory’ type modules can contain (sub) 'Directory' or ‘File’ modules. A set of modules can be used in one or more releases, so each module set is associated with release manifests. The following diagram shows the pattern these relationships (not all CC manifest tables are displayed here).
 
 ![image](./media/img/Module.png)
 Every module-manifest relational table on the right (such as `module_ASCCP_manifest)`has the same pattern, that it has `module_id` and `module_set_release_id` to indicate which module entities and sets are associated with specific manifest components for releases.
@@ -245,12 +245,12 @@ In this case, ‘Component’ module should have a reference to ‘Field’ modu
 
 ## Sequencing Keys
 
-ASCC and BCC associations should be assigned a unique sequencing key within the ACC. The straight-forward approach is to assign a unique numeric number to each association in order. The drawback of this approach is that it may need many operations to add, change, or delete an association from the sequence, especially if the ACC has a large number of associations. Assuming that the ACC has 100 associations, so each association has assigned numbers from 1 to 100. If it attempts to add a new association at the beginning of the sequence, it should increase assigned numbers by 1 for all associations, which needs 100 operations. In order to reduce computational need for sequencing key updates, Score has `seq_key` table that does not rely on the numerical order of the sequence key but instead it captures the order of the key as a linked list.
+ASCC and BCC associations should be assigned a unique sequencing key within the ACC. The straight-forward approach is to assign a unique numeric number to each association in order. The drawback of this approach is that it may need many operations to add, change, or delete an association from the sequence, especially if the ACC has a large number of associations. Assuming that the ACC has 100 associations, so each association has assigned numbers from 1 to 100. If a new association is added at the beginning of the sequence, the sequence key values of all associations need to be incremented by 1, which means 100 table rows needing to be updated. In order to reduce computational need for sequencing key updates, Score has a `seq_key` table that does not rely on the numerical order of the sequence key but instead it captures the order of the key as a linked list.
 
 ![image](./media/img/SeqKey.png)
-`seq_key` table maintains the sequence of associations using doubly linked list structure with `prev_seq_key_id` and `next_seq_key_id` columns. We can rewrite the previous example using the `seq_key` table. Suppose that ‘Party’ ACC had the following ASCCs with unique numeric numbers for sequencing keys.
+`seq_key` table maintains the sequence of associations using doubly linked list structure with `prev_seq_key_id` and `next_seq_key_id` columns. We can rewrite the previous example using the `seq_key` table. Suppose that ‘Party’ ACC had the following ASCCs with unique numeric numbers for sequencing keys as shown in the first table below (Note: Score database has the seq_key column in some tables like the table below, although the columns are populated with values (0) when new records are added such columns are deprecated and no longer used.)
 
-| **ascc\_manifest\_id** | **DEN** | **seq\_key** |
+| **ascc\_manifest\_id** | **DEN** | **seq\_key (Deprecated)** |
 | ---------------- | --- | ------- |
 | 1 | Party. Physical Location. Location | 1 |
 | … |

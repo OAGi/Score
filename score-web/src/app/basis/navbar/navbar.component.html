@@ -12,7 +12,7 @@
     <mat-menu #bieMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="profile_bie" title="{{'BIE_NAV.VIEW'| translate}}"> View/Edit BIE</button>
-        <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}" [disabled]="isTenant && !hasTenantRole">
+        <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}" [disabled]="isTenantEnabled && !hasTenantRole">
           Create BIE
         </button>
         <button mat-menu-item routerLink="profile_bie/copy" title="{{'BIE_NAV.COPY' | translate}}">
@@ -34,6 +34,9 @@
                 [disabled] ='showTermsAndCodeListButton()'
         >View/Edit Code List</button>
         <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer') || showTermsAndCodeListButton()">Uplift Code List</button>
+        <mat-divider *ngIf="isBusinessTermEnabled && !roles.includes('developer')"></mat-divider>
+        <button *ngIf="isBusinessTermEnabled && !roles.includes('developer')" mat-menu-item routerLink="business_term_management/business_term"
+                title="{{'BIZTERM_NAV.VIEW' | translate}}"> View/Edit Business Term <span class="beta">Beta</span></button>
       </ng-template>
     </mat-menu>
 
@@ -46,7 +49,7 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="!isTenant" mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
+    <button *ngIf="!isTenantEnabled" mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
@@ -58,7 +61,7 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="!isTenant" mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
+    <button *ngIf="!isTenantEnabled" mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
     <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="module_management/module_set">
@@ -75,7 +78,7 @@
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
         <button mat-menu-item routerLink="account/pending">Pending SSO</button>
-        <button *ngIf="isTenant" mat-menu-item routerLink="tenant">Tenant</button>
+        <button *ngIf="isTenantEnabled" mat-menu-item routerLink="tenant">Tenant</button>
       </ng-template>
     </mat-menu>
 
@@ -116,7 +119,7 @@
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="settings" *ngIf="roles.length > 0">Settings</button>
+        <button mat-menu-item routerLink="settings/password" *ngIf="roles.length > 0">Settings</button>
         <button mat-menu-item (click)="logout()">Logout</button>
       </ng-template>
     </mat-menu>

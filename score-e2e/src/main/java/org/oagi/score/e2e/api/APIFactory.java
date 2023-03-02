@@ -6,6 +6,13 @@ package org.oagi.score.e2e.api;
 public interface APIFactory extends AutoCloseable {
 
     /**
+     * Return the application settings API.
+     *
+     * @return the application settings API
+     */
+    ApplicationSettingsAPI getApplicationSettingsAPI();
+
+    /**
      * Return the account management API.
      *
      * @return the account management API
@@ -53,6 +60,19 @@ public interface APIFactory extends AutoCloseable {
      * @return the business context value management API
      */
     BusinessContextValueAPI getBusinessContextValueAPI();
+
+    /**
+     * Return the business term management API.
+     *
+     * @return the business term management API
+     */
+    BusinessTermAPI getBusinessTermAPI();
+
+    /**
+     * Return the assigned business term API
+     * @return the assigned business term API
+     */
+    AssignedBusinessTermAPI getAssignedBusinessTermAPI();
 
     /**
      * Return the agency ID list management API.

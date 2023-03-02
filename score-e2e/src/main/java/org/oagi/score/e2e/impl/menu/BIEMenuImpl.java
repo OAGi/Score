@@ -3,10 +3,12 @@ package org.oagi.score.e2e.impl.menu;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.HomePageImpl;
 import org.oagi.score.e2e.impl.page.bie.*;
+import org.oagi.score.e2e.impl.page.business_term.ViewEditBusinessTermPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.UpliftCodeListPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.ViewEditCodeListPageImpl;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.By;
@@ -36,6 +38,9 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
 
     private final By REUSE_REPORT_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"Reuse Report\")]");
+
+    private final By VIEW_EDIT_BUSINESS_TERM_SUB_MENU_LOCATOR =
+            By.xpath("//button[contains(text(), \"View/Edit Business Term\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"View/Edit Code List\")]");
@@ -156,6 +161,22 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
         ReuseReportPage reuseReportPage = new ReuseReportPageImpl(this);
         assert reuseReportPage.isOpened();
         return reuseReportPage;
+    }
+
+    @Override
+    public WebElement getViewEditBusinessTermSubMenu() {
+        if (!isExpanded()) {
+            expandBIEMenu();
+        }
+        return elementToBeClickable(getDriver(), VIEW_EDIT_BUSINESS_TERM_SUB_MENU_LOCATOR);
+    }
+
+    @Override
+    public ViewEditBusinessTermPage openViewEditBusinessTermSubMenu() {
+        retry(() -> click(getViewEditBusinessTermSubMenu()));
+        ViewEditBusinessTermPage viewEditBusinessTermPage = new ViewEditBusinessTermPageImpl(this);
+        assert viewEditBusinessTermPage.isOpened();
+        return viewEditBusinessTermPage;
     }
 
     @Override

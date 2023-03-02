@@ -11,6 +11,7 @@ import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -41,15 +42,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    DragDropModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        DragDropModule,
+        ScoreCommonModule,
+        FontAwesomeModule
+    ],
   declarations: [
     ReleaseListComponent,
     ReleaseCreateComponent,

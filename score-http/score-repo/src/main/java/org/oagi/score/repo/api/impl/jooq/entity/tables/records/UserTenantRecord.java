@@ -38,16 +38,16 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenat to the
-     * user.
+     * Setter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
+     * the user.
      */
     public void setTenantId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenat to the
-     * user.
+     * Getter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
+     * the user.
      */
     public ULong getTenantId() {
         return (ULong) get(1);

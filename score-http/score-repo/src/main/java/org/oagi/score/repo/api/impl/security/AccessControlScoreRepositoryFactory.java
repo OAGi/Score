@@ -8,6 +8,10 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.BieWriteRepository;
 import org.oagi.score.repo.api.businesscontext.*;
+import org.oagi.score.repo.api.businessterm.BusinessTermAssignmentWriteRepository;
+import org.oagi.score.repo.api.businessterm.BusinessTermReadRepository;
+import org.oagi.score.repo.api.businessterm.BusinessTermWriteRepository;
+import org.oagi.score.repo.api.configuration.ConfigurationWriteRepository;
 import org.oagi.score.repo.api.corecomponent.CcReadRepository;
 import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
@@ -79,6 +83,11 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     }
 
     protected abstract void ensureRequester(ScoreUser requester) throws ScoreDataAccessException;
+
+    @Override
+    public ConfigurationWriteRepository createConfigurationWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createConfigurationWriteRepository(), ConfigurationWriteRepository.class);
+    }
 
     @Override
     public ScoreUserReadRepository createScoreUserReadRepository() throws ScoreDataAccessException {
@@ -198,5 +207,20 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     @Override
     public MessageWriteRepository createMessageWriteRepository() throws ScoreDataAccessException {
         return wrapForAccessControl(delegate.createMessageWriteRepository(), MessageWriteRepository.class);
+    }
+
+    @Override
+    public BusinessTermReadRepository createBusinessTermReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createBusinessTermReadRepository(), BusinessTermReadRepository.class);
+    }
+
+    @Override
+    public BusinessTermWriteRepository createBusinessTermWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createBusinessTermWriteRepository(), BusinessTermWriteRepository.class);
+    }
+
+    @Override
+    public BusinessTermAssignmentWriteRepository createBusinessTermAssignmentWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createBusinessTermAssignmentWriteRepository(), BusinessTermAssignmentWriteRepository.class);
     }
 }

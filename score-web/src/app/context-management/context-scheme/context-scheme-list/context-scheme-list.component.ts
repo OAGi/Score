@@ -64,7 +64,7 @@ export class ContextSchemeListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadContextSchemeList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -79,9 +79,7 @@ export class ContextSchemeListComponent implements OnInit {
     this.loadContextSchemeList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadContextSchemeList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
+import com.google.common.collect.ImmutableMap;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.data.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
@@ -7,7 +8,7 @@ import org.oagi.score.gateway.http.api.account_management.service.AccountListSer
 import org.oagi.score.gateway.http.api.account_management.service.AccountService;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.app.configuration.ConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +57,10 @@ public class AccountController implements InitializingBean {
 
     @Autowired
     private ScoreClientRegistrationRepository clientRegistrationRepository;
-    
+
     @Autowired
-    private ConfigurationService configService;
-    
+    private ApplicationConfigurationService configService;
+
     @Autowired
     private TenantService tenantService;
 
@@ -117,16 +118,22 @@ public class AccountController implements InitializingBean {
                 resp.put("enabled", false);
             }
         }
-        
-        resp.put("isTenantInstance", configService.isTenantInstance());
-        resp.put("tenantRoles", getUserTenantsRoleByUserId(appUser.getAppUserId()));
+
+        resp.put("tenant", ImmutableMap.builder()
+                .put("enabled", configService.isTenantEnabled())
+                .put("roles", getUserTenantsRoleByUserId(appUser.getAppUserId()))
+                .build());
+
+        resp.put("businessTerm", ImmutableMap.builder()
+                .put("enabled", configService.isBusinessTermEnabled())
+                .build());
 
         return resp;
     }
 
     private List<ULong> getUserTenantsRoleByUserId(BigInteger userId) {
         List<ULong> tenantRoles = new ArrayList<>();
-        if (configService.isTenantInstance()) {
+        if (configService.isTenantEnabled()) {
             tenantRoles = tenantService.getUserTenantsRoleByUserId(userId);
         }
         return tenantRoles;

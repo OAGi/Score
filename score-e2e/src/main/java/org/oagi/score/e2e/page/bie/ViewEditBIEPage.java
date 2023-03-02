@@ -176,6 +176,20 @@ public interface ViewEditBIEPage extends Page {
     int getTotalNumberOfItems();
 
     /**
+     * Return the UI element of the 'Previous Page' button in the paginator.
+     *
+     * @return the UI element of the 'Previous Page' button in the paginator
+     */
+    WebElement getPreviousPageButton();
+
+    /**
+     * Return the UI element of the 'Next Page' button in the paginator.
+     *
+     * @return the UI element of the 'Next Page' button in the paginator
+     */
+    WebElement getNextPageButton();
+
+    /**
      * Open the 'Transfer BIE Ownership' dialog.
      *
      * @param tr the table record

@@ -83,7 +83,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     forkJoin([
@@ -122,9 +122,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
     this.loadBieList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
+  onChange(property?: string, source?) {
   }
 
   onSourceReleaseChange(property?: string, source?) {

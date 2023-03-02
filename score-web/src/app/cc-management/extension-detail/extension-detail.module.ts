@@ -43,10 +43,10 @@ const routes: Routes = [
     AngularSplitModule
   ],
   declarations: [
-    ExtensionDetailComponent,
+    ExtensionDetailComponent
   ],
   entryComponents: [
-    AppendAssociationDialogComponent,
+    AppendAssociationDialogComponent
   ]
 })
 export class ExtensionDetailModule {

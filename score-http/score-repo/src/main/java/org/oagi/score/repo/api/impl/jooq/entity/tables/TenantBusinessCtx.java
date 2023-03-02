@@ -32,7 +32,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantBusinessCtx
 
 
 /**
- * This table captures the tenant role and theirs bussiness contexts.
+ * This table captures the tenant role and theirs business contexts.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
@@ -65,16 +65,16 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     /**
      * The column <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * bussiness contaxt for the company.
+     * business context for the company.
      */
-    public final TableField<TenantBusinessCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Concrete bussiness contaxt for the company.");
+    public final TableField<TenantBusinessCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Concrete business context for the company.");
 
     private TenantBusinessCtx(Name alias, Table<TenantBusinessCtxRecord> aliased) {
         this(alias, aliased, null);
     }
 
     private TenantBusinessCtx(Name alias, Table<TenantBusinessCtxRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the tenant role and theirs bussiness contexts."), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("This table captures the tenant role and theirs business contexts."), TableOptions.table());
     }
 
     /**

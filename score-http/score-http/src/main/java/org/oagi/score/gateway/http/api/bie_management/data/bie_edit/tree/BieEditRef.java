@@ -14,4 +14,6 @@ public class BieEditRef {
     private String hashPath;
     private BigInteger topLevelAsbiepId;
     private BigInteger refTopLevelAsbiepId;
+    private boolean refInverseMode;
+
 }

@@ -6,6 +6,8 @@ import org.jooq.UpdateSetFirstStep;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.corecomponent.model.OagisComponentType;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.log.model.LogAction;
 import org.oagi.score.service.common.data.CcState;
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.jooq.impl.DSL.and;
@@ -63,6 +66,13 @@ public class AsccpWriteRepository {
         AccManifestRecord roleOfAccManifest = dslContext.selectFrom(ACC_MANIFEST)
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(request.getRoleOfAccManifestId())))
                 .fetchOne();
+
+        AccRecord roleOfAccRecord = dslContext.selectFrom(ACC)
+                .where(ACC.ACC_ID.eq(roleOfAccManifest.getAccId()))
+                .fetchOne();
+        if (roleOfAccRecord.getIsAbstract() == 1) {
+            throw new IllegalArgumentException("An abstract ACC cannot be used to create a new ASCCP.");
+        }
 
         AsccpRecord asccp = new AsccpRecord();
         asccp.setGuid(ScoreGuid.randomGuid());
@@ -107,6 +117,23 @@ public class AsccpWriteRepository {
                         userId, timestamp);
         asccpManifest.setLogId(logRecord.getLogId());
         asccpManifest.update(ASCCP_MANIFEST.LOG_ID);
+
+        if (StringUtils.hasLength(request.getTag())) {
+            ULong asccpManifestId = asccpManifest.getAsccpManifestId();
+            dslContext.selectFrom(TAG)
+                    .where(TAG.NAME.eq(request.getTag()))
+                    .fetchOptionalInto(TagRecord.class)
+                    .ifPresent(tagRecord -> {
+                        AsccpManifestTagRecord asccpManifestTagRecord = new AsccpManifestTagRecord();
+                        asccpManifestTagRecord.setAsccpManifestId(asccpManifestId);
+                        asccpManifestTagRecord.setTagId(tagRecord.getTagId());
+                        asccpManifestTagRecord.setCreatedBy(userId);
+                        asccpManifestTagRecord.setCreationTimestamp(timestamp);
+                        dslContext.insertInto(ASCCP_MANIFEST_TAG)
+                                .set(asccpManifestTagRecord)
+                                .execute();
+                    });
+        }
 
         return new CreateAsccpRepositoryResponse(asccpManifest.getAsccpManifestId().toBigInteger());
     }

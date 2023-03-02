@@ -1,21 +1,19 @@
-About this Guide
-================
+.. Score User Guide documentation master file, created by
+   sphinx-quickstart on Fri Oct  5 17:04:12 2018.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-How to use this guide
----------------------
+Welcome to Score User Guide!
+==========================================
 
-Use the menu on the left to browse through sections.
+.. toctree::
+   :maxdepth: 6
 
-The content of the user guide is on one HTML page. Use the browser’s
-text search to find content on this page.
+   ScoreUserGuide <ScoreUserGuide.rst>
 
-Due to limited development resources, the user guide is designed to
-minimize its maintenance due to UI changes. Therefore, it contains
-minimal UI graphics. It is recommended that the user guide is read along
-with the tool. Follow the instruction along with the tool interactions.
 
-Nomenclature 
--------------
+Indices and tables
+==================
 
 +-------------------------+--------------------------------------------+
 | Structural Format       | Meaning                                    |
@@ -9286,4 +9284,6 @@ Features with restricted behavior
 .. |image7| image:: media/image14.png
    :width: 0.19168in
    :height: 0.20835in
+
+
 

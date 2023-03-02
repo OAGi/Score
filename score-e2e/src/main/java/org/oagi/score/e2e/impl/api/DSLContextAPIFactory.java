@@ -6,6 +6,7 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DefaultDSLContext;
 import org.oagi.score.e2e.Configuration;
 import org.oagi.score.e2e.api.*;
+import org.oagi.score.e2e.impl.api.jooq.entity.DSLContextAssignedBusinessTermAPIImpl;
 
 public class DSLContextAPIFactory implements APIFactory {
 
@@ -27,6 +28,11 @@ public class DSLContextAPIFactory implements APIFactory {
 
         HikariDataSource dataSource = dataSourceFactory.build();
         return new DSLContextAPIFactory(dataSource);
+    }
+
+    @Override
+    public ApplicationSettingsAPI getApplicationSettingsAPI() {
+        return new DSLContextApplicationSettingsAPIImpl(dslContext);
     }
 
     @Override
@@ -62,6 +68,16 @@ public class DSLContextAPIFactory implements APIFactory {
     @Override
     public BusinessContextValueAPI getBusinessContextValueAPI() {
         return new DSLContextBusinessContextValueAPIImpl(dslContext);
+    }
+
+    @Override
+    public BusinessTermAPI getBusinessTermAPI() {
+        return new DSLContextBusinessTermAPIImpl(dslContext, this);
+    }
+
+    @Override
+    public AssignedBusinessTermAPI getAssignedBusinessTermAPI() {
+        return new DSLContextAssignedBusinessTermAPIImpl(dslContext, this);
     }
 
     @Override
