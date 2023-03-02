@@ -1245,7 +1245,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_18")
     public void test_TA_18(){
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        WebElement denSortColumn = getDriver().findElement(By.xpath("//th/div/div[.=\" DEN\"]"));
+        getDriver().findElement(By.xpath("//mat-chip[.=\"ACC\"]"));
     }
 
     @Test
