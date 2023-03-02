@@ -125,12 +125,16 @@ public abstract class PageHelper {
         if (element == null) {
             return null;
         }
+        String s;
         switch (element.getTagName()) {
             case "input":
             case "textarea":
-                return trim(element.getAttribute("value"));
+                s = trim(element.getAttribute("value"));
+                break;
+            default:
+                s = trim(element.getText());
         }
-        return trim(element.getText());
+        return (s.length() > 0) ? s : null;
     }
 
     public static WebElement clear(WebElement element) {

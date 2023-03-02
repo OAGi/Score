@@ -168,6 +168,18 @@ public interface BCCPViewEditPage extends Page {
     void hitUpdateButton();
 
     /**
+     * Return the UI element of the 'Cancel' button, which displays only if it is revised/amended.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Cancel' button.
+     */
+    void hitCancelButton();
+
+    /**
      * Return the BCCP panel container. Use this when the page is opened.
      *
      * @return the BCCP panel container

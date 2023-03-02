@@ -28,6 +28,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By CHANGE_BDT_OPTION_LOCATOR =
             By.xpath("//button/span[contains(text(), \"Change BDT\")]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
@@ -282,6 +284,22 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         retry(() -> click(getUpdateButton(true)));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        retry(() -> {
+            click(getCancelButton());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//score-confirm-dialog//span[contains(text(), \"Okay\")]//ancestor::button[1]")));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
