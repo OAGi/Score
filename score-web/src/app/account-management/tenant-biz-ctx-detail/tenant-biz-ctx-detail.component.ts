@@ -63,7 +63,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBusinessContextList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -82,6 +82,8 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   }
 
   getTenantInfo(tenantId: number) {
+    this.loading = true;
+
     this.service.getTenantInfo(this.tenantId).pipe(
       finalize(() => {
         this.loading = false;
@@ -120,9 +122,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     });
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessContextList();
+  onChange(property?: string, source?) {
   }
 
   onPageChange(event: PageEvent) {
@@ -166,6 +166,8 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   }
 
   removeTenantBusinessCtx(businessCtxId: number) {
+    this.loading = true;
+
     this.service.deleteTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;
@@ -178,6 +180,8 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   }
 
   addTenantBusinessCtx(businessCtxId: number) {
+    this.loading = true;
+
     this.service.addTenantBusinessCtx(this.tenantId, businessCtxId).pipe(
       finalize(() => {
         this.loading = false;

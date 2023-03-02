@@ -25,6 +25,8 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private String contentComponentDefinition;
     private boolean commonlyUsed;
     private boolean deprecated;
+    private BigInteger replacementDtManifestId;
+    private CcBdtNodeDetail replacement;
     private String den;
     private String definition;
     private String definitionSource;

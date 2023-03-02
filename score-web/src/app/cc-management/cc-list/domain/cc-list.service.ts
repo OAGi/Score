@@ -71,6 +71,9 @@ export class CcListService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
+    if (request.tags && request.tags.length > 0) {
+      params = params.set('tags', request.tags.join(','));
+    }
     if (request.componentTypes && request.componentTypes.length > 0) {
       params = params.set('componentTypes', request.componentTypes
         .map((elm: OagisComponentType) => elm.value).join(','));

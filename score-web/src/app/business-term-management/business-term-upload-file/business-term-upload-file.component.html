@@ -1,0 +1,54 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button mat-raised-button class="ml-2" (click)="downloadFile()">
+        <mat-icon>file_download</mat-icon>
+        Download template
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-4 pb-2">
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+
+        <input type="file" class="file-input"
+               [accept]="requiredFileType"
+               (change)="onFileSelected($event)" #fileUpload>
+
+        <div class="file-upload">
+
+          {{ fileName || "No file uploaded yet." }}
+
+          <button mat-mini-fab color="primary" class="upload-btn"
+                  (click)="fileUpload.click()">
+            <mat-icon>attach_file</mat-icon>
+
+          </button>
+
+        </div>
+
+        <div>
+
+          <mat-progress-bar class="progress-bar" mode="determinate"
+                            [value]="uploadProgress" *ngIf="uploadProgress">
+
+          </mat-progress-bar>
+
+          <mat-icon class="cancel-upload" (click)="cancelUpload()"
+                    *ngIf="uploadProgress">delete_forever
+          </mat-icon>
+
+        </div>
+
+        <div style="padding-top: 20px;">
+          <span>Max upload file size: 2 MB</span>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+</div>

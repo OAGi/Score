@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -37,6 +38,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 })
 export class CodeListUpliftComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Code List';
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -105,7 +107,7 @@ export class CodeListUpliftComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCodeList();
     });
 
     this.releases = [];
@@ -131,7 +133,7 @@ export class CodeListUpliftComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.onChange();
+      this.loadCodeList(true);
     });
   }
 
@@ -152,9 +154,6 @@ export class CodeListUpliftComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadCodeList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

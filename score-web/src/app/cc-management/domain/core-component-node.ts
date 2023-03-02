@@ -3,6 +3,7 @@ import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
 import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String, toCamelCase,} from '../../common/utility';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
+import {ShortTag} from "../../tag-management/domain/tag";
 
 export class CcNode {
   type: string;
@@ -147,6 +148,9 @@ export class CcAccNodeDetail extends CcNodeDetail {
   revisionNum: number;
   revisionTrackingNum: number;
 
+  replacementAccManifestId: number;
+  replacement: CcAccNodeDetail;
+
   constructor(node: AccFlatNode, obj: any) {
     super(node);
 
@@ -160,6 +164,8 @@ export class CcAccNodeDetail extends CcNodeDetail {
     this.oagisComponentType = obj.oagisComponentType;
     this.abstracted = obj.abstracted;
     this.deprecated = obj.deprecated;
+    this.replacementAccManifestId = obj.replacementAccManifestId;
+    this.replacement = obj.replacement;
     this.namespaceId = obj.namespaceId;
     this.state = obj.state;
     this.owner = obj.owner;
@@ -182,6 +188,8 @@ export class CcAccNodeDetail extends CcNodeDetail {
       oagisComponentType: this.oagisComponentType,
       abstracted: this.abstracted,
       deprecated: this.deprecated,
+      replacementAccManifestId: this.replacementAccManifestId,
+      replacement: (this.replacement) ? this.replacement.json : undefined,
       definition: this.definition,
       definitionSource: this.definitionSource,
       namespaceId: this.namespaceId,
@@ -203,6 +211,7 @@ export class CcAccNodeDetail extends CcNodeDetail {
       ((this.oagisComponentType) ? this.oagisComponentType : 0) +
       ((this.abstracted) ? 1231 : 1237) +
       ((this.deprecated) ? 1231 : 1237) +
+      ((this.replacementAccManifestId) ? this.replacementAccManifestId : 0) +
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
       ((this.namespaceId) ? this.namespaceId : 0) +
@@ -505,6 +514,9 @@ class AsccpDetail {
   revisionTrackingNum: number;
   _den: string;
 
+  replacementAsccpManifestId: number;
+  replacement: AsccpDetail;
+
   constructor(node: CcFlatNode, obj: any) {
     this._node = node;
     this.manifestId = obj.manifestId;
@@ -526,6 +538,9 @@ class AsccpDetail {
     this.revisionId = obj.revisionId;
     this.revisionNum = obj.revisionNum;
     this.revisionTrackingNum = obj.revisionTrackingNum;
+
+    this.replacementAsccpManifestId = obj.replacementAsccpManifestId;
+    this.replacement = obj.replacement;
   }
 
   get json(): any {
@@ -537,6 +552,8 @@ class AsccpDetail {
       reusable: this.reusable,
       nillable: this.nillable,
       deprecated: this.deprecated,
+      replacementAsccpManifestId: this.replacementAsccpManifestId,
+      replacement: (!!this.replacement) ? this.replacement.json : undefined,
       definition: this.definition,
       definitionSource: this.definitionSource,
       namespaceId: this.namespaceId,
@@ -557,6 +574,7 @@ class AsccpDetail {
       ((this.reusable) ? 1231 : 1237) +
       ((this.nillable) ? 1231 : 1237) +
       ((this.deprecated) ? 1231 : 1237) +
+      ((this.replacementAsccpManifestId) ? this.replacementAsccpManifestId : 0) +
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
       ((this.namespaceId) ? this.namespaceId : 0) +
@@ -911,6 +929,9 @@ class BccpDetail {
   revisionNum: number;
   revisionTrackingNum: number;
 
+  replacementBccpManifestId: number;
+  replacement: BccpDetail;
+
   constructor(node: BccpFlatNode, obj: any) {
     this._node = node;
 
@@ -920,6 +941,8 @@ class BccpDetail {
     this.propertyTerm = obj.propertyTerm;
     this.nillable = obj.nillable;
     this.deprecated = obj.deprecated;
+    this.replacementBccpManifestId = obj.replacementBccpManifestId;
+    this.replacement = obj.replacement;
     this.namespaceId = obj.namespaceId;
     this.defaultValue = obj.defaultValue;
     this.fixedValue = obj.fixedValue;
@@ -944,6 +967,8 @@ class BccpDetail {
       propertyTerm: this.propertyTerm,
       nillable: this.nillable,
       deprecated: this.deprecated,
+      replacementBccpManifestId: this.replacementBccpManifestId,
+      replacement: (!!this.replacement) ? this.replacement.json : undefined,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
       definition: this.definition,
@@ -965,6 +990,7 @@ class BccpDetail {
       ((!!this.propertyTerm) ? hashCode4String(this.propertyTerm) : 0) +
       ((this.nillable) ? 1231 : 1237) +
       ((this.deprecated) ? 1231 : 1237) +
+      ((this.replacementBccpManifestId) ? this.replacementBccpManifestId : 0) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
       ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
@@ -2377,6 +2403,7 @@ export class CcGraphNode {
   cardinalityMax?: number;
   basedDtScId?: number;
   locked?: boolean;
+  tagList?: ShortTag[];
 }
 
 export class CcGraphEdge {

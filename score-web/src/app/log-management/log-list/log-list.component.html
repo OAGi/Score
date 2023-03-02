@@ -19,7 +19,7 @@
 
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <ng-container matColumnDef="check">

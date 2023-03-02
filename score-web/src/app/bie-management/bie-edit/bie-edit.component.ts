@@ -1,4 +1,5 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -7,10 +8,10 @@ import {forkJoin, Observable, ReplaySubject} from 'rxjs';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {
   BieDetailUpdateRequest,
+  BieDetailUpdateResponse,
   BieEditAbieNode,
   BieEditCreateExtensionResponse,
   BieEditNode,
-  UsedBie,
   ValueDomain,
   ValueDomainType
 } from '../bie-edit/domain/bie-edit-node';
@@ -23,6 +24,7 @@ import {
   BieEditAsbiepNodeDetail,
   BieEditBbiepNodeDetail,
   BieEditBbieScNodeDetail,
+  BieEditNodeDetail,
   BieFlatNode,
   BieFlatNodeDatabase,
   BieFlatNodeDataSource,
@@ -38,13 +40,16 @@ import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {BusinessTermService} from '../../business-term-management/domain/business-term.service';
 import {AuthService} from '../../authentication/auth.service';
-import {RxStompService} from '@stomp/ng2-stompjs';
 import {loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
 import {PageRequest} from '../../basis/basis';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {AssignedBtListRequest, AssignedBusinessTerm} from '../../business-term-management/domain/business-term';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {MatMenuTrigger} from '@angular/material/menu';
 
 @Component({
   selector: 'score-bie-edit',
@@ -53,6 +58,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 })
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
+  faRecycle = faRecycle;
   loading = false;
   paddingPixel = 12;
 
@@ -99,10 +105,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   valueDomainTypes = [ValueDomainType.Primitive, ValueDomainType.Code, ValueDomainType.Agency];
 
   /* business term management */
-  businessTermList = 'No assigned yet';
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  usedBieList: UsedBie[];
 
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
   virtualScrollItemSize = 33;
@@ -115,6 +119,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return 1000000 * this.virtualScrollItemSize;
   }
 
+  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: BieFlatNode;
   @ViewChild('businessContextInput') businessContextInput: ElementRef<HTMLInputElement>;
   @ViewChild('matAutocomplete') matAutocomplete: MatAutocomplete;
@@ -148,6 +153,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private route: ActivatedRoute,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private businessTermService: BusinessTermService,
               private auth: AuthService,
               private stompService: RxStompService,
               private clipboard: Clipboard) {
@@ -183,11 +189,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.businessContextUpdating = false;
       this.filteredBusinessContexts = this.businessContextCtrl.valueChanges.pipe(
         startWith(null),
-        map((value: string | null) => value ? this._filter(value) : this._filter()));
+        map((value: string | BusinessContext | null) => value ? this._filter(value) : this._filter()));
       this._loadAllBusinessContexts();
 
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
-        rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
+        this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
       this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
@@ -209,9 +215,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.loading = false;
       return;
     }, err => {
-        this.snackBar.open('Something\'s wrong.', '', {
-          duration: 3000
-        });
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000
+      });
     });
   }
 
@@ -310,15 +316,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.cursorNode = node;
   }
 
-  keyNavigation($event: KeyboardEvent) {
+  keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
     } else if ($event.key === 'ArrowUp') {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
       this.dataSource.toggle(this.cursorNode);
+    } else if ($event.key === 'o' || $event.key === 'O') {
+      this.menuTriggerList.toArray().filter(e => !!e.menuData)
+        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
+        this.contextMenuItem = node;
+        trigger.openMenu();
+      });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
+    } else {
+      return;
     }
     $event.preventDefault();
     $event.stopPropagation();
@@ -426,8 +440,39 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   used(node: BieFlatNode): boolean {
     const used = (!node) ? undefined : node.used;
-    return (used !== undefined) ? used : (this.rootNode.inverseMode);
+    return (used !== undefined) ? used : node.inverseMode;
   }
+
+  /*
+  completed(node: BieFlatNode): boolean {
+    if (node instanceof BbieScFlatNode) {
+      return this.used(node);
+    }
+    if (node.expandable && !node.children) {
+      return false;
+    }
+    for (const child of node.children) {
+      if (!this.completed(child as BieFlatNode)) {
+        return false;
+      }
+    }
+    return this.used(node);
+  }
+
+  indeterminate(node: BieFlatNode): boolean {
+    if (this.completed(node)) {
+      return false;
+    }
+    if (node.children !== undefined) {
+      for (const child of node.children) {
+        if (this.used(child as BieFlatNode)) {
+          return true;
+        }
+      }
+    }
+    return this.used(node);
+  }
+  */
 
   isUsableChildren(node: BieFlatNode): boolean {
     if (!node) {
@@ -485,9 +530,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return userToken.roles.includes('developer');
   }
 
-  isTenantInstance() {
+  get isTenantEnabled(): boolean {
     const userToken = this.auth.getUserToken();
-    return userToken.isTenantInstance;
+    return userToken.tenant.enabled;
+  }
+
+  get isBusinessTermEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.businessTerm.enabled;
   }
 
   canCreateBIEFromThis(node: BieFlatNode): boolean {
@@ -536,10 +586,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.service.getUsedBieList(this.topLevelAsbiepId),
       this.service.getRefBieList(this.topLevelAsbiepId),
     ]).subscribe(([ccGraph, usedBieList, refBieList]) => {
-      this.usedBieList = usedBieList;
-
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
-        this.rootNode.asccpManifestId, this.topLevelAsbiepId, usedBieList, refBieList);
+        this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
       this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
@@ -691,6 +739,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
+    this.isUpdating = true;
     const nodeItem = node as AsbiepFlatNode;
     this.service.createLocalAbieExtension(nodeItem).subscribe((resp: BieEditCreateExtensionResponse) => {
       if (resp.canEdit) {
@@ -722,6 +771,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
+    this.isUpdating = true;
     const nodeItem = node as AsbiepFlatNode;
     this.service.createGlobalAbieExtension(nodeItem).subscribe((resp: BieEditCreateExtensionResponse) => {
       if (resp.canEdit) {
@@ -890,6 +940,47 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
     }
     return false;
+  }
+
+  goToBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
+    let bieId: number;
+    if (bieType === 'ASBIE') {
+      bieId = (detailNode as BieEditAsbiepNodeDetail).asbie.asbieId;
+      const link = this.router.serializeUrl(
+        this.router.createUrlTree(['/business_term_management/assign_business_term/'],
+          {queryParams: {bieId, bieType}}));
+      window.open(link, '_blank');
+    } else if (bieType === 'BBIE') {
+      bieId = (detailNode as BieEditBbiepNodeDetail).bbie.bbieId;
+      const link = this.router.serializeUrl(
+        this.router.createUrlTree(['/business_term_management/assign_business_term/'],
+          {queryParams: {bieId, bieType}}));
+      window.open(link, '_blank');
+    } else {
+      this.snackBar.open('Error occurred. Unrecognized BIE type: ' + bieType);
+    }
+  }
+
+  goToAssignBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
+    let bieId: number;
+    if (bieType === 'ASBIE') {
+      bieId = (detailNode as BieEditAsbiepNodeDetail).asbie.asbieId;
+    } else if (bieType === 'BBIE') {
+      bieId = (detailNode as BieEditBbiepNodeDetail).bbie.bbieId;
+    } else {
+      this.snackBar.open('Error occurred. Unrecognized BIE type: ' + bieType);
+    }
+
+    if (bieId) {
+      const link = this.router.serializeUrl(
+        this.router.createUrlTree(['/business_term_management/assign_business_term/create/bt'],
+          {queryParams: {bieIds: [bieId], bieTypes: [bieType]}}));
+      window.open(link, '_blank');
+    } else {
+      this.snackBar.open('Please save the current state to assign the business terms to this BIE.', '', {
+        duration: 3000,
+      });
+    }
   }
 
   onChange(entity: BieFlatNode, propertyName: string, val: any) {
@@ -1177,6 +1268,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
       bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
     } else {
+      this.bieMinimumLength = undefined;
       return;
     }
 
@@ -1240,6 +1332,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
       bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
     } else {
+      this.bieMaximumLength = undefined;
       return;
     }
 
@@ -1527,6 +1620,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           break;
       }
     });
+
+    if (request.length > 10) {
+      this.loading = true;
+    }
     this.isUpdating = true;
 
     if (this.rootNode.isChanged) {
@@ -1535,10 +1632,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     this.service.updateDetails(this.topLevelAsbiepId, request).pipe(finalize(() => {
       this.isUpdating = false;
-    })).subscribe(resp => {
+      this.loading = false;
+    })).subscribe((resp: BieDetailUpdateResponse) => {
       this.rootNode.reset();
+      this.dataSource.update(resp);
       this.dataSource.getChanged().forEach(e => e.reset());
-      this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(list => this.usedBieList = list);
+      this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(usedBieList => {
+        this.dataSource.database.setUsedBieList(usedBieList);
+      });
       if (callbackFn === undefined) {
         this.snackBar.open('Updated', '', {
           duration: 3000,
@@ -1712,7 +1813,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   _loadAllBusinessContexts() {
     const request = new BusinessContextListRequest();
-    if (this.auth.getUserToken().isTenantInstance) {
+    if (this.isTenantEnabled) {
       request.filters.isBieEditing = true;
     }
     request.page = new PageRequest('name', 'asc', -1, -1);
@@ -1726,11 +1827,17 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return (!this.businessContextUpdating && this.businessContexts.length > 1);
   }
 
-  _filter(name?: string) {
+  _filter(value?: string | BusinessContext) {
     const prevBizCtxNames = this.businessContexts.map(e => e.name);
     let l = this.allBusinessContexts.filter(e => !prevBizCtxNames.includes(e.name));
-    if (name) {
-      l = l.filter(e => e.name.toLowerCase().indexOf(name) === 0);
+    if (!!value) {
+      let name;
+      if (typeof value === 'object') {
+        name = (value as BusinessContext).name;
+      } else {
+        name = value;
+      }
+      l = l.filter(e => e.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
     }
     return l;
   }

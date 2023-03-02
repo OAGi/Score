@@ -85,6 +85,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
 
+    private static final By TYPE_DEFINITION_FIELD_LOCATOR =
+            By.xpath("//textarea[@data-placeholder=\"Type Definition\"]");
+
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
 
@@ -176,6 +179,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert accExtensionViewEditPage.isOpened();
             return accExtensionViewEditPage;
+        });
+    }
+
+    @Override
+    public void getExtendBIELocallyOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+            }
         });
     }
 
@@ -347,6 +364,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public String getAttentionDialogMessage() {
         return visibilityOfElementLocated(getDriver(), ATTENTION_DIALOG_MESSAGE_LOCATOR).getText();
+    }
+
+    @Override
+    public String getTypeDefinitionValue() {
+        return getTypeDefinitionField().getAttribute("ng-reflect-value");
+    }
+
+    @Override
+    public WebElement getTypeDefinitionField(){
+        return visibilityOfElementLocated(getDriver(), TYPE_DEFINITION_FIELD_LOCATOR);
     }
 
     @Override

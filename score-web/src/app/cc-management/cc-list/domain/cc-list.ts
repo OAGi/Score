@@ -4,6 +4,7 @@ import {SimpleRelease} from '../../../release-management/domain/release';
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
+import {ShortTag} from "../../../tag-management/domain/tag";
 
 export class CcListRequest {
   release: SimpleRelease;
@@ -19,6 +20,7 @@ export class CcListRequest {
     manifestId: number
   };
   componentTypes: OagisComponentType[];
+  tags: string[];
 
   dtTypes: string[] = [];
   asccpTypes: string[] = [];
@@ -43,11 +45,11 @@ export class CcListRequest {
     this.release = new SimpleRelease();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
-    if (!this.page.sortActive) {
+    if (this.page.sortActive !== '' && !this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
     }
     this.page.sortDirection = params.get('sortDirection');
-    if (!this.page.sortDirection) {
+    if (this.page.sortDirection !== '' && !this.page.sortDirection) {
       this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
     }
     if (params.get('pageIndex')) {
@@ -66,6 +68,7 @@ export class CcListRequest {
     this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')))] : undefined;
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.tags = (params.get('tags')) ? Array.from(params.get('tags').split(',')) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
       .map(elm => OagisComponentTypes[elm]) : [];
     this.updatedDate = {
@@ -128,6 +131,9 @@ export class CcListRequest {
     if (this.filters.module && this.filters.module.length > 0) {
       params = params.set('module', '' + this.filters.module);
     }
+    if (this.tags && this.tags.length > 0) {
+      params = params.set('tags', this.tags.join(','));
+    }
     if (this.componentTypes && this.componentTypes.length > 0) {
       params = params.set('componentTypes', this.componentTypes
         .map((elm: OagisComponentType) => elm.value).join(','));
@@ -169,6 +175,7 @@ export class CcList {
   sixDigitId: string;
   basedManifestId: number;
   defaultValueDomain: number;
+  tagList: ShortTag[];
 }
 
 export class CcUpdateStateListRequest {
@@ -312,6 +319,9 @@ export class Ascc {
 
 export class SummaryCcExt {
   accId: number;
+  accManifestId: number;
+  releaseId: number;
+  releaseNum: string;
   guid: string;
   objectClassTerm: string;
   state: string;
@@ -322,8 +332,8 @@ export class SummaryCcExt {
   ownerUserId: number;
 
   topLevelAsbiepId: number;
-  propertyTerm: string;
-  associationPropertyTerm: string;
+  den: string;
+  associationDen: string;
   seqKey: number;
 }
 

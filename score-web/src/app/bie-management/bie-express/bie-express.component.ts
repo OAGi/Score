@@ -4,7 +4,6 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
-import {SelectionModel} from '../../../../node_modules/@angular/cdk/collections';
 import {BieExpressService} from './domain/bie-express.service';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieExpressOption} from './domain/generate-expression';
@@ -23,6 +22,7 @@ import {finalize} from 'rxjs/operators';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'score-bie-express',
@@ -97,7 +97,7 @@ export class BieExpressComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     forkJoin([
@@ -132,10 +132,6 @@ export class BieExpressComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.selection.clear();
-    this.loadBieList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -281,6 +277,11 @@ export class BieExpressComponent implements OnInit {
           this.option[includeMetaHeaderForJsonPropertyKey] = true;
           this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
+          if (includeMetaHeaderForJsonPropertyKey.includes('GetTemplate')) {
+            this.option.suppressRootPropertyForOpenAPI30GetTemplate = false;
+          } else if (includeMetaHeaderForJsonPropertyKey.includes('PostTemplate')) {
+            this.option.suppressRootPropertyForOpenAPI30PostTemplate = false;
+          }
           this.previousPackageOption = this.option.packageOption;
           this.option.packageOption = 'EACH';
         } else {
@@ -314,6 +315,11 @@ export class BieExpressComponent implements OnInit {
           this.option[includePaginationResponseForJsonPropertyKey] = true;
           this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
+          if (includePaginationResponseForJsonPropertyKey.includes('GetTemplate')) {
+            this.option.suppressRootPropertyForOpenAPI30GetTemplate = false;
+          } else if (includePaginationResponseForJsonPropertyKey.includes('PostTemplate')) {
+            this.option.suppressRootPropertyForOpenAPI30PostTemplate = false;
+          }
           this.previousPackageOption = this.option.packageOption;
           this.option.packageOption = 'EACH';
         } else {
@@ -325,6 +331,10 @@ export class BieExpressComponent implements OnInit {
   }
 
   expressionOptionChange() {
+    if (this.option.expressionOption === 'ODF') {
+      this.option.packageOption = 'EACH';
+    }
+
     if (this.option.expressionOption === 'JSON') {
       if (this.option.includeMetaHeaderForJson || this.option.includePaginationResponseForJson) {
         this.option.packageOption = 'EACH';

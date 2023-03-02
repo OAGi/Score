@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.types.ULong;
@@ -9,6 +10,8 @@ import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcListRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.ManifestRepository;
 import org.oagi.score.gateway.http.api.info.data.SummaryCcExt;
+import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
+import org.oagi.score.gateway.http.api.tag_management.service.TagService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
@@ -30,6 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,11 +66,23 @@ public class CcListService {
     private ReleaseRepository releaseRepository;
 
     @Autowired
+    private TagService tagService;
+
+    @Autowired
     private DSLContext dslContext;
 
     public PageResponse<CcList> getCcList(CcListRequest request) {
         request.setUsernameMap(userRepository.getUsernameMap());
-        return repository.getCcList(request);
+        PageResponse<CcList> response = repository.getCcList(request);
+        Map<Pair<CcType, BigInteger>, List<ShortTag>> tags =
+                tagService.getShortTagsByPairsOfTypeAndManifestId(response.getList().stream()
+                        .map(e -> Pair.of(e.getType(), e.getManifestId())).collect(Collectors.toList()));
+        response.getList().forEach(ccList -> {
+            ccList.setTagList(
+                    tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList())
+            );
+        });
+        return response;
     }
 
     public ACC getAcc(BigInteger manifestId) {
@@ -133,12 +150,12 @@ public class CcListService {
 
         Release workingRelease = releaseRepository.getWorkingRelease();
 
-        List<ULong> uegIds = dslContext.select(ACC.ACC_ID.as("id"))
+        List<ULong> uegAccManifestIds = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID.as("id"))
                 .from(ACC)
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .where(and(
                         ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
-                        ACC_MANIFEST.RELEASE_ID.greaterThan(ULong.valueOf(workingRelease.getReleaseId())),
+                        ACC_MANIFEST.RELEASE_ID.notEqual(ULong.valueOf(workingRelease.getReleaseId())),
                         ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))
                 ))
                 .fetchInto(ULong.class);
@@ -151,17 +168,22 @@ public class CcListService {
                 Tables.ACC.OBJECT_CLASS_TERM,
                 Tables.ACC.STATE,
                 Tables.ACC.LAST_UPDATE_TIMESTAMP,
+                ACC_MANIFEST.ACC_MANIFEST_ID,
+                RELEASE.RELEASE_ID,
+                RELEASE.RELEASE_NUM,
                 APP_USER.LOGIN_ID,
                 APP_USER.APP_USER_ID,
                 APP_USER.as("updater").LOGIN_ID,
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.STATE,
-                ASCCP.as("bie").PROPERTY_TERM,
-                ASCCP.PROPERTY_TERM,
+                ASCCP.as("bie").DEN,
+                ASCCP.DEN,
                 ASBIE.SEQ_KEY)
                 .from(ASCC)
                 .join(ASCC_MANIFEST).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
                 .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(ASBIE).on(and(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ASBIE.BASED_ASCC_MANIFEST_ID), ASBIE.IS_USED.eq(isUsed)))
                 .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
@@ -170,21 +192,25 @@ public class CcListService {
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASBIEP.BASED_ASCCP_MANIFEST_ID))
                 .join(ASCCP.as("bie")).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
-                .where(ACC.ACC_ID.in(uegIds))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
                     item.setAccId(e.get(Tables.ACC.ACC_ID).toBigInteger());
+                    item.setAccManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
+                    item.setReleaseId(e.get(RELEASE.RELEASE_ID).toBigInteger());
+                    item.setReleaseNum(e.get(RELEASE.RELEASE_NUM));
                     item.setGuid(e.get(Tables.ACC.GUID));
                     item.setObjectClassTerm(e.get(Tables.ACC.OBJECT_CLASS_TERM));
                     item.setState(CcState.valueOf(e.get(Tables.ACC.STATE)));
-                    item.setLastUpdateTimestamp(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP));
+                    item.setLastUpdateTimestamp(Date.from(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP, LocalDateTime.class)
+                            .atZone(ZoneId.systemDefault()).toInstant()));
                     item.setLastUpdateUser(e.get(APP_USER.as("updater").LOGIN_ID));
                     item.setOwnerUsername(e.get(APP_USER.LOGIN_ID));
                     item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).toBigInteger());
                     item.setTopLevelAsbiepId(e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
-                    item.setPropertyTerm(e.get(ASCCP.as("bie").PROPERTY_TERM));
-                    item.setAssociationPropertyTerm(e.get(ASCCP.PROPERTY_TERM));
+                    item.setDen(e.get(ASCCP.as("bie").DEN));
+                    item.setAssociationDen(e.get(ASCCP.DEN));
                     item.setSeqKey(e.get(ASBIE.SEQ_KEY).intValue());
                     return item;
                 }).collect(Collectors.toList());
@@ -195,16 +221,21 @@ public class CcListService {
                 Tables.ACC.OBJECT_CLASS_TERM,
                 Tables.ACC.STATE,
                 Tables.ACC.LAST_UPDATE_TIMESTAMP,
+                ACC_MANIFEST.ACC_MANIFEST_ID,
+                RELEASE.RELEASE_ID,
+                RELEASE.RELEASE_NUM,
                 APP_USER.LOGIN_ID,
                 APP_USER.APP_USER_ID,
                 APP_USER.as("updater").LOGIN_ID,
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.STATE,
-                ASCCP.as("bie").PROPERTY_TERM,
-                BCCP.PROPERTY_TERM,
+                ASCCP.as("bie").DEN,
+                BCCP.DEN,
                 BBIE.SEQ_KEY)
                 .from(BCC)
                 .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
                 .join(BBIE).on(and(BCC_MANIFEST.BCC_MANIFEST_ID.eq(BBIE.BASED_BCC_MANIFEST_ID), BBIE.IS_USED.eq(isUsed)))
                 .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
@@ -214,21 +245,25 @@ public class CcListService {
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP.as("bie")).on(ASCCP.as("bie").ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
-                .where(ACC.ACC_ID.in(uegIds))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
                     item.setAccId(e.get(Tables.ACC.ACC_ID).toBigInteger());
+                    item.setAccManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
+                    item.setReleaseId(e.get(RELEASE.RELEASE_ID).toBigInteger());
+                    item.setReleaseNum(e.get(RELEASE.RELEASE_NUM));
                     item.setGuid(e.get(Tables.ACC.GUID));
                     item.setObjectClassTerm(e.get(Tables.ACC.OBJECT_CLASS_TERM));
                     item.setState(CcState.valueOf(e.get(Tables.ACC.STATE)));
-                    item.setLastUpdateTimestamp(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP));
+                    item.setLastUpdateTimestamp(Date.from(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP, LocalDateTime.class)
+                            .atZone(ZoneId.systemDefault()).toInstant()));
                     item.setLastUpdateUser(e.get(APP_USER.as("updater").LOGIN_ID));
                     item.setOwnerUsername(e.get(APP_USER.LOGIN_ID));
                     item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).toBigInteger());
                     item.setTopLevelAsbiepId(e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
-                    item.setPropertyTerm(e.get(ASCCP.as("bie").PROPERTY_TERM));
-                    item.setAssociationPropertyTerm(e.get(BCCP.PROPERTY_TERM));
+                    item.setDen(e.get(ASCCP.as("bie").DEN));
+                    item.setAssociationDen(e.get(BCCP.DEN));
                     item.setSeqKey(e.get(BBIE.SEQ_KEY).intValue());
                     return item;
                 }).collect(Collectors.toList());

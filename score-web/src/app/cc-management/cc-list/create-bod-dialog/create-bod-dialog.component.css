@@ -78,7 +78,7 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-owner {
-  width: 12%;
+  width: 140px;
   font-size: 13px;
 }
 
@@ -98,4 +98,15 @@ tr.element-row:not(.expanded-row):active {
 
 .element-detail {
   font-size: 12px;
+}
+
+.tag-list {
+  display: inline-block;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
 }

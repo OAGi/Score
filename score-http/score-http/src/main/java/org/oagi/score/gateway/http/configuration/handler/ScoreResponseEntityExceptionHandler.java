@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.repo.api.security.AccessControlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -37,6 +38,16 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
             EmptyResultDataAccessException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessControlException.class)
+    public ResponseEntity handleAccessControlException(
+            AccessControlException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

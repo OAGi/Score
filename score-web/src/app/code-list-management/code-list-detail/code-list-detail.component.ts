@@ -2,17 +2,10 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {RxStompService} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
-import {
-  CodeList,
-  CodeListValue,
-  GetSimpleAgencyIdListValuesResponse, SimpleAgencyIdList,
-  SimpleAgencyIdListValue
-} from '../domain/code-list';
+import {CodeList, CodeListValue, SimpleAgencyIdList, SimpleAgencyIdListValue} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -30,6 +23,8 @@ import {WorkingRelease} from '../../release-management/domain/release';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {CodeListCommentControl} from './code-list-comment-component';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
 
 @Component({
   selector: 'score-code-list-detail',

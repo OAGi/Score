@@ -14,6 +14,8 @@ import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {TagService} from '../../tag-management/domain/tag.service';
 
 const routes: Routes = [
   {
@@ -41,7 +43,8 @@ const routes: Routes = [
     SearchOptionsDialogModule,
     FindUsagesDialogModule,
     DragDropModule,
-    AngularSplitModule
+    AngularSplitModule,
+    FontAwesomeModule
   ],
   declarations: [
     AccDetailComponent,
@@ -51,6 +54,9 @@ const routes: Routes = [
   entryComponents: [
     AppendAssociationDialogComponent,
     BasedAccDialogComponent
+  ],
+  providers: [
+    TagService
   ]
 })
 export class AccDetailModule {

@@ -34,7 +34,7 @@
 
                     <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
                           node.state === 'Deleted' ? 'text-line-through' : 'text-none']"
-                          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : ''"
+                          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
                           [innerHTML]="node.name" (click)="openCoreComponent(node)">
                     </span>
                   </div>

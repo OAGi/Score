@@ -1,5 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
@@ -34,7 +35,8 @@ import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {AboutService} from '../../basis/about/domain/about.service';
-import {saveAs} from 'file-saver';
+import {TagService} from '../../tag-management/domain/tag.service';
+import {Tag} from '../../tag-management/domain/tag';
 
 @Component({
   selector: 'score-cc-list',
@@ -50,6 +52,7 @@ import {saveAs} from 'file-saver';
 })
 export class CcListComponent implements OnInit {
 
+  faFlask = faFlask;
   title = 'Core Component';
 
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT', 'ASCC', 'BCC'];
@@ -75,6 +78,7 @@ export class CcListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  tags: Tag[] = [];
 
   contextMenuItem: CcList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -86,12 +90,30 @@ export class CcListComponent implements OnInit {
               private accountService: AccountListService,
               private auth: AuthService,
               private aboutService: AboutService,
+              private tagService: TagService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
+  }
+
+  get currentUser(): string {
+    const userToken = this.auth.getUserToken();
+    return (userToken) ? userToken.username : undefined;
+  }
+
+  get showDiscardBtn(): boolean {
+    return this.selection.selected.length > 0 ?
+      this.selection.selected.filter(e => e.state === 'Deleted').length === 0 :
+      false;
+  }
+
+  get showRestoreBtn(): boolean {
+    return this.selection.selected.length > 0 ?
+      this.selection.selected.filter(e => e.state === 'WIP').length === 0 :
+      false;
   }
 
   ngOnInit() {
@@ -114,8 +136,9 @@ export class CcListComponent implements OnInit {
     forkJoin([
       this.releaseService.getSimpleReleases(['Draft', 'Published']),
       this.accountService.getAccountNames(),
-      this.aboutService.getProductInfo()
-    ]).subscribe(([releases, loginIds, productInfos]) => {
+      this.aboutService.getProductInfo(),
+      this.tagService.getTags()
+    ]).subscribe(([releases, loginIds, productInfos, tags]) => {
       for (const productInfo of productInfos) {
         if (productInfo.productName === 'Elasticsearch' && productInfo.productVersion !== '0.0.0.0') {
           this.isElasticsearchOn = true;
@@ -140,6 +163,7 @@ export class CcListComponent implements OnInit {
           this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
         }
       }
+      this.tags = tags;
 
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
@@ -148,11 +172,6 @@ export class CcListComponent implements OnInit {
     }, error => {
       this.loading = false;
     });
-  }
-
-  get currentUser(): string {
-    const userToken = this.auth.getUserToken();
-    return (userToken) ? userToken.username : undefined;
   }
 
   loadCcList(isInit?: boolean) {
@@ -201,6 +220,10 @@ export class CcListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
@@ -211,8 +234,6 @@ export class CcListComponent implements OnInit {
         this.sort.direction = 'desc';
       }
     }
-    this.paginator.pageIndex = 0;
-    this.loadCcList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -576,7 +597,7 @@ export class CcListComponent implements OnInit {
         if (['ASCC', 'BCC'].indexOf(row.type) === -1) {
           this.select(row);
         }
-    });
+      });
   }
 
   select(row: CcList) {
@@ -593,18 +614,6 @@ export class CcListComponent implements OnInit {
 
   isSelected(row: CcList) {
     return this.selection.isSelected(row);
-  }
-
-  get showDiscardBtn(): boolean {
-    return this.selection.selected.length > 0 ?
-      this.selection.selected.filter(e => e.state === 'Deleted' ).length === 0 :
-      false;
-  }
-
-  get showRestoreBtn(): boolean {
-    return this.selection.selected.length > 0 ?
-      this.selection.selected.filter(e => e.state === 'WIP' ).length === 0 :
-      false;
   }
 
   openDetail(ccList: CcList, $event?) {

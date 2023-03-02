@@ -7,6 +7,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
+import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -27,14 +28,36 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 })
 export class CodelistListDialogComponent implements OnInit {
 
+  faLocationArrow = faLocationArrow;
   title = 'Code List';
   workingRelease = WorkingRelease;
   releaseStateList = ['Published', 'Production'];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'extensible', 'revision', 'owner', 'lastUpdateTimestamp'
-  ];
+  innerWidth: number;
+  get displayedColumns(): string[] {
+    const columns = ['select', 'state', 'codeListName'];
+    const innerWidth = this.innerWidth;
+    if (innerWidth > 900) {
+      columns.push('agencyId');
+    }
+    if (innerWidth > 1000) {
+      columns.push('versionId');
+    }
+    if (innerWidth > 1100) {
+      columns.push('extensible');
+    }
+    if (innerWidth > 1200) {
+      columns.push('revision');
+    }
+    if (innerWidth > 1300) {
+      columns.splice(3, 0, 'basedCodeListName');
+    }
+    if (innerWidth > 800) {
+      columns.push('owner');
+    }
+    columns.push('lastUpdateTimestamp');
+    return columns;
+  }
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<CodeListForList>(true, []);
   loading = false;
@@ -62,6 +85,7 @@ export class CodelistListDialogComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.innerWidth = window.innerWidth;
     this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
@@ -74,7 +98,7 @@ export class CodelistListDialogComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCodeList();
     });
 
     this.releases = [];
@@ -101,21 +125,22 @@ export class CodelistListDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.onChange();
+      this.loadCodeList(true);
     });
   }
 
+  onResize(event) {
+    this.innerWidth = window.innerWidth;
+  }
+
   onPageChange(event: PageEvent) {
-    this.loadCodeList(true);
+    this.loadCodeList();
   }
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadCodeList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

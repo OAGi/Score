@@ -91,7 +91,7 @@ export class AgencyIdListListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadAgencyIdList();
     });
 
     this.releases = [];
@@ -117,7 +117,7 @@ export class AgencyIdListListComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.onChange();
+      this.loadAgencyIdList(true);
     });
   }
 
@@ -131,16 +131,13 @@ export class AgencyIdListListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.loadAgencyIdList(true);
+    this.loadAgencyIdList();
   }
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadAgencyIdList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

@@ -1,0 +1,10 @@
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block !important;
+}
+
+div.tag-list {
+  height: 20px;
+}

@@ -63,10 +63,10 @@ public class AccountListController {
         request.setExcludeRequester(excludeRequester);
         request.setTenantId(tenantId);
         request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
-        
+
         if (StringUtils.hasLength(businessCtxIds)) {
             List<Long> businessCtxIdsList = Arrays.asList(businessCtxIds.split(",")).stream()
-            		.map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(Long::parseLong).collect(Collectors.toList());
+                    .map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(Long::parseLong).collect(Collectors.toList());
             request.setBusinessCtxIds(businessCtxIdsList);
         }
         PageRequest pageRequest = new PageRequest();

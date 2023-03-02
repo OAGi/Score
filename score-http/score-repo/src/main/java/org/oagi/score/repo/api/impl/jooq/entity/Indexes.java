@@ -15,6 +15,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asccp;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc;
@@ -44,6 +45,7 @@ public class Indexes {
     public static final Index ABIE_ABIE_PATH_K = Internal.createIndex(DSL.name("abie_path_k"), Abie.ABIE, new OrderField[] { Abie.ABIE.PATH }, false);
     public static final Index ACC_ACC_GUID_IDX = Internal.createIndex(DSL.name("acc_guid_idx"), Acc.ACC, new OrderField[] { Acc.ACC.GUID }, false);
     public static final Index ACC_ACC_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("acc_last_update_timestamp_desc_idx"), Acc.ACC, new OrderField[] { Acc.ACC.LAST_UPDATE_TIMESTAMP }, false);
+    public static final Index BBIE_BIZTERM_ASBIE_BIZTERM_ASBIE_FK = Internal.createIndex(DSL.name("asbie_bizterm_asbie_fk"), BbieBizterm.BBIE_BIZTERM, new OrderField[] { BbieBizterm.BBIE_BIZTERM.BBIE_ID }, false);
     public static final Index ASBIE_ASBIE_HASH_PATH_K = Internal.createIndex(DSL.name("asbie_hash_path_k"), Asbie.ASBIE, new OrderField[] { Asbie.ASBIE.HASH_PATH }, false);
     public static final Index ASBIE_ASBIE_PATH_K = Internal.createIndex(DSL.name("asbie_path_k"), Asbie.ASBIE, new OrderField[] { Asbie.ASBIE.PATH }, false);
     public static final Index ASBIEP_ASBIEP_HASH_PATH_K = Internal.createIndex(DSL.name("asbiep_hash_path_k"), Asbiep.ASBIEP, new OrderField[] { Asbiep.ASBIEP.HASH_PATH }, false);

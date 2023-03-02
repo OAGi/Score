@@ -15,9 +15,7 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -81,7 +79,7 @@ export class BieListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     forkJoin([
@@ -135,9 +133,10 @@ export class BieListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -234,7 +233,7 @@ export class BieListComponent implements OnInit {
   }
 
   discard(bieList: BieList) {
-    this.openDialogBieDiscard([bieList.topLevelAsbiepId, ]);
+    this.openDialogBieDiscard([bieList.topLevelAsbiepId,]);
   }
 
   openDialogBieDiscard(topLevelAsbiepIds: number[]) {
@@ -271,7 +270,7 @@ export class BieListComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {roles: this.auth.getUserToken().roles};
-    if (this.auth.getUserToken().isTenantInstance) {
+    if (this.auth.getUserToken().tenant.enabled) {
       dialogConfig.data = {businesCtxIds: bieList.businessContexts.map(b => b.businessContextId)};
     }
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);

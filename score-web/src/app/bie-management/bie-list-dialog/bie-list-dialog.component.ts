@@ -1,4 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
+import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
@@ -14,6 +15,7 @@ import {BieReportService} from '../bie-report/domain/bie-report.service';
 })
 export class BieListDialogComponent implements OnInit {
 
+  faRecycle = faRecycle;
   displayedColumns: string[] = [
     'releaseNum',
     'reusingState',

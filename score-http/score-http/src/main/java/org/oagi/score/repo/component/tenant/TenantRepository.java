@@ -20,8 +20,6 @@ import java.util.List;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
-;
-
 @Repository
 public class TenantRepository {
 

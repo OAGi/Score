@@ -22,6 +22,7 @@ public class CreateAsccpRepositoryRequest extends RepositoryRequest {
     private boolean reusable = true;
     private String definition;
     private String definitionSource;
+    private String tag;
     private CcState initialState = CcState.WIP;
 
     public CreateAsccpRepositoryRequest(AuthenticatedPrincipal user,
@@ -108,5 +109,13 @@ public class CreateAsccpRepositoryRequest extends RepositoryRequest {
 
     public void setInitialType(CcASCCPType initialType) {
         this.initialType = initialType;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

@@ -26,10 +26,10 @@
 }
 
 .mat-tree-node div {
-  height: 16px;
+  height: 20px;
 }
 
-.mat-tree-node span {
+.mat-tree-node > span {
   cursor: pointer;
   padding-right: 0px !important;
   margin-right: 10px;
@@ -272,4 +272,20 @@ button:focus, button:active:focus, button.active:focus {
 .hide-prohibited {
   vertical-align: middle;
   margin-right: 5px;
+}
+
+.tag-list {
+  display: inline-block;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block !important;
+}
+
+.mat-tree-node div.tag-list,
+.mat-tree-node span.tag {
+  height: 20px;
 }

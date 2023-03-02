@@ -75,7 +75,7 @@ const routes: Routes = [
   providers: [
     AboutService,
     PendingActivate,
-    DisabledActivate,
+    DisabledActivate
   ]
 })
 export class BasisModule {

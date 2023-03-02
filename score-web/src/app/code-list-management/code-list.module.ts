@@ -12,6 +12,7 @@ import {CodeListForDerivingComponent} from './code-list-for-deriving/code-list-f
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {CodeListUpliftComponent} from './code-list-uplift/code-list-uplift.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -47,15 +48,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        FontAwesomeModule
+    ],
   declarations: [
     CodeListListComponent,
     CodeListDetailComponent,
