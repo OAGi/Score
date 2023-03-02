@@ -831,9 +831,12 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             assertEnabled(ASBIEPanel.getCardinalityMaxField());
             assertEnabled(ASBIEPanel.getRemarkField());
             assertEnabled(ASBIEPanel.getContextDefinitionField());
-            //TODO
-            // Check if Business Term functionality is enabled. Currently, it is disabled.
-            assertEnabled(ASBIEPanel.getBusinessTermField());
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(ASBIEPanel.getBusinessTermField());
+            }
 
             /**
              * Assert that all options for descendant nodes, that are not in Production state, are disabled
@@ -859,9 +862,12 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             assertDisabled(BBIEPPanel.getContextDefinitionField());
             assertDisabled(BBIEPPanel.getAssociationDefinitionField());
             assertDisabled(BBIEPPanel.getComponentDefinitionField());
-            //TODO
-            // Check if Business Term functionality is enabled. Currently, it is disabled.
-            assertDisabled(BBIEPPanel.getBusinessTermField());
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(ASBIEPanel.getBusinessTermField());
+            }
 
             ASCCPObject asccpDescendant = accASCCPPMap.get(ACCAssociation);
             node = editBIEPage.getNodeByPath(
@@ -881,9 +887,12 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             assertDisabled(ASBIEPanel.getAssociationDefinitionField());
             assertDisabled(ASBIEPanel.getComponentDefinitionField());
             assertDisabled(ASBIEPanel.getTypeDefinitionField());
-            //TODO
-            // Check if Business Term functionality is enabled. Currently, it is disabled.
-            assertDisabled(ASBIEPanel.getBusinessTermField());
+            if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                // TODO:
+                // Check business term abilities are disabled
+            } else {
+                assertDisabled(ASBIEPanel.getBusinessTermField());
+            }
 
         }
     }
@@ -1821,13 +1830,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             /**
              * Release Two Core Components and BIEs
              */
-            ACCObject accReleaseTwo = coreComponentAPI.createRandomACC(endUserForCC, releaseTwo, namespace, "Published");
+            ACCObject accReleaseTwo = coreComponentAPI.createRevisedACC(accReleaseOne, endUserForCC, releaseTwo, "Published");
             coreComponentAPI.appendExtension(accReleaseTwo, endUserForCC, namespace, "Published");
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
-
             BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, endUserForCC, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
+            bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
             bccReleaseTwo.setCardinalityMin(3);
             coreComponentAPI.updateBCC(bccReleaseTwo);
@@ -2210,6 +2219,277 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 } else {
                     assertDisabled(ASBIEPanel.getBusinessTermField());
                 }
+            }
+        }
+    }
+    @Test
+    @DisplayName("TC_6_2_TA_6_5_4")
+    public void test_TA_6_5_4() {
+        AppUserObject usera;
+        ArrayList<ASCCPObject> asccpsForTesting = new ArrayList<>();
+        NamespaceObject namespaceEU;
+        Map<ASCCPObject, ACCObject> asccpACCMap = new HashMap<>();
+        Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
+        Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
+        Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
+        Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseOne.getReleaseNumber());
+            DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
+            AppUserObject endUserForCCFirst = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject endUserForCCSecond = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserForCCFirst);
+            thisAccountWillBeDeletedAfterTests(endUserForCCSecond);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            thisAccountWillBeDeletedAfterTests(usera);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            /**
+             * Core Components and BIEs for Release One
+             */
+            ACCObject accReleaseOne = coreComponentAPI.createRandomACC(endUserForCCFirst, releaseOne, namespace, "Published");
+            coreComponentAPI.appendExtension(accReleaseOne, endUserForCCFirst, namespace, "Published");
+            accReleaseOne.setDefinition("definition 1");
+            coreComponentAPI.updateACC(accReleaseOne);
+
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "Published");
+            BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
+            bccReleaseOne.setCardinalityMax(5);
+            bccReleaseOne.setCardinalityMin(1);
+            coreComponentAPI.updateBCC(bccReleaseOne);
+            bccpBCCMap.put(bccpReleaseOne, bccReleaseOne);
+
+            ASCCPObject asccpReleaseOne = coreComponentAPI.createRandomASCCP(accReleaseOne, endUserForCCFirst, namespace, "Published");
+            asccpReleaseOne.setDefinition(accReleaseOne.getDefinition());
+            asccpBCCPMap.put(asccpReleaseOne, bccpReleaseOne);
+            coreComponentAPI.updateASCCP(asccpReleaseOne);
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIEWIPReleaseOne = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpReleaseOne, usera, "WIP");
+            biesForTesting.add(useraBIEWIPReleaseOne);
+            bieASCCPMap.put(useraBIEWIPReleaseOne, asccpReleaseOne);
+
+            /**
+             * Core Components to append
+             */
+
+            /**
+             * The end user ACC of the ASCCP is also in the Production state and was amended.
+             */
+            ACCObject accToAppendReleaseOne = coreComponentAPI.createRandomACC(endUserForCCFirst, releaseOne, namespace, "Production");
+
+            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "QA");
+            coreComponentAPI.appendBCC(accToAppendReleaseOne, bccpToAppendReleaseOne, "QA");
+            accBCCPMap.put(accToAppendReleaseOne, bccpToAppendReleaseOne);
+            /**
+             * The ACC has a child ASCC that points another end user ASCCP2 that is not in the Production state.
+             */
+            ACCObject accQAReleaseOne = coreComponentAPI.createRandomACC(endUserForCCSecond, releaseOne, namespace, "QA");
+            ASCCPObject asccp2ReleaseOne = coreComponentAPI.createRandomASCCP(accQAReleaseOne, endUserForCCSecond, namespace, "QA");
+            coreComponentAPI.appendASCC(accToAppendReleaseOne, asccp2ReleaseOne, "QA");
+            accASCCPPMap.put(accToAppendReleaseOne, asccp2ReleaseOne);
+            /**
+             * Amend the ACC that should be amended.
+             */
+            coreComponentAPI.createRevisedACC(accToAppendReleaseOne, endUserForCCSecond, releaseOne, "WIP");
+            /**
+             * There is a corresponding UEGACC that has a child association to an end user ASCCP that is in the Production state
+             */
+            ASCCPObject asccpToAppendProductionReleaseOne = coreComponentAPI.createRandomASCCP(accToAppendReleaseOne, endUserForCCSecond, namespace, "Production");
+            asccpsForTesting.add(asccpToAppendProductionReleaseOne);
+            asccpACCMap.put(asccpToAppendProductionReleaseOne, accToAppendReleaseOne);
+
+            /**
+             * Core Components and BIEs for Release Two
+             */
+            ACCObject accReleaseTwo = coreComponentAPI.createRevisedACC(accReleaseOne, endUserForCCFirst, releaseTwo, "Published");
+            coreComponentAPI.appendExtension(accReleaseTwo, endUserForCCFirst, namespace, "Published");
+            accReleaseOne.setDefinition("definition 2");
+            coreComponentAPI.updateACC(accReleaseTwo);
+
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRevisedBCCP(bccpReleaseOne, dataTypeReleaseTwo, endUserForCCFirst, releaseTwo, "Published");
+            BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
+            bccReleaseTwo.setCardinalityMax(3);
+            bccReleaseTwo.setCardinalityMin(3);
+            coreComponentAPI.updateBCC(bccReleaseTwo);
+            bccpBCCMap.put(bccpReleaseTwo, bccReleaseTwo);
+
+            ASCCPObject asccpReleaseTwo = coreComponentAPI.createRevisedASCCP(asccpReleaseOne, accReleaseTwo, endUserForCCFirst, releaseTwo, "Published");
+            asccpReleaseTwo.setDefinition(accReleaseTwo.getDefinition());
+            asccpBCCPMap.put(asccpReleaseTwo, bccpReleaseTwo);
+            coreComponentAPI.updateASCCP(asccpReleaseTwo);
+
+            TopLevelASBIEPObject useraBIEWIPReleaseTwo = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpReleaseTwo, usera, "WIP");
+            biesForTesting.add(useraBIEWIPReleaseTwo);
+            bieASCCPMap.put(useraBIEWIPReleaseTwo, asccpReleaseTwo);
+
+            /**
+             * Core Components to append
+             */
+
+            /**
+             * The end user ACC of the ASCCP is also in the Production state and was amended.
+             */
+            ACCObject accToAppendReleaseTwo = coreComponentAPI.createRevisedACC(accToAppendReleaseOne, endUserForCCFirst, releaseTwo, "Production");
+
+            BCCPObject bccpToAppendReleaseTwo = coreComponentAPI.createRevisedBCCP(bccpToAppendReleaseOne, dataTypeReleaseTwo, endUserForCCFirst, releaseTwo, "QA");
+            coreComponentAPI.appendBCC(accToAppendReleaseTwo, bccpToAppendReleaseTwo, "QA");
+            accBCCPMap.put(accToAppendReleaseTwo, bccpToAppendReleaseTwo);
+            /**
+             * The ACC has a child ASCC that points another end user ASCCP2 that is not in the Production state.
+             */
+            ACCObject accQAReleaseTwo = coreComponentAPI.createRevisedACC(accQAReleaseOne, endUserForCCSecond, releaseTwo, "QA");
+            ASCCPObject asccp2ReleaseTwo = coreComponentAPI.createRevisedASCCP(asccp2ReleaseOne, accQAReleaseTwo, endUserForCCSecond, releaseTwo, "QA");
+            coreComponentAPI.appendASCC(accToAppendReleaseTwo, asccp2ReleaseTwo, "QA");
+            accASCCPPMap.put(accToAppendReleaseTwo, asccp2ReleaseTwo);
+            /**
+             * Amend the ACC that should be amended.
+             */
+            coreComponentAPI.createRevisedACC(accToAppendReleaseTwo, endUserForCCSecond, releaseTwo, "WIP");
+            /**
+             * There is a corresponding UEGACC that has a child association to an end user ASCCP that is in the Production state
+             */
+            ASCCPObject asccpToAppendProductionReleaseTwo = coreComponentAPI.createRevisedASCCP(asccpToAppendProductionReleaseOne, accToAppendReleaseTwo, endUserForCCSecond, releaseTwo, "Production");
+            asccpACCMap.put(asccpToAppendProductionReleaseTwo, accToAppendReleaseTwo);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        for (TopLevelASBIEPObject useraBIEWIP: biesForTesting){
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+            getDriver().manage().window().maximize();
+            assertEquals("WIP", useraBIEWIP.getState());
+            ASCCPObject asccp = bieASCCPMap.get(useraBIEWIP);
+            /**
+             * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
+             * Note that there are two ASCCPs in two releases having different definitions
+             */
+            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            assertEquals(asccp.getDefinition(), ASCCPDefinition);
+            BCCPObject bccp = asccpBCCPMap.get(asccp);
+            BCCObject bcc = bccpBCCMap.get(bccp);
+            WebElement node = editBIEPage.getNodeByPath(
+                    "/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            int originalCardinalityMin = Integer.valueOf(getText(bbiePanel.getCardinalityMinField()));
+            int originalCardinalityMax = Integer.valueOf(getText(bbiePanel.getCardinalityMaxField()));
+            assertEquals(bcc.getCardinalityMin(), originalCardinalityMin);
+            assertEquals(bcc.getCardinalityMax(), originalCardinalityMax);
+            // TODO:
+            // Can't open the context menu in a small size of the screen.
+            ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            for (ASCCPObject asccpToAppend : asccpsForTesting) {
+                /**
+                 * It has child association to an end user ASCCP that is in the Production state
+                 */
+                assertEquals("Production", asccpToAppend.getState());
+                /**
+                 * The end user ACC (of the ASCCP) is not in the Production state
+                 */
+                ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
+                assertEquals("Production", ACCAssociation.getState());
+                SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+                selectCCPropertyPage.selectAssociation(asccpToAppend.getDen());
+            }
+
+            ACCExtensionViewEditPage.setNamespace(namespaceEU);
+            ACCExtensionViewEditPage.hitUpdateButton();
+            ACCExtensionViewEditPage.moveToQA();
+            /**
+             *  there is a corresponding UEGACC in Production state
+             */
+            ACCExtensionViewEditPage.moveToProduction();
+
+            bieMenu.openViewEditBIESubMenu();
+            viewEditBIEPage.openEditBIEPage(useraBIEWIP);
+
+            for (ASCCPObject asccpToAppend : asccpsForTesting) {
+                node = editBIEPage.getNodeByPath(
+                        "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
+                assertTrue(node.isDisplayed());
+                EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
+
+                /**
+                 * Assert that options are enabled for appended ACC that is in the Production state.
+                 */
+                assertEnabled(ASBIEPanel.getUsedCheckbox());
+                ASBIEPanel.toggleUsed();
+
+                assertEnabled(ASBIEPanel.getCardinalityMinField());
+                assertEnabled(ASBIEPanel.getCardinalityMaxField());
+                assertEnabled(ASBIEPanel.getRemarkField());
+                assertEnabled(ASBIEPanel.getContextDefinitionField());
+                if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                    // TODO:
+                    // Check business term abilities are disabled
+                } else {
+                    assertDisabled(ASBIEPanel.getBusinessTermField());
+                }
+
+                /**
+                 * Assert that all options for descendant nodes, that are not in Production state, are disabled
+                 */
+                ACCObject ACCAssociation = asccpACCMap.get(asccpToAppend);
+                BCCPObject bccpDescendant = accBCCPMap.get(ACCAssociation);
+                node = editBIEPage.getNodeByPath(
+                        "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm() + "/" + bccpDescendant.getPropertyTerm());
+                assertTrue(node.isDisplayed());
+                EditBIEPage.BBIEPanel BBIEPPanel = editBIEPage.getBBIEPanel(node);
+                /**
+                 * Assert that all options are disabled for descendant BCC not in Production state.
+                 */
+                assertDisabled(BBIEPPanel.getNillableCheckbox());
+                assertDisabled(BBIEPPanel.getUsedCheckbox());
+                assertDisabled(BBIEPPanel.getCardinalityMinField());
+                assertDisabled(BBIEPPanel.getCardinalityMaxField());
+                assertDisabled(BBIEPPanel.getRemarkField());
+                assertDisabled(BBIEPPanel.getExampleField());
+                assertDisabled(BBIEPPanel.getValueConstraintSelectField());
+                assertDisabled(BBIEPPanel.getValueDomainRestrictionSelectField());
+                assertDisabled(BBIEPPanel.getValueDomainField());
+                assertDisabled(BBIEPPanel.getContextDefinitionField());
+                assertDisabled(BBIEPPanel.getAssociationDefinitionField());
+                assertDisabled(BBIEPPanel.getComponentDefinitionField());
+                if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                    // TODO:
+                    // Check business term abilities are disabled
+                } else {
+                    assertDisabled(ASBIEPanel.getBusinessTermField());
+                }
+
+                ASCCPObject asccpDescendant = accASCCPPMap.get(ACCAssociation);
+                node = editBIEPage.getNodeByPath(
+                        "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm() + "/" + asccpDescendant.getPropertyTerm());
+                assertTrue(node.isDisplayed());
+                ASBIEPanel = editBIEPage.getASBIEPanel(node);
+
+                /**
+                 * Assert that all options are disabled for descendant ASCC not in Production state.
+                 */
+                assertDisabled(ASBIEPanel.getNillableCheckbox());
+                assertDisabled(ASBIEPanel.getUsedCheckbox());
+                assertDisabled(ASBIEPanel.getCardinalityMinField());
+                assertDisabled(ASBIEPanel.getCardinalityMaxField());
+                assertDisabled(ASBIEPanel.getRemarkField());
+                assertDisabled(ASBIEPanel.getContextDefinitionField());
+                assertDisabled(ASBIEPanel.getAssociationDefinitionField());
+                assertDisabled(ASBIEPanel.getComponentDefinitionField());
+                assertDisabled(ASBIEPanel.getTypeDefinitionField());
+                if (getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled()) {
+                    // TODO:
+                    // Check business term abilities are disabled
+                } else {
+                    assertDisabled(ASBIEPanel.getBusinessTermField());
+                }
+
             }
         }
     }
