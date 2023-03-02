@@ -8816,7 +8816,7 @@ Manage Business Terms
 Business term management functionality allows end users to create or import business terms
 from another data dictionary applications such as an enterprise data dictionary management
 and assign those business terms to data elements in the data exchange standard. It is not 
-an intended to be a data dictionary management itself. This is the reason each business term 
+intended to be a data dictionary management itself. This is the reason each business term 
 entity in Score has only a few fields mainly for representing the identity of the business term. 
 
 Currently, Score provides the business term functionality to end users only. 
@@ -8849,7 +8849,7 @@ To create a business term:
    2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
    3. External Reference Id(Optional) 
    4. Comment(Optional) This is free-form text field for adding information about the business term in the context of the Score tool. An example comment may be
-      "This business term is not from the enterprise data dictionary."" 
+      "This business term is not from the enterprise data dictionary."
    
 5. Click the "Create" button. 
 
@@ -9168,7 +9168,7 @@ Multi-tenant mode
  *Multi-tenant Management functions are available only to Developer user with Admin right*. 
 
 Score multi-tenant feature enables standard development organizations like OAGi to offer Score-based BIE-development services to 
-multiple members on a single instance with visibility of BIEs managed by member (i.e. tenant). The visibility is restricted by the 
+multiple members on a single instance with visibility of BIEs managed by the member (i.e. tenant). The visibility is restricted by the 
 business context associated with the BIE and the tenant. In other words, if the BIE has a business context that is associated with 
 the tenant, then end users in that tenant can see the BIE. Users can also see BIEs whose business context don't belong to any tenant. 
 
