@@ -311,7 +311,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
-        invisibilityOfLoadingContainerElement(getDriver());
+        //invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

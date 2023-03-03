@@ -53,6 +53,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             this.appUser = appUser;
             this.states = states;
 
+
             for (int i = 0; i < this.states.size(); ++i) {
                 ASCCPObject asccp;
                 BCCPObject bccp;
@@ -117,14 +118,17 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(asccp.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(bccp.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
         }
     }

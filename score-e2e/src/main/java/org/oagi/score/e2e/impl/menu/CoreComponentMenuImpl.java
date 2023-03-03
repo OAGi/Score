@@ -68,7 +68,7 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
     @Override
     public ViewEditCoreComponentPage openViewEditCoreComponentSubMenu() {
         retry(() -> click(getViewEditCoreComponentSubMenu()));
-        invisibilityOfLoadingContainerElement(getDriver());
+        //invisibilityOfLoadingContainerElement(getDriver());
         ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this);
         assert viewEditCoreComponentPage.isOpened();
         return viewEditCoreComponentPage;
