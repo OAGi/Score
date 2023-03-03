@@ -88,6 +88,13 @@ public interface TransferCCOwnershipDialog extends Dialog {
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
     /**
+     * Return the UI checkbox for select at given index
+     * @param idx index
+     * @return the UI checkbox element
+     */
+    WebElement getSelectCheckboxAtIndex(int idx);
+
+    /**
      * Set the size of items to the 'Items per page' select field.
      *
      * @param items the size of items; 10, 25, 50

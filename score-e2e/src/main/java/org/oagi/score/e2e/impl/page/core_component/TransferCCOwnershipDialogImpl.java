@@ -110,6 +110,13 @@ public class TransferCCOwnershipDialogImpl implements TransferCCOwnershipDialog 
     }
 
     @Override
+    public WebElement getSelectCheckboxAtIndex(int idx) {
+        WebElement tr = getTableRecordAtIndex(idx);
+        WebElement td = getColumnByName(tr, "select");
+        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+    }
+
+    @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::div[5]"));

@@ -13,6 +13,7 @@ import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -1258,6 +1259,198 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_19")
     public void test_TA_19(){
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+            /**
+             * developer can move states of several CCs in one shot on the view/edit CC page
+             */
+            assertEquals(state, getText(accViewEditPage.getStateField()));
+            assertDisabled(accViewEditPage.getStateField());
+            //Transfer the ACC ownership
+            if (state.equals("WIP")){
+                assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
+                assertDisabled(accViewEditPage.getOwnerField());
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(acc.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                //verify the ownership is transferred
+                accViewEditPage.openPage();
+                assertEquals(anotherDeveloper.getLoginId(), getText(accViewEditPage.getOwnerField()));
+                assertDisabled(accViewEditPage.getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+
+                //transfer the ownership back
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(acc.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                accViewEditPage.openPage();
+                assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
+                assertDisabled(accViewEditPage.getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            }
+
+            //ACC change state
+            if (state.equals("WIP")){
+                accViewEditPage.moveToDraft();
+                assertEquals("Draft", getText(accViewEditPage.getStateField()));
+            } else if (state.equals("Draft")){
+                accViewEditPage.moveToCandidate();
+                assertEquals("Candidate", getText(accViewEditPage.getStateField()));
+            } else if (state.equals("Candidate")){
+                accViewEditPage.backToWIP();
+                assertEquals("WIP", getText(accViewEditPage.getStateField()));
+            }
+            //BCCP panel
+            accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
+            assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
+
+            //Transfer the BCCP ownership
+            if (state.equals("WIP")){
+                assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
+                assertDisabled(accViewEditPage.getOwnerField());
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(bccp.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                //verify the ownership is transferred
+                accViewEditPage.openPage();
+                bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+                assertEquals(anotherDeveloper.getLoginId(), getText(bccPanelContainer.getBCCPanel().getOwnerField()));
+                assertDisabled(bccPanelContainer.getBCCPanel().getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+
+                //transfer the ownership back
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(bccp.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                accViewEditPage.openPage();
+                bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+                assertEquals(developer.getLoginId(), getText(bccPanelContainer.getBCCPanel().getOwnerField()));
+                assertDisabled(bccPanelContainer.getBCCPanel().getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            }
+            //BCCP state change
+            if (state.equals("WIP")){
+                accViewEditPage.moveToDraft();
+                assertEquals("Draft", getText(bccPanelContainer.getBCCPanel().getStateField()));
+            } else if (state.equals("Draft")){
+                accViewEditPage.moveToCandidate();
+                assertEquals("Candidate", getText(bccPanelContainer.getBCCPanel().getStateField()));
+            } else if (state.equals("Candidate")){
+                accViewEditPage.backToWIP();
+                assertEquals("WIP", getText(bccPanelContainer.getBCCPanel().getStateField()));
+            }
+
+            //ASCCP Panel
+            accViewEditPage.openPage();
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+            assertEquals(state, getText(asccPanelContainer.getASCCPanel().getStateField()));
+            assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+
+            //Transfer the ASCCP ownership
+            if (state.equals("WIP")){
+                assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
+                assertDisabled(accViewEditPage.getOwnerField());
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(asccp.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                //verify the ownership is transferred
+                accViewEditPage.openPage();
+                asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+                assertEquals(anotherDeveloper.getLoginId(), getText(asccPanelContainer.getASCCPPanel().getOwnerField()));
+                assertDisabled(asccPanelContainer.getASCCPPanel().getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+
+                //transfer the ownership back
+                viewEditCoreComponentPage.openPage();
+                viewEditCoreComponentPage.setDEN(asccp.getDen());
+                viewEditCoreComponentPage.hitSearchButton();
+                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
+                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
+                transferCCOwnershipDialog.hitSearchButton();
+                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
+                click(transferCCOwnershipDialog.getTransferButton());
+                accViewEditPage.openPage();
+                asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+                assertEquals(developer.getLoginId(), getText(asccPanelContainer.getASCCPPanel().getOwnerField()));
+                assertDisabled(asccPanelContainer.getASCCPPanel().getOwnerField());
+                homePage.logout();
+                homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            }
+
+            //ASCCP state change
+            if (state.equals("WIP")){
+                accViewEditPage.moveToDraft();
+                assertEquals("Draft", getText(asccPanelContainer.getASCCPPanel().getStateField()));
+            } else if (state.equals("Draft")){
+                accViewEditPage.moveToCandidate();
+                assertEquals("Candidate", getText(asccPanelContainer.getASCCPPanel().getStateField()));
+            } else if (state.equals("Candidate")){
+                accViewEditPage.backToWIP();
+                assertEquals("WIP", getText(asccPanelContainer.getASCCPPanel().getStateField()));
+            }
+
+        }
 
     }
 
