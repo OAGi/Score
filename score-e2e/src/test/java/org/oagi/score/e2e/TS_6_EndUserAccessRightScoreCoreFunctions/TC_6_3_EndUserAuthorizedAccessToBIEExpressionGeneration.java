@@ -15,14 +15,14 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -106,6 +106,42 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             expressBIEPage.hitGenerateButton();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_2")
+    public void test_TA_2() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "WIP");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
+            assertEquals("WIP", topLevelAsbiep.getState());
+            assertThrows(TimeoutException.class, () -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
         }
     }
 
