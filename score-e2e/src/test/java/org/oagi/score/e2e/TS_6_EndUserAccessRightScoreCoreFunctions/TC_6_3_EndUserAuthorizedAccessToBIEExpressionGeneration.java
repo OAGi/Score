@@ -246,6 +246,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
             assertNotChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
             assertNotChecked(expressBIEPage.getBIEGUIDCheckbox());
@@ -253,8 +255,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.selectXMLSchemaExpression();
-            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.hitGenerateButton();
         }
     }
@@ -288,6 +288,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.toggleBIECCTSMetaData();
             assertChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
             assertEnabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
@@ -299,8 +301,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             expressBIEPage.toggleIncludeWHOColumns();
             expressBIEPage.toggleBasedCCMetaData();
-            expressBIEPage.selectXMLSchemaExpression();
-            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.hitGenerateButton();
         }
     }
@@ -335,6 +335,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.toggleBIECCTSMetaData();
             assertChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
             assertEnabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
@@ -344,8 +346,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.selectXMLSchemaExpression();
-            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.hitGenerateButton();
         }
     }
@@ -379,6 +379,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
             assertNotChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
             assertNotChecked(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
@@ -389,8 +391,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.selectXMLSchemaExpression();
-            expressBIEPage.selectPutAllSchemasInTheSameFile();
             expressBIEPage.hitGenerateButton();
         }
     }
@@ -425,10 +425,46 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            assertNotChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
-            assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
+            assertNotChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
+            assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
+        }
+    }
+    @Test
+    @DisplayName("TC_6_3_TA_10")
+    public void test_TA_10() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            assertNotChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
+            assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
         }
     }
 
