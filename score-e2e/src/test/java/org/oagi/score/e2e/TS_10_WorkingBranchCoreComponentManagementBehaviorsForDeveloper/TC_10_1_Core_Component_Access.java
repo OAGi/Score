@@ -176,9 +176,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             this.appUser = appUser;
             this.states = states;
 
-            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
-            thisAccountWillBeDeletedAfterTests(developer);
-
             for (int i = 0; i < this.states.size(); ++i) {
                 ASCCPObject asccp;
                 BCCPObject bccp;
@@ -188,18 +185,18 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-                    acc = coreComponentAPI.createRandomACC(developer, release, namespace, state);
+                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, state);
+                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);
                     coreComponentAPI.updateBCC(bcc);
 
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, state);
+                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
                     coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
 
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, state);
+                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
                     ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
                     ascc.setCardinalityMax(1);
                     coreComponentAPI.updateASCC(ascc);
@@ -1481,17 +1478,59 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(selectAssociationDialog.getTableRecordByValue("Query Base").isDisplayed());
         assertTrue(selectAssociationDialog.getTableRecordByValue("Authorization ABIE").isDisplayed());
 
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        homePage.logout();
+        homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
 
+        release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.test.com/enduser");
 
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("QA");
+        ccStates.add("Production");
 
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
+        ACCObject ACCendUserWIP, ACCendUserQA;
+        ASCCPObject ASCCPendUserQA;
+        BCCPObject BCCPendUserQA;
+        ACCendUserWIP = randomCoreComponentWithStateContainer.stateACCs.get("WIP");
+        ACCendUserQA = randomCoreComponentWithStateContainer.stateACCs.get("QA");
+        ASCCPendUserQA = randomCoreComponentWithStateContainer.stateASCCPs.get("QA");
+        BCCPendUserQA = randomCoreComponentWithStateContainer.stateBCCPs.get("QA");
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        accViewEditPage.appendPropertyAtLast("/" + ASCCPendUserQA.getPropertyTerm());
+        accViewEditPage.appendPropertyAtLast("/" + BCCPendUserQA.getPropertyTerm());
+        accViewEditPage.setBaseACC("/" + ACCendUserQA.getDen());
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + ASCCPendUserQA.getPropertyTerm());
+        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + BCCPendUserQA.getPropertyTerm());
+        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
+        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserQA.getDen());
+        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
+        accViewEditPage.backToWIP();
+        accViewEditPage.setBaseACC("/" + "Customer Credit Base. Details");
 
-
-
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
+        accViewEditPage.findWhereUsed("/" + "Customer Credit Base");
+        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Customer Credit. Details").isDisplayed());
     }
 
     @AfterEach

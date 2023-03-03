@@ -201,6 +201,14 @@ public interface ACCViewEditPage extends Page {
     WebElement getContextMenuIconByNodeName(String nodeName);
 
     /**
+     * Open the association selection dialog by clicking 'Set Base ACC' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog setBaseACC(String path);
+
+    /**
      * Open the association selection dialog by clicking 'Append Property at Last' context menu.
      *
      * @param path node path

@@ -86,6 +86,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By COMMENTS_ICON_LOCATOR =
             By.xpath("//mat-icon[contains(text(), \"comments\")]");
 
+    private static final By SET_BASE_ACC_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Set Base ACC\")]");
+
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Append Property at Last\")]");
 
@@ -283,6 +286,22 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return getNodeByName(nodeName);
+    }
+
+    @Override
+    public SelectAssociationDialog setBaseACC(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Set Base ACC");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
     }
 
     @Override
