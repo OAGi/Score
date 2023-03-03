@@ -8568,7 +8568,7 @@ To generate a BIE expression:
 
 8. *Select the Expression*. 
 
-.. |Choose the desired syntax to express the BIE. | image:: media/expressionFormat_Options.JPG
+   .. |Choose the desired syntax to express the BIE. | image:: media/expressionFormat_Options.JPG
    :width: 6.5in
    :height: 2.48611in
    
