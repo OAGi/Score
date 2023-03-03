@@ -30,4 +30,44 @@ public interface ExpressBIEPage extends Page {
     void hitGenerateButton();
 
     WebElement getGenerateButton();
+
+    void toggleBIECCTSMetaData();
+
+    WebElement getBIECCTSMetaDataCheckbox();
+
+    void toggleIncludeCCTSDefinitionTag();
+
+    WebElement getIncludeCCTSDefinitionTagCheckbox();
+
+    void toggleBIEGUID();
+
+    WebElement getBIEGUIDCheckbox();
+
+    void toggleBIEOAGIScoreMetaData();
+
+    WebElement getBIEOAGIScoreMetaDataCheckbox();
+
+    void toggleIncludeWHOColumns();
+
+    WebElement getIncludeWHOColumnsCheckbox();
+
+    void toggleBasedCCMetaData();
+
+    void toggleBusinessContext();
+
+    WebElement getBusinessContextCheckbox();
+
+    void toggleBIEDefinition();
+
+    WebElement getBIEDefinitionCheckbox();
+
+    WebElement getBasedCCMetaDataCheckbox();
+
+    void selectXMLSchemaExpression();
+
+    WebElement getXMLSchemaExpressionRadioButton();
+
+    void selectPutAllSchemasInTheSameFile();
+
+    WebElement getPutAllSchemasInTheSameFileRadioButton();
 }

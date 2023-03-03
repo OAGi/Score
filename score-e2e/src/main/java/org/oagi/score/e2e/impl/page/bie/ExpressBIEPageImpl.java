@@ -1,7 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -129,5 +128,112 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public WebElement getGenerateButton() {
         return elementToBeClickable(getDriver(), GENERATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void toggleBIECCTSMetaData() {
+        click(getBIECCTSMetaDataCheckbox());
+    }
+
+    @Override
+    public WebElement getBIECCTSMetaDataCheckbox() {
+        return getCheckboxByName("BIE CCTS Meta Data");
+    }
+
+    @Override
+    public void toggleIncludeCCTSDefinitionTag() {
+        click(getIncludeCCTSDefinitionTagCheckbox());
+    }
+    @Override
+    public WebElement getIncludeCCTSDefinitionTagCheckbox() {
+        return getCheckboxByName("Include CCTS_Definition Tag");
+    }
+
+    @Override
+    public void toggleBIEGUID() {
+        click(getBIEGUIDCheckbox());
+    }
+
+    @Override
+    public WebElement getBIEGUIDCheckbox() {
+        return getCheckboxByName("BIE GUID");
+    }
+
+    @Override
+    public void toggleBIEOAGIScoreMetaData() {
+        click(getBIEOAGIScoreMetaDataCheckbox());
+    }
+
+    @Override
+    public WebElement getBIEOAGIScoreMetaDataCheckbox() {
+        return getCheckboxByName("BIE OAGi/Score Meta Data");
+    }
+
+    @Override
+    public void toggleIncludeWHOColumns() {
+        click(getIncludeWHOColumnsCheckbox());
+    }
+    @Override
+    public WebElement getIncludeWHOColumnsCheckbox() {
+        return getCheckboxByName("Include WHO Columns");
+    }
+
+    @Override
+    public void toggleBasedCCMetaData() {
+        click(getBasedCCMetaDataCheckbox());
+    }
+    @Override
+    public WebElement getBasedCCMetaDataCheckbox() {
+        return getCheckboxByName("Based CC Meta Data");
+    }
+
+    @Override
+    public void toggleBusinessContext() {
+        click(getBusinessContextCheckbox());
+    }
+
+    @Override
+    public WebElement getBusinessContextCheckbox() {
+        return getCheckboxByName("Business Context");
+    }
+
+    @Override
+    public void toggleBIEDefinition() {
+        click(getBIEDefinitionCheckbox());
+    }
+
+    @Override
+    public WebElement getBIEDefinitionCheckbox() {
+        return getCheckboxByName("BIE Definition");
+    }
+
+    @Override
+    public void selectXMLSchemaExpression() {
+        click(getXMLSchemaExpressionRadioButton());
+    }
+
+    @Override
+    public WebElement getXMLSchemaExpressionRadioButton() {
+        return getRadioButtonByName("XML Schema");
+    }
+
+    @Override
+    public void selectPutAllSchemasInTheSameFile() {
+        click(getPutAllSchemasInTheSameFileRadioButton());
+    }
+
+    @Override
+    public WebElement getPutAllSchemasInTheSameFileRadioButton() {
+        return getRadioButtonByName("Put all schemas in the same file");
+    }
+
+    private WebElement getCheckboxByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \""+name+"\")]//ancestor::mat-checkbox[1]"));
+    }
+
+    private WebElement getRadioButtonByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \""+name+"\")]//ancestor::mat-radio-button[1]"));
     }
 }
