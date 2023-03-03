@@ -8566,11 +8566,15 @@ To generate a BIE expression:
    will result in each BIE schema serialized to individual files. In
    this case, a zip file containing all those files will be downloaded.
 
-8. *Select the Expression*. 
+8. *Select the Expression*.  Choose the desired syntax to express the BIE.
 
-   .. |Choose the desired syntax to express the BIE. | image:: media/expressionFormat_Options.JPG
-   :width: 6.5in
-   :height: 2.48611in
+.. image:: media/image1.png
+   :width: 5.95885in
+   :height: 3.21695in
+
+.. image:: media/expressionFormat_Options.JPG
+   :width: 4in
+   :height: 2.225in
    
    -  *XML Schema*: This expression option generates the semantics of the BIE into the legacy OAGIS XML format.  This is a common format for message oriented middleware and file transfers.
 
