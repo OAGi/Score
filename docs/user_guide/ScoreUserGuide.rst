@@ -7478,9 +7478,9 @@ nodes described earlier.
 |                  | Architect Approve, Development and Testing,       |
 |                  | Development Review, and Testing Completed.        |
 +------------------+---------------------------------------------------+
-| *Business Term*  | Other names of the data element commonly known in |
-| (Optional)       | the context. For example, the user may wish to    |
-|                  | capture a BOM BIE that is commonly known as Super |
+| *Legacy Business | Other names of the data element commonly known in |
+|  Term*           | the context. For example, the user may wish to    |
+| (Optional)       | capture a BOM BIE that is commonly known as Super |
 |                  | BOM, Engineering BOM, etc. in its context. At     |
 |                  | present the application support only one Business |
 |                  | Term field; however, the user may use a           |
@@ -8154,7 +8154,7 @@ To find and retrieve a BIE:
 
    2. Sorting the results by the terms exist in the first row of the
       table, viz *State*, *Property Term*, *Owner*, *Business Contexts*,
-      *Version*, *Status, Business Term, Remark* and *Updated on*.
+      *Version*, *Status, *Business Term*, *Remark* and *Updated on*.
 
    3. The *Property Term* and *Business Context* search fields. See also
       `How to use the Search field in
@@ -9249,6 +9249,7 @@ The following features are not available to users when Score is in the multi-ten
 * Make BIE reusable
 * Create ABIE extension locally
 * Create ABIE extension globally
+* Business Term Management
 
 Features with restricted behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
