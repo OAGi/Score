@@ -44,7 +44,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     }
     private class RandomCoreComponentWithStateContainer {
         private AppUserObject appUser;
-
         private List<String> states = new ArrayList<>();
         private HashMap<String, ACCObject> stateACCs= new HashMap<>();
         private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
