@@ -16,7 +16,11 @@ import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.TimeoutException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -260,7 +264,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     }
     @Test
     @DisplayName("TC_6_3_TA_6")
-    public void test_TA_6() {
+    public void test_TA_6() throws Exception {
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -301,7 +305,20 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             expressBIEPage.toggleIncludeWHOColumns();
             expressBIEPage.toggleBasedCCMetaData();
-            expressBIEPage.hitGenerateButton();
+
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 

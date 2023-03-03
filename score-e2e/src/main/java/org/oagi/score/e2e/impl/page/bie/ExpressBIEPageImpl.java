@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -7,12 +8,28 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.devtools.v85.io.IO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.*;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import static java.nio.file.StandardWatchEventKinds.*;
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
@@ -119,9 +136,83 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public void hitGenerateButton() {
+    public File hitGenerateButton() {
         click(getGenerateButton());
-        waitFor(Duration.ofMillis(15000));
+        try {
+            return waitForDownloadFile(Duration.ofMillis(30000), file -> {
+                if (!file.getName().endsWith(".xsd")) {
+                    return false;
+                }
+
+                try {
+                    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                    documentBuilder.parse(file);
+                } catch (Exception e) {
+                    logger.trace("Can't parse " + file, e);
+                    return false;
+                }
+
+                return true;
+            });
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private File waitForDownloadFile(Duration duration, Function<File, Boolean> validator) throws IOException, InterruptedException {
+        String userHome = System.getProperty("user.home");
+        Path path = Paths.get(new File(userHome, "Downloads").toURI());
+
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+
+        long timeout = duration.toMillis();
+        File downloadedFile = null;
+        WatchKey key;
+        do {
+            key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
+            if (key != null && key.isValid()) {
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    downloadedFile = new File(path.toFile(), event.context().toString());
+                    if (validator.apply(downloadedFile)) {
+                        return downloadedFile;
+                    }
+                }
+                key.reset();
+            }
+            if (downloadedFile != null && validator.apply(downloadedFile)) {
+                return downloadedFile;
+            }
+            timeout -= 1000L;
+        } while (timeout > 0L);
+
+        throw new FileNotFoundException();
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        String userHome = System.getProperty("user.home");
+        Path path = Paths.get(new File(userHome + "/Downloads").toURI());
+
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
+
+        long timeout = 150000L;
+        WatchKey key;
+        do {
+            System.out.println("Timeout: " + timeout);
+            key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
+            if (key != null) {
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    System.out.println(
+                            "Event kind:" + event.kind()
+                                    + ". File affected: " + event.context() + ".");
+                }
+            }
+            key = null;
+            timeout -= 1000L;
+        } while (timeout > 0L);
+
     }
 
     @Override

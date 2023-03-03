@@ -8,12 +8,15 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class Configuration {
@@ -91,6 +94,13 @@ public class Configuration {
         if (getBooleanProperty("org.oagi.score.e2e.chrome.disable-gpu")) {
             chromeOptions.addArguments("--disable-gpu");
         }
+
+        // To support TC_6_3 TC_6_3_TA_6
+        Map<String, Object> chromePrefs = new HashMap<>();
+        chromePrefs.put("download.default_directory",
+                new File(System.getProperty("user.home"), "Downloads").getAbsolutePath());
+        chromePrefs.put("safebrowsing.enabled", "true");
+        chromeOptions.setExperimentalOption("prefs", chromePrefs);
         return chromeOptions;
     }
 
@@ -102,6 +112,13 @@ public class Configuration {
         if (getBooleanProperty("org.oagi.score.e2e.edge.disable-gpu")) {
             edgeOptions.addArguments("--disable-gpu");
         }
+
+        // To support TC_6_3 TC_6_3_TA_6
+        Map<String, Object> edgePrefs = new HashMap<>();
+        edgePrefs.put("download.default_directory",
+                new File(System.getProperty("user.home"), "Downloads").getAbsolutePath());
+        edgePrefs.put("safebrowsing.enabled", "true");
+        edgeOptions.setExperimentalOption("prefs", edgePrefs);
         return edgeOptions;
     }
 

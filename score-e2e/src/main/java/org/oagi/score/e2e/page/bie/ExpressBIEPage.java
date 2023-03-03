@@ -4,6 +4,8 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
+
 /**
  * An interface of 'Express BIE' page.
  */
@@ -27,7 +29,7 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    void hitGenerateButton();
+    File hitGenerateButton();
 
     WebElement getGenerateButton();
 
