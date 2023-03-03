@@ -20,6 +20,8 @@ public class ApplicationConfigurationController {
     public ResponseEntity tenantEnable(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest();
         request.setTenantEnabled(true);
+        // Multi-tenant mode does not support the business term management.
+        request.setBusinessTermEnabled(false);
 
         service.changeApplicationConfiguration(user, request);
 

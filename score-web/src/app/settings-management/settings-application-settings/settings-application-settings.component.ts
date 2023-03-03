@@ -38,7 +38,7 @@ export class SettingsApplicationSettingsComponent implements OnInit {
       dialogConfig.data.header = 'Enable multi-tenant mode?';
       dialogConfig.data.content = ['Are you sure you want to switch Score instance to multi-tenant mode?',
         'In the multi-tenant mode, some functionalities such as creating user extensions, BIE reuse, ',
-        'and BIE uplifting will be unavailable.'];
+        'BIE uplifting, and business term function will be unavailable.'];
       dialogConfig.data.action = 'Enable';
     } else {
       dialogConfig.data.header = 'Disable multi-tenant mode?';
@@ -64,15 +64,33 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   }
 
   updateBusinessTermConfiguration(value: boolean) {
-    this.settingsService.updateBusinessTermConfiguration(value).subscribe(_ => {
-      this.auth.reloadUserToken().subscribe(userToken => {
-        if (userToken.businessTerm.enabled === value) {
-          this.snackBar.open('Updated', '', {
-            duration: 3000,
+    const dialogConfig = this.confirmDialogService.newConfig();
+    if (value) {
+      dialogConfig.data.header = 'Enable business term function?';
+      dialogConfig.data.content = ['Are you sure you want to enable the business term function?',
+        'You may lose legacy business term data in BIEs.'];
+      dialogConfig.data.action = 'Enable';
+    } else {
+      dialogConfig.data.header = 'Disable business term function?';
+      dialogConfig.data.content = ['Are you sure you want to disable the business term function?',
+        'You may lose some data in regard to business terms.'];
+      dialogConfig.data.action = 'Disable';
+    }
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.settingsService.updateBusinessTermConfiguration(value).subscribe(_ => {
+            this.auth.reloadUserToken().subscribe(userToken => {
+              if (userToken.businessTerm.enabled === value) {
+                this.snackBar.open('Updated', '', {
+                  duration: 3000,
+                });
+              }
+            });
           });
         }
       });
-    });
   }
 
 }
