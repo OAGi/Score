@@ -1456,6 +1456,26 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_20")
     public void test_TA_20(){
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Identifier Set. Details", release.getReleaseNumber());
+
+
+
+
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.setModule("Master");
+        viewEditCoreComponentPage.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-chip[.=\"BCC\"]")).size());
+
+
+
 
 
 

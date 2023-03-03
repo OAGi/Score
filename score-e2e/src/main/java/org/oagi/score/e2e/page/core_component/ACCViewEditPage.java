@@ -193,6 +193,31 @@ public interface ACCViewEditPage extends Page {
     WebElement getCommentsIcon();
 
     /**
+     * Return the UI element of the 'Context Menu' icon for the node.
+     *
+     * @param nodeName Node name
+     * @return the UI element of the 'Context Menu' icon
+     */
+    WebElement getContextMenuIconByNodeName(String nodeName);
+
+    /**
+     * Open the association selection dialog by clicking 'Append Property at Last' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog appendPropertyAtLast(String path);
+
+    /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPath(String path);
+
+
+    /**
      * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.
      *
      * @return the UI element of the 'Revise' button

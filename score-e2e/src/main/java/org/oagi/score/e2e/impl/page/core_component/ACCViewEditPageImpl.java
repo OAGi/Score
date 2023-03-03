@@ -5,7 +5,9 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 
@@ -84,6 +86,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By COMMENTS_ICON_LOCATOR =
             By.xpath("//mat-icon[contains(text(), \"comments\")]");
 
+    private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+
+    private static final By WHERE_USED_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Where Used\")]");
 
     private final ACCObject acc;
 
@@ -259,6 +266,39 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public WebElement getCommentsIcon(){
         return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
+    }
+    @Override
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        WebElement node = getNodeByName(nodeName);
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return getNodeByName(nodeName);
+    }
+
+    @Override
+    public SelectAssociationDialog appendPropertyAtLast(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Append Property at Last");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
     }
 
     @Override
