@@ -258,6 +258,52 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.hitGenerateButton();
         }
     }
+    @Test
+    @DisplayName("TC_6_3_TA_6")
+    public void test_TA_6() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.toggleBIECCTSMetaData();
+            assertChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
+            assertEnabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
+            expressBIEPage.toggleIncludeCCTSDefinitionTag();
+            expressBIEPage.toggleBIEGUID();
+            expressBIEPage.toggleBusinessContext();
+            expressBIEPage.toggleBIEOAGIScoreMetaData();
+            assertChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
+            assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
+            expressBIEPage.toggleIncludeWHOColumns();
+            expressBIEPage.toggleBasedCCMetaData();
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            expressBIEPage.hitGenerateButton();
+        }
+    }
 
     @AfterEach
     public void tearDown() {
