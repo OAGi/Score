@@ -47,7 +47,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     }
     @Test
     @DisplayName("TC_6_3_TA_1")
-    public void test_TA_1() {
+    public void test_TA_1() throws Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -110,7 +110,19 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 
@@ -152,7 +164,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_3")
-    public void test_TA_3() {
+    public void test_TA_3() throws  Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -181,13 +193,25 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
             assertEquals("QA", topLevelAsbiep.getState());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 
     @Test
     @DisplayName("TC_6_3_TA_4")
-    public void test_TA_4() {
+    public void test_TA_4() throws Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -216,13 +240,25 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
             assertEquals("Production", topLevelAsbiep.getState());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 
     @Test
     @DisplayName("TC_6_3_TA_5")
-    public void test_TA_5() {
+    public void test_TA_5() throws Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -259,7 +295,19 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
     @Test
@@ -324,7 +372,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_7")
-    public void test_TA_7() {
+    public void test_TA_7() throws Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -363,12 +411,24 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
     @Test
     @DisplayName("TC_6_3_TA_8")
-    public void test_TA_8() {
+    public void test_TA_8() throws Exception{
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -408,7 +468,19 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
-            expressBIEPage.hitGenerateButton();
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 
