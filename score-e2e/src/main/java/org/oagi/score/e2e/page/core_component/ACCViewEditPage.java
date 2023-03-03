@@ -209,6 +209,14 @@ public interface ACCViewEditPage extends Page {
     SelectAssociationDialog appendPropertyAtLast(String path);
 
     /**
+     * Open the association selection dialog by clicking 'Where Used' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog findWhereUsed(String path);
+
+    /**
      * Click the drop-down menu to open the context menu on the node.
      *
      * @param path the path of the node

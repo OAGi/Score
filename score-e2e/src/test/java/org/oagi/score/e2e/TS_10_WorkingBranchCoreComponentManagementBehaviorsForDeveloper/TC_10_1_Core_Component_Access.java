@@ -13,6 +13,7 @@ import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
@@ -1464,15 +1465,26 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Identifier Set. Details", release.getReleaseNumber());
-
-
-
-
+        SelectAssociationDialog selectAssociationDialog = accViewEditPage.findWhereUsed("/" + "Identifier Set. Details");
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Tax Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Party Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Line Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Document Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Identifier Set").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.setModule("Master");
-        viewEditCoreComponentPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-chip[.=\"BCC\"]")).size());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Query Base. Details", release.getReleaseNumber());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + "Query Base. Details" + "/" + "Response Code");
+        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Query Base").isDisplayed());
+        assertTrue(selectAssociationDialog.getTableRecordByValue("Authorization ABIE").isDisplayed());
+
+
+
+
+
 
 
 

@@ -302,6 +302,22 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public SelectAssociationDialog findWhereUsed(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Where Used");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
+    }
+
+    @Override
     public WebElement getReviseButton() {
         return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
     }
