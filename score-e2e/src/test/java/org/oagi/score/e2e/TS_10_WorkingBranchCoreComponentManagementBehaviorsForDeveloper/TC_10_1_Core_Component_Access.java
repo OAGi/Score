@@ -1449,14 +1449,16 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 accViewEditPage.backToWIP();
                 assertEquals("WIP", getText(asccPanelContainer.getASCCPPanel().getStateField()));
             }
-
         }
-
     }
 
     @Test
     @DisplayName("TC_10_1_TA_20")
     public void test_TA_20(){
+
+
+
+
 
     }
 
