@@ -114,7 +114,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("\"component\": \"code_list\""));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -195,7 +195,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("\"component\": \"code_list\""));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -292,7 +292,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("\"component\": \"code_list\""));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
