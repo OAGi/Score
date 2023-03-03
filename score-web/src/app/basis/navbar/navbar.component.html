@@ -36,7 +36,7 @@
         <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer') || showTermsAndCodeListButton()">Uplift Code List</button>
         <mat-divider *ngIf="isBusinessTermEnabled && !roles.includes('developer')"></mat-divider>
         <button *ngIf="isBusinessTermEnabled && !roles.includes('developer')" mat-menu-item routerLink="business_term_management/business_term"
-                title="{{'BIZTERM_NAV.VIEW' | translate}}"> View/Edit Business Term <span class="beta">Beta</span></button>
+                title="{{'BIZTERM_NAV.VIEW' | translate}}"> View/Edit Business Term</button>
       </ng-template>
     </mat-menu>
 
