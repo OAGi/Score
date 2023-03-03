@@ -11,7 +11,6 @@ import org.openqa.selenium.WebElement;
 import java.time.Duration;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
@@ -142,7 +141,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void toggleIncludeCCTSDefinitionTag() {
-        click(getIncludeCCTSDefinitionTagCheckbox());
+        click(getIncludeCCTSDefinitionTagCheckbox().findElement(By.tagName("label")));
     }
     @Override
     public WebElement getIncludeCCTSDefinitionTagCheckbox() {
@@ -171,7 +170,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void toggleIncludeWHOColumns() {
-        click(getIncludeWHOColumnsCheckbox());
+        click(getIncludeWHOColumnsCheckbox().findElement(By.tagName("label")));
     }
     @Override
     public WebElement getIncludeWHOColumnsCheckbox() {
@@ -229,11 +228,11 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \""+name+"\")]//ancestor::mat-checkbox[1]"));
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 
     private WebElement getRadioButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \""+name+"\")]//ancestor::mat-radio-button[1]"));
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
     }
 }
