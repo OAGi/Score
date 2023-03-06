@@ -5,6 +5,7 @@ import org.oagi.score.e2e.impl.page.bie.TransferBIEOwnershipDialogImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.BCCPObject;
+import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.*;
@@ -13,9 +14,11 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -167,12 +170,30 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public ACCViewEditPage openACCViewEditPageByManifestID(BigInteger accManifestID) {
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestID);
+        ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
+        accViewEditPage.openPage();
+        assert accViewEditPage.isOpened();
+        return accViewEditPage;
+    }
+
+    @Override
     public ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
 
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(den, branch);
         ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
+        assert asccpViewEditPage.isOpened();
+        return asccpViewEditPage;
+    }
+
+    @Override
+    public ASCCPViewEditPage openASCCPViewEditPageByManifestID(BigInteger asccpManifestID) {
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestID);
+        ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
+        asccpViewEditPage.openPage();
         assert asccpViewEditPage.isOpened();
         return asccpViewEditPage;
     }
@@ -189,11 +210,35 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public BCCPViewEditPage openBCCPViewEditPageByManifestID(BigInteger bccpManifestID) {
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestID);
+        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        bccpViewEditPage.openPage();
+        assert bccpViewEditPage.isOpened();
+        return bccpViewEditPage;
+    }
+
+    @Override
     public DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
 
-        throw new UnsupportedOperationException();
+        List<DTObject> dtList = getAPIFactory().getCoreComponentAPI().getBDTByDENAndReleaseNum(den, branch);
+        if (dtList.size() > 1) {
+            throw new IllegalArgumentException("Found out more than one DT record by given arguments [DEN: " + den + ", Branch: " + branch + "]");
+        }
+        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dtList.get(0));
+        assert dtViewEditPage.isOpened();
+        return dtViewEditPage;
+    }
+
+    @Override
+    public DTViewEditPage openDTViewEditPageByManifestID(BigInteger dtManifestID) {
+        DTObject dt = getAPIFactory().getCoreComponentAPI().getBDTByManifestId(dtManifestID);
+        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
+        dtViewEditPage.openPage();
+        assert dtViewEditPage.isOpened();
+        return dtViewEditPage;
     }
 
     @Override

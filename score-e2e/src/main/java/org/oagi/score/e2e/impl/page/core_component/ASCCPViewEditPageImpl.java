@@ -63,7 +63,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "ASCCP".equals(getASCCPPanel());
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "ASCCP".equals(getText(getASCCPPanel().getCoreComponentField()));
         assert getText(getTitle()).equals(asccp.getDen());
     }
 

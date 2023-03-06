@@ -93,7 +93,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "BCCP".equals(getBCCPPanelContainer().getBCCPPanel());
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "BCCP".equals(getText(getBCCPPanelContainer().getBCCPPanel().getCoreComponentField()));
         assert getText(getTitle()).equals(bccp.getDen());
     }
 

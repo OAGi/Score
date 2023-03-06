@@ -67,6 +67,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        invisibilityOfLoadingContainerElement(getDriver());
         String expectedType = (dt.getBasedDtManifestId() == null) ? "CDT" : "BDT";
         assert expectedType.equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(dt.getDen());

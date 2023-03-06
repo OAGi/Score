@@ -3,6 +3,7 @@ package org.oagi.score.e2e.page.core_component;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 /**
@@ -151,6 +152,14 @@ public interface ViewEditCoreComponentPage extends Page {
     ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch);
 
     /**
+     * Open the page of the ACC by its manifest ID.
+     *
+     * @param accManifestID manifest ID
+     * @return the ACC page object
+     */
+    ACCViewEditPage openACCViewEditPageByManifestID(BigInteger accManifestID);
+
+    /**
      * Open the page of the ASCCP filtered by `den` and `branch`.
      *
      * @param den DEN text
@@ -158,6 +167,14 @@ public interface ViewEditCoreComponentPage extends Page {
      * @return the ASCCP page object
      */
     ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the page of the ASCCP by its manifest ID.
+     *
+     * @param asccpManifestID manifest ID
+     * @return the ASCCP page object
+     */
+    ASCCPViewEditPage openASCCPViewEditPageByManifestID(BigInteger asccpManifestID);
 
     /**
      * Open the page of the BCCP filtered by `den` and `branch`.
@@ -169,6 +186,14 @@ public interface ViewEditCoreComponentPage extends Page {
     BCCPViewEditPage openBCCPViewEditPageByDenAndBranch(String den, String branch);
 
     /**
+     * Open the page of the BCCP by its manifest ID.
+     *
+     * @param bccpManifestID manifest ID
+     * @return the BCCP page object
+     */
+    BCCPViewEditPage openBCCPViewEditPageByManifestID(BigInteger bccpManifestID);
+
+    /**
      * Open the page of the DT filtered by `den` and `branch`.
      *
      * @param den DEN text
@@ -176,6 +201,14 @@ public interface ViewEditCoreComponentPage extends Page {
      * @return the DT page object
      */
     DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the page of the DT by its manifest ID.
+     *
+     * @param dtManifestID manifest ID
+     * @return the DT page object
+     */
+    DTViewEditPage openDTViewEditPageByManifestID(BigInteger dtManifestID);
 
     /**
      * Open the 'Transfer CC Ownership' dialog.

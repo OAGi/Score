@@ -111,6 +111,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "ACC".equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(acc.getDen());
     }
