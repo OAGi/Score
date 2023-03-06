@@ -135,7 +135,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void setDefinition(String definition) {
-        sendKeys(getDENField(), definition);
+        sendKeys(getDefinitionField(), definition);
     }
 
     @Override

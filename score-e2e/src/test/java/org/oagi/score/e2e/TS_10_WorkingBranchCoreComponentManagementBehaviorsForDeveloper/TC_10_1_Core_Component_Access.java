@@ -988,7 +988,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         viewEditCoreComponentPage.setDefinition("\"Notice Document\"");
         click(viewEditCoreComponentPage.getSearchButton());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
-        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Show Receive Delivery. Show Receive Delivery", "oagis").isDisplayed());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Show Receive Delivery. Show Receive Delivery\")]")).size());
     }
     @Test
     @DisplayName("TC_10_1_TA_16")
