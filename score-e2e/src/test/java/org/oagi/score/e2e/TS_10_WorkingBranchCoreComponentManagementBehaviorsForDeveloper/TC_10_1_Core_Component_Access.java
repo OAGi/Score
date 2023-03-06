@@ -260,7 +260,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
          */
 
         By COMMENT_FIELD_LOCATOR =
-                By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                By.xpath("//mat-sidenav//textarea");
 
         assertEquals("WIP", getText(accViewEditPage.getStateField()));
         assertDisabled(accViewEditPage.getStateField());
@@ -347,7 +347,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
 
             By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
@@ -434,7 +434,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
 
             By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
