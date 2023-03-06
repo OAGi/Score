@@ -31,7 +31,28 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    File hitGenerateButton();
+    enum ExpressionFormat {
+        XML,
+        JSON,
+        YML
+    }
+
+    /**
+     * Hit the 'Generate' button for a single BIE selection.
+     *
+     * @param format BIE Expression format
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format);
+
+    /**
+     * Hit the 'Generate' button.
+     *
+     * @param format BIE Expression format
+     * @param compressed {@code true} if it checks multiple BIEs, otherwise {@code false}
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format, boolean compressed);
 
     WebElement getGenerateButton();
 
@@ -90,4 +111,5 @@ public interface ExpressBIEPage extends Page {
     void selectPutEachSchemaInAnIndividualFile();
 
     WebElement getPutEachSchemaInAnIndividualFileRadioButton();
+
 }

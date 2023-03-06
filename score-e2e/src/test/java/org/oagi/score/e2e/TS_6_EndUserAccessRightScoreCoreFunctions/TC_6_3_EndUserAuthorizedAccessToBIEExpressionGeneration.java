@@ -112,12 +112,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -195,12 +190,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -242,12 +232,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -297,12 +282,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -356,12 +336,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -413,12 +388,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -470,12 +440,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -598,12 +563,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -652,12 +612,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-                // TODO: BIE expression validation
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-                Element rootElement = document.getDocumentElement();
-                assertEquals("xsd:schema", rootElement.getTagName());
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -694,7 +649,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> expressBIEPage.selectBIEForExpression(topLevelAsbiep));
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectJSONSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -705,6 +660,15 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertDisabled(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
             assertDisabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
         }
     }
 
@@ -761,12 +725,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         File generatedBIEExpression = null;
         try {
-            generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-            // TODO: BIE expression validation
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-            Element rootElement = document.getDocumentElement();
-            assertEquals("xsd:schema", rootElement.getTagName());
+            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
         } finally {
             if (generatedBIEExpression != null) {
                 generatedBIEExpression.delete();
@@ -827,12 +786,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         File generatedBIEExpression = null;
         try {
-            generatedBIEExpression = expressBIEPage.hitGenerateButton();
-
-            // TODO: BIE expression validation
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
-            Element rootElement = document.getDocumentElement();
-            assertEquals("xsd:schema", rootElement.getTagName());
+            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML, true);
         } finally {
             if (generatedBIEExpression != null) {
                 generatedBIEExpression.delete();
