@@ -557,6 +557,289 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         }
     }
 
+    @Test
+    @DisplayName("TC_6_3_TA_11")
+    public void test_TA_11() throws Exception{
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            expressBIEPage.toggleBIEDefinition();
+            assertNotChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectJSONSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            assertEnabled(expressBIEPage.getMakeAsAnArrayCheckbox());
+            assertNotChecked(expressBIEPage.getMakeAsAnArrayCheckbox());
+            assertEnabled(expressBIEPage.getIncludeMetaHeaderCheckbox());
+            assertNotChecked(expressBIEPage.getIncludeMetaHeaderCheckbox());
+            assertEnabled(expressBIEPage.getIncludePaginationResponseCheckbox());
+            assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_12")
+    public void test_TA_12() throws Exception{
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectJSONSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            assertEnabled(expressBIEPage.getMakeAsAnArrayCheckbox());
+            assertNotChecked(expressBIEPage.getMakeAsAnArrayCheckbox());
+            assertEnabled(expressBIEPage.getIncludeMetaHeaderCheckbox());
+            assertNotChecked(expressBIEPage.getIncludeMetaHeaderCheckbox());
+            assertEnabled(expressBIEPage.getIncludePaginationResponseCheckbox());
+            assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+                // TODO: BIE expression validation
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+                Element rootElement = document.getDocumentElement();
+                assertEquals("xsd:schema", rootElement.getTagName());
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_13")
+    public void test_TA_13() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEWIP);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+            expressBIEPage.selectJSONSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            assertDisabled(expressBIEPage.getBIECCTSMetaDataCheckbox());
+            assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
+            assertDisabled(expressBIEPage.getBIEGUIDCheckbox());
+            assertDisabled(expressBIEPage.getBusinessContextCheckbox());
+            assertDisabled(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
+            assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
+            assertDisabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_14")
+    public void test_TA_14() throws Exception {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+        expressBIEPage.selectXMLSchemaExpression();
+        expressBIEPage.selectPutAllSchemasInTheSameFile();
+        expressBIEPage.toggleBIECCTSMetaData();
+        assertChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
+        assertEnabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
+        expressBIEPage.toggleIncludeCCTSDefinitionTag();
+        expressBIEPage.toggleBIEGUID();
+        expressBIEPage.toggleBusinessContext();
+        expressBIEPage.toggleBIEOAGIScoreMetaData();
+        assertChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
+        assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
+        expressBIEPage.toggleIncludeWHOColumns();
+        expressBIEPage.toggleBasedCCMetaData();
+
+        File generatedBIEExpression = null;
+        try {
+            generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+            // TODO: BIE expression validation
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+            Element rootElement = document.getDocumentElement();
+            assertEquals("xsd:schema", rootElement.getTagName());
+        } finally {
+            if (generatedBIEExpression != null) {
+                generatedBIEExpression.delete();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_15")
+    public void test_TA_15() throws Exception {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
+        expressBIEPage.selectXMLSchemaExpression();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+        expressBIEPage.toggleBIECCTSMetaData();
+        assertChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
+        assertEnabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
+        expressBIEPage.toggleIncludeCCTSDefinitionTag();
+        expressBIEPage.toggleBIEGUID();
+        expressBIEPage.toggleBusinessContext();
+        expressBIEPage.toggleBIEOAGIScoreMetaData();
+        assertChecked(expressBIEPage.getBIEOAGIScoreMetaDataCheckbox());
+        assertEnabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
+        expressBIEPage.toggleIncludeWHOColumns();
+        expressBIEPage.toggleBasedCCMetaData();
+
+        File generatedBIEExpression = null;
+        try {
+            generatedBIEExpression = expressBIEPage.hitGenerateButton();
+
+            // TODO: BIE expression validation
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(generatedBIEExpression);
+            Element rootElement = document.getDocumentElement();
+            assertEquals("xsd:schema", rootElement.getTagName());
+        } finally {
+            if (generatedBIEExpression != null) {
+                generatedBIEExpression.delete();
+            }
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.bie;
 
-import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -8,7 +7,6 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.devtools.v85.io.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +17,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
@@ -298,9 +296,34 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
+    public WebElement getMakeAsAnArrayCheckbox() {
+        return getCheckboxByName("Make as an array");
+    }
+
+    @Override
+    public WebElement getIncludeMetaHeaderCheckbox() {
+        return getCheckboxByName("Include Meta Header");
+    }
+
+    @Override
+    public WebElement getIncludePaginationResponseCheckbox() {
+        return getCheckboxByName("Include Pagination Response");
+    }
+
+    @Override
     public void selectXMLSchemaExpression() {
         click(getXMLSchemaExpressionRadioButton());
     }
+
+    @Override
+    public void selectJSONSchemaExpression() {
+        click(getJSONSchemaExpressionRadioButton());
+    }
+    @Override
+    public WebElement getJSONSchemaExpressionRadioButton() {
+        return getRadioButtonByName("JSON Schema");
+    }
+
 
     @Override
     public WebElement getXMLSchemaExpressionRadioButton() {
@@ -325,5 +348,27 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private WebElement getRadioButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
+    }
+
+    @Override
+    public void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection) {
+        setBranch(release.getReleaseNumber());
+        for (TopLevelASBIEPObject bie: biesForSelection){
+            retry(() -> {
+                WebElement tr = getTableRecordByValue(bie.getDen());
+                WebElement td = getColumnByName(tr, "select");
+                click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            });
+        }
+    }
+
+    @Override
+    public void selectPutEachSchemaInAnIndividualFile() {
+        click(getPutEachSchemaInAnIndividualFileRadioButton());
+    }
+
+    @Override
+    public WebElement getPutEachSchemaInAnIndividualFileRadioButton() {
+        return getRadioButtonByName("Put each schema in an individual file");
     }
 }
