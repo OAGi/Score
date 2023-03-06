@@ -180,6 +180,30 @@ public interface BCCPViewEditPage extends Page {
     void hitCancelButton();
 
     /**
+     * Return the UI element of the 'Delete' button, which displays only if it is in 'WIP' state.
+     *
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton();
+
+    /**
+     * Hit the 'Cancel' button.
+     */
+    void hitDeleteButton();
+
+    /**
+     * Return the UI element of the 'Restore' button, which displays only if it is in 'Deleted' state.
+     *
+     * @return the UI element of the 'Restore' button
+     */
+    WebElement getRestoreButton();
+
+    /**
+     * Hit the 'Restore' button.
+     */
+    void hitRestoreButton();
+
+    /**
      * Return the BCCP panel container. Use this when the page is opened.
      *
      * @return the BCCP panel container

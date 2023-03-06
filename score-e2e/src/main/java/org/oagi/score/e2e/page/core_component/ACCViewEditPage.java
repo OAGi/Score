@@ -225,6 +225,14 @@ public interface ACCViewEditPage extends Page {
     SelectAssociationDialog findWhereUsed(String path);
 
     /**
+     * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.
+     *
+     * @param bccNode BCC node
+     * @return the BCCP page object
+     */
+    BCCPViewEditPage openBCCPInNewTab(WebElement bccNode);
+
+    /**
      * Click the drop-down menu to open the context menu on the node.
      *
      * @param path the path of the node
@@ -232,6 +240,13 @@ public interface ACCViewEditPage extends Page {
      */
     WebElement clickOnDropDownMenuByPath(String path);
 
+    /**
+     * Check the node whether it is in 'Deleted' or not.
+     *
+     * @param node node
+     * @return {@code true} if the node is in 'Deleted', otherwise {@code false}
+     */
+    boolean isDeleted(WebElement node);
 
     /**
      * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.

@@ -139,11 +139,21 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         goToNode(path);
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(contextMenuIcon);
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return getNodeByName(nodeName);
+        return node;
     }
 
     @Override

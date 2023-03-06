@@ -7,10 +7,8 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -30,6 +28,10 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    private static final By RESTORE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By CHANGE_BDT_OPTION_LOCATOR =
             By.xpath("//button/span[contains(text(), \"Change BDT\")]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
@@ -245,11 +247,21 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         goToNode(path);
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(contextMenuIcon);
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return getNodeByName(nodeName);
+        return node;
     }
 
     @Override
@@ -301,6 +313,38 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Deleted".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getRestoreButton() {
+        return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitRestoreButton() {
+        retry(() -> {
+            click(getRestoreButton());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//score-confirm-dialog//span[contains(text(), \"Restore\")]//ancestor::button[1]")));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Restored".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
