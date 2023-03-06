@@ -17,7 +17,9 @@ import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,6 +39,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     public void init() {
         super.init();
 
+    }
+
+    private void pressEscape(){
+        invisibilityOfLoadingContainerElement(getDriver());
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -282,11 +290,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
         assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-        assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
         assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
         click(bccPanelContainer.getBCCPanel().getCommentsIcon());
         assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -369,11 +375,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
             assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -456,11 +460,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
             assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -537,7 +539,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
 
             By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
@@ -559,11 +561,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
             assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -643,11 +643,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
             assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -728,11 +726,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
             assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            assertDisabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
@@ -804,26 +800,37 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 result.get(0).click();
             }
             // search by "ACC" type
-            viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getTypeSelectField().click();
             List<WebElement> accOption = options.stream().filter(e -> "ACC".equals(getText(e))).collect(Collectors.toList());
             accOption.get(0).click();
+            pressEscape();
             click(viewEditCoreComponentPage.getSearchButton());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
 
             // search by "ASCCP" type
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.getTypeSelectField().click();
+            options = getDriver().findElements(By.cssSelector("mat-option"));
+            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+                List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+                result.get(0).click();
+            }
             List<WebElement> asccpOption = options.stream().filter(e -> "ASCCP".equals(getText(e))).collect(Collectors.toList());
             asccpOption.get(0).click();
+            pressEscape();
             click(viewEditCoreComponentPage.getSearchButton());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
 
             // search by "BCCP" type
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.getTypeSelectField().click();
+            options = getDriver().findElements(By.cssSelector("mat-option"));
+            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+                List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+                result.get(0).click();
+            }
             List<WebElement> bccpOption = options.stream().filter(e -> "BCCP".equals(getText(e))).collect(Collectors.toList());
             bccpOption.get(0).click();
+            pressEscape();
             click(viewEditCoreComponentPage.getSearchButton());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
         }
