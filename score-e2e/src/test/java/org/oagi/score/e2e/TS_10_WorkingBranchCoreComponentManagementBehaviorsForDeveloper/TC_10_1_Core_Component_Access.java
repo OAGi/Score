@@ -1041,8 +1041,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         pressEscape();
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Financial Account Reference Base. Details\")]")).size());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Identification. Details", "oagis").isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
         viewEditCoreComponentPage.getComponentTypeSelectField().click();
