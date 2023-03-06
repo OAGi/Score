@@ -966,7 +966,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         viewEditCoreComponentPage.setDEN("\"Action Code\"");
         click(viewEditCoreComponentPage.getSearchButton());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Code", "oagis").isDisplayed());
-        assertFalse(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Corrective Action Type Code. Code", "oagis").isDisplayed());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Corrective Action Type Code. Code\")]")).size());
     }
 
     @Test
