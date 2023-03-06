@@ -6,6 +6,7 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBusinessContextsPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -132,7 +133,7 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td/a/span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td/div/a/span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -143,9 +144,9 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
     @Override
     public void selectBusinessContext(BusinessContextObject businessContext) {
         sendKeys(getNameField(), businessContext.getName());
-        hitSearchButton();
 
         retry(() -> {
+            hitSearchButton();
             WebElement tr = getTableRecordByValue(businessContext.getName());
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));

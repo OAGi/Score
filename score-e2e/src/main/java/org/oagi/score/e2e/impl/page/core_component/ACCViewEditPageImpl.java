@@ -3,12 +3,15 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ACCObject;
+import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
+import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
@@ -91,6 +94,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+
+    private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Open in new tab\")]");
 
     private static final By WHERE_USED_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Where Used\")]");
@@ -282,11 +288,32 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         goToNode(path);
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(contextMenuIcon);
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return getNodeByName(nodeName);
+        return node;
+    }
+
+    @Override
+    public boolean isDeleted(WebElement node) {
+        try {
+            WebElement elm = node.findElement(By.xpath(
+                    "//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]"));
+            return elm != null && elm.isDisplayed();
+        } catch (WebDriverException e) {
+            return false;
+        }
     }
 
     @Override
@@ -319,6 +346,27 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
         assert selectAssociationDialog.isOpened();
         return selectAssociationDialog;
+    }
+
+    @Override
+    public BCCPViewEditPage openBCCPInNewTab(WebElement bccNode) {
+        try {
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(bccNode);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        }
+
+        switchToNextTab(getDriver());
+        String url = getDriver().getCurrentUrl();
+        int idx = url.lastIndexOf("/");
+
+        BigInteger manifestId = new BigInteger(url.substring(idx + 1));
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(manifestId);
+        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        assert bccpViewEditPage.isOpened();
+        return bccpViewEditPage;
     }
 
     @Override
