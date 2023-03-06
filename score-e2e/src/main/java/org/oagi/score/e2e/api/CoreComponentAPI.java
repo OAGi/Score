@@ -140,6 +140,18 @@ public interface CoreComponentAPI {
     BCCPObject createRandomBCCP(DTObject dataType, AppUserObject creator,
                                 NamespaceObject namespace, String state);
 
+    /**
+     * Create a random BDT.
+     *
+     * @param baseDataType The base data type
+     * @param creator      account who creates this BDT
+     * @param namespace    namespace
+     * @param state        BDT state
+     * @return created BDT object
+     */
+    DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
+                             NamespaceObject namespace, String state);
+
     ACCObject createRevisedACC(ACCObject prevAcc, AppUserObject creator, ReleaseObject release, String state);
 
     ASCCPObject createRevisedASCCP(ASCCPObject prevAsccp, ACCObject roleOfAcc,

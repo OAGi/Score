@@ -532,6 +532,64 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
+    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+        DTObject bdt = DTObject.createRandomDT(baseDataType, creator, namespace, state);
+        bdt.setReleaseId(baseDataType.getReleaseId());
+        DtRecord dtRecord = new DtRecord();
+        dtRecord.setGuid(bdt.getGuid());
+        dtRecord.setDataTypeTerm(bdt.getDataTypeTerm());
+        dtRecord.setRepresentationTerm(bdt.getRepresentationTerm());
+        dtRecord.setBasedDtId(ULong.valueOf(bdt.getBasedDtId()));
+        dtRecord.setDen(bdt.getDen());
+        dtRecord.setDefinition(bdt.getDefinition());
+        dtRecord.setDefinitionSource(bdt.getDefinitionSource());
+        dtRecord.setNamespaceId(ULong.valueOf(bdt.getNamespaceId()));
+        dtRecord.setIsDeprecated((byte) (bdt.isDeprecated() ? 1 : 0));
+        dtRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
+        dtRecord.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
+        dtRecord.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
+        dtRecord.setCreationTimestamp(bdt.getCreationTimestamp());
+        dtRecord.setLastUpdateTimestamp(bdt.getLastUpdateTimestamp());
+        dtRecord.setState(bdt.getState());
+
+        ULong bdtId = dslContext.insertInto(DT)
+                .set(dtRecord)
+                .returning(DT.DT_ID)
+                .fetchOne().getDtId();
+        bdt.setDtId(bdtId.toBigInteger());
+
+        LogRecord dummyLogRecord = new LogRecord();
+        dummyLogRecord.setHash(UUID.randomUUID().toString().replaceAll("-", ""));
+        dummyLogRecord.setRevisionNum(UInteger.valueOf(1));
+        dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+        dummyLogRecord.setLogAction("Added");
+        dummyLogRecord.setReference(bdt.getGuid());
+        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
+        dummyLogRecord.setCreationTimestamp(bdt.getCreationTimestamp());
+
+        ULong logId = dslContext.insertInto(LOG)
+                .set(dummyLogRecord)
+                .returning(LOG.LOG_ID)
+                .fetchOne().getLogId();
+
+        DtManifestRecord bdtManifestRecord = new DtManifestRecord();
+
+        bdtManifestRecord.setReleaseId(ULong.valueOf(bdt.getReleaseId()));
+        bdtManifestRecord.setDtId(bdtId);
+        bdtManifestRecord.setLogId(logId);
+        bdtManifestRecord.setBasedDtManifestId(ULong.valueOf(baseDataType.getDtManifestId()));
+
+        ULong dtManifestId = dslContext.insertInto(DT_MANIFEST)
+                .set(bdtManifestRecord)
+                .returning(DT_MANIFEST.DT_MANIFEST_ID)
+                .fetchOne().getDtManifestId();
+        bdt.setDtManifestId(dtManifestId.toBigInteger());
+
+        return bdt;
+    }
+
+    @Override
     public ACCObject createRevisedACC(ACCObject prevAcc, AppUserObject creator,
                                       ReleaseObject release, String state) {
         ACCObject acc = new ACCObject();
@@ -1060,10 +1118,19 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dt.setDataTypeTerm(record.get(DT.DATA_TYPE_TERM));
         dt.setRepresentationTerm(record.get(DT.REPRESENTATION_TERM));
         dt.setQualifier(record.get(DT.QUALIFIER));
-        dt.setState(record.get(DT.STATE));
         dt.setDen(record.get(DT.DEN));
         dt.setDefinition(record.get(DT.DEFINITION));
         dt.setDefinitionSource(record.get(DT.DEFINITION_SOURCE));
+        if (record.get(DT.NAMESPACE_ID) != null) {
+            dt.setNamespaceId(record.get(DT.NAMESPACE_ID).toBigInteger());
+        }
+        dt.setState(record.get(DT.STATE));
+        dt.setDeprecated(record.get(DT.IS_DEPRECATED) == 1);
+        dt.setOwnerUserId(record.get(DT.OWNER_USER_ID).toBigInteger());
+        dt.setCreatedBy(record.get(DT.CREATED_BY).toBigInteger());
+        dt.setLastUpdatedBy(record.get(DT.LAST_UPDATED_BY).toBigInteger());
+        dt.setCreationTimestamp(record.get(DT.CREATION_TIMESTAMP));
+        dt.setLastUpdateTimestamp(record.get(DT.LAST_UPDATE_TIMESTAMP));
         return dt;
     }
 
