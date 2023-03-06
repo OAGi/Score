@@ -793,6 +793,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             /**
              * developer can filter Core Components based on their Type.
              */
+            viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.getTypeSelectField().click();
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
             for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
@@ -871,14 +872,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             /**
              * developer can filter Core Components based on their Type.
              */
+            viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.getStateSelectField().click();
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
 
             // search by state
-            viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getStateSelectField().click();
             List<WebElement> stateOption = options.stream().filter(e -> state.equals(getText(e))).collect(Collectors.toList());
             stateOption.get(0).click();
+            pressEscape();
             click(viewEditCoreComponentPage.getSearchButton());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
