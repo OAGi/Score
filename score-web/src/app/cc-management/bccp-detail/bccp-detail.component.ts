@@ -659,6 +659,7 @@ export class BccpDetailComponent implements OnInit {
             })
           )
           .subscribe(_ => {
+            this.snackBar.open('Deleted', '', {duration: 3000});
             this.router.navigateByUrl('/core_component');
           }, error => {
           });
