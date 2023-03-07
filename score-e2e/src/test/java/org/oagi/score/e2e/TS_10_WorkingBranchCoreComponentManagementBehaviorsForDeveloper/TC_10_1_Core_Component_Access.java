@@ -12,10 +12,7 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -1322,21 +1319,21 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Identifier Set. Details", release.getReleaseNumber());
-        SelectAssociationDialog selectAssociationDialog = accViewEditPage.findWhereUsed("/" + "Identifier Set. Details");
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Tax Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Party Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Line Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Document Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Identifier Set").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
+        FindWhereUsedDialog findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Identifier Set. Details");
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Tax Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Party Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Line Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Document Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Identifier Set").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Query Base. Details", release.getReleaseNumber());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + "Query Base. Details" + "/" + "Response Code");
-        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Query Base").isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Authorization ABIE").isDisplayed());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Query Base").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Authorization ABIE").isDisplayed());
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1368,18 +1365,18 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
-        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + ASCCPendUserQA.getPropertyTerm());
-        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + ASCCPendUserQA.getPropertyTerm());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
-        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + BCCPendUserQA.getPropertyTerm());
-        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + BCCPendUserQA.getPropertyTerm());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
-        selectAssociationDialog = accViewEditPage.findWhereUsed("/" + ACCendUserQA.getDen());
-        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserQA.getDen());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
@@ -1389,8 +1386,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
         accViewEditPage.findWhereUsed("/" + "Customer Credit Base");
-        assertTrue(selectAssociationDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
-        assertTrue(selectAssociationDialog.getTableRecordByValue("Customer Credit. Details").isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        assertTrue(findWhereUsedDialog.getTableRecordByValue("Customer Credit. Details").isDisplayed());
     }
 
     @AfterEach

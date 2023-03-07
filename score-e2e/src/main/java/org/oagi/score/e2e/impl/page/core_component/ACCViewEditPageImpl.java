@@ -7,6 +7,7 @@ import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.FindWhereUsedDialog;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -370,7 +371,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public SelectAssociationDialog findWhereUsed(String path) {
+    public FindWhereUsedDialog findWhereUsed(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
             click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
@@ -379,10 +380,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             new Actions(getDriver()).sendKeys("O").perform();
             click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
         }
-        SelectAssociationDialog selectAssociationDialog =
-                new SelectAssociationDialogImpl(this, "Where Used");
-        assert selectAssociationDialog.isOpened();
-        return selectAssociationDialog;
+        FindWhereUsedDialog findWhereUsedDialog =
+                new FindWhereUsedDialogImpl(this, "Where Used");
+        assert findWhereUsedDialog.isOpened();
+        return findWhereUsedDialog;
     }
 
     @Override

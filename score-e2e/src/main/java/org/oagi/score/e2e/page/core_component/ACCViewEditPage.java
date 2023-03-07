@@ -222,7 +222,7 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the association selection dialog object
      */
-    SelectAssociationDialog findWhereUsed(String path);
+    FindWhereUsedDialog  findWhereUsed(String path);
 
     /**
      * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.
