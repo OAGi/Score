@@ -1,29 +1,37 @@
 package org.oagi.score.e2e.impl.page.bie;
 
-import org.oagi.score.e2e.impl.PageHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.devtools.v85.io.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
@@ -136,28 +144,118 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public File hitGenerateButton() {
+    public File hitGenerateButton(ExpressionFormat format) {
+        return hitGenerateButton(format, false);
+    }
+
+    @Override
+    public File hitGenerateButton(ExpressionFormat format, boolean compressed) {
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(Duration.ofMillis(30000), file -> {
-                if (!file.getName().endsWith(".xsd")) {
-                    return false;
-                }
-
-                try {
-                    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                    documentBuilder.parse(file);
-                } catch (Exception e) {
-                    logger.trace("Can't parse " + file, e);
-                    return false;
-                }
-
-                return true;
-            });
+            return waitForDownloadFile(Duration.ofMillis(30000), getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private Function<File, Boolean> getValidator(ExpressionFormat format, boolean compressed) {
+        Function<File, Boolean> validator;
+        switch (format) {
+            case XML:
+                validator = xmlValidator();
+                break;
+            case JSON:
+                validator = jsonValidator();
+                break;
+            case YML:
+                validator = ymlValidator();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported expression format: " + format);
+        }
+
+        if (compressed) {
+            return file -> {
+                try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file))) {
+                    ZipEntry entry = zipInputStream.getNextEntry();
+                    while (entry != null) {
+                        File entryFile = new File(FileUtils.getTempDirectory(), entry.getName());
+                        try (OutputStream outputStream = new FileOutputStream(entryFile)) {
+                            IOUtils.copy(zipInputStream, outputStream);
+                        }
+                        if (!validator.apply(entryFile)) {
+                            return false;
+                        }
+
+                        entry = zipInputStream.getNextEntry();
+                    }
+                    zipInputStream.closeEntry();
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+                return true;
+            };
+        }
+        return validator;
+    }
+
+    private Function<File, Boolean> xmlValidator() {
+        return file -> {
+            if (!file.getName().endsWith(".xsd")) {
+                return false;
+            }
+
+            try {
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                Document document = documentBuilder.parse(file);
+                Element rootElement = document.getDocumentElement();
+                if (!"xsd:schema".equals(rootElement.getTagName())) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
+
+            return true;
+        };
+    }
+
+    private Function<File, Boolean> jsonValidator() {
+        return file -> {
+            if (!file.getName().endsWith(".json")) {
+                return false;
+            }
+
+            try {
+                String str = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                JSONObject json = new JSONObject(str);
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
+
+            return true;
+        };
+    }
+
+    private Function<File, Boolean> ymlValidator() {
+        return file -> {
+            if (!file.getName().endsWith(".yml") || !file.getName().endsWith(".yaml")) {
+                return false;
+            }
+
+            try {
+                String str = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                Map<String, Object> schema = new Yaml().load(str);
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
+
+            return true;
+        };
     }
 
     private File waitForDownloadFile(Duration duration, Function<File, Boolean> validator) throws IOException, InterruptedException {
@@ -188,31 +286,6 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         } while (timeout > 0L);
 
         throw new FileNotFoundException();
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        String userHome = System.getProperty("user.home");
-        Path path = Paths.get(new File(userHome + "/Downloads").toURI());
-
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
-
-        long timeout = 150000L;
-        WatchKey key;
-        do {
-            System.out.println("Timeout: " + timeout);
-            key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
-            if (key != null) {
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    System.out.println(
-                            "Event kind:" + event.kind()
-                                    + ". File affected: " + event.context() + ".");
-                }
-            }
-            key = null;
-            timeout -= 1000L;
-        } while (timeout > 0L);
-
     }
 
     @Override
@@ -298,9 +371,34 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
+    public WebElement getMakeAsAnArrayCheckbox() {
+        return getCheckboxByName("Make as an array");
+    }
+
+    @Override
+    public WebElement getIncludeMetaHeaderCheckbox() {
+        return getCheckboxByName("Include Meta Header");
+    }
+
+    @Override
+    public WebElement getIncludePaginationResponseCheckbox() {
+        return getCheckboxByName("Include Pagination Response");
+    }
+
+    @Override
     public void selectXMLSchemaExpression() {
         click(getXMLSchemaExpressionRadioButton());
     }
+
+    @Override
+    public void selectJSONSchemaExpression() {
+        click(getJSONSchemaExpressionRadioButton());
+    }
+    @Override
+    public WebElement getJSONSchemaExpressionRadioButton() {
+        return getRadioButtonByName("JSON Schema");
+    }
+
 
     @Override
     public WebElement getXMLSchemaExpressionRadioButton() {
@@ -325,5 +423,48 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private WebElement getRadioButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
+    }
+
+    @Override
+    public void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection) {
+        setBranch(release.getReleaseNumber());
+        for (TopLevelASBIEPObject bie: biesForSelection){
+            retry(() -> {
+                WebElement tr = getTableRecordByValue(bie.getDen());
+                WebElement td = getColumnByName(tr, "select");
+                click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            });
+        }
+    }
+
+    @Override
+    public void selectPutEachSchemaInAnIndividualFile() {
+        click(getPutEachSchemaInAnIndividualFileRadioButton());
+    }
+
+    @Override
+    public WebElement getPutEachSchemaInAnIndividualFileRadioButton() {
+        return getRadioButtonByName("Put each schema in an individual file");
+    }
+
+    @Override
+    public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+        click(getIncludeMetaHeaderCheckbox());
+        IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog = new IncludeMetaHeaderProfileBIEDialogImpl(this);
+        assert includeMetaHeaderProfileBIEDialog.isOpened();
+        includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+    }
+
+    @Override
+    public void toggleMakeAsAnArray() {
+        click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+    }
+
+    @Override
+    public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+        click(getIncludePaginationResponseCheckbox());
+        IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog = new IncludePaginationResponseProfileBIEDialogImpl(this);
+        assert includePaginationResponseProfileBIEDialog.isOpened();
+        includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
     }
 }

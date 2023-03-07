@@ -1,10 +1,13 @@
 package org.oagi.score.e2e.page.bie;
 
+import org.oagi.score.e2e.obj.BusinessContextObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * An interface of 'Express BIE' page.
@@ -29,7 +32,34 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    File hitGenerateButton();
+    void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+    void toggleMakeAsAnArray();
+
+    void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    enum ExpressionFormat {
+        XML,
+        JSON,
+        YML
+    }
+
+    /**
+     * Hit the 'Generate' button for a single BIE selection.
+     *
+     * @param format BIE Expression format
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format);
+
+    /**
+     * Hit the 'Generate' button.
+     *
+     * @param format BIE Expression format
+     * @param compressed {@code true} if it checks multiple BIEs, otherwise {@code false}
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format, boolean compressed);
 
     WebElement getGenerateButton();
 
@@ -67,9 +97,26 @@ public interface ExpressBIEPage extends Page {
 
     void selectXMLSchemaExpression();
 
+    void selectJSONSchemaExpression();
+
+    WebElement getJSONSchemaExpressionRadioButton();
+
     WebElement getXMLSchemaExpressionRadioButton();
 
     void selectPutAllSchemasInTheSameFile();
 
     WebElement getPutAllSchemasInTheSameFileRadioButton();
+
+    WebElement getMakeAsAnArrayCheckbox();
+
+    WebElement getIncludeMetaHeaderCheckbox();
+
+    WebElement getIncludePaginationResponseCheckbox();
+
+    void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection);
+
+    void selectPutEachSchemaInAnIndividualFile();
+
+    WebElement getPutEachSchemaInAnIndividualFileRadioButton();
+
 }
