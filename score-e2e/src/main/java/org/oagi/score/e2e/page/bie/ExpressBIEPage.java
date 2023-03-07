@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.bie;
 
+import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
@@ -30,6 +31,8 @@ public interface ExpressBIEPage extends Page {
     WebElement getTableRecordByValue(String value);
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
 
     enum ExpressionFormat {
         XML,
