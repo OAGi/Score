@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -364,6 +365,10 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "Working";
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -378,13 +383,47 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
-        acc.setDefinition("definition changed");
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(accNode).getASCCPPanel();
-        assertEquals("definition changed", getText(asccpPanel.getDefinitionField()));
+        viewEditCoreComponentPage.openPage();
+
+        String den = asccp.getDen();
+        {
+            viewEditCoreComponentPage.setDEN(den);
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
+
+            viewEditCoreComponentPage.setDEN(den);
+            viewEditCoreComponentPage.hitSearchButton();
+
+            tr = viewEditCoreComponentPage.getTableRecordByValue(den);
+            td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
+            assertEquals(anotherDeveloper.getLoginId(), getText(td));
+        }
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        {
+            viewEditCoreComponentPage.setDEN(den);
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(endUser.getLoginId()));
+        }
+
     }
 
     @Test
