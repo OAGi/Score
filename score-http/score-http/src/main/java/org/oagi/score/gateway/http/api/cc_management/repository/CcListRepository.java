@@ -333,8 +333,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(ACC.OBJECT_CLASS_TERM), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(ACC.OBJECT_CLASS_TERM), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(ACC.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ACC.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -634,8 +634,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(ASCCP.PROPERTY_TERM), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(ASCCP.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ASCCP.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -736,8 +736,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(BCCP.PROPERTY_TERM), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(BCCP.PROPERTY_TERM), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(BCCP.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(BCCP.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
