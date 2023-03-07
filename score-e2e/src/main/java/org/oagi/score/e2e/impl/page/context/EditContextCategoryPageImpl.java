@@ -100,9 +100,11 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
 
     @Override
     public ViewEditContextCategoryPage discardContextCategory() {
-        click(getDiscardButton());
-        click(elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
-        assert getSnackBar(getDriver(), "Discarded").isDisplayed();
-        return this.parent;
+        return retry(() -> {
+            click(getDiscardButton());
+            click(elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
+            assert getSnackBar(getDriver(), "Discarded").isDisplayed();
+            return this.parent;
+        });
     }
 }

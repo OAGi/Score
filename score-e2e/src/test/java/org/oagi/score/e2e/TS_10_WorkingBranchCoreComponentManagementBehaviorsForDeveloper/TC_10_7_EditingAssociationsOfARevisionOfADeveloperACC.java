@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -68,8 +67,8 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
-        }
 
+        }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
@@ -111,6 +110,13 @@ public class TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC extends BaseT
         accViewEditPage.setCardinalityMax(originalCardinalityMax);
         accViewEditPage.hitUpdateButton();
         assertEquals(Integer.toString(originalCardinalityMax), getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
+    }
+
+    @Test
+    @DisplayName("TC_10_9_TA_1")
+    public void manual_tests() {
+
+
     }
 
 

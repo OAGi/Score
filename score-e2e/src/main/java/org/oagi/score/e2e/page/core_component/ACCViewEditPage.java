@@ -128,6 +128,12 @@ public interface ACCViewEditPage extends Page {
     WebElement getObjectClassTermField();
 
     /**
+     *
+     * @param objectClassTerm
+     */
+    void setObjectClassTerm(String objectClassTerm);
+
+    /**
      * Return the 'Object Class Term' field label text.
      *
      * @return the 'Object Class Term' field label text
@@ -186,7 +192,78 @@ public interface ACCViewEditPage extends Page {
     String getDefinitionFieldValue();
 
     /**
-     * Return the UI element of the 'Revise' button.
+     * Return the UI element of the 'Comment' Icon
+     *
+     * @return the UI element of the 'Comment' Icon
+     */
+    WebElement getCommentsIcon();
+
+    /**
+     * Return the UI element of the 'Context Menu' icon for the node.
+     *
+     * @param nodeName Node name
+     * @return the UI element of the 'Context Menu' icon
+     */
+    WebElement getContextMenuIconByNodeName(String nodeName);
+
+    /**
+     * Open the association selection dialog by clicking 'Set Base ACC' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog setBaseACC(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Append Property at Last' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog appendPropertyAtLast(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Where Used' context menu.
+     *
+     * @param path node path
+     * @return the find 'Where used' dialog object
+     */
+    FindWhereUsedDialog  findWhereUsed(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Create ASCCP from this' context menu.
+     *
+     * @param path node path
+     * @return the 'Create ASCCP from this' dialog object
+     */
+    WebElement  createASCCPfromThis(String path);
+
+    /**
+     * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.
+     *
+     * @param bccNode BCC node
+     * @return the BCCP page object
+     */
+    BCCPViewEditPage openBCCPInNewTab(WebElement bccNode);
+
+    /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPath(String path);
+
+    /**
+     * Check the node whether it is in 'Deleted' or not.
+     *
+     * @param node node
+     * @return {@code true} if the node is in 'Deleted', otherwise {@code false}
+     */
+    boolean isDeleted(WebElement node);
+
+    /**
+     * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.
      *
      * @return the UI element of the 'Revise' button
      */
@@ -198,7 +275,7 @@ public interface ACCViewEditPage extends Page {
     void hitReviseButton();
 
     /**
-     * Return the UI element of the 'Amend' button.
+     * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
      *
      * @return the UI element of the 'Amend' button
      */
@@ -664,6 +741,13 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
+        /**
+         * Return the UI element of the 'Comment' Icon.
+         *
+         * @return the UI element of the 'Comment' Icon
+         */
+        WebElement getCommentsIcon();
+
     }
 
     interface BCCPanelContainer {
@@ -729,6 +813,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getDENField();
 
         /**
+         * Return the UI element of the 'Property Term' field.
+         *
+         * @return the UI element of the 'Property Term' field
+         */
+        WebElement getPropertyTermField();
+
+        /**
          * Return the UI element of the 'Cardinality Min' field.
          *
          * @return the UI element of the 'Cardinality Min' field
@@ -778,6 +869,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefaultValueField();
 
         /**
+         * Return the UI element of the 'Namespace' select field.
+         *
+         * @return the UI element of the 'Namespace' select field
+         */
+        WebElement getNamespaceSelectField();
+
+        /**
          * Return the UI element of the 'Definition Source' field.
          *
          * @return the UI element of the 'Definition Source' field
@@ -790,6 +888,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * Return the UI element of the 'Comment' Icon.
+         *
+         * @return the UI element of the 'Comment' Icon
+         */
+        WebElement getCommentsIcon();
 
     }
 

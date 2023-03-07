@@ -74,7 +74,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setDen(record.get(ACC.DEN));
         acc.setDefinition(record.get(ACC.DEFINITION));
         acc.setDefinitionSource(record.get(ACC.DEFINITION_SOURCE));
-        acc.setNamespaceId(record.get(ACC.NAMESPACE_ID).toBigInteger());
+        if (record.get(ACC.NAMESPACE_ID) != null) {
+            acc.setNamespaceId(record.get(ACC.NAMESPACE_ID).toBigInteger());
+        }
         acc.setAbstract(record.get(ACC.IS_ABSTRACT) == 1);
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
@@ -127,7 +129,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccp.setDefinition(record.get(ASCCP.DEFINITION));
         asccp.setDefinitionSource(record.get(ASCCP.DEFINITION_SOURCE));
         asccp.setRoleOfAccManifestId(record.get(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID).toBigInteger());
-        asccp.setNamespaceId(record.get(ASCCP.NAMESPACE_ID).toBigInteger());
+        if (record.get(ASCCP.NAMESPACE_ID) != null) {
+            asccp.setNamespaceId(record.get(ASCCP.NAMESPACE_ID).toBigInteger());
+        }
         asccp.setState(record.get(ASCCP.STATE));
         asccp.setDeprecated(record.get(ASCCP.IS_DEPRECATED) == 1);
         asccp.setOwnerUserId(record.get(ASCCP.OWNER_USER_ID).toBigInteger());
@@ -179,7 +183,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setDen(record.get(BCCP.DEN));
         bccp.setDefinition(record.get(BCCP.DEFINITION));
         bccp.setDefinitionSource(record.get(BCCP.DEFINITION_SOURCE));
-        bccp.setNamespaceId(record.get(BCCP.NAMESPACE_ID).toBigInteger());
+        if (record.get(BCCP.NAMESPACE_ID) != null) {
+            bccp.setNamespaceId(record.get(BCCP.NAMESPACE_ID).toBigInteger());
+        }
         bccp.setState(record.get(BCCP.STATE));
         bccp.setDeprecated(record.get(BCCP.IS_DEPRECATED) == 1);
         bccp.setOwnerUserId(record.get(BCCP.OWNER_USER_ID).toBigInteger());
@@ -317,7 +323,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(acc.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"acc\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(acc.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(acc.getCreationTimestamp());
 
@@ -440,7 +446,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(asccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"asccp\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(asccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(asccp.getCreationTimestamp());
 
@@ -500,7 +506,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(bccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"bccp\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(bccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bccp.getCreationTimestamp());
 
@@ -523,6 +529,64 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setBccpManifestId(bccpManifestId.toBigInteger());
 
         return bccp;
+    }
+
+    @Override
+    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+        DTObject bdt = DTObject.createRandomDT(baseDataType, creator, namespace, state);
+        bdt.setReleaseId(baseDataType.getReleaseId());
+        DtRecord dtRecord = new DtRecord();
+        dtRecord.setGuid(bdt.getGuid());
+        dtRecord.setDataTypeTerm(bdt.getDataTypeTerm());
+        dtRecord.setRepresentationTerm(bdt.getRepresentationTerm());
+        dtRecord.setBasedDtId(ULong.valueOf(bdt.getBasedDtId()));
+        dtRecord.setDen(bdt.getDen());
+        dtRecord.setDefinition(bdt.getDefinition());
+        dtRecord.setDefinitionSource(bdt.getDefinitionSource());
+        dtRecord.setNamespaceId(ULong.valueOf(bdt.getNamespaceId()));
+        dtRecord.setIsDeprecated((byte) (bdt.isDeprecated() ? 1 : 0));
+        dtRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
+        dtRecord.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
+        dtRecord.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
+        dtRecord.setCreationTimestamp(bdt.getCreationTimestamp());
+        dtRecord.setLastUpdateTimestamp(bdt.getLastUpdateTimestamp());
+        dtRecord.setState(bdt.getState());
+
+        ULong bdtId = dslContext.insertInto(DT)
+                .set(dtRecord)
+                .returning(DT.DT_ID)
+                .fetchOne().getDtId();
+        bdt.setDtId(bdtId.toBigInteger());
+
+        LogRecord dummyLogRecord = new LogRecord();
+        dummyLogRecord.setHash(UUID.randomUUID().toString().replaceAll("-", ""));
+        dummyLogRecord.setRevisionNum(UInteger.valueOf(1));
+        dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
+        dummyLogRecord.setLogAction("Added");
+        dummyLogRecord.setReference(bdt.getGuid());
+        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
+        dummyLogRecord.setCreationTimestamp(bdt.getCreationTimestamp());
+
+        ULong logId = dslContext.insertInto(LOG)
+                .set(dummyLogRecord)
+                .returning(LOG.LOG_ID)
+                .fetchOne().getLogId();
+
+        DtManifestRecord bdtManifestRecord = new DtManifestRecord();
+
+        bdtManifestRecord.setReleaseId(ULong.valueOf(bdt.getReleaseId()));
+        bdtManifestRecord.setDtId(bdtId);
+        bdtManifestRecord.setLogId(logId);
+        bdtManifestRecord.setBasedDtManifestId(ULong.valueOf(baseDataType.getDtManifestId()));
+
+        ULong dtManifestId = dslContext.insertInto(DT_MANIFEST)
+                .set(bdtManifestRecord)
+                .returning(DT_MANIFEST.DT_MANIFEST_ID)
+                .fetchOne().getDtManifestId();
+        bdt.setDtManifestId(dtManifestId.toBigInteger());
+
+        return bdt;
     }
 
     @Override
@@ -582,7 +646,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(acc.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"acc\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(acc.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(acc.getCreationTimestamp());
 
@@ -664,7 +728,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(asccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"asccp\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(asccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(asccp.getCreationTimestamp());
 
@@ -752,7 +816,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(bccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"bccp\"}"));
         dummyLogRecord.setCreatedBy(ULong.valueOf(bccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bccp.getCreationTimestamp());
 
@@ -1053,9 +1117,20 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dt.setGuid(record.get(DT.GUID));
         dt.setDataTypeTerm(record.get(DT.DATA_TYPE_TERM));
         dt.setRepresentationTerm(record.get(DT.REPRESENTATION_TERM));
+        dt.setQualifier(record.get(DT.QUALIFIER));
         dt.setDen(record.get(DT.DEN));
         dt.setDefinition(record.get(DT.DEFINITION));
         dt.setDefinitionSource(record.get(DT.DEFINITION_SOURCE));
+        if (record.get(DT.NAMESPACE_ID) != null) {
+            dt.setNamespaceId(record.get(DT.NAMESPACE_ID).toBigInteger());
+        }
+        dt.setState(record.get(DT.STATE));
+        dt.setDeprecated(record.get(DT.IS_DEPRECATED) == 1);
+        dt.setOwnerUserId(record.get(DT.OWNER_USER_ID).toBigInteger());
+        dt.setCreatedBy(record.get(DT.CREATED_BY).toBigInteger());
+        dt.setLastUpdatedBy(record.get(DT.LAST_UPDATED_BY).toBigInteger());
+        dt.setCreationTimestamp(record.get(DT.CREATION_TIMESTAMP));
+        dt.setLastUpdateTimestamp(record.get(DT.LAST_UPDATE_TIMESTAMP));
         return dt;
     }
 

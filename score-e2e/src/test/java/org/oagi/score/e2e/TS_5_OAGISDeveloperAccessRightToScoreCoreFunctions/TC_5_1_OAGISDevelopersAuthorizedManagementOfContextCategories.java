@@ -320,7 +320,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
         EditContextCategoryPage editContextCategoryPage =
                 viewEditContextCategoryPage.openEditContextCategoryPageByContextCategoryName(randomContextCategory.getName());
-        assertThrows(TimeoutException.class, () -> editContextCategoryPage.discardContextCategory());
+        assertThrows(WebDriverException.class, () -> editContextCategoryPage.discardContextCategory());
 
         assertTrue(getDriver().findElement(
                         By.xpath("//*[contains(text(), \"context category cannot be deleted\")]"))

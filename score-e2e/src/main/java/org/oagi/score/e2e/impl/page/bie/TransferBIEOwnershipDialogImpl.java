@@ -148,6 +148,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
 
             click(getTransferButton());
+            invisibilityOfLoadingContainerElement(getDriver());
             assert "Transferred".equals(getSnackBarMessage(getDriver()));
         });
     }

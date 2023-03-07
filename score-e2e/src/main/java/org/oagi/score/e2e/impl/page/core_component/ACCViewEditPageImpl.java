@@ -3,11 +3,16 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ACCObject;
+import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.FindWhereUsedDialog;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
+import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
@@ -82,6 +87,23 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
 
+    private static final By COMMENTS_ICON_LOCATOR =
+            By.xpath("//mat-icon[contains(text(), \"comments\")]");
+
+    private static final By SET_BASE_ACC_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Set Base ACC\")]");
+
+    private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+
+    private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Open in new tab\")]");
+
+    private static final By WHERE_USED_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Where Used\")]");
+
+    private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
 
     private final ACCObject acc;
 
@@ -99,6 +121,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "ACC".equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(acc.getDen());
     }
@@ -196,6 +219,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public void setObjectClassTerm(String objectClassTerm){
+        sendKeys(getObjectClassTermField(), objectClassTerm);
+    }
+
+    @Override
     public String getObjectClassTermFieldLabel() {
         return getObjectClassTermField().getAttribute("data-placeholder");
     }
@@ -254,6 +282,131 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public String getDefinitionFieldValue() {
         return getText(getDefinitionField());
     }
+    @Override
+    public WebElement getCommentsIcon(){
+        return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
+    }
+    @Override
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        WebElement node = getNodeByName(nodeName);
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return node;
+    }
+
+    @Override
+    public boolean isDeleted(WebElement node) {
+        try {
+            WebElement elm = node.findElement(By.xpath(
+                    "//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]"));
+            return elm != null && elm.isDisplayed();
+        } catch (WebDriverException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public SelectAssociationDialog setBaseACC(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Set Base ACC");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
+    }
+
+    @Override
+    public SelectAssociationDialog appendPropertyAtLast(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Append Property at Last");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
+    }
+
+    @Override
+    public BCCPViewEditPage openBCCPInNewTab(WebElement bccNode) {
+        try {
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(bccNode);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        }
+
+        switchToNextTab(getDriver());
+        String url = getDriver().getCurrentUrl();
+        int idx = url.lastIndexOf("/");
+
+        BigInteger manifestId = new BigInteger(url.substring(idx + 1));
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(manifestId);
+        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        assert bccpViewEditPage.isOpened();
+        return bccpViewEditPage;
+    }
+
+    @Override
+    public FindWhereUsedDialog findWhereUsed(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+        }
+        FindWhereUsedDialog findWhereUsedDialog =
+                new FindWhereUsedDialogImpl(this, "Where Used");
+        assert findWhereUsedDialog.isOpened();
+        return findWhereUsedDialog;
+    }
+    @Override
+    public WebElement createASCCPfromThis(String path){
+        WebElement confirmDialog;
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+        }
+        return confirmDialog;
+
+    }
 
     @Override
     public WebElement getReviseButton() {
@@ -264,6 +417,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void hitReviseButton() {
         click(getReviseButton());
         click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
     }
 
@@ -276,6 +430,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void hitAmendButton() {
         click(getAmendButton());
         click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -686,6 +842,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+        @Override
+        public WebElement getCommentsIcon(){
+            return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
+        }
     }
 
     private class BCCPanelImpl implements BCCPanel {
@@ -732,6 +892,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public WebElement getPropertyTermField(){
+            return getInputFieldByName(baseXPath, "Property Term");
+        }
+
+        @Override
         public WebElement getCardinalityMinField() {
             return getInputFieldByName(baseXPath, "Cardinality Min");
         }
@@ -757,6 +922,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public WebElement getNamespaceSelectField(){
+            return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
         public WebElement getFixedValueField() {
             return getInputFieldByName(baseXPath, "Fixed Value");
         }
@@ -774,6 +944,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+        @Override
+        public WebElement getCommentsIcon(){
+            return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
 

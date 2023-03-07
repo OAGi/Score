@@ -58,6 +58,9 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+
     private static final By ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
@@ -327,6 +330,17 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     @Override
     public void hitCancelButton() {
         click(getCancelButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getUpdateButton() {
+        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        click(getUpdateButton());
         invisibilityOfLoadingContainerElement(getDriver());
     }
 

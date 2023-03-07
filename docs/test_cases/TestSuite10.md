@@ -1396,14 +1396,6 @@ The developer can transfer ownership of the BCCP to another developer while in t
 #### Test Assertion #10.19.4
 When the BCCP DEN changes, all BCCs which uses the BCCP and whose revision numbers are 1 shall have their DEN updated accordingly.
 
-#### Test Assertion #10.19.5
-The end user can Exclude SCs or not from the Searching Field by checking or unchecking the “Exclude SCs” checkbox accordingly.
-
-##### Test Assertion #10.19.5.a
-If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excluding from the searching field
-##### Test Assertion #10.19.5.b
-If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
-
 ### Test Step Pre-condition:
 
 1. There is a BCCP, say BCCP1, which is a brand new BCCP and it is in WIP state and owned by the developer conducting the test steps.

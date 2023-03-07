@@ -6,9 +6,10 @@ import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -21,29 +22,36 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
-
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
-
-    public static final By AMEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
-
-    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-
-    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
-
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    public static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
-
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
+    private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
 
+    private static final By CHANGE_ACC_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Change ACC\")]");
 
     private final ASCCPObject asccp;
+    private BasePage parent;
 
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
@@ -59,7 +67,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert "ASCCP".equals(getASCCPPanel());
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "ASCCP".equals(getText(getASCCPPanel().getCoreComponentField()));
         assert getText(getTitle()).equals(asccp.getDen());
     }
 
@@ -78,6 +87,143 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     @Override
     public WebElement getSearchButton() {
         return visibilityOfElementLocated(getDriver(), SEARCH_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getReviseButton() {
+        return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitReviseButton() {
+        click(getReviseButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getAmendButton() {
+        return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitAmendButton() {
+        click(getAmendButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        retry(() -> click(getUpdateButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToQA() {
+        click(getMoveToQAButton(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getBackToWIPButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void backToWIP() {
+        click(getBackToWIPButton(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public void moveToProduction() {
+        click(getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getMoveToDraft(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToDraft() {
+        click(getMoveToDraft(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getMoveToCandidate(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToCandidate() {
+        click(getMoveToCandidate(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getMoveToQAButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public WebElement getMoveToProduction(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedCheckbox());
+    }
+
+    @Override
+    public WebElement getDeprecatedCheckbox() {
+        return elementToBeClickable(getDriver(), DEPRECATED_CHECKBOX_LOCATOR);
     }
 
     @Override
@@ -158,6 +304,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                }
+
+                @Override
+                public DTPanel getDTPanel() {
+                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
                 }
             };
         });
@@ -385,6 +536,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void setPropertyTerm(String propertyTerm) {
+            sendKeys(getPropertyTermField(), propertyTerm);
+        }
+
+        @Override
         public String getPropertyTermFieldLabel() {
             return getText(getPropertyTermField().findElement(By.xpath("parent::div//label")));
         }
@@ -398,6 +554,10 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         public WebElement getNillableCheckbox() {
             return getCheckboxByName(baseXPath, "Nillable");
         }
+        @Override
+        public void toggleNillable() {
+            click(getNillableCheckbox());
+        }
 
         @Override
         public WebElement getDeprecatedCheckbox() {
@@ -410,6 +570,15 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void setNamespace(String namespace) {
+            click(getNamespaceSelectField());
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+            click(option);
+            assert getText(getNamespaceSelectField()).equals(namespace);
+        }
+
+        @Override
         public WebElement getDefinitionSourceField() {
             return getInputFieldByName(baseXPath, "Definition Source");
         }
@@ -417,6 +586,56 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+
+        @Override
+        public void setDefinition(String definition){
+            sendKeys(getDefinitionField(), definition);
+        }
+
+        @Override
+        public SelectAssociationDialog changeACC(String path) {
+
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            }
+            SelectAssociationDialog selectAssociationDialog =
+                    new SelectAssociationDialogImpl((BasePageImpl) parent, "Change ACC");
+            assert selectAssociationDialog.isOpened();
+            return selectAssociationDialog;
+        }
+
+        @Override
+        public WebElement clickOnDropDownMenuByPath(String path) {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            String nodeName = nodes[nodes.length - 1];
+            WebElement node = getNodeByName(nodeName);
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            try {
+                if (visibilityOfElementLocated(getDriver(),
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    return node;
+                }
+            } catch (WebDriverException ignore) {
+            }
+            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+            click(contextMenuIcon);
+            assert visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+            return node;
+        }
+
+        @Override
+        public WebElement getContextMenuIconByNodeName(String nodeName) {
+            WebElement node = getNodeByName(nodeName);
+            return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
         }
     }
 
@@ -598,71 +817,67 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
     }
 
-    @Override
-    public void hitAmendButton() {
-        click(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR));
-        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
-    }
+    private class DTPanelImpl implements DTPanel {
 
+        private final String baseXPath;
 
-    @Override
-    public void moveToQA() {
-        click(getMoveToQAButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-    }
-
-    @Override
-    public void moveToProduction() {
-        click(getMoveToProduction(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-    }
-
-    @Override
-    public WebElement getMoveToQAButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        private DTPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
         }
-    }
 
-    @Override
-    public WebElement getMoveToProduction(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        @Override
+        public WebElement getCoreComponentField() {
+            return getInputFieldByName(baseXPath, "Core Component");
         }
-    }
 
-    @Override
-    public void toggleDeprecated() {
-        click(getDeprecatedCheckbox());
-    }
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName(baseXPath, "Release");
+        }
 
-    @Override
-    public WebElement getDeprecatedCheckbox() {
-        return elementToBeClickable(getDriver(), DEPRECATED_CHECKBOX_LOCATOR);
-    }
+        @Override
+        public WebElement getRevisionField() {
+            return getInputFieldByName(baseXPath, "Revision");
+        }
 
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName(baseXPath, "State");
+        }
 
-    @Override
-    public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
-        invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-    }
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName(baseXPath, "Owner");
+        }
 
-    @Override
-    public WebElement getUpdateButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        @Override
+        public WebElement getGUIDField() {
+            return getInputFieldByName(baseXPath, "GUID");
+        }
+
+        @Override
+        public WebElement getDENField() {
+            return getInputFieldByName(baseXPath, "DEN");
+        }
+
+        @Override
+        public WebElement getDataTypeTermField() {
+            return getInputFieldByName(baseXPath, "Data Type Term");
+        }
+
+        @Override
+        public WebElement getQualifierField() {
+            return getInputFieldByName(baseXPath, "Qualifier");
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return getTextAreaFieldByName(baseXPath, "Definition");
         }
     }
 }

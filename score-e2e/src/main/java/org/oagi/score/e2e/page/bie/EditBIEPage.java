@@ -388,6 +388,9 @@ public interface EditBIEPage extends Page {
          */
         WebElement getNillableCheckbox();
 
+        /**
+         * Toggle the 'Nillable' checkbox
+         */
         void toggleNillable();
 
         /**
@@ -484,6 +487,9 @@ public interface EditBIEPage extends Page {
          */
         WebElement getNillableCheckbox();
 
+        /**
+         * Toggle the 'Nillable' checkbox
+         */
         void toggleNillable();
 
         /**
