@@ -466,6 +466,12 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
+         *
+         * @param propertyTerm
+         */
+        void setPropertyTerm(String propertyTerm);
+
+        /**
          * Return the label of the 'Property Term' field.
          *
          * @return the label of the 'Property Term' field
@@ -487,6 +493,11 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getNillableCheckbox();
 
         /**
+         * Toggle the 'Nillable' checkbox
+         */
+        void toggleNillable();
+
+        /**
          * Return the UI element of the 'Deprecated' checkbox.
          *
          * @return the UI element of the 'Deprecated' checkbox
@@ -499,6 +510,13 @@ public interface ASCCPViewEditPage extends Page {
          * @return the UI element of the 'Namespace' select field
          */
         WebElement getNamespaceSelectField();
+
+        /**
+         * Set the 'Namespace' field with the given text.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(String namespace);
 
         /**
          * Return the UI element of the 'Definition Source' field.

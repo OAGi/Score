@@ -532,6 +532,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void setPropertyTerm(String propertyTerm) {
+            sendKeys(getPropertyTermField(), propertyTerm);
+        }
+
+        @Override
         public String getPropertyTermFieldLabel() {
             return getText(getPropertyTermField().findElement(By.xpath("parent::div//label")));
         }
@@ -545,6 +550,10 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         public WebElement getNillableCheckbox() {
             return getCheckboxByName(baseXPath, "Nillable");
         }
+        @Override
+        public void toggleNillable() {
+            click(getNillableCheckbox());
+        }
 
         @Override
         public WebElement getDeprecatedCheckbox() {
@@ -554,6 +563,15 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         @Override
         public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public void setNamespace(String namespace) {
+            click(getNamespaceSelectField());
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+            click(option);
+            assert getText(getNamespaceSelectField()).equals(namespace);
         }
 
         @Override
