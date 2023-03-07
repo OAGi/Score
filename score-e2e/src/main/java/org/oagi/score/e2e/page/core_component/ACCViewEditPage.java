@@ -128,6 +128,12 @@ public interface ACCViewEditPage extends Page {
     WebElement getObjectClassTermField();
 
     /**
+     *
+     * @param objectClassTerm
+     */
+    void setObjectClassTerm(String objectClassTerm);
+
+    /**
      * Return the 'Object Class Term' field label text.
      *
      * @return the 'Object Class Term' field label text

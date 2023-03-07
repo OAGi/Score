@@ -219,6 +219,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public void setObjectClassTerm(String objectClassTerm){
+        sendKeys(getObjectClassTermField(), objectClassTerm);
+    }
+
+    @Override
     public String getObjectClassTermFieldLabel() {
         return getObjectClassTermField().getAttribute("data-placeholder");
     }
