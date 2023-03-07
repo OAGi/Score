@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_6_EndUserAccessRightScoreCoreFunctions;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,14 +15,18 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.TimeoutException;
-import java.io.File;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
@@ -37,9 +43,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
+
     @Test
     @DisplayName("TC_6_3_TA_1")
-    public void test_TA_1(){
+    public void test_TA_1() {
         AppUserObject usera;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -121,7 +128,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -157,7 +165,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -199,7 +208,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -241,7 +251,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -261,7 +272,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -282,6 +295,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_6")
     public void test_TA_6() {
@@ -290,7 +304,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -310,7 +325,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -345,7 +362,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -365,7 +383,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -388,6 +408,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_8")
     public void test_TA_8() {
@@ -396,7 +417,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -416,7 +438,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -449,7 +473,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -469,7 +494,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -477,6 +504,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_10")
     public void test_TA_10() {
@@ -485,7 +513,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -505,7 +534,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectXMLSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -522,7 +553,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -542,7 +574,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             expressBIEPage.toggleBIEDefinition();
             assertNotChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectJSONSchemaExpression();
@@ -572,7 +606,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -592,7 +627,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertDoesNotThrow( () ->{expressBIEPage.selectBIEForExpression(topLevelAsbiep);});
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
             expressBIEPage.selectJSONSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -621,7 +658,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -673,7 +711,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -699,7 +738,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        ;
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectXMLSchemaExpression();
         expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -734,7 +774,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -760,7 +801,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        ;
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectXMLSchemaExpression();
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
@@ -785,6 +827,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_16")
     public void test_TA_16() {
@@ -794,7 +837,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -820,7 +864,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        ;
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectJSONSchemaExpression();
         expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -834,6 +879,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_17")
     public void test_TA_17() {
@@ -843,7 +889,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -869,7 +916,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);;
+        expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        ;
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectJSONSchemaExpression();
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
@@ -892,10 +940,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         BusinessContextObject context;
+        ASCCPObject asccp;
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);;
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            ;
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -903,7 +953,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
-            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
@@ -925,17 +975,24 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectJSONSchemaExpression();
             expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
 
-            File generatedBIEExpression = null;
+            File file = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+                expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+                waitFor(Duration.ofMillis(5000));
+                ObjectMapper mapper = new ObjectMapper();
+                file = getFileBasedOnName(asccp.getPropertyTerm(), "json");
+                JsonNode root = mapper.readTree(file);
+                JsonNode rootNode = root.path("properties");
+                String metaHeaderNodeType = rootNode.get("metaHeader").getNodeType().toString();
+                assertEquals("OBJECT", metaHeaderNodeType);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             } finally {
-                if (generatedBIEExpression != null) {
-                    generatedBIEExpression.delete();
+                if (file != null) {
+                    file.delete();
                 }
             }
-
         }
-
     }
 
     @AfterEach
@@ -945,5 +1002,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         this.randomAccounts.forEach(newUser -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
+    }
+
+    private File getFileBasedOnName(String fileName, String fileExtension) {
+        fileName = fileName.replaceAll(" ","") + "."+fileExtension;
+        String userHome = System.getProperty("user.home");
+        Path path = Paths.get(new File(userHome, "Downloads").toURI());
+        Path path2 = Paths.get(new File(path.toString(), fileName).toURI());
+        return path2.toFile();
     }
 }
