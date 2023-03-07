@@ -454,4 +454,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         assert includeMetaHeaderProfileBIEDialog.isOpened();
         includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
     }
+
+    @Override
+    public void toggleMakeAsAnArray() {
+        click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+    }
 }

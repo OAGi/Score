@@ -34,6 +34,8 @@ public interface ExpressBIEPage extends Page {
 
     void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
 
+    void toggleMakeAsAnArray();
+
     enum ExpressionFormat {
         XML,
         JSON,
