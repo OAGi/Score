@@ -226,4 +226,13 @@ public interface SelectAssociationDialog extends Dialog {
     void close();
 
     void hitCancelButton();
+
+    /**
+     * Return the UI element of the 'Update' button.
+     *
+     * @return the UI element of the 'Update' button
+     */
+    WebElement getUpdateButton();
+
+    void hitUpdateButton();
 }

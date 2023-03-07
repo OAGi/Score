@@ -7,9 +7,9 @@ import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -47,7 +47,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
 
+    private static final By CHANGE_ACC_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Change ACC\")]");
+
     private final ASCCPObject asccp;
+    private BasePage parent;
 
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
@@ -582,6 +586,56 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+
+        @Override
+        public void setDefinition(String definition){
+            sendKeys(getDefinitionField(), definition);
+        }
+
+        @Override
+        public SelectAssociationDialog changeACC(String path) {
+
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            }
+            SelectAssociationDialog selectAssociationDialog =
+                    new SelectAssociationDialogImpl((BasePageImpl) parent, "Change ACC");
+            assert selectAssociationDialog.isOpened();
+            return selectAssociationDialog;
+        }
+
+        @Override
+        public WebElement clickOnDropDownMenuByPath(String path) {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            String nodeName = nodes[nodes.length - 1];
+            WebElement node = getNodeByName(nodeName);
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            try {
+                if (visibilityOfElementLocated(getDriver(),
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    return node;
+                }
+            } catch (WebDriverException ignore) {
+            }
+            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+            click(contextMenuIcon);
+            assert visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+            return node;
+        }
+
+        @Override
+        public WebElement getContextMenuIconByNodeName(String nodeName) {
+            WebElement node = getNodeByName(nodeName);
+            return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
         }
     }
 

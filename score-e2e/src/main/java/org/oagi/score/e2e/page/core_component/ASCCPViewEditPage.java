@@ -532,6 +532,37 @@ public interface ASCCPViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
+        /**
+         *
+         * @param definition
+         */
+        void setDefinition(String definition);
+
+        /**
+         * Open the association selection dialog by clicking 'Change ACC' context menu.
+         *
+         * @param path node path
+         * @return the association selection dialog object
+         */
+        SelectAssociationDialog changeACC(String path);
+
+        /**
+         * Click the drop-down menu to open the context menu on the node.
+         *
+         * @param path the path of the node
+         * @return node UI element
+         */
+        WebElement clickOnDropDownMenuByPath(String path);
+
+        /**
+         * Return the UI element of the 'Context Menu' icon for the node.
+         *
+         * @param nodeName Node name
+         * @return the UI element of the 'Context Menu' icon
+         */
+        WebElement getContextMenuIconByNodeName(String nodeName);
+
+
     }
 
     interface BCCPanelContainer {
