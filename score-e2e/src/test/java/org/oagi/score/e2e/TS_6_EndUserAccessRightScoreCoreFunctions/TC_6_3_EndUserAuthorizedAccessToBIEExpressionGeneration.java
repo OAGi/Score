@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
@@ -994,6 +995,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_18a")
     public void test_TA_18a() {
@@ -1057,6 +1059,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_3_TA_18b")
     public void test_TA_18b() {
@@ -1192,6 +1195,65 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         }
     }
 
+    @Test
+    @DisplayName("TC_6_3_TA_19")
+    public void test_TA_19() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        BusinessContextObject context;
+        ASCCPObject asccp;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        expressBIEPage.selectJSONSchemaExpression();
+        expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
@@ -1202,7 +1264,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     }
 
     private File getFileBasedOnName(String fileName, String fileExtension) {
-        fileName = fileName.replaceAll(" ","") + "."+fileExtension;
+        fileName = fileName.replaceAll(" ", "") + "." + fileExtension;
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
         Path path2 = Paths.get(new File(path.toString(), fileName).toURI());
