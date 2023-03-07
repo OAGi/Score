@@ -544,8 +544,17 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         selectAssociationDialog.setDEN("Issued Item Instance Extension. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-
-
+        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.setDEN("Any Structured Content. Details");
+        selectAssociationDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
+        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.setDEN("OAGIS10 Nouns. Details");
+        selectAssociationDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
+        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.setDEN("OAGIS10 BODs. Details");
+        selectAssociationDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
     }
-
 }
