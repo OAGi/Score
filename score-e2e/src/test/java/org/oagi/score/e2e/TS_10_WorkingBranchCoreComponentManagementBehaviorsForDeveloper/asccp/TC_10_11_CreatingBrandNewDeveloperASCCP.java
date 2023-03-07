@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
@@ -202,14 +202,12 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-
-
-
-
-
+        accViewEditPage.createASCCPfromThis("/" + acc.getDen());
+        WebElement confirmCreateButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]"));
+        click(confirmCreateButton);
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+        assertEquals(acc.getDen(), asccp.getPropertyTerm());
     }
-
-
-
-
 }

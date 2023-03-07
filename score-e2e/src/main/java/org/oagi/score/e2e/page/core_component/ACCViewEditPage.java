@@ -220,9 +220,17 @@ public interface ACCViewEditPage extends Page {
      * Open the association selection dialog by clicking 'Where Used' context menu.
      *
      * @param path node path
-     * @return the association selection dialog object
+     * @return the find 'Where used' dialog object
      */
     FindWhereUsedDialog  findWhereUsed(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Create ASCCP from this' context menu.
+     *
+     * @param path node path
+     * @return the 'Create ASCCP from this' dialog object
+     */
+    WebElement  createASCCPfromThis(String path);
 
     /**
      * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.

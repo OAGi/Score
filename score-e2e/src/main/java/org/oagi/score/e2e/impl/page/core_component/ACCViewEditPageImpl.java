@@ -102,6 +102,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By WHERE_USED_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Where Used\")]");
 
+    private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
+
     private final ACCObject acc;
 
     public ACCViewEditPageImpl(BasePage parent, ACCObject acc) {
@@ -384,6 +387,20 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 new FindWhereUsedDialogImpl(this, "Where Used");
         assert findWhereUsedDialog.isOpened();
         return findWhereUsedDialog;
+    }
+    @Override
+    public WebElement createASCCPfromThis(String path){
+        WebElement confirmDialog;
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+        }
+        return confirmDialog;
+
     }
 
     @Override
