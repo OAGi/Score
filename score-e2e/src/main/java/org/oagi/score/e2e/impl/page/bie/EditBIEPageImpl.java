@@ -390,7 +390,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public ASBIEPanel getASBIEPanel(WebElement asccpNode) {
         return retry(() -> {
             click(asccpNode);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
             String nodeText = getText(asccpNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle);
@@ -402,7 +402,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public BBIEPanel getBBIEPanel(WebElement bccpNode) {
         return retry(() -> {
             click(bccpNode);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle);
@@ -414,7 +414,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public BBIESCPanel getBBIESCPanel(WebElement bdtScNode) {
         return retry(() -> {
             click(bdtScNode);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle);
@@ -482,6 +482,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             WebElement businessContextButton = elementToBeClickable(getDriver(),
                     By.xpath("//mat-option//span[contains(text(), \"" + businessContextName + "\")]"));
             click(businessContextButton);
+            waitFor(ofMillis(500L));
         }
 
         @Override
