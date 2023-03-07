@@ -11,6 +11,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ASCCPCreateDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -136,7 +137,24 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
 
     @Test
     public void test_TA_10_11_5(){
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("Test Equipment Extension. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Test Equipment Extension\")]//ancestor::tr/td[1]//label/span[1]")).size());
+    }
+
+    @Test
+    public void test_TA_10_11_6() {
 
 
     }
