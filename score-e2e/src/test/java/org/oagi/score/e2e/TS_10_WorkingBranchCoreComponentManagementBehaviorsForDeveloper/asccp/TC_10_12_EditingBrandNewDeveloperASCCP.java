@@ -330,11 +330,35 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
     }
 
+    @Test
+    public void test_TA_10_12_1_i() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+
+        assertThrows(TimeoutException.class, () -> asccpPanel.setNamespace(endUserNamespace.getUri()));
+    }
     @Test
     public void test_TA_10_12_2() {
 
@@ -399,7 +423,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_12_6() {
+    public void test_TA_10_12_6_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -435,7 +459,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_12_7() {
+    public void test_TA_10_12_6_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
