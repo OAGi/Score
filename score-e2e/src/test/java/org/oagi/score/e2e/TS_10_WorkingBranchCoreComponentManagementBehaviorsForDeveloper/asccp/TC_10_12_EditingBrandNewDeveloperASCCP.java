@@ -505,58 +505,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
     @Test
     public void test_TA_10_12_5(){
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
 
-        String branch = "Working";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("Test Equipment Extension. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Test Equipment Extension\")]//ancestor::tr/td[1]//label/span[1]")).size());
-    }
-
-    @Test
-    public void test_TA_10_12_6_a() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "Working";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("Issued Item Instance Base. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-
-        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("Issued Item Instance Extension. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Extension. Details\")]")).size());
-
-        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("Any Structured Content. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
-
-        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("OAGIS10 Nouns. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
-
-        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        asccpCreateDialog.setDEN("OAGIS10 BODs. Details");
-        asccpCreateDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
-    }
-
-    @Test
-    public void test_TA_10_12_6_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -568,13 +517,35 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.createASCCPfromThis("/" + acc.getDen());
-        WebElement confirmCreateButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]"));
-        click(confirmCreateButton);
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        assertEquals(acc.getDen(), asccp.getPropertyTerm());
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+
+        //change ACC
+        ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        SelectAssociationDialog selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.selectAssociation(anotherACC.getDen());
+        selectAssociationDialog.hitUpdateButton();
+
+        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        String asccpDEN= getText(asccpPanel.getDENField());
+        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
+
+        //only semantics or semantic group ACC can be selected
+        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.setDEN("Issued Item Instance Base. Details");
+        selectAssociationDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
+        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog.setDEN("Issued Item Instance Extension. Details");
+        selectAssociationDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
+
+
     }
+
 }
