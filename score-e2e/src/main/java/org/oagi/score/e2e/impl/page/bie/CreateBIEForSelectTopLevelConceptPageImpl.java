@@ -11,6 +11,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -283,8 +284,11 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
             waitFor(Duration.ofMillis(1000));
             invisibilityOfLoadingContainerElement(getDriver());
 
+            String currentUrl = getDriver().getCurrentUrl();
+            BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .getTopLevelASBIEPByDENAndReleaseNum(asccpDEN, branch);
+                    .getTopLevelASBIEPByID(topLevelAsbiepId);
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
             assert editBIEPage.isOpened();
             return editBIEPage;

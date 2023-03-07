@@ -117,7 +117,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
         });
     }
 
@@ -196,9 +196,10 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
     @Override
     public void discardBusinessContext(BusinessContextObject businessContext) {
         setName(businessContext.getName());
-        click(getSearchButton());
 
         retry(() -> {
+            hitSearchButton();
+
             WebElement tr;
             WebElement td;
             try {

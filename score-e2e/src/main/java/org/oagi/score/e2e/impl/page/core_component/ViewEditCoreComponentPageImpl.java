@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
@@ -327,9 +328,10 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     private void openCoreComponentByDen(String den) {
         sendKeys(getDENField(), den);
-        hitSearchButton();
 
         retry(() -> {
+            hitSearchButton();
+
             WebElement td;
             WebElement tr;
             try {
@@ -338,7 +340,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a core component using " + den, e);
             }
-            if (!den.equals(getDENFieldFromTheTable(td))) {
+            String denField = getDENFieldFromTheTable(td);
+            if (!den.equals(denField)) {
                 throw new NoSuchElementException("Cannot locate a core component using " + den);
             }
             WebElement tdLoginID = td.findElement(By.cssSelector("a"));
@@ -355,7 +358,10 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void hitSearchButton() {
-        retry(() -> click(getSearchButton()));
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(1000L));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
     }
 

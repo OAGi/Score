@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
@@ -524,7 +526,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
 
             WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
             WebElement td_bc = viewEditBIEPage.getColumnByName(tr, "businessContexts");
-            assertEquals(newName, getText(td_bc.findElement(By.xpath("mat-chip-list//mat-chip"))));
+            assertEquals(newName, getText(td_bc.findElement(By.xpath("span/a"))));
         }
     }
 
@@ -577,8 +579,8 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
                 "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(Duration.ofSeconds(3L))
-                    .pollingEvery(Duration.ofMillis(100L))
+                    .withTimeout(ofSeconds(3L))
+                    .pollingEvery(ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
@@ -587,12 +589,14 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         });
 
         viewEditBusinessContextPage.goToNextPage();
+        waitFor(ofSeconds(1L));
         viewEditBusinessContextPage.goToPreviousPage();
+        waitFor(ofSeconds(1L));
 
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(Duration.ofSeconds(3L))
-                    .pollingEvery(Duration.ofMillis(100L))
+                    .withTimeout(ofSeconds(3L))
+                    .pollingEvery(ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
             assertChecked(checkboxOfFirstRecord);
         });

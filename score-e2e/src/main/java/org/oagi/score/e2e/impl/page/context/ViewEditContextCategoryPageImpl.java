@@ -131,7 +131,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
         });
     }
 
@@ -196,7 +196,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(2000L));
 
             ContextCategoryObject contextCategory =
                     getAPIFactory().getContextCategoryAPI().getContextCategoryByName(contextCategoryName);

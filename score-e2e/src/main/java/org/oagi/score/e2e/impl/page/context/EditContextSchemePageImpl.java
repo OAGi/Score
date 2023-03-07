@@ -99,6 +99,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     public void setContextCategory(ContextCategoryObject contextCategory) {
         retry(() -> {
             click(getContextCategorySelectField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), contextCategory.getName());
             WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[contains(text(), \"" + contextCategory.getName() + "\")]"));

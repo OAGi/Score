@@ -136,7 +136,7 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td/span/a[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td/div/a/span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -147,9 +147,10 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
     @Override
     public void selectBusinessContext(BusinessContextObject businessContext) {
         sendKeys(getNameField(), businessContext.getName());
-        hitSearchButton();
 
         retry(() -> {
+            hitSearchButton();
+
             WebElement tr = getTableRecordByValue(businessContext.getName());
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));

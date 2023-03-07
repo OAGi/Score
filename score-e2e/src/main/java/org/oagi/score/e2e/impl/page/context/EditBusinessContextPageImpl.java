@@ -9,6 +9,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -110,6 +113,8 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
                         "/ancestor::tr/td[contains(text(), \"" + contextScheme.getSchemeName() + "\")]" +
                         "/ancestor::tr/td[contains(text(), \"" + contextCategory.getName() + "\")]"));
         click(td);
+        waitFor(ofMillis(2000L));
+
         BusinessContextValueDialog businessContextValueDialog = new BusinessContextValueDialogImpl(this);
         assert businessContextValueDialog.isOpened();
         retry(() -> {
