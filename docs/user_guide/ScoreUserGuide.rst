@@ -8568,13 +8568,15 @@ To generate a BIE expression:
 
 8. *Select the Expression*.  Choose the desired syntax to express the BIE.
 
-   -  *XML Schema*: This expression option generates the semantics of the BIE into the legacy OAGIS XML format.  This is a common format for message oriented middleware and file transfers.
+   |bie_expression_format|
 
-   -  *JSON Schema*: This expression option generates the semantics of the BIE into JSON Schema Draft 4 format, which is the widely accepted JSON Schema format.  This is a common format for message oriented middleware and file transfers.
+   -  *XML Schema*: This expression option generates the semantics of the BIE into the legacy OAGIS XML format. This is a common format for message oriented middleware and file transfers.
+
+   -  *JSON Schema*: This expression option generates the semantics of the BIE into JSON Schema Draft 4 format, which is the widely accepted JSON Schema format. This is a common format for message oriented middleware and file transfers.
     
-   -  *OpenAPI Specification*: This expresses the semantics of the BIE into either the requestBody of a POST verb, or the responseBody of a GET verb.  There are additional options to allow the BIE to be an array, suppression of the root property, attachment of a previously defined metaHeader component (must be available in the same branch), and for the GET verb provide a pagination component.  OpenAPI can be expression in either JSON or YAML syntax, loaded into OAS editors such as Swagger Editor, or imported into middleware tools such as Mulesoft.  This is a common format for exchanging information over HTTP in a RESTful manner.
+   -  *OpenAPI Specification*: This expresses the semantics of the BIE into either the requestBody of a POST verb, or the responseBody of a GET verb. There are additional options to allow the BIE to be an array, suppression of the root property, attachment of a previously defined metaHeader component (must be available in the same branch), and for the GET verb provide a pagination component.  OpenAPI can be expression in either JSON or YAML syntax, loaded into OAS editors such as Swagger Editor, or imported into middleware tools such as Mulesoft.  This is a common format for exchanging information over HTTP in a RESTful manner.
 
-   -  *Open Document Format (supports CSV)*: This expression option generates the semantics of the BIE into an Excel or Open Document Format.  There are two sheets to this document which one is the sample CSV sheet with standard column headers based off the BIE and one row of example data if entered into the BIE, and the other includes the specification of column headers.  If context definitions and example data is entered into the BIE, then these will appear in the specification sheet.  Normally the cardinality of each BCC is 0:1 as a spreadsheet is a flat rendition of these semantics.  This is a common format for exchanging larger volumes of information using file transfers, and processing by ETL tools.
+   -  *Open Document Format (supports CSV)*: This expression option generates the semantics of the BIE into an Excel or Open Document Format. There are two sheets to this document which one is the sample CSV sheet with standard column headers based off the BIE and one row of example data if entered into the BIE, and the other includes the specification of column headers.  If context definitions and example data is entered into the BIE, then these will appear in the specification sheet.  Normally the cardinality of each BCC is 0:1 as a spreadsheet is a flat rendition of these semantics.  This is a common format for exchanging larger volumes of information using file transfers, and processing by ETL tools.
     
 9. Click "Generate". The generated file will be automatically
    downloaded, typically to the "Downloads" folder in the User profile
@@ -9291,6 +9293,6 @@ Features with restricted behavior
 .. |image7| image:: media/image14.png
    :width: 0.19168in
    :height: 0.20835in
-
-
-
+.. |bie_expression_format| image:: media/expression_format_options.png
+   :width: 363px
+   :height: 202px
