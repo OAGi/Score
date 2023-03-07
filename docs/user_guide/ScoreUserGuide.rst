@@ -8154,7 +8154,7 @@ To find and retrieve a BIE:
 
    2. Sorting the results by the terms exist in the first row of the
       table, viz *State*, *Property Term*, *Owner*, *Business Contexts*,
-      *Version*, *Status, *Business Term*, *Remark* and *Updated on*.
+      *Version*, *Status*, *Business Term*, *Remark* and *Updated on*.
 
    3. The *Property Term* and *Business Context* search fields. See also
       `How to use the Search field in
