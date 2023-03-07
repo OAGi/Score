@@ -145,8 +145,6 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("Test Equipment Extension. Details");
         asccpCreateDialog.hitSearchButton();
@@ -155,8 +153,38 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
 
     @Test
     public void test_TA_10_11_6() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("Issued Item Instance Base. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
+
+        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("Issued Item Instance Extension. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Extension. Details\")]")).size());
+
+        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("Any Structured Content. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
+
+        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("OAGIS10 Nouns. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
+
+        asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        asccpCreateDialog.setDEN("OAGIS10 BODs. Details");
+        asccpCreateDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
     }
 
 
