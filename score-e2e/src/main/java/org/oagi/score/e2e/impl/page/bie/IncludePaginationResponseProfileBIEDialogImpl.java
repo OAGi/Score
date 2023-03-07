@@ -4,16 +4,16 @@ import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
-import org.oagi.score.e2e.page.bie.IncludeMetaHeaderProfileBIEDialog;
+import org.oagi.score.e2e.page.bie.IncludePaginationResponseProfileBIEDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
-public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderProfileBIEDialog {
+public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePaginationResponseProfileBIEDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
@@ -38,13 +38,14 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
             By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
     private final BasePageImpl parent;
 
-    public IncludeMetaHeaderProfileBIEDialogImpl(BasePageImpl parent) {
+    public IncludePaginationResponseProfileBIEDialogImpl(BasePageImpl parent) {
         this.parent = parent;
     }
 
     private WebDriver getDriver() {
         return this.parent.getDriver();
     }
+
 
     @Override
     public boolean isOpened() {
@@ -93,9 +94,9 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
     }
 
     @Override
-    public void selectMetaHeaderProfile(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+    public void selectPaginationResponseProfile(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
         retry(() -> {
-            WebElement tr = getTableRecordByValue(metaHeaderASBIEP.getDen());
+            WebElement tr = getTableRecordByValue(paginationResponseASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
         });

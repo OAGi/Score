@@ -459,4 +459,12 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleMakeAsAnArray() {
         click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
     }
+
+    @Override
+    public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+        click(getIncludePaginationResponseCheckbox());
+        IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog = new IncludePaginationResponseProfileBIEDialogImpl(this);
+        assert includePaginationResponseProfileBIEDialog.isOpened();
+        includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+    }
 }

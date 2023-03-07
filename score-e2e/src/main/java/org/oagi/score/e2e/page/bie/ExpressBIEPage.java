@@ -36,6 +36,8 @@ public interface ExpressBIEPage extends Page {
 
     void toggleMakeAsAnArray();
 
+    void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
     enum ExpressionFormat {
         XML,
         JSON,

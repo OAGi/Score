@@ -5,7 +5,7 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Dialog;
 import org.openqa.selenium.WebElement;
 
-public interface IncludeMetaHeaderProfileBIEDialog extends Dialog {
+public interface IncludePaginationResponseProfileBIEDialog extends Dialog {
 
     WebElement getBusinessContextField();
 
@@ -19,7 +19,7 @@ public interface IncludeMetaHeaderProfileBIEDialog extends Dialog {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    void selectMetaHeaderProfile(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+    void selectPaginationResponseProfile(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
 
     WebElement getSelectButton();
 }
