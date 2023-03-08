@@ -1868,14 +1868,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         File file = null;
         try {
-            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
         } finally {
             if (file != null) {
                 file.delete();
             }
         }
-
     }
+
     @Test
     @DisplayName("TC_6_3_TA_30")
     public void test_TA_30() {
