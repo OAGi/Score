@@ -84,6 +84,10 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         assert "Express BIE".equals(getText(getTitle()));
     }
 
+    private String getCheckedAttribute(WebElement element){
+        return element.findElement(By.xpath("label/span[1]/input")).getAttribute("aria-checked");
+    }
+
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("title"));
@@ -415,11 +419,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-            click(getIncludeMetaHeaderCheckbox());
-            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
-                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-            assert includeMetaHeaderProfileBIEDialog.isOpened();
-            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
+            if (checked.equals("true")){
+                click(getIncludeMetaHeaderCheckbox());
+            }else{
+                click(getIncludeMetaHeaderCheckbox());
+                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includeMetaHeaderProfileBIEDialog.isOpened();
+                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            }
         }
 
         @Override
@@ -429,11 +438,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         @Override
         public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
-            click(getIncludePaginationResponseCheckbox());
-            IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                    new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-            assert includePaginationResponseProfileBIEDialog.isOpened();
-            includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
+            if (checked.equals("true")){
+                click(getIncludePaginationResponseCheckbox());
+            }else{
+                click(getIncludePaginationResponseCheckbox());
+                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includePaginationResponseProfileBIEDialog.isOpened();
+                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            }
         }
     }
 
@@ -573,11 +587,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-            click(getIncludeMetaHeaderCheckbox());
-            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
-                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-            assert includeMetaHeaderProfileBIEDialog.isOpened();
-            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
+            if (checked.equals("true")){
+                click(getIncludeMetaHeaderCheckbox());
+            }else{
+                click(getIncludeMetaHeaderCheckbox());
+                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includeMetaHeaderProfileBIEDialog.isOpened();
+                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            }
         }
 
         @Override
@@ -587,11 +606,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         @Override
         public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
-            click(getIncludePaginationResponseCheckbox());
-            IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                    new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-            assert includePaginationResponseProfileBIEDialog.isOpened();
-            includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
+           if (checked.equals("true")){
+               click(getIncludePaginationResponseCheckbox());
+           }else{
+               click(getIncludePaginationResponseCheckbox());
+               IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                       new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+               assert includePaginationResponseProfileBIEDialog.isOpened();
+               includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+           }
         }
     }
 
@@ -614,11 +638,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-            click(getIncludeMetaHeaderCheckbox());
-            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
-                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-            assert includeMetaHeaderProfileBIEDialog.isOpened();
-            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
+            if (checked.equals("true")){
+                click(getIncludeMetaHeaderCheckbox());
+            }else{
+                click(getIncludeMetaHeaderCheckbox());
+                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includeMetaHeaderProfileBIEDialog.isOpened();
+                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            }
         }
     }
 
