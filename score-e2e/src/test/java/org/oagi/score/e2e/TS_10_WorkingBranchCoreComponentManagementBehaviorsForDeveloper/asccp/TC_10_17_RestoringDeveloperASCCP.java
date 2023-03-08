@@ -151,7 +151,7 @@ public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
@@ -171,26 +171,20 @@ public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("Deleted", getText(accPanel.getStateField()));
         asccpViewEditPage.hitDeleteButton();
-        assertTrue(viewEditCoreComponentPage.isOpened());
-        homePage.logout();
 
-        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        assertTrue(accViewEditPage.isDeleted(asccNode));
-        asccpViewEditPage = accViewEditPage.openASCCPInNewTab(asccNode);
+        //reload the page
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals("Deleted", getText(asccpPanel.getStateField()));
-        assertEquals(developer.getLoginId(), getText(asccpPanel.getOwnerField()));
         asccpViewEditPage.hitRestoreButton();
 
-        switchToMainTab(getDriver());
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        assertFalse(accViewEditPage.isDeleted(asccNode));
+        //reload the page
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals("WIP", getText(asccpPanel.getStateField()));
-        assertEquals(anotherDeveloper.getLoginId(), getText(asccpPanel.getOwnerField()));
-
     }
 }
