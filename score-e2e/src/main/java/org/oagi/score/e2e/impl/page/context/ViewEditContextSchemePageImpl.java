@@ -118,13 +118,18 @@ public class ViewEditContextSchemePageImpl extends BasePageImpl implements ViewE
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
         });
     }
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override

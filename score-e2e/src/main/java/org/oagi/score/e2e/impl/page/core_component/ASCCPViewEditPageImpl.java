@@ -137,6 +137,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -154,6 +155,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -162,6 +164,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -179,6 +182,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -196,6 +200,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -572,9 +577,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         @Override
         public void setNamespace(String namespace) {
             click(getNamespaceSelectField());
+            waitFor(ofMillis(1000L));
             WebElement option = elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
             click(option);
+            waitFor(ofMillis(1000L));
             assert getText(getNamespaceSelectField()).equals(namespace);
         }
 

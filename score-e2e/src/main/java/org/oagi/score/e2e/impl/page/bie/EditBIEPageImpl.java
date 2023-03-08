@@ -167,7 +167,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 new Actions(getDriver()).sendKeys("O").perform();
                 click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
+
             ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert ACCExtensionViewEditPage.isOpened();
             return ACCExtensionViewEditPage;
@@ -185,7 +186,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 new Actions(getDriver()).sendKeys("O").perform();
                 click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
+
             ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert accExtensionViewEditPage.isOpened();
             return accExtensionViewEditPage;
@@ -335,6 +337,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -352,6 +355,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -369,6 +373,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -918,6 +923,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public String getValueDomainWarningMessage(String valueDomain) {
             click(getValueDomainField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
