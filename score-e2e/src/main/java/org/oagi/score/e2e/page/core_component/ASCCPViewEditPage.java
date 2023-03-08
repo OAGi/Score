@@ -42,9 +42,21 @@ public interface ASCCPViewEditPage extends Page {
     WebElement getCancelButton();
 
     /**
-     * Hit the 'Revise' button.
+     * Hit the 'Cancel' button.
      */
     void hitCancelButton();
+
+    /**
+     * Return the UI element of the 'Delete' button. Developers only can see the 'Delete' button.
+     *
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton();
+
+    /**
+     * Hit the 'Delete' button.
+     */
+    void hitDeleteButton();
 
     /**
      * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
