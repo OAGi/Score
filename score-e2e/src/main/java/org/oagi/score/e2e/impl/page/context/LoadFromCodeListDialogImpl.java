@@ -163,7 +163,12 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -175,14 +180,14 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
     public void goToNextPage() {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Next page']")));
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//button[@aria-label='Next page']")));
     }
 
     @Override
     public void goToPreviousPage() {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//button[@aria-label='Previous page']")));
     }
 
     @Override
@@ -206,20 +211,26 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a code list using " + codeListName, e);
             }
-            /*
-             * TODO:
-             * The following assertion doesn't work when it runs on 'headless' mode.
-             *
             String actualText = getText(td.findElement(By.cssSelector("a > span")));
             if (!codeListName.equals(actualText)) {
-                throw new NoSuchElementException("Cannot locate a code list using " + codeListName);
+                try {
+                    tr = getTableRecordAtIndex(2);
+                    td = getColumnByName(tr, "codeListName");
+                } catch (TimeoutException e) {
+                    throw new NoSuchElementException("Cannot locate a code list using " + codeListName, e);
+                }
+
+                actualText = getText(td.findElement(By.cssSelector("a > span")));
+                if (!codeListName.equals(actualText)) {
+                    throw new NoSuchElementException("Cannot locate a code list using " + codeListName);
+                }
             }
-             */
+
             click(getColumnByName(tr, "select"));
             click(getSelectButton());
+            waitFor(ofMillis(500));
 
             assert parent.isOpened();
-            waitFor(ofMillis(500));
         });
     }
 }

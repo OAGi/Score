@@ -480,6 +480,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -488,6 +489,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -514,6 +516,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -1067,6 +1070,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -1075,6 +1079,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override

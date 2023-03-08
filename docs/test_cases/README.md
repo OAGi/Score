@@ -194,4 +194,8 @@
 	- [Test Case 41.12 - End User DT state management](/docs/test_cases/TestSuite41.md#test-case-4112)
 	- [Test Case 41.13 - Deleting end user DT](/docs/test_cases/TestSuite41.md#test-case-4113)
 	- [Test Case 41.14 - Restoring end user DT](/docs/test_cases/TestSuite41.md#test-case-4114)
-
+- [Test Suite 42 - Business Term Management](/docs/test_cases/TestSuite42.md)
+	- [Test Case 42.1 - View or Edit Business Term](/docs/test_cases/TestSuite42.md#test-case-421)
+	- [Test Case 42.2 - Business Term Assignment](/docs/test_cases/TestSuite42.md#test-case-422)
+	- [Test Case 42.3 - Business Term from BIE detail page](/docs/test_cases/TestSuite42.md#test-case-423)
+	- [Test Case 42.4 - Load Business Terms from an External Source](/docs/test_cases/TestSuite42.md#test-case-424)
