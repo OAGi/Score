@@ -247,6 +247,14 @@ public interface ACCViewEditPage extends Page {
     BCCPViewEditPage openBCCPInNewTab(WebElement bccNode);
 
     /**
+     * Open the ASCCP page through 'Open in new tab' context menu for the given ACC node.
+     *
+     * @param accNode ACC node
+     * @return the ASCCP page object
+     */
+    ASCCPViewEditPage openASCCPInNewTab(WebElement accNode);
+
+    /**
      * Click the drop-down menu to open the context menu on the node.
      *
      * @param path the path of the node

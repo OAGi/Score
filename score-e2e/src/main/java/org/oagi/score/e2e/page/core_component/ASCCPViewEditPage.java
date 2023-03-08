@@ -59,6 +59,18 @@ public interface ASCCPViewEditPage extends Page {
     void hitDeleteButton();
 
     /**
+     * Return the UI element of the 'Restore' button. Developers only can see the 'Restore' button.
+     *
+     * @return the UI element of the 'Restore' button
+     */
+    WebElement getRestoreButton();
+
+    /**
+     * Hit the 'Delete' button.
+     */
+    void hitRestoreButton();
+
+    /**
      * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
      *
      * @return the UI element of the 'Amend' button
