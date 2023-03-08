@@ -34,29 +34,79 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
-
-    void toggleMakeAsAnArray();
-
-    void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
-
     int getNumberOfBIEsInIndexBox();
 
     int getNumberfBIEsInTable();
 
-    void selectOpenAPIExpression();
+    WebElement getXMLSchemaExpressionRadioButton();
+
+    void selectXMLSchemaExpression();
+
+    WebElement getJSONSchemaExpressionRadioButton();
+
+    JSONSchemaExpressionOptions selectJSONSchemaExpression();
+
+    interface JSONSchemaExpressionOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
 
     WebElement getOpenAPIExpressionRadioButton();
 
-    void selectYAMLOpenAPIFormat();
+    OpenAPIExpressionOptions selectOpenAPIExpression();
 
-    void toggleGETOperationTemplate();
+    interface OpenAPIExpressionOptions {
 
-    WebElement getGETOperationTemplateCheckbox();
+        void selectYAMLOpenAPIFormat();
 
-    WebElement getPOSTOperationTemplate();
+        WebElement getGETOperationTemplateCheckbox();
 
-    void togglePOSTOperationTemplate();
+        OpenAPIExpressionGETOperationOptions toggleGETOperationTemplate();
+
+        WebElement getPOSTOperationTemplateCheckbox();
+
+        OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate();
+
+    }
+
+    interface OpenAPIExpressionGETOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
+
+    interface OpenAPIExpressionPOSTOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+    }
 
     void selectJSONOpenAPIFormat();
 
@@ -117,23 +167,9 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getBasedCCMetaDataCheckbox();
 
-    void selectXMLSchemaExpression();
-
-    void selectJSONSchemaExpression();
-
-    WebElement getJSONSchemaExpressionRadioButton();
-
-    WebElement getXMLSchemaExpressionRadioButton();
-
     void selectPutAllSchemasInTheSameFile();
 
     WebElement getPutAllSchemasInTheSameFileRadioButton();
-
-    WebElement getMakeAsAnArrayCheckbox();
-
-    WebElement getIncludeMetaHeaderCheckbox();
-
-    WebElement getIncludePaginationResponseCheckbox();
 
     void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection);
 

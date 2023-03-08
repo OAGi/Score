@@ -184,6 +184,10 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
         if (compressed) {
             return file -> {
+                if (!file.getName().endsWith(".zip")) {
+                    return false;
+                }
+
                 try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file))) {
                     ZipEntry entry = zipInputStream.getNextEntry();
                     while (entry != null) {
@@ -250,7 +254,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private Function<File, Boolean> ymlValidator() {
         return file -> {
-            if (!file.getName().endsWith(".yml") || !file.getName().endsWith(".yaml")) {
+            if (!file.getName().endsWith(".yml") && !file.getName().endsWith(".yaml")) {
                 return false;
             }
 
@@ -283,12 +287,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                     downloadedFile = new File(path.toFile(), event.context().toString());
                     if (validator.apply(downloadedFile)) {
                         return downloadedFile;
+                    } else {
+                        downloadedFile = null;
                     }
                 }
                 key.reset();
             }
             if (downloadedFile != null && validator.apply(downloadedFile)) {
                 return downloadedFile;
+            } else {
+                downloadedFile = null;
             }
             timeout -= 1000L;
         } while (timeout > 0L);
@@ -379,38 +387,69 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public WebElement getMakeAsAnArrayCheckbox() {
-        return getCheckboxByName("Make as an array");
-    }
-
-    @Override
-    public WebElement getIncludeMetaHeaderCheckbox() {
-        return getCheckboxByName("Include Meta Header");
-    }
-
-    @Override
-    public WebElement getIncludePaginationResponseCheckbox() {
-        return getCheckboxByName("Include Pagination Response");
-    }
-
-    @Override
     public void selectXMLSchemaExpression() {
         click(getXMLSchemaExpressionRadioButton());
     }
 
     @Override
-    public void selectJSONSchemaExpression() {
+    public JSONSchemaExpressionOptions selectJSONSchemaExpression() {
         click(getJSONSchemaExpressionRadioButton());
+        return new JSONSchemaExpressionOptionsImpl();
     }
+
+    private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
+        @Override
+        public WebElement getMakeAsAnArrayCheckbox() {
+            return getCheckboxByName("Make as an array");
+        }
+
+        @Override
+        public void toggleMakeAsAnArray() {
+            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+        }
+
+        @Override
+        public WebElement getIncludeMetaHeaderCheckbox() {
+            return getCheckboxByName("Include Meta Header");
+        }
+
+        @Override
+        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+            click(getIncludeMetaHeaderCheckbox());
+            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+            assert includeMetaHeaderProfileBIEDialog.isOpened();
+            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+        }
+
+        @Override
+        public WebElement getIncludePaginationResponseCheckbox() {
+            return getCheckboxByName("Include Pagination Response");
+        }
+
+        @Override
+        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+            click(getIncludePaginationResponseCheckbox());
+            IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                    new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+            assert includePaginationResponseProfileBIEDialog.isOpened();
+            includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+        }
+    }
+
+    @Override
+    public WebElement getXMLSchemaExpressionRadioButton() {
+        return getRadioButtonByName("XML Schema");
+    }
+
     @Override
     public WebElement getJSONSchemaExpressionRadioButton() {
         return getRadioButtonByName("JSON Schema");
     }
 
-
     @Override
-    public WebElement getXMLSchemaExpressionRadioButton() {
-        return getRadioButtonByName("XML Schema");
+    public WebElement getOpenAPIExpressionRadioButton() {
+        return getRadioButtonByName("Open API 3.0 (Template)");
     }
 
     @Override
@@ -426,6 +465,11 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+    }
+
+    private WebElement getCheckboxByNameAndClassInCheckbox(String name, String classInCheckbox) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[contains(@class, \"" + classInCheckbox + "\")]"));
     }
 
     private WebElement getRadioButtonByName(String name) {
@@ -456,27 +500,6 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-        click(getIncludeMetaHeaderCheckbox());
-        IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog = new IncludeMetaHeaderProfileBIEDialogImpl(this);
-        assert includeMetaHeaderProfileBIEDialog.isOpened();
-        includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
-    }
-
-    @Override
-    public void toggleMakeAsAnArray() {
-        click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
-    }
-
-    @Override
-    public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
-        click(getIncludePaginationResponseCheckbox());
-        IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog = new IncludePaginationResponseProfileBIEDialogImpl(this);
-        assert includePaginationResponseProfileBIEDialog.isOpened();
-        includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
-    }
-
-    @Override
     public int getNumberOfBIEsInIndexBox() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
@@ -492,41 +515,111 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public void selectOpenAPIExpression() {
+    public OpenAPIExpressionOptions selectOpenAPIExpression() {
         click(getOpenAPIExpressionRadioButton());
-    }
-    @Override
-    public WebElement getOpenAPIExpressionRadioButton() {
-        return getRadioButtonByName("Open API 3.0 (Template)");
+        return new OpenAPIExpressionOptionsImpl();
     }
 
-    @Override
-    public void selectYAMLOpenAPIFormat() {
-        retry(() -> {
-            click(getOpenAPIFormatSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option/span[contains(text(), \"YAML\")]"));
-            click(optionField);
-        });
+    private class OpenAPIExpressionOptionsImpl implements OpenAPIExpressionOptions {
+        @Override
+        public void selectYAMLOpenAPIFormat() {
+            retry(() -> {
+                click(getOpenAPIFormatSelectField());
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option/span[contains(text(), \"YAML\")]"));
+                click(optionField);
+            });
+        }
+
+        @Override
+        public WebElement getGETOperationTemplateCheckbox() {
+            return getCheckboxByName("GET Operation Template");
+        }
+
+        @Override
+        public OpenAPIExpressionGETOperationOptions toggleGETOperationTemplate() {
+            click(getGETOperationTemplateCheckbox());
+            return new OpenAPIExpressionGETOperationOptionsImpl();
+        }
+
+        @Override
+        public WebElement getPOSTOperationTemplateCheckbox() {
+            return getCheckboxByName("POST Operation Template");
+        }
+
+        @Override
+        public OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate() {
+            click(getPOSTOperationTemplateCheckbox());
+            return new OpenAPIExpressionPOSTOperationOptionsImpl();
+        }
     }
 
-    @Override
-    public void toggleGETOperationTemplate() {
-        click(getGETOperationTemplateCheckbox());
-    }
-    @Override
-    public WebElement getGETOperationTemplateCheckbox() {
-        return getCheckboxByName("GET Operation Template");
+    private class OpenAPIExpressionGETOperationOptionsImpl implements OpenAPIExpressionGETOperationOptions {
+
+        @Override
+        public WebElement getMakeAsAnArrayCheckbox() {
+            return getCheckboxByNameAndClassInCheckbox("Make as an array", "get-operation-template");
+        }
+
+        @Override
+        public void toggleMakeAsAnArray() {
+            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+        }
+
+        @Override
+        public WebElement getIncludeMetaHeaderCheckbox() {
+            return getCheckboxByNameAndClassInCheckbox("Include Meta Header", "get-operation-template");
+        }
+
+        @Override
+        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+            click(getIncludeMetaHeaderCheckbox());
+            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+            assert includeMetaHeaderProfileBIEDialog.isOpened();
+            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+        }
+
+        @Override
+        public WebElement getIncludePaginationResponseCheckbox() {
+            return getCheckboxByNameAndClassInCheckbox("Include Pagination Response", "get-operation-template");
+        }
+
+        @Override
+        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+            click(getIncludePaginationResponseCheckbox());
+            IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                    new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+            assert includePaginationResponseProfileBIEDialog.isOpened();
+            includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+        }
     }
 
-    @Override
-    public WebElement getPOSTOperationTemplate() {
-        return getCheckboxByName("POST Operation Template");
-    }
+    private class OpenAPIExpressionPOSTOperationOptionsImpl implements OpenAPIExpressionPOSTOperationOptions {
 
-    @Override
-    public void togglePOSTOperationTemplate() {
-        click(getPOSTOperationTemplate());
+        @Override
+        public WebElement getMakeAsAnArrayCheckbox() {
+            return getCheckboxByNameAndClassInCheckbox("Make as an array", "post-operation-template");
+        }
+
+        @Override
+        public void toggleMakeAsAnArray() {
+            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+        }
+
+        @Override
+        public WebElement getIncludeMetaHeaderCheckbox() {
+            return getCheckboxByNameAndClassInCheckbox("Include Meta Header", "post-operation-template");
+        }
+
+        @Override
+        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+            click(getIncludeMetaHeaderCheckbox());
+            IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                    new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+            assert includeMetaHeaderProfileBIEDialog.isOpened();
+            includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+        }
     }
 
     @Override

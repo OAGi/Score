@@ -355,19 +355,19 @@
 
                   <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
                                 [disabled]="option.openAPI30GetTemplate != true"
-                                class="generate-second-option">
+                                class="get-operation-template generate-second-option">
                   <span
                     class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30GetTemplate"
                                 [disabled]="option.openAPI30GetTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30GetTemplate || option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
-                                class="generate-second-option">
+                                class="get-operation-template generate-second-option">
                   <span
                     class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
                                 [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
-                                class="generate-second-option"
+                                class="get-operation-template generate-second-option"
                                 (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate')">
@@ -376,7 +376,7 @@
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
                                 [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
-                                class="generate-second-option"
+                                class="get-operation-template generate-second-option"
                                 (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
                                              'includePaginationResponseForJsonForOpenAPI30GetTemplate',
                                              'paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate')">
@@ -390,19 +390,19 @@
 
                   <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
                                 [disabled]="option.openAPI30PostTemplate != true"
-                                class="generate-second-option">
+                                class="post-operation-template generate-second-option">
                   <span
                     class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30PostTemplate"
                                 [disabled]="option.openAPI30PostTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
-                                class="generate-second-option">
+                                class="post-operation-template generate-second-option">
                   <span
                     class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
                                 [disabled]="option.openAPI30PostTemplate != true || option.suppressRootPropertyForOpenAPI30PostTemplate"
-                                class="generate-second-option"
+                                class="post-operation-template generate-second-option"
                                 (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate')">
