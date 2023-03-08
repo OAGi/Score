@@ -13,21 +13,18 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
+import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
@@ -1762,6 +1759,95 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
         jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
         assertDisabled(expressBIEPage.getPutAllSchemasInTheSameFileRadioButton());
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_27")
+    public void test_TA_27() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject reusableASCCP;
+        BusinessContextObject context;
+        ReleaseObject release;
+        TopLevelASBIEPObject reusableBIE;
+        Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject accReusable = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Published");
+            coreComponentAPI.appendBCC(accReusable, bccp, "Published");
+            reusableASCCP = coreComponentAPI.createRandomASCCP(accReusable, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            reusableBIE = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), reusableASCCP, usera, "QA");
+
+
+            ACCObject accOne = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            coreComponentAPI.appendASCC(accOne, reusableASCCP, "Published");
+            ASCCPObject asccpOne = coreComponentAPI.createRandomASCCP(accOne, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIEOne = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccpOne, usera, "WIP");
+            biesForTesting.add(useraBIEOne);
+            bieASCCPMap.put(useraBIEOne, asccpOne);
+
+            ACCObject accTwo = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            coreComponentAPI.appendASCC(accTwo, reusableASCCP, "Published");
+            ASCCPObject asccpTwo = coreComponentAPI.createRandomASCCP(accTwo, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIETwo = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccpTwo, usera, "WIP");
+            biesForTesting.add(useraBIETwo);
+            bieASCCPMap.put(useraBIETwo, asccpTwo);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        for (TopLevelASBIEPObject bie: biesForTesting){
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(bie);
+            ASCCPObject asccp = bieASCCPMap.get(bie);
+            SelectProfileBIEToReuseDialog selectProfileBIEToReuse =
+                    editBIEPage.reuseBIEOnNode("/" + asccp.getPropertyTerm() + "/" + reusableASCCP.getPropertyTerm());
+            selectProfileBIEToReuse.selectBIEToReuse(reusableBIE);
+        }
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectBIEForExpression(reusableBIE);
+        });
+        expressBIEPage.selectXMLSchemaExpression();
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+
+        expressBIEPage.selectJSONSchemaExpression();
+        file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
     }
 
     @Test
