@@ -1,7 +1,10 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -42,9 +45,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_1")
-    @Disabled
+    @Deprecated
     public void test_TA_1() {
         //The name of the Core Component page should be “Core Components (Model Library)”.
+        throw new NotImplementedException();
     }
 
     @Test
@@ -85,9 +89,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_4")
-    @Disabled
+    @Deprecated
     public void test_TA_4() {
         //The title of the left pane where the tree of an ACC is displayed should be “ACC (Component Type or Group Definition)”.
+        throw new NotImplementedException();
 
     }
 
@@ -165,17 +170,18 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_7")
-    @Disabled
+    @Deprecated
     public void testTA_7() {
         //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
+        throw new NotImplementedException();
     }
 
     @Test
     @DisplayName("TC_7_6_TA_8")
-    @Disabled
+    @Deprecated
     public void testTA_8() {
         //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
-
+        throw new NotImplementedException();
     }
 
     @Test
@@ -217,9 +223,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_11")
-    @Disabled
+    @Deprecated
     public void test_TA_11() {
         //The title of the right pane where the details of a BCCP are displayed should be “BCCP (Associated Field) Detail”.
+        throw new NotImplementedException();
     }
 
     @Test
@@ -254,10 +261,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_14")
-    @Disabled
+    @Deprecated
     public void test_TA_14() {
         //The title of the right pane where the details of an ASCC are displayed should be “ASCC (Component Association) Detail”. (It cannot be checked yet).
-
+        throw new NotImplementedException();
     }
 
     @Test
@@ -299,10 +306,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_17")
-    @Disabled
+    @Deprecated
     public void test_TA_17() {
         //The title of the right pane where the details of a BCC are displayed should be “BCC (Field Association) Detail”.
-
+        throw new NotImplementedException();
     }
 
     @Test
@@ -343,11 +350,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_20")
-    @Disabled
     public void test_TA_20() {
         //The title of the right pane where the details of a supplementary component are displayed should be
         // “Supplementary Component (Field Metadata)”. (It cannot be checked yet).
-
+        throw new NotImplementedException();
     }
 
     @Test
@@ -391,12 +397,12 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleDT);
     }
 
-    /*@Test
+    @Test
     public void test() {
         for (String loginID : Arrays.asList("eu_K316X", "dev_azHuS2k7m")) {
             thisAccountWillBeDeletedAfterTests(getAPIFactory().getAppUserAPI().getAppUserByLoginID(loginID));
         }
-    }*/
+    }
 
     @AfterEach
     public void tearDown() {

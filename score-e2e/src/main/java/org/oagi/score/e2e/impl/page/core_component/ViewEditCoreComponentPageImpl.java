@@ -335,7 +335,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             WebElement td;
             WebElement tr;
             try {
-                tr = getTableRecordByValue(den);
+                tr = getTableRecordAtIndex(1);
                 td = getColumnByName(tr, "den");
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a core component using " + den, e);
