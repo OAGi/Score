@@ -206,9 +206,10 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                         entry = zipInputStream.getNextEntry();
                     }
                     zipInputStream.closeEntry();
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
+                } catch (IOException ignore) {
+                    return false;
                 }
+
                 return true;
             };
         }
@@ -291,16 +292,12 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                     downloadedFile = new File(path.toFile(), event.context().toString());
                     if (validator.apply(downloadedFile)) {
                         return downloadedFile;
-                    } else {
-                        downloadedFile = null;
                     }
                 }
                 key.reset();
             }
             if (downloadedFile != null && validator.apply(downloadedFile)) {
                 return downloadedFile;
-            } else {
-                downloadedFile = null;
             }
             timeout -= 1000L;
         } while (timeout > 0L);
