@@ -1341,6 +1341,58 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         int numberofBIEsInIndexBox = expressBIEPage.getNumberOfBIEsInIndexBox();
         assertEquals(numberOfBIEsDisplayed, numberofBIEsInIndexBox);
     }
+    @Test
+    @DisplayName("TC_6_3_TA_22")
+    public void test_TA_22() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        {
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, releaseOne, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            /**
+             * The end user can generate an expression of a single BIE with multiple business contexts assigned
+             */
+            BusinessContextObject contextOne = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            BusinessContextObject contextTwo = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextOne,contextTwo), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie: biesForTesting){
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            expressBIEPage.toggleBusinessContext();
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML, true);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
 
     @AfterEach
     public void tearDown() {
