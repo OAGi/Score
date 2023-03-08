@@ -1426,6 +1426,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_23")
     public void test_TA_23() {
         AppUserObject usera;
+        AppUserObject userb;
         ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -1434,7 +1435,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
@@ -1475,20 +1476,99 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
             getOperationOptions.toggleMakeAsAnArray();
-            assertNotEquals(usera.getLoginId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertFalse(userb.isDeveloper());
             List<String> acceptedStates = Arrays.asList("QA", "Production");
             assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
             getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
-            assertNotEquals(usera.getLoginId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
             assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
             getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
 
             ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
             postOperationOptions.toggleMakeAsAnArray();
             postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
 
-            expressBIEPage.selectPutAllSchemasInTheSameFile();
-            expressBIEPage.toggleBusinessContext();
+    @Test
+    @DisplayName("TC_6_3_TA_24")
+    public void test_TA_24() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie: biesForTesting){
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleMakeAsAnArray();
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertTrue(userb.isDeveloper());
+            List<String> acceptedStates = Arrays.asList("QA", "Production");
+            assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleMakeAsAnArray();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
             File file = null;
             try {
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
@@ -1632,13 +1712,5 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         this.randomAccounts.forEach(newUser -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
-    }
-
-    private File getFileBasedOnName(String fileName, String fileExtension) {
-        fileName = fileName.replaceAll(" ", "") + "." + fileExtension;
-        String userHome = System.getProperty("user.home");
-        Path path = Paths.get(new File(userHome, "Downloads").toURI());
-        Path path2 = Paths.get(new File(path.toString(), fileName).toURI());
-        return path2.toFile();
     }
 }
