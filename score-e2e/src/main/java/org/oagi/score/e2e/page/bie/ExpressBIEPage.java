@@ -78,6 +78,7 @@ public interface ExpressBIEPage extends Page {
 
         OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate();
 
+        void selectJSONOpenAPIFormat();
     }
 
     interface OpenAPIExpressionGETOperationOptions {

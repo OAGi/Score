@@ -566,6 +566,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             click(getPOSTOperationTemplateCheckbox());
             return new OpenAPIExpressionPOSTOperationOptionsImpl();
         }
+
+        @Override
+        public void selectJSONOpenAPIFormat() {
+            retry(() -> {
+                click(getOpenAPIFormatSelectField());
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
+                click(optionField);
+            });
+        }
     }
 
     private class OpenAPIExpressionGETOperationOptionsImpl implements OpenAPIExpressionGETOperationOptions {
