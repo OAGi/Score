@@ -642,22 +642,14 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         //reload the page
         viewEditCoreComponentPage.openPage();
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage.hitCancelButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-
-        //change ACC
-        ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
-        selectAssociationDialog.selectAssociation(anotherACC.getDen());
-        selectAssociationDialog.hitUpdateButton();
-
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
-
+        assertEquals("Published", getText(asccpPanel.getStateField()));
+        assertEquals("1", getText(asccpPanel.getRevisionField()));
     }
-
-
-
-
 }

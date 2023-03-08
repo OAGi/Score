@@ -34,6 +34,10 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    public static final By CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -100,6 +104,19 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        click(getCancelButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

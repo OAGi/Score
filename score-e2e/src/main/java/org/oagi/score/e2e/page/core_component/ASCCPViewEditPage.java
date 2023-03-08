@@ -35,6 +35,18 @@ public interface ASCCPViewEditPage extends Page {
     void hitReviseButton();
 
     /**
+     * Return the UI element of the 'Cancel' button. Developers only can see the 'Cancel' button.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Revise' button.
+     */
+    void hitCancelButton();
+
+    /**
      * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
      *
      * @return the UI element of the 'Amend' button
