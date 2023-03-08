@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -66,8 +65,8 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
 
-    private static final By PAGINATOR_RANGE_LABEL_LOCATOR =
-            By.xpath("div.mat-paginator-range-label");
+    private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
     public ExpressBIEPageImpl(BasePage parent) {
         super(parent);
@@ -117,6 +116,11 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public WebElement getBranchSelectField() {
         return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getOpenAPIFormatSelectField() {
+        return visibilityOfElementLocated(getDriver(), OPEN_API_FORMAT_SELECT_FIELD_LOCATOR);
     }
 
     @Override
@@ -485,5 +489,43 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         List<WebElement> rows = getDriver().findElements(By.xpath("//td//span/ancestor::tr"));
         int numberOfBIEs = rows.size();
         return numberOfBIEs;
+    }
+
+    @Override
+    public void selectOpenAPIExpression() {
+        click(getOpenAPIExpressionRadioButton());
+    }
+    @Override
+    public WebElement getOpenAPIExpressionRadioButton() {
+        return getRadioButtonByName("Open API 3.0 (Template)");
+    }
+
+    @Override
+    public void selectYAMLOpenAPIFormat() {
+        retry(() -> {
+            click(getOpenAPIFormatSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option/span[contains(text(), \"YAML\")]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void toggleGETOperationTemplate() {
+        click(getGETOperationTemplateCheckbox());
+    }
+    @Override
+    public WebElement getGETOperationTemplateCheckbox() {
+        return getCheckboxByName("GET Operation Template");
+    }
+
+    @Override
+    public WebElement getPOSTOperationTemplate() {
+        return getCheckboxByName("POST Operation Template");
+    }
+
+    @Override
+    public void togglePOSTOperationTemplate() {
+        click(getPOSTOperationTemplate());
     }
 }

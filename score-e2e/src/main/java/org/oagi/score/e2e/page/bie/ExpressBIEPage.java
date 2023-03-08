@@ -20,6 +20,8 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getBranchSelectField();
 
+    WebElement getOpenAPIFormatSelectField();
+
     WebElement getDENField();
 
     void setDEN(String den);
@@ -41,6 +43,20 @@ public interface ExpressBIEPage extends Page {
     int getNumberOfBIEsInIndexBox();
 
     int getNumberfBIEsInTable();
+
+    void selectOpenAPIExpression();
+
+    WebElement getOpenAPIExpressionRadioButton();
+
+    void selectYAMLOpenAPIFormat();
+
+    void toggleGETOperationTemplate();
+
+    WebElement getGETOperationTemplateCheckbox();
+
+    WebElement getPOSTOperationTemplate();
+
+    void togglePOSTOperationTemplate();
 
     enum ExpressionFormat {
         XML,
