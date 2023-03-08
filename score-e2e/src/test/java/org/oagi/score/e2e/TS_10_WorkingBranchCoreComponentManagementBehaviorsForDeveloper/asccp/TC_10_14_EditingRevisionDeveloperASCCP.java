@@ -21,9 +21,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
@@ -204,7 +202,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         //reload the page
         viewEditCoreComponentPage.openPage();
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Data Area. Change Acknowledge Product Availability Data Area", branch);
-        WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + "Data Area. Change Acknowledge Product Availability Data Area" );
+        WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + "Data Area. Change Acknowledge Product Availability Data Area");
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
@@ -596,7 +594,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         selectAssociationDialog.hitUpdateButton();
 
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
+        String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
 
     }
