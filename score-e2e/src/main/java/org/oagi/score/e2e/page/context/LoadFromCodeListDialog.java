@@ -115,6 +115,14 @@ public interface LoadFromCodeListDialog extends Dialog {
     WebElement getTableRecordAtIndex(int idx);
 
     /**
+     * Return the UI element of the table record containing the given value.
+     *
+     * @param value value
+     * @return the UI element of the table record
+     */
+    WebElement getTableRecordByValue(String value);
+
+    /**
      * Return the UI element of the column of the given table record with the column name.
      *
      * @param tableRecord the table record

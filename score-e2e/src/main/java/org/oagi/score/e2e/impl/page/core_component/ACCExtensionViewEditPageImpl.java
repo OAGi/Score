@@ -195,7 +195,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement getNamespaceField() {
-        return visibilityOfElementLocated(getDriver(), NAMESPACE_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
     }
 
     @Override
@@ -206,9 +206,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     @Override
     public void setNamespace(NamespaceObject namespace) {
         click(getNamespaceField());
+        waitFor(ofMillis(1000L));
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
         click(option);
+        waitFor(ofMillis(1000L));
         assert getNamespaceFieldValue().equals(namespace.getUri());
     }
 
@@ -306,6 +308,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public void hitUpdateButton() {
         retry(() -> click(getUpdateButton(true)));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
         assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
@@ -332,6 +335,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         click(getMoveToQAButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -348,6 +353,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         click(getBackToWIPButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -364,6 +371,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         click(getMoveToProductionButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
