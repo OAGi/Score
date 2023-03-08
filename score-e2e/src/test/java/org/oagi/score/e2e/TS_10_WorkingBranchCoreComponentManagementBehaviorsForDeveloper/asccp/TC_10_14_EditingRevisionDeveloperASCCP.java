@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -462,4 +462,140 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
 
     }
+
+    @Test
+    public void test_TA_10_14_1_g() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            coreComponentAPI.updateASCCP(asccp);
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage.hitReviseButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        //ACC node cannot be changed
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertFalse(accPanel.getCoreComponentField().isEnabled());
+        assertEquals("ACC", getText(accPanel.getCoreComponentField()));
+        assertFalse(accPanel.getReleaseField().isEnabled());
+        assertFalse(accPanel.getRevisionField().isEnabled());
+        assertFalse(accPanel.getStateField().isEnabled());
+        assertFalse(accPanel.getOwnerField().isEnabled());
+        assertFalse(accPanel.getGUIDField().isEnabled());
+        assertFalse(accPanel.getDENField().isEnabled());
+        assertFalse(accPanel.getObjectClassTermField().isEnabled());
+        assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
+        assertFalse(accPanel.getNamespaceSelectField().isEnabled());
+        assertFalse(accPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(accPanel.getDefinitionField().isEnabled());
+
+        //BCCP node cannot be changed
+        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ASCCPViewEditPage.BCCPPanel bccpPanel = asccpViewEditPage.getBCCPanelContainer(bccpNode).getBCCPPanel();
+        assertFalse(bccpPanel.getCoreComponentField().isEnabled());
+        assertEquals("BCCP", getText(accPanel.getCoreComponentField()));
+        assertFalse(bccpPanel.getReleaseField().isEnabled());
+        assertFalse(bccpPanel.getRevisionField().isEnabled());
+        assertFalse(bccpPanel.getStateField().isEnabled());
+        assertFalse(bccpPanel.getOwnerField().isEnabled());
+        assertFalse(bccpPanel.getGUIDField().isEnabled());
+        assertFalse(bccpPanel.getDENField().isEnabled());
+        assertFalse(bccpPanel.getPropertyTermField().isEnabled());
+        assertFalse(bccpPanel.getNillableCheckbox().isEnabled());
+        assertFalse(bccpPanel.getDeprecatedCheckbox().isEnabled());
+        assertFalse(bccpPanel.getValueConstraintSelectField().isEnabled());
+        assertFalse(bccpPanel.getNamespaceSelectField().isEnabled());
+        assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(bccpPanel.getDefinitionField().isEnabled());
+
+    }
+
+    @Test
+    public void test_TA_10_14_2() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            asccp.setDefinitionSource(randomPrint(50, 100).trim());
+            asccp.setDefinition(null);
+            coreComponentAPI.updateASCCP(asccp);
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage.hitReviseButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        asccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
+        ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
+        assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.hitUpdateButton());
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
+    }
+
+
 }
