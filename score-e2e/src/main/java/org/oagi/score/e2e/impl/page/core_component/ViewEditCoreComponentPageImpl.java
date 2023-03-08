@@ -13,6 +13,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -75,7 +78,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            WebElement branchSelectField = new FluentWait<>(getDriver())
+                    .withTimeout(Duration.ofSeconds(6L))
+                            .pollingEvery(Duration.ofMillis(100L))
+                                    .until(ExpectedConditions.visibilityOfElementLocated(BRANCH_SELECT_FIELD_LOCATOR));
+            click(branchSelectField);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);

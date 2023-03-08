@@ -74,7 +74,7 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         assertEquals("WIP", getText(asccpPanel.getStateField()));
 
         String propertyTermText = getText(asccpPanel.getPropertyTermField());
-        assertEquals("Property Term", propertyTermText);
+        assertEquals(asccp.getPropertyTerm(), propertyTermText);
 
         assertNotChecked(asccpPanel.getNillableCheckbox());
         assertDisabled(asccpPanel.getDeprecatedCheckbox());
