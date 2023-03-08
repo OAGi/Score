@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -64,6 +65,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
+
+    private static final By PAGINATOR_RANGE_LABEL_LOCATOR =
+            By.xpath("div.mat-paginator-range-label");
 
     public ExpressBIEPageImpl(BasePage parent) {
         super(parent);
@@ -466,5 +470,20 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog = new IncludePaginationResponseProfileBIEDialogImpl(this);
         assert includePaginationResponseProfileBIEDialog.isOpened();
         includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+    }
+
+    @Override
+    public int getNumberOfBIEsInIndexBox() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
+    public int getNumberfBIEsInTable() {
+        List<WebElement> rows = getDriver().findElements(By.xpath("//td//span/ancestor::tr"));
+        int numberOfBIEs = rows.size();
+        return numberOfBIEs;
     }
 }

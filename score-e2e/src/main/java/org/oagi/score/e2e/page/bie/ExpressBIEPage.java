@@ -38,6 +38,10 @@ public interface ExpressBIEPage extends Page {
 
     void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
 
+    int getNumberOfBIEsInIndexBox();
+
+    int getNumberfBIEsInTable();
+
     enum ExpressionFormat {
         XML,
         JSON,
