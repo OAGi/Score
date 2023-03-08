@@ -58,6 +58,8 @@ public interface ExpressBIEPage extends Page {
 
     void togglePOSTOperationTemplate();
 
+    void selectJSONOpenAPIFormat();
+
     enum ExpressionFormat {
         XML,
         JSON,
