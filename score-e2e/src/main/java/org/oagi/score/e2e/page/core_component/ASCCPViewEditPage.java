@@ -526,6 +526,12 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         *
+         * @param definitionSource
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field

@@ -584,6 +584,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void setDefinitionSource(String definitionSource){
+            sendKeys(getDefinitionSourceField(), definitionSource);
+        }
+
+        @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
