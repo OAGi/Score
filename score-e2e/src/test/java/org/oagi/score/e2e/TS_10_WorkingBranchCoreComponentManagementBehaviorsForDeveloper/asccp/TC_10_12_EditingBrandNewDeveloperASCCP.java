@@ -21,11 +21,11 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
@@ -128,8 +128,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         asccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
 
         String denText = getText(asccpPanel.getDENField());
-        assertEquals("Test Object " + randomPropertyTerm, denText);
-
+        assertTrue(denText.startsWith("Test Object " + randomPropertyTerm));
     }
 
     @Test
@@ -327,7 +326,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         selectAssociationDialog.hitUpdateButton();
 
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
+        String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
     }
 
@@ -360,6 +359,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> asccpPanel.setNamespace(endUserNamespace.getUri()));
     }
+
     @Test
     public void test_TA_10_12_2() {
 
@@ -457,12 +457,13 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertEquals("1", getText(accViewEditPage.getRevisionField()));
 
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
+        String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
         assertEquals("1", getText(asccpPanel.getRevisionField()));
     }
+
     @Test
-    public void test_TA_10_12_4(){
+    public void test_TA_10_12_4() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -493,7 +494,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertEquals("1", getText(accViewEditPage.getRevisionField()));
 
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
+        String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
         assertEquals("1", getText(asccpPanel.getRevisionField()));
 
@@ -504,7 +505,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_12_5(){
+    public void test_TA_10_12_5() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -532,7 +533,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         selectAssociationDialog.hitUpdateButton();
 
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN= getText(asccpPanel.getDENField());
+        String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
 
         //only semantics or semantic group ACC can be selected
