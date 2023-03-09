@@ -19,13 +19,12 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 import static org.oagi.score.e2e.impl.PageHelper.switchToMainTab;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -135,6 +134,7 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
         assertEquals("Deleted", getText(asccPanelContainer.getASCCPPanel().getStateField()));
     }
+
     @Test
     public void test_TA_10_16_3() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -193,6 +193,7 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         assertEquals("WIP", getText(asccpPanel.getStateField()));
         assertEquals(anotherDeveloper.getLoginId(), getText(asccpPanel.getOwnerField()));
     }
+
     @Test
     public void test_TA_10_16_4() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

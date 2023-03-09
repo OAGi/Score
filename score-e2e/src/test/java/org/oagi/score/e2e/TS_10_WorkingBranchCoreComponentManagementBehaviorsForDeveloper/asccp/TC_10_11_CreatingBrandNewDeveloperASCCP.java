@@ -108,13 +108,12 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         acc.setDefinition("definition changed");
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(accNode).getASCCPPanel();
-        assertEquals("definition changed", getText(asccpPanel.getDefinitionField()));
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("definition changed", getText(accPanel.getDefinitionField()));
     }
 
     @Test
