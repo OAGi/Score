@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.security.AccessControlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,16 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.set("X-Error-Message", ex.getMessage());
         return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ScoreDataAccessException.class)
+    public ResponseEntity handleScoreDataAccessException(
+            ScoreDataAccessException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
 }
