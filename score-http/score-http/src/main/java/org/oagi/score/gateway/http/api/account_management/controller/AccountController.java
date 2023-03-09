@@ -139,7 +139,7 @@ public class AccountController implements InitializingBean {
         return tenantRoles;
     }
 
-    @RequestMapping(value = "/accounts/{id}/enable", method = RequestMethod.POST)
+    @RequestMapping(value = "/accounts/{id:[\\d]+}/enable", method = RequestMethod.POST)
     public ResponseEntity enable(
             @PathVariable("id") long id,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -147,7 +147,7 @@ public class AccountController implements InitializingBean {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/accounts/{id}/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/accounts/{id:[\\d]+}/disable", method = RequestMethod.POST)
     public ResponseEntity disable(
             @PathVariable("id") long id,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
