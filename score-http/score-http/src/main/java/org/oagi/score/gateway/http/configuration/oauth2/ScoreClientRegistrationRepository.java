@@ -21,19 +21,19 @@ import java.util.stream.Collectors;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2App.OAUTH2_APP;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope.OAUTH2_APP_SCOPE;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.*;
-import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.BASIC;
-import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.POST;
+import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
+import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_POST;
 
 @Component
 public class ScoreClientRegistrationRepository
         implements ClientRegistrationRepository, Iterable<ClientRegistration>, InitializingBean {
 
     private static final Map<String, ClientAuthenticationMethod> predefinedClientAuthenticationMethodMap =
-            Arrays.asList(BASIC, POST)
+            Arrays.asList(CLIENT_SECRET_BASIC, CLIENT_SECRET_POST)
                     .stream().collect(Collectors.toMap(ClientAuthenticationMethod::getValue, Function.identity()));
 
     private static final Map<String, AuthorizationGrantType> predefinedAuthorizationGrantTypeMap =
-            Arrays.asList(AUTHORIZATION_CODE, IMPLICIT, REFRESH_TOKEN, CLIENT_CREDENTIALS, PASSWORD)
+            Arrays.asList(AUTHORIZATION_CODE, REFRESH_TOKEN, CLIENT_CREDENTIALS, PASSWORD)
                     .stream().collect(Collectors.toMap(AuthorizationGrantType::getValue, Function.identity()));
 
     @Autowired
@@ -54,8 +54,24 @@ public class ScoreClientRegistrationRepository
                         authorizationGrantType = new AuthorizationGrantType(oauth2AppRecord.getAuthorizationGrantType());
                     }
 
+                    /*
+                     * [Migrating to Spring Security 6] Backward-compatible replacement
+                     *
+                     * 'basic' -> 'client_secret_basic'
+                     * 'post' -> 'client_secret_post'
+                     */
+                    String registeredClientAuthenticationMethod = oauth2AppRecord.getClientAuthenticationMethod();
+                    switch (registeredClientAuthenticationMethod) {
+                        case "basic":
+                            registeredClientAuthenticationMethod = CLIENT_SECRET_BASIC.getValue();
+                            break;
+                        case "post":
+                            registeredClientAuthenticationMethod = CLIENT_SECRET_POST.getValue();
+                            break;
+                    }
+
                     ClientAuthenticationMethod clientAuthenticationMethod =
-                            predefinedClientAuthenticationMethodMap.get(oauth2AppRecord.getClientAuthenticationMethod());
+                            predefinedClientAuthenticationMethodMap.get(registeredClientAuthenticationMethod);
                     if (clientAuthenticationMethod == null) {
                         clientAuthenticationMethod = new ClientAuthenticationMethod(oauth2AppRecord.getClientAuthenticationMethod());
                     }
@@ -98,7 +114,7 @@ public class ScoreClientRegistrationRepository
 
                     ClientRegistration registration = builder.clientId(oauth2AppRecord.getClientId())
                             .clientSecret(oauth2AppRecord.getClientSecret())
-                            .redirectUriTemplate(oauth2AppRecord.getRedirectUri())
+                            .redirectUri(oauth2AppRecord.getRedirectUri())
                             .clientAuthenticationMethod(clientAuthenticationMethod)
                             .authorizationGrantType(authorizationGrantType)
                             .providerConfigurationMetadata(configurationMetadata)

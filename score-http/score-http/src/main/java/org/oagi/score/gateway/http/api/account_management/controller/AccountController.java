@@ -1,6 +1,9 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.data.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
@@ -27,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
