@@ -63,7 +63,7 @@ public class TenantController {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
-    @RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "/tenants/{tenantId:[\\d]+}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteTenantInfo(@PathVariable("tenantId") BigInteger tenantId) {
         if (!configService.isTenantEnabled()) {
@@ -74,7 +74,7 @@ public class TenantController {
         return ResponseEntity.accepted().build();
     }
 
-    @RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.PUT,
+    @RequestMapping(value = "/tenants/{tenantId:[\\d]+}", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateTenantInfo(@PathVariable("tenantId") BigInteger tenantId,
                                            @RequestBody String name) {
@@ -89,7 +89,7 @@ public class TenantController {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
-    @RequestMapping(value = "/tenants/{tenantId}", method = RequestMethod.GET,
+    @RequestMapping(value = "/tenants/{tenantId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantInfo getTenantInfo(@PathVariable("tenantId") BigInteger tenantId) {
         if (!configService.isTenantEnabled()) {
@@ -98,7 +98,7 @@ public class TenantController {
         return tenantService.getTenantById(tenantId);
     }
 
-    @RequestMapping(value = "/tenants/users/{tenantId}", method = RequestMethod.POST,
+    @RequestMapping(value = "/tenants/users/{tenantId:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity connectUserToTenant(@PathVariable("tenantId") BigInteger tenantId,
                                               @RequestBody BigInteger appUserId) {
@@ -112,7 +112,7 @@ public class TenantController {
         return ResponseEntity.badRequest().build();
     }
 
-    @RequestMapping(value = "/tenants/users/{tenantId}", method = RequestMethod.PUT,
+    @RequestMapping(value = "/tenants/users/{tenantId:[\\d]+}", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity disconnectUserFromTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                    @RequestBody BigInteger appUserId) {
@@ -126,7 +126,7 @@ public class TenantController {
         return ResponseEntity.badRequest().build();
     }
 
-    @RequestMapping(value = "/tenants/bis-ctx/{tenantId}", method = RequestMethod.POST,
+    @RequestMapping(value = "/tenants/bis-ctx/{tenantId:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity connectBusinessCtxToTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                      @RequestBody BigInteger businessCtxId) {
@@ -140,7 +140,7 @@ public class TenantController {
         return ResponseEntity.badRequest().build();
     }
 
-    @RequestMapping(value = "/tenants/bis-ctx/{tenantId}", method = RequestMethod.PUT,
+    @RequestMapping(value = "/tenants/bis-ctx/{tenantId:[\\d]+}", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity disconnectBusinessCtxFromTenant(@PathVariable("tenantId") BigInteger tenantId,
                                                           @RequestBody BigInteger businessCtxId) {
