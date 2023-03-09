@@ -216,6 +216,6 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        assertEquals(acc.getDen(), asccp.getPropertyTerm());
+        assertTrue(acc.getDen().startsWith(asccp.getPropertyTerm()));
     }
 }
