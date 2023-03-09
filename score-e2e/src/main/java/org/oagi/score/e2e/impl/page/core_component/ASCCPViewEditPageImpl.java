@@ -59,8 +59,6 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Change ACC\")]");
 
     private final ASCCPObject asccp;
-    private BasePage parent;
-
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
         this.asccp = asccp;
