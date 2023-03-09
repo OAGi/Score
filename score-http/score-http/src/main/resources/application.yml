@@ -23,9 +23,10 @@ spring:
   cache:
     type: redis
 
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   main:
     allow-circular-references: true
