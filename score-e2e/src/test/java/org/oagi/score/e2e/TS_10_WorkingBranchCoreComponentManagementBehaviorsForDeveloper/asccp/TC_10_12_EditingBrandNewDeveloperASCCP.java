@@ -443,19 +443,23 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         randomPropertyTerm = "Test Object " + randomPropertyTerm;
 
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.setObjectClassTerm(randomPropertyTerm);
-        accViewEditPage.hitUpdateButton();
-        assertEquals("1", getText(accViewEditPage.getRevisionField()));
+        acc.setObjectClassTerm(randomPropertyTerm);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("1", getText(accPanel.getRevisionField()));
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        viewEditCoreComponentPage.openPage();
+        waitFor(ofSeconds(1L));
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
         assertEquals("1", getText(asccpPanel.getRevisionField()));
