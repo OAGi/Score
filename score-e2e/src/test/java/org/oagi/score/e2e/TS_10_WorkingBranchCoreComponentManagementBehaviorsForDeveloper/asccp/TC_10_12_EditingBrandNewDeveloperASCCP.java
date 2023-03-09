@@ -238,10 +238,10 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertFalse(accPanel.getGUIDField().isEnabled());
         assertFalse(accPanel.getDENField().isEnabled());
         assertFalse(accPanel.getObjectClassTermField().isEnabled());
-        //assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
-        //assertFalse(accPanel.getNamespaceSelectField().isEnabled());
-        //assertFalse(accPanel.getDefinitionSourceField().isEnabled());
-        //assertFalse(accPanel.getDefinitionField().isEnabled());
+        assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
+        assertFalse(accPanel.getNamespaceSelectField().isEnabled());
+        assertFalse(accPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(accPanel.getDefinitionField().isEnabled());
 
         //BCCP node cannot be changed
         WebElement bccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -319,7 +319,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.selectAssociation(anotherACC.getDen());
         selectAssociationDialog.hitUpdateButton();
 
@@ -526,7 +526,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.selectAssociation(anotherACC.getDen());
         selectAssociationDialog.hitUpdateButton();
 
@@ -535,23 +535,23 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
 
         //only semantics or semantic group ACC can be selected
-        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.setDEN("Issued Item Instance Base. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.setDEN("Issued Item Instance Extension. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.setDEN("Any Structured Content. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
-        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.setDEN("OAGIS10 Nouns. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
-        selectAssociationDialog = asccpPanel.changeACC("/" + anotherACC.getDen());
+        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.setDEN("OAGIS10 BODs. Details");
         selectAssociationDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
