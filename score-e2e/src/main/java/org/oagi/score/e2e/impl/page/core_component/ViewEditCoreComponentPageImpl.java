@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
@@ -78,11 +79,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            WebElement branchSelectField = new FluentWait<>(getDriver())
-                    .withTimeout(Duration.ofSeconds(6L))
-                            .pollingEvery(Duration.ofMillis(100L))
-                                    .until(ExpectedConditions.visibilityOfElementLocated(BRANCH_SELECT_FIELD_LOCATOR));
-            click(branchSelectField);
+            click(getBranchSelectField());
+            waitFor(ofSeconds(1L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
