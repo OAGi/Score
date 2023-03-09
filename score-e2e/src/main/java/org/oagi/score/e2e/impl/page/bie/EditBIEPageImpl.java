@@ -6,6 +6,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
+import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -158,40 +159,48 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
-        return retry(() -> {
-            WebElement node = clickOnDropDownMenuByPath(path);
-            try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
-            } catch (TimeoutException e) {
-                click(node);
-                new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
-            }
-            waitFor(ofMillis(1000L));
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(2000L));
 
-            ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-            assert ACCExtensionViewEditPage.isOpened();
-            return ACCExtensionViewEditPage;
-        });
+        String url = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
+        if (!accExtensionViewEditPage.isOpened()) {
+            accExtensionViewEditPage.openPage();
+            assert accExtensionViewEditPage.isOpened();
+        }
+        return accExtensionViewEditPage;
     }
 
     @Override
     public ACCExtensionViewEditPage extendBIELocallyOnNode(String path) {
-        return retry(() -> {
-            WebElement node = clickOnDropDownMenuByPath(path);
-            try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
-            } catch (TimeoutException e) {
-                click(node);
-                new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
-            }
-            waitFor(ofMillis(1000L));
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(2000L));
 
-            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+        String url = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
+        if (!accExtensionViewEditPage.isOpened()) {
+            accExtensionViewEditPage.openPage();
             assert accExtensionViewEditPage.isOpened();
-            return accExtensionViewEditPage;
-        });
+        }
+        return accExtensionViewEditPage;
     }
 
     @Override
@@ -210,12 +219,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ACCExtensionViewEditPage continueToExtendBIEOnNode() {
-        click(elementToBeClickable(getDriver(), YES_BUTTON_IN_DIALOG_LOCATOR));
-        waitFor(ofMillis(500L));
-        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
-        switchToNextTab(getDriver());
-        assert accExtensionViewEditPage.isOpened();
-        return accExtensionViewEditPage;
+        return retry(() -> {
+            click(elementToBeClickable(getDriver(), YES_BUTTON_IN_DIALOG_LOCATOR));
+            waitFor(ofMillis(500L));
+            switchToNextTab(getDriver());
+
+            String url = getDriver().getCurrentUrl();
+            if (!url.contains("extension")) {
+                throw new WebDriverException();
+            }
+
+            BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+            ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
+            if (!accExtensionViewEditPage.isOpened()) {
+                accExtensionViewEditPage.openPage();
+                assert accExtensionViewEditPage.isOpened();
+            }
+            return accExtensionViewEditPage;
+        });
     }
 
     @Override

@@ -1,10 +1,6 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -46,9 +42,9 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_1")
     @Deprecated
+    @Disabled
     public void test_TA_1() {
-        //The name of the Core Component page should be “Core Components (Model Library)”.
-        throw new NotImplementedException();
+        // The name of the Core Component page should be “Core Components (Model Library)”.
     }
 
     @Test
@@ -90,10 +86,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_4")
     @Deprecated
+    @Disabled
     public void test_TA_4() {
-        //The title of the left pane where the tree of an ACC is displayed should be “ACC (Component Type or Group Definition)”.
-        throw new NotImplementedException();
-
+        // The title of the left pane where the tree of an ACC is displayed should be
+        // “ACC (Component Type or Group Definition)”.
     }
 
     @Test
@@ -140,9 +136,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
@@ -155,7 +148,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         // CHECK THE SAME FOR THE GLOBAL BIE EXTENSION
 
         BusinessContextObject contextGlobalExtension = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
+        TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().
+                generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiepGlobalExtension);
@@ -171,17 +165,19 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_7")
     @Deprecated
+    @Disabled
     public void testTA_7() {
-        //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
-        throw new NotImplementedException();
+        // The title of the left pane where the tree of an ASCCP is displayed should be
+        // “ASCCP (Component or Group Definition)”.
     }
 
     @Test
     @DisplayName("TC_7_6_TA_8")
     @Deprecated
+    @Disabled
     public void testTA_8() {
-        //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
-        throw new NotImplementedException();
+        // The title of the left pane where the tree of an ASCCP is displayed should be
+        // “ASCCP (Component or Group Definition)”.
     }
 
     @Test
@@ -224,9 +220,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_11")
     @Deprecated
+    @Disabled
     public void test_TA_11() {
-        //The title of the right pane where the details of a BCCP are displayed should be “BCCP (Associated Field) Detail”.
-        throw new NotImplementedException();
+        // The title of the right pane where the details of a BCCP are displayed should be
+        // “BCCP (Associated Field) Detail”.
     }
 
     @Test
@@ -262,9 +259,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_14")
     @Deprecated
+    @Disabled
     public void test_TA_14() {
-        //The title of the right pane where the details of an ASCC are displayed should be “ASCC (Component Association) Detail”. (It cannot be checked yet).
-        throw new NotImplementedException();
+        // The title of the right pane where the details of an ASCC are displayed should be
+        // “ASCC (Component Association) Detail”. (It cannot be checked yet).
     }
 
     @Test
@@ -307,9 +305,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_17")
     @Deprecated
+    @Disabled
     public void test_TA_17() {
-        //The title of the right pane where the details of a BCC are displayed should be “BCC (Field Association) Detail”.
-        throw new NotImplementedException();
+        // The title of the right pane where the details of a BCC are displayed should be
+        // “BCC (Field Association) Detail”.
     }
 
     @Test
@@ -350,10 +349,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_20")
+    @Disabled
     public void test_TA_20() {
-        //The title of the right pane where the details of a supplementary component are displayed should be
+        // The title of the right pane where the details of a supplementary component are displayed should be
         // “Supplementary Component (Field Metadata)”. (It cannot be checked yet).
-        throw new NotImplementedException();
     }
 
     @Test
@@ -395,13 +394,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         waitFor(ofMillis(500L));
         String denFieldTitleDT = accViewEditPage.getDENFieldLabelDT();
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleDT);
-    }
-
-    @Test
-    public void test() {
-        for (String loginID : Arrays.asList("eu_K316X", "dev_azHuS2k7m")) {
-            thisAccountWillBeDeletedAfterTests(getAPIFactory().getAppUserAPI().getAppUserByLoginID(loginID));
-        }
     }
 
     @AfterEach

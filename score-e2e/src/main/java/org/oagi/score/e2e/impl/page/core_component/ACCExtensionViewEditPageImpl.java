@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
@@ -74,13 +75,16 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
-    public ACCExtensionViewEditPageImpl(BasePage parent) {
+    private final ACCObject acc;
+
+    public ACCExtensionViewEditPageImpl(BasePage parent, ACCObject acc) {
         super(parent);
+        this.acc = acc;
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/core_component/extension").toString();
+        return getConfig().getBaseUrl().resolve("/core_component/extension/" + this.acc.getAccManifestId()).toString();
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.openqa.selenium.*;
 
 import java.time.Duration;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialog {
@@ -92,7 +93,19 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
 
     @Override
     public void hitSearchButton() {
-        retry(() -> click(getSearchButton()));
+        int totalNumberOfItems = getTotalNumberOfItems();
+        retry(() -> {
+            click(getSearchButton());
+            waitFor(ofMillis(1000L));
+        });
+
+        // retry if the total number of items wasn't changed.
+        if (totalNumberOfItems == getTotalNumberOfItems()) {
+            retry(() -> {
+                click(getSearchButton());
+                waitFor(ofMillis(1000L));
+            });
+        }
     }
 
     @Override
@@ -120,6 +133,14 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
                 By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
         click(itemField);
         waitFor(Duration.ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-transfer-ownership-dialog//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
 
     @Override
