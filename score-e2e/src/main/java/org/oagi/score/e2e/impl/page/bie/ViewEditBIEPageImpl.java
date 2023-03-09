@@ -200,7 +200,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override

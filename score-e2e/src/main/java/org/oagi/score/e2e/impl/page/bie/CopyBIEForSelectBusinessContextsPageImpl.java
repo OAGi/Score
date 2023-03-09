@@ -120,10 +120,19 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     @Override
     public void hitSearchButton() {
+        int totalNumberOfItems = getTotalNumberOfItems();
         retry(() -> {
             click(getSearchButton());
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
         });
+
+        // retry if the total number of items wasn't changed.
+        if (totalNumberOfItems == getTotalNumberOfItems()) {
+            retry(() -> {
+                click(getSearchButton());
+                waitFor(ofMillis(1000L));
+            });
+        }
     }
 
     @Override
@@ -139,6 +148,26 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
 
     @Override

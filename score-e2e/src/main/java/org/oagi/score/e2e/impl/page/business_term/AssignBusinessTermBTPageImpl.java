@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class AssignBusinessTermBTPageImpl extends BasePageImpl implements AssignBusinessTermBTPage {
@@ -189,6 +190,7 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
     public void goToNextPage() {
         ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Next page']")));
+        waitFor(ofSeconds(1L));
 
     }
 
@@ -196,6 +198,7 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
     public void goToPreviousPage() {
         ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
+        waitFor(ofSeconds(1L));
     }
 
     @Override
