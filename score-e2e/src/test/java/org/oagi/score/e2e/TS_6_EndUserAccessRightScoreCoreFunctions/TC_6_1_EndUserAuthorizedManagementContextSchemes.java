@@ -404,9 +404,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
         });
 
         viewEditContextSchemePage.goToNextPage();
-        waitFor(ofSeconds(1L));
         viewEditContextSchemePage.goToPreviousPage();
-        waitFor(ofSeconds(1L));
 
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
