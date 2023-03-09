@@ -29,7 +29,6 @@ public class TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment extends Base
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -48,7 +47,6 @@ public class TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment extends Base
         ASCCPObject asccp;
         BCCPObject bccp;
         ACCObject acc;
-
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
