@@ -17,6 +17,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -166,21 +167,29 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("Issued Item Instance Extension. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Extension. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("Any Structured Content. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("OAGIS10 Nouns. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("OAGIS10 BODs. Details");
         asccpCreateDialog.hitSearchButton();

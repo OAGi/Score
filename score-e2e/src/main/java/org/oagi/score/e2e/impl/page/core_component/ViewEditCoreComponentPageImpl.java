@@ -80,7 +80,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
-            waitFor(ofSeconds(1L));
+            waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
