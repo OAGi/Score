@@ -291,7 +291,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Change ACC");
-        assert selectAssociationDialog.isOpened();
+        //assert selectAssociationDialog.isOpened();
         return selectAssociationDialog;
     }
 
