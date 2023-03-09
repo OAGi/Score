@@ -472,39 +472,63 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc, randomACC1, randomACC2;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            randomACC1 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            randomACC2 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "WIP");
+            ASCCObject randomASCC1 = coreComponentAPI.appendASCC(randomACC1, asccp, "WIP");
+            randomASCC1.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(randomASCC1);
+            ASCCObject randomASCC2 = coreComponentAPI.appendASCC(randomACC2, asccp, "WIP");
+            randomASCC2.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(randomASCC2);
+        }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
-        String url = getDriver().getCurrentUrl();
-        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
 
         String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         randomPropertyTerm = "Test Object " + randomPropertyTerm;
+        asccpPanel.setPropertyTerm(randomPropertyTerm);
+        asccpViewEditPage.hitUpdateButton();
 
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-        accViewEditPage.setObjectClassTerm(randomPropertyTerm);
-        accViewEditPage.hitUpdateButton();
-        assertEquals("1", getText(accViewEditPage.getRevisionField()));
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+            WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() +"/" + randomACC1.getDen());
+            ASCCPViewEditPage.ASCCPanel asccPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals(randomPropertyTerm, getText(asccPanel.getDENField()));
+        }
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String asccpDEN = getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(randomPropertyTerm));
-        assertEquals("1", getText(asccpPanel.getRevisionField()));
-
-        ASCCPViewEditPage.ASCCPanel asccPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertEquals("1", getText(asccPanel.getRevisionField()));
-        String asccDEN = getText(asccPanel.getDENField());
-        assertTrue(asccDEN.startsWith(randomPropertyTerm));
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+            WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() +"/" + randomACC2.getDen());
+            ASCCPViewEditPage.ASCCPanel asccPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals(randomPropertyTerm, getText(asccPanel.getDENField()));
+        }
     }
 
     @Test
