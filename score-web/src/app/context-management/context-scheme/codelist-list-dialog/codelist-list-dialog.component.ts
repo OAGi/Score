@@ -64,8 +64,10 @@ export class CodelistListDialogComponent implements OnInit {
 
   releases: Release[];
   loginIdList: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
@@ -108,6 +110,7 @@ export class CodelistListDialogComponent implements OnInit {
       this.accountService.getAccountNames()
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases.filter(e => e.releaseNum !== this.workingRelease.releaseNum));
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
         if (savedReleaseId) {

@@ -73,8 +73,10 @@ export class CcListComponent implements OnInit {
 
   releases: Release[] = [];
   loginIdList: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
@@ -163,6 +165,7 @@ export class CcListComponent implements OnInit {
           this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
         }
       }
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.tags = tags;
 
       this.loginIdList.push(...loginIds);

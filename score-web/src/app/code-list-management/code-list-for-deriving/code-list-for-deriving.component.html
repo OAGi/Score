@@ -15,17 +15,22 @@
                             (ngModelChange)="onChange('branch', request.release);
                                             this.paginator.pageIndex = 0; this.loadCodeList();">
                   <mat-select-trigger>
-                    <span>{{request.release.releaseNum}}</span>
-                    <span class="right cc-state {{request.release.state}}" style="float: right"
+                    <span>{{ request.release.releaseNum }}</span>
+                    <span class="right cc-state {{ request.release.state }}" style="float: right"
                           *ngIf="request.release.releaseNum !== workingRelease.releaseNum">
-                      {{request.release.state}}
+                      {{ request.release.state }}
                     </span>
                   </mat-select-trigger>
-                  <mat-option *ngFor="let release of releases" [value]="release">
-                    <span class="release-num">{{release.releaseNum}}</span>
-                    <span class="release-state {{release.state}}"
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+                    <span class="release-num">{{ release.releaseNum }}</span>
+                    <span class="release-state {{ release.state }}"
                           *ngIf="release.releaseNum !== workingRelease.releaseNum">
-                      {{release.state}}</span>
+                      {{ release.state }}</span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>

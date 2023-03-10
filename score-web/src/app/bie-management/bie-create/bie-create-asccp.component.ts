@@ -58,8 +58,10 @@ export class BieCreateAsccpComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
@@ -120,6 +122,7 @@ export class BieCreateAsccpComponent implements OnInit {
       this.tags = tags;
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
         if (savedReleaseId) {

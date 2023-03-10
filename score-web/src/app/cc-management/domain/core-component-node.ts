@@ -1119,7 +1119,9 @@ class BdtDetail {
   bdtId: number;
   guid: string;
   dataTypeTerm: string;
+  representationTerm: string;
   qualifier: string;
+  namespaceId: number;
   den: string;
   definition: string;
   definitionSource: string;
@@ -1140,7 +1142,9 @@ class BdtDetail {
     this.bdtId = obj.bdtId;
     this.guid = obj.guid;
     this.dataTypeTerm = obj.dataTypeTerm;
+    this.representationTerm = obj.representationTerm;
     this.qualifier = obj.qualifier;
+    this.namespaceId = obj.namespaceId;
     this.den = obj.den;
     this.definition = obj.definition;
     this.definitionSource = obj.definitionSource;
