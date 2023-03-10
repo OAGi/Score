@@ -27,7 +27,7 @@ import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SplitAreaDirective} from 'angular-split';
@@ -35,13 +35,14 @@ import {SearchOptionsService} from '../search-options-dialog/domain/search-optio
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {Tag, ShortTag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'score-asccp-detail',
@@ -70,6 +71,9 @@ export class AsccpDetailComponent implements OnInit {
   namespaces: SimpleNamespace[];
   tags: Tag[] = [];
   commentControl: CommentControl;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   initialExpandDepth = 10;
 
@@ -133,6 +137,8 @@ export class AsccpDetailComponent implements OnInit {
       })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags]) => {
       this.lastRevision = revisionResponse;
       this.namespaces = namespaces;
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
 
       // subscribe an event
