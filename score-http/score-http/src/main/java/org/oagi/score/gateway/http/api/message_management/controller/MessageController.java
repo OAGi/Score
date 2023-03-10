@@ -95,7 +95,7 @@ public class MessageController {
         return pageResponse;
     }
 
-    @RequestMapping(value = "/message/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/message/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetMessageResponse getMessage(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,

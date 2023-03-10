@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIEForSelectBIEPage {
@@ -196,19 +195,8 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public void hitSearchButton() {
-        int totalNumberOfItems = getTotalNumberOfItems();
-        retry(() -> {
-            click(getSearchButton());
-            invisibilityOfLoadingContainerElement(getDriver());
-        });
-
-        // retry if the total number of items wasn't changed.
-        if (totalNumberOfItems == getTotalNumberOfItems()) {
-            retry(() -> {
-                click(getSearchButton());
-                invisibilityOfLoadingContainerElement(getDriver());
-            });
-        }
+        click(getSearchButton());
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

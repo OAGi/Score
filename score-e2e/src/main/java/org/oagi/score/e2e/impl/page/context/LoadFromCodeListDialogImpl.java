@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static java.time.Duration.ofMillis;
-import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
@@ -182,7 +181,6 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//button[@aria-label='Next page']")));
-        waitFor(ofSeconds(1L));
     }
 
     @Override
@@ -190,7 +188,6 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//button[@aria-label='Previous page']")));
-        waitFor(ofSeconds(1L));
     }
 
     @Override

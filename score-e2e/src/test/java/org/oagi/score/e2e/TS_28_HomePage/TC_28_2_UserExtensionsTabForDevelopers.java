@@ -92,7 +92,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
-                ccWIPList.add(new Pair<>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                ccWIPList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
             }
 
             for (int i = 0; i < numberOfQAUEGs; ++i) {
@@ -116,12 +116,13 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
-                ccQAList.add(new Pair<>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                ccQAList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
                 accExtensionViewEditPage.moveToQA();
 
                 topLevelAsbiep.setState("QA");
                 getAPIFactory().getBusinessInformationEntityAPI()
                         .updateTopLevelASBIEP(topLevelAsbiep);
+
             }
 
             for (int i = 0; i < numberOfProductionUEGs; ++i) {
@@ -146,7 +147,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                 accExtensionViewEditPage.setNamespace(userNamespace);
                 accExtensionViewEditPage.hitUpdateButton();
 
-                ccProductionList.add(new Pair<>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
                 accExtensionViewEditPage.moveToQA();
 
                 topLevelAsbiep.setState("QA");
@@ -162,6 +163,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
 
             homePage.logout();
         }
+
     }
 
     private static int extractNumberFromText(String text) {
@@ -178,7 +180,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -214,7 +216,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.0.1");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -269,6 +271,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
             assertTrue(viewEditCCPageForQA.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
         }
 
+
         click(homePage.getScoreLogo()); // to go to the home page again.
         ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openTotalUEsByStatesPanel()
                 .clickStateProgressBar("Production");
@@ -291,6 +294,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
             String ownerName = container2.ccProductionList.get(i).getValue();
             assertTrue(viewEditCCPageForProduction.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
         }
+
     }
 
     @Test
@@ -303,7 +307,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -330,12 +334,12 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         WebElement td_Production = uesByUsersAndStatesPanel.getColumnByName(tr, "Production");
         WebElement td_Total = uesByUsersAndStatesPanel.getColumnByName(tr, "total");
 
-        assertTrue(container1.numberOfWIPUEGs <= Integer.valueOf(getText(td_WIP)));
-        assertTrue(container1.numberOfQAUEGs <= Integer.valueOf(getText(td_QA)));
-        assertTrue(container1.numberOfProductionUEGs <= Integer.valueOf(getText(td_Production)));
-        assertTrue(container1.numberOfWIPUEGs +
+        assertEquals(container1.numberOfWIPUEGs, Integer.valueOf(getText(td_WIP)));
+        assertEquals(container1.numberOfQAUEGs, Integer.valueOf(getText(td_QA)));
+        assertEquals(container1.numberOfProductionUEGs, Integer.valueOf(getText(td_Production)));
+        assertEquals(container1.numberOfWIPUEGs +
                         container1.numberOfQAUEGs +
-                        container1.numberOfProductionUEGs <=
+                        container1.numberOfProductionUEGs,
                 Integer.valueOf(getText(td_Total)));
 
         uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId()); // to turn off the checkbox
@@ -346,12 +350,12 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         WebElement td2_Production = uesByUsersAndStatesPanel.getColumnByName(tr2, "Production");
         WebElement td2_Total = uesByUsersAndStatesPanel.getColumnByName(tr2, "total");
 
-        assertTrue(container2.numberOfWIPUEGs <= Integer.valueOf(getText(td2_WIP)));
-        assertTrue(container2.numberOfQAUEGs <= Integer.valueOf(getText(td2_QA)));
-        assertTrue(container2.numberOfProductionUEGs <= Integer.valueOf(getText(td2_Production)));
-        assertTrue(container2.numberOfWIPUEGs +
+        assertEquals(container2.numberOfWIPUEGs, Integer.valueOf(getText(td2_WIP)));
+        assertEquals(container2.numberOfQAUEGs, Integer.valueOf(getText(td2_QA)));
+        assertEquals(container2.numberOfProductionUEGs, Integer.valueOf(getText(td2_Production)));
+        assertEquals(container2.numberOfWIPUEGs +
                         container2.numberOfQAUEGs +
-                        container2.numberOfProductionUEGs <=
+                        container2.numberOfProductionUEGs,
                 Integer.valueOf(getText(td2_Total)));
     }
 
@@ -365,7 +369,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -386,12 +390,12 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         WebElement td_Production = uesByUsersAndStatesPanel.getColumnByName(tr, "Production");
         WebElement td_Total = uesByUsersAndStatesPanel.getColumnByName(tr, "total");
 
-        assertTrue(container1.numberOfWIPUEGs <= Integer.valueOf(getText(td_WIP)));
-        assertTrue(container1.numberOfQAUEGs <= Integer.valueOf(getText(td_QA)));
-        assertTrue(container1.numberOfProductionUEGs <= Integer.valueOf(getText(td_Production)));
-        assertTrue(container1.numberOfWIPUEGs +
+        assertEquals(container1.numberOfWIPUEGs, Integer.valueOf(getText(td_WIP)));
+        assertEquals(container1.numberOfQAUEGs, Integer.valueOf(getText(td_QA)));
+        assertEquals(container1.numberOfProductionUEGs, Integer.valueOf(getText(td_Production)));
+        assertEquals(container1.numberOfWIPUEGs +
                         container1.numberOfQAUEGs +
-                        container1.numberOfProductionUEGs <=
+                        container1.numberOfProductionUEGs,
                 Integer.valueOf(getText(td_Total)));
 
         uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId()); //un-select endUser1
@@ -405,24 +409,25 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         WebElement td2_Production = uesByUsersAndStatesPanel.getColumnByName(tr2, "Production");
         WebElement td2_Total = uesByUsersAndStatesPanel.getColumnByName(tr2, "total");
 
-        assertTrue(container2.numberOfWIPUEGs <= Integer.valueOf(getText(td2_WIP)));
-        assertTrue(container2.numberOfQAUEGs <= Integer.valueOf(getText(td2_QA)));
-        assertTrue(container2.numberOfProductionUEGs <= Integer.valueOf(getText(td2_Production)));
-        assertTrue(container2.numberOfWIPUEGs +
+        assertEquals(container2.numberOfWIPUEGs, Integer.valueOf(getText(td2_WIP)));
+        assertEquals(container2.numberOfQAUEGs, Integer.valueOf(getText(td2_QA)));
+        assertEquals(container2.numberOfProductionUEGs, Integer.valueOf(getText(td2_Production)));
+        assertEquals(container2.numberOfWIPUEGs +
                         container2.numberOfQAUEGs +
-                        container2.numberOfProductionUEGs <=
+                        container2.numberOfProductionUEGs,
                 Integer.valueOf(getText(td2_Total)));
     }
 
     @Test
     @DisplayName("TC_28_2_5")
     public void developer_can_click_table_cell_to_view_relevant_user_extensions_in_user_extensions_panel() {
+
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser1);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.3");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -438,14 +443,14 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
 
         WebElement tr = uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId());
         WebElement td_Total = uesByUsersAndStatesPanel.getColumnByName(tr, "total");
-        assertTrue(container1.numberOfWIPUEGs +
+        assertEquals(container1.numberOfWIPUEGs +
                         container1.numberOfQAUEGs +
-                        container1.numberOfProductionUEGs <=
+                        container1.numberOfProductionUEGs,
                 Integer.valueOf(getText(td_Total)));
 
         ViewEditCoreComponentPage viewEditCCPageForWIP = uesByUsersAndStatesPanel.openViewEditCCPageByUsernameAndColumnName(
                 endUser1.getLoginId(), "WIP");
-        assertTrue(container1.numberOfWIPUEGs <= viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
+        assertEquals(container1.numberOfWIPUEGs, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("QA"));
         assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("Production"));
 
@@ -455,7 +460,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         ViewEditCoreComponentPage viewEditCCPageForQA = uesByUsersAndStatesPanel.openViewEditCCPageByUsernameAndColumnName(
                 endUser1.getLoginId(), "QA");
         assertEquals(0, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("WIP"));
-        assertTrue(container1.numberOfQAUEGs <= viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("QA"));
+        assertEquals(container1.numberOfQAUEGs, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("QA"));
         assertEquals(0, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -465,7 +470,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                 endUser1.getLoginId(), "Production");
         assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("QA"));
-        assertTrue(container1.numberOfProductionUEGs <= viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("Production"));
+        assertEquals(container1.numberOfProductionUEGs, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
         uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
@@ -475,9 +480,9 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         // The total number of randomly-generated CCs could be more than the default size of items, 10.
         // Thus, it should set 'Items per page' to more than 10 to count the total number of CCs.
         viewEditCCPageForTotal.setItemsPerPage(50);
-        assertTrue(container1.numberOfWIPUEGs <= viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("WIP"));
-        assertTrue(container1.numberOfQAUEGs <= viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("QA"));
-        assertTrue(container1.numberOfProductionUEGs <= viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("Production"));
+        assertEquals(container1.numberOfWIPUEGs, viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("WIP"));
+        assertEquals(container1.numberOfQAUEGs, viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("QA"));
+        assertEquals(container1.numberOfProductionUEGs, viewEditCCPageForTotal.getNumberOfOnlyCCsPerStateAreListed("Production"));
     }
 
     @AfterEach

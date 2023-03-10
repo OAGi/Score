@@ -99,15 +99,15 @@ public class BieListController {
         return bieService.getBieList(user, request);
     }
 
-    @RequestMapping(value = "/bie_list/{topLevelAsbiepId:[\\d]+}/usage",
+    @RequestMapping(value = "/bie_list/{topLevelAsbiepId}/usage",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieList> getBieUsageList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                 @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
-                                                 @RequestParam(name = "sortActive") String sortActive,
-                                                 @RequestParam(name = "sortDirection") String sortDirection,
-                                                 @RequestParam(name = "pageIndex") int pageIndex,
-                                                 @RequestParam(name = "pageSize") int pageSize) {
+                                            @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
+                                            @RequestParam(name = "sortActive") String sortActive,
+                                            @RequestParam(name = "sortDirection") String sortDirection,
+                                            @RequestParam(name = "pageIndex") int pageIndex,
+                                            @RequestParam(name = "pageSize") int pageSize) {
 
         BieListRequest request = new BieListRequest();
         request.setUsageTopLevelAsbiepId(topLevelAsbiepId);
@@ -224,19 +224,19 @@ public class BieListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/profile_bie/business_ctx_from_abie/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/profile_bie/business_ctx_from_abie/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BizCtx findBizCtxFromAbieId(@PathVariable("id") BigInteger abieId) {
         return bieService.findBizCtxByAbieId(abieId);
     }
 
-    @RequestMapping(value = "/profile_bie/{id:[\\d]+}/biz_ctx", method = RequestMethod.GET,
+    @RequestMapping(value = "/profile_bie/{id}/biz_ctx", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BizCtxAssignment> getAssignBizCtx(@PathVariable("id") BigInteger topLevelAsbiepId) {
         return bieService.getAssignBizCtx(topLevelAsbiepId);
     }
 
-    @RequestMapping(value = "/profile_bie/{id:[\\d]+}/assign_biz_ctx", method = RequestMethod.POST,
+    @RequestMapping(value = "/profile_bie/{id}/assign_biz_ctx", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity assignBizCtx(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                        @PathVariable("id") BigInteger topLevelAsbiepId,
@@ -245,7 +245,7 @@ public class BieListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/profile_bie/{id:[\\d]+}/transfer_ownership", method = RequestMethod.POST,
+    @RequestMapping(value = "/profile_bie/{id}/transfer_ownership", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @PathVariable("id") BigInteger topLevelAsbiepId,

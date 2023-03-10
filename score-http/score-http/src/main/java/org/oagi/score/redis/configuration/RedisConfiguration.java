@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class RedisConfiguration {
 
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.redis.host}")
     private String redisHost;
 
-    @Value("${spring.data.redis.port}")
+    @Value("${spring.redis.port}")
     private int redisPort;
 
     @Bean

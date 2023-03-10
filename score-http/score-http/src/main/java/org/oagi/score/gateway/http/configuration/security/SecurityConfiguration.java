@@ -1,29 +1,18 @@
 package org.oagi.score.gateway.http.configuration.security;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.oagi.score.gateway.http.configuration.oauth2.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
-import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -34,14 +23,23 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
-public class SecurityConfiguration {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AppUserDetailsService userDetailsService;
+
+    @Autowired
+    private ScoreOAuth2AuthorizationRequestResolver authorizationRequestResolver;
+
+    @Autowired
+    private ScoreOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
     @Autowired
     private ScoreOAuth2AuthorizedClientService oAuth2AuthorizedClientService;
@@ -51,20 +49,6 @@ public class SecurityConfiguration {
 
     @Autowired
     private ScoreClientRegistrationRepository clientRegistrationRepository;
-
-    @Bean
-    public OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver() {
-        OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver =
-                new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
-        return oAuth2AuthorizationRequestResolver;
-    }
-
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
-        AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository =
-                new HttpSessionOAuth2AuthorizationRequestRepository();
-        return authorizationRequestRepository;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -102,17 +86,14 @@ public class SecurityConfiguration {
         return rememberMeServices;
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/favicon.ico", "/resources/**", "/error", "/messages/**");
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/favicon.ico", "/resources/**", "/error", "/messages/**");
     }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
     }
 
     @Bean
@@ -120,8 +101,8 @@ public class SecurityConfiguration {
         return new OidcIdTokenDecoderFactory();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 .headers()
                 .defaultsDisabled()
@@ -131,9 +112,9 @@ public class SecurityConfiguration {
                 .deny()
                 .and()
                 .authorizeRequests()
-                .requestMatchers("/info/**").permitAll()
-                .requestMatchers("/messages/**").permitAll()
-                .requestMatchers("/oauth2/**").permitAll()
+                .antMatchers("/info/**").permitAll()
+                .antMatchers("/messages/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
@@ -171,14 +152,13 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .rememberMe().rememberMeServices(rememberMeServices())
                 .and()
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login")
-                        .loginProcessingUrl("/oauth2/code/*")
-                        .successHandler(authenticationSuccessHandler)
-                        .authorizedClientService(oAuth2AuthorizedClientService)
-                        .authorizationEndpoint()
-                        .authorizationRequestRepository(authorizationRequestRepository())
-                        .authorizationRequestResolver(oAuth2AuthorizationRequestResolver())
-                );
-        return http.build();
+                .apply(new ScoreOAuth2LoginConfigurer<>())
+                .successHandler(authenticationSuccessHandler)
+                .loginProcessingUrl("/oauth2/code/*")
+                .authorizedClientService(oAuth2AuthorizedClientService)
+                .authorizationEndpoint()
+                .authorizationRequestRepository(authorizationRequestRepository)
+                .authorizationRequestResolver(authorizationRequestResolver)
+                .and().loginPage("/login");
     }
 }

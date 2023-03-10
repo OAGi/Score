@@ -32,7 +32,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
@@ -144,54 +143,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void hitSearchButton() {
-        int totalNumberOfItems = getTotalNumberOfItems();
-        retry(() -> {
-            click(getSearchButton());
-            invisibilityOfLoadingContainerElement(getDriver());
-        });
-
-        // retry if the total number of items wasn't changed.
-        if (totalNumberOfItems == getTotalNumberOfItems()) {
-            retry(() -> {
-                click(getSearchButton());
-                invisibilityOfLoadingContainerElement(getDriver());
-            });
-        }
+        click(getSearchButton());
+        invisibilityOfLoadingContainerElement(getDriver());
     }
-
-    @Override
-    public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
-    }
-
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
-
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
-    }
-
-    @Override
-    public void setItemsPerPage(int items) {
-        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
-        click(itemsPerPageField);
-        waitFor(ofMillis(500L));
-        WebElement itemField = elementToBeClickable(getDriver(),
-                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
-        waitFor(ofMillis(500L));
-    }
-
-    @Override
-    public int getTotalNumberOfItems() {
-        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
-        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
-        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
 
     @Override

@@ -1,9 +1,6 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
 import com.google.common.collect.ImmutableMap;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.data.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
@@ -30,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class AccountController implements InitializingBean {
         return tenantRoles;
     }
 
-    @RequestMapping(value = "/accounts/{id:[\\d]+}/enable", method = RequestMethod.POST)
+    @RequestMapping(value = "/accounts/{id}/enable", method = RequestMethod.POST)
     public ResponseEntity enable(
             @PathVariable("id") long id,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -147,7 +147,7 @@ public class AccountController implements InitializingBean {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/accounts/{id:[\\d]+}/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/accounts/{id}/disable", method = RequestMethod.POST)
     public ResponseEntity disable(
             @PathVariable("id") long id,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {

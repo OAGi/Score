@@ -249,26 +249,20 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public EditBIEPage openEditBIEPageByDEN(String den) {
-            return retry(() -> {
-                WebElement tr = getTableRecordByValue(den);
-                WebElement td = getColumnByName(tr, "den");
-                WebElement link = td.findElement(By.tagName("a"));
+            WebElement tr = getTableRecordByValue(den);
+            WebElement td = getColumnByName(tr, "den");
+            WebElement link = td.findElement(By.tagName("a"));
 
-                String href = link.getAttribute("href");
-                String topLevelAsbiepId = href.substring(href.indexOf("/profile_bie/") + "/profile_bie/".length());
-                TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
-                        getTopLevelASBIEPByID(new BigInteger(topLevelAsbiepId));
+            String href = link.getAttribute("href");
+            String topLevelAsbiepId = href.substring(href.indexOf("/profile_bie/") + "/profile_bie/".length());
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByID(new BigInteger(topLevelAsbiepId));
 
-                click(link);
-                waitFor(ofMillis(1000L));
+            click(link);
+            waitFor(ofMillis(500L));
 
-                EditBIEPage editBIEPage = new EditBIEPageImpl(this.parent, topLevelASBIEP);
-                if (!editBIEPage.isOpened()) {
-                    editBIEPage.openPage();
-                    assert editBIEPage.isOpened();
-                }
-                return editBIEPage;
-            });
+            EditBIEPage editBIEPage = new EditBIEPageImpl(this.parent, topLevelASBIEP);
+            assert editBIEPage.isOpened();
+            return editBIEPage;
         }
     }
 
@@ -330,7 +324,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             WebElement tr = getTableRecordByValue(user);
             WebElement td = getColumnByName(tr, columnName);
             click(td.findElement(By.tagName("a")));
-            waitFor(ofMillis(1000L));
+            waitFor(ofMillis(500L));
 
             ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
             assert viewEditBIEPage.isOpened();
@@ -456,8 +450,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             WebElement tr = getTableRecordByValue(user);
             WebElement td = getColumnByName(tr, columnName);
             click(td.findElement(By.tagName("a")));
-            waitFor(ofMillis(1000L));
-            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(500L));
 
             ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
             assert viewEditCoreComponentPage.isOpened();

@@ -374,7 +374,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public WebElement getTableRecordByValue(String value){
         defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + value + "\")]//ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\""+value+"\")]//ancestor::tr"));
     }
 
     @Override
@@ -388,13 +388,13 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public int getNumberOfOnlyCCsPerStateAreListed(String state) {
-        return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][contains(@class, '" + state + "')]")).size();
+        return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][contains(@class, '"+state+"')]")).size();
     }
 
     @Override
     public WebElement getTableRecordByCCNameAndOwner(String name, String owner){
         defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(),\"" + owner + "\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\""+name+"\")]//ancestor::tr//td[8]//*[contains(text(),\""+owner+"\")]"));
     }
 
     @Override

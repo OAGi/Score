@@ -394,7 +394,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get isValid(): boolean {
-    if (this.selectedNode && this.selectedNode.bieType !== 'ABIE' && this.selectedNode.used) {
+    if (this.selectedNode && this.selectedNode.used) {
       if (!!this.bieCardinalityMin && !this.bieCardinalityMin.valid) {
         return false;
       }
