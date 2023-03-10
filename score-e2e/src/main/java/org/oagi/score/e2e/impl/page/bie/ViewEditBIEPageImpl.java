@@ -77,6 +77,12 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     }
 
     @Override
+    public boolean isOpened() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        return super.isOpened();
+    }
+
+    @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
@@ -189,8 +195,19 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public void hitSearchButton() {
-        click(getSearchButton());
-        invisibilityOfLoadingContainerElement(getDriver());
+        int totalNumberOfItems = getTotalNumberOfItems();
+        retry(() -> {
+            click(getSearchButton());
+            invisibilityOfLoadingContainerElement(getDriver());
+        });
+
+        // retry if the total number of items wasn't changed.
+        if (totalNumberOfItems == getTotalNumberOfItems()) {
+            retry(() -> {
+                click(getSearchButton());
+                invisibilityOfLoadingContainerElement(getDriver());
+            });
+        }
     }
 
     @Override
@@ -200,7 +217,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -210,14 +227,16 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public void setItemsPerPage(int items) {
-        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
-        click(itemsPerPageField);
-        waitFor(ofMillis(500L));
-        WebElement itemField = elementToBeClickable(getDriver(),
-                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
-        waitFor(ofMillis(500L));
+        retry(() -> {
+            WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                    By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+            click(itemsPerPageField);
+            waitFor(ofMillis(500L));
+            WebElement itemField = elementToBeClickable(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+            click(itemField);
+            waitFor(ofMillis(500L));
+        });
     }
 
     @Override
@@ -294,11 +313,13 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
-            waitFor(ofMillis(500L));
-            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
+            if (!editBIEPage.isOpened()) {
+                editBIEPage.openPage();
+                assert editBIEPage.isOpened();
+            }
             return editBIEPage;
         });
     }
@@ -357,6 +378,8 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public int getNumberOfOnlyBIEsPerStateAreListed(String state) {
-        return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][@class=\"" + state + " bie-state\"]")).size();
+        return findElements(getDriver(), By.xpath(
+                "//table//*[contains(text(), \"" + state + "\")][@class=\"" + state + " bie-state\"]"))
+                .size();
     }
 }

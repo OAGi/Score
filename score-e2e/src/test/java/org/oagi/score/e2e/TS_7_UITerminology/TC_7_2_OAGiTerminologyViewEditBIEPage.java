@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +22,7 @@ public class TC_7_2_OAGiTerminologyViewEditBIEPage extends BaseTest {
     @Disabled
     public void test_TA_1() {
         //The name of the page should be “BIEs (Profiled Components, Nouns, BODs)”.
+
     }
 
 }

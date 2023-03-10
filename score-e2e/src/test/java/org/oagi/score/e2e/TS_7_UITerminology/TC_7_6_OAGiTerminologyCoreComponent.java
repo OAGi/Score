@@ -1,6 +1,4 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
-
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -45,6 +43,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Disabled
     public void test_TA_1() {
         //The name of the Core Component page should be “Core Components (Model Library)”.
+
     }
 
     @Test
@@ -88,7 +87,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Disabled
     public void test_TA_4() {
         //The title of the left pane where the tree of an ACC is displayed should be “ACC (Component Type or Group Definition)”.
-
     }
 
     @Test
@@ -135,9 +133,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
@@ -150,7 +145,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         // CHECK THE SAME FOR THE GLOBAL BIE EXTENSION
 
         BusinessContextObject contextGlobalExtension = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
+        TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().
+                generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiepGlobalExtension);
@@ -168,6 +164,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Disabled
     public void testTA_7() {
         //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
+
     }
 
     @Test
@@ -175,6 +172,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Disabled
     public void testTA_8() {
         //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
+
 
     }
 
@@ -220,6 +218,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Disabled
     public void test_TA_11() {
         //The title of the right pane where the details of a BCCP are displayed should be “BCCP (Associated Field) Detail”.
+
     }
 
     @Test
@@ -345,9 +344,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @DisplayName("TC_7_6_TA_20")
     @Disabled
     public void test_TA_20() {
-        //The title of the right pane where the details of a supplementary component are displayed should be
+        // The title of the right pane where the details of a supplementary component are displayed should be
         // “Supplementary Component (Field Metadata)”. (It cannot be checked yet).
-
     }
 
     @Test
@@ -391,12 +389,12 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         assertEquals("DEN (Dictionary Entry Name)", denFieldTitleDT);
     }
 
-    /*@Test
+    @Test
     public void test() {
         for (String loginID : Arrays.asList("eu_K316X", "dev_azHuS2k7m")) {
             thisAccountWillBeDeletedAfterTests(getAPIFactory().getAppUserAPI().getAppUserByLoginID(loginID));
         }
-    }*/
+    }
 
     @AfterEach
     public void tearDown() {

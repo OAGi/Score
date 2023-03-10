@@ -26,7 +26,7 @@ public class BieReportController {
         return bieRepository.getBieReuseReport(null);
     }
 
-    @RequestMapping(value = "/profile_bie/reuse_report/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/profile_bie/reuse_report/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieReuseReport> findTargetAsccpManifest(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @PathVariable("id") BigInteger reusedTopLevelAsbiepId) {

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditBusinessContextPageImpl extends BasePageImpl implements ViewEditBusinessContextPage {
@@ -115,10 +116,19 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
 
     @Override
     public void hitSearchButton() {
+        int totalNumberOfItems = getTotalNumberOfItems();
         retry(() -> {
             click(getSearchButton());
             waitFor(ofMillis(1000L));
         });
+
+        // retry if the total number of items wasn't changed.
+        if (totalNumberOfItems == getTotalNumberOfItems()) {
+            retry(() -> {
+                click(getSearchButton());
+                waitFor(ofMillis(1000L));
+            });
+        }
     }
 
     @Override
@@ -127,8 +137,33 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
     }
 
     @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+    }
+
+    @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
 
     @Override
@@ -136,6 +171,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Next page']")));
+        waitFor(ofSeconds(1L));
     }
 
     @Override
@@ -143,6 +179,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         click(elementToBeClickable(getDriver(), By.xpath("//button[@aria-label='Previous page']")));
+        waitFor(ofSeconds(1L));
     }
 
     @Override

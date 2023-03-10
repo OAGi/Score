@@ -19,17 +19,19 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.impl.PageHelper.retry;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories extends BaseTest {
@@ -458,8 +460,8 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
                 "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(Duration.ofSeconds(3L))
-                    .pollingEvery(Duration.ofMillis(100L))
+                    .withTimeout(ofSeconds(3L))
+                    .pollingEvery(ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
@@ -472,8 +474,8 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(Duration.ofSeconds(3L))
-                    .pollingEvery(Duration.ofMillis(100L))
+                    .withTimeout(ofSeconds(3L))
+                    .pollingEvery(ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
             assertChecked(checkboxOfFirstRecord);
         });

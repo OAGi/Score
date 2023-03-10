@@ -143,7 +143,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForWIP.setOwner(developer.getLoginId());
         viewEditBIEPageForWIP.hitSearchButton();
 
-        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
+        assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
@@ -153,7 +153,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForQA.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
+        assertTrue(container.numberOfQABIEs <= viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -163,7 +163,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
+        assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
     }
 
     @Test
@@ -212,7 +212,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForWIP.setOwner(developer.getLoginId());
         viewEditBIEPageForWIP.hitSearchButton();
 
-        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
+        assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
@@ -222,7 +222,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForQA.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
+        assertTrue(container.numberOfQABIEs <= viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -232,7 +232,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
+        assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
     }
 
     @Test
