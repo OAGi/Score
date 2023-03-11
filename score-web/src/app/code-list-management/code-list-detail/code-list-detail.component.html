@@ -301,10 +301,26 @@
                     </mat-form-field>
                   </div>
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="access === 'CanEdit' && !hasRevision">
                       <mat-label>Namespace</mat-label>
-                      <mat-select data-id="codeList.namespace" [(ngModel)]="codeList.namespaceId" placeholder="Namespace" required
-                                  [disabled]="access !== 'CanEdit' || hasRevision">
+                      <mat-select data-id="codeList.namespace" placeholder="Namespace"
+                                  [(ngModel)]="codeList.namespaceId"
+                                  [required]="true">
+                        <mat-option>
+                          <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                                 [placeholderLabel]="'Search...'"
+                                                 [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+                          {{ namespace.uri }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="access !== 'CanEdit' || hasRevision">
+                      <mat-label>Namespace</mat-label>
+                      <mat-select data-id="codeList.namespace" placeholder="Namespace"
+                                  [(ngModel)]="codeList.namespaceId"
+                                  [required]="true" [disabled]="true">
                         <mat-option *ngFor="let namespace of getSelectableNamespaces(codeList.namespaceId)"
                                     [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                       </mat-select>

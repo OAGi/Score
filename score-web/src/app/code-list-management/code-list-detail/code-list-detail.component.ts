@@ -17,7 +17,7 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {hashCode} from '../../common/utility';
+import {hashCode, initFilter} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
@@ -42,6 +42,9 @@ export class CodeListDetailComponent implements OnInit {
 
   namespaces: SimpleNamespace[] = [];
   isUpdating: boolean;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   agencyListFilterCtrl: FormControl = new FormControl();
   filteredAgencyLists: ReplaySubject<SimpleAgencyIdList[]> = new ReplaySubject<SimpleAgencyIdList[]>(1);
@@ -116,6 +119,8 @@ export class CodeListDetailComponent implements OnInit {
         this.agencyIdLists = resp.agencyIdLists;
         this.allAgencyIdListValues = resp.agencyIdListValues;
         this.namespaces = namespaces;
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+          this.getSelectableNamespaces(), (e) => e.uri);
         this.revision = revision;
 
         this.filteredAgencyLists.next(this.agencyIdLists.slice());
