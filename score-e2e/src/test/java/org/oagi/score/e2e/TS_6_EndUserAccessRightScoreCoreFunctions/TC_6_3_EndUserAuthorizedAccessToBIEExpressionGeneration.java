@@ -13,21 +13,18 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
+import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
@@ -526,7 +523,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
 
         }
@@ -566,10 +564,11 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
@@ -580,17 +579,17 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             });
             expressBIEPage.toggleBIEDefinition();
             assertNotChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
-            assertEnabled(expressBIEPage.getMakeAsAnArrayCheckbox());
-            assertNotChecked(expressBIEPage.getMakeAsAnArrayCheckbox());
-            assertEnabled(expressBIEPage.getIncludeMetaHeaderCheckbox());
-            assertNotChecked(expressBIEPage.getIncludeMetaHeaderCheckbox());
-            assertEnabled(expressBIEPage.getIncludePaginationResponseCheckbox());
-            assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getMakeAsAnArrayCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getMakeAsAnArrayCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getIncludeMetaHeaderCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getIncludeMetaHeaderCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -619,10 +618,11 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
@@ -632,17 +632,17 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
             expressBIEPage.selectPutAllSchemasInTheSameFile();
-            assertEnabled(expressBIEPage.getMakeAsAnArrayCheckbox());
-            assertNotChecked(expressBIEPage.getMakeAsAnArrayCheckbox());
-            assertEnabled(expressBIEPage.getIncludeMetaHeaderCheckbox());
-            assertNotChecked(expressBIEPage.getIncludeMetaHeaderCheckbox());
-            assertEnabled(expressBIEPage.getIncludePaginationResponseCheckbox());
-            assertNotChecked(expressBIEPage.getIncludePaginationResponseCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getMakeAsAnArrayCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getMakeAsAnArrayCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getIncludeMetaHeaderCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getIncludeMetaHeaderCheckbox());
+            assertEnabled(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
+            assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -671,10 +671,11 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
@@ -724,23 +725,25 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
-        ;
+
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectXMLSchemaExpression();
         expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -787,23 +790,25 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
-        ;
+
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectXMLSchemaExpression();
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
@@ -850,23 +855,25 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
-        ;
+
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectJSONSchemaExpression();
         expressBIEPage.selectPutAllSchemasInTheSameFile();
@@ -891,7 +898,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -902,14 +909,16 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
 
         }
@@ -918,7 +927,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
-        ;
+
         assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
         expressBIEPage.selectJSONSchemaExpression();
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
@@ -957,13 +966,16 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
-            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
-
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
@@ -973,15 +985,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
-            expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
 
             File file = null;
             try {
-                expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
-                waitFor(Duration.ofMillis(5000));
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
                 ObjectMapper mapper = new ObjectMapper();
-                file = getFileBasedOnName(asccp.getPropertyTerm(), "json");
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
                 String metaHeaderNodeType = rootNode.get("metaHeader").getNodeType().toString();
@@ -1020,11 +1030,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
-            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1036,16 +1049,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
-            expressBIEPage.toggleMakeAsAnArray();
-            expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleMakeAsAnArray();
+            jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
 
             File file = null;
             try {
-                expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
-                waitFor(Duration.ofMillis(5000));
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
                 ObjectMapper mapper = new ObjectMapper();
-                file = getFileBasedOnName(asccp.getPropertyTerm(), "json");
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
                 String metaHeaderNodeType = rootNode.get("metaHeader").getNodeType().toString();
@@ -1085,14 +1096,19 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
-            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
-            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
-            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1104,15 +1120,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
-            expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
-            expressBIEPage.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
-                waitFor(Duration.ofMillis(5000));
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
                 ObjectMapper mapper = new ObjectMapper();
-                file = getFileBasedOnName(asccp.getPropertyTerm(), "json");
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
                 String metaHeaderNodeType = rootNode.get("metaHeader").getNodeType().toString();
@@ -1152,14 +1166,19 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
-            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
-            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
-            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1171,16 +1190,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             });
             assertChecked(expressBIEPage.getBIEDefinitionCheckbox());
-            expressBIEPage.selectJSONSchemaExpression();
-            expressBIEPage.toggleMakeAsAnArray();
-            expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
-            expressBIEPage.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleMakeAsAnArray();
+            jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
-                waitFor(Duration.ofMillis(5000));
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
                 ObjectMapper mapper = new ObjectMapper();
-                file = getFileBasedOnName(asccp.getPropertyTerm(), "json");
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
                 String metaHeaderNodeType = rootNode.get("metaHeader").getNodeType().toString();
@@ -1219,18 +1236,22 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
-            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -1240,8 +1261,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
-        expressBIEPage.selectJSONSchemaExpression();
-        expressBIEPage.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+        jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
         File file = null;
         try {
@@ -1277,14 +1298,16 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEProduction);
 
             acc = coreComponentAPI.createRandomACC(userb, releaseTwo, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1292,10 +1315,1839 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         getDriver().manage().window().maximize();
 
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-        for (TopLevelASBIEPObject bie: biesForTesting){
+        for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
                 expressBIEPage.selectBIEForExpression(bie);
             });
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_21")
+    public void test_TA_21() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        BusinessContextObject context;
+        ASCCPObject asccp;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        expressBIEPage.setBranch(release.getReleaseNumber());
+        int numberOfBIEsDisplayed = expressBIEPage.getNumberfBIEsInTable();
+        int numberofBIEsInIndexBox = expressBIEPage.getNumberOfBIEsInIndexBox();
+        assertEquals(numberOfBIEsDisplayed, numberofBIEsInIndexBox);
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_22")
+    public void test_TA_22() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        {
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, releaseOne, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            /**
+             * The end user can generate an expression of a single BIE with multiple business contexts assigned
+             */
+            BusinessContextObject contextOne = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            BusinessContextObject contextTwo = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(contextOne, contextTwo), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            expressBIEPage.selectXMLSchemaExpression();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+            expressBIEPage.toggleBusinessContext();
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_23")
+    public void test_TA_23() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleMakeAsAnArray();
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertFalse(userb.isDeveloper());
+            List<String> acceptedStates = Arrays.asList("QA", "Production");
+            assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleMakeAsAnArray();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_24")
+    public void test_TA_24() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectJSONOpenAPIFormat();
+
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleMakeAsAnArray();
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertTrue(userb.isDeveloper());
+            List<String> acceptedStates = Arrays.asList("QA", "Production");
+            assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleMakeAsAnArray();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_25")
+    public void test_TA_25() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        BusinessContextObject context;
+        ASCCPObject asccp;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(file);
+                JsonNode rootNode = root.path("properties");
+                String metaHeaderNodeType = rootNode.get("paginationResponse").getNodeType().toString();
+                assertEquals("OBJECT", metaHeaderNodeType);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_25a")
+    public void test_TA_25a() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        BusinessContextObject context;
+        ASCCPObject asccp;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+        for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
+            ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            });
+            ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+            jsonSchemaExpressionOptions.toggleMakeAsAnArray();
+            jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(file);
+                JsonNode rootNode = root.path("properties");
+                String metaHeaderNodeType = rootNode.get("paginationResponse").getNodeType().toString();
+                assertEquals("OBJECT", metaHeaderNodeType);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_26")
+    public void test_TA_26() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ReleaseObject release;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        BusinessContextObject context;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+
+        }
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
+        jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        assertDisabled(expressBIEPage.getPutAllSchemasInTheSameFileRadioButton());
+        jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+        assertDisabled(expressBIEPage.getPutAllSchemasInTheSameFileRadioButton());
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_27")
+    public void test_TA_27() {
+        AppUserObject usera;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject reusableASCCP;
+        BusinessContextObject context;
+        ReleaseObject release;
+        TopLevelASBIEPObject reusableBIE;
+        Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject accReusable = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Published");
+            coreComponentAPI.appendBCC(accReusable, bccp, "Published");
+            reusableASCCP = coreComponentAPI.createRandomASCCP(accReusable, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            reusableBIE = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), reusableASCCP, usera, "QA");
+
+
+            ACCObject accOne = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            coreComponentAPI.appendASCC(accOne, reusableASCCP, "Published");
+            ASCCPObject asccpOne = coreComponentAPI.createRandomASCCP(accOne, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIEOne = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccpOne, usera, "WIP");
+            biesForTesting.add(useraBIEOne);
+            bieASCCPMap.put(useraBIEOne, asccpOne);
+
+            ACCObject accTwo = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
+            coreComponentAPI.appendASCC(accTwo, reusableASCCP, "Published");
+            ASCCPObject asccpTwo = coreComponentAPI.createRandomASCCP(accTwo, usera, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject useraBIETwo = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccpTwo, usera, "WIP");
+            biesForTesting.add(useraBIETwo);
+            bieASCCPMap.put(useraBIETwo, asccpTwo);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(bie);
+            ASCCPObject asccp = bieASCCPMap.get(bie);
+            SelectProfileBIEToReuseDialog selectProfileBIEToReuse =
+                    editBIEPage.reuseBIEOnNode("/" + asccp.getPropertyTerm() + "/" + reusableASCCP.getPropertyTerm());
+            selectProfileBIEToReuse.selectBIEToReuse(reusableBIE);
+        }
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectBIEForExpression(reusableBIE);
+        });
+        expressBIEPage.selectXMLSchemaExpression();
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+
+        expressBIEPage.selectJSONSchemaExpression();
+        file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_28")
+    public void test_TA_28() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_29")
+    public void test_TA_29() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_30")
+    public void test_TA_30() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectJSONOpenAPIFormat();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_31")
+    public void test_TA_31() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectJSONOpenAPIFormat();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_32")
+    public void test_TA_32() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleMakeAsAnArray();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_33")
+    public void test_TA_33() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleMakeAsAnArray();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_34")
+    public void test_TA_34() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_35")
+    public void test_TA_35() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_36")
+    public void test_TA_36() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_37")
+    public void test_TA_37() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_38")
+    public void test_TA_38() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleMakeAsAnArray();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_39")
+    public void test_TA_39() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        postOperationOptions.toggleMakeAsAnArray();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_40")
+    public void test_TA_40() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_41")
+    public void test_TA_41() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        ReleaseObject release;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_42")
+    public void test_TA_42() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            getOperationOptions.toggleMakeAsAnArray();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_6_3_TA_43")
+    public void test_TA_43() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+        getOperationOptions.toggleMakeAsAnArray();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
+    @Test
+    @DisplayName("TC_6_3_TA_44")
+    public void test_TA_44() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            getOperationOptions.toggleMakeAsAnArray();
+
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            postOperationOptions.toggleMakeAsAnArray();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+    @Test
+    @DisplayName("TC_6_3_TA_45")
+    public void test_TA_45() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectYAMLOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+        getOperationOptions.toggleMakeAsAnArray();
+
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        postOperationOptions.toggleMakeAsAnArray();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
+    @Test
+    @DisplayName("TC_6_3_TA_46")
+    public void test_TA_46() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+        for (TopLevelASBIEPObject bie : biesForTesting) {
+            assertDoesNotThrow(() -> {
+                expressBIEPage.selectBIEForExpression(bie);
+            });
+            ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+            openAPIExpressionOptions.selectJSONOpenAPIFormat();
+            ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+            getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+            getOperationOptions.toggleMakeAsAnArray();
+
+            ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+            postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+            postOperationOptions.toggleMakeAsAnArray();
+            expressBIEPage.selectPutAllSchemasInTheSameFile();
+
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+        }
+    }
+    @Test
+    @DisplayName("TC_6_3_TA_47")
+    public void test_TA_47() {
+        AppUserObject usera;
+        AppUserObject userb;
+        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        ASCCPObject asccp;
+        BusinessContextObject context;
+        TopLevelASBIEPObject metaHeaderASBIEP;
+        TopLevelASBIEPObject paginationResponseASBIEP;
+        ReleaseObject release;
+        {
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+
+            thisAccountWillBeDeletedAfterTests(usera);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            TopLevelASBIEPObject useraBIEProduction = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
+            biesForTesting.add(useraBIEProduction);
+
+            acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
+
+            TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
+            biesForTesting.add(useraBIEQA);
+
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
+
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
+                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        getDriver().manage().window().maximize();
+
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
+
+        assertDoesNotThrow(() -> {
+            expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
+        });
+        ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
+        openAPIExpressionOptions.selectJSONOpenAPIFormat();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
+        getOperationOptions.toggleMakeAsAnArray();
+
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
+        postOperationOptions.toggleMakeAsAnArray();
+        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+
+        File file = null;
+        try {
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
         }
     }
 
@@ -1306,13 +3158,5 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         this.randomAccounts.forEach(newUser -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
-    }
-
-    private File getFileBasedOnName(String fileName, String fileExtension) {
-        fileName = fileName.replaceAll(" ", "") + "." + fileExtension;
-        String userHome = System.getProperty("user.home");
-        Path path = Paths.get(new File(userHome, "Downloads").toURI());
-        Path path2 = Paths.get(new File(path.toString(), fileName).toURI());
-        return path2.toFile();
     }
 }

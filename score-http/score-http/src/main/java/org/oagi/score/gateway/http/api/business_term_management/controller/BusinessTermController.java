@@ -261,7 +261,7 @@ public class BusinessTermController {
                 .body(resource);
     }
 
-    @RequestMapping(value = "/business_term/{id:[\\d]+}", method = RequestMethod.POST)
+    @RequestMapping(value = "/business_term/{id}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("id") String businessTermId,
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -285,7 +285,7 @@ public class BusinessTermController {
         }
     }
 
-    @RequestMapping(value = "/business_term/{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/business_term/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger businessTermId) throws ScoreDataAccessException {
@@ -334,7 +334,7 @@ public class BusinessTermController {
         }
     }
 
-    @RequestMapping(value = "/business_term/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_term/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BusinessTerm getBusinessTerm(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -372,7 +372,7 @@ public class BusinessTermController {
         return businessTermService.checkAssignmentUniqueness(request);
     }
 
-    @RequestMapping(value = "/business_terms/assign/{type}/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_terms/assign/{type}/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AssignedBusinessTerm getAssignedBusinessTerm(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -386,7 +386,7 @@ public class BusinessTermController {
         return businessTermService.getBusinessTermAssignment(request);
     }
 
-    @RequestMapping(value = "/business_terms/assign/{type}/{id:[\\d]+}", method = RequestMethod.POST)
+    @RequestMapping(value = "/business_terms/assign/{type}/{id}", method = RequestMethod.POST)
     public ResponseEntity updateAssignment(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger assignedBizTermId,
@@ -411,7 +411,7 @@ public class BusinessTermController {
         }
     }
 
-    @RequestMapping(value = "/business_terms/assign/{type}/{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/business_terms/assign/{type}/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteAssignment(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger assignedBizTermId,
@@ -461,4 +461,8 @@ public class BusinessTermController {
         }
     }
 
+    @ExceptionHandler(ScoreDataAccessException.class)
+    public ResponseEntity handleAllException(Exception ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

@@ -19,7 +19,7 @@ public class XbtListController {
     @Autowired
     private XbtListService service;
 
-    @RequestMapping(value = "/xbt/simple_list/{releaseId:[\\d]+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/xbt/simple_list/{releaseId}", method = RequestMethod.GET)
     public List<Xbt> getSimpleXbtList(
             @PathVariable("releaseId") BigInteger releaseId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {

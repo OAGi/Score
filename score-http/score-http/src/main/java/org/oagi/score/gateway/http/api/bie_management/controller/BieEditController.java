@@ -45,7 +45,7 @@ public class BieEditController {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/profile_bie/node/root/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/profile_bie/node/root/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNode getRootNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                    @PathVariable("id") BigInteger topLevelAsbiepId) {
@@ -53,7 +53,7 @@ public class BieEditController {
         return rootNode;
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/abie/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/abie/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AbieNode getAbieDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -63,7 +63,7 @@ public class BieEditController {
         return service.getAbieDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/asbie/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/asbie/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AsbieNode getAsbieDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -73,7 +73,7 @@ public class BieEditController {
         return service.getAsbieDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbie/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbie/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BbieNode getBbieDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -83,7 +83,7 @@ public class BieEditController {
         return service.getBbieDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/asbiep/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/asbiep/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AsbiepNode getAsbiepDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -93,7 +93,7 @@ public class BieEditController {
         return service.getAsbiepDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbiep/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbiep/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BbiepNode getBbiepDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -103,7 +103,7 @@ public class BieEditController {
         return service.getBbiepDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbiep/{manifestId:[\\d]+}/bdt_pri_restri",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbiep/{manifestId}/bdt_pri_restri",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableBdtPriRestri> availableBdtPriRestriListByBccpManifestId(
@@ -113,7 +113,7 @@ public class BieEditController {
         return service.availableBdtPriRestriListByBccpManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbiep/{manifestId:[\\d]+}/code_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbiep/{manifestId}/code_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableCodeList> availableCodeListListByBccpManifestId(
@@ -123,7 +123,7 @@ public class BieEditController {
         return service.availableCodeListListByBccpManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbiep/{manifestId:[\\d]+}/agency_id_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbiep/{manifestId}/agency_id_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableAgencyIdList> availableAgencyIdListListByBccpManifestId(
@@ -133,7 +133,7 @@ public class BieEditController {
         return service.availableAgencyIdListListByBccpManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbie_sc/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbie_sc/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BbieScNode getBbieScDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -143,7 +143,7 @@ public class BieEditController {
         return service.getBbieScDetail(user, topLevelAsbiepId, manifestId, hashPath);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbie_sc/{manifestId:[\\d]+}/bdt_sc_pri_restri",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbie_sc/{manifestId}/bdt_sc_pri_restri",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableBdtScPriRestri> availableBdtScPriRestriListByBdtScManifestId(
@@ -153,7 +153,7 @@ public class BieEditController {
         return service.availableBdtScPriRestriListByBdtScManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbie_sc/{manifestId:[\\d]+}/code_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbie_sc/{manifestId}/code_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableCodeList> availableCodeListListByBdtScManifestId(
@@ -163,7 +163,7 @@ public class BieEditController {
         return service.availableCodeListListByBdtScManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/bbie_sc/{manifestId:[\\d]+}/agency_id_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/bbie_sc/{manifestId}/agency_id_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AvailableAgencyIdList> availableAgencyIdListListByBdtScManifestId(
@@ -173,7 +173,7 @@ public class BieEditController {
         return service.availableAgencyIdListListByBdtScManifestId(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/dt/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/dt/{manifestId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BdtNode getBdtDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -182,7 +182,7 @@ public class BieEditController {
         return service.getBdtDetail(user, topLevelAsbiepId, manifestId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/used_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/used_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieEditUsed> getUsedAbieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -190,7 +190,7 @@ public class BieEditController {
         return service.getBieUsedList(user, topLevelAsbiepId);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/ref_list",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/ref_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieEditRef> getRefAsbieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -198,7 +198,7 @@ public class BieEditController {
         return service.getBieRefList(user, topLevelAsbiepId);
     }
 
-    @RequestMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state", method = RequestMethod.POST,
+    @RequestMapping(value = "/profile_bie/node/root/{id}/state", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("id") BigInteger topLevelAsbiepId,
@@ -207,7 +207,7 @@ public class BieEditController {
         service.updateState(user, topLevelAsbiepId, state);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/detail", method = RequestMethod.POST,
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/detail", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditUpdateDetailResponse updateDetails(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                      @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
@@ -234,7 +234,7 @@ public class BieEditController {
 
     /* Reuse BIE */
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/asbiep/{manifestId:[\\d]+}/reuse",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/asbiep/{manifestId}/reuse",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void reuseBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -247,7 +247,7 @@ public class BieEditController {
         service.reuseBIE(user, reuseBIERequest);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/remove_reuse",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/remove_reuse",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void reuseBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -267,12 +267,12 @@ public class BieEditController {
         createBieFromExistingBieService.createBieFromExistingBie(user, request);
     }
 
-    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/reset_detail",
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/reset_detail",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void resetDetailBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                               @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
-                               @RequestBody ResetDetailBIERequest request) {
+                         @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
+                         @RequestBody ResetDetailBIERequest request) {
 
         request.setTopLevelAsbiepId(topLevelAsbiepId);
         service.resetDetailBIE(user, request);

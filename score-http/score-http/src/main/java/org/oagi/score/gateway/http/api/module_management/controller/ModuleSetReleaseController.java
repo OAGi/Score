@@ -78,7 +78,7 @@ public class ModuleSetReleaseController {
         return service.getModuleSetReleaseList(request);
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/module_set_release/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ModuleSetRelease getModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                 @PathVariable("id") BigInteger moduleSetReleaseId) {
@@ -97,7 +97,7 @@ public class ModuleSetReleaseController {
         return response.getModuleSetRelease();
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}", method = RequestMethod.POST,
+    @RequestMapping(value = "/module_set_release/{id}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ModuleSetRelease updateModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                      @PathVariable("id") BigInteger moduleSetReleaseId,
@@ -113,7 +113,7 @@ public class ModuleSetReleaseController {
         return response.getModuleSetRelease();
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "/module_set_release/{id}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void discardModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                  @PathVariable("id") BigInteger moduleSetReleaseId) {
@@ -122,7 +122,7 @@ public class ModuleSetReleaseController {
         service.discardModuleSetRelease(request);
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/export", method = RequestMethod.GET,
+    @RequestMapping(value = "/module_set_release/{id}/export", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InputStreamResource> exportModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                                       @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
@@ -136,7 +136,7 @@ public class ModuleSetReleaseController {
                 .body(new InputStreamResource(new FileInputStream(output)));
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/assignable", method = RequestMethod.GET,
+    @RequestMapping(value = "/module_set_release/{id}/assignable", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ModuleAssignComponents getAssignableCCs(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                    @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
@@ -145,7 +145,7 @@ public class ModuleSetReleaseController {
         return service.getAssignableCCs(request);
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/assigned", method = RequestMethod.GET,
+    @RequestMapping(value = "/module_set_release/{id}/assigned", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ModuleAssignComponents getAssignedCCs(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                  @PathVariable("id") BigInteger moduleSetReleaseId,
@@ -154,7 +154,7 @@ public class ModuleSetReleaseController {
         return service.getAssignedCCs(sessionService.asScoreUser(user), moduleSetReleaseId, moduleId);
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/assign", method = RequestMethod.POST,
+    @RequestMapping(value = "/module_set_release/{id}/assign", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void assignCCs(@AuthenticationPrincipal AuthenticatedPrincipal user,
                              @PathVariable("id") BigInteger moduleSetReleaseId,
@@ -163,7 +163,7 @@ public class ModuleSetReleaseController {
         service.setAssignCc(sessionService.asScoreUser(user), assignCCToModule);
     }
 
-    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/unassign", method = RequestMethod.POST,
+    @RequestMapping(value = "/module_set_release/{id}/unassign", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void unassignCCs(@AuthenticationPrincipal AuthenticatedPrincipal user,
                              @PathVariable("id") BigInteger moduleSetReleaseId,

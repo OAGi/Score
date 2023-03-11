@@ -8,7 +8,6 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.WebElement;
 
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -207,6 +206,8 @@ public interface EditBIEPage extends Page {
     void getExtendBIELocallyOnNode(String path);
 
     String getTypeDefinitionValue();
+
+    SelectProfileBIEToReuseDialog reuseBIEOnNode(String path);
 
     /**
      * An interface of the panel for 'Top-Level ASBIEP' node.

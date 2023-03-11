@@ -31,11 +31,11 @@ export class BieEditService {
   }
 
   getUsedBieList(topLevelAsbiepId: number): Observable<UsedBie[]> {
-    return this.http.get<UsedBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/used_list');
+    return this.http.get<UsedBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/used_list/');
   }
 
   getRefBieList(topLevelAsbiepId: number): Observable<RefBie[]> {
-    return this.http.get<RefBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/ref_list');
+    return this.http.get<RefBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/ref_list/');
   }
 
   getBbiepBdtPriRestriList(topLevelAsbiepId: number, manifestId: number): Observable<BdtPriRestri[]> {

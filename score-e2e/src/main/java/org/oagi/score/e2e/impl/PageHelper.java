@@ -64,10 +64,6 @@ public abstract class PageHelper {
         return driver.findElement(locator);
     }
 
-    public static List<WebElement> findElements(WebDriver driver, By locator) {
-        return driver.findElements(locator);
-    }
-
     public static Wait<WebDriver> defaultWait(WebDriver driver) {
         return wait(driver, Duration.ofSeconds(3L), ofMillis(100L));
     }

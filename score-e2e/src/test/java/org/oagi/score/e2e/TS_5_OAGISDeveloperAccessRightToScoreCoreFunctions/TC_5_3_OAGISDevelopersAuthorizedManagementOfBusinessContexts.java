@@ -472,9 +472,8 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
     @Test
     @DisplayName("TC_5_3_TA_13")
     public void developer_can_update_BIE_referenced_business_context_created_by_any_user() {
-        String branch = "10.8.5";
         ASCCPObject asccp =
-                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Item Master. Item Master", branch);
+                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Item Master. Item Master", "10.8.5");
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -522,16 +521,12 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
             editBusinessContextPage.hitUpdateButton();
 
             ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
-            viewEditBIEPage.setBranch(branch);
+            viewEditBIEPage.setBusinessContext(newName);
+            viewEditBIEPage.hitSearchButton();
 
-            retry(() -> {
-                viewEditBIEPage.setBusinessContext(newName);
-                viewEditBIEPage.hitSearchButton();
-
-                WebElement tr = viewEditBIEPage.getTableRecordByValue(newName);
-                WebElement td = viewEditBIEPage.getColumnByName(tr, "businessContexts");
-                assertEquals(newName, getText(td.findElement(By.cssSelector("span > a"))));
-            });
+            WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+            WebElement td_bc = viewEditBIEPage.getColumnByName(tr, "businessContexts");
+            assertEquals(newName, getText(td_bc.findElement(By.xpath("span/a"))));
         }
     }
 
@@ -548,14 +543,17 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         // Test 'Name' field
         contextMenu = homePage.getContextMenu();
         viewEditBusinessContextPage = contextMenu.openViewEditBusinessContextSubMenu();
+        viewEditBusinessContextPage.setName(businessContext.getName());
+        viewEditBusinessContextPage.hitSearchButton();
+        assertBusinessContextNameInTheSearchResultsAtFirst(
+                viewEditBusinessContextPage, businessContext.getName());
+    }
 
+    private void assertBusinessContextNameInTheSearchResultsAtFirst(ViewEditBusinessContextPage viewEditBusinessContextPage, String name) {
         retry(() -> {
-            viewEditBusinessContextPage.setName(businessContext.getName());
-            viewEditBusinessContextPage.hitSearchButton();
-
-            WebElement tr = viewEditBusinessContextPage.getTableRecordByValue(businessContext.getName());
+            WebElement tr = viewEditBusinessContextPage.getTableRecordAtIndex(1);
             WebElement td = viewEditBusinessContextPage.getColumnByName(tr, "name");
-            assertEquals(businessContext.getName(), getText(td.findElement(By.cssSelector("a > span"))));
+            assertEquals(name, td.findElement(By.cssSelector("a > span")).getText());
         });
     }
 
@@ -591,7 +589,9 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         });
 
         viewEditBusinessContextPage.goToNextPage();
+        waitFor(ofSeconds(1L));
         viewEditBusinessContextPage.goToPreviousPage();
+        waitFor(ofSeconds(1L));
 
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())

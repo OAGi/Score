@@ -35,7 +35,7 @@ public class AgencyIdController {
     @Autowired
     private SessionService sessionService;
 
-    @RequestMapping(value = "/simple_agency_id_list_values/{releaseId:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/simple_agency_id_list_values/{releaseId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetSimpleAgencyIdListValuesResponse getSimpleAgencyIdListValues(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -43,7 +43,7 @@ public class AgencyIdController {
         return service.getSimpleAgencyIdListValues(sessionService.asScoreUser(user), releaseId);
     }
 
-    @RequestMapping(value = "/agency_id_list/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/agency_id_list/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AgencyIdList getAgencyIdListDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                               @PathVariable("id") BigInteger manifestId) {
@@ -131,7 +131,7 @@ public class AgencyIdController {
         }
     }
 
-    @RequestMapping(value = "/agency_id_list/{manifestId:[\\d]+}/transfer_ownership",
+    @RequestMapping(value = "/agency_id_list/{manifestId}/transfer_ownership",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -143,7 +143,7 @@ public class AgencyIdController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/agency_id_list/{manifestId:[\\d]+}",
+    @RequestMapping(value = "/agency_id_list/{manifestId}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AgencyIdList updateAgencyIdList(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -153,27 +153,27 @@ public class AgencyIdController {
         return service.updateAgencyIdListProperty(requester, agencyIdList);
     }
 
-    @RequestMapping(value = "/agency_id_list/{manifestId:[\\d]+}/state",
+    @RequestMapping(value = "/agency_id_list/{manifestId}/state",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateAgencyIdListState(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                        @PathVariable("manifestId") BigInteger manifestId,
-                                        @RequestBody Map<String, String> request) {
+                                           @PathVariable("manifestId") BigInteger manifestId,
+                                           @RequestBody Map<String, String> request) {
         ScoreUser requester = sessionService.asScoreUser(user);
         String toState = request.get("toState");
         service.updateAgencyIdListState(requester, manifestId, CcState.valueOf(toState));
     }
 
-    @RequestMapping(value = "/agency_id_list/{manifestId:[\\d]+}/revision",
+    @RequestMapping(value = "/agency_id_list/{manifestId}/revision",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void reviseAgencyIdList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                   @PathVariable("manifestId") BigInteger manifestId) {
+                                        @PathVariable("manifestId") BigInteger manifestId) {
         ScoreUser requester = sessionService.asScoreUser(user);
         service.reviseAgencyIdList(requester, manifestId);
     }
 
-    @RequestMapping(value = "/agency_id_list/{manifestId:[\\d]+}/cancel",
+    @RequestMapping(value = "/agency_id_list/{manifestId}/cancel",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void cancelAgencyIdList(@AuthenticationPrincipal AuthenticatedPrincipal user,

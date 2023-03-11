@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.time.Duration.ofMillis;
-import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,15 +59,14 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
         ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
-        String name = contextScheme.getSchemeName();
+        viewEditContextSchemePage.setName(contextScheme.getSchemeName());
 
         retry(() -> {
-            viewEditContextSchemePage.setName(name);
             viewEditContextSchemePage.hitSearchButton();
 
-            WebElement tr = viewEditContextSchemePage.getTableRecordByValue(name);
+            WebElement tr = viewEditContextSchemePage.getTableRecordAtIndex(1);
             WebElement td = viewEditContextSchemePage.getColumnByName(tr, "schemeName");
-            assertEquals(name, td.findElement(By.cssSelector("a > span")).getText());
+            assertEquals(contextScheme.getSchemeName(), td.findElement(By.cssSelector("a > span")).getText());
         });
     }
 
@@ -1082,16 +1079,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         // Test 'Updater' field
         contextMenu = homePage.getContextMenu();
         viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
-        String name = randomContextScheme.getSchemeName();
-
-        retry(() -> {
-            viewEditContextSchemePage.setUpdater(appUser.getLoginId());
-            viewEditContextSchemePage.hitSearchButton();
-
-            WebElement tr = viewEditContextSchemePage.getTableRecordByValue(name);
-            WebElement td = viewEditContextSchemePage.getColumnByName(tr, "schemeName");
-            assertEquals(name, getText(td.findElement(By.cssSelector("a > span"))));
-        });
+        viewEditContextSchemePage.setUpdater(appUser.getLoginId());
+        viewEditContextSchemePage.hitSearchButton();
+        assertContextSchemeNameInTheSearchResultsAtFirst(
+                viewEditContextSchemePage, randomContextScheme.getSchemeName());
     }
 
     @Test
@@ -1109,15 +1100,17 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         // Test 'Name' field
         contextMenu = homePage.getContextMenu();
         viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
-        String name = randomContextScheme.getSchemeName();
+        viewEditContextSchemePage.setName(randomContextScheme.getSchemeName());
+        viewEditContextSchemePage.hitSearchButton();
+        assertContextSchemeNameInTheSearchResultsAtFirst(
+                viewEditContextSchemePage, randomContextScheme.getSchemeName());
+    }
 
+    private void assertContextSchemeNameInTheSearchResultsAtFirst(ViewEditContextSchemePage viewEditContextSchemePage, String name) {
         retry(() -> {
-            viewEditContextSchemePage.setName(name);
-            viewEditContextSchemePage.hitSearchButton();
-
-            WebElement tr = viewEditContextSchemePage.getTableRecordByValue(name);
+            WebElement tr = viewEditContextSchemePage.getTableRecordAtIndex(1);
             WebElement td = viewEditContextSchemePage.getColumnByName(tr, "schemeName");
-            assertEquals(name, getText(td.findElement(By.cssSelector("a > span"))));
+            assertEquals(name, td.findElement(By.cssSelector("a > span")).getText());
         });
     }
 
@@ -1536,8 +1529,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
                 "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(ofSeconds(3L))
-                    .pollingEvery(ofMillis(100L))
+                    .withTimeout(Duration.ofSeconds(3L))
+                    .pollingEvery(Duration.ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
@@ -1550,8 +1543,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
-                    .withTimeout(ofSeconds(3L))
-                    .pollingEvery(ofMillis(100L))
+                    .withTimeout(Duration.ofSeconds(3L))
+                    .pollingEvery(Duration.ofMillis(100L))
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
             assertChecked(checkboxOfFirstRecord);
         });

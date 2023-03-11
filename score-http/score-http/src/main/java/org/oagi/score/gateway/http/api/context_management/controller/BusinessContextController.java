@@ -111,7 +111,7 @@ public class BusinessContextController {
         return pageResponse;
     }
 
-    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BusinessContext getBusinessContext(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -144,7 +144,7 @@ public class BusinessContextController {
                 .collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/business_context_values_from_biz_ctx/{id:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_context_values_from_biz_ctx/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBusinessCtxValuesFromBizCtx(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -180,7 +180,7 @@ public class BusinessContextController {
         }
     }
 
-    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.POST)
+    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("id") BigInteger businessContextId,
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -202,7 +202,7 @@ public class BusinessContextController {
         }
     }
 
-    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.PUT)
     public ResponseEntity assign(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger businessContextId,
@@ -212,7 +212,7 @@ public class BusinessContextController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger businessContextId,

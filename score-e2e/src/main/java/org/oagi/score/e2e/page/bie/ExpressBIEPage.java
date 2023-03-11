@@ -16,90 +16,100 @@ public interface ExpressBIEPage extends Page {
 
     void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP);
 
-    /**
-     * Return the UI element of the 'Branch' select field.
-     *
-     * @return the UI element of the 'Branch' select field
-     */
-    WebElement getBranchSelectField();
-
-    /**
-     * Set the 'Branch' select field with the given text.
-     *
-     * @param branch Branch
-     */
     void setBranch(String branch);
 
-    /**
-     * Return the UI element of the 'DEN' field.
-     *
-     * @return the UI element of the 'DEN' field
-     */
+    WebElement getBranchSelectField();
+
+    WebElement getOpenAPIFormatSelectField();
+
     WebElement getDENField();
 
-    /**
-     * Set the 'DEN' select field with the given text.
-     *
-     * @param den DEN
-     */
     void setDEN(String den);
 
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
     WebElement getSearchButton();
 
-    /**
-     * Hit the 'Search' button.
-     */
     void hitSearchButton();
 
-    /**
-     * Return the UI element of the table record at the given index, which starts from 1.
-     *
-     * @param idx The index of the table record.
-     * @return the UI element of the table record at the given index
-     */
-    WebElement getTableRecordAtIndex(int idx);
-
-    /**
-     * Return the UI element of the table record containing the given value.
-     *
-     * @param value value
-     * @return the UI element of the table record
-     */
     WebElement getTableRecordByValue(String value);
 
-    /**
-     * Return the UI element of the column of the given table record with the column name.
-     *
-     * @param tableRecord the table record
-     * @param columnName  the column name
-     * @return the UI element of the column
-     */
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    /**
-     * Set the size of items to the 'Items per page' select field.
-     *
-     * @param items the size of items; 10, 25, 50
-     */
-    void setItemsPerPage(int items);
+    int getNumberOfBIEsInIndexBox();
 
-    /**
-     * Return the total number of items being paged.
-     *
-     * @return the total number of items being paged
-     */
-    int getTotalNumberOfItems();
+    int getNumberfBIEsInTable();
 
-    void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+    WebElement getXMLSchemaExpressionRadioButton();
 
-    void toggleMakeAsAnArray();
+    void selectXMLSchemaExpression();
 
-    void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+    WebElement getJSONSchemaExpressionRadioButton();
+
+    JSONSchemaExpressionOptions selectJSONSchemaExpression();
+
+    interface JSONSchemaExpressionOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
+
+    WebElement getOpenAPIExpressionRadioButton();
+
+    OpenAPIExpressionOptions selectOpenAPIExpression();
+
+    interface OpenAPIExpressionOptions {
+
+        void selectYAMLOpenAPIFormat();
+
+        WebElement getGETOperationTemplateCheckbox();
+
+        OpenAPIExpressionGETOperationOptions toggleGETOperationTemplate();
+
+        WebElement getPOSTOperationTemplateCheckbox();
+
+        OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate();
+
+        void selectJSONOpenAPIFormat();
+    }
+
+    interface OpenAPIExpressionGETOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
+
+    interface OpenAPIExpressionPOSTOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+    }
+
+    void selectJSONOpenAPIFormat();
 
     enum ExpressionFormat {
         XML,
@@ -158,23 +168,9 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getBasedCCMetaDataCheckbox();
 
-    void selectXMLSchemaExpression();
-
-    void selectJSONSchemaExpression();
-
-    WebElement getJSONSchemaExpressionRadioButton();
-
-    WebElement getXMLSchemaExpressionRadioButton();
-
     void selectPutAllSchemasInTheSameFile();
 
     WebElement getPutAllSchemasInTheSameFileRadioButton();
-
-    WebElement getMakeAsAnArrayCheckbox();
-
-    WebElement getIncludeMetaHeaderCheckbox();
-
-    WebElement getIncludePaginationResponseCheckbox();
 
     void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection);
 

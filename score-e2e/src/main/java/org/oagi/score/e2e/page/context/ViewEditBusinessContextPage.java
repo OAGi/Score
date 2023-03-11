@@ -89,14 +89,6 @@ public interface ViewEditBusinessContextPage extends Page {
     WebElement getTableRecordAtIndex(int idx);
 
     /**
-     * Return the UI element of the table record containing the given value.
-     *
-     * @param value value
-     * @return the UI element of the table record
-     */
-    WebElement getTableRecordByValue(String value);
-
-    /**
      * Return the UI element of the column of the given table record with the column name.
      *
      * @param tableRecord the table record
@@ -104,20 +96,6 @@ public interface ViewEditBusinessContextPage extends Page {
      * @return the UI element of the column
      */
     WebElement getColumnByName(WebElement tableRecord, String columnName);
-
-    /**
-     * Set the size of items to the 'Items per page' select field.
-     *
-     * @param items the size of items; 10, 25, 50
-     */
-    void setItemsPerPage(int items);
-
-    /**
-     * Return the total number of items being paged.
-     *
-     * @return the total number of items being paged
-     */
-    int getTotalNumberOfItems();
 
     /**
      * Move the table to the next page via the pagination.

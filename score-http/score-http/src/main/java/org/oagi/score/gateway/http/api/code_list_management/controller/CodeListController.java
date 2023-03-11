@@ -108,7 +108,7 @@ public class CodeListController {
         return service.getCodeLists(user, request);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/code_list/{manifestId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeList getCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                 @PathVariable("manifestId") BigInteger manifestId) {
@@ -126,7 +126,7 @@ public class CodeListController {
         return resp;
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -136,7 +136,7 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId}/revision", method = RequestMethod.POST)
     public ResponseEntity makeNewRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -145,14 +145,14 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision", method = RequestMethod.GET)
+    @RequestMapping(value = "/code_list/{manifestId}/revision", method = RequestMethod.GET)
     public CodeList getCodeListRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
         return service.getCodeListRevision(user, manifestId);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision/cancel", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId}/revision/cancel", method = RequestMethod.POST)
     public ResponseEntity cancelRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -209,7 +209,7 @@ public class CodeListController {
         return service.hasSameNameCodeList(params);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/transfer_ownership",
+    @RequestMapping(value = "/code_list/{manifestId}/transfer_ownership",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -220,7 +220,7 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/uplift",
+    @RequestMapping(value = "/code_list/{manifestId}/uplift",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeListUpliftingResponse upliftCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
