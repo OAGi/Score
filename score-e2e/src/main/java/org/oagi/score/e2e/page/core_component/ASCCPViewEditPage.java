@@ -35,6 +35,42 @@ public interface ASCCPViewEditPage extends Page {
     void hitReviseButton();
 
     /**
+     * Return the UI element of the 'Cancel' button. Developers only can see the 'Cancel' button.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Cancel' button.
+     */
+    void hitCancelButton();
+
+    /**
+     * Return the UI element of the 'Delete' button. Developers only can see the 'Delete' button.
+     *
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton();
+
+    /**
+     * Hit the 'Delete' button.
+     */
+    void hitDeleteButton();
+
+    /**
+     * Return the UI element of the 'Restore' button. Developers only can see the 'Restore' button.
+     *
+     * @return the UI element of the 'Restore' button
+     */
+    WebElement getRestoreButton();
+
+    /**
+     * Hit the 'Delete' button.
+     */
+    void hitRestoreButton();
+
+    /**
      * Return the UI element of the 'Amend' button. End-users only can see the 'Revise' button.
      *
      * @return the UI element of the 'Amend' button
@@ -153,6 +189,31 @@ public interface ASCCPViewEditPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Change ACC' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog changeACC(String path);
+
+    /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPath(String path);
+
+    /**
+     * Return the UI element of the 'Context Menu' icon for the node.
+     *
+     * @param nodeName Node name
+     * @return the UI element of the 'Context Menu' icon
+     */
+    WebElement getContextMenuIconByNodeName(String nodeName);
+
 
     /**
      * Return the ASCCP panel. Use this when the page is opened.
@@ -526,6 +587,12 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         *
+         * @param definitionSource
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field
@@ -537,32 +604,6 @@ public interface ASCCPViewEditPage extends Page {
          * @param definition
          */
         void setDefinition(String definition);
-
-        /**
-         * Open the association selection dialog by clicking 'Change ACC' context menu.
-         *
-         * @param path node path
-         * @return the association selection dialog object
-         */
-        SelectAssociationDialog changeACC(String path);
-
-        /**
-         * Click the drop-down menu to open the context menu on the node.
-         *
-         * @param path the path of the node
-         * @return node UI element
-         */
-        WebElement clickOnDropDownMenuByPath(String path);
-
-        /**
-         * Return the UI element of the 'Context Menu' icon for the node.
-         *
-         * @param nodeName Node name
-         * @return the UI element of the 'Context Menu' icon
-         */
-        WebElement getContextMenuIconByNodeName(String nodeName);
-
-
     }
 
     interface BCCPanelContainer {

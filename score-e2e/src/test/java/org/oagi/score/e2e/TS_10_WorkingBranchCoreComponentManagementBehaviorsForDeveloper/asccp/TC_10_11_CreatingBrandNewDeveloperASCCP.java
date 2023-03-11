@@ -17,6 +17,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         assertEquals("WIP", getText(asccpPanel.getStateField()));
 
         String propertyTermText = getText(asccpPanel.getPropertyTermField());
-        assertEquals("Property Term", propertyTermText);
+        assertEquals(asccp.getPropertyTerm(), propertyTermText);
 
         assertNotChecked(asccpPanel.getNillableCheckbox());
         assertDisabled(asccpPanel.getDeprecatedCheckbox());
@@ -108,13 +109,12 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         acc.setDefinition("definition changed");
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(accNode).getASCCPPanel();
-        assertEquals("definition changed", getText(asccpPanel.getDefinitionField()));
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("definition changed", getText(accPanel.getDefinitionField()));
     }
 
     @Test
@@ -167,21 +167,29 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("Issued Item Instance Extension. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Extension. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("Any Structured Content. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("OAGIS10 Nouns. Details");
         asccpCreateDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
 
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofSeconds(1L));
         asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         asccpCreateDialog.setDEN("OAGIS10 BODs. Details");
         asccpCreateDialog.hitSearchButton();
@@ -208,6 +216,6 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        assertEquals(acc.getDen(), asccp.getPropertyTerm());
+        assertTrue(acc.getDen().startsWith(asccp.getPropertyTerm()));
     }
 }

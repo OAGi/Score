@@ -13,6 +13,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -21,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
@@ -76,6 +80,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
+            waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);

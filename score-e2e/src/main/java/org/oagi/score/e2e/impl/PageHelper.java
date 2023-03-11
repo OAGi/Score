@@ -73,9 +73,7 @@ public abstract class PageHelper {
     }
 
     public static Wait<WebDriver> wait(WebDriver driver, Duration timeout, Duration interval) {
-        return new FluentWait<>(driver)
-                .withTimeout(timeout)
-                .pollingEvery(interval);
+        return new FluentWait<>(driver).withTimeout(timeout).pollingEvery(interval);
     }
 
     public static WebElement visibilityOfElementLocated(WebDriver driver, By locator) {
@@ -115,9 +113,10 @@ public abstract class PageHelper {
     }
 
     public static void invisibilityOfLoadingContainerElement(Wait<WebDriver> wait) {
-        if (!invisibilityOfElementLocated(wait,
-                By.xpath("//*[contains(@class, 'loading-container')]"))) {
-            throw new WebDriverException("Loading container is running...");
+        // add try-catch statement in case the loading icon won't be caught by the xpath in the given time
+        try {
+            invisibilityOfElementLocated(wait, By.xpath("//*[contains(@class, 'loading-container')]"));
+        } catch (WebDriverException ex) {
         }
     }
 

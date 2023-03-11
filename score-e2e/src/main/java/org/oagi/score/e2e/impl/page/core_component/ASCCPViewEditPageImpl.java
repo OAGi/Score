@@ -2,17 +2,13 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
-import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
@@ -34,6 +30,18 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    public static final By CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+    public static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+    public static final By RESTORE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
+    public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -51,8 +59,6 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Change ACC\")]");
 
     private final ASCCPObject asccp;
-    private BasePage parent;
-
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
         this.asccp = asccp;
@@ -100,6 +106,45 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        click(getCancelButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Canceled".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        click(getDeleteButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_DELETE_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Deleted".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getRestoreButton() {
+        return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitRestoreButton() {
+        click(getRestoreButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_RESTORE_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Restored".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -238,6 +283,51 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         return getNodeByName(nodes[nodes.length - 1]);
     }
 
+    @Override
+    public SelectAssociationDialog changeACC(String path) {
+
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Change ACC");
+        //assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return node;
+    }
+
+    @Override
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        WebElement node = getNodeByName(nodeName);
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
     private WebElement goToNode(String path) {
         click(getSearchInputTextField());
         WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
@@ -288,6 +378,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 public ASCCPanel getASCCPanel() {
                     return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public ASCCPPanel getASCCPPanel() {
                     return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -306,6 +397,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 public BCCPanel getBCCPanel() {
                     return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -340,7 +432,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     private class ACCPanelImpl implements ACCPanel {
-        
+
         private final String baseXPath;
 
         public ACCPanelImpl(String baseXPath) {
@@ -559,6 +651,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         public WebElement getNillableCheckbox() {
             return getCheckboxByName(baseXPath, "Nillable");
         }
+
         @Override
         public void toggleNillable() {
             click(getNillableCheckbox());
@@ -591,58 +684,18 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void setDefinitionSource(String definitionSource) {
+            sendKeys(getDefinitionSourceField(), definitionSource);
+        }
+
+        @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
 
         @Override
-        public void setDefinition(String definition){
+        public void setDefinition(String definition) {
             sendKeys(getDefinitionField(), definition);
-        }
-
-        @Override
-        public SelectAssociationDialog changeACC(String path) {
-
-            WebElement node = clickOnDropDownMenuByPath(path);
-            try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
-            } catch (TimeoutException e) {
-                click(node);
-                new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
-            }
-            SelectAssociationDialog selectAssociationDialog =
-                    new SelectAssociationDialogImpl((BasePageImpl) parent, "Change ACC");
-            assert selectAssociationDialog.isOpened();
-            return selectAssociationDialog;
-        }
-
-        @Override
-        public WebElement clickOnDropDownMenuByPath(String path) {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            String nodeName = nodes[nodes.length - 1];
-            WebElement node = getNodeByName(nodeName);
-            click(node);
-            new Actions(getDriver()).sendKeys("O").perform();
-            try {
-                if (visibilityOfElementLocated(getDriver(),
-                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                    return node;
-                }
-            } catch (WebDriverException ignore) {
-            }
-            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-            click(contextMenuIcon);
-            assert visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-            return node;
-        }
-
-        @Override
-        public WebElement getContextMenuIconByNodeName(String nodeName) {
-            WebElement node = getNodeByName(nodeName);
-            return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
         }
     }
 

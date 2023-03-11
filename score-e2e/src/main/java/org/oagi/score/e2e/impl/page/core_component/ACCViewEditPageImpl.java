@@ -3,12 +3,10 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ACCObject;
+import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.FindWhereUsedDialog;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -376,6 +374,27 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
         assert bccpViewEditPage.isOpened();
         return bccpViewEditPage;
+    }
+
+    @Override
+    public ASCCPViewEditPage openASCCPInNewTab(WebElement accNode) {
+        try {
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(accNode);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+        }
+
+        switchToNextTab(getDriver());
+        String url = getDriver().getCurrentUrl();
+        int idx = url.lastIndexOf("/");
+
+        BigInteger manifestId = new BigInteger(url.substring(idx + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(manifestId);
+        ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
+        assert asccpViewEditPage.isOpened();
+        return asccpViewEditPage;
     }
 
     @Override
