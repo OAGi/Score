@@ -543,8 +543,7 @@
                           <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asAccDetail().namespaceId"
-                                        [required]="true"
-                                        [disabled]="true">
+                                        [required]="true" [disabled]="true">
                               <mat-option *ngFor="let namespace of getSelectableNamespaces(asAccDetail().namespaceId)"
                                           [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                             </mat-select>
