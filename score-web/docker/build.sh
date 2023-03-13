@@ -21,6 +21,7 @@ echo "Running 'npm install'..."
 npm install
 
 echo "Building project..."
+rm -rf dist
 ng build --configuration production --optimization --aot --build-optimizer --common-chunk --vendor-chunk
 
 echo "Preparing files..."
