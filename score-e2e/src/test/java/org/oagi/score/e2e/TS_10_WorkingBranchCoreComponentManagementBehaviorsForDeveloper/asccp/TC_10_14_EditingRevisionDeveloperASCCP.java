@@ -209,10 +209,6 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         assertDisabled(asccpPanel.getReusableCheckbox());
         asccpViewEditPage.hitReviseButton();
 
-        //reload the page
-        viewEditCoreComponentPage.openPage();
-        waitFor(ofSeconds(1L));
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Cancel Acknowledge Test Results. Cancel Acknowledge Test Results", branch);
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertEquals("2", getText(asccpPanel.getRevisionField()));
         assertNotChecked(asccpPanel.getReusableCheckbox());

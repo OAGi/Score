@@ -346,7 +346,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
                 throw new NoSuchElementException("Cannot locate a core component using " + den, e);
             }
             String denField = getDENFieldFromTheTable(td);
-            if (!den.equals(denField)) {
+            if (!denField.startsWith(den)) {
                 throw new NoSuchElementException("Cannot locate a core component using " + den);
             }
             WebElement tdLoginID = td.findElement(By.cssSelector("a"));
