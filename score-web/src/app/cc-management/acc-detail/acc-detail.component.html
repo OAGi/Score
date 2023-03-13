@@ -319,49 +319,49 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
-                    <mat-divider *ngIf="isEditable"></mat-divider>
+                    <mat-divider *ngIf="isEditable()"></mat-divider>
                     <button mat-menu-item (click)="setBaseAcc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && hasBasedAcc === false">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && hasBasedAcc === false">
                       <span class="context-menu-item">Set Base ACC</span>
                     </button>
                     <button mat-menu-item (click)="discardBaseAcc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 1 && contextMenuItem.type.toUpperCase() === 'ACC' && isEditable">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 1 && contextMenuItem.type.toUpperCase() === 'ACC' && isEditable()">
                       <span class="context-menu-item">Delete</span>
                     </button>
                     <button mat-menu-item (click)="createAsccp()"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable"
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable()"
                             [disabled]="isAbstract(contextMenuItem)">
                       <span class="context-menu-item">Create ASCCP from this</span>
                     </button>
                     <button mat-menu-item (click)="createExtensionComponent()"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isExtendable && userRoles.includes('developer')">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && isExtendable && userRoles.includes('developer')">
                       <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Extension Component</span>
                     </button>
                     <button mat-menu-item (click)="appendAssociation(contextMenuItem, 0)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable()">
                       <span class="context-menu-item">Insert Property at First</span>
                     </button>
                     <button mat-menu-item (click)="appendAssociation(contextMenuItem, -1)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable()">
                       <span class="context-menu-item">Append Property at Last</span>
                     </button>
                     <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem))"
-                            *ngIf="isEditable && isDraggable(contextMenuItem)">
+                            *ngIf="isEditable() && isDraggable(contextMenuItem)">
                       <span class="context-menu-item">Insert Property Before</span>
                     </button>
                     <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem) + 1)"
-                            *ngIf="isEditable && isDraggable(contextMenuItem)">
+                            *ngIf="isEditable() && isDraggable(contextMenuItem)">
                       <span class="context-menu-item">Insert Property After</span>
                     </button>
                     <mat-divider *ngIf="!!contextMenuItem && contextMenuItem.level !== 0 &&
                                         isDraggable(contextMenuItem) && doesRefactorAllow(contextMenuItem)"></mat-divider>
                     <button mat-menu-item [matMenuTriggerFor]="refactorSubMenu"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0 && isEditable &&
+                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0 && isEditable() &&
                                    isDraggable(contextMenuItem) && doesRefactorAllow(contextMenuItem)">
                       <span class="context-menu-item">Refactor</span>
                     </button>
                     <button mat-menu-item (click)="onClickDiscard(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0 && isEditable &&
+                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0 && isEditable() &&
                                    isDraggable(contextMenuItem) && doesRefactorAllow(contextMenuItem) &&
                                    discardAble(contextMenuItem)">
                       <span class="context-menu-item">Remove</span>
