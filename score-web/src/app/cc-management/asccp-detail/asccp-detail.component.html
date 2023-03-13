@@ -308,9 +308,9 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
-                    <mat-divider *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isAccChangeable()"></mat-divider>
+                    <mat-divider *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && isAccChangeable()"></mat-divider>
                     <button mat-menu-item (click)="changeAcc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isAccChangeable()">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && isAccChangeable()">
                       <span class="context-menu-item">Change ACC</span>
                     </button>
                     <mat-divider></mat-divider>

@@ -983,7 +983,7 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBccpDetail().bccp.nillable"
-                                          [disabled]="!isEditable() || hasRevision() && (this.lastRevision.isNillable || this.lastRevision.fixedValue)">
+                                          [disabled]="!isEditable() || (hasRevision() && (this.lastRevision.isNillable || !!this.lastRevision.fixedValue))">
                               <span>Nillable</span>
                             </mat-checkbox>
                           </div>
