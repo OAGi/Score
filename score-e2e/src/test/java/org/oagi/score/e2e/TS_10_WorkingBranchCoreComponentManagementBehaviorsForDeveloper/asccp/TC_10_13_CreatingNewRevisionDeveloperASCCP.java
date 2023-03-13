@@ -22,7 +22,7 @@ import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_13_CreatingNewRevisionDeveloperASCCP extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {

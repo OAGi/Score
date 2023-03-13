@@ -87,7 +87,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page to verify
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertDisabled(asccpPanel.getGUIDField());
@@ -134,7 +134,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         String newDefinitionSource = randomPrint(50, 100).trim();
@@ -145,8 +145,8 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals(newDefinitionSource, getText(asccpPanel.getDefinitionSourceField()));
         assertEquals(newDefinition, getText(asccpPanel.getDefinitionField()));
     }
