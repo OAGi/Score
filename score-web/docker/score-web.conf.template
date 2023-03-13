@@ -31,6 +31,5 @@ server {
         alias   /usr/share/nginx/docs;
         try_files $uri $uri/ /index.html;
         index  index.html;
-        rewrite ^([^.]*[^/])$ $1/ permanent;
     }
 }
