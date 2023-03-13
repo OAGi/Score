@@ -1,0 +1,19 @@
+FROM mysql:5.7
+
+LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
+
+ENV MYSQL_DATABASE=oagi
+ENV MYSQL_USER=oagi
+ENV MYSQL_PASSWORD=oagi
+ENV MYSQL_ROOT_PASSWORD=oagi
+
+RUN yum -y update
+
+VOLUME /var/lib/mysql
+
+ADD oagis_3.0.0.sql /docker-entrypoint-initdb.d/oagis.sql
+
+USER mysql
+EXPOSE 3306
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["mysqld"]
