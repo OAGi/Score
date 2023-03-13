@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.security.AccessControlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -101,6 +103,16 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.set("X-Error-Message", ex.getMessage());
         return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ScoreDataAccessException.class)
+    public ResponseEntity handleScoreDataAccessException(
+            ScoreDataAccessException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
 }
