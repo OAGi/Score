@@ -559,6 +559,8 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
         selectAssociationDialog.selectAssociation(anotherACC.getDen());
         selectAssociationDialog.hitUpdateButton();
