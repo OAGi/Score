@@ -19,11 +19,11 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
@@ -193,16 +193,17 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
 
         //Test when "Reusable" checkbox is unchecked in the original developer ASCCP
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Data Area. Change Acknowledge Product Availability Data Area", branch);
-        WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + "Data Area. Change Acknowledge Product Availability Data Area");
+        waitFor(ofSeconds(1L));
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Cancel Acknowledge Test Results. Cancel Acknowledge Test Results", branch);
+        WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + "Cancel Acknowledge Test Results" + "/Cancel Acknowledge Test Results. Details" + "/Data Area");
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
@@ -210,7 +211,8 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Data Area. Change Acknowledge Product Availability Data Area", branch);
+        waitFor(ofSeconds(1L));
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Cancel Acknowledge Test Results. Cancel Acknowledge Test Results", branch);
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertEquals("2", getText(asccpPanel.getRevisionField()));
         assertNotChecked(asccpPanel.getReusableCheckbox());
