@@ -449,7 +449,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         asccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
