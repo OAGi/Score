@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.23.2-alpine
+FROM nginxinc/nginx-unprivileged:1.23.3-alpine
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 

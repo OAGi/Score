@@ -1,4 +1,4 @@
-FROM tomcat:9.0.73-jdk17-corretto
+FROM tomcat:10.1.7-jdk17-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -10,7 +10,7 @@ ENV DB_PASSWORD oagi
 ENV REDIS_HOST localhost
 ENV REDIS_PORT 6379
 
-RUN yum -y update
+RUN apt-get -y update
 
 COPY mysql-connector-j-8.0.32.jar /usr/local/tomcat/lib/mysql-connector-j-8.0.32.jar
 

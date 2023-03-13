@@ -1,4 +1,4 @@
-FROM mysql:5.7
+FROM mysql:5.7.41
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -11,7 +11,7 @@ RUN yum -y update
 
 VOLUME /var/lib/mysql
 
-ADD oagis_3.0.0.sql /docker-entrypoint-initdb.d/oagis.sql
+ADD oagis.sql /docker-entrypoint-initdb.d/oagis.sql
 
 USER mysql
 EXPOSE 3306
