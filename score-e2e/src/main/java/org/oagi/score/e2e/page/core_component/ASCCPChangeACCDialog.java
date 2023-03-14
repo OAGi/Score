@@ -5,7 +5,7 @@ import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 
-public interface SelectACCDialog extends Dialog {
+public interface ASCCPChangeACCDialog extends Dialog {
     /**
      * Return the UI element of the 'State' select field.
      *

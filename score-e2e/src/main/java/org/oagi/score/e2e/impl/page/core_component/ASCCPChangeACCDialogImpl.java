@@ -1,11 +1,63 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.page.core_component.SelectACCDialog;
+import org.oagi.score.e2e.page.core_component.ASCCPChangeACCDialog;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 
-public class SelectACCDialogImpl implements SelectACCDialog {
+public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
+
+    private static final By TYPE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By STATE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By OWNER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By UPDATER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
+
+    private static final By UPDATED_START_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+
+    private static final By UPDATED_END_DATE_FIELD_LOCATOR =
+            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+
+    private static final By DEN_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+
+    private static final By DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//input");
+
+    private static final By MODULE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Module\")]//ancestor::mat-form-field//input");
+
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+
+    private static final By INSERT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Insert\")]//ancestor::button[1]");
+
+    private static final By APPEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+
+    private static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+
+    private static final By ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     @Override
     public boolean isOpened() {
