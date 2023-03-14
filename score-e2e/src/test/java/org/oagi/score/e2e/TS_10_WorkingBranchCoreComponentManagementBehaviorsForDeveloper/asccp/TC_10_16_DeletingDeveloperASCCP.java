@@ -84,9 +84,8 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         assertTrue(viewEditCoreComponentPage.isOpened());
 
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("Deleted", asccpPanel.getStateField());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+        assertEquals("Deleted", getText(asccpPanel.getStateField()));
     }
 
     @Test
