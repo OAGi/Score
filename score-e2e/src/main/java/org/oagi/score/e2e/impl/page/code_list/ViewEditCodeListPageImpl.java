@@ -247,4 +247,30 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     public WebElement getStateSelectField() {
         return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
+
+    @Override
+    public void searchCodeListByDefinitionAndBranch(CodeListObject codeList, String releaseNumber) {
+        setBranch(releaseNumber);
+        sendKeys(getDefinitionField(), codeList.getDefinition());
+        retry(() -> {
+            hitSearchButton();
+
+            WebElement td;
+            WebElement tr;
+            try {
+                tr = getTableRecordByValue(codeList.getName());
+                td = getColumnByName(tr, "codeListName");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a code list using " + codeList.getName(), e);
+            }
+            String nameField = getNameFieldFromTheTable(td);
+            if (!codeList.getName().equals(nameField)) {
+                throw new NoSuchElementException("Cannot locate a code list using " + codeList.getName());
+            }
+        });
+    }
+    @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Definition\")]"));
+    }
 }

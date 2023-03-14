@@ -36,4 +36,8 @@ public interface ViewEditCodeListPage extends Page {
     void toggleState(String state);
 
     WebElement getStateSelectField();
+
+    void searchCodeListByDefinitionAndBranch(CodeListObject codeList, String releaseNumber);
+
+    WebElement getDefinitionField();
 }

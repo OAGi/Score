@@ -38,8 +38,8 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_11_1_TA_1")
-    public void test_TA_1() {
+    @DisplayName("TC_11_1_TA_1_and_TA_14")
+    public void test_TA_1_and_TA_14() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
@@ -601,6 +601,43 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                 viewEditCodeListPage.toggleState(currentState);
                 viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             }
+        }
+
+    }
+    @Test
+    @DisplayName("TC_11_1_TA_15")
+    public void test_TA_15() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            viewEditCodeListPage.searchCodeListByDefinitionAndBranch(cl, workingBranch.getReleaseNumber());
         }
 
     }
