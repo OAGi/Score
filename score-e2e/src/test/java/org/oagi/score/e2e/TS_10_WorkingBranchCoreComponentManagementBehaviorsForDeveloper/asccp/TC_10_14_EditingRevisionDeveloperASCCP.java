@@ -470,7 +470,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
         ASCCPObject asccp;
-        BCCPObject bccp;
+        BCCPObject bccp, bccp_to_append;
         ACCObject acc, acc_association;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
@@ -483,7 +483,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
@@ -513,16 +513,19 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         assertFalse(accPanel.getGUIDField().isEnabled());
         assertFalse(accPanel.getDENField().isEnabled());
         assertFalse(accPanel.getObjectClassTermField().isEnabled());
-        assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
-        assertFalse(accPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(accPanel.getComponentTypeSelectField());
+        assertDisabled(accPanel.getNamespaceSelectField());
         assertFalse(accPanel.getDefinitionSourceField().isEnabled());
         assertFalse(accPanel.getDefinitionField().isEnabled());
 
         //BCCP node cannot be changed
-        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen() + "/" + bccp.getPropertyTerm());
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ASCCPViewEditPage.BCCPPanel bccpPanel = asccpViewEditPage.getBCCPanelContainer(bccpNode).getBCCPPanel();
         assertFalse(bccpPanel.getCoreComponentField().isEnabled());
-        assertEquals("BCCP", getText(accPanel.getCoreComponentField()));
+        assertEquals("BCCP", getText(bccpPanel.getCoreComponentField()));
         assertFalse(bccpPanel.getReleaseField().isEnabled());
         assertFalse(bccpPanel.getRevisionField().isEnabled());
         assertFalse(bccpPanel.getStateField().isEnabled());
@@ -530,10 +533,10 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
         assertFalse(bccpPanel.getPropertyTermField().isEnabled());
-        assertFalse(bccpPanel.getNillableCheckbox().isEnabled());
-        assertFalse(bccpPanel.getDeprecatedCheckbox().isEnabled());
-        assertFalse(bccpPanel.getValueConstraintSelectField().isEnabled());
-        assertFalse(bccpPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertDisabled(bccpPanel.getDeprecatedCheckbox());
+        assertDisabled(bccpPanel.getValueConstraintSelectField());
+        assertDisabled(bccpPanel.getNamespaceSelectField());
         assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
         assertFalse(bccpPanel.getDefinitionField().isEnabled());
 
