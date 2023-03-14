@@ -217,6 +217,4 @@ public interface ASCCPChangeACCDialog extends Dialog {
      * @return ASCCPViewEditPage
      */
     ASCCPViewEditPage hitUpdateButton(String accDen);
-
-
 }

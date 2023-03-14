@@ -314,16 +314,13 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.selectAssociation(anotherACC.getDen());
-        selectAssociationDialog.hitUpdateButton();
+        ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.hitUpdateButton(anotherACC.getDen());
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
     }
@@ -554,41 +551,47 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
         viewEditCoreComponentPage.openPage();
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.selectAssociation(anotherACC.getDen());
-        selectAssociationDialog.hitUpdateButton();
+        ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.hitUpdateButton(anotherACC.getDen());
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
 
         //only semantics or semantic group ACC can be selected
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Issued Item Instance Base. Details");
-        selectAssociationDialog.hitSearchButton();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("Issued Item Instance Base. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Issued Item Instance Extension. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("Issued Item Instance Extension. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Any Structured Content. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpCreateDialog.setDEN("Any Structured Content. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("OAGIS10 Nouns. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("OAGIS10 Nouns. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("OAGIS10 BODs. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("OAGIS10 BODs. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
     }
 }

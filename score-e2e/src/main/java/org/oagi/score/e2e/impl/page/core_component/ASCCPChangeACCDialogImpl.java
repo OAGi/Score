@@ -52,7 +52,7 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//button//*[contains(text(),\"Update\")]");
 
     private ASCCPViewEditPageImpl parent;
 

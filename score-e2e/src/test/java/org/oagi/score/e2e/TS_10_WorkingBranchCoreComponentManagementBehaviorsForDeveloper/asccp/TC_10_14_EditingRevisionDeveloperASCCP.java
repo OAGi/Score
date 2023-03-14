@@ -595,7 +595,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
+        assertTrue(asccpDEN.endsWith(anotherACC.getObjectClassTerm()));
     }
 
     @Test
