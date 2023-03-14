@@ -703,7 +703,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         getDriver().manage().window().maximize();
         for (CodeListObject cl : codeListForTesting) {
-            /**
+            /*TODO:
              * Selection of module name does not work because newly created code lists do not have assigned module
              */
             viewEditCodeListPage.searchCodeListByModuleAndBranch(cl, workingBranch.getReleaseNumber());
