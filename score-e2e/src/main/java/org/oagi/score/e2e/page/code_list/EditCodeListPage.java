@@ -19,4 +19,8 @@ public interface EditCodeListPage extends Page {
     EditCodeListValueDialog addCodeListValue();
 
     WebElement getAddCodeListValueButton();
+
+    AddCodeListCommentDialog hitAddCommentButton();
+
+    WebElement getAddCommentButton();
 }

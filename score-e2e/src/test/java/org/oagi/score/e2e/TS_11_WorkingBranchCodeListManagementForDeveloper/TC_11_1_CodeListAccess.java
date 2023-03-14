@@ -6,15 +6,19 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_1_CodeListAccess extends BaseTest {
@@ -134,7 +138,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developerA);
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
             /**
-             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             * Create Code List for Working branch. States - WIP
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
@@ -155,6 +159,67 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertDisabled(editCodeListPage.getDefinitionSourceField());
         }
 
+    }
+    @Test
+    @DisplayName("TC_11_1_TA_4")
+    public void test_TA_4() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
+            codeListForTesting.add(codeListDeleted);
+
+            /**
+             * This code list should be in a draft release, not in a working branch
+             */
+            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Release Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
+            codeListForTesting.add(codeListReleaseDraft);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            /**
+             * The developer can view the details of a CL that is in Draft, Candidate, Deleted, or Release Draft state and owned by any developer
+             * but he cannot make any change except adding comments.
+             */
+            assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
+            ArrayList<String> acceptedStates = new ArrayList<>(List.of("Draft", "Candidate", "Deleted", "Release Draft"));
+            assertTrue(acceptedStates.contains(cl.getState()));
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            pressEscape();
+        }
+
+    }
+
+    private void pressEscape(){
+        invisibilityOfLoadingContainerElement(getDriver());
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     @AfterEach
