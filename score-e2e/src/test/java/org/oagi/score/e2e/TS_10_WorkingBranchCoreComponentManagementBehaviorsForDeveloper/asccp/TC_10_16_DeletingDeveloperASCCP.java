@@ -188,6 +188,8 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         switchToMainTab(getDriver());
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         assertFalse(accViewEditPage.isDeleted(asccNode));
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals("WIP", getText(asccpPanel.getStateField()));
         assertEquals(anotherDeveloper.getLoginId(), getText(asccpPanel.getOwnerField()));
