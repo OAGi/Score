@@ -238,8 +238,8 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertFalse(accPanel.getGUIDField().isEnabled());
         assertFalse(accPanel.getDENField().isEnabled());
         assertFalse(accPanel.getObjectClassTermField().isEnabled());
-        assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
-        assertFalse(accPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(accPanel.getComponentTypeSelectField());
+        assertDisabled(accPanel.getNamespaceSelectField());
         assertFalse(accPanel.getDefinitionSourceField().isEnabled());
         assertFalse(accPanel.getDefinitionField().isEnabled());
 
@@ -255,11 +255,11 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertFalse(bccpPanel.getOwnerField().isEnabled());
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
-        assertFalse(bccpPanel.getPropertyTermField().isEnabled());
-        assertFalse(bccpPanel.getNillableCheckbox().isEnabled());
-        assertFalse(bccpPanel.getDeprecatedCheckbox().isEnabled());
-        assertFalse(bccpPanel.getValueConstraintSelectField().isEnabled());
-        assertFalse(bccpPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(bccpPanel.getPropertyTermField());
+        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertDisabled(bccpPanel.getDeprecatedCheckbox());
+        assertDisabled(bccpPanel.getValueConstraintSelectField());
+        assertDisabled(bccpPanel.getNamespaceSelectField());
         assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
         assertFalse(bccpPanel.getDefinitionField().isEnabled());
     }
