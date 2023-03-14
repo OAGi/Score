@@ -301,6 +301,48 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         }
 
     }
+    @Test
+    @DisplayName("TC_11_1_TA_7")
+    public void test_TA_7() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - Deleted
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
+            codeListForTesting.add(codeListDeleted);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            /**
+             * The developer can view the details of a CL that is in Draft, Candidate, Deleted, or Release Draft state and owned by any developer
+             * but he cannot make any change except adding comments.
+             */
+            assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
+            assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
+            assertTrue(developerA.isDeveloper());
+            assertEquals("Deleted",cl.getState());
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            pressEscape();
+        }
+
+    }
 
     private void pressEscape(){
         invisibilityOfLoadingContainerElement(getDriver());
