@@ -151,7 +151,6 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                 .set(codeListManifestRecord)
                 .returning(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
                 .fetchOne().getCodeListManifestId();
-
         codeList.setCodeListManifestId(codeListManifestId.toBigInteger());
         codeList.setCodeListId(codeListId.toBigInteger());
         codeList.setAgencyIdListValueManifestId(agencyIdListValueManifestId.toBigInteger());
@@ -273,6 +272,17 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                 .set(CODE_LIST.IS_DEPRECATED, (byte) (codeListWIP.isDeprecated() ? 1 : 0))
                 .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeListWIP.getCodeListId())))
                 .execute();
+    }
+
+    @Override
+    public String getModuleNameForCodeList(CodeListObject codeList) {
+        return dslContext.select(MODULE.NAME)
+                .from(MODULE)
+                .join(MODULE_CODE_LIST_MANIFEST).on(MODULE_CODE_LIST_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
+                .join(CODE_LIST_MANIFEST).on(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())))
+                .fetchOneInto(String.class);
     }
 
     @Override

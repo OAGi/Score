@@ -40,4 +40,12 @@ public interface ViewEditCodeListPage extends Page {
     void searchCodeListByDefinitionAndBranch(CodeListObject codeList, String releaseNumber);
 
     WebElement getDefinitionField();
+
+    void searchCodeListByModuleAndBranch(CodeListObject codeList, String releaseNumber);
+
+    WebElement getModuleField();
+
+    void searchCodeListByUpdatedDateAndBranch(CodeListObject codeList, String releaseNumber);
+
+    WebElement getUpdatedDateField();
 }

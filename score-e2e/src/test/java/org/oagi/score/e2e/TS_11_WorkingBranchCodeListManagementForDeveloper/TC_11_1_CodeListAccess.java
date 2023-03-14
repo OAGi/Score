@@ -605,6 +605,43 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     }
     @Test
+    @DisplayName("TC_11_1_TA_13")
+    public void test_TA_13() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            viewEditCodeListPage.searchCodeListByUpdatedDateAndBranch(cl, workingBranch.getReleaseNumber());
+        }
+
+    }
+    @Test
     @DisplayName("TC_11_1_TA_15")
     public void test_TA_15() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -638,6 +675,38 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         getDriver().manage().window().maximize();
         for (CodeListObject cl : codeListForTesting) {
             viewEditCodeListPage.searchCodeListByDefinitionAndBranch(cl, workingBranch.getReleaseNumber());
+        }
+
+    }
+    @Test
+    @DisplayName("TC_11_1_TA_16")
+    public void test_TA_16() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - Published
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+            codeListForTesting.add(codeListPublished);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            /**
+             * Selection of module name does not work because newly created code lists do not have assigned module
+             */
+            viewEditCodeListPage.searchCodeListByModuleAndBranch(cl, workingBranch.getReleaseNumber());
         }
 
     }

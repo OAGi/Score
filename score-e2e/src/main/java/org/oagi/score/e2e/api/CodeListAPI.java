@@ -28,4 +28,6 @@ public interface CodeListAPI {
     void addCodeListToAnotherRelease(CodeListObject codeList, ReleaseObject release, AppUserObject creator);
 
     void updateCodeList(CodeListObject codeListWIP);
+
+    String getModuleNameForCodeList(CodeListObject codeList);
 }
