@@ -13,8 +13,7 @@ import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -33,7 +32,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_1")
-    public void test_TA_1(){
+    public void test_TA_1() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
@@ -63,7 +62,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         getDriver().manage().window().maximize();
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
             viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
         }
@@ -72,7 +71,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_2")
-    public void test_TA_2(){
+    public void test_TA_2() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject workingBranch;
@@ -98,12 +97,12 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         getDriver().manage().window().maximize();
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             assertEquals(Boolean.valueOf("true"), developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
-            if (cl.getState().equals("WIP")){
+            if (cl.getState().equals("WIP")) {
                 /**
                  * The developer can view and edit the details (including code values) of a CL that is in the WIP state and owned by him.
                  */
@@ -114,10 +113,46 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                 editCodeListValueDialog.setMeaning("meaning");
                 editCodeListValueDialog.hitAddButton();
                 editCodeListPage.hitUpdateButton();
-            }else{
+            } else {
                 assertDisabled(editCodeListPage.getDefinitionField());
                 assertDisabled(editCodeListPage.getDefinitionSourceField());
             }
+        }
+
+    }
+
+    @Test
+    @DisplayName("TC_11_1_TA_3")
+    public void test_TA_3() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
+            assertEquals("WIP", cl.getState());
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            /**
+             * The developer CAN view but CANNOT edit the details of a CL that is in WIP state and owned by another developer.
+             */
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
         }
 
     }
