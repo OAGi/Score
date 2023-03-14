@@ -101,6 +101,60 @@ public class TC_10_2_CreatingBrandNewDeveloperACC extends BaseTest {
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
     }
 
+    @Test
+    public void test_TA_10_2_3() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "10.8.6";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
+    }
+
+    @Test
+    public void test_TA_10_2_4() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "10.8.6";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
+    }
+
+
+    @Test
+    public void test_TA_10_2_5() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "10.8.6";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
+    }
+
+
+    @Test
+    public void test_TA_10_2_6() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "10.8.6";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
+    }
+
 
 
 }
