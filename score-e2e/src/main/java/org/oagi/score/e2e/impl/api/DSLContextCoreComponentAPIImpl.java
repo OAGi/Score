@@ -365,7 +365,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     public ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId) {
         List<Field<?>> fields = new ArrayList();
         fields.addAll(Arrays.asList(CODE_LIST.fields()));
-        List<Result<Record>> records =  dslContext.select(fields)
+        List<Result<Record>> records = dslContext.select(fields)
                 .from(BDT_PRI_RESTRI)
                 .join(DT_MANIFEST).on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -374,14 +374,51 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .where(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.isNotNull().and(DT.GUID.eq(guid).and(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))))
                 .fetchMany();
-        return codeListMapper(records);
+        return codeListMapperList(records);
     }
 
-    private ArrayList<CodeListObject> codeListMapper(List<Result<Record>> records) {
+    @Override
+    public CodeListObject getCodeListByNameAndReleaseNum(String name, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+        List<Field<?>> fields = new ArrayList();
+        fields.add(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID);
+        fields.add(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID);
+        fields.add(CODE_LIST_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(CODE_LIST.fields()));
+        return dslContext.select(fields)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId),
+                        CODE_LIST.NAME.eq(name)))
+                .fetchOne(record -> codeListMapper(record));
+
+    }
+
+    private CodeListObject codeListMapper(Record record) {
+        CodeListObject codeList = new CodeListObject();
+        codeList.setCodeListId(record.get(CODE_LIST.CODE_LIST_ID).toBigInteger());
+        codeList.setName(record.get(CODE_LIST.NAME));
+        codeList.setGuid(record.get(CODE_LIST.GUID));
+        codeList.setEnumTypeGuid(record.get(CODE_LIST.ENUM_TYPE_GUID));
+        codeList.setListId(record.get(CODE_LIST.LIST_ID));
+        codeList.setVersionId(record.get(CODE_LIST.VERSION_ID));
+        codeList.setDefinition(record.get(CODE_LIST.DEFINITION));
+        codeList.setRemark(record.get(CODE_LIST.REMARK));
+        codeList.setDefinitionSource(record.get(CODE_LIST.DEFINITION_SOURCE));
+        codeList.setNamespaceId(record.get(CODE_LIST.NAMESPACE_ID).toBigInteger());
+        codeList.setCreatedBy(record.get(CODE_LIST.CREATED_BY).toBigInteger());
+        codeList.setOwnerUserId(record.get(CODE_LIST.OWNER_USER_ID).toBigInteger());
+        codeList.setLastUpdatedBy(record.get(CODE_LIST.LAST_UPDATED_BY).toBigInteger());
+        codeList.setState(record.get(CODE_LIST.STATE));
+        return codeList;
+    }
+
+    private ArrayList<CodeListObject> codeListMapperList(List<Result<Record>> records) {
         ArrayList<CodeListObject> codeLists = new ArrayList<>();
-        for (Result result : records){
+        for (Result result : records) {
             CodeListObject codeList = new CodeListObject();
-            if (result.isNotEmpty()){
+            if (result.isNotEmpty()) {
                 Record record = (Record) result.get(0);
                 codeList.setCodeListId(record.get(CODE_LIST.CODE_LIST_ID).toBigInteger());
                 codeList.setName(record.get(CODE_LIST.NAME));
@@ -400,7 +437,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 codeLists.add(codeList);
             }
         }
-        return  codeLists;
+        return codeLists;
     }
 
 
