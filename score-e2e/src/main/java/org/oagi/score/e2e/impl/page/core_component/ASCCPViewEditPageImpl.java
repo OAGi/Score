@@ -4,6 +4,7 @@ import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.core_component.ASCCPChangeACCDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
@@ -284,20 +285,22 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     @Override
-    public SelectAssociationDialog changeACC(String path) {
-
-        WebElement node = clickOnDropDownMenuByPath(path);
-        try {
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
-        } catch (TimeoutException e) {
-            click(node);
-            new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
-        }
-        SelectAssociationDialog selectAssociationDialog =
-                new SelectAssociationDialogImpl(this, "Change ACC");
-        assert selectAssociationDialog.isOpened();
-        return selectAssociationDialog;
+    public ASCCPChangeACCDialog openChangeACCDialog(String path) {
+        return retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            }
+            waitFor(ofMillis(500L));
+            ASCCPChangeACCDialog asccpChangeACCDialog =
+                    new ASCCPChangeACCDialogImpl(this);
+            assert asccpChangeACCDialog.isOpened();
+            return asccpChangeACCDialog;
+        });
     }
 
     @Override

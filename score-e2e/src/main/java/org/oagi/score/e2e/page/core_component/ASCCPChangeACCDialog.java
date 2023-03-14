@@ -202,11 +202,6 @@ public interface ASCCPChangeACCDialog extends Dialog {
      */
     WebElement getCancelButton();
 
-    /**
-     * Close the dialog.
-     */
-    void close();
-
     ASCCPViewEditPage hitCancelButton();
 
     /**

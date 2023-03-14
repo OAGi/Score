@@ -191,12 +191,11 @@ public interface ASCCPViewEditPage extends Page {
     WebElement getNodeByPath(String path);
 
     /**
-     * Open the association selection dialog by clicking 'Change ACC' context menu.
+     * Open the ASCCPChangeACC dialog by clicking 'Change ACC' context menu.
      *
-     * @param path node path
-     * @return the association selection dialog object
+     * @return the ASCCPChangeACCDialog  object
      */
-    SelectAssociationDialog changeACC(String path);
+    ASCCPChangeACCDialog openChangeACCDialog(String path);
 
     /**
      * Click the drop-down menu to open the context menu on the node.

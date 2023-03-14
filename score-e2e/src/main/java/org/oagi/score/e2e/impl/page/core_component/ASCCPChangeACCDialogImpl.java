@@ -12,8 +12,8 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
-    private static final By TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+    private static final By TAG_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Tag\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
@@ -48,20 +48,11 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
-    private static final By INSERT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert\")]//ancestor::button[1]");
-
-    private static final By APPEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
-
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
-
-    private static final By ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     private ASCCPViewEditPageImpl parent;
 
@@ -181,7 +172,7 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
     @Override
     public String getDENFieldLabel() {
-        return null;
+        return getDENField().getAttribute("data-placeholder");
     }
 
     @Override
@@ -206,17 +197,21 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
     @Override
     public String getModuleFieldLabel() {
-        return null;
+        return getModuleField().getAttribute("data-placeholder");
     }
 
     @Override
     public WebElement getTagSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), TAG_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setTag(String tag) {
-
+        click(getTagSelectField());
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + tag + "\")]"));
+        click(optionField);
+        escape(getDriver());
     }
 
     @Override
@@ -260,11 +255,6 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
     @Override
     public WebElement getCancelButton() {
         return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
-    }
-
-    @Override
-    public void close() {
-
     }
 
     @Override
