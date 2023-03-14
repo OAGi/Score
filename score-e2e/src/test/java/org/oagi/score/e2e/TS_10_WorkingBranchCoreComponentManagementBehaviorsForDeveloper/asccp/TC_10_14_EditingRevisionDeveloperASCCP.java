@@ -471,7 +471,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         ASCCPObject asccp;
         BCCPObject bccp;
-        ACCObject acc;
+        ACCObject acc, acc_association;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -482,7 +482,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
@@ -500,11 +500,9 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
         //reload the page
         viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         //ACC node cannot be changed
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen());
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
         assertFalse(accPanel.getCoreComponentField().isEnabled());
         assertEquals("ACC", getText(accPanel.getCoreComponentField()));
@@ -521,7 +519,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         assertFalse(accPanel.getDefinitionField().isEnabled());
 
         //BCCP node cannot be changed
-        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen() + "/" + bccp.getPropertyTerm());
         ASCCPViewEditPage.BCCPPanel bccpPanel = asccpViewEditPage.getBCCPanelContainer(bccpNode).getBCCPPanel();
         assertFalse(bccpPanel.getCoreComponentField().isEnabled());
         assertEquals("BCCP", getText(accPanel.getCoreComponentField()));
