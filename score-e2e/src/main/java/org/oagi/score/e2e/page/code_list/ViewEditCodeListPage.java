@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.code_list;
 
+import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -25,4 +26,10 @@ public interface ViewEditCodeListPage extends Page {
     WebElement getBranchSelectField();
 
     void searchCodeListByNameAndBranch(String name, String releaseNumber);
+
+    void searchCodeListByNameAndDeprecation(CodeListObject cl, String releaseNumber);
+
+    void setDeprecated(CodeListObject codeList);
+
+    WebElement getDeprecatedSelectField();
 }

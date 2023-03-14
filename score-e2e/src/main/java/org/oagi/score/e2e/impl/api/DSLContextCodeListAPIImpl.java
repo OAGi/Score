@@ -268,6 +268,14 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
+    public void updateCodeList(CodeListObject codeListWIP) {
+        dslContext.update(CODE_LIST)
+                .set(CODE_LIST.IS_DEPRECATED, (byte) (codeListWIP.isDeprecated() ? 1 : 0))
+                .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeListWIP.getCodeListId())))
+                .execute();
+    }
+
+    @Override
     public void addCodeListToAnotherRelease(CodeListObject codeList, ReleaseObject release, AppUserObject creator) {
         CodeListRecord codeListRecord = new CodeListRecord();
         codeListRecord.setGuid(codeList.getGuid());

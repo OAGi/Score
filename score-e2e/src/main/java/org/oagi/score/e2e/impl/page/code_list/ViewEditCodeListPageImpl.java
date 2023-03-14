@@ -20,6 +20,8 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             By.xpath("//*[contains(text(),\"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(),\"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
     public ViewEditCodeListPageImpl(BasePage parent) {
         super(parent);
@@ -145,5 +147,81 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
                 throw new NoSuchElementException("Cannot locate a code list using " + name);
             }
         });
+    }
+
+    @Override
+    public void searchCodeListByNameAndDeprecation(CodeListObject cl, String releaseNumber) {
+        setBranch(releaseNumber);
+        setDeprecated(cl);
+        sendKeys(getNameField(), cl.getName());
+        retry(() -> {
+            hitSearchButton();
+
+            WebElement td;
+            WebElement tr;
+            try {
+                tr = getTableRecordByValue(cl.getName());
+                td = getColumnByName(tr, "codeListName");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a code list using " + cl.getName(), e);
+            }
+            String nameField = getNameFieldFromTheTable(td);
+            if (!cl.getName().equals(nameField)) {
+                throw new NoSuchElementException("Cannot locate a code list using " + cl.getName());
+            }
+        });
+    }
+    @Override
+    public void setDeprecated(CodeListObject codeList) {
+        retry(() -> {
+            click(getDeprecatedSelectField());
+            waitFor(ofSeconds(2L));
+            if (codeList.isDeprecated()){
+                /**
+                 * Check if the opposite option is checked.
+                 */
+                WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox"));
+                String statusSecondOption = otherOptionField.getAttribute("ng-reflect-state").toString();
+                if (statusSecondOption.equals("checked")){
+                    click(otherOptionField);
+                }
+                String statusFirstOption = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
+
+                if (statusFirstOption.equals("checked")){
+                    escape(getDriver());
+                }else{
+                    WebElement optionField = visibilityOfElementLocated(getDriver(),
+                            By.xpath("//mat-option//span[contains(text(), \"True\")]"));
+                    click(optionField);
+                    escape(getDriver());
+                }
+            }else{
+                WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox"));
+                String status = otherOptionField.getAttribute("ng-reflect-state").toString();
+                if (status.equals("checked")){
+                    click(otherOptionField);
+                }
+                String statusFirstOption = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
+
+                if (statusFirstOption.equals("checked")){
+                    escape(getDriver());
+                }else{
+                    WebElement optionField = visibilityOfElementLocated(getDriver(),
+                            By.xpath("//mat-option//span[contains(text(), \"False\")]"));
+                    click(optionField);
+                    escape(getDriver());
+                }
+            }
+
+        });
+    }
+
+    @Override
+    public WebElement getDeprecatedSelectField() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
     }
 }
