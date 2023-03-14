@@ -393,6 +393,56 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         }
 
     }
+    @Test
+    @DisplayName("TC_11_1_TA_9")
+    public void test_TA_9() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject endUser;
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
+            codeListForTesting.add(codeListDeleted);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            /**
+             * An end user can add comments to any developer CL in any state.
+             */
+            assertNotEquals(endUser.getAppUserId(), cl.getOwnerUserId());
+            assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
+            assertFalse(endUser.isDeveloper());
+            assertTrue(developerA.isDeveloper());
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            pressEscape();
+        }
+
+    }
 
     private void pressEscape(){
         invisibilityOfLoadingContainerElement(getDriver());
