@@ -398,6 +398,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     private CodeListObject codeListMapper(Record record) {
         CodeListObject codeList = new CodeListObject();
         codeList.setCodeListId(record.get(CODE_LIST.CODE_LIST_ID).toBigInteger());
+        codeList.setCodeListManifestId(record.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger());
         codeList.setName(record.get(CODE_LIST.NAME));
         codeList.setGuid(record.get(CODE_LIST.GUID));
         codeList.setEnumTypeGuid(record.get(CODE_LIST.ENUM_TYPE_GUID));

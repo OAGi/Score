@@ -23,10 +23,14 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -36,7 +40,11 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/code_list/" + this.codeList.getCodeListId()).toString();
+        if (this.codeList.getCodeListManifestId()!=null){
+            return getConfig().getBaseUrl().resolve("/code_list/" + this.codeList.getCodeListManifestId()).toString();
+        }else{
+            return getConfig().getBaseUrl().resolve("/code_list/" + this.codeList.getCodeListId()).toString();
+        }
     }
 
     @Override
@@ -109,5 +117,17 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getAddCommentButton() {
         return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
+    }
+
+    @Override
+    public void hitRevise() {
+        click(getReviseButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+    @Override
+    public WebElement getReviseButton() {
+        return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
     }
 }

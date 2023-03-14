@@ -23,4 +23,8 @@ public interface EditCodeListPage extends Page {
     AddCodeListCommentDialog hitAddCommentButton();
 
     WebElement getAddCommentButton();
+
+    void hitRevise();
+
+    WebElement getReviseButton();
 }
