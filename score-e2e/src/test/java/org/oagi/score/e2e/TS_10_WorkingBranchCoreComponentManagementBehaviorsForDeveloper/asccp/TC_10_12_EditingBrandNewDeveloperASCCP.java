@@ -561,7 +561,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
+        assertTrue(asccpDEN.endsWith(anotherACC.getObjectClassTerm()));
 
         //only semantics or semantic group ACC can be selected
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
