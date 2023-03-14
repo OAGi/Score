@@ -326,13 +326,63 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         getDriver().manage().window().maximize();
         for (CodeListObject cl : codeListForTesting) {
             /**
-             * The developer can view the details of a CL that is in Draft, Candidate, Deleted, or Release Draft state and owned by any developer
+             * The developer can view the details of a CL that is in Deleted owned by any developer
              * but he cannot make any change except adding comments.
              */
             assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
             assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             assertTrue(developerA.isDeveloper());
             assertEquals("Deleted",cl.getState());
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            pressEscape();
+        }
+
+    }
+
+    @Test
+    @DisplayName("TC_11_1_TA_8")
+    public void test_TA_8() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
+            codeListForTesting.add(codeListDeleted);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            /**
+             * A developer can add comments to any developer CL in any state.
+             */
+            assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
+            assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
+            assertTrue(developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
