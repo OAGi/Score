@@ -32,4 +32,8 @@ public interface ViewEditCodeListPage extends Page {
     void setDeprecated(CodeListObject codeList);
 
     WebElement getDeprecatedSelectField();
+
+    void toggleState(String state);
+
+    WebElement getStateSelectField();
 }

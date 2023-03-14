@@ -22,6 +22,8 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+    private static final By STATE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
 
     public ViewEditCodeListPageImpl(BasePage parent) {
         super(parent);
@@ -58,6 +60,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     public WebElement getNameField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Name\")]"));
     }
+
     private void openCodeListByName(String name) {
         sendKeys(getNameField(), name);
 
@@ -93,9 +96,9 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     }
 
     @Override
-    public WebElement getTableRecordByValue(String value){
+    public WebElement getTableRecordByValue(String value) {
         defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\""+value+"\")]//ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
@@ -106,6 +109,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
@@ -171,45 +175,46 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             }
         });
     }
+
     @Override
     public void setDeprecated(CodeListObject codeList) {
         retry(() -> {
             click(getDeprecatedSelectField());
             waitFor(ofSeconds(2L));
-            if (codeList.isDeprecated()){
+            if (codeList.isDeprecated()) {
                 /**
                  * Check if the opposite option is checked.
                  */
                 WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox"));
                 String statusSecondOption = otherOptionField.getAttribute("ng-reflect-state").toString();
-                if (statusSecondOption.equals("checked")){
+                if (statusSecondOption.equals("checked")) {
                     click(otherOptionField);
                 }
                 String statusFirstOption = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
 
-                if (statusFirstOption.equals("checked")){
+                if (statusFirstOption.equals("checked")) {
                     escape(getDriver());
-                }else{
+                } else {
                     WebElement optionField = visibilityOfElementLocated(getDriver(),
                             By.xpath("//mat-option//span[contains(text(), \"True\")]"));
                     click(optionField);
                     escape(getDriver());
                 }
-            }else{
+            } else {
                 WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox"));
                 String status = otherOptionField.getAttribute("ng-reflect-state").toString();
-                if (status.equals("checked")){
+                if (status.equals("checked")) {
                     click(otherOptionField);
                 }
                 String statusFirstOption = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
 
-                if (statusFirstOption.equals("checked")){
+                if (statusFirstOption.equals("checked")) {
                     escape(getDriver());
-                }else{
+                } else {
                     WebElement optionField = visibilityOfElementLocated(getDriver(),
                             By.xpath("//mat-option//span[contains(text(), \"False\")]"));
                     click(optionField);
@@ -223,5 +228,23 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getDeprecatedSelectField() {
         return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void toggleState(String state) {
+        retry(() -> {
+            click(getStateSelectField());
+            waitFor(ofSeconds(2L));
+
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
+            click(optionField);
+            escape(getDriver());
+                });
+    }
+
+    @Override
+    public WebElement getStateSelectField() {
+        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
 }

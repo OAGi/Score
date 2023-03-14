@@ -558,6 +558,52 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         }
 
     }
+    @Test
+    @DisplayName("TC_11_1_TA_12")
+    public void test_TA_12() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             */
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+        }
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        String previousState = "";
+        for (CodeListObject cl : codeListForTesting) {
+            if (previousState.equals("")){
+                String currentState = cl.getState();
+                previousState = cl.getState();
+                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            }else{
+                viewEditCodeListPage.toggleState(previousState);
+                String currentState = cl.getState();
+                previousState = cl.getState();
+                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            }
+        }
+
+    }
 
     private void pressEscape(){
         invisibilityOfLoadingContainerElement(getDriver());
