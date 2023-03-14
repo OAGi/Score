@@ -47,7 +47,7 @@ public class CommentController {
         service.postComments(user, request);
     }
 
-    @RequestMapping(value = "/comment/{commentId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/comment/{commentId:[\\d]+}", method = RequestMethod.POST)
     public void updateComment(@AuthenticationPrincipal AuthenticatedPrincipal user,
                               @PathVariable("commentId") long commentId,
                               @RequestBody UpdateCommentRequest request) {

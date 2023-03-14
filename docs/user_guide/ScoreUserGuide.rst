@@ -1171,87 +1171,93 @@ that is displayed:
 -  *Type* allows for filtering the results based on the `CC
    type <#core-component-in-brief>`__. To use this filter:
 
-   -  Click on it and check or uncheck the "ACC", "ASCC", "ASCCP",
-      "BCC", "BCCP", "CDT", or "BDT" checkboxes to filter out various
-      CC types. If no CC type is selected, the filter is not used.
+   -  | Click on it and check or uncheck the "ACC", "ASCC", "ASCCP",
+        "BCC", "BCCP", "CDT", or "BDT" checkboxes to filter out various
+        CC types. If no CC type is selected, the filter is not used.
 
 -  *State* allows for filtering the results based on Core Components’
    state. To use this filter:
 
-   -  Click on it and check the checkboxes to list core components in
-      those states. If no State is selected, the filter is not used. For
-      definitions of states, see the `CC States <#cc-states>`__ section.
-      See also the `CC unit of control <#cc-unit-of-control>`__ section.
+   -  | Click on it and check the checkboxes to list core components in
+        those states. If no State is selected, the filter is not used. For
+        definitions of states, see the `CC States <#cc-states>`__ section.
+        See also the `CC unit of control <#cc-unit-of-control>`__ section.
 
--  *Deprecated* allows for filtering in or out deprecated CCs. Select
-   "True" to show only deprecated CCs or "False" to show only CCs that
-   are not deprecated. Both are included when neither option is
-   selected.
+-  | *Deprecated* allows for filtering in or out deprecated CCs. Select
+     "True" to show only deprecated CCs or "False" to show only CCs that
+     are not deprecated. Both are included when neither option is
+     selected.
 
 -  *Component Type* enables filtering ACC based on the `Component
    Type <#component-types>`__ that supports OAGIS architecture. To use
    this filter:
 
-   -  Check the desired checkboxes next to the `Component
-      Type <#component-types>`__. If no selection is performed, the
-      filter is not used. Note that Component Type only applies to ACC.
-      If no (CC) Type filtering is selected, all types of CCs are still
-      listed. In other words, if the Component Type filter is used, it
-      might be better to set the Type filter to only ACC.
+   -  | Check the desired checkboxes next to the `Component
+        Type <#component-types>`__. If no selection is performed, the
+        filter is not used. Note that Component Type only applies to ACC.
+        If no (CC) Type filtering is selected, all types of CCs are still
+        listed. In other words, if the Component Type filter is used, it
+        might be better to set the Type filter to only ACC.
+
+-  *Tag* enables filtering components based on the tag. Note that this only
+   applies to the CC associated with the tag(s). To use this filter:
+
+   -  | Check the checkboxes to list core components that associated with
+        the tag(s).
 
 -  Free form text filtering based on CCs’ *DEN* (dictionary entry name),
    *Definition*, *Module* or a combination of them. The matching is case
    insensitive. To use these filters:
 
-   -  Enter a search string in the *DEN* (the name of the core
-      component), *Definition* or *Module* field and click "Search"
-      button. Note that search strings entered in three fields are
-      treated as having an AND logical relationship.
+   -  | Enter a search string in the *DEN* (the name of the core
+        component), *Definition* or *Module* field and click "Search"
+        button. Note that search strings entered in three fields are
+        treated as having an AND logical relationship.
 
-   -  It is important to note that the DEN is stored in space-separated
-      format (while the XML schema or other expressions of the standard
-      may have the name formatted in camel case). For example, type in
-      "Employee Count" instead of "EmployeeCount". In addition, "ID" is
-      stored as "Identifier" in DEN.
+   -  | It is important to note that the DEN is stored in space-separated
+        format (while the XML schema or other expressions of the standard
+        may have the name formatted in camel case). For example, type in
+        "Employee Count" instead of "EmployeeCount". In addition, "ID" is
+        stored as "Identifier" in DEN.
 
-   -  The *Definition* field allows you to find a core component whose
-      definition matches the input string. The content in the Definition
-      is generally written in normal language grammar. Keep in mind
-      though that if you try to match a data element name in the
-      Definition, it may still be in the camel case format. The tool
-      does not parse the Definition when it is imported. Unfortunately,
-      when standard developers refer to data elements in the definition
-      there is no consistent convention. For example, one definition may
-      be "Address of the Customer Party" while another may be "Business
-      Unit of the CustomerParty". Notice that the format of the
-      "Customer Party" data element is inconsistent in the two
-      definitions.
+   -  | The *Definition* field allows you to find a core component whose
+        definition matches the input string. The content in the Definition
+        is generally written in normal language grammar. Keep in mind
+        though that if you try to match a data element name in the
+        Definition, it may still be in the camel case format. The tool
+        does not parse the Definition when it is imported. Unfortunately,
+        when standard developers refer to data elements in the definition
+        there is no consistent convention. For example, one definition may
+        be "Address of the Customer Party" while another may be "Business
+        Unit of the CustomerParty". Notice that the format of the
+        "Customer Party" data element is inconsistent in the two
+        definitions.
 
-   -  A good technique is to search with longer input string first, if
-      nothing found try changing to different synonyms, and also try
-      shortening the input string where more results, yet less accurate,
-      will be returned.
+   -  | A good technique is to search with longer input string first, if
+        nothing found try changing to different synonyms, and also try
+        shortening the input string where more results, yet less accurate,
+        will be returned.
 
-   -  Use double quotes around the search terms in *DEN* and
-      *Definition*, to match the exact substring as in the double
-      quotes. For example, if search input in the *DEN* field is ""Name
-      Identification"", part of the DEN has to match the whole search
-      input. In other words, a component with DEN "Named Identification.
-      Details" won’t be returned. However, if the search input in the
-      *DEN* field is "Name Identification" without double quotes, DENs
-      that partially match both tokens will be returned. In other words,
-      the CC with DEN "Named Identification. Details" will be returned.
+   -  | Use double quotes around the search terms in *DEN* and
+        *Definition*, to match the exact substring as in the double
+        quotes. For example, if search input in the *DEN* field is ""Name
+        Identification"", part of the DEN has to match the whole search
+        input. In other words, a component with DEN "Named Identification.
+        Details" won’t be returned. However, if the search input in the
+        *DEN* field is "Name Identification" without double quotes, DENs
+        that partially match both tokens will be returned. In other words,
+        the CC with DEN "Named Identification. Details" will be returned.
 
-   -  The *Module* field allows for filtering based on the physical file
-      path the core component resides based on the Module Assignment in
-      Score. The path is stored with a backslash and without the file
-      extension, such as ".xsd". In the case of OAGIS 10.4 standard, for
-      example, all shared components reside in subfolders of the
-      "Model\\Platform\\2_4\\Common" folder, nouns are serialized to the
-      respective noun module (e.g. "Model\\Nouns\\PurchaseOrder"). To
-      search only shared components, the user may enter "common" in the
-      *Module* field. Or, to search only about nouns, the user may enter
-      "nouns" in the *Module* field.
+   -  | The *Module* field allows for filtering based on the physical file
+        path the core component resides based on the Module Assignment in
+        Score. The path is stored with a backslash and without the file
+        extension, such as ".xsd". In the case of OAGIS 10.4 standard, for
+        example, all shared components reside in subfolders of the
+        "Model\\Platform\\2_4\\Common" folder, nouns are serialized to the
+        respective noun module (e.g. "Model\\Nouns\\PurchaseOrder"). To
+        search only shared components, the user may enter "common" in the
+        *Module* field. Or, to search only about nouns, the user may enter
+        "nouns" in the *Module* field.
 
 After searching for a CC, clicking anywhere in the row will display its
 definition. Click on its DEN to open its detail page.
@@ -7478,8 +7484,13 @@ nodes described earlier.
 |                  | Architect Approve, Development and Testing,       |
 |                  | Development Review, and Testing Completed.        |
 +------------------+---------------------------------------------------+
+| *Inverse Mode*   | In *Inverse Mode*, all disabled nodes under the   |
+| (Optional)       | root BIE are processed as an enabled node. For    |
+|                  | example, the user could turn this mode on when    |
+|                  | it needs to enable all components in the tree.    |
++------------------+---------------------------------------------------+
 | *Legacy Business | Other names of the data element commonly known in |
-|  Term*           | the context. For example, the user may wish to    |
+| Term*            | the context. For example, the user may wish to    |
 | (Optional)       | capture a BOM BIE that is commonly known as Super |
 |                  | BOM, Engineering BOM, etc. in its context. At     |
 |                  | present the application support only one Business |

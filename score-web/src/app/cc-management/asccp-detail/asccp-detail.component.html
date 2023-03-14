@@ -308,9 +308,9 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
-                    <mat-divider *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isAccChangeable()"></mat-divider>
+                    <mat-divider *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && isAccChangeable()"></mat-divider>
                     <button mat-menu-item (click)="changeAcc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable && isAccChangeable()">
+                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable() && isAccChangeable()">
                       <span class="context-menu-item">Change ACC</span>
                     </button>
                     <mat-divider></mat-divider>
@@ -714,13 +714,27 @@
 
                       <div class="row">
                         <div class="col-12">
-                          <mat-form-field>
+                          <mat-form-field *ngIf="selectedNode.level === 0 && isEditable() && !hasRevision()">
+                            <mat-select placeholder="Namespace"
+                                        [(ngModel)]="asAsccpDetail().asccp.namespaceId"
+                                        [required]="true">
+                              <mat-option>
+                                <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                                       [placeholderLabel]="'Search...'"
+                                                       [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                              </mat-option>
+                              <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+                                {{ namespace.uri }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                          <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asAsccpDetail().asccp.namespaceId"
                                         [required]="true"
-                                        [disabled]="!isEditable() || hasRevision()">
+                                        [disabled]="true">
                               <mat-option *ngFor="let namespace of getSelectableNamespaces(asAsccpDetail().asccp.namespaceId)"
-                                          [value]="namespace.namespaceId">{{namespace.uri}}</mat-option>
+                                          [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                             </mat-select>
                           </mat-form-field>
                         </div>
@@ -1134,16 +1148,36 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-4">
                           <mat-form-field>
                             <input matInput placeholder="Data Type Term" maxlength="45"
                                    [(ngModel)]="asBccpDetail().bdt.dataTypeTerm" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
+                          <mat-form-field>
+                            <input matInput placeholder="Representation Term" maxlength="100"
+                                   [(ngModel)]="asBccpDetail().bdt.representationTerm" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <input matInput placeholder="Qualifier" maxlength="100"
                                    [(ngModel)]="asBccpDetail().bdt.qualifier" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-select placeholder="Namespace"
+                                        [(ngModel)]="asBccpDetail().bdt.namespaceId"
+                                        [disabled]="true">
+                              <mat-option [value]="0">-</mat-option>
+                              <mat-option *ngFor="let namespace of getSelectableNamespaces(asBccpDetail().bdt.namespaceId)"
+                                          [value]="namespace.namespaceId">{{namespace.uri}}</mat-option>
+                            </mat-select>
                           </mat-form-field>
                         </div>
                       </div>

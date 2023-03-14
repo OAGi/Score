@@ -7,6 +7,9 @@ import {SimpleNamespace} from '../../../../namespace-management/domain/namespace
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
 import {Module, ModuleElement, ModuleSet, ModuleSetListRequest, Tile} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
+import {FormControl} from "@angular/forms";
+import {ReplaySubject} from "rxjs";
+import {initFilter} from "../../../../common/utility";
 
 @Component({
   selector: 'score-module-add-dialog',
@@ -22,6 +25,9 @@ export class ModuleAddDialogComponent implements OnInit {
   /* create new module */
   namespaceList: SimpleNamespace[];
   module: ModuleElement;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   /* create new moduleDir */
   moduleDir: ModuleElement;
@@ -53,7 +59,9 @@ export class ModuleAddDialogComponent implements OnInit {
     this.module = new ModuleElement();
     this.moduleDir = new ModuleElement();
     this.namespaceService.getSimpleNamespaces().subscribe(resp => {
-      this.namespaceList = resp;
+      this.namespaceList = resp.filter(e => e.standard);
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.namespaceList, (e) => e.uri);
     });
 
     this.moduleService.getModuleSetList().subscribe(resp => {

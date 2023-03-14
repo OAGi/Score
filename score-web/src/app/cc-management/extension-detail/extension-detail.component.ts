@@ -42,13 +42,13 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
 import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -96,6 +96,9 @@ export class ExtensionDetailComponent implements OnInit {
   namespaces: SimpleNamespace[];
   tags: Tag[] = [];
   commentControl: CommentControl;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   initialExpandDepth = 10;
 
@@ -157,6 +160,8 @@ export class ExtensionDetailComponent implements OnInit {
       })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags]) => {
       this.lastRevision = revisionResponse;
       this.namespaces = namespaces;
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
 
       // subscribe an event

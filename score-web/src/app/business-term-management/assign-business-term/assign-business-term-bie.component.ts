@@ -48,8 +48,10 @@ export class AssignBusinessTermBieComponent implements OnInit {
 
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
@@ -95,6 +97,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
         if (this.request.release.releaseId) {
           this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];

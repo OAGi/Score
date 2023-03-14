@@ -10,6 +10,7 @@ import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
@@ -87,6 +88,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By TYPE_DEFINITION_FIELD_LOCATOR =
             By.xpath("//textarea[@data-placeholder=\"Type Definition\"]");
+
+    private static final By REUSE_BIE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Reuse BIE\")]");
 
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
@@ -167,7 +171,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 new Actions(getDriver()).sendKeys("O").perform();
                 click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
+
             ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert ACCExtensionViewEditPage.isOpened();
             return ACCExtensionViewEditPage;
@@ -185,7 +190,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 new Actions(getDriver()).sendKeys("O").perform();
                 click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(1000L));
+
             ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
             assert accExtensionViewEditPage.isOpened();
             return accExtensionViewEditPage;
@@ -335,6 +341,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -352,6 +359,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -369,6 +377,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -382,7 +391,41 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public WebElement getTypeDefinitionField(){
+    public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path) {
+        /*return retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            }
+            waitFor(ofMillis(1000L));
+
+            SelectProfileBIEToReusePage selectProfileBIEToReuse = new SelectProfileBIEToReusePageImpl(this);
+            assert selectProfileBIEToReuse.isOpened();
+            return selectProfileBIEToReuse;
+        });*/
+
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
+        assert selectProfileBIEToReuse.isOpened();
+        return selectProfileBIEToReuse;
+
+    }
+
+    @Override
+    public WebElement getTypeDefinitionField() {
         return visibilityOfElementLocated(getDriver(), TYPE_DEFINITION_FIELD_LOCATOR);
     }
 
@@ -918,6 +961,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public String getValueDomainWarningMessage(String valueDomain) {
             click(getValueDomainField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));

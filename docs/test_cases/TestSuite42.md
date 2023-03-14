@@ -1,6 +1,6 @@
 # Test Suite 42
 
-**Business Term**
+**Business Term Management**
 
 ## Test Case 42.1
 **View or Edit Business Term**

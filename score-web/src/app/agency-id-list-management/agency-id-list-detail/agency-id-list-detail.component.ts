@@ -24,6 +24,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {AgencyIdListCommentControl} from './agency-id-list-comment-component';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
+import {initFilter} from "../../common/utility";
 
 @Component({
   selector: 'score-agency-id-list-detail',
@@ -42,6 +43,8 @@ export class AgencyIdListDetailComponent implements OnInit {
   valueSearch: string;
   workingRelease = WorkingRelease;
 
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
   valueFilterCtrl: FormControl = new FormControl();
   valueFilteredList: ReplaySubject<AgencyIdListValue[]> = new ReplaySubject<AgencyIdListValue[]>(1);
 
@@ -87,6 +90,8 @@ export class AgencyIdListDetailComponent implements OnInit {
       })
     ).subscribe(([agencyIdList, namespaces]) => {
       this.namespaces = namespaces;
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.getSelectableNamespaces(), (e) => e.uri);
       this.init(agencyIdList);
       this.isUpdating = false;
     });

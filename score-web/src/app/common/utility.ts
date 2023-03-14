@@ -80,27 +80,33 @@ export function hashCode(obj): string {
     }));
 }
 
-export function initFilter(formControl: FormControl,
-                           filteredSubject: ReplaySubject<string[]>,
-                           list: string[]) {
+export type MapperFunction<T, R> = (source: T) => R;
+
+export function initFilter<T>(formControl: FormControl,
+                              filteredSubject: ReplaySubject<T[]>,
+                              list: T[],
+                              toStrFunc?: MapperFunction<T, string>) {
   formControl.valueChanges
-    .subscribe(() => filter(formControl, filteredSubject, list));
+    .subscribe(() => filter(formControl, filteredSubject, list, toStrFunc));
   filteredSubject.next(list.slice());
 }
 
-export function filter(formControl: FormControl,
-                       filteredSubject: ReplaySubject<string[]>,
-                       list: string[]) {
+export function filter<T>(formControl: FormControl,
+                          filteredSubject: ReplaySubject<T[]>,
+                          list: T[],
+                          toStrFunc?: MapperFunction<T, string>) {
+  if (!toStrFunc) {
+    toStrFunc = (s) => s.toString();
+  }
   let search = formControl.value;
   if (!search) {
     filteredSubject.next(list.slice());
-    return;
   } else {
     search = search.toLowerCase();
+    filteredSubject.next(
+      list.filter(e => !!e).filter(e => toStrFunc(e).toLowerCase().indexOf(search) > -1)
+    );
   }
-  filteredSubject.next(
-    list.filter(e => e.toLowerCase().indexOf(search) > -1)
-  );
 }
 
 export function loadBooleanProperty(userToken: UserToken, key: string, defaultValue: boolean): boolean {

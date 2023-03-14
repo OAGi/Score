@@ -19,15 +19,20 @@
                     <mat-select-trigger class="d-flex">
                       <span>{{ request.release.releaseNum }}</span>
                       <span class="f12 ml-auto {{ request.release.state }}">
-                      {{ request.release.state | separate }}
-                    </span>
+                        {{ request.release.state | separate }}
+                      </span>
                     </mat-select-trigger>
-                    <mat-option *ngFor="let release of releases" [value]="release">
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
                       <div class="d-flex">
                         <span class="release-num">{{ release.releaseNum }}</span>
                         <span class="f12 ml-auto {{ release.state }}">
-                        {{ release.state | separate }}
-                      </span>
+                          {{ release.state | separate }}
+                        </span>
                       </div>
                     </mat-option>
                   </mat-select>

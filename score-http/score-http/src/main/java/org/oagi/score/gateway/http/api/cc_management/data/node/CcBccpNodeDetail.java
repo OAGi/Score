@@ -73,7 +73,9 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger manifestId;
         private String guid;
         private String dataTypeTerm;
+        private String representationTerm;
         private String qualifier;
+        private BigInteger namespaceId;
         private String den;
         private String definition;
         private String definitionSource;
