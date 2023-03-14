@@ -94,6 +94,8 @@ public class Configuration {
         if (getBooleanProperty("org.oagi.score.e2e.chrome.disable-gpu")) {
             chromeOptions.addArguments("--disable-gpu");
         }
+        // To support the docker environment.
+        chromeOptions.addArguments("--remote-allow-origins=*");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> chromePrefs = new HashMap<>();
@@ -112,6 +114,8 @@ public class Configuration {
         if (getBooleanProperty("org.oagi.score.e2e.edge.disable-gpu")) {
             edgeOptions.addArguments("--disable-gpu");
         }
+        // To support the docker environment.
+        edgeOptions.addArguments("--remote-allow-origins=*");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> edgePrefs = new HashMap<>();
