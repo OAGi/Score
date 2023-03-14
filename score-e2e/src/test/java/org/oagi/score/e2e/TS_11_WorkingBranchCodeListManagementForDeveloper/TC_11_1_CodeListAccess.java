@@ -15,7 +15,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -440,6 +442,67 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
+        }
+
+    }
+    @Test
+    @DisplayName("TC_11_1_TA_10")
+    public void test_TA_10() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerB;
+        Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
+        {
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            /**
+             * Create Code List for Release 10.8.4. States - WIP, Draft and Candidate
+             */
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseOne, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+            codeListReleaseMap.put(codeListWIP, releaseOne);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseOne, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+            codeListReleaseMap.put(codeListDraft, releaseOne);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseOne, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+            codeListReleaseMap.put(codeListCandidate, releaseOne);
+
+            /**
+             * Create Code List for Release 10.8.6. States - WIP, Draft and Candidate
+             */
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
+            codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseTwo, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+            codeListReleaseMap.put(codeListWIP, releaseTwo);
+
+            codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseTwo, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListForTesting.add(codeListDraft);
+            codeListReleaseMap.put(codeListDraft, releaseTwo);
+
+            codeListCandidate = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, releaseTwo, "Candidate");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListForTesting.add(codeListCandidate);
+            codeListReleaseMap.put(codeListCandidate, releaseTwo);
+        }
+        HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        getDriver().manage().window().maximize();
+        for (CodeListObject cl : codeListForTesting) {
+            ReleaseObject release = codeListReleaseMap.get(cl);
+            assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
+            viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), release.getReleaseNumber());
         }
 
     }
