@@ -26,4 +26,8 @@ public interface CodeListAPI {
     Boolean doesCodeListExistInTheRelease(CodeListObject codeList, String release);
 
     void addCodeListToAnotherRelease(CodeListObject codeList, ReleaseObject release, AppUserObject creator);
+
+    void updateCodeList(CodeListObject codeListWIP);
+
+    String getModuleNameForCodeList(CodeListObject codeList, String releaseNumber);
 }
