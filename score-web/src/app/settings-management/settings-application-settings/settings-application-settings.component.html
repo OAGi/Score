@@ -43,6 +43,23 @@
                   </button>
                 </div>
               </div>
+              <div class="mt-4">
+                <div class="subhead">
+                  <h4 class="subhead-heading">BIE Inverse Mode</h4>
+                </div>
+                <div class="actions">
+                  <button mat-raised-button color="primary"
+                          (click)="updateBIEInverseModeConfiguration(true)"
+                          [disabled]="isBIEInverseModeEnabled">
+                    Enable
+                  </button>
+                  <button mat-raised-button color="warn"
+                          (click)="updateBIEInverseModeConfiguration(false)"
+                          [disabled]="!isBIEInverseModeEnabled">
+                    Disable
+                  </button>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
         </mat-card>

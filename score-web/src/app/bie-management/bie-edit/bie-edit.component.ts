@@ -540,6 +540,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return userToken.businessTerm.enabled;
   }
 
+  get isBIEInverseModeEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.bie.inverseMode;
+  }
+
   canCreateBIEFromThis(node: BieFlatNode): boolean {
     return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.derived;
   }

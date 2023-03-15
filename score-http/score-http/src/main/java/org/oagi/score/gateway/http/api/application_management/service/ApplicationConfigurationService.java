@@ -29,6 +29,8 @@ public class ApplicationConfigurationService {
 
 	private static final String BUSINESS_TERM_CONFIG_PARAM_NAME = "score.business-term.enabled";
 
+	private static final String BIE_INVERSE_MODE_CONFIG_PARAM_NAME = "score.bie.inverse-mode";
+
 	public String getConfigurationValueByName(String paramConfigName) {
 		return configRepo.getConfigurationValueByName(paramConfigName);
 	}
@@ -39,6 +41,10 @@ public class ApplicationConfigurationService {
 
 	public boolean isBusinessTermEnabled() {
 		return getBooleanProperty(BUSINESS_TERM_CONFIG_PARAM_NAME);
+	}
+
+	public boolean isBieInverseModeEnabled() {
+		return getBooleanProperty(BIE_INVERSE_MODE_CONFIG_PARAM_NAME);
 	}
 
 	public boolean getBooleanProperty(String key) {
@@ -60,13 +66,19 @@ public class ApplicationConfigurationService {
 		Boolean tenantEnabled = request.getTenantEnabled();
 		if (tenantEnabled != null) {
 			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.updateBooleanConfiguration(scoreUser, TENANT_CONFIG_PARAM_NAME, tenantEnabled);
+					.upsertBooleanConfiguration(scoreUser, TENANT_CONFIG_PARAM_NAME, tenantEnabled);
 		}
 
 		Boolean businessTermEnabled = request.getBusinessTermEnabled();
 		if (businessTermEnabled != null) {
 			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.updateBooleanConfiguration(scoreUser, BUSINESS_TERM_CONFIG_PARAM_NAME, businessTermEnabled);
+					.upsertBooleanConfiguration(scoreUser, BUSINESS_TERM_CONFIG_PARAM_NAME, businessTermEnabled);
+		}
+
+		Boolean bieInverseModeEnabled = request.getBieInverseModeEnabled();
+		if (bieInverseModeEnabled != null) {
+			scoreRepositoryFactory.createConfigurationWriteRepository()
+					.upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
 		}
 	}
 

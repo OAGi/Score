@@ -9,4 +9,6 @@ public class ApplicationConfigurationChangeRequest {
 
     private Boolean businessTermEnabled;
 
+    private Boolean bieInverseModeEnabled;
+
 }
