@@ -35,6 +35,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
+    private static final By REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
@@ -45,6 +47,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::div[1]/mat-select//span");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
             By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select//span");
+    public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -180,5 +184,36 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public void setName(String codeListName) {
         sendKeys(getCodeListNameField(), codeListName);
+    }
+
+    @Override
+    public void selectCodeListValue(String valueCode) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(valueCode);
+            WebElement td = getColumnByName(tr, "select");
+            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        });
+    }
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+    }
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void removeCodeListValue() {
+        retry(() -> {
+            click(getRemoveValueButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+    @Override
+    public WebElement getRemoveValueButton() {
+        return elementToBeClickable(getDriver(), REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR);
     }
 }

@@ -43,4 +43,14 @@ public interface EditCodeListPage extends Page {
     WebElement getAgencyIDListField();
 
     void setName(String codeListName);
+
+    void selectCodeListValue(String valueCode);
+
+    WebElement getTableRecordByValue(String value);
+
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    void removeCodeListValue();
+
+    WebElement getRemoveValueButton();
 }
