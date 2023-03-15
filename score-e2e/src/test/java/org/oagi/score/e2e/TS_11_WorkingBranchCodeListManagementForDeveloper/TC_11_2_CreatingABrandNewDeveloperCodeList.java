@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +131,23 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.hitAddButton();
         editCodeListPage.selectCodeListValue("code value 2");
         editCodeListPage.removeCodeListValue();
+    }
+
+    @Test
+    @DisplayName("TC_11_2_TA_6")
+    public void test_TA_6() {
+        AppUserObject developer;
+        ReleaseObject release;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setBranch(release.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> viewEditCodeListPage.getNewCodeListButton());
     }
     
 
