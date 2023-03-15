@@ -88,9 +88,13 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        accPanel.getComponentTypeSelectField().sendKeys("Semantic Group");
         assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+        assertNotChecked(accPanel.getAbstractCheckbox());
+
+        accPanel.getComponentTypeSelectField().sendKeys("Semantics");
+        assertNotChecked(accPanel.getAbstractCheckbox());
+        assertEnabled(accPanel.getAbstractCheckbox());
     }
 
     @Test
