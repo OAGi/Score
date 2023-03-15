@@ -337,10 +337,24 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+        // cannot create extension component when the component type isn't Semantics
+        String accOwner = getText(accPanel.getOwnerField());
+        accPanel.setComponentType("Base(Abstract)");
+        accPanel.setNamespace(namespace.getUri());
+        accViewEditPage.hitUpdateButton();
+        accViewEditPage.clickOnDropDownMenuByPath("/" + acc.getDen());
+
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]")).size());
+        escape(getDriver());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        accPanel.setComponentType("Semantics");
+        accViewEditPage.hitUpdateButton();
+        accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
+        WebElement extensionASCCNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Extension");
+        ACCViewEditPage.ASCCPPanel extensionASCCPPanel = accViewEditPage.getASCCPanelContainer(extensionASCCNode).getASCCPPanel();
+        assertEquals("ASCCP", getText(extensionASCCPPanel.getCommentsIcon()));
+        assertEquals("Extension", getText(extensionASCCPPanel.getPropertyTermField()));
+        assertTrue(getText(extensionASCCPPanel.getDENField()).endsWith(acc.getObjectClassTerm() + " Extension"));
     }
 
     @Test
