@@ -128,6 +128,10 @@ public class AccountController implements InitializingBean {
                 .put("enabled", configService.isBusinessTermEnabled())
                 .build());
 
+        resp.put("bie", ImmutableMap.builder()
+                .put("inverseMode", configService.isBieInverseModeEnabled())
+                .build());
+
         return resp;
     }
 

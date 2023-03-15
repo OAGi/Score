@@ -115,4 +115,15 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(OutOfMemoryError.class)
+    public ResponseEntity handleOutOfMemoryError(
+            OutOfMemoryError ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", "Not enough memory to perform the request: " + ex.getMessage() + ". " +
+                "Please consider either increasing available heap space or cleaning data to reduce the size of the request.");
+        return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

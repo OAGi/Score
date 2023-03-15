@@ -3,6 +3,7 @@ package org.oagi.score.repo.api.impl.jooq.configuration;
 import org.jooq.DSLContext;
 import org.oagi.score.repo.api.configuration.ConfigurationWriteRepository;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ConfigurationRecord;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import static org.jooq.impl.DSL.and;
@@ -17,13 +18,25 @@ public class JooqConfigurationWriteRepository
     }
 
     @Override
-    public void updateBooleanConfiguration(ScoreUser user, String configurationName, boolean value) {
-        dslContext().update(CONFIGURATION)
-                .set(CONFIGURATION.VALUE, (value) ? "true" : "false")
+    public void upsertBooleanConfiguration(ScoreUser user, String configurationName, boolean value) {
+        ConfigurationRecord configurationRecord = dslContext().selectFrom(CONFIGURATION)
                 .where(and(
                         CONFIGURATION.NAME.eq(configurationName),
                         CONFIGURATION.TYPE.eq("Boolean")
                 ))
-                .execute();
+                .fetchOptional().orElse(null);
+
+        if (configurationRecord == null) {
+            dslContext().insertInto(CONFIGURATION)
+                    .set(CONFIGURATION.NAME, configurationName)
+                    .set(CONFIGURATION.VALUE, (value) ? "true" : "false")
+                    .set(CONFIGURATION.TYPE, "Boolean")
+                    .execute();
+        } else {
+            dslContext().update(CONFIGURATION)
+                    .set(CONFIGURATION.VALUE, (value) ? "true" : "false")
+                    .where(CONFIGURATION.CONFIGURATION_ID.eq(configurationRecord.getConfigurationId()))
+                    .execute();
+        }
     }
 }
