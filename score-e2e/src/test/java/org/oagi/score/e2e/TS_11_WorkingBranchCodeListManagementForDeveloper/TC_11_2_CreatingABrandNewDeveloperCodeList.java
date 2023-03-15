@@ -9,22 +9,19 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
@@ -68,8 +65,41 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         assertEquals("Working", getText(editCodeListPage.getReleaseField()));
         assertEquals("1", getText(editCodeListPage.getRevisionField()));
         ArrayList<String> oagisOwnedListIDs = getAPIFactory().getCodeListAPI().getOAGISOwnedLists();
-        System.out.println(getText(editCodeListPage.getAgencyIDListField()));
         assertTrue(oagisOwnedListIDs.contains(getText(editCodeListPage.getAgencyIDListField())));
+    }
+
+    @Test
+    @DisplayName("TC_11_2_TA_2")
+    public void test_TA_2() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
+        assertEquals(null, codeList.getBasedCodeListManifestId());
+        editCodeListPage.setDefinition("test definition");
+        editCodeListPage.setDefinitionSource("test definition source");
+        editCodeListPage.setName("test code list");
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        editCodeListValueDialog.setCode("code value");
+        editCodeListValueDialog.setMeaning("code meaning");
+        editCodeListValueDialog.hitAddButton();
+        editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        editCodeListValueDialog.setCode("code value 2");
+        editCodeListValueDialog.setMeaning("code meaning 2");
+        editCodeListValueDialog.hitAddButton();
+        editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        editCodeListValueDialog.setCode("code value");
+        editCodeListValueDialog.setMeaning("code meaning");
+        editCodeListValueDialog.hitAddButton();
+        assert "code value already exist".equals(getSnackBarMessage(getDriver()));
     }
     
 

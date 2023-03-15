@@ -41,4 +41,6 @@ public interface EditCodeListPage extends Page {
     WebElement getRevisionField();
 
     WebElement getAgencyIDListField();
+
+    void setName(String codeListName);
 }

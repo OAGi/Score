@@ -176,4 +176,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getAgencyIDListField() {
         return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_SELECT_FIELD_LOCATOR);
     }
+
+    @Override
+    public void setName(String codeListName) {
+        sendKeys(getCodeListNameField(), codeListName);
+    }
 }
