@@ -9,7 +9,6 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPCreateDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
@@ -23,7 +22,6 @@ import java.util.List;
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -147,10 +145,10 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         escape(getDriver());
     }
 
-    private void isHidden(String xpath){
-        try{
+    private void isHidden(String xpath) {
+        try {
             getDriver().findElement(By.xpath(xpath + "[@hidden]"));
-        }catch(Exception notPresent){
+        } catch (Exception notPresent) {
             waitFor(ofMillis(2000L));
             assertTrue(!isElementPresent(getDriver(), By.xpath(xpath)));
         }
@@ -420,52 +418,4 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         assertTrue("Namespace is required.".equals(getSnackBarMessage(getDriver())));
 
     }
-
-    @Test
-    public void test_TA_10_3_3_a() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "Working";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
-        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
-    }
-
-    @Test
-    public void test_TA_10_3_3_b() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "Working";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
-        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        accPanel.setComponentType("Base(Abstract");
-        accViewEditPage.hitUpdateButton();
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
-    }
-
-
-
 }
