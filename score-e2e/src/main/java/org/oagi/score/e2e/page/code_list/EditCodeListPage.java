@@ -27,4 +27,18 @@ public interface EditCodeListPage extends Page {
     void hitRevise();
 
     WebElement getReviseButton();
+
+    WebElement getCodeListNameField();
+
+    WebElement getVersionField();
+
+    WebElement getDeprecatedSelectField();
+
+    WebElement getNamespaceSelectField();
+
+    WebElement getReleaseField();
+
+    WebElement getRevisionField();
+
+    WebElement getAgencyIDListField();
 }

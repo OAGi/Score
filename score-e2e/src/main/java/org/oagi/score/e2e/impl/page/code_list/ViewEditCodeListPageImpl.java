@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -20,6 +21,8 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             By.xpath("//*[contains(text(),\"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"New Code List\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
@@ -50,7 +53,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     public EditCodeListPage openCodeListViewEditPageByNameAndBranch(String name, String branch) {
         setBranch(branch);
         openCodeListByName(name);
-        CodeListObject codeList = getAPIFactory().getCoreComponentAPI().getCodeListByNameAndReleaseNum(name, branch);
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNum(name, branch);
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
         assert editCodeListPage.isOpened();
         return editCodeListPage;
@@ -325,5 +328,23 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getUpdatedDateField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]"));
+    }
+
+    @Override
+    public EditCodeListPage hitNewCodeListButton(AppUserObject user, String releaseNumber) {
+        retry(() -> {
+            click(getNewCodeListButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(user, releaseNumber);
+        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
+        assert editCodeListPage.isOpened();
+        return editCodeListPage;
+    }
+
+    @Override
+    public WebElement getNewCodeListButton() {
+        return elementToBeClickable(getDriver(), NEW_CODE_LIST_BUTTON_LOCATOR);
     }
 }

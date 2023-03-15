@@ -674,7 +674,6 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     }
     @Test
     @DisplayName("TC_11_1_TA_16")
-    @Disabled
     public void test_TA_16() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;

@@ -11,4 +11,8 @@ public interface AddCodeListCommentDialog extends Dialog {
     void hitCommentButton();
 
     WebElement getCommentButton();
+
+    void hitCloseButton();
+
+    WebElement getCloseButton();
 }

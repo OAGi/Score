@@ -19,6 +19,14 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
 
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+    private static final By CODE_LIST_NAME_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+    private static final By VERSION_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+    private static final By REVISION_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+    private static final By RELEASE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -31,6 +39,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
+    private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::div[1]/mat-select//span");
+    private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select//span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -129,5 +143,37 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getReviseButton() {
         return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getCodeListNameField() {
+        return visibilityOfElementLocated(getDriver(), CODE_LIST_NAME_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getVersionField() {
+        return visibilityOfElementLocated(getDriver(), VERSION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDeprecatedSelectField() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
+    }
+    @Override
+    public WebElement getNamespaceSelectField() {
+        return visibilityOfElementLocated(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
+    }
+    @Override
+    public WebElement getReleaseField() {
+        return visibilityOfElementLocated(getDriver(), RELEASE_FIELD_LOCATOR);
+    }
+    @Override
+    public WebElement getRevisionField() {
+        return visibilityOfElementLocated(getDriver(), REVISION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getAgencyIDListField() {
+        return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_SELECT_FIELD_LOCATOR);
     }
 }
