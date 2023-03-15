@@ -266,10 +266,17 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        click(accPanel.getComponentTypeSelectField());
+        waitFor(ofMillis(1000L));
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Base(Abstract) \"]//ancestor::mat-option")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Semantic Group \"]//ancestor::mat-option")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Semantics \"]//ancestor::mat-option")).size());
+        escape(getDriver());
     }
 
     @Test
