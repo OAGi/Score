@@ -88,10 +88,8 @@
     <mat-menu #help="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="about">About</button>
-        <button mat-menu-item>
-          <a target="_blank" rel="noopener noreferrer" href="/docs/">
-            User Guide
-          </a>
+        <button mat-menu-item (click)="openUserGuide($event)">
+          User Guide
         </button>
       </ng-template>
     </mat-menu>
