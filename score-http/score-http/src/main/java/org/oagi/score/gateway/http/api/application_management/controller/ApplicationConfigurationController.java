@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,42 +17,54 @@ public class ApplicationConfigurationController {
     @Autowired
     private ApplicationConfigurationService service;
 
-    @RequestMapping(value = "/application/tenant/enable", method = RequestMethod.POST)
-    public ResponseEntity tenantEnable(@AuthenticationPrincipal AuthenticatedPrincipal user) {
+    @RequestMapping(value = "/application/{type}/enable", method = RequestMethod.POST)
+    public ResponseEntity tenantEnable(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                       @PathVariable("type") String type) {
         ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest();
-        request.setTenantEnabled(true);
-        // Multi-tenant mode does not support the business term management.
-        request.setBusinessTermEnabled(false);
+        switch (type) {
+            case "tenant":
+                request.setTenantEnabled(true);
+                // Multi-tenant mode does not support the business term management.
+                request.setBusinessTermEnabled(false);
+                break;
+
+            case "business-term":
+                request.setBusinessTermEnabled(true);
+                break;
+
+            case "bie-inverse-mode":
+                request.setBieInverseModeEnabled(true);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unregistered type: " + type);
+        }
 
         service.changeApplicationConfiguration(user, request);
 
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/application/tenant/disable", method = RequestMethod.POST)
-    public ResponseEntity tenantDisable(@AuthenticationPrincipal AuthenticatedPrincipal user) {
+    @RequestMapping(value = "/application/{type}/disable", method = RequestMethod.POST)
+    public ResponseEntity tenantDisable(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                        @PathVariable("type") String type) {
         ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest();
-        request.setTenantEnabled(false);
+        switch (type) {
+            case "tenant":
+                request.setTenantEnabled(false);
+                break;
 
-        service.changeApplicationConfiguration(user, request);
+            case "business-term":
+                request.setBusinessTermEnabled(false);
+                break;
 
-        return ResponseEntity.noContent().build();
-    }
+            case "bie-inverse-mode":
+                request.setBieInverseModeEnabled(false);
+                break;
 
-    @RequestMapping(value = "/application/business-term/enable", method = RequestMethod.POST)
-    public ResponseEntity businessTermEnable(@AuthenticationPrincipal AuthenticatedPrincipal user) {
-        ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest();
-        request.setBusinessTermEnabled(true);
-
-        service.changeApplicationConfiguration(user, request);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @RequestMapping(value = "/application/business-term/disable", method = RequestMethod.POST)
-    public ResponseEntity businessTermDisable(@AuthenticationPrincipal AuthenticatedPrincipal user) {
-        ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest();
-        request.setBusinessTermEnabled(false);
+            default:
+                throw new UnsupportedOperationException("Unregistered type: " + type);
+        }
 
         service.changeApplicationConfiguration(user, request);
 

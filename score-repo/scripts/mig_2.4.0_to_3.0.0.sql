@@ -151,7 +151,8 @@ CREATE TABLE `configuration`
 -- Init data
 INSERT INTO `configuration` (`name`, `type`, `value`)
 VALUES ('score.tenant.enabled', 'Boolean', 'false'),
-       ('score.business-term.enabled', 'Boolean', 'true');
+       ('score.business-term.enabled', 'Boolean', 'true'),
+       ('score.bie.inverse-mode', 'Boolean', 'false');
 
 -- Add 'levenshtein' function
 -- Built by Felix Zandanel <felix@zandanel.me>, https://github.com/fza/mysql-doctrine-levenshtein-function

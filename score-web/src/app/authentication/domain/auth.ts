@@ -8,6 +8,10 @@ export class BusinessTermProperties {
   enabled: boolean;
 }
 
+export class BIEProperties {
+  inverseMode: boolean;
+}
+
 export class TenantProperties {
   enabled: boolean;
   roles: string[];
@@ -21,6 +25,7 @@ export class UserToken {
 
   tenant: TenantProperties;
   businessTerm: BusinessTermProperties;
+  bie: BIEProperties;
 
   constructor() {
     this.roles = ['',];
@@ -34,6 +39,9 @@ export class UserToken {
 
     this.businessTerm = new BusinessTermProperties();
     this.businessTerm.enabled = false;
+
+    this.bie = new BIEProperties();
+    this.bie.inverseMode = false;
   }
 }
 

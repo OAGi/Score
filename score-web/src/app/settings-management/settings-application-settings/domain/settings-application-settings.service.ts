@@ -10,11 +10,19 @@ export class SettingsApplicationSettingsService {
   }
 
   updateTenantConfiguration(value: boolean): Observable<any> {
-    return this.http.post('/api/application/tenant/' + (value ? 'enable' : 'disable'), {});
+    return this.updateConfiguration('tenant', value);
   }
 
   updateBusinessTermConfiguration(value: boolean): Observable<any> {
-    return this.http.post('/api/application/business-term/' + (value ? 'enable' : 'disable'), {});
+    return this.updateConfiguration('business-term', value);
+  }
+
+  updateBIEInverseModeConfiguration(value: boolean): Observable<any> {
+    return this.updateConfiguration('bie-inverse-mode', value);
+  }
+
+  updateConfiguration(type: string, value: boolean): Observable<any> {
+    return this.http.post('/api/application/' + type + '/' + (value ? 'enable' : 'disable'), {});
   }
 
 }

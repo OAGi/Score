@@ -32,6 +32,11 @@ export class SettingsApplicationSettingsComponent implements OnInit {
     return userToken.businessTerm.enabled;
   }
 
+  get isBIEInverseModeEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.bie.inverseMode;
+  }
+
   updateTenantConfiguration(value: boolean) {
     const dialogConfig = this.confirmDialogService.newConfig();
     if (value) {
@@ -83,6 +88,35 @@ export class SettingsApplicationSettingsComponent implements OnInit {
           this.settingsService.updateBusinessTermConfiguration(value).subscribe(_ => {
             this.auth.reloadUserToken().subscribe(userToken => {
               if (userToken.businessTerm.enabled === value) {
+                this.snackBar.open('Updated', '', {
+                  duration: 3000,
+                });
+              }
+            });
+          });
+        }
+      });
+  }
+
+  updateBIEInverseModeConfiguration(value: boolean) {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    if (value) {
+      dialogConfig.data.header = 'Enable BIE inverse mode?';
+      dialogConfig.data.content = ['Are you sure you want to enable the BIE inverse mode?',
+        'The BIE expression could be failed if system does not have enough memory to express a large size of BIEs.'];
+      dialogConfig.data.action = 'Enable';
+    } else {
+      dialogConfig.data.header = 'Disable BIE inverse mode?';
+      dialogConfig.data.content = ['Are you sure you want to disable the BIE inverse mode?'];
+      dialogConfig.data.action = 'Disable';
+    }
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.settingsService.updateBIEInverseModeConfiguration(value).subscribe(_ => {
+            this.auth.reloadUserToken().subscribe(userToken => {
+              if (userToken.bie.inverseMode === value) {
                 this.snackBar.open('Updated', '', {
                   duration: 3000,
                 });
