@@ -143,4 +143,13 @@ export class NavbarComponent implements OnInit {
     }
     return false;
   }
+
+  openUserGuide($event) {
+    let url = this.router.serializeUrl(this.router.createUrlTree(['/docs']));
+    if (!url.endsWith('/')) {
+      url += '/';
+    }
+    window.open(url, '_blank');
+  }
+
 }
