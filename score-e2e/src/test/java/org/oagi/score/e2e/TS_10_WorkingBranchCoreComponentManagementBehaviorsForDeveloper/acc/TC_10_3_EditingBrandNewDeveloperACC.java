@@ -13,6 +13,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -20,10 +21,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
@@ -130,9 +132,27 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage.ACCPanel finalAccPanel = accPanel;
         assertThrows(TimeoutException.class, () -> finalAccPanel.setNamespace(endUserNamespace.getUri()));
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        click(accPanel.getComponentTypeSelectField());
+        waitFor(ofMillis(1000L));
+        isHidden("//mat-option//span[.=\" Extension \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" User Extension Group \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" Embedded \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" OAGIS10 Nouns \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" OAGIS10 BODs \"]//ancestor::mat-option");
+        escape(getDriver());
+    }
 
-
-
+    private void isHidden(String xpath){
+        try{
+            getDriver().findElement(By.xpath(xpath + "[@hidden]"));
+        }catch(Exception notPresent){
+            waitFor(ofMillis(2000L));
+            assertTrue(!isElementPresent(getDriver(), By.xpath(xpath)));
+        }
     }
 
     @Test
