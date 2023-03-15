@@ -310,6 +310,51 @@ Note that you can change the Name and the Organization of a user while
 changing his/her password (see `Update User’s
 Information <#update-users-information-including-password-reset>`__).
 
+Application Settings
+--------------------
+
+Administrators can change the application settings for some features
+such as the multi-tenant mode, business term management, and the BIE
+inverse mode. Each configuration has on/off toggle buttons to enable
+or disable the feature.
+
+To change configurations:
+
+1. On the right side of the top menu of the page, click the account’s
+   name.
+
+2. Choose "Settings" from the drop-down list.
+
+3. Click the "Application settings" on the left side of the page.
+
+The following subsections explain each setting.
+
+Multi-tenant Mode
+~~~~~~~~~~~~~~~~~
+
+Multi-tenant management would be activated if the multi-tenant mode
+configuration is enabled. Note that some functionalities such as
+creating user extensions, BIE reuse, BIE uplifting, and business term
+function will be unavailable in the multi-tenant mode. See `Multi-tenant
+mode feature restrictions <#multi-tenant-mode-feature-restrictions>`__
+for more details.
+
+Business term function
+~~~~~~~~~~~~~~~~~~~~~~
+
+Business term management would be activated if the business term
+configuration is enabled. Note that users cannot see legacy business
+term data in BIEs, and may need to migrate it manually. See `Manage
+Business Terms <#manage-business-terms>`__ for more details.
+
+BIE inverse mode
+~~~~~~~~~~~~~~~~
+
+The BIE inverse mode would be activated if the BIE inverse mode
+configuration is enabled. Note that the BIE expression could be failed
+if system does not have enough memory to express a large size of BIEs.
+See `Restrict a BIE <#restrict-a-bie>`__ for more details.
+
 Customize UI
 ------------
 
