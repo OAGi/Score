@@ -185,4 +185,6 @@ public interface CoreComponentAPI {
                                                NamespaceObject namespace, String state);
 
     ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId);
+
+    CodeListObject getCodeListByNameAndReleaseNum(String name, String releaseNum);
 }
