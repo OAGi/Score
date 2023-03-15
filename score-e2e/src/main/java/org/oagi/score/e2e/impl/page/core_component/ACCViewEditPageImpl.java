@@ -683,6 +683,17 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public void setComponentType(String componentType) {
+            click(getComponentTypeSelectField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + componentType + "\")]//ancestor::mat-option"));
+            click(option);
+            waitFor(ofMillis(1000L));
+            assert getText(getComponentTypeSelectField()).equals(componentType);
+        }
+
+        @Override
         public WebElement getAbstractCheckbox() {
             return getCheckboxByName(baseXPath, "Abstract");
         }
@@ -695,6 +706,17 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
+        }
+
+        @Override
+        public void setNamespace(String namespace) {
+            click(getNamespaceSelectField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+            click(option);
+            waitFor(ofMillis(1000L));
+            assert getText(getNamespaceSelectField()).equals(namespace);
         }
 
         @Override

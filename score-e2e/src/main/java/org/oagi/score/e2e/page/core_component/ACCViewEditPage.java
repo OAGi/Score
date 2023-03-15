@@ -497,6 +497,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getComponentTypeSelectField();
 
         /**
+         * Set the 'Component' field with the given text.
+         *
+         * @param componentType "Base" "Semantic" or "Semantic Group"
+         */
+        void setComponentType(String componentType);
+
+        /**
          * Return the UI element of the 'Abstract' checkbox.
          *
          * @return the UI element of the 'Abstract' checkbox
@@ -516,6 +523,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Namespace' select field
          */
         WebElement getNamespaceSelectField();
+
+        /**
+         * Set the 'Namespace' field with the given text.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(String namespace);
 
         /**
          * Return the UI element of the 'Definition Source' field.

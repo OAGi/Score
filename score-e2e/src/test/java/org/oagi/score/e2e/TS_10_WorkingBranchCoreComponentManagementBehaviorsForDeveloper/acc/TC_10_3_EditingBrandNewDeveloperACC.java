@@ -13,6 +13,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -20,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -66,7 +66,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        accPanel.setComponentType("Base(Abstract)");
         assertDisabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }
@@ -88,11 +88,11 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Semantic Group");
+        accPanel.setComponentType("Semantic Group");
         assertDisabled(accPanel.getAbstractCheckbox());
         assertNotChecked(accPanel.getAbstractCheckbox());
 
-        accPanel.getComponentTypeSelectField().sendKeys("Semantics");
+        accPanel.setComponentType("Semantics");
         assertNotChecked(accPanel.getAbstractCheckbox());
         assertEnabled(accPanel.getAbstractCheckbox());
     }
@@ -113,10 +113,26 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+        assertEquals("true", accPanel.getObjectClassTermField().getAttribute("aria-required"));
+        assertEquals("true", accPanel.getComponentTypeSelectField().getAttribute("aria-required"));
+        assertEquals("true", accPanel.getNamespaceSelectField().getAttribute("aria-required"));
+        assertEquals("true", accPanel.getAbstractCheckbox().getAttribute("aria-required"));
+
+        //only standard namespace shall be allowed
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        ACCViewEditPage.ACCPanel finalAccPanel = accPanel;
+        assertThrows(TimeoutException.class, () -> finalAccPanel.setNamespace(endUserNamespace.getUri()));
+
+
+
+
     }
 
     @Test
