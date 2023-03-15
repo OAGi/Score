@@ -490,6 +490,12 @@ public interface ACCViewEditPage extends Page {
         WebElement getObjectClassTermField();
 
         /**
+         * Set the "Object Class Term" field with given text.
+         * @param objectClassTerm
+         */
+        void setObjectClassTerm(String objectClassTerm);
+
+        /**
          * Return the UI element of the 'Component Type' select field.
          *
          * @return the UI element of the 'Component Type' select field
