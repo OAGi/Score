@@ -280,7 +280,49 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_h() {
+    public void test_TA_10_3_2_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        // cannot create extension component when the component type isn't Semantics
+        String accOwner = getText(accPanel.getOwnerField());
+        accPanel.setComponentType("Base(Abstract)");
+        accPanel.setNamespace(namespace.getUri());
+        accViewEditPage.hitUpdateButton();
+        accViewEditPage.clickOnDropDownMenuByPath("/" + acc.getDen());
+
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]")).size());
+        escape(getDriver());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        accPanel.setComponentType("Semantics");
+        accViewEditPage.hitUpdateButton();
+        accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
+        WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getObjectClassTerm() + " Extension. Details");
+        ACCViewEditPage.ACCPanel extensionACCPanel = accViewEditPage.getACCPanel(extensionNode);
+        String extensionObjectClassTerm = getText(extensionACCPanel.getObjectClassTermField());
+        assertEquals(acc.getObjectClassTerm() + " Extension", extensionObjectClassTerm);
+        assertEquals("Extension", getText(extensionACCPanel.getComponentTypeSelectField()));
+        assertEquals(accOwner, getText(extensionACCPanel.getOwnerField()));
+
+        String extensionDen = getText(extensionACCPanel.getDENField());
+        WebElement allExtensionBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Extension/" + extensionDen + "/All Extension. Details");
+        ACCViewEditPage.ACCPanel allExtensionBasePanel = accViewEditPage.getACCPanel(allExtensionBaseNode);
+        assertEquals("All Extension. Details", getText(allExtensionBasePanel.getDENField()));
+    }
+
+    @Test
+    public void test_TA_10_3_2_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -297,6 +339,95 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
         accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertChecked(accPanel.getAbstractCheckbox());
+    }
+
+    @Test
+    public void test_TA_10_3_2_c() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
+        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertChecked(accPanel.getAbstractCheckbox());
+    }
+
+    @Test
+    public void test_TA_10_3_2_d() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
+        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertChecked(accPanel.getAbstractCheckbox());
+    }
+
+    @Test
+    public void test_TA_10_3_3_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
+        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertChecked(accPanel.getAbstractCheckbox());
+    }
+
+    @Test
+    public void test_TA_10_3_3_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        accPanel.setComponentType("Base(Abstract");
+        accViewEditPage.hitUpdateButton();
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
         assertDisabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }

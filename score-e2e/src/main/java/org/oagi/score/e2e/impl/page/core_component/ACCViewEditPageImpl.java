@@ -103,6 +103,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
 
+    private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
+
+
     private final ACCObject acc;
 
     public ACCViewEditPageImpl(BasePage parent, ACCObject acc) {
@@ -337,6 +341,20 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 new SelectAssociationDialogImpl(this, "Set Base ACC");
         assert selectAssociationDialog.isOpened();
         return selectAssociationDialog;
+    }
+
+    @Override
+    public ACCViewEditPage createOAGiExtensionComponent(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
+        }
+        assert this.isOpened();
+        return this;
     }
 
     @Override

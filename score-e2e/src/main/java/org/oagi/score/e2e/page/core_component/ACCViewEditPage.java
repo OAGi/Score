@@ -215,6 +215,14 @@ public interface ACCViewEditPage extends Page {
     SelectAssociationDialog setBaseACC(String path);
 
     /**
+     * Open the 'Create Extension Component' dialog by clicking 'Create OAGi Extension Component' context menu.
+     *
+     * @param path node path
+     * @return the ACCViewEditPage
+     */
+    ACCViewEditPage createOAGiExtensionComponent(String path);
+
+    /**
      * Open the association selection dialog by clicking 'Append Property at Last' context menu.
      *
      * @param path node path
