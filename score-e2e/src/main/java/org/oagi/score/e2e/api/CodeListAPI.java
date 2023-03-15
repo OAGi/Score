@@ -29,5 +29,5 @@ public interface CodeListAPI {
 
     void updateCodeList(CodeListObject codeListWIP);
 
-    String getModuleNameForCodeList(CodeListObject codeList);
+    String getModuleNameForCodeList(CodeListObject codeList, String releaseNumber);
 }

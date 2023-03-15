@@ -277,11 +277,11 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public void searchCodeListByModuleAndBranch(CodeListObject codeList, String releaseNumber) {
         setBranch(releaseNumber);
-        String moduleSetName = getAPIFactory().getCodeListAPI().getModuleNameForCodeList(codeList);
+        String moduleSetName = getAPIFactory().getCodeListAPI().getModuleNameForCodeList(codeList, releaseNumber);
         sendKeys(getModuleField(), moduleSetName);
+        sendKeys(getNameField(), codeList.getName());
         retry(() -> {
             hitSearchButton();
-
             WebElement td;
             WebElement tr;
             try {

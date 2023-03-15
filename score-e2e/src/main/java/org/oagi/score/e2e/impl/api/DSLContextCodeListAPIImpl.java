@@ -275,13 +275,15 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
-    public String getModuleNameForCodeList(CodeListObject codeList) {
+    public String getModuleNameForCodeList(CodeListObject codeList, String releaseNumber) {
         return dslContext.select(MODULE.NAME)
                 .from(MODULE)
                 .join(MODULE_CODE_LIST_MANIFEST).on(MODULE_CODE_LIST_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .join(CODE_LIST_MANIFEST).on(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())))
+                .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())).and
+                        (RELEASE.RELEASE_NUM.eq(releaseNumber)))
                 .fetchOneInto(String.class);
     }
 

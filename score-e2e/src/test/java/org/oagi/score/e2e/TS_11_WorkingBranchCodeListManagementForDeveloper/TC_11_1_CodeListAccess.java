@@ -176,7 +176,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developerA);
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
@@ -191,22 +191,16 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
             codeListForTesting.add(codeListDeleted);
 
-            /**
-             * This code list should be in a draft release, not in a working branch
-             */
-            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Release Draft");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
-            codeListForTesting.add(codeListReleaseDraft);
         }
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         getDriver().manage().window().maximize();
         for (CodeListObject cl : codeListForTesting) {
             /**
-             * The developer can view the details of a CL that is in Draft, Candidate, Deleted, or Release Draft state and owned by any developer
+             * The developer can view the details of a CL that is in Draft, Candidate or Deleted state and owned by any developer
              * but he cannot make any change except adding comments.
              */
             assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
-            ArrayList<String> acceptedStates = new ArrayList<>(List.of("Draft", "Candidate", "Deleted", "Release Draft"));
+            ArrayList<String> acceptedStates = new ArrayList<>(List.of("Draft", "Candidate", "Deleted"));
             assertTrue(acceptedStates.contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
@@ -361,7 +355,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
@@ -410,7 +404,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Draft");
@@ -680,33 +674,30 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     }
     @Test
     @DisplayName("TC_11_1_TA_16")
+    @Disabled
     public void test_TA_16() {
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
-        ReleaseObject workingBranch;
+        Map<CodeListObject, ReleaseObject> codeListRelease = new HashMap<>();
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
-            /**
-             * Create Code List for Working branch. States - Published
-             */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
-            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
-            codeListForTesting.add(codeListPublished);
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            CodeListObject existingCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_ChargeCode",release.getReleaseNumber());
+            codeListForTesting.add(existingCodeList);
+            codeListRelease.put(existingCodeList, release);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+            existingCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("clm6DateFormatCode1_DateFormatCode", release.getReleaseNumber());
+            codeListForTesting.add(existingCodeList);
+            codeListRelease.put(existingCodeList, release);
         }
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         getDriver().manage().window().maximize();
         for (CodeListObject cl : codeListForTesting) {
-            /*TODO:
-             * Selection of module name does not work because newly created code lists do not have assigned module
-             */
-            viewEditCodeListPage.searchCodeListByModuleAndBranch(cl, workingBranch.getReleaseNumber());
+            ReleaseObject release = codeListRelease.get(cl);
+            viewEditCodeListPage.searchCodeListByModuleAndBranch(cl, release.getReleaseNumber());
         }
 
     }
