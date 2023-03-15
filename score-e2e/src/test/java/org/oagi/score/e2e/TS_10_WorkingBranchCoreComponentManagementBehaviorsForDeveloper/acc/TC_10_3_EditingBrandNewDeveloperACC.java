@@ -405,14 +405,20 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.createACC(branch);
+        String url = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+
+        // cannot create extension component when the namespace is not set
+        accViewEditPage.clickOnDropDownMenuByPath("/" + acc.getDen());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]")).size());
+        accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
+        assertTrue("Namespace is required.".equals(getSnackBarMessage(getDriver())));
+
     }
 
     @Test
