@@ -6,11 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.ACCObject;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPCreateDialog;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -100,61 +101,4 @@ public class TC_10_2_CreatingBrandNewDeveloperACC extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
     }
-
-    @Test
-    public void test_TA_10_2_3() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "10.8.6";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
-    }
-
-    @Test
-    public void test_TA_10_2_4() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "10.8.6";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
-    }
-
-
-    @Test
-    public void test_TA_10_2_5() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "10.8.6";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
-    }
-
-
-    @Test
-    public void test_TA_10_2_6() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "10.8.6";
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.createACC(branch));
-    }
-
-
-
 }
