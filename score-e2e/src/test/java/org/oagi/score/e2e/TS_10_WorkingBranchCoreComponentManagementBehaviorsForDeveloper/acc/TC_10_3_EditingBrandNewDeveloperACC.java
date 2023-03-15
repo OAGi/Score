@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPCreateDialog;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
@@ -218,13 +218,36 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
-        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.getComponentTypeSelectField().sendKeys("Base(Abstract");
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
+        ASCCPObject randomASCCP1, randomASCCP2;
+        randomASCCP1 = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, developer, namespace, "WIP");
+        randomASCCP2 = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, developer, namespace, "WIP");
+
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        randomPropertyTerm = "Test Object " + randomPropertyTerm;
+
+        acc.setObjectClassTerm(randomPropertyTerm);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP1.getAsccpManifestId());
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            String asccpDEN = getText(asccpPanel.getDENField());
+            assertTrue(asccpDEN.endsWith(randomPropertyTerm));
+            assertEquals("1", getText(asccpPanel.getRevisionField()));
+        }
+
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP2.getAsccpManifestId());
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            String asccpDEN = getText(asccpPanel.getDENField());
+            assertTrue(asccpDEN.endsWith(randomPropertyTerm));
+            assertEquals("1", getText(asccpPanel.getRevisionField()));
+        }
+
     }
 
     @Test
