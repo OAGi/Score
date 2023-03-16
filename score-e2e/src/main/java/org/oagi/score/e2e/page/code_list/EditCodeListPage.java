@@ -53,4 +53,8 @@ public interface EditCodeListPage extends Page {
     void removeCodeListValue();
 
     WebElement getRemoveValueButton();
+
+    WebElement getDeriveCodeListBasedOnThisButton();
+
+    void hitDeriveCodeListBasedOnThisButton();
 }

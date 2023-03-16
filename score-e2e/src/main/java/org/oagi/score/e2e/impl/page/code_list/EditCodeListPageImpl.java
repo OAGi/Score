@@ -49,6 +49,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select//span");
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
+    private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Derive Code List based on this\")]//ancestor::button[1]");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -215,5 +217,18 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getRemoveValueButton() {
         return elementToBeClickable(getDriver(), REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDeriveCodeListBasedOnThisButton() {
+        return elementToBeClickable(getDriver(), DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR);
+    }
+    @Override
+    public void hitDeriveCodeListBasedOnThisButton() {
+        retry(() -> {
+            click(getDeriveCodeListBasedOnThisButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 }

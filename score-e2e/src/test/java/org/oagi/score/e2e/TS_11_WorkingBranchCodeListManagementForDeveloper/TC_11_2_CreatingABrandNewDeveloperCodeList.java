@@ -9,6 +9,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
@@ -131,6 +132,27 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.hitAddButton();
         editCodeListPage.selectCodeListValue("code value 2");
         editCodeListPage.removeCodeListValue();
+    }
+    @Test
+    @DisplayName("TC_11_2_TA_5")
+    public void test_TA_5() {
+        AppUserObject developerA;
+        ReleaseObject release;
+        CodeListObject codeList;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerB);
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, release, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
+        }
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage  = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
     }
 
     @Test
