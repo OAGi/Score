@@ -840,8 +840,18 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public void setCardinalityMinField(String cardinalityMin) {
+            sendKeys(getCardinalityMinField(), cardinalityMin);
+        }
+
+        @Override
         public WebElement getCardinalityMaxField() {
             return getInputFieldByName(baseXPath, "Cardinality Max");
+        }
+
+        @Override
+        public void setCardinalityMaxField(String cardinalityMax) {
+            sendKeys(getCardinalityMaxField(), cardinalityMax);
         }
 
         @Override
