@@ -1245,7 +1245,8 @@ that is displayed:
         might be better to set the Type filter to only ACC.
 
 -  *Tag* enables filtering components based on the tag. Note that this only
-   applies to the CC associated with the tag(s). To use this filter:
+   applies to the CC associated with the tag(s). See `Tagging CCs <#tagging-ccs>`__
+   for more details. To use this filter:
 
    -  | Check the checkboxes to list core components that associated with
         the tag(s).
@@ -3312,6 +3313,33 @@ a property of an ACC. The ACC should be deleted first.
 
 3. A confirmation dialog is displayed. Confirm or cancel the purge
    request.
+
+Tagging CCs
+^^^^^^^^^^^
+The tagging feature in Score allows users to label and categorize core components
+for better management. With this feature, users can assign custom tags to core
+components making it easier to locate and work with them later. To label the tag
+to core components:
+
+1. Click on the ellipsis of a node in the CC tree located in the left pane
+   on any CC detail page.
+
+2. Next, select the "Tag" option from the menu that appears.
+
+   1. To apply the tag to the core component, choose the desired tag from the list
+      of available tags in the submenus.
+
+   2. To add a new tag, first click on the "Edit Tags" menu item. Then, scroll
+      down to the bottom of the dialog box. Next, type in the "Name", "Text Color",
+      "Background Color", and "Description (Optional)" fields for the new tag.
+      Finally, click on the "Add" button to create the new tag.
+
+   3. To edit existing tags, click on the "Edit Tags" menu item. Then, update
+      the "Name", "Text Color", "Background Color", and "Description (Optional)"
+      fields of the tag. Finally, click on the "Update" button to save the changes.
+
+   4. To discard existing tags, click on the "Edit Tags" menu item and then
+      click on the "Discard" button located below the tag properties.
 
 Create an OAGIS BOD
 ~~~~~~~~~~~~~~~~~~~
