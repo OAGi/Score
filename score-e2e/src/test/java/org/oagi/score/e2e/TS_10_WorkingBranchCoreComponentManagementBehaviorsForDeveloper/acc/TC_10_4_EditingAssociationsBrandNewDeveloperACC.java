@@ -166,7 +166,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ACCViewEditPage.ASCCPPanel asccpPanelFromACCPage = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertEquals("Deprecated", getText(asccpPanel.getStateField()));
     }
 
