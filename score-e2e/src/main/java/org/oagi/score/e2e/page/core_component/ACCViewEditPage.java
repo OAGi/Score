@@ -263,6 +263,23 @@ public interface ACCViewEditPage extends Page {
     ASCCPViewEditPage openASCCPInNewTab(WebElement accNode);
 
     /**
+     * Open the association selection dialog by clicking 'Insert Property Before' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog insertPropertyBefore(String path);
+
+
+    /**
+     * Open the association selection dialog by clicking 'Insert Property After' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog insertPropertyAfter(String path);
+
+    /**
      * Click the drop-down menu to open the context menu on the node.
      *
      * @param path the path of the node

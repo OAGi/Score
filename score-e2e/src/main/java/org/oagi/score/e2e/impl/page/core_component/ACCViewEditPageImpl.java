@@ -106,6 +106,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
 
+    private static final By INSERT_PROPERTY_BEFORE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Insert Property Before\")]");
+
+    private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Insert Property After\")]");
+
 
     private final ACCObject acc;
 
@@ -443,6 +449,38 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
         return confirmDialog;
 
+    }
+
+    @Override
+    public SelectAssociationDialog insertPropertyBefore(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Insert Property Before");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
+    }
+
+    @Override
+    public SelectAssociationDialog insertPropertyAfter(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
+        }
+        SelectAssociationDialog selectAssociationDialog =
+                new SelectAssociationDialogImpl(this, "Insert Property After");
+        assert selectAssociationDialog.isOpened();
+        return selectAssociationDialog;
     }
 
     @Override
