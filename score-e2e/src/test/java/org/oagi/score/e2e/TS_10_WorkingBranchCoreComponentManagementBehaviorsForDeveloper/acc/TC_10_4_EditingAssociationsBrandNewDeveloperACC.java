@@ -244,10 +244,89 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         assertEquals("WIP", getText(asccPanel.getStateField()));
     }
-
-
     @Test
     public void test_TA_10_4_1_e() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation("Data Area. Acknowledge Batch Certificate Of Analysis Data Area");
+        assertTrue("Target ASCCP is not resuable.".equals(getSnackBarMessage(getDriver())));
+
+        // Also test for when non-reusable ASCCP has been deleted while still having an association and
+        // the developer still try to user the ASCCP in another association.
+
+        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ASCCPObject asccp_NotReusable = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "Published");
+
+
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+
+        assertEquals("WIP", getText(asccPanel.getStateField()));
+
+
+
     }
+
+    @Test
+    public void test_TA_10_4_1_f() {
+
+
+    }
+
+
+    @Test
+    public void test_TA_10_4_2() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_a() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_b() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_c() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_d() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_e() {
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_3_f() {
+
+
+    }
+
+
 }
