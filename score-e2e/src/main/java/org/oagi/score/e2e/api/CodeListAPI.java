@@ -41,4 +41,6 @@ public interface CodeListAPI {
     boolean isListIdUnique(String listId);
 
     ArrayList<String> getOAGISOwnedLists();
+
+    boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList);
 }

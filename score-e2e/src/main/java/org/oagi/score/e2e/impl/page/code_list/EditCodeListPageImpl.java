@@ -231,4 +231,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
+    @Override
+    public void setVersion(String version) {
+        sendKeys(getVersionField(), version);
+    }
 }

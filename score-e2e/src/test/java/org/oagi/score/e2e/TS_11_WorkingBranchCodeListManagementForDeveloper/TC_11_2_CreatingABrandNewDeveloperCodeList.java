@@ -134,6 +134,26 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListPage.removeCodeListValue();
     }
     @Test
+    @DisplayName("TC_11_2_TA_4")
+    public void test_TA_4() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
+        editCodeListPage.setVersion("test version");
+        assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
+        String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
+        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
+    }
+    @Test
     @DisplayName("TC_11_2_TA_5")
     public void test_TA_5() {
         AppUserObject developerA;

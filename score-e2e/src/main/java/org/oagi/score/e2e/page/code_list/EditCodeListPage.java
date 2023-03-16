@@ -57,4 +57,6 @@ public interface EditCodeListPage extends Page {
     WebElement getDeriveCodeListBasedOnThisButton();
 
     void hitDeriveCodeListBasedOnThisButton();
+
+    void setVersion(String version);
 }

@@ -359,6 +359,25 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
+    public boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList) {
+        List<Result<Record>> records = dslContext.select(CODE_LIST.CODE_LIST_ID)
+                .from(CODE_LIST)
+                .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                .where(and(CODE_LIST.LIST_ID.eq(codeList.getListId()),
+                        (CODE_LIST.VERSION_ID.eq(codeList.getVersionId())),
+                        (AGENCY_ID_LIST.NAME).eq(agencyIDList)))
+                .fetchMany();
+        if (records.size()>1){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    @Override
     public CodeListObject getNewlyCreatedCodeList(AppUserObject user, String releaseNumber) {
         ULong latestCodeListIDByUserInRelease = dslContext.select(DSL.max(CODE_LIST.CODE_LIST_ID))
                 .from(CODE_LIST_MANIFEST)
