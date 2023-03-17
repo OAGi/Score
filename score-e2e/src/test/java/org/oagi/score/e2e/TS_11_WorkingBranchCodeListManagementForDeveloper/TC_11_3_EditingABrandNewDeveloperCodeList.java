@@ -58,10 +58,9 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(endUser);
             namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
             namespaceForTesting.add(namespace);
-
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
         /**
@@ -76,7 +75,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
          * Test Assertion #11.3.1.b
          * Note: For developer Based Code list is not visible on the UI
          */
-        assertTrue(codeList.getBasedCodeListManifestId()==null);
+        assertTrue(codeList.getBasedCodeListManifestId() == null);
         /**
          * Test Assertion #11.3.1.c
          */
@@ -97,7 +96,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         /**
          * Test Assertion #11.3.1.e
          */
-        for (NamespaceObject namespace : namespaceForTesting){
+        for (NamespaceObject namespace : namespaceForTesting) {
             assertThrows(Exception.class, () -> {
                 editCodeListPage.setNamespace(namespace);
             });
@@ -119,9 +118,10 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setMeaning("different meaning");
         String enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
-        String message = enteredValue+" already exist";
+        String message = enteredValue + " already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
     }
+
     @Test
     @DisplayName("TC_11_3_TA_2")
     public void test_TA_2() {
@@ -135,8 +135,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
             NamespaceObject OAGiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
@@ -145,6 +145,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         assertEquals("false", editCodeListValueDialog.getDefinitionSourceField().getAttribute("aria-required"));
         assertEquals("false", editCodeListValueDialog.getDefinitionField().getAttribute("aria-required"));
     }
+
     @Test
     @DisplayName("TC_11_3_TA_3")
     public void test_TA_3() {
@@ -160,8 +161,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
             codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
         editCodeListPage.selectCodeListValue(codeListValue.getValue());
@@ -185,8 +186,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
             codeListValueOne = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
             codeListValueTwo = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValueOne.getValue());
@@ -220,8 +221,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
             codeListValueOne = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
@@ -231,7 +232,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setDefinitionSource("different definition source");
         String enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
-        String message = enteredValue+" already exist";
+        String message = enteredValue + " already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
 
         editCodeListValueDialog = editCodeListPage.addCodeListValue();
@@ -241,7 +242,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setDefinitionSource(codeListValueOne.getDefinitionSource());
         enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
-        message = enteredValue+" already exist";
+        message = enteredValue + " already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
     }
 

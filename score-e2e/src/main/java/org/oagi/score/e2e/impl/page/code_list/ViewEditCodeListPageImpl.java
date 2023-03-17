@@ -331,11 +331,12 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     }
 
     @Override
-    public EditCodeListPage hitNewCodeListButton(AppUserObject user, String releaseNumber) {
+    public EditCodeListPage openNewCodeList(AppUserObject user, String releaseNumber) {
         retry(() -> {
             click(getNewCodeListButton());
             waitFor(ofMillis(1000L));
         });
+
         invisibilityOfLoadingContainerElement(getDriver());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(user, releaseNumber);
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);

@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-@Execution(ExecutionMode.SAME_THREAD)
+@Execution(ExecutionMode.CONCURRENT)
 public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -48,10 +48,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage  = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         assertEquals("Code List", getText(editCodeListPage.getCodeListNameField()));
         assertEquals("1", getText(editCodeListPage.getVersionField()));
@@ -80,10 +80,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         assertEquals(null, codeList.getBasedCodeListManifestId());
         editCodeListPage.setDefinition("test definition");
@@ -102,9 +102,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setMeaning("code meaning");
         String enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
-        String message = enteredValue+" already exist";
+        String message = enteredValue + " already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
     }
+
     @Test
     @DisplayName("TC_11_2_TA_3")
     public void test_TA_3() {
@@ -115,10 +116,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         assertEquals(null, codeList.getBasedCodeListManifestId());
         editCodeListPage.setDefinition("test definition");
@@ -135,6 +136,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListPage.selectCodeListValue("code value 2");
         editCodeListPage.removeCodeListValue();
     }
+
     @Test
     @DisplayName("TC_11_2_TA_4")
     public void test_TA_4() {
@@ -145,16 +147,17 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         editCodeListPage.setVersion("test version");
         assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
         String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
         assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
     }
+
     @Test
     @DisplayName("TC_11_2_TA_5")
     public void test_TA_5() {
@@ -170,10 +173,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, release, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
         assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
     }
 
@@ -187,12 +190,13 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         viewEditCodeListPage.setBranch(release.getReleaseNumber());
         assertThrows(TimeoutException.class, () -> viewEditCodeListPage.getNewCodeListButton());
     }
+
     @Test
     @DisplayName("TC_11_2_TA_7")
     public void test_TA_7() {
@@ -203,10 +207,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        getDriver().manage().window().maximize();
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.hitNewCodeListButton(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         assertEquals(null, codeList.getBasedCodeListManifestId());
         editCodeListPage.setDefinition("test definition");
@@ -218,7 +222,6 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
         editCodeListValueDialog.hitAddButton();
     }
-    
 
     @AfterEach
     public void tearDown() {

@@ -50,7 +50,7 @@ public interface ViewEditCodeListPage extends Page {
 
     WebElement getUpdatedDateField();
 
-    EditCodeListPage hitNewCodeListButton(AppUserObject user, String releaseNumber);
+    EditCodeListPage openNewCodeList(AppUserObject user, String releaseNumber);
 
     WebElement getNewCodeListButton();
 }
