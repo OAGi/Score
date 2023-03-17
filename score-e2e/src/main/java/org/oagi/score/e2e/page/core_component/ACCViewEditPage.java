@@ -280,6 +280,14 @@ public interface ACCViewEditPage extends Page {
     SelectAssociationDialog insertPropertyAfter(String path);
 
     /**
+     * Remove the association by clicking 'Remove' context menu.
+     *
+     * @param path node path
+     * @return the ACCViewEditPage
+     */
+    ACCViewEditPage removeAssociation(String path);
+
+    /**
      * Click the drop-down menu to open the context menu on the node.
      *
      * @param path the path of the node

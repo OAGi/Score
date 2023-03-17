@@ -112,6 +112,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Insert Property After\")]");
 
+    private static final By REMOVE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Remove\")]");
+
 
     private final ACCObject acc;
 
@@ -227,7 +230,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public void setObjectClassTerm(String objectClassTerm){
+    public void setObjectClassTerm(String objectClassTerm) {
         sendKeys(getObjectClassTermField(), objectClassTerm);
     }
 
@@ -290,10 +293,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public String getDefinitionFieldValue() {
         return getText(getDefinitionField());
     }
+
     @Override
-    public WebElement getCommentsIcon(){
+    public WebElement getCommentsIcon() {
         return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
     }
+
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
@@ -436,8 +441,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         assert findWhereUsedDialog.isOpened();
         return findWhereUsedDialog;
     }
+
     @Override
-    public WebElement createASCCPfromThis(String path){
+    public WebElement createASCCPfromThis(String path) {
         WebElement confirmDialog;
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
@@ -481,6 +487,25 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 new SelectAssociationDialogImpl(this, "Insert Property After");
         assert selectAssociationDialog.isOpened();
         return selectAssociationDialog;
+    }
+
+    @Override
+    public ACCViewEditPage removeAssociation(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REMOVE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REMOVE_OPTION_LOCATOR));
+        }
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
+
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Remove anyway\")]//ancestor::button[1]")));
+        assert this.isOpened();
+        return this;
     }
 
     @Override
@@ -639,6 +664,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 public ASCCPanel getASCCPanel() {
                     return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public ASCCPPanel getASCCPPanel() {
                     return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -657,6 +683,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 public BCCPanel getBCCPanel() {
                     return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -957,8 +984,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+
         @Override
-        public WebElement getCommentsIcon(){
+        public WebElement getCommentsIcon() {
             return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
@@ -1007,7 +1035,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
-        public WebElement getPropertyTermField(){
+        public WebElement getPropertyTermField() {
             return getInputFieldByName(baseXPath, "Property Term");
         }
 
@@ -1057,7 +1085,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
-        public WebElement getNamespaceSelectField(){
+        public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
         }
 
@@ -1097,7 +1125,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
-        public WebElement getCommentsIcon(){
+        public WebElement getCommentsIcon() {
             return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
