@@ -1396,7 +1396,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
@@ -1430,7 +1430,63 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     @Test
     public void test_TA_10_4_10_b() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer,release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+
+        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper,release, namespace, "WIP");
+        accForBase.setDeprecated(true);
+        getAPIFactory().getCoreComponentAPI().updateACC(accForBase);
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.setDEN(accForBase.getDen());
+        accSetBaseACCDialog.hitSearchButton();
+        By APPLY_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Apply\")]//ancestor::button[1]");
+
+        ACCObject finalAccForBase = accForBase;
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+                td = tr.findElement(By.className("mat-column-" + "den"));
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+            }
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
+
+            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
+        });
     }
 
     @Test
