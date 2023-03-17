@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
@@ -124,6 +121,51 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.hitAddButton();
         String message = enteredValue+" already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
+    }
+    @Test
+    @DisplayName("TC_11_3_TA_2")
+    public void test_TA_2() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        CodeListObject codeList;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject OAGiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        assertEquals("true", editCodeListValueDialog.getCodeField().getAttribute("aria-required"));
+        assertEquals("true", editCodeListValueDialog.getMeaningField().getAttribute("aria-required"));
+        assertEquals("false", editCodeListValueDialog.getDefinitionSourceField().getAttribute("aria-required"));
+        assertEquals("false", editCodeListValueDialog.getDefinitionField().getAttribute("aria-required"));
+    }
+    @Test
+    @DisplayName("TC_11_3_TA_3")
+    public void test_TA_3() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        CodeListObject codeList;
+        CodeListValueObject codeListValue;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject OAGiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
+            codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        editCodeListPage.selectCodeListValue(codeListValue.getValue());
+        assertDoesNotThrow(() -> editCodeListPage.removeCodeListValue());
     }
 
     @AfterEach
