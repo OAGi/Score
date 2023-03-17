@@ -1427,7 +1427,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertEquals(state, getText(accBasePanel.getStateField()));
         }
     }
-
     @Test
     public void test_TA_10_4_10_b() {
 
