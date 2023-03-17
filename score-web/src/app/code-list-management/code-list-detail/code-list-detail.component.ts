@@ -88,7 +88,7 @@ export class CodeListDetailComponent implements OnInit {
 
   ngOnInit() {
     this.commentControl = new CodeListCommentControl(this.sidenav, this.service);
-    this.isUpdating = false;
+    this.isUpdating = true;
 
     this.agencyListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -110,11 +110,7 @@ export class CodeListDetailComponent implements OnInit {
           this.service.getCodeListRevision(this.manifestId),
           this.namespaceService.getSimpleNamespaces()
         ]);
-      })).pipe(
-      finalize(() => {
-        this.isUpdating = false;
-      })
-    ).subscribe(([codeList, revision, namespaces]) => {
+      })).subscribe(([codeList, revision, namespaces]) => {
       this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
         this.agencyIdLists = resp.agencyIdLists;
         this.allAgencyIdListValues = resp.agencyIdListValues;
@@ -126,6 +122,8 @@ export class CodeListDetailComponent implements OnInit {
         this.filteredAgencyLists.next(this.agencyIdLists.slice());
 
         this.init(codeList);
+      }, _ => {
+        this.isUpdating = false;
       });
     });
 
@@ -201,6 +199,8 @@ export class CodeListDetailComponent implements OnInit {
     this.codeList = codeList;
 
     this._updateDataSource(this.codeList.codeListValues);
+
+    this.isUpdating = false;
   }
 
   get currentAgencyIdListValues(): SimpleAgencyIdListValue[] {
