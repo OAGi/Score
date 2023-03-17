@@ -892,11 +892,23 @@ public interface ACCViewEditPage extends Page {
         WebElement getCardinalityMinField();
 
         /**
+         * set the UI element of the 'Cardinality Min' field by the given text.
+         * @param cardinalityMin
+         */
+        void setCardinalityMinField(String cardinalityMin);
+
+        /**
          * Return the UI element of the 'Cardinality Max' field.
          *
          * @return the UI element of the 'Cardinality Max' field
          */
         WebElement getCardinalityMaxField();
+
+        /**
+         * set the UI element of the 'Cardinality Max' field by the given text.
+         * @param cardinalityMin
+         */
+        void setCardinalityMaxField(String cardinalityMax);
 
         /**
          * Return the UI element of the 'Entity Type' select field.
