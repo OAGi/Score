@@ -168,6 +168,83 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         assertDoesNotThrow(() -> editCodeListPage.removeCodeListValue());
     }
 
+    @Test
+    @DisplayName("TC_11_3_TA_4")
+    public void test_TA_4() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        CodeListObject codeList;
+        CodeListValueObject codeListValueOne;
+        CodeListValueObject codeListValueTwo;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject OAGiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
+            codeListValueOne = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
+            codeListValueTwo = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValueOne.getValue());
+        editCodeListValueDialog.setCode("new code");
+        editCodeListValueDialog.setMeaning("new meaning");
+        editCodeListValueDialog.setDefinition("new definition");
+        editCodeListValueDialog.setDefinitionSource("new definition source");
+        assertDisabled(editCodeListPage.getDeprecatedSelectField());
+        editCodeListValueDialog.hitSaveButton();
+
+        editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValueTwo.getValue());
+        editCodeListValueDialog.setMeaning("new meaning");
+        editCodeListValueDialog.setDefinition("new definition");
+        editCodeListValueDialog.setDefinitionSource("new definition source");
+        assertDisabled(editCodeListPage.getDeprecatedSelectField());
+        editCodeListValueDialog.hitSaveButton();
+    }
+
+    @Test
+    @DisplayName("TC_11_3_TA_5")
+    public void test_TA_5() {
+        AppUserObject developer;
+        ReleaseObject workingBranch;
+        CodeListObject codeList;
+        CodeListValueObject codeListValueOne;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject OAGiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developer, OAGiNamespace, workingBranch, "WIP");
+            codeListValueOne = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        getDriver().manage().window().maximize();
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        editCodeListValueDialog.setCode(codeListValueOne.getValue());
+        editCodeListValueDialog.setMeaning("different meaning");
+        editCodeListValueDialog.setDefinition("different definition");
+        editCodeListValueDialog.setDefinitionSource("different definition source");
+        String enteredValue = getText(editCodeListValueDialog.getCodeField());
+        editCodeListValueDialog.hitAddButton();
+        String message = enteredValue+" already exist";
+        assert message.equals(getSnackBarMessage(getDriver()));
+
+        editCodeListValueDialog = editCodeListPage.addCodeListValue();
+        editCodeListValueDialog.setCode(codeListValueOne.getValue());
+        editCodeListValueDialog.setMeaning(codeListValueOne.getMeaning());
+        editCodeListValueDialog.setDefinition(codeListValueOne.getDefinition());
+        editCodeListValueDialog.setDefinitionSource(codeListValueOne.getDefinitionSource());
+        enteredValue = getText(editCodeListValueDialog.getCodeField());
+        editCodeListValueDialog.hitAddButton();
+        message = enteredValue+" already exist";
+        assert message.equals(getSnackBarMessage(getDriver()));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

@@ -68,4 +68,6 @@ public interface EditCodeListPage extends Page {
     void hitUpdateAnywayButton();
 
     void setNamespace(NamespaceObject namespace);
+
+    EditCodeListValueDialog editCodeListValue(String value);
 }

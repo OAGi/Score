@@ -21,6 +21,8 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
             By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::mat-dialog-actions/button[1]");
+    private static final By SAVE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Save\")]//ancestor::mat-dialog-actions/button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//span[contains(text(),\"Deprecated\")]//ancestor::mat-checkbox");
 
@@ -105,4 +107,16 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
         sendKeys(getDefinitionSourceField(), definitionSource);
     }
 
+    @Override
+    public void hitSaveButton() {
+        retry(() -> {
+            click(getSaveButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+    @Override
+    public WebElement getSaveButton() {
+        return elementToBeClickable(getDriver(), SAVE_BUTTON_LOCATOR);
+    }
 }

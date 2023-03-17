@@ -272,4 +272,15 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             click(optionField);
         });
     }
+
+    @Override
+    public EditCodeListValueDialog editCodeListValue(String value) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(value);
+            click(tr);
+        });
+        EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
+        assert editCodeListValueDialog.isOpened();
+        return editCodeListValueDialog;
+    }
 }

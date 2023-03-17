@@ -25,4 +25,8 @@ public interface EditCodeListValueDialog extends Dialog {
     void setDefinition(String definition);
 
     void setDefinitionSource(String definitionSource);
+
+    void hitSaveButton();
+
+    WebElement getSaveButton();
 }
