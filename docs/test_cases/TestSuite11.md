@@ -77,7 +77,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #11.2.1
-On the Code List View/Edit page where a working branch is selected, the developer can create a brand-new code list without base with only required information, See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields. The following are default values – Based Code List = Null and cannot be changed; Name = “a code list”; List ID = Randomly Generated GUID; Agency ID = the OAGI one; Version = 1; Definition = blank; Definition Source= blank; Remark = blank; Deprecated = false (and locked); Namespace = null; Comments = empty. The brand-new CL must not have any release assigned yet, i.e., it must not appear in any release branch except the working branch. It has a revision number 1.
+On the Code List View/Edit page where a working branch is selected, the developer can create a brand-new code list without base with only required information, See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields. The following are default values – Name = “Code List”; List ID = Randomly Generated GUID; Agency ID = the OAGI one; Version = 1; Definition = blank; Definition Source= blank; Deprecated = false (and locked); Namespace = null; Comments = empty. The brand-new CL must not have any release assigned yet, i.e., it must not appear in any release branch except the working branch. It has a revision number 1.
 
 #### Test Assertion #11.2.2
 The developer can create a code list without base with all information specified and multiple code values. In addition, Code list value cannot be duplicated.

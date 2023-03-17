@@ -19,4 +19,14 @@ public interface EditCodeListValueDialog extends Dialog {
     WebElement getDefinitionSourceField();
 
     WebElement getAddCodeListValueButton();
+
+    WebElement getDeprecatedSelectField();
+
+    void setDefinition(String definition);
+
+    void setDefinitionSource(String definitionSource);
+
+    void hitSaveButton();
+
+    WebElement getSaveButton();
 }

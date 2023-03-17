@@ -184,7 +184,4 @@ public interface CoreComponentAPI {
     ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,
                                                NamespaceObject namespace, String state);
 
-    ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId);
-
-    CodeListObject getCodeListByNameAndReleaseNum(String name, String releaseNum);
 }

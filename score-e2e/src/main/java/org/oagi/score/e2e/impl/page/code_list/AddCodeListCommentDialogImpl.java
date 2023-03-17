@@ -16,6 +16,8 @@ public class AddCodeListCommentDialogImpl implements AddCodeListCommentDialog {
             By.xpath("//span[contains(text(), \"Comment\")]//ancestor::button[1]");
     private static final By COMMENT_FIELD_LOCATOR =
             By.xpath("//mat-sidenav//mat-form-field//textarea");
+    private static final By CLOSE_BUTTON_LOCATOR =
+            By.xpath("//div/mat-icon[contains(text(), \"close\")]");
 
     private final BasePageImpl parent;
 
@@ -64,5 +66,19 @@ public class AddCodeListCommentDialogImpl implements AddCodeListCommentDialog {
     @Override
     public WebElement getCommentButton() {
         return elementToBeClickable(getDriver(), COMMENT_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCloseButton() {
+        retry(() -> {
+            click(getCloseButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getCloseButton() {
+        return elementToBeClickable(getDriver(), CLOSE_BUTTON_LOCATOR);
     }
 }
