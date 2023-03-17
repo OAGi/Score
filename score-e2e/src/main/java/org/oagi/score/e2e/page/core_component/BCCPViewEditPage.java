@@ -835,6 +835,11 @@ public interface BCCPViewEditPage extends Page {
         WebElement getDeprecatedCheckbox();
 
         /**
+         * Toggle the 'Deprecated' checkbox
+         */
+        void toggleDeprecated();
+
+        /**
          * Return the UI element of the 'Namespace' select field.
          *
          * @return the UI element of the 'Namespace' select field

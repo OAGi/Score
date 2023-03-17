@@ -894,6 +894,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         }
 
         @Override
+        public void toggleDeprecated() {
+            click(getDeprecatedCheckbox());
+        }
+
+        @Override
         public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
         }

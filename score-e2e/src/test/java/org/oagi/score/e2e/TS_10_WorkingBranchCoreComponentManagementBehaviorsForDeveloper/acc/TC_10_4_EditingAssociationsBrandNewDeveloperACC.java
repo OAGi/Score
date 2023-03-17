@@ -9,10 +9,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -707,40 +704,53 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         String branch = "Working";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc, acc_association;
-        ASCCObject ascc;
-        ASCCPObject asccp;
+        ACCObject acc;
         BCCPObject bccp, bccp_to_append;
-
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
-
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
-            ascc.setCardinalityMax(1);
-            coreComponentAPI.updateASCC(ascc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp_to_append.getBccpManifestId());
+        bccpViewEditPage.hitReviseButton();
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        bccpPanel.toggleDeprecated();
+        bccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertNotChecked(asccPanel.getDeprecatedCheckbox());
-        assertDisabled(asccPanel.getDeprecatedCheckbox());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.setDEN(bccp_to_append.getDen());
+        appendBCCPDialog.hitSearchButton();
+        By APPEND_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+                td = tr.findElement(By.className("mat-column-" + "den"));
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an association using " + bccp_to_append.getDen(), e);
+            }
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
+
+            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
+            waitFor(ofMillis(500));
+        });
     }
 
     @Test
