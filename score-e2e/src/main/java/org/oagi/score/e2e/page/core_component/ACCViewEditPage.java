@@ -906,7 +906,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Cardinality Max' field by the given text.
-         * @param cardinalityMin
+         * @param cardinalityMax
          */
         void setCardinalityMaxField(String cardinalityMax);
 
@@ -916,6 +916,12 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Entity Type' select field
          */
         WebElement getEntityTypeSelectField();
+
+        /**
+         * set the UI element of the 'Entity Type' select field by given text.
+         * @param entityType Element or Attribute
+         */
+        void setEntityType(String entityType);
 
         /**
          * Return the UI element of the 'Deprecated' checkbox.
@@ -932,6 +938,12 @@ public interface ACCViewEditPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
+         * set the UI element of the 'Value Constraint' select field with the given text
+         * @param valueConstraint 'Default Value' or 'Fixed Value' or None
+         */
+        void setValueConstraint(String valueConstraint);
+
+        /**
          * Return the UI element of the 'Fixed Value' field.
          *
          * @return the UI element of the 'Fixed Value' field
@@ -944,6 +956,12 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Default Value' field
          */
         WebElement getDefaultValueField();
+
+        /**
+         * set the UI element of the 'Default Value' field with the given text.
+         * @param defaultValue
+         */
+        void setDefaultValue(String defaultValue);
 
         /**
          * Return the UI element of the 'Namespace' select field.
@@ -960,11 +978,23 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         * set the UI element of the 'Definition Source' field with given text
+         * @param definitionSource
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * set the UI element of the 'Definition' field with the given text.
+         * @param definition
+         */
+        void setDefinition(String definition);
 
         /**
          * Return the UI element of the 'Comment' Icon.

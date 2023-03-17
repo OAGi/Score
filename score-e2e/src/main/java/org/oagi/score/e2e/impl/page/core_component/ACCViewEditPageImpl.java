@@ -1037,6 +1037,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public void setEntityType(String entityType) {
+            sendKeys(getEntityTypeSelectField(), entityType);
+        }
+
+        @Override
         public WebElement getDeprecatedCheckbox() {
             return getCheckboxByName(baseXPath, "Deprecated");
         }
@@ -1044,6 +1049,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public WebElement getValueConstraintSelectField() {
             return getSelectFieldByName(baseXPath, "Value Constraint");
+        }
+
+        @Override
+        public void setValueConstraint(String valueConstraint) {
+            sendKeys(getValueConstraintSelectField(), valueConstraint);
         }
 
         @Override
@@ -1062,14 +1072,30 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public void setDefaultValue(String defaultValue) {
+            sendKeys(getDefaultValueField(), defaultValue);
+        }
+
+        @Override
         public WebElement getDefinitionSourceField() {
             return getInputFieldByName(baseXPath, "Definition Source");
+        }
+
+        @Override
+        public void setDefinitionSource(String definitionSource) {
+            sendKeys(getDefinitionSourceField(), definitionSource);
         }
 
         @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+
+        @Override
+        public void setDefinition(String definition) {
+            sendKeys(getDefinitionField(), definition);
+        }
+
         @Override
         public WebElement getCommentsIcon(){
             return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);

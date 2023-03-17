@@ -23,8 +23,7 @@ import java.util.Map;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
+import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -1143,10 +1142,32 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
-        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
-        bccPanel.setCardinalityMaxField("-1");
-        waitFor(ofMillis(500L));
-        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation("Record Set Total");
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setEntityType("Attribute");
+        assertEnabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setValueConstraint("Default Value");
+        bccPanel.setDefaultValue("99");
+        bccPanel.setDefinition("test");
+        accViewEditPage.hitUpdateButton();
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("Default Value", getText(bccPanel.getValueConstraintSelectField()));
+        assertEquals("99", getText(bccPanel.getDefaultValueField()));
     }
 
     @Test
