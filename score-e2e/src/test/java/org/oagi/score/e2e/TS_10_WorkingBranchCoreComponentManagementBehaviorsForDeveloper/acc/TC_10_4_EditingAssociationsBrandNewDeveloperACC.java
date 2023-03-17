@@ -1391,7 +1391,10 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer,release, namespace, "WIP");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         List<String> ccStates = new ArrayList<>();
@@ -1402,27 +1405,27 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
-            ASCCPObject asccp;
-            WebElement asccNode;
+            WebElement accBaseNode;
+            ACCViewEditPage.ACCPanel accBasePanel;
+            ACCSetBaseACCDialog accSetBaseACCDialog;
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+            accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+            assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+            accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
             String state = entry.getKey();
-            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
 
-            viewEditCoreComponentPage.openPage();
-            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-            appendASCCPDialog.selectAssociation(asccp.getDen());
-            click(appendASCCPDialog.getAppendButton(true));
-
-            viewEditCoreComponentPage.openPage();
-            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-            ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-            assertEquals(state, getText(asccpPanel.getStateField()));
+            accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+            accViewEditPage = accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+            accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+            accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+            assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+            assertEquals(state, getText(accBasePanel.getStateField()));
         }
-
-
-
-
     }
 
     @Test

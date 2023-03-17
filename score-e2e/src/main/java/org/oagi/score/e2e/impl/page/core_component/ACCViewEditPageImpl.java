@@ -115,7 +115,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By REMOVE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]");
 
-
+    private static final By DELETE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]");
     private final ACCObject acc;
 
     public ACCViewEditPageImpl(BasePage parent, ACCObject acc) {
@@ -339,7 +340,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public SelectAssociationDialog setBaseACC(String path) {
+    public ACCSetBaseACCDialog setBaseACC(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
             click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
@@ -348,10 +349,30 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             new Actions(getDriver()).sendKeys("O").perform();
             click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
         }
-        SelectAssociationDialog selectAssociationDialog =
-                new SelectAssociationDialogImpl(this, "Set Base ACC");
-        assert selectAssociationDialog.isOpened();
-        return selectAssociationDialog;
+        ACCSetBaseACCDialog accSetBaseACCDialog =
+                new ACCSetBaseACCDialogImpl(this);
+        assert accSetBaseACCDialog.isOpened();
+        return accSetBaseACCDialog;
+    }
+
+    @Override
+    public ACCViewEditPage deleteBaseACC(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
+        }
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
+
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
+        assert this.isOpened();
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        return this;
     }
 
     @Override
