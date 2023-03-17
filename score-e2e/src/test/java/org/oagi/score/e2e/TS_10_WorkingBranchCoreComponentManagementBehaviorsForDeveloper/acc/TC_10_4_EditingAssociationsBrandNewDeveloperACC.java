@@ -1034,29 +1034,17 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         String branch = "Working";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc, acc_association;
-        ASCCObject ascc;
-        ASCCPObject asccp;
+        ACCObject acc;
         BCCPObject bccp, bccp_to_append;
-
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
-
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
-            ascc.setCardinalityMax(1);
-            coreComponentAPI.updateASCC(ascc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -1064,10 +1052,26 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertNotChecked(asccPanel.getDeprecatedCheckbox());
-        assertDisabled(asccPanel.getDeprecatedCheckbox());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("0", getText(bccPanel.getCardinalityMinField()));
+        bccPanel.getCardinalityMinField().clear();
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Min is required\")]")).isDisplayed());
+
+        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
+        bccPanel.getCardinalityMaxField().clear();
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Max is required\")]")).isDisplayed());
+
+        bccPanel.setCardinalityMinField("11");
+        bccPanel.setCardinalityMaxField("111");
+        accViewEditPage.hitUpdateButton();
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
     }
 
     @Test
