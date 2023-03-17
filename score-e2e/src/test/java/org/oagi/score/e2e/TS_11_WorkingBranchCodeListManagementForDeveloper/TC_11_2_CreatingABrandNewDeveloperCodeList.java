@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -100,8 +100,10 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode("code value");
         editCodeListValueDialog.setMeaning("code meaning");
+        String enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
-        assert "code value already exist".equals(getSnackBarMessage(getDriver()));
+        String message = enteredValue+" already exist";
+        assert message.equals(getSnackBarMessage(getDriver()));
     }
     @Test
     @DisplayName("TC_11_2_TA_3")

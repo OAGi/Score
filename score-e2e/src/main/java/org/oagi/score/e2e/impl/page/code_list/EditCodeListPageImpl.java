@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.code_list;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPage {
@@ -44,13 +46,17 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::div[1]/mat-select//span");
+            By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select//span");
+            By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select");
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Derive Code List based on this\")]//ancestor::button[1]");
+    private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
+    private static final By UPDATE_ANYWAY_BUTTON_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button/span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -235,5 +241,35 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public void setVersion(String version) {
         sendKeys(getVersionField(), version);
+    }
+
+    @Override
+    public String getDefinitionWarningDialogMessage() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR).getText();
+    }
+
+    @Override
+    public WebElement getUpdateAnywayButton() {
+        return visibilityOfElementLocated(getDriver(), UPDATE_ANYWAY_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitUpdateAnywayButton() {
+        retry(() -> {
+            click(getUpdateAnywayButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public void setNamespace(NamespaceObject namespace) {
+        retry(() -> {
+            click(getNamespaceSelectField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
     }
 }

@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.code_list;
 
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -59,4 +60,12 @@ public interface EditCodeListPage extends Page {
     void hitDeriveCodeListBasedOnThisButton();
 
     void setVersion(String version);
+
+    String getDefinitionWarningDialogMessage();
+
+    WebElement getUpdateAnywayButton();
+
+    void hitUpdateAnywayButton();
+
+    void setNamespace(NamespaceObject namespace);
 }
