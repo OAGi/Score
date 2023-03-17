@@ -2,16 +2,13 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.page.core_component.ACCSetBaseACCDialog;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static java.time.Duration.ofMillis;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
@@ -54,12 +51,14 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//button//*[contains(text(),\"Update\")]");
+    private static final By APPLY_BUTTON_LOCATOR =
+            By.xpath("//mat-dialog-container//button//*[contains(text(),\"Apply\")]");
 
     private ACCViewEditPageImpl parent;
 
-    public ACCSetBaseACCDialogImpl(ACCViewEditPageImpl parent){this.parent = parent;}
+    public ACCSetBaseACCDialogImpl(ACCViewEditPageImpl parent) {
+        this.parent = parent;
+    }
 
     private WebDriver getDriver() {
         return this.parent.getDriver();
@@ -84,161 +83,219 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public WebElement getStateSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setState(String state) {
-
+        click(getStateSelectField());
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + state + "\")]"));
+        click(optionField);
+        escape(getDriver());
     }
 
     @Override
     public WebElement getDeprecatedSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setDeprecated(boolean deprecated) {
-
+        click(getDeprecatedSelectField());
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
+        click(optionField);
     }
 
     @Override
     public WebElement getOwnerSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setOwner(String owner) {
-
+        click(getOwnerSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + owner + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
     }
 
     @Override
     public WebElement getUpdaterSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setUpdater(String updater) {
-
+        click(getUpdaterSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + updater + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
     }
 
     @Override
     public WebElement getUpdatedStartDateField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), UPDATED_START_DATE_FIELD_LOCATOR);
     }
 
     @Override
     public void setUpdatedStartDate(LocalDateTime updatedStartDate) {
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedStartDateField(), formatter.format(updatedStartDate));
     }
 
     @Override
     public WebElement getUpdatedEndDateField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), UPDATED_END_DATE_FIELD_LOCATOR);
     }
 
     @Override
     public void setUpdatedEndDate(LocalDateTime updatedEndDate) {
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
     }
 
     @Override
     public WebElement getDENField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
     }
 
     @Override
     public void setDEN(String den) {
-
+        sendKeys(getDENField(), den);
     }
 
     @Override
     public String getDENFieldLabel() {
-        return null;
+        return getDENField().getAttribute("data-placeholder");
     }
 
     @Override
     public WebElement getDefinitionField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
     public void setDefinition(String definition) {
-
+        sendKeys(getDefinitionField(), definition);
     }
 
     @Override
     public WebElement getModuleField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), MODULE_FIELD_LOCATOR);
     }
 
     @Override
     public void setModule(String module) {
-
+        sendKeys(getModuleField(), module);
     }
 
     @Override
     public String getModuleFieldLabel() {
-        return null;
+        return getModuleField().getAttribute("data-placeholder");
     }
 
     @Override
     public WebElement getComponentTypeSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), COMPONENT_TYPE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setComponentType(String componentType) {
-
+        click(getComponentTypeSelectField());
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + componentType + "\")]"));
+        click(optionField);
+        escape(getDriver());
     }
 
     @Override
     public WebElement getSearchButton() {
-        return null;
+        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
     public void hitSearchButton() {
-
+        click(getSearchButton());
+        waitFor(ofMillis(500L));
     }
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return null;
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return null;
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
-        return null;
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
     }
 
     @Override
     public void setItemsPerPage(int items) {
-
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//mat-dialog-container//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(ofMillis(500L));
     }
 
     @Override
     public WebElement getCancelButton() {
-        return null;
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
     }
 
     @Override
-    public ASCCPViewEditPage hitCancelButton() {
-        return null;
+    public ACCViewEditPage hitCancelButton() {
+        click(getCancelButton());
+        return parent;
     }
 
     @Override
     public WebElement getApplyButton() {
-        return null;
+        return elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR);
     }
 
     @Override
     public ACCViewEditPage hitApplyButton(String accDen) {
-        return null;
+        setDEN(accDen);
+        hitSearchButton();
+
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = getTableRecordAtIndex(1);
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an ACC using " + accDen, e);
+            }
+            String denColumn = getText(td.findElement(By.tagName("span")));
+            if (!denColumn.contains(accDen)) {
+                throw new NoSuchElementException("Cannot locate an ACC using " + accDen);
+            }
+            WebElement select = getColumnByName(tr, "select");
+            click(select);
+        });
+
+        click(getApplyButton());
+        waitFor(ofMillis(500L));
+
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        return parent;
     }
 }

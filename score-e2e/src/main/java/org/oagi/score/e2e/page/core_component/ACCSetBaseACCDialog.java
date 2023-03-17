@@ -201,7 +201,7 @@ public interface ACCSetBaseACCDialog extends Dialog {
      */
     WebElement getCancelButton();
 
-    ASCCPViewEditPage hitCancelButton();
+    ACCViewEditPage hitCancelButton();
 
     /**
      * Return the UI element of the 'Apply' button.
