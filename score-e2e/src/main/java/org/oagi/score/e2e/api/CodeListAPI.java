@@ -6,6 +6,7 @@ import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 /**
  * APIs for the code list management.
@@ -30,4 +31,16 @@ public interface CodeListAPI {
     void updateCodeList(CodeListObject codeListWIP);
 
     String getModuleNameForCodeList(CodeListObject codeList, String releaseNumber);
+
+    ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId);
+
+    CodeListObject getCodeListByNameAndReleaseNum(String name, String releaseNum);
+
+    CodeListObject getNewlyCreatedCodeList(AppUserObject user, String releaseNumber);
+
+    boolean isListIdUnique(String listId);
+
+    ArrayList<String> getOAGISOwnedLists();
+
+    boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList);
 }

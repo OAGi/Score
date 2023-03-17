@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.code_list;
 
+import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
@@ -48,4 +49,8 @@ public interface ViewEditCodeListPage extends Page {
     void searchCodeListByUpdatedDateAndBranch(CodeListObject codeList, String releaseNumber);
 
     WebElement getUpdatedDateField();
+
+    EditCodeListPage openNewCodeList(AppUserObject user, String releaseNumber);
+
+    WebElement getNewCodeListButton();
 }

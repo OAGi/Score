@@ -3682,7 +3682,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bbiePanel.setValueDomainRestriction("Code");
             String BIEreleaseNumber = useraBIE.getReleaseNumber();
             DTObject dataType = bccpDTMap.get(bccp);
-            List<CodeListObject> defaultCodeLists = getAPIFactory().getCoreComponentAPI().
+            List<CodeListObject> defaultCodeLists = getAPIFactory().getCodeListAPI().
                     getDefaultCodeListsForDT(dataType.getGuid(), dataType.getReleaseId());
             if (!defaultCodeLists.isEmpty()) {
                 for (CodeListObject cl : defaultCodeLists) {
@@ -3823,7 +3823,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             bbiePanel.setValueDomainRestriction("Code");
             String BIEreleaseNumber = useraBIE.getReleaseNumber();
             DTObject dataType = bccpDTMap.get(bccp);
-            ArrayList<CodeListObject> defaultCodeLists = getAPIFactory().getCoreComponentAPI().
+            ArrayList<CodeListObject> defaultCodeLists = getAPIFactory().getCodeListAPI().
                     getDefaultCodeListsForDT(dataType.getGuid(), dataType.getReleaseId());
             if (!defaultCodeLists.isEmpty()) {
                 for (CodeListObject cl : defaultCodeLists) {
