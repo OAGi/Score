@@ -1537,11 +1537,51 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
         assertEquals("Semantics", getText(accBasePanel.getComponentTypeSelectField()));
     }
-
     @Test
     public void test_TA_10_4_10_d() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer,release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+
+        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper,release, namespace, "WIP");
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertDisabled(accBasePanel.getObjectClassTermField());
+        assertDisabled(accBasePanel.getComponentTypeSelectField());
+        assertDisabled(accBasePanel.getAbstractCheckbox());
+        assertDisabled(accBasePanel.getDeprecatedCheckbox());
+        assertDisabled(accBasePanel.getNamespaceSelectField());
+        assertDisabled(accBasePanel.getDefinitionField());
+        assertDisabled(accBasePanel.getDefinitionSourceField());
     }
 
     @Test
