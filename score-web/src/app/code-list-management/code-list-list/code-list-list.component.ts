@@ -231,12 +231,15 @@ export class CodeListListComponent implements OnInit {
   }
 
   createCodeList() {
+    this.loading = true;
     this.service.create(this.request.release.releaseId)
       .subscribe(resp => {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
         this.router.navigateByUrl('/code_list/' + resp.manifestId);
+      }, _ => {
+        this.loading = false;
       });
   }
 
