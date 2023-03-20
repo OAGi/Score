@@ -7,11 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
@@ -28,15 +36,9 @@ public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_11_2_TA_1")
+    @DisplayName("TC_11_6_TA_1")
     public void test_TA_1() {
-        AppUserObject developer;
-        ReleaseObject workingBranch;
-        {
-            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        }
+
 
     }
 

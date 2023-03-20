@@ -76,4 +76,10 @@ public interface EditCodeListPage extends Page {
     WebElement getGuidField();
 
     WebElement getListIDField();
+
+    void hitCancelButton();
+
+    WebElement getCancelButton();
+
+    void valueExists(String value);
 }

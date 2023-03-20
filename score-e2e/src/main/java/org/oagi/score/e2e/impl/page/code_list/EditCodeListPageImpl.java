@@ -39,6 +39,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
@@ -63,6 +65,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-dialog-container//p");
     private static final By UPDATE_ANYWAY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button/span");
+    private static final By CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -303,5 +307,27 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getListIDField() {
         return visibilityOfElementLocated(getDriver(), LIST_ID_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        retry(() -> {
+            click(getCancelButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_REVISION_VALUE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void valueExists(String value) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(value);
+        });
     }
 }

@@ -35,7 +35,7 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_11_2_TA_1")
+    @DisplayName("TC_11_4_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
