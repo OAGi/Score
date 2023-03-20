@@ -11,6 +11,7 @@ ENV REDIS_HOST localhost
 ENV REDIS_PORT 6379
 
 RUN apt-get -y update
+RUN apt-get -y upgrade
 
 COPY mysql-connector-j-8.0.32.jar /usr/local/tomcat/lib/mysql-connector-j-8.0.32.jar
 

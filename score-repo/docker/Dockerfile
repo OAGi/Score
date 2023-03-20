@@ -8,6 +8,7 @@ ENV MYSQL_PASSWORD=oagi
 ENV MYSQL_ROOT_PASSWORD=oagi
 
 RUN yum -y update
+RUN yum -y upgrade
 
 VOLUME /var/lib/mysql
 
