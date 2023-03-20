@@ -413,4 +413,18 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         click(itemField);
         waitFor(Duration.ofMillis(500L));
     }
+
+    @Override
+    public DTViewEditPage createDT(String den, String branch) {
+        setBranch(branch);
+        click(getCreateDTButton());
+        DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
+        dtCreateDialog.selectBasedDTByDEN(den);
+        dtCreateDialog.hitCreateButton();
+        DTObject dt = getAPIFactory().getCoreComponentAPI().getLatestDTCreated(den, branch);
+
+        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
+        assert dtViewEditPage.isOpened();
+        return dtViewEditPage;
+    }
 }

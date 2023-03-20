@@ -363,6 +363,29 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
+    public DTObject getLatestDTCreated(String den, String branch) {
+        ULong latestCreatedDT = dslContext.select(DSL.max(DT.DT_ID))
+                .from(DT)
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(
+                        RELEASE.RELEASE_NUM.eq(branch),
+                        DT.DEN.eq(den)))
+                .fetchOneInto(ULong.class);
+        ULong releaseId = getReleaseIdByReleaseNum(branch);
+        List<Field<?>> fields = new ArrayList();
+        fields.add(DT_MANIFEST.DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(DT.fields()));
+        return dslContext.select(fields)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .where(DT.DT_ID.eq(latestCreatedDT))
+                .fetchOne(record -> dtMapper(record));
+    }
+
+    @Override
     public ASCCPObject createRandomASCCP(ACCObject roleOfAcc, AppUserObject creator,
                                          NamespaceObject namespace, String state) {
         ASCCPObject asccp = ASCCPObject.createRandomASCCP(roleOfAcc, creator, namespace, state);
