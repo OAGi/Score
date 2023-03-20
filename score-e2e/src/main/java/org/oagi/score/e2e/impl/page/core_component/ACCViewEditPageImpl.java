@@ -112,6 +112,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Insert Property After\")]");
 
+    private static final By REFACTOR_OPTIION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Refactor\")]");
+
+    private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Refactor to Base\")]");
+
     private static final By REMOVE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]");
 
@@ -508,6 +514,24 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 new SelectAssociationDialogImpl(this, "Insert Property After");
         assert selectAssociationDialog.isOpened();
         return selectAssociationDialog;
+    }
+
+    @Override
+    public SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+        }
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = new SelectBaseACCToRefactorDialogImpl(this,
+                associationPropertyTerm);
+        assert selectBaseACCToRefactorDialog.isOpened();
+        return selectBaseACCToRefactorDialog;
     }
 
     @Override

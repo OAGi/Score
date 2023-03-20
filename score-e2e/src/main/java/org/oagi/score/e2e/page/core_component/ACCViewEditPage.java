@@ -288,6 +288,14 @@ public interface ACCViewEditPage extends Page {
     SelectAssociationDialog insertPropertyAfter(String path);
 
     /**
+     * Open the association selection dialog by clicking 'Refactor/Refactor to Base' context menu.
+     * @param path
+     * @param associationPropertyTerm ASCCP or BCCP propertyTerm
+     * @return
+     */
+    SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm);
+
+    /**
      * Remove the association by clicking 'Remove' context menu.
      *
      * @param path node path
