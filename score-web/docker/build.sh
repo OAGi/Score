@@ -36,6 +36,6 @@ cd docker
 docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.0.0 .
 
 echo "Scanning vulnerabilities..."
-docker scan -f Dockerfile oagi1docker/srt-web:3.0.0
+docker scout cves oagi1docker/srt-web:3.0.0
 
 echo "Done."
