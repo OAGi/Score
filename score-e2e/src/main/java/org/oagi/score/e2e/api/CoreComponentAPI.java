@@ -184,5 +184,4 @@ public interface CoreComponentAPI {
     ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,
                                                NamespaceObject namespace, String state);
 
-    DTObject getLatestDTCreated(String den, String branch);
 }

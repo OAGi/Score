@@ -326,5 +326,4 @@ public interface ViewEditCoreComponentPage extends Page {
      */
     void setItemsPerPage(int items);
 
-    DTViewEditPage createDT(String den, String branch);
 }

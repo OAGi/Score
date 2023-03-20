@@ -50,12 +50,6 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-    private static final By VALUE_DOMAIN_LOCATOR =
-            By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
-    private static final By ADD_VALUE_DOMAIN_LOCATOR =
-            By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private final DTObject dt;
 
@@ -216,39 +210,4 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         return getText(getDefinitionField());
     }
 
-    @Override
-    public void showValueDomain() {
-        click(getShowValueDomain());
-    }
-    @Override
-    public WebElement getShowValueDomain() {
-        return elementToBeClickable(getDriver(), VALUE_DOMAIN_LOCATOR);
-    }
-    @Override
-    public WebElement getAddValueDomainButton() {
-        return elementToBeClickable(getDriver(), ADD_VALUE_DOMAIN_LOCATOR);
-    }
-
-    @Override
-    public void addCodeListValueDomain(String valueDomainName) {
-        click(getAddValueDomainButton());
-        WebElement tr = getTheLastTableRecord();
-        WebElement tdDomainType = getColumnByName(tr, "type").findElement(By.xpath("//div/mat-select"));
-        click(tdDomainType);
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
-        WebElement tdDomainName = getColumnByName(tr, "name").findElement(By.xpath("//div/mat-select"));
-        click(tdDomainName);
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ valueDomainName +"\")]//ancestor::mat-option[1]")));
-    }
-    @Override
-    public WebElement getTheLastTableRecord() {
-        defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//table//tbody//tr[last()]"));
-    }
-    @Override
-    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
-        return tableRecord.findElement(By.className("mat-column-" + columnName));
-    }
 }
