@@ -96,4 +96,12 @@ public interface EditCodeListPage extends Page {
     WebElement getBackToWIPButton();
 
     WebElement getMoveToCandidateButton();
+
+    void hitDeleteButton();
+
+    WebElement getDeleteButton();
+
+    void hitRestoreButton();
+
+    WebElement getRestoreButton();
 }
