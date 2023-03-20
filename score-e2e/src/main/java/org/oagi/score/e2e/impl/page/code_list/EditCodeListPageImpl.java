@@ -29,6 +29,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+    private static final By STATE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+    private static final By LIST_ID_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-form-field//input");
+    private static final By GUID_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -282,5 +288,20 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
         return editCodeListValueDialog;
+    }
+
+    @Override
+    public WebElement getStateField() {
+        return visibilityOfElementLocated(getDriver(), STATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getGuidField() {
+        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getListIDField() {
+        return visibilityOfElementLocated(getDriver(), LIST_ID_FIELD_LOCATOR);
     }
 }

@@ -70,4 +70,10 @@ public interface EditCodeListPage extends Page {
     void setNamespace(NamespaceObject namespace);
 
     EditCodeListValueDialog editCodeListValue(String value);
+
+    WebElement getStateField();
+
+    WebElement getGuidField();
+
+    WebElement getListIDField();
 }
