@@ -1964,7 +1964,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             selectBaseACCToRefactorDialog.hitRefactorButton();
         }
     }
-
     @Test
     public void test_TA_10_4_14_e() {
 
