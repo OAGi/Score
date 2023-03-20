@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -36,10 +36,41 @@ public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_11_6_TA_1")
-    public void test_TA_1() {
+    @DisplayName("TC_11_6_from_TA_1_to_TA_4")
+    public void test_from_TA_1_to_TA_4() {
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
 
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
+            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListForTesting.add(codeList);
+        }
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        for (CodeListObject codeList : codeListForTesting) {
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            assertEquals("Working", getText(editCodeListPage.getReleaseField()));
+            assertEquals(developerA.getLoginId(), getText(editCodeListPage.getOwnerField()));
+            assertEquals("WIP", getText(editCodeListPage.getStateField()));
+            editCodeListPage.moveToDraft();
+            assertEquals("Draft", getText(editCodeListPage.getStateField()));
+            editCodeListPage.backToWIP();
+            assertEquals("WIP", getText(editCodeListPage.getStateField()));
+            editCodeListPage.moveToDraft();
+            editCodeListPage.moveToCandidate();
+            assertEquals("Candidate", getText(editCodeListPage.getStateField()));
+            editCodeListPage.backToWIP();
+            assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        }
     }
 
     @AfterEach

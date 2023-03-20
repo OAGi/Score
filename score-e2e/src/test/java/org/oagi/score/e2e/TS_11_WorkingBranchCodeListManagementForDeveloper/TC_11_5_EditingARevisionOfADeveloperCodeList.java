@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
@@ -312,7 +311,6 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             editCodeListValueDialog.hitAddButton();
             editCodeListPage.hitUpdateButton();
             editCodeListPage.hitCancelButton();
-            waitFor(ofMillis(500L));
             CodeListValueObject oldValue = codeListCodeListValueMap.get(codeList);
             assertEquals("Published", getText(editCodeListPage.getStateField()));
             assertEquals("1", getText(editCodeListPage.getRevisionField()));

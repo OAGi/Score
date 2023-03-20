@@ -3,7 +3,6 @@ package org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.oagi.score.e2e.AssertionHelper;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -16,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {

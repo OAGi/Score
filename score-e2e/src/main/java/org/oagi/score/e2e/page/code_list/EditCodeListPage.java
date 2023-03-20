@@ -82,4 +82,18 @@ public interface EditCodeListPage extends Page {
     WebElement getCancelButton();
 
     void valueExists(String value);
+
+    WebElement getOwnerField();
+
+    void moveToDraft();
+
+    WebElement getMoveToDraftButton();
+
+    void backToWIP();
+
+    void moveToCandidate();
+
+    WebElement getBackToWIPButton();
+
+    WebElement getMoveToCandidateButton();
 }
