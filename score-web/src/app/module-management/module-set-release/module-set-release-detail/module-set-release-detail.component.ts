@@ -124,7 +124,31 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.filteredReleaseList.next(this.releaseList.slice());
   }
 
-  exportScheme() {
+  validateSchemas() {
+    this.isUpdating = true;
+    this.moduleService.validate(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Validation Result';
+
+      const entries = Object.entries(resp.results);
+      if (entries.length === 0) {
+        dialogConfig.data.content = ['All schemas are valid.'];
+      } else {
+        entries.forEach(([key, value]) => {
+          dialogConfig.data.content = [key + ': ' + value];
+        });
+      }
+
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+        .subscribe(result => {
+          this.isUpdating = false;
+        });
+    }, err => {
+      this.isUpdating = false;
+    });
+  }
+
+  exportSchemas() {
     this.isUpdating = true;
     this.moduleService.export(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});

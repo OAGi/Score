@@ -308,6 +308,10 @@ export class ModuleSetReleaseListRequest {
 
 }
 
+export class ModuleSetReleaseValidateResponse {
+  results: Map<string, string>;
+}
+
 export interface Tile {
   elements: ModuleElement[];
   current: ModuleElement;
