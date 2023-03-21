@@ -125,6 +125,7 @@ export class CodeListForList {
   owner: string;
   access: string;
   revision: string;
+  deprecated: boolean;
 }
 
 export class CodeList {

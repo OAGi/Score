@@ -232,8 +232,7 @@ export class ReleaseAssignComponent implements OnInit {
     return true;
   }
 
-  onChange() {
-    this.filterList();
+  onChange(property?: string, source?) {
   }
 
   count(list: AssignableNode[]) {

@@ -18,6 +18,7 @@ public class CreateAccRepositoryRequest extends RepositoryRequest {
     private String initialDefinition;
     private BigInteger basedAccManifestId;
     private BigInteger namespaceId;
+    private String tag;
 
     public CreateAccRepositoryRequest(AuthenticatedPrincipal user, BigInteger releaseId) {
         super(user);
@@ -81,5 +82,13 @@ public class CreateAccRepositoryRequest extends RepositoryRequest {
 
     public void setInitialType(CcACCType initialType) {
         this.initialType = initialType;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

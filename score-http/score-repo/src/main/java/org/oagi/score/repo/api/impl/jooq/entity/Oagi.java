@@ -13,6 +13,7 @@ import org.jooq.impl.SchemaImpl;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Abie;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Acc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdList;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValue;
@@ -20,18 +21,24 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValueManifest
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbie;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Asccp;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccBizterm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule;
@@ -41,6 +48,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxAssignment;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContent;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContentManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BusinessTerm;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPriXpsTypeMap;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtPri;
@@ -53,11 +61,13 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Comment;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Configuration;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxScheme;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
@@ -81,9 +91,13 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.UserTenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest;
 
@@ -134,6 +148,11 @@ public class Oagi extends SchemaImpl {
     public final AccManifest ACC_MANIFEST = AccManifest.ACC_MANIFEST;
 
     /**
+     * The table <code>oagi.acc_manifest_tag</code>.
+     */
+    public final AccManifestTag ACC_MANIFEST_TAG = AccManifestTag.ACC_MANIFEST_TAG;
+
+    /**
      * The AGENCY_ID_LIST table stores information about agency identification
      * lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE.
      */
@@ -172,6 +191,12 @@ public class Oagi extends SchemaImpl {
     public final Asbie ASBIE = Asbie.ASBIE;
 
     /**
+     * The asbie_bizterm table stores information about the aggregation between
+     * the ascc_bizterm and ASBIE. TODO: Placeholder, definition is missing.
+     */
+    public final AsbieBizterm ASBIE_BIZTERM = AsbieBizterm.ASBIE_BIZTERM;
+
+    /**
      * ASBIEP represents a role in a usage of an ABIE. It is a contextualization
      * of an ASCCP.
      */
@@ -182,6 +207,12 @@ public class Oagi extends SchemaImpl {
      * ASCCP. 
      */
     public final Ascc ASCC = Ascc.ASCC;
+
+    /**
+     * The ascc_bizterm table stores information about the aggregation between
+     * the business term and ASCC. TODO: Placeholder, definition is missing.
+     */
+    public final AsccBizterm ASCC_BIZTERM = AsccBizterm.ASCC_BIZTERM;
 
     /**
      * The table <code>oagi.ascc_manifest</code>.
@@ -200,6 +231,11 @@ public class Oagi extends SchemaImpl {
     public final AsccpManifest ASCCP_MANIFEST = AsccpManifest.ASCCP_MANIFEST;
 
     /**
+     * The table <code>oagi.asccp_manifest_tag</code>.
+     */
+    public final AsccpManifestTag ASCCP_MANIFEST_TAG = AsccpManifestTag.ASCCP_MANIFEST_TAG;
+
+    /**
      * A BBIE represents a relationship/association between an ABIE and a BBIEP.
      * It is a contextualization of a BCC. The BBIE table also stores some
      * information about the specific constraints related to the BDT associated
@@ -209,6 +245,12 @@ public class Oagi extends SchemaImpl {
      * column among the three can have a value in a particular record.
      */
     public final Bbie BBIE = Bbie.BBIE;
+
+    /**
+     * The bbie_bizterm table stores information about the aggregation between
+     * the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing.
+     */
+    public final BbieBizterm BBIE_BIZTERM = BbieBizterm.BBIE_BIZTERM;
 
     /**
      * Because there is no single table that is a contextualized counterpart of
@@ -231,6 +273,12 @@ public class Oagi extends SchemaImpl {
     public final Bcc BCC = Bcc.BCC;
 
     /**
+     * The bcc_bizterm table stores information about the aggregation between
+     * the business term and BCC. TODO: Placeholder, definition is missing.
+     */
+    public final BccBizterm BCC_BIZTERM = BccBizterm.BCC_BIZTERM;
+
+    /**
      * The table <code>oagi.bcc_manifest</code>.
      */
     public final BccManifest BCC_MANIFEST = BccManifest.BCC_MANIFEST;
@@ -245,6 +293,11 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.bccp_manifest</code>.
      */
     public final BccpManifest BCCP_MANIFEST = BccpManifest.BCCP_MANIFEST;
+
+    /**
+     * The table <code>oagi.bccp_manifest_tag</code>.
+     */
+    public final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
 
     /**
      * This table captures the allowed primitives for a BDT. The allowed
@@ -326,6 +379,13 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.blob_content_manifest</code>.
      */
     public final BlobContentManifest BLOB_CONTENT_MANIFEST = BlobContentManifest.BLOB_CONTENT_MANIFEST;
+
+    /**
+     * The Business Term table stores information about the business term, which
+     * is usually associated to BIE or CC. TODO: Placeeholder, definition is
+     * missing.
+     */
+    public final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
 
     /**
      * This table capture allowed primitives of the CDT?s Content Component. 
@@ -418,6 +478,11 @@ public class Oagi extends SchemaImpl {
     public final Comment COMMENT = Comment.COMMENT;
 
     /**
+     * The table stores configuration properties of the application. 
+     */
+    public final Configuration CONFIGURATION = Configuration.CONFIGURATION;
+
+    /**
      * This table captures the context category. Examples of context categories
      * as described in the CCTS are business process, industry, etc.
      */
@@ -445,6 +510,11 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.dt_manifest</code>.
      */
     public final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
+
+    /**
+     * The table <code>oagi.dt_manifest_tag</code>.
+     */
+    public final DtManifestTag DT_MANIFEST_TAG = DtManifestTag.DT_MANIFEST_TAG;
 
     /**
      * This table represents the supplementary component (SC) of a DT. Revision
@@ -571,6 +641,21 @@ public class Oagi extends SchemaImpl {
     public final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
+     * The table <code>oagi.tag</code>.
+     */
+    public final Tag TAG = Tag.TAG;
+
+    /**
+     * This table about the user tenant role.
+     */
+    public final Tenant TENANT = Tenant.TENANT;
+
+    /**
+     * This table captures the tenant role and theirs business contexts.
+     */
+    public final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
+
+    /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and
      * the owner_top_level_asbiep_id column in all BIE tables allow all related
      * BIEs to be retrieved all at once speeding up the profile BOD
@@ -593,6 +678,11 @@ public class Oagi extends SchemaImpl {
      * rule.
      */
     public final UsageRuleExpression USAGE_RULE_EXPRESSION = UsageRuleExpression.USAGE_RULE_EXPRESSION;
+
+    /**
+     * This table captures the tenant roles of the user
+     */
+    public final UserTenant USER_TENANT = UserTenant.USER_TENANT;
 
     /**
      * This table stores XML schema built-in types and OAGIS built-in types.
@@ -625,6 +715,7 @@ public class Oagi extends SchemaImpl {
             Abie.ABIE,
             Acc.ACC,
             AccManifest.ACC_MANIFEST,
+            AccManifestTag.ACC_MANIFEST_TAG,
             AgencyIdList.AGENCY_ID_LIST,
             AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST,
             AgencyIdListValue.AGENCY_ID_LIST_VALUE,
@@ -632,18 +723,24 @@ public class Oagi extends SchemaImpl {
             AppOauth2User.APP_OAUTH2_USER,
             AppUser.APP_USER,
             Asbie.ASBIE,
+            AsbieBizterm.ASBIE_BIZTERM,
             Asbiep.ASBIEP,
             Ascc.ASCC,
+            AsccBizterm.ASCC_BIZTERM,
             AsccManifest.ASCC_MANIFEST,
             Asccp.ASCCP,
             AsccpManifest.ASCCP_MANIFEST,
+            AsccpManifestTag.ASCCP_MANIFEST_TAG,
             Bbie.BBIE,
+            BbieBizterm.BBIE_BIZTERM,
             BbieSc.BBIE_SC,
             Bbiep.BBIEP,
             Bcc.BCC,
+            BccBizterm.BCC_BIZTERM,
             BccManifest.BCC_MANIFEST,
             Bccp.BCCP,
             BccpManifest.BCCP_MANIFEST,
+            BccpManifestTag.BCCP_MANIFEST_TAG,
             BdtPriRestri.BDT_PRI_RESTRI,
             BdtScPriRestri.BDT_SC_PRI_RESTRI,
             BieUsageRule.BIE_USAGE_RULE,
@@ -653,6 +750,7 @@ public class Oagi extends SchemaImpl {
             BizCtxValue.BIZ_CTX_VALUE,
             BlobContent.BLOB_CONTENT,
             BlobContentManifest.BLOB_CONTENT_MANIFEST,
+            BusinessTerm.BUSINESS_TERM,
             CdtAwdPri.CDT_AWD_PRI,
             CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP,
             CdtPri.CDT_PRI,
@@ -665,11 +763,13 @@ public class Oagi extends SchemaImpl {
             CodeListValue.CODE_LIST_VALUE,
             CodeListValueManifest.CODE_LIST_VALUE_MANIFEST,
             Comment.COMMENT,
+            Configuration.CONFIGURATION,
             CtxCategory.CTX_CATEGORY,
             CtxScheme.CTX_SCHEME,
             CtxSchemeValue.CTX_SCHEME_VALUE,
             Dt.DT,
             DtManifest.DT_MANIFEST,
+            DtManifestTag.DT_MANIFEST_TAG,
             DtSc.DT_SC,
             DtScManifest.DT_SC_MANIFEST,
             DtUsageRule.DT_USAGE_RULE,
@@ -693,9 +793,13 @@ public class Oagi extends SchemaImpl {
             RefSpec.REF_SPEC,
             Release.RELEASE,
             SeqKey.SEQ_KEY,
+            Tag.TAG,
+            Tenant.TENANT,
+            TenantBusinessCtx.TENANT_BUSINESS_CTX,
             TopLevelAsbiep.TOP_LEVEL_ASBIEP,
             UsageRule.USAGE_RULE,
             UsageRuleExpression.USAGE_RULE_EXPRESSION,
+            UserTenant.USER_TENANT,
             Xbt.XBT,
             XbtManifest.XBT_MANIFEST
         );

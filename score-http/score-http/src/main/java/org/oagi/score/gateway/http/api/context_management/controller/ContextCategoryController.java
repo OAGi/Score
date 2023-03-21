@@ -1,9 +1,9 @@
 package org.oagi.score.gateway.http.api.context_management.controller;
 
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.ContextCategoryService;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -91,7 +91,7 @@ public class ContextCategoryController {
         return response.getResults();
     }
 
-    @RequestMapping(value = "/context_category/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/context_category/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextCategory getContextCategory(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -107,7 +107,7 @@ public class ContextCategoryController {
         return response.getContextCategory();
     }
 
-    @RequestMapping(value = "/context_schemes_from_ctg/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/context_schemes_from_ctg/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ContextScheme> getContextSchemeListFromCtxCategory(@PathVariable("id") BigInteger id) {
         return contextCategoryService.getContextSchemeByCategoryId(id);
@@ -133,7 +133,7 @@ public class ContextCategoryController {
         }
     }
 
-    @RequestMapping(value = "/context_category/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/context_category/{id:[\\d]+}", method = RequestMethod.POST)
     public ResponseEntity update(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger contextCategoryId,
@@ -155,7 +155,7 @@ public class ContextCategoryController {
         }
     }
 
-    @RequestMapping(value = "/context_category/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/context_category/{id:[\\d]+}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger contextCategoryId) {

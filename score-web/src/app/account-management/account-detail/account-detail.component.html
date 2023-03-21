@@ -47,8 +47,8 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="mb-2">
-      <mat-card-content class="mat-card-container" *ngIf="account && account.appOauth2UserId === 0">
+    <mat-card class="mb-2" *ngIf="account && (account.appOauth2UserId === 0 || !account.appOauth2UserId)">
+      <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>New password</mat-label>
           <input matInput type="password" data-id="user.newPassword" autocomplete="new-password"

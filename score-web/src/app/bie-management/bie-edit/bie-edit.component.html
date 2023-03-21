@@ -66,7 +66,8 @@
                     <div class="actions ml-auto d-flex align-items-center">
                       <div>
                         <button mat-icon-button [id]="'bie-settings'"
-                                [matMenuTriggerFor]="settingsContextMenu">
+                                [matMenuTriggerFor]="settingsContextMenu"
+                                [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                           <mat-icon>settings</mat-icon>
                         </button>
                       </div>
@@ -141,7 +142,7 @@
                            [attr.data-path]="node.path"
                            [class]="{'tree-node-selected': cursorNode === node}"
                            (click)="onClick(node, $event)"
-                           (keydown)="keyNavigation($event)"
+                           (keydown)="keyNavigation(node, $event)"
                            [style.padding-left]="node.level * paddingPixel + 'px'">
                         <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                                 (click)="toggle(node, $event)"
@@ -189,6 +190,7 @@
                           <mat-icon [style.visibility]="dataSource.isExpandable(node) ? '' : 'hidden'"
                                     class="context-menu-icon"
                                     [matMenuTriggerFor]="contextMenu"
+                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
                                     (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                           </mat-icon>
                         </div>
@@ -210,7 +212,8 @@
                       <span class="context-menu-item">Reuse BIE</span>
                     </button>
                     <button mat-menu-item (click)="createBIEfromThis(contextMenuItem)"
-                            *ngIf="canCreateBIEFromThis(contextMenuItem)">
+                            *ngIf="canCreateBIEFromThis(contextMenuItem)"
+                            [disabled]="isTenantEnabled">
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
@@ -220,14 +223,14 @@
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
                             *ngIf="canEdit && isExtension(contextMenuItem)"
-                            [disabled]="!canExtend(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem) || isTenantEnabled"
                             [matTooltip]="'Developer cannot create ABIE Extension'"
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Locally</span>
                     </button>
                     <button mat-menu-item (click)="createGlobalAbieExtension(contextMenuItem)"
                             *ngIf="canEdit && isExtension(contextMenuItem)"
-                            [disabled]="!canExtend(contextMenuItem)"
+                            [disabled]="!canExtend(contextMenuItem) || isTenantEnabled"
                             [matTooltip]="'Developer cannot create ABIE Extension'"
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
@@ -322,22 +325,20 @@
                           </mat-form-field>
                         </div>
                       </div>
-                      <!--
-                      <div class="row">
+                      <div class="row" *ngIf="isBIEInverseModeEnabled">
                         <div class="col-md-12 col-sm-12">
                           <div class="checkbox">
-                            <mat-checkbox color="primary"
-                                          [(ngModel)]="rootNode.inverseMode">
+                            <mat-slide-toggle color="accent"
+                                              [(ngModel)]="rootNode.inverseMode">
                               Inverse Mode
-                            </mat-checkbox>
+                            </mat-slide-toggle>
                           </div>
                         </div>
                       </div>
-                      -->
                       <div class="row">
                         <div class="col-md-6 col-sm-12">
                           <mat-form-field>
-                            <input matInput placeholder="Business Term" maxlength="225"
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
                                    [(ngModel)]="asAbieDetail().asbiep.bizTerm"
                                    [disabled]="!isEditable(selectedNode)">
                           </mat-form-field>
@@ -494,8 +495,19 @@
 
                       <div class="row" *ngIf="selectedNode && !selectedNode.derived && !reusedNode">
                         <div class="col-md-6 col-sm-12">
-                          <mat-form-field>
-                            <input matInput placeholder="Business Term" maxlength="225"
+                          <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
+                            <button class="hover-button" mat-raised-button color="primary"
+                                    (click)="goToBusinessTermsForBie(selectedNode.detail, 'ASBIE')">
+                              Show Business Terms
+                            </button>
+                            <button mat-raised-button
+                                    [disabled]="!isEditable(selectedNode)"
+                                    (click)="goToAssignBusinessTermsForBie(selectedNode.detail, 'ASBIE')">
+                              Assign Business Term
+                            </button>
+                          </div>
+                          <mat-form-field *ngIf="!isBusinessTermEnabled || isDeveloper">
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
                                    [(ngModel)]="asAsbiepDetail().asbiep.bizTerm"
                                    [disabled]="!isEditable(selectedNode)">
                           </mat-form-field>
@@ -556,6 +568,34 @@
                               [matChipInputFor]="reusedBusinessContextChipList">
                           </mat-chip-list>
                         </mat-form-field>
+
+                        <div class="row">
+                          <div class="col-md-12 col-sm-12">
+                            <div class="checkbox">
+                              <mat-slide-toggle color="accent"
+                                                [(ngModel)]="reusedNode.inverseMode"
+                                                [disabled]="true">
+                                Inverse Mode
+                              </mat-slide-toggle>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                     [value]="reusedNodeDetail.asbiep.bizTerm"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <input matInput placeholder="Remark" maxlength="225"
+                                     [value]="reusedNodeDetail.asbiep.remark"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
                         <div class="row">
                           <div class="col-md-6 col-sm-12">
                             <mat-form-field>
@@ -568,23 +608,6 @@
                             <mat-form-field>
                               <input matInput placeholder="Status" maxlength="225"
                                      [value]="reusedNode.status"
-                                     [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                        </div>
-
-                        <div class="row">
-                          <div class="col-md-6 col-sm-12">
-                            <mat-form-field>
-                              <input matInput placeholder="Business Term" maxlength="225"
-                                     [value]="reusedNodeDetail.asbiep.bizTerm"
-                                     [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-md-6 col-sm-12">
-                            <mat-form-field>
-                              <input matInput placeholder="Remark" maxlength="225"
-                                     [value]="reusedNodeDetail.asbiep.remark"
                                      [disabled]="true">
                             </mat-form-field>
                           </div>
@@ -723,8 +746,19 @@
 
                       <div class="row">
                         <div class="col-md-6 col-sm-12">
-                          <mat-form-field>
-                            <input matInput placeholder="Business Term" maxlength="225"
+                          <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
+                            <button class="hover-button" mat-raised-button color="primary"
+                                    (click)="goToBusinessTermsForBie(selectedNode.detail, 'BBIE')">
+                              Show Business Terms
+                            </button>
+                            <button mat-raised-button
+                                    [disabled]="!isEditable(selectedNode)"
+                                    (click)="goToAssignBusinessTermsForBie(selectedNode.detail, 'BBIE')">
+                              Assign Business Term
+                            </button>
+                          </div>
+                          <mat-form-field *ngIf="!isBusinessTermEnabled || isDeveloper">
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
                                    [(ngModel)]="asBbiepDetail().bbiep.bizTerm"
                                    [disabled]="!isEditable(selectedNode)">
                           </mat-form-field>
@@ -832,12 +866,12 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', !isValidState(codeList.state) ? 'text-warning' : 'dummy',
+                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
                                           codeList.deprecated ? 'deprecated': 'dummy']"
-                                         [matTooltip]="'This code list is usable but unstable'"
-                                         [matTooltipDisabled]="isValidState(codeList.state)">
-                                      <span>{{ codeList.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span>)</span>
+                                         [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
+                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -857,12 +891,12 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', !isValidState(agency.state) ? 'text-warning' : 'dummy',
+                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
                                           agency.deprecated ? 'deprecated': 'dummy']"
-                                         [matTooltip]="'This agency id list is usable but unstable'"
-                                         [matTooltipDisabled]="isValidState(agency.state)">
-                                      <span>{{ agency.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span>)</span>
+                                         [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
+                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -1036,7 +1070,7 @@
                       <div class="row">
                         <div class="col-md-6 col-sm-12">
                           <mat-form-field>
-                            <input matInput placeholder="Business Term" maxlength="225"
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
                                    [(ngModel)]="asBbieScDetail().bbieSc.bizTerm"
                                    [disabled]="!isEditable(selectedNode)">
                           </mat-form-field>
@@ -1146,12 +1180,12 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', !isValidState(codeList.state) ? 'text-warning' : 'dummy',
+                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
                                           codeList.deprecated ? 'deprecated': 'dummy']"
-                                         [matTooltip]="'This code list is usable but unstable'"
-                                         [matTooltipDisabled]="isValidState(codeList.state)">
-                                      <span>{{ codeList.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span>)</span>
+                                         [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
+                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -1171,12 +1205,12 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', !isValidState(agency.state) ? 'text-warning' : 'dummy',
+                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
                                           agency.deprecated ? 'deprecated': 'dummy']"
-                                         [matTooltip]="'This agency id list is usable but unstable'"
-                                         [matTooltipDisabled]="isValidState(agency.state)">
-                                      <span>{{ agency.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span>)</span>
+                                         [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
+                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>

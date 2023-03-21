@@ -3,11 +3,13 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {hashCode, sha256} from '../../../../common/utility';
+import {hashCode, initFilter, sha256} from '../../../../common/utility';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
 import {ModuleElement} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
+import {FormControl} from "@angular/forms";
+import {ReplaySubject} from "rxjs";
 
 @Component({
   selector: 'score-module-edit-dialog',
@@ -19,6 +21,9 @@ export class ModuleEditDialogComponent implements OnInit {
   $hashCode: string;
 
   namespaceList: SimpleNamespace[];
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   title: string;
 
@@ -41,7 +46,9 @@ export class ModuleEditDialogComponent implements OnInit {
     }));
 
     this.namespaceService.getSimpleNamespaces().subscribe(resp => {
-      this.namespaceList = resp;
+      this.namespaceList = resp.filter(e => e.standard);
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.namespaceList, (e) => e.uri);
     });
   }
 

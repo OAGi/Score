@@ -1,12 +1,11 @@
 package org.oagi.score.gateway.http.api.cc_management.controller;
 
 import org.oagi.score.gateway.http.api.cc_management.data.CcActionRequest;
-import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.ExtensionUpdateResponse;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcNode;
 import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
+import org.oagi.score.service.common.data.CcState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,7 +93,7 @@ public class ExtensionController {
         return service.updateDetails(user, request);
     }
 
-    @RequestMapping(value = "/core_component/extension//{type}/{manifestId:[\\d]+}/revision",
+    @RequestMapping(value = "/core_component/extension/{type}/{manifestId:[\\d]+}/revision",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcNode getLastCcNode(@AuthenticationPrincipal AuthenticatedPrincipal user,

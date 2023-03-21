@@ -196,6 +196,23 @@ public class DtWriteRepository {
         bdtManifest.setLogId(logRecord.getLogId());
         bdtManifest.update(DT_MANIFEST.LOG_ID);
 
+        if (StringUtils.hasLength(request.getTag())) {
+            ULong dtManifestId = bdtManifest.getDtManifestId();
+            dslContext.selectFrom(TAG)
+                    .where(TAG.NAME.eq(request.getTag()))
+                    .fetchOptionalInto(TagRecord.class)
+                    .ifPresent(tagRecord -> {
+                        DtManifestTagRecord dtManifestTagRecord = new DtManifestTagRecord();
+                        dtManifestTagRecord.setDtManifestId(dtManifestId);
+                        dtManifestTagRecord.setTagId(tagRecord.getTagId());
+                        dtManifestTagRecord.setCreatedBy(userId);
+                        dtManifestTagRecord.setCreationTimestamp(timestamp);
+                        dslContext.insertInto(DT_MANIFEST_TAG)
+                                .set(dtManifestTagRecord)
+                                .execute();
+                    });
+        }
+
         return new CreateBdtRepositoryResponse(bdtManifest.getDtManifestId().toBigInteger());
     }
 

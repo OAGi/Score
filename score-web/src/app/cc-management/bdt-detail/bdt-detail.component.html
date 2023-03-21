@@ -117,7 +117,8 @@
                   <div class="col-7 actions-wrap">
                     <div class="actions ml-auto" *ngIf="isWorkingRelease()">
                       <button mat-icon-button [id]="'cc-settings'"
-                              [matMenuTriggerFor]="settingsContextMenu">
+                              [matMenuTriggerFor]="settingsContextMenu"
+                              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                         <mat-icon>settings</mat-icon>
                       </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
@@ -165,7 +166,8 @@
                     </div>
                     <div class="actions ml-auto" *ngIf="!isWorkingRelease()">
                       <button mat-icon-button [id]="'cc-settings'"
-                              [matMenuTriggerFor]="settingsContextMenu">
+                              [matMenuTriggerFor]="settingsContextMenu"
+                              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                         <mat-icon>settings</mat-icon>
                       </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
@@ -252,7 +254,7 @@
                            tabIndex="0"
                            [class]="{'tree-node-selected': cursorNode === node}"
                            (click)="onClick(node, $event)"
-                           (keydown)="keyNavigation($event)"
+                           (keydown)="keyNavigation(node, $event)"
                            [matTooltip]="'Circular reference detected.'"
                            [matTooltipDisabled]="!node.isCycle"
                            [style.padding-left]="node.level * paddingPixel + 'px'">
@@ -269,12 +271,12 @@
                         </ng-template>
 
                         <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
-                          node.deprecated ? 'deprecated' : 'dummy',
-                          node.inhibited ? 'inhibited' : 'dummy',
-                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                          this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd',
-                          node.state === 'Deleted' ? 'text-line-through' : 'text-none']"
-                              [matTooltip]="node.state === 'Deleted' ? 'Deleted' : ''"
+                              node.deprecated ? 'deprecated' : 'dummy',
+                              node.inhibited ? 'inhibited' : 'dummy',
+                              this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
+                              this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd',
+                              node.state === 'Deleted' ? 'text-line-through' : 'text-none']"
+                              [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
@@ -282,6 +284,12 @@
                               *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                         </span>
+
+                        <div class="tag-list pl-2 align-self-center">
+                            <span class="tag ml-2" *ngFor="let tag of node.tagList"
+                                  [style.background-color]="tag.backgroundColor"
+                                  [style.color]="tag.textColor">{{ tag.name }}</span>
+                        </div>
 
                         <div class="ml-auto align-self-center mr-2">
                           <mat-icon [hidden]="!node.showCopyLinkIcon"
@@ -291,6 +299,7 @@
                           </mat-icon>
                           <mat-icon [style.visibility]="!node.isCycle ? '' : 'hidden'"
                                     [matMenuTriggerFor]="contextMenu"
+                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
                                     (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                           </mat-icon>
                         </div>
@@ -321,6 +330,19 @@
                     </button>
                     <button mat-menu-item (click)="openHistory(contextMenuItem)">
                       <span class="context-menu-item">Show History</span>
+                    </button>
+                    <button mat-menu-item [matMenuTriggerFor]="editTagsSubMenu">Tags</button>
+                  </mat-menu>
+
+                  <mat-menu #editTagsSubMenu="matMenu">
+                    <button mat-menu-item *ngFor="let tag of tags" (click)="toggleTag(contextMenuItem, tag)">
+                      <mat-icon>{{ contains(contextMenuItem, tag) ? 'check' : '' }}</mat-icon>
+                      <span>{{ tag.name }}</span>
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item (click)="openEditTags()">
+                      <mat-icon>edit</mat-icon>
+                      <span>Edit Tags</span>
                     </button>
                   </mat-menu>
                 </mat-card-content>
@@ -413,15 +435,27 @@
 
                       <div class="row">
                         <div class="col-12">
-                          <mat-form-field>
+                          <mat-form-field *ngIf="selectedNode.level === 0 && isEditable() && !hasRevision()">
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asBdtDetail().namespaceId"
-                                        [disabled]="!isEditable() || hasRevision()">
-                              <mat-option [value]="0">-</mat-option>
-                              <mat-option *ngFor="let namespace of getSelectableNamespaces(asBdtDetail().namespaceId)"
-                                          [value]="namespace.namespaceId">
-                                {{namespace.uri}}
+                                        [required]="true">
+                              <mat-option>
+                                <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                                       [placeholderLabel]="'Search...'"
+                                                       [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
                               </mat-option>
+                              <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+                                {{ namespace.uri }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                          <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
+                            <mat-select placeholder="Namespace"
+                                        [(ngModel)]="asBdtDetail().namespaceId"
+                                        [required]="true"
+                                        [disabled]="true">
+                              <mat-option *ngFor="let namespace of getSelectableNamespaces(asBdtDetail().namespaceId)"
+                                          [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                             </mat-select>
                           </mat-form-field>
                         </div>
@@ -524,7 +558,8 @@
                                                 (ngModelChange)="onChangeValueDomain(asBdtDetail())">
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtPriRestri.inherited">
-                                        <span>{{ codeList.codeListName }}</span>
+                                        <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
+                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -855,7 +890,8 @@
                                                 (ngModelChange)="onChangeValueDomain(asBdtScDetail())">
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtScPriRestri.inherited">
-                                        <span>{{ codeList.codeListName }}</span>
+                                        <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
+                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>

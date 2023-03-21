@@ -3,17 +3,13 @@ package org.oagi.score.gateway.http.api.code_list_management.service;
 import org.jooq.*;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
-import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.code_list_management.data.*;
-import org.oagi.score.service.common.data.AccessPrivilege;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventHandler;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.component.code_list.*;
+import org.oagi.score.service.common.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -28,10 +24,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.*;
-
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
-import static org.oagi.score.repo.api.bie.model.BieState.*;
+import static org.oagi.score.repo.api.bie.model.BieState.Production;
+import static org.oagi.score.repo.api.bie.model.BieState.QA;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service

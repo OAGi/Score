@@ -32,6 +32,11 @@
               "src/score-web-theme.scss",
               "src/styles.css"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules/@angular/material"
+              ]
+            },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.js",
@@ -46,7 +51,7 @@
             "vendorChunk": false,
             "buildOptimizer": false,
             "allowedCommonJsDependencies": [
-              "webfontloader", "util", "crypto-js", "uuid", "@stomp/rx-stomp", "file-saver/FileSaver"
+              "webfontloader", "util", "crypto-js", "@types/uuid", "@stomp/rx-stomp", "angular2-uuid", "file-saver"
             ]
           },
           "configurations": {

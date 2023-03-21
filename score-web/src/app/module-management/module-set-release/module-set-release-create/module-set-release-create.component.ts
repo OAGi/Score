@@ -142,6 +142,8 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
                 this.doCreateModuleSetRelease();
               }
             });
+        } else {
+          this.doCreateModuleSetRelease();
         }
       });
     } else {

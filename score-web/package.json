@@ -1,6 +1,6 @@
 {
   "name": "score-web",
-  "version": "2.4.1",
+  "version": "3.0.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -31,7 +31,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
-    "@stomp/ng2-stompjs": "^8.0.0",
+    "@stomp/rx-stomp": "^1.2.0",
     "@types/uuid": "^8.3.4",
     "angular-split": "^14.1.0",
     "bootstrap": "^4.6.2",

@@ -16,7 +16,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {base64Decode, initFilter, loadBranch, saveBooleanProperty, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
 import {SimpleRelease} from '../../release-management/domain/release';
@@ -44,8 +44,10 @@ export class BieCopyProfileBieComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
@@ -55,6 +57,8 @@ export class BieCopyProfileBieComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+
+  HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
   constructor(private bizCtxService: BusinessContextService,
               private service: BieCopyService,
@@ -81,7 +85,7 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     // Load Business Contexts
@@ -106,6 +110,7 @@ export class BieCopyProfileBieComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
         if (savedReleaseId) {
@@ -132,9 +137,11 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.loadBieList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
+  onChange(property?: string, source?) {
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
   }
 
   onReleaseChange(source) {
@@ -219,6 +226,10 @@ export class BieCopyProfileBieComponent implements OnInit {
       this.snackBar.open('Copying request queued', '', {
         duration: 3000,
       });
+
+      // Issue #1366
+      // 'Hide Unused' option must be turned off after BIE creation.
+      saveBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
       this.router.navigateByUrl('/profile_bie');
     });

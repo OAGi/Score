@@ -23,6 +23,7 @@ public class CcListRequest {
     private String den;
     private String definition;
     private String module;
+    private List<String> tags;
     private String componentTypes;
     private List<String> excludes;
     private Boolean isBIEUsable;

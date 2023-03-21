@@ -59,20 +59,24 @@
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="request.filters.uri" (keyup.enter)="onChange()"
+                  <input matInput [(ngModel)]="request.filters.uri"
+                         (ngModelChange)="onChange('filters.uri', request.filters.uri)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadNamespaceList();"
                          placeholder="URI">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="request.filters.prefix" (keyup.enter)="onChange()"
+                  <input matInput [(ngModel)]="request.filters.prefix"
+                         (ngModelChange)="onChange('filters.prefix', request.filters.prefix)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadNamespaceList();"
                          placeholder="Prefix">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                         [max]="request.updatedDate.end"
                          (dateInput)="onDateEvent('startDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
@@ -89,7 +93,7 @@
               <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                         [min]="request.updatedDate.start"
                          (dateInput)="onDateEvent('endDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
@@ -107,7 +111,8 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadNamespaceList();">
           <mat-icon>search</mat-icon>
           Search
         </button>
@@ -120,14 +125,15 @@
       </div>
 
       <div class="mat-elevation-z1">
-        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+        <table mat-table
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                [dataSource]="dataSource">
 
           <ng-container matColumnDef="uri">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> URI</th>
             <td mat-cell *matCellDef="let element">
               <a routerLink="{{ element.namespaceId }}">
-                <div class="ellipsis">{{ element.uri }}</div>
+                <div>{{ element.uri }}</div>
               </a>
             </td>
           </ng-container>
@@ -139,7 +145,9 @@
 
           <ng-container matColumnDef="owner">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Owner</th>
-            <td mat-cell *matCellDef="let element">{{ element.owner }}</td>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.owner">{{ element.owner }}</span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="transferOwnership">
@@ -172,8 +180,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
-              </div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
             </td>
           </ng-container>
 

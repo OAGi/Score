@@ -62,6 +62,7 @@ public class CcListController {
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
+            @RequestParam(name = "tags", required = false) String tags,
             @RequestParam(name = "componentTypes", required = false) String componentTypes,
             @RequestParam(name = "dtTypes", required = false) String dtTypes,
             @RequestParam(name = "asccpTypes", required = false) String asccpTypes,
@@ -110,6 +111,8 @@ public class CcListController {
         request.setDen(den);
         request.setDefinition(definition);
         request.setModule(module);
+        request.setTags(!StringUtils.hasLength(tags) ? Collections.emptyList() :
+                Arrays.asList(tags.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setComponentTypes(componentTypes);
         request.setDtTypes(!StringUtils.hasLength(dtTypes) ? Collections.emptyList() :
                 Arrays.asList(dtTypes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));

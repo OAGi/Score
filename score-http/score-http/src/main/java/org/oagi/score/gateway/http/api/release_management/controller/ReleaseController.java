@@ -1,9 +1,9 @@
 package org.oagi.score.gateway.http.api.release_management.controller;
 
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseService;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -34,7 +34,7 @@ public class ReleaseController {
         return service.getSimpleReleases(request);
     }
 
-    @RequestMapping(value = "/simple_release/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/simple_release/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SimpleRelease getSimpleRelease(@PathVariable("id") BigInteger releaseId) {
         return service.getSimpleReleaseByReleaseId(releaseId);
@@ -113,7 +113,7 @@ public class ReleaseController {
         return service.createRelease(user, releaseDetail);
     }
 
-    @RequestMapping(value = "/release/{id}", method = RequestMethod.POST,
+    @RequestMapping(value = "/release/{id:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                               @PathVariable("id") BigInteger releaseId,
@@ -122,14 +122,14 @@ public class ReleaseController {
         service.updateRelease(user, releaseDetail);
     }
 
-    @RequestMapping(value = "/release/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/release/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReleaseDetail getReleaseDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                           @PathVariable("id") BigInteger releaseId) {
         return service.getReleaseDetail(user, releaseId);
     }
 
-    @RequestMapping(value = "/release/{id}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "/release/{id:[\\d]+}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void discard(@AuthenticationPrincipal AuthenticatedPrincipal user,
                         @PathVariable("id") BigInteger releaseId) {
@@ -144,14 +144,14 @@ public class ReleaseController {
                 .map(e -> new BigInteger(e)).collect(Collectors.toList()));
     }
 
-    @RequestMapping(value = "/release/{id}/assignable", method = RequestMethod.GET,
+    @RequestMapping(value = "/release/{id:[\\d]+}/assignable", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AssignComponents assignComponents(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                              @PathVariable("id") BigInteger releaseId) {
         return service.getAssignComponents(releaseId);
     }
 
-    @RequestMapping(value = "/release/{id}/state", method = RequestMethod.POST,
+    @RequestMapping(value = "/release/{id:[\\d]+}/state", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void transitState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                              @PathVariable("id") BigInteger releaseId,
@@ -167,7 +167,7 @@ public class ReleaseController {
         return service.validate(user, request);
     }
 
-    @RequestMapping(value = "/release/{id}/draft", method = RequestMethod.POST,
+    @RequestMapping(value = "/release/{id:[\\d]+}/draft", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReleaseValidationResponse createDraft(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                  @PathVariable("id") BigInteger releaseId,

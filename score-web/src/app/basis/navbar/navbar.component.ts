@@ -5,11 +5,10 @@ import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
 import {base64Encode} from '../../common/utility';
 import {MessageService} from '../../message-management/domain/message.service';
-import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {RxStompService} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {Router} from '@angular/router';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
 
 @Component({
   selector: 'score-navbar',
@@ -32,6 +31,21 @@ export class NavbarComponent implements OnInit {
     translate.use(browserLang.match(/ccts|oagis/) ? browserLang : 'ccts');
     translate.onLangChange.subscribe((event: LangChangeEvent) => {
     });
+  }
+
+  get isTenantEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.tenant.enabled;
+  }
+
+  get hasTenantRole(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.tenant.roles !== undefined && userToken.tenant.roles.length > 0;
+  }
+
+  get isBusinessTermEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.businessTerm.enabled;
   }
 
   ngOnInit() {
@@ -86,6 +100,13 @@ export class NavbarComponent implements OnInit {
     return this.roles.includes('developer');
   }
 
+  showContextButton() {
+    if (this.isTenantEnabled) {
+      return this.auth.isAdmin();
+    }
+    return true;
+  }
+
   logout() {
     const userToken = this.userToken;
     if (!!userToken && userToken.authentication === 'oauth2') {
@@ -114,6 +135,21 @@ export class NavbarComponent implements OnInit {
       params = params.set(param['key'], param['value']);
     }
     return base64Encode(params.toString());
+  }
+
+  showTermsAndCodeListButton() {
+    if (this.isTenantEnabled) {
+      return !this.auth.isAdmin();
+    }
+    return false;
+  }
+
+  openUserGuide($event) {
+    let url = this.router.serializeUrl(this.router.createUrlTree(['/docs']));
+    if (!url.endsWith('/')) {
+      url += '/';
+    }
+    window.open(url, '_blank');
   }
 
 }

@@ -69,8 +69,13 @@ tr.element-row:not(.expanded-row):active {
   width: 70px;
 }
 
-.mat-column-state, .mat-column-owner {
+.mat-column-state {
   width: 100px;
+}
+
+.mat-column-owner {
+  width: 140px;
+  font-size: 13px;
 }
 
 .den {
@@ -97,4 +102,15 @@ tr.element-row:not(.expanded-row):active {
 
 .f12 {
   font-size: 12px;
+}
+
+.tag-list {
+  display: inline-block;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
 }

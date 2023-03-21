@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>2.4.1</version>
+    <version>3.0.0</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.6</version>
+        <version>3.0.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -29,9 +29,9 @@
         <redisson.version>3.18.1</redisson.version>
         <netty.version>4.1.89.Final</netty.version>
         <lombok.version>1.18.24</lombok.version>
-        <mysql-connector-java.version>8.0.31</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.32</mysql-connector-java.version>
         <log4j.version>2.19.0</log4j.version>
-        <jOOQ.version>3.17.5</jOOQ.version>
+        <jOOQ.version>3.17.8</jOOQ.version>
         <guava.version>31.1-jre</guava.version>
         <gson.version>2.10</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
@@ -39,7 +39,7 @@
         <commons-lang.version>3.12.0</commons-lang.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.2.3</poi.version>
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
         <saxon.version>10.6</saxon.version>
     </properties>
 
@@ -47,7 +47,12 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-service</artifactId>
-            <version>2.4.1</version>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -234,10 +239,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.1</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -246,20 +256,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.reporting</groupId>
+                        <artifactId>maven-reporting-impl</artifactId>
+                        <version>4.0.0-M3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.reporting</groupId>
+                        <artifactId>maven-reporting-api</artifactId>
+                        <version>4.0.0-M4</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

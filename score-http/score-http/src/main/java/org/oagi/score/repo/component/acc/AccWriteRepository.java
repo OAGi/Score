@@ -8,6 +8,7 @@ import org.jooq.UpdateSetFirstStep;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.BCCEntityType;
 import org.oagi.score.service.log.model.LogAction;
@@ -116,6 +117,23 @@ public class AccWriteRepository {
                         .set(accManifest)
                         .returning(ACC_MANIFEST.ACC_MANIFEST_ID).fetchOne().getAccManifestId()
         );
+
+        if (StringUtils.hasLength(request.getTag())) {
+            ULong accManifestId = accManifest.getAccManifestId();
+            dslContext.selectFrom(TAG)
+                    .where(TAG.NAME.eq(request.getTag()))
+                    .fetchOptionalInto(TagRecord.class)
+                    .ifPresent(tagRecord -> {
+                        AccManifestTagRecord accManifestTagRecord = new AccManifestTagRecord();
+                        accManifestTagRecord.setAccManifestId(accManifestId);
+                        accManifestTagRecord.setTagId(tagRecord.getTagId());
+                        accManifestTagRecord.setCreatedBy(userId);
+                        accManifestTagRecord.setCreationTimestamp(timestamp);
+                        dslContext.insertInto(ACC_MANIFEST_TAG)
+                                .set(accManifestTagRecord)
+                                .execute();
+                    });
+        }
 
         return new CreateAccRepositoryResponse(accManifest.getAccManifestId().toBigInteger());
     }

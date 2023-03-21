@@ -6,7 +6,7 @@
 /out-tsc
 
 # dependencies
-/node_modules
+/node_modules*
 
 # IDEs and editors
 /.idea
@@ -35,7 +35,12 @@ testem.log
 /typings
 package-lock.json
 yarn.lock
+/misc
+/docker/docs
+/docker/score-web
+.angular
 
 # System Files
 .DS_Store
 Thumbs.db
+/backup

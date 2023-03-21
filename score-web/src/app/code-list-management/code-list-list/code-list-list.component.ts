@@ -60,8 +60,10 @@ export class CodeListListComponent implements OnInit {
 
   releases: Release[] = [];
   loginIdList: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
@@ -94,7 +96,7 @@ export class CodeListListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCodeList();
     });
 
     this.releases = [];
@@ -103,6 +105,7 @@ export class CodeListListComponent implements OnInit {
       this.accountService.getAccountNames()
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases);
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
         if (savedReleaseId) {
@@ -120,7 +123,7 @@ export class CodeListListComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.onChange();
+      this.loadCodeList(true);
     });
   }
 
@@ -134,16 +137,13 @@ export class CodeListListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.loadCodeList(true);
+    this.loadCodeList();
   }
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.loadCodeList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -231,12 +231,15 @@ export class CodeListListComponent implements OnInit {
   }
 
   createCodeList() {
+    this.loading = true;
     this.service.create(this.request.release.releaseId)
       .subscribe(resp => {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
         this.router.navigateByUrl('/code_list/' + resp.manifestId);
+      }, _ => {
+        this.loading = false;
       });
   }
 

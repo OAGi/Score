@@ -58,6 +58,15 @@ export class AuthService implements OnInit, CanActivate {
     }));
   }
 
+  reloadUserToken(): Observable<UserToken> {
+    return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
+      if (!!res) {
+        this.storeUserInfo(res);
+      }
+      return res;
+    }));
+  }
+
   authenticate(credentials, callback?: (value: any) => void, errCallback?: (error: any) => void) {
     const params = new HttpParams()
       .set('username', credentials.username)
@@ -298,6 +307,21 @@ export class CanActivateUser implements CanActivate {
 
     this.authService.logout(getResolvedUrl(route));
     return false;
+  }
+
+}
+
+@Injectable()
+export class CanActivateTenantInstance implements CanActivate {
+
+  constructor(private authService: AuthService) {
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+
+    const userToken = this.authService.getUserToken();
+    return userToken.tenant.enabled;
   }
 
 }

@@ -5,11 +5,13 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
+import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppOauth2UserRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,8 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,9 +43,15 @@ public class AccountListService {
     @Autowired
     private DSLContext dslContext;
 
+    @Autowired
+    private ApplicationConfigurationService configService;
+
+    @Autowired
+    private TenantService tenantService;
+
     public PageResponse<AppUser> getAccounts(AuthenticatedPrincipal user,
                                              AccountListRequest request) {
-        SelectOnConditionStep step = dslContext.select(
+        SelectOnConditionStep step = dslContext.selectDistinct(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
@@ -53,7 +61,9 @@ public class AccountListService {
                 APP_USER.ORGANIZATION,
                 APP_OAUTH2_USER.APP_OAUTH2_USER_ID
         ).from(APP_USER)
-                .leftJoin(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID));
+                .leftJoin(APP_OAUTH2_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID))
+                .leftJoin(USER_TENANT)
+                .on(USER_TENANT.APP_USER_ID.eq(APP_USER.APP_USER_ID));
 
         List<Condition> conditions = new ArrayList();
         if (StringUtils.hasLength(request.getLoginId())) {
@@ -97,6 +107,25 @@ public class AccountListService {
             conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUserByUsername(user).getLoginId().trim()));
         }
 
+		if (configService.isTenantEnabled()) {
+			BigInteger tenantId = request.getTenantId();
+			boolean notConnectedToTenant = request.isNotConnectedToTenant();
+			if (tenantId != null && !notConnectedToTenant) {
+				conditions.add(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)));
+			}
+
+			if (tenantId != null && notConnectedToTenant) {
+				conditions.add(APP_USER.APP_USER_ID.notIn(dslContext.select(USER_TENANT.APP_USER_ID).from(USER_TENANT)
+						.where(USER_TENANT.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+			}
+
+			List<Long> businessCtxIds = request.getBusinessCtxIds();
+			if (businessCtxIds != null && !businessCtxIds.isEmpty()) {
+				conditions.add(USER_TENANT.TENANT_ID.in(dslContext.select(TENANT_BUSINESS_CTX.TENANT_ID)
+						.from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.BIZ_CTX_ID.in(businessCtxIds))));
+			}
+		}
+
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 
         PageRequest pageRequest = request.getPageRequest();
@@ -137,6 +166,8 @@ public class AccountListService {
         }
 
         SelectWithTiesAfterOffsetStep<Record6<ULong, String, String, Byte, String, ULong>> offsetStep = null;
+
+        int pageCount = dslContext.fetchCount(conditionStep);
         if (sortField != null) {
             offsetStep = conditionStep.orderBy(sortField)
                     .limit(pageRequest.getOffset(), pageRequest.getPageSize());
@@ -154,12 +185,7 @@ public class AccountListService {
         response.setList(result);
         response.setPage(pageRequest.getPageIndex());
         response.setSize(pageRequest.getPageSize());
-        response.setLength(dslContext.selectCount()
-                .from(APP_USER)
-                .leftJoin(APP_OAUTH2_USER)
-                .on(APP_OAUTH2_USER.APP_USER_ID.eq(APP_USER.APP_USER_ID))
-                .where(conditions)
-                .fetchOptionalInto(Integer.class).orElse(0));
+        response.setLength(pageCount);
 
         return response;
     }
@@ -211,7 +237,8 @@ public class AccountListService {
 
         AppUserRecord record = new AppUserRecord();
         record.setLoginId(account.getLoginId());
-        if (account.getAppOauth2UserId() == 0) {
+        if (account.getAppOauth2UserId() == null ||
+            account.getAppOauth2UserId().longValue() == 0L) {
             record.setPassword(passwordEncoder.encode(account.getPassword()));
         }
         record.setName(account.getName());
@@ -224,7 +251,9 @@ public class AccountListService {
                 .set(record)
                 .returning(APP_USER.APP_USER_ID).fetchOne().getAppUserId();
 
-        if (account.getAppOauth2UserId() > 0 && account.getSub().length() > 0) {
+        if (account.getAppOauth2UserId() != null &&
+            account.getAppOauth2UserId().longValue() > 0L &&
+            account.getSub().length() > 0) {
             AppOauth2UserRecord oauth2User = dslContext.selectFrom(APP_OAUTH2_USER).where(
                     and(APP_OAUTH2_USER.APP_OAUTH2_USER_ID.eq(ULong.valueOf(account.getAppOauth2UserId())),
                             APP_OAUTH2_USER.SUB.eq(account.getSub()))).fetchOne();

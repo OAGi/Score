@@ -1,5 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatTableDataSource} from '@angular/material/table';
@@ -44,15 +44,20 @@ import {
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin} from 'rxjs';
-import {Message} from '@stomp/stompjs';
-import {RxStompService} from '@stomp/ng2-stompjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
+import {MatMenuTrigger} from '@angular/material/menu';
+import {Tag, ShortTag} from '../../tag-management/domain/tag';
+import {TagService} from '../../tag-management/domain/tag.service';
+import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
+import {FormControl} from "@angular/forms";
 
 
 @Component({
@@ -80,7 +85,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   workingRelease = WorkingRelease;
   namespaces: SimpleNamespace[];
+  tags: Tag[] = [];
   commentControl: CommentControl;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   initialExpandDepth = 10;
 
@@ -96,6 +105,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
 
+  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
@@ -140,6 +150,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
               private namespaceService: NamespaceService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private tagService: TagService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -160,10 +171,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           this.service.getLastPublishedRevision(this.type, this.manifestId),
           this.service.getBdtNode(this.manifestId),
           this.namespaceService.getSimpleNamespaces(),
+          this.tagService.getTags()
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces]) => {
+      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags]) => {
       this.lastRevision = revisionResponse;
       this.namespaces = namespaces;
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.getSelectableNamespaces(), (e) => e.uri);
+      this.tags = tags;
 
       // subscribe an event
       this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
@@ -783,6 +798,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
             })
           )
           .subscribe(_ => {
+            this.snackBar.open('Deleted', '', {duration: 3000});
             this.router.navigateByUrl('/core_component');
           }, error => {
           });
@@ -852,6 +868,48 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     window.open('/log/core-component/' + node.guid + '?type=' + node.type + '&manifestId=' + node.manifestId, '_blank');
   }
 
+  contains(node: CcFlatNode, tag: Tag): boolean {
+    if (!node || !node.tagList) {
+      return false;
+    }
+    return node.tagList.filter(e => e.tagId === tag.tagId).length > 0;
+  }
+
+  toggleTag(node: CcFlatNode, tag: Tag) {
+    if (!node || !tag) {
+      return;
+    }
+
+    this.tagService.toggleTag(node.type, node.manifestId, tag.name).subscribe(_ => {
+      if (this.contains(node, tag)) {
+        node.tagList.splice(node.tagList.map(e => e.tagId).indexOf(tag.tagId), 1);
+      } else {
+        if (!node.tagList) {
+          node.tagList = [];
+        }
+        const shortTag = new ShortTag();
+        shortTag.tagId = tag.tagId;
+        shortTag.name = tag.name;
+        shortTag.textColor = tag.textColor;
+        shortTag.backgroundColor = tag.backgroundColor;
+        node.tagList.push(shortTag);
+      }
+    });
+  }
+
+  openEditTags() {
+    const dialogRef = this.dialog.open(EditTagsDialogComponent, {
+      width: '90%',
+      maxWidth: '90%',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe(_ => {
+      this.tagService.getTags().subscribe(tags => {
+        this.tags = tags;
+      });
+    });
+  }
+
   openComments(type: string, node?: CcFlatNode) {
     if (!node) {
       node = this.selectedNode;
@@ -865,15 +923,23 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.cursorNode = node;
   }
 
-  keyNavigation($event: KeyboardEvent) {
+  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
     } else if ($event.key === 'ArrowUp') {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
       this.dataSource.toggle(this.cursorNode);
+    } else if ($event.key === 'o' || $event.key === 'O') {
+      this.menuTriggerList.toArray().filter(e => !!e.menuData)
+        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
+        this.contextMenuItem = node;
+        trigger.openMenu();
+      });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
+    } else {
+      return;
     }
     $event.preventDefault();
     $event.stopPropagation();

@@ -1,8 +1,8 @@
 package org.oagi.score.gateway.http.api.cc_management.data.node;
 
 import lombok.Data;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
+import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -30,6 +30,8 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private String propertyTerm;
     private String representationTerm;
     private Boolean deprecated;
+    private BigInteger replacementDtScManifestId;
+    private CcBdtScNodeDetail replacement;
 
     private CcState state;
     private String owner;

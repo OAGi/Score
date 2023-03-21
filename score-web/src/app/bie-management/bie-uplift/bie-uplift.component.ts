@@ -34,6 +34,8 @@ import {
 } from '../domain/bie-flat-tree';
 import {CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
+import {BieEditAbieNode} from '../bie-edit/domain/bie-edit-node';
+import {saveBooleanProperty} from '../../common/utility';
 
 
 export class BieUpliftSourceFlatNodeDatabase<T extends BieFlatNode> extends BieFlatNodeDatabase<T> {
@@ -107,6 +109,8 @@ export class BieUpliftComponent implements OnInit {
   unmatchedSource: BieUpliftSourceFlatNode[] = [];
   currentUnmatchedSource: BieUpliftSourceFlatNode;
 
+  HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
+
   constructor(private bizCtxService: BusinessContextService,
               private bieListService: BieListService,
               private accountService: AccountListService,
@@ -148,15 +152,17 @@ export class BieUpliftComponent implements OnInit {
         this.sourceReleaseNum = sourceRootNode.releaseNum;
 
         const sourceDatabase = new BieUpliftSourceFlatNodeDatabase<BieUpliftSourceFlatNode>(sourceCcGraph,
-          sourceRootNode.asccpManifestId, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
+          sourceRootNode, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
         this.sourceDataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(sourceDatabase, this.bieEditService);
         this.sourceSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>(this.sourceDataSource, sourceDatabase);
         this.sourceDataSource.init();
 
         this.sourceDataSource.hideUnused = true;
 
+        const targetRootNode = new BieEditAbieNode();
+        targetRootNode.asccpManifestId = this.targetAsccpManifestId;
         const targetDatabase = new BieUpliftTargetFlatNodeDatabase<BieUpliftTargetFlatNode>(targetCcGraph,
-          this.targetAsccpManifestId, undefined, [], []);
+          targetRootNode, undefined, [], []);
         this.targetDataSource = new BieFlatNodeDataSource<BieUpliftTargetFlatNode>(targetDatabase, this.bieEditService);
         this.targetSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>(this.targetDataSource, targetDatabase);
         this.targetDataSource.init();
@@ -598,6 +604,10 @@ export class BieUpliftComponent implements OnInit {
         this.loading = false;
       }))
       .subscribe(result => {
+        // Issue #1366
+        // 'Hide Unused' option must be turned off after BIE creation.
+        saveBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
+
         this.router.navigateByUrl('/profile_bie/' + result.topLevelAsbiepId);
       });
   }

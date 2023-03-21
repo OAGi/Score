@@ -70,7 +70,9 @@
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
-                  <input (keyup.enter)="onChange()" [(ngModel)]="request.filters.name" matInput
+                  <input matInput [(ngModel)]="request.filters.name"
+                         (ngModelChange)="onChange('filters.name', request.filters.name)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadModuleSetReleaseList();"
                          placeholder="Name">
                 </mat-form-field>
               </div>
@@ -79,7 +81,8 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button (click)="onChange()" color="primary" mat-raised-button type="submit">
+        <button color="primary" mat-raised-button type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadModuleSetReleaseList();">
           <mat-icon>search</mat-icon>
           Search
         </button>
@@ -98,7 +101,7 @@
           <ng-container matColumnDef="name">
             <th *matHeaderCellDef mat-header-cell mat-sort-header> Name</th>
             <td *matCellDef="let element" mat-cell>
-              <div class="den ellipsis" style="margin-right: 10px;">
+              <div class="den word-break-all">
                 <a routerLink="{{ element.moduleSetReleaseId }}">{{ element.moduleSetReleaseName }}</a>
               </div>
             </td>
@@ -107,7 +110,7 @@
           <ng-container matColumnDef="release">
             <th *matHeaderCellDef mat-header-cell> Release Num</th>
             <td *matCellDef="let element" mat-cell>
-              <div class="den ellipsis" style="margin-right: 10px;">
+              <div class="den word-break-all">
                 <a routerLink="/release/{{ element.releaseId }}">{{ element.releaseNum }}</a>
               </div>
             </td>
@@ -116,7 +119,7 @@
           <ng-container matColumnDef="default">
             <th *matHeaderCellDef mat-header-cell> Default</th>
             <td *matCellDef="let element" mat-cell>
-              <div *ngIf="element.default" class="ellipsis">Y</div>
+              <div *ngIf="element.default">Y</div>
             </td>
           </ng-container>
 
@@ -124,8 +127,7 @@
             <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
             <td *matCellDef="let element" mat-cell>
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdatedBy.username }}</b>
-              </div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
             </td>
           </ng-container>
 
@@ -147,6 +149,7 @@
 
         <mat-paginator
           [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
           showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>

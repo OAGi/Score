@@ -33,23 +33,24 @@ public class JooqBusinessContextReadRepository
     }
 
     private SelectOnConditionStep select() {
-        return dslContext().select(
-                BIZ_CTX.BIZ_CTX_ID,
-                BIZ_CTX.GUID,
-                BIZ_CTX.NAME,
-                APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
-                APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
-                APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
-                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
-                APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
-                APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
-                APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
-                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
-                BIZ_CTX.CREATION_TIMESTAMP,
-                BIZ_CTX.LAST_UPDATE_TIMESTAMP)
+        return dslContext().selectDistinct(
+                        BIZ_CTX.BIZ_CTX_ID,
+                        BIZ_CTX.GUID,
+                        BIZ_CTX.NAME,
+                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                        APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
+                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                        APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
+                        BIZ_CTX.CREATION_TIMESTAMP,
+                        BIZ_CTX.LAST_UPDATE_TIMESTAMP)
                 .from(BIZ_CTX)
                 .join(APP_USER.as("creator")).on(BIZ_CTX.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(BIZ_CTX.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(APP_USER.as("updater")).on(BIZ_CTX.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
     }
 
     private RecordMapper<Record, BusinessContext> mapper() {
@@ -120,15 +121,15 @@ public class JooqBusinessContextReadRepository
 
     private SelectConditionStep selectForValues(BigInteger businessContextId) {
         return dslContext().select(
-                BIZ_CTX_VALUE.BIZ_CTX_VALUE_ID,
-                BIZ_CTX_VALUE.BIZ_CTX_ID,
-                CTX_CATEGORY.CTX_CATEGORY_ID,
-                CTX_CATEGORY.NAME.as("ctx_category_name"),
-                CTX_SCHEME.CTX_SCHEME_ID,
-                CTX_SCHEME.SCHEME_NAME.as("ctx_scheme_name"),
-                CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID,
-                CTX_SCHEME_VALUE.VALUE.as("ctx_scheme_value"),
-                CTX_SCHEME_VALUE.MEANING.as("ctx_scheme_value_meaning"))
+                        BIZ_CTX_VALUE.BIZ_CTX_VALUE_ID,
+                        BIZ_CTX_VALUE.BIZ_CTX_ID,
+                        CTX_CATEGORY.CTX_CATEGORY_ID,
+                        CTX_CATEGORY.NAME.as("ctx_category_name"),
+                        CTX_SCHEME.CTX_SCHEME_ID,
+                        CTX_SCHEME.SCHEME_NAME.as("ctx_scheme_name"),
+                        CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID,
+                        CTX_SCHEME_VALUE.VALUE.as("ctx_scheme_value"),
+                        CTX_SCHEME_VALUE.MEANING.as("ctx_scheme_value_meaning"))
                 .from(BIZ_CTX_VALUE)
                 .join(CTX_SCHEME_VALUE).on(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID.equal(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID))
                 .join(CTX_SCHEME).on(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID.equal(CTX_SCHEME.CTX_SCHEME_ID))
@@ -156,7 +157,7 @@ public class JooqBusinessContextReadRepository
         };
     }
 
-    private Collection<Condition> getConditions(GetBusinessContextListRequest request) {
+    private Collection<Condition> getConditions(GetBusinessContextListRequest request, boolean isTenantInstance) {
         List<Condition> conditions = new ArrayList();
 
         if (!request.getBusinessContextIdList().isEmpty()) {
@@ -199,6 +200,26 @@ public class JooqBusinessContextReadRepository
             conditions.add(BIZ_CTX.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
         }
 
+        // for tenant management
+        if (isTenantInstance) {
+            Long tenantId = request.getTenantId();
+            boolean notConnectedToTenant = request.isNotConnectedToTenant();
+            if (tenantId != null && !notConnectedToTenant) {
+                conditions.add(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)));
+            }
+
+            if (tenantId != null && notConnectedToTenant) {
+                conditions.add(BIZ_CTX.BIZ_CTX_ID.notIn(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+                        .from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.eq(ULong.valueOf(tenantId)))));
+            }
+        }
+
+        // for editing bie
+        if (isTenantInstance && request.isBieEditing()) {
+            conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+                    .from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.in(request.getUserTenantIds()))));
+        }
+
         return conditions;
     }
 
@@ -227,8 +248,8 @@ public class JooqBusinessContextReadRepository
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBusinessContextListResponse getBusinessContextList(
-            GetBusinessContextListRequest request) throws ScoreDataAccessException {
-        Collection<Condition> conditions = getConditions(request);
+            GetBusinessContextListRequest request, boolean isTenantInstance) throws ScoreDataAccessException {
+        Collection<Condition> conditions = getConditions(request, isTenantInstance);
 
         SelectConditionStep conditionStep;
         if (!request.getTopLevelAsbiepIdList().isEmpty()) {

@@ -1,8 +1,8 @@
 package org.oagi.score.gateway.http.api.cc_management.data.node;
 
 import lombok.Data;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
+import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
 
@@ -24,6 +24,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private int cardinalityMin;
         private int cardinalityMax;
         private boolean deprecated;
+        private BigInteger replacementBccManifestId;
+        private Bcc replacement;
         private boolean nillable;
         private String defaultValue;
         private String fixedValue;
@@ -48,6 +50,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private String den;
         private boolean nillable;
         private boolean deprecated;
+        private BigInteger replacementBccpManifestId;
+        private Bccp replacement;
         private BigInteger namespaceId = BigInteger.ZERO;
         private String defaultValue;
         private String fixedValue;
@@ -69,7 +73,9 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger manifestId;
         private String guid;
         private String dataTypeTerm;
+        private String representationTerm;
         private String qualifier;
+        private BigInteger namespaceId;
         private String den;
         private String definition;
         private String definitionSource;

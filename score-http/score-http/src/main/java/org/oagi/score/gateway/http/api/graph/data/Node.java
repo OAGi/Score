@@ -2,12 +2,11 @@ package org.oagi.score.gateway.http.api.graph.data;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
 import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @JsonSerialize(using = NodeSerializer.class)
 public class Node {
@@ -32,6 +31,7 @@ public class Node {
     private NodeType type;
     private ULong manifestId;
     private CcState state;
+    private List<ShortTag> tagList;
 
     private ULong basedManifestId;
     private ULong linkedManifestId;
@@ -67,6 +67,14 @@ public class Node {
 
     public void setState(CcState state) {
         this.state = state;
+    }
+
+    public List<ShortTag> getTagList() {
+        return (tagList != null) ? tagList : Collections.emptyList();
+    }
+
+    public void setTagList(List<ShortTag> tagList) {
+        this.tagList = tagList;
     }
 
     public ULong getBasedManifestId() {
@@ -156,6 +164,7 @@ public class Node {
                 ", basedManifestId=" + basedManifestId +
                 ", linkedManifestId=" + linkedManifestId +
                 ", prevManifestId=" + prevManifestId +
+                ", tagList=" + tagList +
                 ", properties=" + properties +
                 '}';
     }

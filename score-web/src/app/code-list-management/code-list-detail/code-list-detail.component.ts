@@ -2,17 +2,10 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {RxStompService} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
-import {
-  CodeList,
-  CodeListValue,
-  GetSimpleAgencyIdListValuesResponse, SimpleAgencyIdList,
-  SimpleAgencyIdListValue
-} from '../domain/code-list';
+import {CodeList, CodeListValue, SimpleAgencyIdList, SimpleAgencyIdListValue} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -24,12 +17,14 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {hashCode} from '../../common/utility';
+import {hashCode, initFilter} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {CodeListCommentControl} from './code-list-comment-component';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
 
 @Component({
   selector: 'score-code-list-detail',
@@ -47,6 +42,9 @@ export class CodeListDetailComponent implements OnInit {
 
   namespaces: SimpleNamespace[] = [];
   isUpdating: boolean;
+
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   agencyListFilterCtrl: FormControl = new FormControl();
   filteredAgencyLists: ReplaySubject<SimpleAgencyIdList[]> = new ReplaySubject<SimpleAgencyIdList[]>(1);
@@ -90,7 +88,7 @@ export class CodeListDetailComponent implements OnInit {
 
   ngOnInit() {
     this.commentControl = new CodeListCommentControl(this.sidenav, this.service);
-    this.isUpdating = false;
+    this.isUpdating = true;
 
     this.agencyListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -112,20 +110,20 @@ export class CodeListDetailComponent implements OnInit {
           this.service.getCodeListRevision(this.manifestId),
           this.namespaceService.getSimpleNamespaces()
         ]);
-      })).pipe(
-      finalize(() => {
-        this.isUpdating = false;
-      })
-    ).subscribe(([codeList, revision, namespaces]) => {
+      })).subscribe(([codeList, revision, namespaces]) => {
       this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
         this.agencyIdLists = resp.agencyIdLists;
         this.allAgencyIdListValues = resp.agencyIdListValues;
         this.namespaces = namespaces;
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+          this.getSelectableNamespaces(), (e) => e.uri);
         this.revision = revision;
 
         this.filteredAgencyLists.next(this.agencyIdLists.slice());
 
         this.init(codeList);
+      }, _ => {
+        this.isUpdating = false;
       });
     });
 
@@ -201,6 +199,8 @@ export class CodeListDetailComponent implements OnInit {
     this.codeList = codeList;
 
     this._updateDataSource(this.codeList.codeListValues);
+
+    this.isUpdating = false;
   }
 
   get currentAgencyIdListValues(): SimpleAgencyIdListValue[] {

@@ -2,8 +2,6 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {RxStompService} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
@@ -19,12 +17,14 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {AgencyIdListCommentControl} from './agency-id-list-comment-component';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
+import {initFilter} from "../../common/utility";
 
 @Component({
   selector: 'score-agency-id-list-detail',
@@ -43,6 +43,8 @@ export class AgencyIdListDetailComponent implements OnInit {
   valueSearch: string;
   workingRelease = WorkingRelease;
 
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
   valueFilterCtrl: FormControl = new FormControl();
   valueFilteredList: ReplaySubject<AgencyIdListValue[]> = new ReplaySubject<AgencyIdListValue[]>(1);
 
@@ -88,6 +90,8 @@ export class AgencyIdListDetailComponent implements OnInit {
       })
     ).subscribe(([agencyIdList, namespaces]) => {
       this.namespaces = namespaces;
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+        this.getSelectableNamespaces(), (e) => e.uri);
       this.init(agencyIdList);
       this.isUpdating = false;
     });

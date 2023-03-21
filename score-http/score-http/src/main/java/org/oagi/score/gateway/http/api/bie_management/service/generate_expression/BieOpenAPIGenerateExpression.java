@@ -846,9 +846,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         // Issue #692
+        Xbt xbt = getXbt(bbie, bdt);
         String exampleText = bbie.getExample();
         if (StringUtils.hasLength(exampleText)) {
             properties.put("example", exampleText);
+        } else { // Issue #1405
+            properties.put("example", emptyExample(xbt));
         }
 
         // Issue #564
@@ -857,7 +860,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 .stream().filter(e -> e.getCardinalityMax() != 0).collect(Collectors.toList());
         if (bbieScList.isEmpty()) {
             if (ref == null && isFriendly()) {
-                Xbt xbt = getXbt(bbie, bdt);
                 Map<String, Object> content = toProperties(xbt);
                 properties.putAll(content);
             } else {
@@ -872,7 +874,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
             Map<String, Object> contentProperties = new LinkedHashMap();
             if (ref == null && isFriendly()) {
-                Xbt xbt = getXbt(bbie, bdt);
                 Map<String, Object> content = toProperties(xbt);
                 contentProperties.putAll(content);
             } else {
@@ -911,6 +912,18 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private Object emptyExample(Xbt xbt) {
+        Map<String, Object> properties = toProperties(xbt);
+        Object type = properties.getOrDefault("type", "string");
+        if ("boolean".equals(type)) {
+            return false; // false for boolean (example: false)
+        } else if ("integer".equals(type) || "number".equals(type)) {
+            return null; // null value if integer or numeric (example: null)
+        } else {
+            return ""; // string or date, then empty string (example: "")
+        }
     }
 
     private Map<String, Object> allOf(Map<String, Object> properties) {
@@ -1036,9 +1049,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         // Issue #692
+        Xbt xbt = getXbt(bbieSc, dtSc);
         String exampleText = bbieSc.getExample();
         if (StringUtils.hasLength(exampleText)) {
             properties.put("example", exampleText);
+        } else { // Issue #1405
+            properties.put("example", emptyExample(xbt));
         }
 
         CodeList codeList = generationContext.getCodeList(bbieSc);
@@ -1051,10 +1067,8 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
                 if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
-                    Xbt xbt = getXbt(bbieSc, dtSc);
                     ref = fillSchemas(schemas, xbt, bbieSc);
                 } else if (!isFriendly()) {
-                    Xbt xbt = getXbt(bbieSc, dtSc);
                     ref = fillSchemas(schemas, xbt);
                 } else {
                     ref = null;
@@ -1063,7 +1077,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         }
 
         if (ref == null && isFriendly()) {
-            Xbt xbt = getXbt(bbieSc, dtSc);
             Map<String, Object> content = toProperties(xbt);
             properties.putAll(content);
         } else {

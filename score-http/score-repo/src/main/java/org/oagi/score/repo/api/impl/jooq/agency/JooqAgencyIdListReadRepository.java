@@ -21,7 +21,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
@@ -342,16 +342,31 @@ public class JooqAgencyIdListReadRepository
             return agencyIdListValue;
         });
 
-        for (AgencyIdListValue agencyIdListValue : agencyIdListValueList) {
-            boolean used = dslContext().selectCount()
+        if (!agencyIdListValueList.isEmpty()) {
+            List<ULong> agencyIdListValueIdList = agencyIdListValueList.stream()
+                    .map(e -> ULong.valueOf(e.getAgencyIdListValueManifestId())).collect(Collectors.toList());
+            Map<ULong, Integer> codeListRefCounter = dslContext().select(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            count(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID).as("cnt"))
                     .from(CODE_LIST_MANIFEST)
-                    .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(ULong.valueOf(agencyIdListValue.getAgencyIdListValueManifestId())))
-                    .fetchOptionalInto(Integer.class).orElse(0) +
-                    dslContext().selectCount()
+                    .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(agencyIdListValueIdList))
+                    .groupBy(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .fetchMap(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            count(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID).as("cnt"));
+
+            Map<ULong, Integer> agencyIdListRefCounter = dslContext().select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            count(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID).as("cnt"))
                     .from(AGENCY_ID_LIST_MANIFEST)
-                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(ULong.valueOf(agencyIdListValue.getAgencyIdListValueManifestId())))
-                    .fetchOptionalInto(Integer.class).orElse(0) > 0;
-            agencyIdListValue.setUsed(used);
+                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(agencyIdListValueIdList))
+                    .groupBy(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .fetchMap(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            count(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID).as("cnt"));
+
+            for (AgencyIdListValue agencyIdListValue : agencyIdListValueList) {
+                ULong key = ULong.valueOf(agencyIdListValue.getAgencyIdListValueManifestId());
+                if (codeListRefCounter.containsKey(key) || agencyIdListRefCounter.containsKey(key)) {
+                    agencyIdListValue.setUsed(true);
+                }
+            }
         }
 
         return agencyIdListValueList;

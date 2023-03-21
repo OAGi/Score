@@ -3,9 +3,9 @@ package org.oagi.score.gateway.http.api.account_management.controller;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.account_management.service.AccountListService;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
-import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,9 @@ public class AccountListController {
             @RequestParam(name = "roles", required = false) String roles,
             @RequestParam(name = "excludeSSO", required = false) Boolean excludeSSO,
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
+            @RequestParam(name = "tenantId", required = false) BigInteger tenantId,
+            @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
+            @RequestParam(name = "businessCtxIds", required = false) String businessCtxIds,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
@@ -57,7 +61,14 @@ public class AccountListController {
         }
         request.setExcludeSSO(excludeSSO != null ? excludeSSO : false);
         request.setExcludeRequester(excludeRequester);
+        request.setTenantId(tenantId);
+        request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
 
+        if (StringUtils.hasLength(businessCtxIds)) {
+            List<Long> businessCtxIdsList = Arrays.asList(businessCtxIds.split(",")).stream()
+                    .map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(Long::parseLong).collect(Collectors.toList());
+            request.setBusinessCtxIds(businessCtxIdsList);
+        }
         PageRequest pageRequest = new PageRequest();
         pageRequest.setSortActive(sortActive);
         pageRequest.setSortDirection(sortDirection);
@@ -68,7 +79,7 @@ public class AccountListController {
         return service.getAccounts(user, request);
     }
 
-    @RequestMapping(value = "/account/{appUserId}", method = RequestMethod.GET,
+    @RequestMapping(value = "/account/{appUserId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUser getAccount(@PathVariable("appUserId") long appUserId) {
         return service.getAccountById(appUserId);

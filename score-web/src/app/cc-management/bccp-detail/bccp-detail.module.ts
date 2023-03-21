@@ -40,7 +40,7 @@ const routes: Routes = [
     AngularSplitModule
   ],
   declarations: [
-    BccpDetailComponent,
+    BccpDetailComponent
   ]
 })
 export class BccpDetailModule {

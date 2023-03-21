@@ -14,9 +14,11 @@ import {PageRequest} from '../../../basis/basis';
 import {SemanticGroup, Semantics} from '../../domain/core-component-node';
 import {CcListComponent} from '../cc-list.component';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
+import {TagService} from "../../../tag-management/domain/tag.service";
+import {Tag} from "../../../tag-management/domain/tag";
 
 @Component({
   selector: 'score-create-asccp-dialog',
@@ -48,6 +50,7 @@ export class CreateAsccpDialogComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  tags: Tag[] = [];
   request: CcListRequest;
   action: string;
 
@@ -59,6 +62,7 @@ export class CreateAsccpDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<CcListComponent>,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              private tagService: TagService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }
@@ -79,44 +83,25 @@ export class CreateAsccpDialogComponent implements OnInit {
     this.sort.direction = 'desc';
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadCcList();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    this.loading = true;
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.tagService.getTags()
+    ]).subscribe(([loginIds, tags]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+      this.tags = tags;
+
+      this.loadCcList(true);
     });
-    this.onChange();
   }
 
-  onPageChange(event: PageEvent) {
-    this.onChange();
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onChange() {
+  loadCcList(isInit?: boolean) {
     this.loading = true;
     this.request.componentTypes = [Semantics, SemanticGroup];
 
@@ -146,6 +131,49 @@ export class CreateAsccpDialogComponent implements OnInit {
       this.dataSource.data = list;
       this.loading = false;
     });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.loadCcList();
+  }
+
+  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = new Date(event.value);
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = new Date(event.value);
+        break;
+    }
+  }
+
+  reset(type: string) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = null;
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = null;
+        break;
+    }
+  }
+
+  onChange(property?: string, source?) {
+    if (property === 'filters.den') {
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
+
+    if (property === 'fuzzySearch') {
+      if (this.request.fuzzySearch) {
+        this.sort.active = '';
+        this.sort.direction = '';
+      } else {
+        this.sort.active = 'lastUpdateTimestamp';
+        this.sort.direction = 'desc';
+      }
+    }
   }
 
   onNoClick(): void {

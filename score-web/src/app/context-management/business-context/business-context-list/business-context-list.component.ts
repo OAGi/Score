@@ -61,7 +61,7 @@ export class BusinessContextListComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBusinessContextList();
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -76,9 +76,7 @@ export class BusinessContextListComponent implements OnInit {
     this.loadBusinessContextList();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessContextList();
+  onChange(property?: string, source?) {
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

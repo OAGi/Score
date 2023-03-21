@@ -1,13 +1,13 @@
 package org.oagi.score.gateway.http.api.namespace_management.controller;
 
 import com.google.common.collect.ImmutableMap;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.api.namespace_management.data.Namespace;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceListRequest;
 import org.oagi.score.gateway.http.api.namespace_management.data.SimpleNamespace;
 import org.oagi.score.gateway.http.api.namespace_management.service.NamespaceService;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -84,7 +84,7 @@ public class NamespaceController {
         return service.getNamespaceList(user, request);
     }
 
-    @RequestMapping(value = "/namespace/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/namespace/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Namespace getNamespace(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                   @PathVariable("id") BigInteger namespaceId) {
@@ -101,7 +101,7 @@ public class NamespaceController {
                 .build();
     }
 
-    @RequestMapping(value = "/namespace/{id}", method = RequestMethod.POST,
+    @RequestMapping(value = "/namespace/{id:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateNamespace(@PathVariable("id") BigInteger namespaceId,
                                           @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -111,7 +111,7 @@ public class NamespaceController {
         return ResponseEntity.accepted().build();
     }
 
-    @RequestMapping(value = "/namespace/{id}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "/namespace/{id:[\\d]+}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity discardNamespace(@PathVariable("id") BigInteger namespaceId,
                                            @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -119,7 +119,7 @@ public class NamespaceController {
         return ResponseEntity.accepted().build();
     }
 
-    @RequestMapping(value = "/namespace/{id}/transfer_ownership", method = RequestMethod.POST,
+    @RequestMapping(value = "/namespace/{id:[\\d]+}/transfer_ownership", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateNamespace(@PathVariable("id") BigInteger namespaceId,
                                           @AuthenticationPrincipal AuthenticatedPrincipal user,

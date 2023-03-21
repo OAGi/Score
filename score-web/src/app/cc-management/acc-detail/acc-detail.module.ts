@@ -15,6 +15,7 @@ import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {TagService} from '../../tag-management/domain/tag.service';
 
 const routes: Routes = [
   {
@@ -30,21 +31,21 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        MatInputModule,
-        CommonModule,
-        TranslateModule,
-        ScoreCommonModule,
-        SearchOptionsDialogModule,
-        FindUsagesDialogModule,
-        DragDropModule,
-        AngularSplitModule,
-        FontAwesomeModule
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    MatInputModule,
+    CommonModule,
+    TranslateModule,
+    ScoreCommonModule,
+    SearchOptionsDialogModule,
+    FindUsagesDialogModule,
+    DragDropModule,
+    AngularSplitModule,
+    FontAwesomeModule
+  ],
   declarations: [
     AccDetailComponent,
     AppendAssociationDialogComponent,
@@ -53,6 +54,9 @@ const routes: Routes = [
   entryComponents: [
     AppendAssociationDialogComponent,
     BasedAccDialogComponent
+  ],
+  providers: [
+    TagService
   ]
 })
 export class AccDetailModule {

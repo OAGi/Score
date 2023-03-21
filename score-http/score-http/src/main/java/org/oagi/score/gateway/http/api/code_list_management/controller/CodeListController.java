@@ -1,17 +1,17 @@
 package org.oagi.score.gateway.http.api.code_list_management.controller;
 
 import org.oagi.score.gateway.http.api.cc_management.data.CcCreateResponse;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.code_list_management.data.*;
 import org.oagi.score.gateway.http.api.code_list_management.service.CodeListService;
-import org.oagi.score.service.common.data.AccessPrivilege;
-import org.oagi.score.service.common.data.PageRequest;
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.service.log.LogRepository;
 import org.oagi.score.service.codelist.CodeListUpliftingService;
 import org.oagi.score.service.codelist.model.CodeListUpliftingRequest;
 import org.oagi.score.service.codelist.model.CodeListUpliftingResponse;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
+import org.oagi.score.service.log.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -108,7 +108,7 @@ public class CodeListController {
         return service.getCodeLists(user, request);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}", method = RequestMethod.GET,
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeList getCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                 @PathVariable("manifestId") BigInteger manifestId) {
@@ -126,7 +126,7 @@ public class CodeListController {
         return resp;
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -136,7 +136,7 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}/revision", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision", method = RequestMethod.POST)
     public ResponseEntity makeNewRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -145,14 +145,14 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}/revision", method = RequestMethod.GET)
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision", method = RequestMethod.GET)
     public CodeList getCodeListRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
         return service.getCodeListRevision(user, manifestId);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}/revision/cancel", method = RequestMethod.POST)
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/revision/cancel", method = RequestMethod.POST)
     public ResponseEntity cancelRevision(
             @PathVariable("manifestId") BigInteger manifestId,
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
@@ -209,7 +209,7 @@ public class CodeListController {
         return service.hasSameNameCodeList(params);
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}/transfer_ownership",
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/transfer_ownership",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -220,7 +220,7 @@ public class CodeListController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/code_list/{manifestId}/uplift",
+    @RequestMapping(value = "/code_list/{manifestId:[\\d]+}/uplift",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeListUpliftingResponse upliftCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,

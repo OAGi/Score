@@ -1,9 +1,12 @@
 package org.oagi.score.gateway.http.api.context_management.controller;
 
-import org.oagi.score.service.common.data.PageResponse;
+import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
@@ -32,6 +32,12 @@ public class BusinessContextController {
     @Autowired
     private BusinessContextService businessContextService;
 
+    @Autowired
+    private ApplicationConfigurationService configService;
+
+    @Autowired
+    private TenantService tenantService;
+
     @RequestMapping(value = "/business_contexts", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BusinessContext> getBusinessContextList(
@@ -42,6 +48,9 @@ public class BusinessContextController {
             @RequestParam(name = "updaterUsernameList", required = false) String updaterUsernameList,
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
+            @RequestParam(name = "tenantId", required = false) Long tenantId,
+            @RequestParam(name = "notConnectedToTenant", required = false) Boolean notConnectedToTenant,
+            @RequestParam(name = "isBieEditing", required = false) Boolean isBieEditing,
             @RequestParam(name = "sortActive", required = false) String sortActive,
             @RequestParam(name = "sortDirection", required = false) String sortDirection,
             @RequestParam(name = "pageIndex", defaultValue = "-1") int pageIndex,
@@ -67,23 +76,42 @@ public class BusinessContextController {
             calendar.add(Calendar.DATE, 1);
             request.setUpdateEndDate(new Timestamp(calendar.getTimeInMillis()).toLocalDateTime());
         }
+        request.setTenantId(tenantId);
+        request.setNotConnectedToTenant(notConnectedToTenant != null ? notConnectedToTenant : false);
+        request.setBieEditing(isBieEditing != null ? isBieEditing : false);
+
+        if (configService.isTenantEnabled() && request.isBieEditing()) {
+            List<ULong> userTenantIds = tenantService.getUserTenantsRoleByUserId(request.getRequester().getUserId());
+        	List<Long> mappedIds = new ArrayList<>();
+        	userTenantIds.forEach(i -> mappedIds.add(i.longValue()));
+        	request.setUserTenantIds(mappedIds);
+        }
 
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
         request.setSortActive(sortActive);
         request.setSortDirection("asc".equalsIgnoreCase(sortDirection) ? ASC : DESC);
 
-        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request);
+        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, configService.isTenantEnabled());
+
+		List<BusinessContext> ctxs = response.getResults();
+        if (configService.isTenantEnabled()) {
+            ctxs.forEach(c -> {
+                List<String> names = tenantService.getTenantNameByBusinessCtxId(c.getBusinessContextId());
+                String tenant = names.stream().map(Object::toString).collect(Collectors.joining(","));
+                c.setConnectedTenantNames(tenant);
+            });
+        }
 
         PageResponse<BusinessContext> pageResponse = new PageResponse<>();
-        pageResponse.setList(response.getResults());
+        pageResponse.setList(ctxs);
         pageResponse.setPage(response.getPage());
         pageResponse.setSize(response.getSize());
         pageResponse.setLength(response.getLength());
         return pageResponse;
     }
 
-    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BusinessContext getBusinessContext(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -109,14 +137,14 @@ public class BusinessContextController {
         request.setPageIndex(-1);
         request.setPageSize(-1);
 
-        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request);
+        GetBusinessContextListResponse response = businessContextService.getBusinessContextList(request, false);
         return response.getResults().stream()
                 .flatMap(e -> e.getBusinessContextValueList().stream())
                 .distinct()
                 .collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/business_context_values_from_biz_ctx/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/business_context_values_from_biz_ctx/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBusinessCtxValuesFromBizCtx(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -152,7 +180,7 @@ public class BusinessContextController {
         }
     }
 
-    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("id") BigInteger businessContextId,
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -174,7 +202,7 @@ public class BusinessContextController {
         }
     }
 
-    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.PUT)
     public ResponseEntity assign(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger businessContextId,
@@ -184,7 +212,7 @@ public class BusinessContextController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/business_context/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/business_context/{id:[\\d]+}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger businessContextId,

@@ -15,6 +15,7 @@ import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.co
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {TagService} from '../../tag-management/domain/tag.service';
 
 const routes: Routes = [
   {
@@ -25,16 +26,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        CommonModule,
-        TranslateModule,
-        ScoreCommonModule,
-        FontAwesomeModule
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    CommonModule,
+    TranslateModule,
+    ScoreCommonModule,
+    FontAwesomeModule
+  ],
   declarations: [
     CcListComponent,
     CreateAsccpDialogComponent,
@@ -52,7 +53,8 @@ const routes: Routes = [
   ],
   providers: [
     CcListService,
-    CcNodeService
+    CcNodeService,
+    TagService
   ]
 })
 export class CcListModule {

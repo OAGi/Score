@@ -1,4 +1,4 @@
-/target/
+target
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -24,6 +24,13 @@
 /nbdist/
 /.nb-gradle/
 
+docker/*.war
+/data/
+/backup
+docker/volumes/elasticsearch/
+docker/volumes/logstash/config/queries/*.yml
+.trash
+misc
+
 # System Files
 .DS_Store
-Thumbs.db

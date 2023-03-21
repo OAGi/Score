@@ -28,7 +28,9 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.stripToNull;
 import static org.jooq.impl.DSL.*;
+import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.oagi.score.service.common.data.OagisComponentType.*;
 
 @Repository
@@ -55,19 +57,21 @@ public class CcListRepository {
         if (request.getTypes().isAcc()) {
             select = (select != null) ? select.union(getAccList(request, release, defaultModuleSetReleaseId)) : getAccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isAsccp()) {
+        // Component Types are only allowed by ACC.
+        if (request.getTypes().isAsccp() && !hasLength(request.getComponentTypes())) {
             select = (select != null) ? select.union(getAsccpList(request, release, defaultModuleSetReleaseId)) : getAsccpList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isBccp()) {
+        if (request.getTypes().isBccp() && !hasLength(request.getComponentTypes())) {
             select = (select != null) ? select.union(getBccpList(request, release, defaultModuleSetReleaseId)) : getBccpList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isAscc()) {
+        // Tags are only allowed by ACC, ASCCP, BCCP, and DT.
+        if (request.getTypes().isAscc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()) {
             select = (select != null) ? select.union(getAsccList(request, release, defaultModuleSetReleaseId)) : getAsccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isBcc()) {
+        if (request.getTypes().isBcc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()) {
             select = (select != null) ? select.union(getBccList(request, release, defaultModuleSetReleaseId)) : getBccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isDt()) {
+        if (request.getTypes().isDt() && !hasLength(request.getComponentTypes())) {
             select = (select != null) ? select.union(getDtList(request, release, defaultModuleSetReleaseId)) : getDtList(request, release, defaultModuleSetReleaseId);
         }
 
@@ -106,23 +110,26 @@ public class CcListRepository {
                 break;
         }
 
-        SortField sortField = null;
+        List<SortField> sortFields = new ArrayList<>();
         if (field != null && pageRequest.getSortDirection() != null) {
             switch (pageRequest.getSortDirection()) {
                 case "asc":
-                    sortField = field.asc();
+                    sortFields.add(field.asc());
                     break;
                 case "desc":
-                    sortField = field.desc();
+                    sortFields.add(field.desc());
                     break;
             }
+        }
+        if (StringUtils.hasLength(request.getDen())) {
+            sortFields.add(field("score").desc());
         }
 
         int count = dslContext.fetchCount(select);
 
         SelectWithTiesAfterOffsetStep offsetStep = null;
-        if (sortField != null) {
-            offsetStep = select.orderBy(sortField)
+        if (!sortFields.isEmpty()) {
+            offsetStep = select.orderBy(sortFields)
                     .limit(pageRequest.getOffset(), pageRequest.getPageSize());
         } else {
             if (pageRequest.getPageIndex() >= 0 && pageRequest.getPageSize() > 0) {
@@ -238,6 +245,9 @@ public class CcListRepository {
         if (request.getUpdateEndDate() != null) {
             conditions.add(ACC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            conditions.add(TAG.NAME.in(request.getTags()));
+        }
         if (request.getComponentTypes() != null && !request.getComponentTypes().isEmpty()) {
             List<OagisComponentType> componentTypes = Arrays.asList(request.getComponentTypes().split(","))
                     .stream()
@@ -296,7 +306,8 @@ public class CcListRepository {
             }
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("ACC").as("type"),
                 ACC_MANIFEST.ACC_MANIFEST_ID.as("manifest_id"),
                 ACC.ACC_ID.as("id"),
@@ -318,7 +329,17 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 ACC_MANIFEST.BASED_ACC_MANIFEST_ID.as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain"))
+                val((String) null).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(ACC.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ACC.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(ACC)
                 .join(ACC_MANIFEST)
                 .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID).and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -330,6 +351,10 @@ public class CcListRepository {
                 .on(ACC.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
                 .on(ACC.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
+                .leftJoin(ACC_MANIFEST_TAG)
+                .on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST_TAG.ACC_MANIFEST_ID))
+                .leftJoin(TAG)
+                .on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_ACC_MANIFEST)
                 .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
@@ -377,7 +402,8 @@ public class CcListRepository {
             conditions.add(ASCC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("ASCC").as("type"),
                 ASCC_MANIFEST.ASCC_MANIFEST_ID.as("manifest_id"),
                 ASCC.ASCC_ID.as("id"),
@@ -399,7 +425,17 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain"))
+                val((String) null).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(ASCC.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ASCC.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(ASCC)
                 .join(ASCC_MANIFEST)
                 .on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID).and(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -464,7 +500,8 @@ public class CcListRepository {
             conditions.add(BCC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("BCC").as("type"),
                 BCC_MANIFEST.BCC_MANIFEST_ID.as("manifest_id"),
                 BCC.BCC_ID.as("id"),
@@ -486,7 +523,17 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain"))
+                val((String) null).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(BCC.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(BCC.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(BCC)
                 .join(BCC_MANIFEST)
                 .on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID).and(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -541,6 +588,9 @@ public class CcListRepository {
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), ASCCP.DEFINITION));
         }
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            conditions.add(TAG.NAME.in(request.getTags()));
+        }
         if (StringUtils.hasLength(request.getModule())) {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
@@ -557,7 +607,8 @@ public class CcListRepository {
             conditions.add(ACC.OAGIS_COMPONENT_TYPE.notIn(Arrays.asList(SemanticGroup.getValue(), UserExtensionGroup.getValue())));
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("ASCCP").as("type"),
                 ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifest_id"),
                 ASCCP.ASCCP_ID.as("id"),
@@ -579,7 +630,17 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain"))
+                val((String) null).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(ASCCP.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ASCCP.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(ASCCP)
                 .join(ASCCP_MANIFEST)
                 .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID).and(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -595,6 +656,10 @@ public class CcListRepository {
                 .on(ASCCP.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
                 .on(ASCCP.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
+                .leftJoin(ASCCP_MANIFEST_TAG)
+                .on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
+                .leftJoin(TAG)
+                .on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_ASCCP_MANIFEST)
                 .on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID), MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
@@ -631,6 +696,9 @@ public class CcListRepository {
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), BCCP.DEFINITION));
         }
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            conditions.add(TAG.NAME.in(request.getTags()));
+        }
         if (StringUtils.hasLength(request.getModule())) {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
@@ -641,7 +709,8 @@ public class CcListRepository {
             conditions.add(BCCP.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("BCCP").as("type"),
                 BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifest_id"),
                 BCCP.BCCP_ID.as("id"),
@@ -663,7 +732,17 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain"))
+                val((String) null).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(BCCP.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(BCCP.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(BCCP)
                 .join(BCCP_MANIFEST)
                 .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID).and(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -675,6 +754,10 @@ public class CcListRepository {
                 .on(BCCP.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
                 .on(BCCP.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
+                .leftJoin(BCCP_MANIFEST_TAG)
+                .on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID))
+                .leftJoin(TAG)
+                .on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_BCCP_MANIFEST)
                 .on(and(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID), MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
@@ -721,6 +804,9 @@ public class CcListRepository {
         if (!request.getExcludes().isEmpty()) {
             conditions.add(DT.DT_ID.notIn(request.getExcludes()));
         }
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            conditions.add(TAG.NAME.in(request.getTags()));
+        }
         if (StringUtils.hasLength(request.getDen())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), DT.DEN));
         }
@@ -740,7 +826,8 @@ public class CcListRepository {
             conditions.add(DT.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
-        return dslContext.select(
+        List<Field> selectFields = new ArrayList<>();
+        selectFields.addAll(Arrays.asList(
                 inline("DT").as("type"),
                 DT_MANIFEST.DT_MANIFEST_ID.as("manifest_id"),
                 DT.DT_ID.as("id"),
@@ -763,9 +850,19 @@ public class CcListRepository {
                 DT_MANIFEST.BASED_DT_MANIFEST_ID.as("based_manifest_id"),
                 DT.SIX_DIGIT_ID,
                 concat(ifnull(CDT_PRI.NAME, ""),
-                ifnull(CODE_LIST.NAME, ""),
-                ifnull(AGENCY_ID_LIST.NAME, ""),
-                ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain"))
+                        ifnull(CODE_LIST.NAME, ""),
+                        ifnull(AGENCY_ID_LIST.NAME, ""),
+                        ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain")
+        ));
+        if (StringUtils.hasLength(request.getDen())) {
+            selectFields.add(
+                    val(1).minus(levenshtein(lower(DT.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(DT.DEN), length(request.getDen()))))
+                            .as("score")
+            );
+        }
+
+        return dslContext.select(selectFields)
                 .from(DT)
                 .join(DT_MANIFEST)
                 .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID).and(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
@@ -777,6 +874,10 @@ public class CcListRepository {
                 .on(DT.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
                 .on(DT.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
+                .leftJoin(DT_MANIFEST_TAG)
+                .on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST_TAG.DT_MANIFEST_ID))
+                .leftJoin(TAG)
+                .on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_DT_MANIFEST)
                 .on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID), MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)

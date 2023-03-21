@@ -98,6 +98,14 @@ b {
   color: #000;
 }
 
+.word-break-all {
+  word-break: break-all;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
 .mat-table {
   width: 100%;
   table-layout: fixed;

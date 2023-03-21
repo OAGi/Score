@@ -56,7 +56,7 @@ export class AccountListDialogComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadAccounts();
     });
 
     this.loadAccounts(true);
@@ -66,9 +66,7 @@ export class AccountListDialogComponent implements OnInit {
     this.loadAccounts();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
+  onChange(property?: string, source?) {
   }
 
   loadAccounts(isInit?: boolean) {

@@ -23,10 +23,15 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>Namespace</mat-label>
-          <mat-select [(ngModel)]="module.namespaceId">
-            <mat-option [value]="">-</mat-option>
-            <mat-option *ngFor="let namespace of namespaceList" [value]="namespace.namespaceId">
-              {{namespace.uri}}
+          <mat-select data-id="module.namespace" placeholder="Namespace"
+                      [(ngModel)]="module.namespaceId">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+              {{ namespace.uri }}
             </mat-option>
           </mat-select>
         </mat-form-field>

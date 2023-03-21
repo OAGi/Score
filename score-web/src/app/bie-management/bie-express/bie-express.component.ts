@@ -45,8 +45,10 @@ export class BieExpressComponent implements OnInit {
 
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
@@ -97,7 +99,7 @@ export class BieExpressComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadBieList();
     });
 
     forkJoin([
@@ -109,6 +111,7 @@ export class BieExpressComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
       if (savedReleaseId) {
         this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
@@ -132,10 +135,6 @@ export class BieExpressComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-
-    this.paginator.pageIndex = 0;
-    this.selection.clear();
-    this.loadBieList();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

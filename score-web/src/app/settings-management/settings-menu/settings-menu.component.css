@@ -1,0 +1,62 @@
+.settings-menu .mat-list-item {
+  height: 48px !important;
+}
+
+.nav-item {
+  cursor: pointer;
+  font-weight: 600;
+  line-height: 20px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.nav-item.active {
+  background: rgba(208, 215, 222, 0.24);
+}
+
+.nav-item:hover {
+  background: rgba(208, 215, 222, 0.32);
+}
+
+.nav-item .mat-icon {
+  transform: scale(0.8);
+}
+
+.container > .row {
+  background-color: #ffffff;
+  border-color: #d0d7de;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  display: block;
+}
+
+.box.row {
+  padding: 16px;
+  margin-top: -1px;
+  list-style-type: none;
+  border-top-style: solid;
+  border-top-width: 1px;
+}
+
+.row .label {
+  align-self: center;
+}
+
+.row .mat-slider {
+  width: 300px;
+}
+
+.nav-item.active .mat-list-text {
+  font-weight: bold;
+}
+
+.admin-only {
+  font-weight: 500;
+  border-radius: 100px;
+  font-size: 12px;
+  line-height: 20px;
+  box-shadow: none;
+  color: red;
+  background-color: transparent;
+}

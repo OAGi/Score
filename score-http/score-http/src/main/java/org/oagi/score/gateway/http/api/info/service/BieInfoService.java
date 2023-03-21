@@ -1,15 +1,15 @@
 package org.oagi.score.gateway.http.api.info.service;
 
-import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
-import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.gateway.http.api.info.data.SummaryBie;
 import org.oagi.score.gateway.http.api.info.data.SummaryBieInfo;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class BieInfoService {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }
 
-        List<SummaryBie> summaryBieList = repository.getSummaryBieList(releaseId);
+        List<SummaryBie> summaryBieList = repository.getSummaryBieList(releaseId, requester);
 
         SummaryBieInfo info = new SummaryBieInfo();
         Map<BieState, Integer> numberOfTotalBieByStates =

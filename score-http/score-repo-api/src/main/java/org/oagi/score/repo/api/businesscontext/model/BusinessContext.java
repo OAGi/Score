@@ -19,6 +19,8 @@ public class BusinessContext extends Auditable implements Serializable {
 
     private boolean used;
 
+    private String connectedTenantNames;
+
     public BigInteger getBusinessContextId() {
         return businessContextId;
     }
@@ -58,4 +60,12 @@ public class BusinessContext extends Auditable implements Serializable {
     public void setUsed(boolean used) {
         this.used = used;
     }
+
+	public String getConnectedTenantNames() {
+		return connectedTenantNames;
+	}
+
+	public void setConnectedTenantNames(String connectedTenantNames) {
+		this.connectedTenantNames = connectedTenantNames;
+	}
 }

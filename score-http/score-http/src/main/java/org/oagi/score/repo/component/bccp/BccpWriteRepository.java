@@ -101,6 +101,23 @@ public class BccpWriteRepository {
         bccpManifest.setLogId(logRecord.getLogId());
         bccpManifest.update(BCCP_MANIFEST.LOG_ID);
 
+        if (StringUtils.hasLength(request.getTag())) {
+            ULong bccpManifestId = bccpManifest.getBccpManifestId();
+            dslContext.selectFrom(TAG)
+                    .where(TAG.NAME.eq(request.getTag()))
+                    .fetchOptionalInto(TagRecord.class)
+                    .ifPresent(tagRecord -> {
+                        BccpManifestTagRecord bccpManifestTagRecord = new BccpManifestTagRecord();
+                        bccpManifestTagRecord.setBccpManifestId(bccpManifestId);
+                        bccpManifestTagRecord.setTagId(tagRecord.getTagId());
+                        bccpManifestTagRecord.setCreatedBy(userId);
+                        bccpManifestTagRecord.setCreationTimestamp(timestamp);
+                        dslContext.insertInto(BCCP_MANIFEST_TAG)
+                                .set(bccpManifestTagRecord)
+                                .execute();
+                    });
+        }
+
         return new CreateBccpRepositoryResponse(bccpManifest.getBccpManifestId().toBigInteger());
     }
 

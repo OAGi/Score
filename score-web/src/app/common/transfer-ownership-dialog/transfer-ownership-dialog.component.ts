@@ -50,25 +50,28 @@ export class TransferOwnershipDialogComponent implements OnInit {
     this.sort.direction = 'asc';
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadAccounts();
     });
 
-    this.onChange();
+    this.loadAccounts(true);
   }
 
   onPageChange(event: PageEvent) {
     this.loadAccounts();
   }
 
-  onChange() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
+  onChange(property?: string, source?) {
   }
 
-  loadAccounts() {
+  loadAccounts(isInit?: boolean) {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+
+    if (this.authService.getUserToken().tenant.enabled) {
+      this.request.filters.businessCtxIds = this.data.businesCtxIds;
+    }
+
     if (this.data && this.data.roles) {
       this.request.filters.roles = this.data.roles;
     }

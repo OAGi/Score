@@ -1,9 +1,9 @@
 package org.oagi.score.gateway.http.api.context_management.controller;
 
-import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.repo.api.businesscontext.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.ContextSchemeService;
+import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -103,7 +103,7 @@ public class ContextSchemeController {
         return pageResponse;
     }
 
-    @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/context_scheme/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextScheme getContextScheme(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -132,7 +132,7 @@ public class ContextSchemeController {
         return response.getResults();
     }
 
-    @RequestMapping(value = "/context_category/{id}/simple_context_schemes", method = RequestMethod.GET,
+    @RequestMapping(value = "/context_category/{id:[\\d]+}/simple_context_schemes", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ContextScheme> getSimpleContextSchemeList(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -173,7 +173,7 @@ public class ContextSchemeController {
         }
     }
 
-    @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/context_scheme/{id:[\\d]+}", method = RequestMethod.POST)
     public ResponseEntity update(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger contextSchemeId,
@@ -201,7 +201,7 @@ public class ContextSchemeController {
         }
     }
 
-    @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/context_scheme/{id:[\\d]+}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger contextSchemeId) {
@@ -266,7 +266,7 @@ public class ContextSchemeController {
         return contextSchemeService.hasSameCtxSchemeName(contextScheme);
     }
 
-    @RequestMapping(value = "/context_scheme/{id}/simple_context_scheme_values", method = RequestMethod.GET,
+    @RequestMapping(value = "/context_scheme/{id:[\\d]+}/simple_context_scheme_values", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<ContextSchemeValue> getSimpleContextSchemeValueList(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,

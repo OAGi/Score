@@ -1,0 +1,7 @@
+.mat-column-select, .cdk-column-select {
+  width: 100px;
+}
+
+.file-input {
+  display: none;
+}
