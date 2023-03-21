@@ -5,11 +5,11 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
 
-public class GetModuleSetReleaseRequest extends Request {
+public class ValidateModuleSetReleaseRequest extends Request {
 
     private BigInteger moduleSetReleaseId;
 
-    public GetModuleSetReleaseRequest(ScoreUser requester) {
+    public ValidateModuleSetReleaseRequest(ScoreUser requester) {
         super(requester);
     }
 
@@ -21,9 +21,5 @@ public class GetModuleSetReleaseRequest extends Request {
         this.moduleSetReleaseId = moduleSetReleaseId;
     }
 
-    public GetModuleSetReleaseRequest withModuleSetReleaseId(BigInteger moduleSetReleaseId) {
-        setModuleSetReleaseId(moduleSetReleaseId);
-        return this;
-    }
 
 }
