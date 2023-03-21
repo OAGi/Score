@@ -296,6 +296,13 @@ public interface ACCViewEditPage extends Page {
     SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm);
 
     /**
+     * Ungroup the association by clicking 'Refactor/Ungroup' context menu
+     * @param path
+     * @return the ACCViewEditPage
+     */
+    ACCViewEditPage unGroup(String path);
+
+    /**
      * Remove the association by clicking 'Remove' context menu.
      *
      * @param path node path

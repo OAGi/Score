@@ -2120,7 +2120,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_4_15_b() {
+    public void test_TA_10_4_15_bc() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2207,23 +2207,68 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         }
     }
-
-    @Test
-    public void test_TA_10_4_15_c() {
-
-
-
-
-
-    }
-
     @Test
     public void test_TA_10_4_16() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Production Order Header Base. Details", branch);
+        String url = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        String nodePath = "/Production Order Header Base. Details/Serial Lot";
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Serial Lot");
+        WebElement tr;
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Header Base. Details");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
 
+        //Click on the selected base to revise
+        By SELECTED_BASE_OPTION_LOCATOR =
+                By.xpath("//score-based-acc-dialog//*[contains(text(),\"Header Base. Details\")]");
+        click(visibilityOfElementLocated(getDriver(), SELECTED_BASE_OPTION_LOCATOR));
+        switchToNextTab(getDriver());
+        url = getDriver().getCurrentUrl();
+        int idx = url.lastIndexOf("/");
+        BigInteger selectedACC_manifestId = new BigInteger(url.substring(idx + 1));
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPageForSelectedACC = viewEditCoreComponentPage.openACCViewEditPageByManifestID(selectedACC_manifestId);
+        accViewEditPageForSelectedACC.hitReviseButton();
 
+        //Switch to main tab
+        switchToMainTab(getDriver());
+        selectBaseACCToRefactorDialog.hitCancelButton();
+
+        //Revise the ACC and ungroup the ASCC node to fix "Refactoring" issue
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accManifestId);
+        String nodePathForUngroup = "/Product Requirement Base. Details/Item Instance Identifiers Group";
+        accViewEditPage.unGroup(nodePathForUngroup);
+        WebElement nodeAfterUngroup = accViewEditPage.getNodeByPath("Product Requirement Base. Details/Serial Lot");
+        assertTrue(nodeAfterUngroup.isDisplayed());
+
+        //Verify that "Refactor" is enabled
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accManifestId);
+        selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Serial Lot");
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Header Base. Details");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
     }
 
     @Test

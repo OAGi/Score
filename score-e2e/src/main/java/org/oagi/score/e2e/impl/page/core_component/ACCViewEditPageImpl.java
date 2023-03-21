@@ -118,6 +118,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Refactor to Base\")]");
 
+    private static final By UNGROUP_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Ungroup\")]");
+
     private static final By REMOVE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]");
 
@@ -532,6 +535,28 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 associationPropertyTerm);
         assert selectBaseACCToRefactorDialog.isOpened();
         return selectBaseACCToRefactorDialog;
+    }
+
+    @Override
+    public ACCViewEditPage unGroup(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(visibilityOfElementLocated(getDriver(), UNGROUP_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(visibilityOfElementLocated(getDriver(), UNGROUP_OPTION_LOCATOR));
+        }
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
+
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Ungroup anyway\")]//ancestor::button[1]")));
+        assert this.isOpened();
+        assert "Ungrouped".equals(getSnackBarMessage(getDriver()));
+        return this;
     }
 
     @Override
