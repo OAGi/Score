@@ -2585,5 +2585,88 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
     }
 
+    @Test
+    public void test_TA_10_4_21_a() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_21_b() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_21_c() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_21_d() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_21_e() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_22() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_23() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_24() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_25() {
+
+
+
+
+    }
+
+    @Test
+    public void test_TA_10_4_26() {
+
+
+
+
+    }
+
+
+
+
 
 }
