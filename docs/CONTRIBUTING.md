@@ -19,7 +19,7 @@
 3. When start working on the issue.
     1. Assign the issue to milestone and project
     2. Fork the current Score repo to developer's private repo.
-    3. Make sure that a specific branch for a specific milestone and issue exists. If not, create one (e.g., 'develop/2.4/1291' branch for the issue #1291 in the 2.4 milestone. 'develop/2.4/1291' branch will be merged into 'develop/2.4', and 'develop/2.4' will be merged into 'develop'.)
+    3. Make sure that a specific branch for a specific milestone and issue exists. If not, create one (e.g., 'v2.4_#1291' branch for the issue #1291 in the 2.4 milestone. 'v2.4_#1291' branch will be merged into 'v2.4' in the upstream repository.)
     4. Once entered a project, the issue is placed on "To DO" card.
     5. After that, the progress the issue through the following (kanban) cards outlined below. The issue may go through the cards a few rounds in various order. These cards only serve as indications that the issue has been through these stages. In some cases, with multiple developers working on the same issue, some of these activities can occur in parallel, e.g., writing test assertions (in detail) may happen at the same time as coding. Comments may be made in the issue when some of these tasks are not needed for the issue. 
         - "Writing Test Assertion" Card - See [Overview of test case document](./OverviewOfTestCaseDocument.md) about how to write test assertions.
