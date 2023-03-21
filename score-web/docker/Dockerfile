@@ -3,6 +3,7 @@ FROM nginxinc/nginx-unprivileged:1.23.3-alpine
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
 USER 0
+RUN apk update
 RUN apk upgrade
 
 RUN ["rm", "-f", "/etc/nginx/conf.d/default.conf"]
