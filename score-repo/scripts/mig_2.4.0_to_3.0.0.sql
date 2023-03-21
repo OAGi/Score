@@ -338,5 +338,6 @@ SET `acc_manifest`.`replacement_acc_manifest_id` = `t`.`replacement_acc_manifest
 WHERE `acc_manifest`.`acc_manifest_id` = `t`.`acc_manifest_id`;
 
 -- Migrate 'client_authentication_method' values
+SET SQL_SAFE_UPDATES = 0;
 UPDATE `oauth2_app` SET `client_authentication_method` = 'client_secret_basic' WHERE `client_authentication_method` = 'basic';
 UPDATE `oauth2_app` SET `client_authentication_method` = 'client_secret_post' WHERE `client_authentication_method` = 'post';
