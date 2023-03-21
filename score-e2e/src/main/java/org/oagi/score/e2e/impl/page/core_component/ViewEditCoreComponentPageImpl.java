@@ -2,10 +2,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.bie.TransferBIEOwnershipDialogImpl;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.ASCCPObject;
-import org.oagi.score.e2e.obj.BCCPObject;
-import org.oagi.score.e2e.obj.DTObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.*;
@@ -274,7 +271,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         setBranch(branch);
         click(getCreateACCButton());
 
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term", branch);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term. Details", branch);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
@@ -426,5 +423,18 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
         assert dtViewEditPage.isOpened();
         return dtViewEditPage;
+    }
+
+    @Override
+    public BCCPViewEditPage createBCCP(String dataType, String branch, AppUserObject user) {
+        setBranch(branch);
+        click(getCreateBCCPButton());
+        BCCPCreateDialog bccpCreateDialog = new BCCPCreateDialogImpl(this, branch);
+        bccpCreateDialog.selectDataTypeByDEN(dataType);
+        bccpCreateDialog.hitCreateButton();
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getLatestBCCPCreatedByUser(user, branch);
+        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        assert bccpViewEditPage.isOpened();
+        return bccpViewEditPage;
     }
 }

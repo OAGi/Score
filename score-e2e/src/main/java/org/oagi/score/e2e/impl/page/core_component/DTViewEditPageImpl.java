@@ -61,6 +61,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+    public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
+            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -312,5 +314,16 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \""+ codeListName +"\")]//ancestor::mat-option[1]")));
+    }
+
+    @Override
+    public void setDefaultValueDomain(String name) {
+        click(getDefaultValueDomainField());
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]")));
+    }
+    @Override
+    public WebElement getDefaultValueDomainField() {
+        return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
     }
 }

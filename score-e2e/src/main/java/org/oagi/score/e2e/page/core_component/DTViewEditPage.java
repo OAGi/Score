@@ -217,4 +217,8 @@ public interface DTViewEditPage extends Page {
     void codeListIdMarkedAsDeleted(String name);
 
     void changeCodeListValueDomain(String codeListName);
+
+    void setDefaultValueDomain(String name);
+
+    WebElement getDefaultValueDomainField();
 }

@@ -11,10 +11,10 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.*;
 
@@ -118,6 +118,82 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             dtViewEditPage.showValueDomain();
             assertThrows(NoSuchElementException.class, () -> {dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName());});
             escape(getDriver());
+        }
+    }
+    @Test
+    @DisplayName("TC_11_7_TA_3")
+    public void test_TA_3() {
+        AppUserObject developerA;
+        ReleaseObject workingBranch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
+            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListForTesting.add(codeList);
+        }
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        for (CodeListObject codeList : codeListForTesting) {
+            /**
+             * Create BDT that uses the newly created Code List
+             */
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
+            dtViewEditPage.showValueDomain();
+            dtViewEditPage.addCodeListValueDomain(codeList.getName());
+            dtViewEditPage.setDefaultValueDomain(codeList.getName());
+            String qualifier = "testDataType";
+            dtViewEditPage.setQualifier(qualifier);
+            String definition = getText(dtViewEditPage.getDefinitionField());
+            dtViewEditPage.hitUpdateButton();
+            if (definition == null){
+                dtViewEditPage.hitUpdateAnywayButton();
+            }
+            /**
+             * Create new BCCP that uses previously created BDT
+             */
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.createBCCP(qualifier + "_ Code. Type", workingBranch.getReleaseNumber(), developerA);
+            String BCCPPropertyTerm = "testBCCPProperty";
+            bccpViewEditPage.setPropertyTerm(BCCPPropertyTerm);
+            bccpViewEditPage.setNamespace("http://www.openapplications.org/oagis/10");
+            bccpViewEditPage.setDefinition("definition");
+            definition = getText(bccpViewEditPage.getDefinitionField());
+            bccpViewEditPage.hitUpdateButton();
+            if (definition == null){
+                bccpViewEditPage.hitUpdateAnywayButton();
+            }
+            BCCPObject createdBCCP = getAPIFactory().getCoreComponentAPI().getLatestBCCPCreatedByUser(developerA, workingBranch.getReleaseNumber());
+            /**
+             * Create ACC that has previously created BCCP
+             */
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.createACC(workingBranch.getReleaseNumber());
+            ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term. Details", workingBranch.getReleaseNumber());
+            SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+            selectAssociationDialog.selectAssociation(createdBCCP.getDen());
+
+            /**
+             * Delete Code List
+             */
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            editCodeListPage.hitDeleteButton();
+            /*TODO:
+            As the developer expands the tree down to the BCCP using the BDT that the deleted CL, the CL shall be flagged as deleted.
+             */
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm());
+            ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+
         }
     }
     @Test

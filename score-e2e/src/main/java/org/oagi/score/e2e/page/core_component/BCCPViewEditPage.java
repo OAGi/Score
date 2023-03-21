@@ -242,6 +242,22 @@ public interface BCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
+    void setPropertyTerm(String propertyTerm);
+
+    WebElement getPropertyTermField();
+
+    void setNamespace(String namespace);
+
+    WebElement getNamespaceSelectField();
+
+    void hitUpdateAnywayButton();
+
+    WebElement getUpdateAnywayButton();
+
+    WebElement getDefinitionField();
+
+    void setDefinition(String definition);
+
     /**
      * An interface of the ACC panel
      */

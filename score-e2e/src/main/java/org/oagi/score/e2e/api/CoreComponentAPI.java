@@ -185,4 +185,6 @@ public interface CoreComponentAPI {
                                                NamespaceObject namespace, String state);
 
     DTObject getLatestDTCreated(String den, String branch);
+
+    BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 }

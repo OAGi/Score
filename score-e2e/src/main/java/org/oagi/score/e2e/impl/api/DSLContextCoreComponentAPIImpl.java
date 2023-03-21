@@ -386,6 +386,28 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
+    public BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch) {
+        ULong latestCreatedBCCP = dslContext.select(DSL.max(BCCP.BCCP_ID))
+                .from(BCCP)
+                .join(BCCP_MANIFEST).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(
+                        RELEASE.RELEASE_NUM.eq(branch),
+                        BCCP.CREATED_BY.eq(ULong.valueOf(user.getAppUserId()))))
+                .fetchOneInto(ULong.class);
+        List<Field<?>> fields = new ArrayList();
+        fields.add(BCCP_MANIFEST.BCCP_MANIFEST_ID);
+        fields.add(BCCP_MANIFEST.BDT_MANIFEST_ID);
+        fields.add(BCCP_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(BCCP.fields()));
+        return dslContext.select(fields)
+                .from(BCCP_MANIFEST)
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .where(BCCP.BCCP_ID.eq(latestCreatedBCCP))
+                .fetchOne(record -> bccpMapper(record));
+    }
+
+    @Override
     public ASCCPObject createRandomASCCP(ACCObject roleOfAcc, AppUserObject creator,
                                          NamespaceObject namespace, String state) {
         ASCCPObject asccp = ASCCPObject.createRandomASCCP(roleOfAcc, creator, namespace, state);
