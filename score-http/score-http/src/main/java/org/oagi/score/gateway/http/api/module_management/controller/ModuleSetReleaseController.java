@@ -122,6 +122,15 @@ public class ModuleSetReleaseController {
         service.discardModuleSetRelease(request);
     }
 
+    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/validate", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ValidateModuleSetReleaseResponse validateModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                                     @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
+        ValidateModuleSetReleaseRequest request = new ValidateModuleSetReleaseRequest(sessionService.asScoreUser(user));
+        request.setModuleSetReleaseId(moduleSetReleaseId);
+        return service.validateModuleSetRelease(request);
+    }
+
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/export", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InputStreamResource> exportModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
