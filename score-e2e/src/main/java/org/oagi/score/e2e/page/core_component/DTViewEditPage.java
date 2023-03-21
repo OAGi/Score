@@ -201,4 +201,20 @@ public interface DTViewEditPage extends Page {
     WebElement getTheLastTableRecord();
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    void hitUpdateButton();
+
+    void hitUpdateAnywayButton();
+
+    WebElement getUpdateAnywayButton();
+
+    WebElement getUpdateButton();
+
+    void setQualifier(String qualifier);
+
+    WebElement getQualifierField();
+
+    void codeListIdMarkedAsDeleted(String name);
+
+    void changeCodeListValueDomain(String codeListName);
 }
