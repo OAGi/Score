@@ -7,6 +7,7 @@ import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.export.model.SchemaModule;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.gateway.http.api.module_management.data.AssignCCToModule;
+import org.oagi.score.gateway.http.api.module_management.data.ExportModuleSetReleaseResponse;
 import org.oagi.score.gateway.http.api.module_management.data.ModuleAssignComponents;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.provider.ImportedDataProvider;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
@@ -111,16 +111,18 @@ public class ModuleSetReleaseService {
         return response;
     }
 
-    public File exportModuleSetRelease(ScoreUser user, BigInteger moduleSetReleaseId) throws Exception {
+    public ExportModuleSetReleaseResponse exportModuleSetRelease(ScoreUser user, BigInteger moduleSetReleaseId) throws Exception {
         GetModuleSetReleaseRequest request = new GetModuleSetReleaseRequest(user);
         request.setModuleSetReleaseId(moduleSetReleaseId);
         ModuleSetRelease moduleSetRelease = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getModuleSetRelease(request).getModuleSetRelease();
         String fileName = moduleSetRelease.getModuleSetName().replace(" ", "");
-        File baseDirectory = new File(FileUtils.getTempDirectory(), fileName);
+        File baseDirectory = new File(new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString()), fileName);
         FileUtils.forceMkdir(baseDirectory);
 
         List<File> files = exportModuleSetReleaseWithoutCompression(user, moduleSetReleaseId, baseDirectory);
-        return Zip.compressionHierarchy(files, fileName);
+        File zipFile = Zip.compressionHierarchy(baseDirectory, files);
+        FileUtils.deleteDirectory(baseDirectory);
+        return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);
     }
 
     private List<File> exportModuleSetReleaseWithoutCompression(ScoreUser user, BigInteger moduleSetReleaseId,
