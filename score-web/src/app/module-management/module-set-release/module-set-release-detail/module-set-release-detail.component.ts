@@ -134,8 +134,9 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
       if (entries.length === 0) {
         dialogConfig.data.content = ['All schemas are valid.'];
       } else {
+        dialogConfig.data.content = [];
         entries.forEach(([key, value]) => {
-          dialogConfig.data.content = [key + ': ' + value];
+          dialogConfig.data.content.push(key + ': ' + value);
         });
       }
 

@@ -33,13 +33,14 @@
   letter-spacing: .2px;
   line-height: 20px;
   min-height: 24px;
+  max-height: 480px;
   padding-bottom: 8px;
   padding-top: 9px;
   border-bottom: 1px solid transparent;
   color: rgba(0, 0, 0, 0.7);
   height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .content p {
