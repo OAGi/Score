@@ -244,7 +244,7 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the find 'Where used' dialog object
      */
-    FindWhereUsedDialog  findWhereUsed(String path);
+    FindWhereUsedDialog findWhereUsed(String path);
 
     /**
      * Open the association selection dialog by clicking 'Create ASCCP from this' context menu.
@@ -349,6 +349,18 @@ public interface ACCViewEditPage extends Page {
      * Hit the 'Amend' button.
      */
     void hitAmendButton();
+
+    /**
+     * Return the UI element of the 'Cancel' button. Developers only can see the 'Cancel' button.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Revise' button.
+     */
+    void hitCancelButton();
 
     /**
      * Return the UI element of the 'Move to QA' button.
