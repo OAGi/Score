@@ -1,11 +1,13 @@
 package org.oagi.score.gateway.http.api.module_management.service;
 
+import org.apache.commons.io.FileUtils;
 import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.impl.DefaultExportContextBuilder;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.export.model.SchemaModule;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.gateway.http.api.module_management.data.AssignCCToModule;
+import org.oagi.score.gateway.http.api.module_management.data.ExportModuleSetReleaseResponse;
 import org.oagi.score.gateway.http.api.module_management.data.ModuleAssignComponents;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.provider.ImportedDataProvider;
@@ -16,21 +18,28 @@ import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.CcRepository;
 import org.oagi.score.repository.ModuleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class ModuleSetReleaseService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
@@ -67,11 +76,57 @@ public class ModuleSetReleaseService {
         return scoreRepositoryFactory.createModuleSetReleaseWriteRepository().deleteModuleSetRelease(request);
     }
 
-    public File exportModuleSetRelease(ScoreUser user, BigInteger moduleSetReleaseId) throws Exception {
+    public ValidateModuleSetReleaseResponse validateModuleSetRelease(ValidateModuleSetReleaseRequest request) throws Exception {
+        File baseDirectory = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
+        FileUtils.forceMkdir(baseDirectory);
+
+        List<File> schemaFiles = exportModuleSetReleaseWithoutCompression(request.getRequester(), request.getModuleSetReleaseId(), baseDirectory);
+        ValidateModuleSetReleaseResponse response = new ValidateModuleSetReleaseResponse();
+        try {
+            schemaFiles.parallelStream().forEach(schemaFile -> {
+                logger.debug("Attempt to validate the schema file: " + schemaFile);
+                try {
+                    SchemaFactory schemaFactory = SchemaFactory.newDefaultInstance();
+                    schemaFactory.newSchema(schemaFile);
+                } catch (Exception e) {
+                    try {
+                        String moduleName = schemaFile.getCanonicalPath();
+                        moduleName = moduleName.substring(baseDirectory.getCanonicalPath().length() + 1);
+                        moduleName = moduleName.replaceAll("\\\\", "/");
+                        response.addResult(moduleName, e.getMessage());
+                    } catch (IOException ignore) {
+                        logger.debug("I/O exception occurs", ignore);
+                    }
+                }
+            });
+        } finally {
+            try {
+                FileUtils.deleteDirectory(baseDirectory);
+                logger.debug("After the validation, the base directory has been removed: " + baseDirectory);
+            } catch (IOException ignore) {
+                logger.debug("I/O exception occurs", ignore);
+            }
+        }
+
+        return response;
+    }
+
+    public ExportModuleSetReleaseResponse exportModuleSetRelease(ScoreUser user, BigInteger moduleSetReleaseId) throws Exception {
         GetModuleSetReleaseRequest request = new GetModuleSetReleaseRequest(user);
         request.setModuleSetReleaseId(moduleSetReleaseId);
         ModuleSetRelease moduleSetRelease = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getModuleSetRelease(request).getModuleSetRelease();
+        String fileName = moduleSetRelease.getModuleSetName().replace(" ", "");
+        File baseDirectory = new File(new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString()), fileName);
+        FileUtils.forceMkdir(baseDirectory);
 
+        List<File> files = exportModuleSetReleaseWithoutCompression(user, moduleSetReleaseId, baseDirectory);
+        File zipFile = Zip.compressionHierarchy(baseDirectory, files);
+        FileUtils.deleteDirectory(baseDirectory);
+        return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);
+    }
+
+    private List<File> exportModuleSetReleaseWithoutCompression(ScoreUser user, BigInteger moduleSetReleaseId,
+                                                                File baseDirectory) throws Exception {
         ImportedDataProvider dataProvider = new ImportedDataProvider(ccRepository, moduleSetReleaseId);
         DefaultExportContextBuilder builder = new DefaultExportContextBuilder(moduleRepository, dataProvider, moduleSetReleaseId);
         XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
@@ -79,10 +134,8 @@ public class ModuleSetReleaseService {
 
         List<File> files = new ArrayList<>();
 
-        String fileName = moduleSetRelease.getModuleSetName().replace(" ", "");
-
         for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
-            visitor.setBaseDirectory(new File("./data/" + fileName));
+            visitor.setBaseDirectory(baseDirectory);
             schemaModule.visit(visitor);
             File file = visitor.endSchemaModule(schemaModule);
             if (file != null) {
@@ -90,7 +143,7 @@ public class ModuleSetReleaseService {
             }
         }
 
-        return Zip.compressionHierarchy(files, fileName);
+        return files;
     }
 
     public ModuleAssignComponents getAssignableCCs(GetAssignableCCListRequest request) {

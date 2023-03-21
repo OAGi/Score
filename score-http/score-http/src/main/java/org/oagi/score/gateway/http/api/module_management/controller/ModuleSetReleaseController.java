@@ -1,9 +1,11 @@
 package org.oagi.score.gateway.http.api.module_management.controller;
 
 import org.oagi.score.gateway.http.api.module_management.data.AssignCCToModule;
+import org.oagi.score.gateway.http.api.module_management.data.ExportModuleSetReleaseResponse;
 import org.oagi.score.gateway.http.api.module_management.data.ModuleAssignComponents;
 import org.oagi.score.gateway.http.api.module_management.service.ModuleSetReleaseService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.helper.DeleteOnCloseFileSystemResource;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.module.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,18 +124,29 @@ public class ModuleSetReleaseController {
         service.discardModuleSetRelease(request);
     }
 
+    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/validate", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ValidateModuleSetReleaseResponse validateModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                                     @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
+        ValidateModuleSetReleaseRequest request = new ValidateModuleSetReleaseRequest(sessionService.asScoreUser(user));
+        request.setModuleSetReleaseId(moduleSetReleaseId);
+        return service.validateModuleSetRelease(request);
+    }
+
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/export", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InputStreamResource> exportModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                                      @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
+    public ResponseEntity<DeleteOnCloseFileSystemResource> exportModuleSetRelease(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
 
-        File output = service.exportModuleSetRelease(sessionService.asScoreUser(user), moduleSetReleaseId);
+        ExportModuleSetReleaseResponse response =
+                service.exportModuleSetRelease(sessionService.asScoreUser(user), moduleSetReleaseId);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + output.getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
                 .contentType(MediaType.parseMediaType("application/zip"))
-                .contentLength(output.length())
-                .body(new InputStreamResource(new FileInputStream(output)));
+                .contentLength(response.getFile().length())
+                .body(new DeleteOnCloseFileSystemResource(response.getFile()));
     }
 
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/assignable", method = RequestMethod.GET,
