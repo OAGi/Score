@@ -7,18 +7,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -46,7 +49,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
@@ -72,6 +75,61 @@ public class TC_12_1_CodeListAccess extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(endUser.getAppUserId(), cl.getOwnerUserId());
             viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+        }
+    }
+    @Test
+    @DisplayName("TC_12_1_TA_2")
+    public void test_TA_2() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject endUser;
+        ReleaseObject workingBranch;
+        Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            /**
+             * Create developer Code List for Working branch. States - WIP, Draft and Candidate
+             */
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListValuesMap.put(codeListWIP, value);
+            codeListForTesting.add(codeListWIP);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Draft");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
+            codeListValuesMap.put(codeListDraft, value);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
+            codeListValuesMap.put(codeListCandidate, value);
+            codeListForTesting.add(codeListCandidate);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        for (CodeListObject cl : codeListForTesting) {
+            assertNotEquals(endUser.getAppUserId(), cl.getOwnerUserId());
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getCodeListNameField());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            assertDisabled(editCodeListPage.getVersionField());
+            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            CodeListValueObject value = codeListValuesMap.get(cl);
+            assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
+            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            escape(getDriver());
         }
     }
 
