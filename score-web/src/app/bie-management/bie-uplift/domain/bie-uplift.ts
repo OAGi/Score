@@ -236,9 +236,9 @@ export class MatchInfo {
         break;
     }
     this.reuse = '';
-    this.sourceDisplayPath = '/' + source.parents.map(i => i.name).join(' /');
+    this.sourceDisplayPath = '/' + source.parents.map(i => i.name).join('/');
     if (target) {
-      this.targetDisplayPath = '/' + target.parents.map(i => i.name).join(' /');
+      this.targetDisplayPath = '/' + target.parents.map(i => i.name).join('/');
       if (source.fixed) {
         this.match = 'System';
       } else {

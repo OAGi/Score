@@ -15,7 +15,7 @@ export class ReportDialogComponent implements OnInit {
   dataSource = new MatTableDataSource<MatchInfo>();
 
   displayedColumns: string[] = [
-    'ccType', 'sourceDisplayPath', 'context', 'targetDisplayPath', 'match', 'reuse', 'validCode'
+    'ccType', 'displayPath', 'context', 'match', 'reuse', 'validCode'
   ];
 
   hideSystemMatched = true;
@@ -55,7 +55,7 @@ export class ReportDialogComponent implements OnInit {
       if (row.message !== '') {
         return true;
       }
-      return row.match == 'Unmatched' || !!(row.reuse) || row.valid === false;
+      return row.match === 'Unmatched' || !!(row.reuse) || row.valid === false;
     }
     return true;
   }
