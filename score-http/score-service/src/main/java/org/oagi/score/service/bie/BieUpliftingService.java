@@ -1570,11 +1570,10 @@ public class BieUpliftingService {
             // if the end-user code list with the same name, list ID, and agency ID exists (or has been uplifted)
             // in the target release and it is allowed by the target BIE node.
             targetCodeList = targetCodeListList.stream()
-                    .filter(e -> {
-                        return StringUtils.equals(sourceCodeList.getName(), e.getName()) &&
-                                StringUtils.equals(sourceCodeList.getListId(), e.getListId()) &&
-                                StringUtils.equals(sourceCodeList.getAgencyName(), e.getAgencyName());
-                    })
+                    .filter(e -> StringUtils.equals(sourceCodeList.getName(), e.getName()) &&
+                            StringUtils.equals(sourceCodeList.getListId(), e.getListId()) &&
+                            StringUtils.equals(sourceCodeList.getAgencyName(), e.getAgencyName()) &&
+                            StringUtils.equals(sourceCodeList.getVersionId(), e.getVersionId()))
                     .findFirst().orElse(null);
         }
 
@@ -1604,12 +1603,10 @@ public class BieUpliftingService {
             // if the end-user agency ID list with the list ID, agency ID, and version exists (or has been uplifted)
             // in the target release and it is allowed by the target BIE node.
             targetAgencyIdList = targetAgencyIdListList.stream()
-                    .filter(e -> {
-                        return StringUtils.equals(sourceAgencyIdList.getName(), e.getName()) &&
-                                StringUtils.equals(sourceAgencyIdList.getListId(), e.getListId()) &&
-                                StringUtils.equals(sourceAgencyIdList.getAgencyIdListValueName(), e.getAgencyIdListValueName()) &&
-                                StringUtils.equals(sourceAgencyIdList.getVersionId(), e.getVersionId());
-                    })
+                    .filter(e -> StringUtils.equals(sourceAgencyIdList.getName(), e.getName()) &&
+                            StringUtils.equals(sourceAgencyIdList.getListId(), e.getListId()) &&
+                            StringUtils.equals(sourceAgencyIdList.getAgencyIdListValueName(), e.getAgencyIdListValueName()) &&
+                            StringUtils.equals(sourceAgencyIdList.getVersionId(), e.getVersionId()))
                     .findFirst().orElse(null);
         }
 
