@@ -2727,31 +2727,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_4_21_b() {
-
-
-
-
-    }
-
-    @Test
-    public void test_TA_10_4_21_c() {
-
-
-
-
-    }
-
-    @Test
-    public void test_TA_10_4_21_d() {
-
-
-
-
-    }
-
-    @Test
     public void test_TA_10_4_21_e() {
+
+
 
 
 
