@@ -8,6 +8,7 @@ import org.oagi.score.repo.api.bie.model.*;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
 import org.oagi.score.repo.api.corecomponent.model.*;
 import org.oagi.score.repo.api.impl.jooq.utils.ScoreGuidUtils;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.release.model.GetReleaseRequest;
 import org.oagi.score.repo.api.release.model.Release;
@@ -1536,7 +1537,7 @@ public class BieUpliftingService {
         if (targetAgencyIdListManifest != null) {
             return "";
         }
-        return "Agency Id List '" + sourceAgencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use a default primitive in the domain value restriction.";
+        return "Agency ID List '" + sourceAgencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.";
     }
 
     private String checkBdtScAgencyIdListIdMappable(AgencyIdListManifest sourceAgencyIdListManifest,
@@ -1550,7 +1551,7 @@ public class BieUpliftingService {
         if (targetAgencyIdListManifest != null) {
             return "";
         }
-        return "Agency Id List '" + sourceAgencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use a default primitive in the domain value restriction.";
+        return "Agency ID List '" + sourceAgencyIdList.getName() + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.";
     }
 
     public CodeListManifest getTargetCodeListManifest(
@@ -1564,11 +1565,25 @@ public class BieUpliftingService {
                 .filter(e -> e.getGuid().equals(sourceCodeList.getGuid()))
                 .findFirst().orElse(null);
         if (targetCodeList == null) {
+            // Issue #1356
+            // End-user code list assigned to a source BIE node can be carried into the uplifted BIE only
+            // if the end-user code list with the same name, list ID, and agency ID exists (or has been uplifted)
+            // in the target release and it is allowed by the target BIE node.
+            targetCodeList = targetCodeListList.stream()
+                    .filter(e -> StringUtils.equals(sourceCodeList.getName(), e.getName()) &&
+                            StringUtils.equals(sourceCodeList.getListId(), e.getListId()) &&
+                            StringUtils.equals(sourceCodeList.getAgencyName(), e.getAgencyName()) &&
+                            StringUtils.equals(sourceCodeList.getVersionId(), e.getVersionId()))
+                    .findFirst().orElse(null);
+        }
+
+        if (targetCodeList == null) {
             return null;
         }
 
+        CodeList finalTargetCodeList = targetCodeList;
         return targetCodeListManifestList.stream()
-                .filter(e -> e.getCodeListId().equals(targetCodeList.getCodeListId()))
+                .filter(e -> e.getCodeListId().equals(finalTargetCodeList.getCodeListId()))
                 .findFirst().orElse(null);
     }
 
@@ -1583,11 +1598,25 @@ public class BieUpliftingService {
                 .filter(e -> e.getGuid().equals(sourceAgencyIdList.getGuid()))
                 .findFirst().orElse(null);
         if (targetAgencyIdList == null) {
+            // Issue #1356
+            // End-user agency ID list assigned to a source BIE node can be carried into the uplifted BIE only
+            // if the end-user agency ID list with the list ID, agency ID, and version exists (or has been uplifted)
+            // in the target release and it is allowed by the target BIE node.
+            targetAgencyIdList = targetAgencyIdListList.stream()
+                    .filter(e -> StringUtils.equals(sourceAgencyIdList.getName(), e.getName()) &&
+                            StringUtils.equals(sourceAgencyIdList.getListId(), e.getListId()) &&
+                            StringUtils.equals(sourceAgencyIdList.getAgencyIdListValueName(), e.getAgencyIdListValueName()) &&
+                            StringUtils.equals(sourceAgencyIdList.getVersionId(), e.getVersionId()))
+                    .findFirst().orElse(null);
+        }
+
+        if (targetAgencyIdList == null) {
             return null;
         }
 
+        AgencyIdList finalTargetAgencyIdList = targetAgencyIdList;
         return targetAgencyIdListManifestList.stream()
-                .filter(e -> e.getAgencyIdListId().equals(targetAgencyIdList.getAgencyIdListId()))
+                .filter(e -> e.getAgencyIdListId().equals(finalTargetAgencyIdList.getAgencyIdListId()))
                 .findFirst().orElse(null);
     }
 
