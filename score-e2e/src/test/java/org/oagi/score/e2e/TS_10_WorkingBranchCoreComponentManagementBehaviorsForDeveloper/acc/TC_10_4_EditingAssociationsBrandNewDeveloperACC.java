@@ -2798,9 +2798,77 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     @Test
     public void test_TA_10_4_22() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Document Identification Base. Details", branch);
+        accViewEditPage.hitReviseButton();
+        String url = getDriver().getCurrentUrl();
+        BigInteger baseACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Manufacturing Route Operation Base. Details", branch);
+        url = getDriver().getCurrentUrl();
+        BigInteger refactorACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        accViewEditPage.hitReviseButton();
+        String nodePath = "/Manufacturing Route Operation Base. Details/Termination Indicator";
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Termination Indicator");
+        WebElement tr;
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Document Identification Base");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        selectBaseACCToRefactorDialog.hitRefactorButton();
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(refactorACCManifestId);
+        WebElement movedBCCPNode = accViewEditPage.getNodeByPath(nodePath);
+        assertFalse(movedBCCPNode.isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
+        movedBCCPNode = accViewEditPage.getNodeByPath("/Document Identification Base. Details/Termination Indicator");
+        assertTrue(movedBCCPNode.isDisplayed());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(refactorACCManifestId);
+        accViewEditPage.hitCancelButton();
+        movedBCCPNode = accViewEditPage.getNodeByPath(nodePath);
+        assertTrue(movedBCCPNode.isDisplayed());
+
+        //Refactor a second time
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(refactorACCManifestId);
+        accViewEditPage.hitReviseButton();
+        WebElement bccNode = accViewEditPage.getNodeByPath(nodePath);
+        ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        bccpPanel.setDefinition("refactoring2");
+
+        selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Termination Indicator");
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Document Identification Base");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        selectBaseACCToRefactorDialog.hitRefactorButton();
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
+        bccNode = accViewEditPage.getNodeByPath("/Document Identification Base. Details/Termination Indicator");
+        bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        assertEquals("refactoring2", getText(bccpPanel.getDefinitionField()));
     }
 
     @Test

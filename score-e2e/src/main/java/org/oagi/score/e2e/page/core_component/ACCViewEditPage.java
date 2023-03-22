@@ -1165,6 +1165,13 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
+        /**
+         * set the UI element of the 'Definition' field with the given text
+         *
+         * @param definition
+         */
+        void setDefinition(String definition);
+
     }
 
 }
