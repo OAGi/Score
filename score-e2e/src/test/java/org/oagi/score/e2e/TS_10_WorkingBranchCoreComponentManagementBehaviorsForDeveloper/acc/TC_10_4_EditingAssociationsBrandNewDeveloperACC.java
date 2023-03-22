@@ -9,7 +9,6 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -3034,17 +3033,4 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         movedNode = accViewEditPage.getNodeByPath(movedNodePath);
         assertFalse(movedNode.isDisplayed());
     }
-
-    @Test
-    public void test_TA_10_4_26() {
-
-
-
-
-    }
-
-
-
-
-
 }
