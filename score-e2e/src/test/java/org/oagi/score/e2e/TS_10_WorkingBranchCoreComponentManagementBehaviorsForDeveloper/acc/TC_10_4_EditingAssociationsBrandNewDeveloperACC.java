@@ -2992,9 +2992,47 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     @Test
     public void test_TA_10_4_25() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Operation Reference Base. Details", branch);
+        accViewEditPage.hitReviseButton();
+        String url = getDriver().getCurrentUrl();
+        BigInteger baseACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Manufacturing Route Operation Base. Details", branch);
+        url = getDriver().getCurrentUrl();
+        BigInteger refactorACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        accViewEditPage.hitReviseButton();
+        String nodePath = "/Manufacturing Route Operation Base. Details/Container Identifier";
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Container Identifier");
+        WebElement tr;
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Operation Reference Base. Details");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        selectBaseACCToRefactorDialog.hitRefactorButton();
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
+        String movedNodePath = "/Operation Reference Base. Details/Container Identifier";
+        WebElement movedNode = accViewEditPage.getNodeByPath(movedNodePath);
+        assertTrue(movedNode.isDisplayed());
+
+        accViewEditPage.hitCancelButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
+        movedNode = accViewEditPage.getNodeByPath(movedNodePath);
+        assertFalse(movedNode.isDisplayed());
     }
 
     @Test
