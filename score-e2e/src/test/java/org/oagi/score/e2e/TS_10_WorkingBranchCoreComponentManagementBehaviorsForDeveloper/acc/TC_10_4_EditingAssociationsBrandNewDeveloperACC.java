@@ -2874,9 +2874,41 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     @Test
     public void test_TA_10_4_23() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
 
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Classification Base. Details", branch);
+        accViewEditPage.hitReviseButton();
+        String url = getDriver().getCurrentUrl();
+        BigInteger baseACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
 
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Semantic Classification. Details", branch);
+        url = getDriver().getCurrentUrl();
+        BigInteger refactorACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/Semantic Classification. Details");
+        selectAssociationDialog.selectAssociation("Description. Text");
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(refactorACCManifestId);
+        String nodePath = "/Semantic Classification. Details/Description";
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Description");
+        WebElement tr;
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Classification Base. Details");
+        assertTrue(tr.isDisplayed());
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEquals(1, getDriver().findElements(By.xpath("//score-based-acc-dialog//*[contains(text(),\"Ungrouping 'Free Form Text Group' required.\")]")).size());
+        selectBaseACCToRefactorDialog.hitCancelButton();
     }
 
     @Test
