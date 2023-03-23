@@ -9,7 +9,6 @@ import org.oagi.score.gateway.http.helper.DeleteOnCloseFileSystemResource;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.module.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,6 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -118,7 +115,7 @@ public class ModuleSetReleaseController {
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void discardModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                 @PathVariable("id") BigInteger moduleSetReleaseId) {
+                                        @PathVariable("id") BigInteger moduleSetReleaseId) {
         DeleteModuleSetReleaseRequest request = new DeleteModuleSetReleaseRequest(sessionService.asScoreUser(user));
         request.setModuleSetReleaseId(moduleSetReleaseId);
         service.discardModuleSetRelease(request);
@@ -134,7 +131,7 @@ public class ModuleSetReleaseController {
     }
 
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/export", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<DeleteOnCloseFileSystemResource> exportModuleSetRelease(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {

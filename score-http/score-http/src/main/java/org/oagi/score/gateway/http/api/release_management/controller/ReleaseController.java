@@ -1,11 +1,16 @@
 package org.oagi.score.gateway.http.api.release_management.controller;
 
+import org.oagi.score.gateway.http.api.release_management.data.GenerateMigrationScriptResponse;
 import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.helper.DeleteOnCloseFileSystemResource;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
@@ -20,6 +25,9 @@ public class ReleaseController {
 
     @Autowired
     private ReleaseService service;
+
+    @Autowired
+    private SessionService sessionService;
 
     @RequestMapping(value = "/simple_releases", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -174,4 +182,22 @@ public class ReleaseController {
                                                  @RequestBody ReleaseValidationRequest request) {
         return service.createDraft(user, releaseId, request);
     }
+
+    @RequestMapping(value = "/release/{id:[\\d]+}/generate_migration_script", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<DeleteOnCloseFileSystemResource> generateMigrationScript(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") BigInteger releaseId) throws Exception {
+
+        GenerateMigrationScriptResponse response =
+                service.generateMigrationScript(sessionService.asScoreUser(user), releaseId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .contentLength(response.getFile().length())
+                .body(new DeleteOnCloseFileSystemResource(response.getFile()));
+    }
+
+
 }
