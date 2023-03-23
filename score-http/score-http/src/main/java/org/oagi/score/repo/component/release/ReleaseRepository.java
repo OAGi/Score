@@ -2132,6 +2132,11 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .fetchOptionalInto(Integer.class).orElse(0) > 0;
     }
 
+    public boolean isLatestRelease(BigInteger releaseId) {
+        return dslContext.resultQuery("SELECT max(`release_id`) FROM `release` WHERE `release_num` != 'Working'")
+                .fetchOneInto(BigInteger.class).equals(releaseId);
+    }
+
     public void cleanUp(BigInteger releaseId) {
 
         // ACCs

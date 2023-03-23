@@ -13,4 +13,5 @@ public class ReleaseDetail {
     private String releaseLicense;
     private BigInteger namespaceId;
     private String state;
+    private boolean isLatestRelease;
 }
