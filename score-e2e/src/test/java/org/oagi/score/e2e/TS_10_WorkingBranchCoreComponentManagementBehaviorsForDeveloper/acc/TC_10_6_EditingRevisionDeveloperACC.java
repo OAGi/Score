@@ -140,8 +140,6 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
         assertChecked(accPanel.getAbstractCheckbox());
 
     }
-
-
     @Test
     public void test_TA_10_6_1_c() {
 
