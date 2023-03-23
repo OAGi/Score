@@ -34,6 +34,8 @@ public class MigrationScriptGenerator {
 
     private BigInteger delta;
 
+    private int defaultMaximumRowsInStatement = 1000;
+
     public MigrationScriptGenerator(DSLContext dslContext, ResourceLoader resourceLoader, BigInteger delta) {
         this.dslContext = dslContext;
         this.resourceLoader = resourceLoader;
@@ -296,7 +298,7 @@ public class MigrationScriptGenerator {
                         "JOIN `dt_manifest` ON `dt_sc_manifest`.`owner_dt_manifest_id` = `dt_manifest`.`dt_manifest_id` " +
                         "JOIN `dt` ON `dt_manifest`.`dt_id` = `dt`.`dt_id` " +
                         "WHERE `dt_sc_manifest`.`dt_sc_manifest_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "log");
+        dumpData(writer, "log", false, null, 50);
         dumpData(writer, "module", true);
         dumpData(writer, "module_acc_manifest", true);
         dumpData(writer, "module_agency_id_list_manifest", true);
@@ -334,15 +336,20 @@ public class MigrationScriptGenerator {
     }
 
     private void dumpData(PrintWriter writer, String tableName) throws IOException {
-        dumpData(writer, tableName, false, null);
+        dumpData(writer, tableName, false, null, defaultMaximumRowsInStatement);
     }
 
     private void dumpData(PrintWriter writer, String tableName, boolean includeTableStructure) throws IOException {
-        dumpData(writer, tableName, includeTableStructure, null);
+        dumpData(writer, tableName, includeTableStructure, null, defaultMaximumRowsInStatement);
     }
 
     private void dumpData(PrintWriter writer, String tableName, boolean includeTableStructure,
                           Supplier<ResultQuery<Record>> resultQuerySupplier) throws IOException {
+        dumpData(writer, tableName, includeTableStructure, resultQuerySupplier, defaultMaximumRowsInStatement);
+    }
+
+    private void dumpData(PrintWriter writer, String tableName, boolean includeTableStructure,
+                          Supplier<ResultQuery<Record>> resultQuerySupplier, int maximumRowsInStatement) throws IOException {
 
         if (resultQuerySupplier == null) {
             resultQuerySupplier = () -> dslContext.resultQuery("SELECT `" + tableName + "`.* FROM `" + tableName +
@@ -390,7 +397,7 @@ public class MigrationScriptGenerator {
             }
 
             values.add("(" + list.stream().collect(Collectors.joining(",")) + ")");
-            if (values.size() == 100) {
+            if (values.size() == maximumRowsInStatement) {
                 writer.println("INSERT INTO `" + tableName + "` (" + columnsStr + ") VALUES " +
                         values.stream().collect(Collectors.joining(",")) + ";");
                 values.clear();
