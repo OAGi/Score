@@ -13,6 +13,8 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -20,8 +22,10 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
@@ -141,6 +145,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
         assertChecked(accPanel.getAbstractCheckbox());
 
     }
+
     @Test
     public void test_TA_10_6_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -172,6 +177,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
         assertEquals(newObjectTermText, getText(accPanel.getObjectClassTermField()));
         assertDisabled(accPanel.getNamespaceSelectField());
     }
+
     @Test
     public void test_TA_10_6_1_d_deprecated_previous_version() {
 
@@ -197,6 +203,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
         assertDisabled(accPanel.getDeprecatedCheckbox());
 
     }
+
     @Test
     public void test_TA_10_6_1_d_not_deprecated_previous_version() {
 
@@ -224,6 +231,30 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_6_1_e() {
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        accPanel.setObjectClassTerm(randomPropertyTerm);
+        String namespaceForUpdate = "http://www.openapplications.org/oagis/10";
+        accPanel.setNamespace(namespaceForUpdate);
+
+        assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
 
     }
 }
