@@ -74,6 +74,11 @@
                 (click)="updateState('Published')">
           Publish
         </button>
+        <button mat-raised-button color="accent"
+                *ngIf="releaseDetail.state === 'Published' && releaseDetail.latestRelease"
+                (click)="generateMigrationScript()">
+          Generate Migration Script
+        </button>
       </div>
     </div>
   </div>

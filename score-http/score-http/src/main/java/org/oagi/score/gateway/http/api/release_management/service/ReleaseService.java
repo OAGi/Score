@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.event.ReleaseCleanupEvent;
 import org.oagi.score.gateway.http.event.ReleaseCreateRequestEvent;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.release.ReleaseRepositoryDiscardRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -29,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -47,6 +51,9 @@ public class ReleaseService implements InitializingBean {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private SessionService sessionService;
@@ -307,6 +314,7 @@ public class ReleaseService implements InitializingBean {
         detail.setReleaseNote(release.getReleaseNote());
         detail.setReleaseLicense(release.getReleaseLicense());
         detail.setState(release.getState());
+        detail.setLatestRelease(repository.isLatestRelease(releaseId));
         return detail;
     }
 
@@ -438,5 +446,16 @@ public class ReleaseService implements InitializingBean {
         } finally {
             lock.unlock();
         }
+    }
+
+    public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser user, BigInteger releaseId) throws IOException {
+        Release release = repository.findById(releaseId);
+
+        MigrationScriptGenerator generator = new MigrationScriptGenerator(dslContext, resourceLoader,
+                BigInteger.valueOf(100000000L));
+        File file = generator.generate(user, release);
+
+        String fileName = release.getReleaseNum().replace(".", "_") + ".zip";
+        return new GenerateMigrationScriptResponse(fileName, file);
     }
 }
