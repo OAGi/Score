@@ -64,15 +64,6 @@ public class MigrationScriptGenerator {
             writer.flush();
         }
 
-//        File anotherScriptFile = new File("C:\\Users\\hno2\\Downloads\\10_8_6\\mig_10.8.6.sql");
-//        try (PrintWriter writer = new PrintWriter(new FileWriter(anotherScriptFile))) {
-//            writeBeginHeaders(writer, user, release, delta);
-//            writeData(writer, release);
-//            writeEndHeaders(writer, release, delta);
-//
-//            writer.flush();
-//        }
-
         return scriptFile;
     }
 
@@ -139,7 +130,7 @@ public class MigrationScriptGenerator {
         writer.println("DELETE FROM `log` WHERE `log_id` < " + delta + ";");
         writer.println("DELETE FROM `seq_key` WHERE `seq_key_id` < " + delta + ";");
         writer.println("");
-        writer.println("DELETE FROM `namespace` WHERE `namespace_id` = 1;");
+        writer.println("DELETE FROM `namespace` WHERE `namespace_id` < " + delta + ";");
         writer.println("DELETE FROM `release` WHERE `release_id` < " + delta + ";");
         writer.println("");
         writer.println("DELETE FROM `xbt` WHERE `xbt_id` < " + delta + ";");
