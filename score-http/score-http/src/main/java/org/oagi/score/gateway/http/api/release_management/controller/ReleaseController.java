@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.api.release_management.controller;
 
-import org.oagi.score.gateway.http.api.release_management.data.GenerateMigrationScriptResponse;
 import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;

@@ -716,7 +716,7 @@ export class CcListComponent implements OnInit {
         }).length === this.selection.selected.length;
       case 'Export':
         return this.selection.selected.filter(e => {
-          if (e.type === 'ASCCP' && e.releaseNum !== this.workingRelease.releaseNum) {
+          if (e.type === 'ASCCP') {
             return e;
           }
         }).length === this.selection.selected.length;

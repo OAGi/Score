@@ -12,7 +12,8 @@ import java.util.List;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
-public class CcRepository {
+public class CoreComponentRepositoryForModuleSetRelease {
+
     @Autowired
     private DSLContext dslContext;
 

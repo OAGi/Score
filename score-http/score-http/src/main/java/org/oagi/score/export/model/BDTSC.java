@@ -1,7 +1,7 @@
 package org.oagi.score.export.model;
 
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repository.provider.DataProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,11 @@ public class BDTSC implements Component {
 
     private DtScRecord dtSc;
 
-    private ImportedDataProvider importedDataProvider;
+    private DataProvider dataProvider;
 
     public BDTSC(DtScManifestRecord dtScManifest, DtScRecord dtSc,
-                 ImportedDataProvider importedDataProvider) {
-        this.importedDataProvider = importedDataProvider;
+                 DataProvider dataProvider) {
+        this.dataProvider = dataProvider;
         this.dtScManifest = dtScManifest;
         this.dtSc = dtSc;
     }
@@ -75,14 +75,14 @@ public class BDTSC implements Component {
 
     public CdtScAwdPriRecord getCdtScAwdPri() {
         ensureTypeName();
-        return importedDataProvider.findCdtScAwdPri(
+        return dataProvider.findCdtScAwdPri(
                 cdtScAwdPriXpsTypeMap.getCdtScAwdPriId()
         );
     }
 
     public CdtPriRecord getCdtPri() {
         CdtScAwdPriRecord cdtScAwdPri = getCdtScAwdPri();
-        return importedDataProvider.findCdtPri(cdtScAwdPri.getCdtPriId());
+        return dataProvider.findCdtPri(cdtScAwdPri.getCdtPriId());
     }
 
     public AgencyIdListRecord getAgencyIdList() {
@@ -107,7 +107,7 @@ public class BDTSC implements Component {
         }
 
         List<BdtScPriRestriRecord> bdtScPriRestriList =
-                importedDataProvider.findBdtScPriRestriListByDtScManifestId(dtScManifest.getDtScManifestId());
+                dataProvider.findBdtScPriRestriListByDtScManifestId(dtScManifest.getDtScManifestId());
 
         List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                 bdtScPriRestriList.stream()
@@ -136,17 +136,17 @@ public class BDTSC implements Component {
                 }
 
                 cdtScAwdPriXpsTypeMap =
-                        importedDataProvider.findCdtScAwdPriXpsTypeMap(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
-                xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+                        dataProvider.findCdtScAwdPriXpsTypeMap(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
+                xbt = dataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 typeName = xbt.getBuiltinType();
             } else {
-                AgencyIdListManifestRecord agencyIdListManifest = importedDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
-                agencyIdList = importedDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
+                AgencyIdListManifestRecord agencyIdListManifest = dataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
+                agencyIdList = dataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
                 typeName = agencyIdList.getName() + "ContentType";
             }
         } else {
-            CodeListManifestRecord codeListManifest = importedDataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
-            codeList = importedDataProvider.findCodeList(codeListManifest.getCodeListId());
+            CodeListManifestRecord codeListManifest = dataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
+            codeList = dataProvider.findCodeList(codeListManifest.getCodeListId());
             typeName = codeList.getName() + "ContentType";
         }
     }
