@@ -180,6 +180,14 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
         findSeqKeyMap = findSeqKeyList.stream()
                 .collect(Collectors.groupingBy(SeqKeyRecord::getFromAccManifestId));
 
+        findReleaseList = coreComponentRepositoryForModuleSetRelease.findAllRelease();
+        findReleaseMap = findReleaseList.stream()
+                .collect(Collectors.toMap(ReleaseRecord::getReleaseId, Function.identity()));
+
+        findNamespaceList = coreComponentRepositoryForModuleSetRelease.findAllNamespace();
+        findNamespaceMap = findNamespaceList.stream()
+                .collect(Collectors.toMap(NamespaceRecord::getNamespaceId, Function.identity()));
+
 
         logger.info("Ready for " + getClass().getSimpleName() + " in " + (System.currentTimeMillis() - s) / 1000d + " seconds");
     }
@@ -575,5 +583,31 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
     
     public ModuleCCID findModuleBlobContent(ULong blobContentId) {
         return findModuleBlobContentManifestMap.get(blobContentId);
+    }
+
+    private List<ReleaseRecord> findReleaseList;
+    private Map<ULong, ReleaseRecord> findReleaseMap;
+
+    @Override
+    public List<ReleaseRecord> findRelease() {
+        return findReleaseList;
+    }
+
+    @Override
+    public ReleaseRecord findRelease(ULong releaseId) {
+        return findReleaseMap.get(releaseId);
+    }
+
+    private List<NamespaceRecord> findNamespaceList;
+    private Map<ULong, NamespaceRecord> findNamespaceMap;
+
+    @Override
+    public List<NamespaceRecord> findNamespace() {
+        return findNamespaceList;
+    }
+
+    @Override
+    public NamespaceRecord findNamespace(ULong namespaceId) {
+        return findNamespaceMap.get(namespaceId);
     }
 }

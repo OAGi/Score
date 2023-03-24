@@ -281,4 +281,16 @@ public class CoreComponentRepositoryForRelease {
                 .from(SEQ_KEY)
                 .fetchInto(SeqKeyRecord.class);
     }
+
+    public List<ReleaseRecord> findAllRelease() {
+        return dslContext.select(RELEASE.fields())
+                .from(RELEASE)
+                .fetchInto(ReleaseRecord.class);
+    }
+
+    public List<NamespaceRecord> findAllNamespace() {
+        return dslContext.select(NAMESPACE.fields())
+                .from(NAMESPACE)
+                .fetchInto(NamespaceRecord.class);
+    }
 }

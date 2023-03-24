@@ -30,8 +30,15 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     public ExportContext build(BigInteger asccpManifestId) {
         ULong asccpManifestIdULong = ULong.valueOf(asccpManifestId);
 
+        AsccpManifestRecord asccpManifestRecord = this.releaseDataProvider.findASCCPManifest(asccpManifestIdULong);
+        ReleaseRecord releaseRecord = releaseDataProvider.findRelease(asccpManifestRecord.getReleaseId());
+        NamespaceRecord namespaceRecord = releaseDataProvider.findNamespace(releaseRecord.getNamespaceId());
+
         DefaultExportContext context = new DefaultExportContext();
         ScoreModule scoreModule = new ScoreModule();
+        scoreModule.setReleaseNamespaceId(namespaceRecord.getNamespaceId());
+        scoreModule.setReleaseNamespacePrefix(namespaceRecord.getPrefix());
+        scoreModule.setReleaseNamespaceUri(namespaceRecord.getUri());
         scoreModule.setPath(getPath(asccpManifestIdULong));
 
         SchemaModule schemaModule = new SchemaModule(scoreModule, this);

@@ -144,17 +144,22 @@ public class ReleaseDataProvider implements DataProvider {
         List<AsccRecord> asccList = coreComponentRepositoryForRelease.findAllAscc(ULong.valueOf(releaseId));
         findAsccByFromAccIdMap = asccList.stream()
                 .collect(Collectors.groupingBy(AsccRecord::getFromAccId));
-
         findAsccMap = asccList.stream()
                 .collect(Collectors.toMap(AsccRecord::getAsccId, Function.identity()));
 
         findBlobContentList = coreComponentRepositoryForRelease.findAllBlobContent(ULong.valueOf(releaseId));
 
         findSeqKeyList = coreComponentRepositoryForRelease.findAllSeqKeyRecord();
-
         findSeqKeyMap = findSeqKeyList.stream()
                 .collect(Collectors.groupingBy(SeqKeyRecord::getFromAccManifestId));
 
+        findReleaseList = coreComponentRepositoryForRelease.findAllRelease();
+        findReleaseMap = findReleaseList.stream()
+                .collect(Collectors.toMap(ReleaseRecord::getReleaseId, Function.identity()));
+
+        findNamespaceList = coreComponentRepositoryForRelease.findAllNamespace();
+        findNamespaceMap = findNamespaceList.stream()
+                .collect(Collectors.toMap(NamespaceRecord::getNamespaceId, Function.identity()));
 
         logger.info("Ready for " + getClass().getSimpleName() + " in " + (System.currentTimeMillis() - s) / 1000d + " seconds");
     }
@@ -463,6 +468,32 @@ public class ReleaseDataProvider implements DataProvider {
     
     public List<BlobContentRecord> findBlobContent() {
         return findBlobContentList;
+    }
+
+    private List<ReleaseRecord> findReleaseList;
+    private Map<ULong, ReleaseRecord> findReleaseMap;
+
+    @Override
+    public List<ReleaseRecord> findRelease() {
+        return findReleaseList;
+    }
+
+    @Override
+    public ReleaseRecord findRelease(ULong releaseId) {
+        return findReleaseMap.get(releaseId);
+    }
+
+    private List<NamespaceRecord> findNamespaceList;
+    private Map<ULong, NamespaceRecord> findNamespaceMap;
+
+    @Override
+    public List<NamespaceRecord> findNamespace() {
+        return findNamespaceList;
+    }
+
+    @Override
+    public NamespaceRecord findNamespace(ULong namespaceId) {
+        return findNamespaceMap.get(namespaceId);
     }
 
 }
