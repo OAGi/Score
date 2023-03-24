@@ -259,6 +259,14 @@ public interface ASCCPViewEditPage extends Page {
 
     AddCommentDialog hitAddCommentButton();
 
+    WebElement getDefinitionField();
+
+    WebElement getDefinitionSourceField();
+
+    WebElement getDENField();
+
+    WebElement getPropertyTermField();
+
     /**
      * An interface of the ACC panel
      */

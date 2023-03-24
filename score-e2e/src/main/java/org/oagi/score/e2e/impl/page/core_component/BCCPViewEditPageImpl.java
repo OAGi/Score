@@ -48,7 +48,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//label/span[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -419,6 +419,26 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 }
             };
         });
+    }
+
+    @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefinitionSourceField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDENField() {
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getPropertyTermField() {
+        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
     }
 
     @Override

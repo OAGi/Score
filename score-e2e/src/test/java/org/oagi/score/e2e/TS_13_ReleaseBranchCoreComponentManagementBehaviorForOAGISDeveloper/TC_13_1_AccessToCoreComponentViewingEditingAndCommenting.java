@@ -367,6 +367,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertEquals("WIP", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -381,6 +383,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertEquals("WIP", accExtension.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -392,6 +396,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
+            assertDisabled(bccpViewEditPage.getDefinitionField());
+            assertDisabled(bccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(bccpViewEditPage.getDENField());
+            assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertEquals("WIP", bccp.getState());
             AddCommentDialog addCommentDialog = bccpViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -404,6 +412,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
+            assertDisabled(asccpViewEditPage.getDefinitionField());
+            assertDisabled(asccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(asccpViewEditPage.getDENField());
+            assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertEquals("WIP", asccp.getState());
             AddCommentDialog addCommentDialog = asccpViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -512,6 +524,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertTrue(acceptedStates.contains(acc.getState()));
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -526,6 +540,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertTrue(acceptedStates.contains(accExtension.getState()));
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -537,6 +553,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
+            assertDisabled(bccpViewEditPage.getDefinitionField());
+            assertDisabled(bccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(bccpViewEditPage.getDENField());
+            assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertTrue(acceptedStates.contains(bccp.getState()));
             AddCommentDialog addCommentDialog = bccpViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -549,6 +569,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
+            assertDisabled(asccpViewEditPage.getDefinitionField());
+            assertDisabled(asccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(asccpViewEditPage.getDENField());
+            assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertTrue(acceptedStates.contains(asccp.getState()));
             AddCommentDialog addCommentDialog = asccpViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -582,6 +606,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertTrue(acceptedStates.contains(accExtension.getState()));
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -675,6 +701,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertEquals("Production", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitAmendButton();});
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -690,6 +718,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertEquals("Production", accExtension.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitAmendButton();});
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -702,6 +732,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
+            assertDisabled(bccpViewEditPage.getDefinitionField());
+            assertDisabled(bccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(bccpViewEditPage.getDENField());
+            assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertEquals("Production", bccp.getState());
             assertThrows(TimeoutException.class, ()-> {bccpViewEditPage.hitAmendButton();});
             AddCommentDialog addCommentDialog = bccpViewEditPage.hitAddCommentButton();
@@ -715,6 +749,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
+            assertDisabled(asccpViewEditPage.getDefinitionField());
+            assertDisabled(asccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(asccpViewEditPage.getDENField());
+            assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertEquals("Production", asccp.getState());
             assertThrows(TimeoutException.class, ()-> {asccpViewEditPage.hitAmendButton();});
             AddCommentDialog addCommentDialog = asccpViewEditPage.hitAddCommentButton();
@@ -781,6 +819,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertEquals("Published", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
             assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
             assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitReviseButton();});
             AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
             addCommentDialog.setComment("some comment");
@@ -791,6 +831,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
+            assertDisabled(bccpViewEditPage.getDefinitionField());
+            assertDisabled(bccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(bccpViewEditPage.getDENField());
+            assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertEquals("Published", bccp.getState());
             assertThrows(TimeoutException.class, ()-> {bccpViewEditPage.hitReviseButton();});
             AddCommentDialog addCommentDialog = bccpViewEditPage.hitAddCommentButton();
@@ -802,6 +846,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
+            assertDisabled(asccpViewEditPage.getDefinitionField());
+            assertDisabled(asccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(asccpViewEditPage.getDENField());
+            assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertEquals("Published", asccp.getState());
             assertThrows(TimeoutException.class, ()-> {asccpViewEditPage.hitReviseButton();});
             AddCommentDialog addCommentDialog = asccpViewEditPage.hitAddCommentButton();

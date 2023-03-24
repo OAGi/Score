@@ -61,6 +61,14 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Change ACC\")]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+    private static final By PROPERTY_TERM_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+    private static final By DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By DEN_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
     private final ASCCPObject asccp;
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
@@ -389,6 +397,25 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 }
             };
         });
+    }
+    @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefinitionSourceField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDENField() {
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getPropertyTermField() {
+        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
     }
 
     @Override
