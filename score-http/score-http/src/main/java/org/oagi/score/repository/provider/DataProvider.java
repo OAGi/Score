@@ -105,4 +105,12 @@ public interface DataProvider {
 
     List<BlobContentRecord> findBlobContent();
 
+    List<ReleaseRecord> findRelease();
+
+    ReleaseRecord findRelease(ULong releaseId);
+
+    List<NamespaceRecord> findNamespace();
+
+    NamespaceRecord findNamespace(ULong namespaceId);
+
 }
