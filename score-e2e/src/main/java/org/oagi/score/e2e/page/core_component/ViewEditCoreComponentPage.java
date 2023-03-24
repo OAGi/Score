@@ -326,4 +326,5 @@ public interface ViewEditCoreComponentPage extends Page {
      */
     void setItemsPerPage(int items);
 
+    void selectAllComponentTypes();
 }
