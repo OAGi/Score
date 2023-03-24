@@ -546,6 +546,11 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getReusableCheckbox();
 
         /**
+         * Toggle the 'Reusable' checkbox.
+         */
+        void toggleReusable();
+
+        /**
          * Return the UI element of the 'Nillable' checkbox.
          *
          * @return the UI element of the 'Nillable' checkbox

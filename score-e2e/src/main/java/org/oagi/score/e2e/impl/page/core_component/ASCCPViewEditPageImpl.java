@@ -651,6 +651,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         }
 
         @Override
+        public void toggleReusable() {
+            click(getReusableCheckbox());
+        }
+
+        @Override
         public WebElement getNillableCheckbox() {
             return getCheckboxByName(baseXPath, "Nillable");
         }

@@ -249,11 +249,41 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
     }
     @Test
     public void test_TA_10_7_1_e() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+        ACCObject acc_WithNonReusableAsccp = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ASCCPObject asccp_NotReusable = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+        ASCCObject ascc = coreComponentAPI.appendASCC(acc_WithNonReusableAsccp, asccp_NotReusable, "WIP");
+        ascc.setCardinalityMax(1);
+        coreComponentAPI.updateASCC(ascc);
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel =asccpViewEditPage.getASCCPPanel();
+        asccpPanel.toggleReusable();
+        asccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation(asccp_NotReusable.getDen());
+        assertTrue("Target ASCCP is not resuable.".equals(getSnackBarMessage(getDriver())));
     }
 
     @Test
     public void test_TA_10_7_1_f() {
+
 
     }
 
