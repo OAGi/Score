@@ -2,7 +2,10 @@ package org.oagi.score.repo.component.graph;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record4;
+import org.jooq.Record5;
+import org.jooq.Record6;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.graph.data.FindUsagesResponse;
 import org.oagi.score.gateway.http.api.graph.data.Graph;

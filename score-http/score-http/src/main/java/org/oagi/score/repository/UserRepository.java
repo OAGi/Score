@@ -4,8 +4,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
+import org.oagi.score.service.common.data.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

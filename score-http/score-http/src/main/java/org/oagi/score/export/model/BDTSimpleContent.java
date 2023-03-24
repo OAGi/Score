@@ -1,11 +1,11 @@
 package org.oagi.score.export.model;
 
 import org.jooq.types.ULong;
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScRecord;
+import org.oagi.score.repository.provider.DataProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -25,27 +25,27 @@ public class BDTSimpleContent extends AbstractBDTSimple {
 
     private List<BDTSC> dtScList;
 
-    private ImportedDataProvider importedDataProvider;
+    private DataProvider dataProvider;
 
     public BDTSimpleContent(DtManifestRecord dtManifestRecord, DtRecord dataType,
                             DtManifestRecord baseDtManifestRecord, DtRecord baseDataType,
                             boolean isDefaultBDT,
                             Map<DtScManifestRecord, DtScRecord> dtScMap,
-                            ImportedDataProvider importedDataProvider) {
-        super(importedDataProvider);
+                            DataProvider dataProvider) {
+        super(dataProvider);
 
         this.dtManifestRecord = dtManifestRecord;
         this.dataType = dataType;
         this.baseDtManifestRecord = baseDtManifestRecord;
         this.baseDataType = baseDataType;
         this.isDefaultBDT = isDefaultBDT;
-        this.importedDataProvider = importedDataProvider;
+        this.dataProvider = dataProvider;
         this.dtScList = map(dtScMap);
     }
 
     private List<BDTSC> map(Map<DtScManifestRecord, DtScRecord> dtScMap) {
         return dtScMap.entrySet().stream()
-                .map(entry -> new BDTSC(entry.getKey(), entry.getValue(), importedDataProvider))
+                .map(entry -> new BDTSC(entry.getKey(), entry.getValue(), dataProvider))
                 .collect(Collectors.toList());
     }
 

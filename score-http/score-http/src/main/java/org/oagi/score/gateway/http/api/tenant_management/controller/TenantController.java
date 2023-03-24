@@ -1,10 +1,10 @@
 package org.oagi.score.gateway.http.api.tenant_management.controller;
 
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.tenant_management.data.Tenant;
 import org.oagi.score.gateway.http.api.tenant_management.data.TenantInfo;
 import org.oagi.score.gateway.http.api.tenant_management.data.TenantListRequest;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;

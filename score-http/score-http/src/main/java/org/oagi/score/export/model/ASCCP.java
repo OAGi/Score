@@ -1,11 +1,11 @@
 package org.oagi.score.export.model;
 
 import org.oagi.score.common.util.Utility;
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpRecord;
+import org.oagi.score.repository.provider.DataProvider;
 
 public abstract class ASCCP implements Component {
 
@@ -18,9 +18,9 @@ public abstract class ASCCP implements Component {
     }
 
     public static ASCCP newInstance(AsccpRecord asccp, AsccpManifestRecord asccpManifest,
-                                    ImportedDataProvider importedDataProvider) {
-        AccManifestRecord roleOfAccManifest = importedDataProvider.findACCManifest(asccpManifest.getRoleOfAccManifestId());
-        AccRecord roleOfAcc = importedDataProvider.findACC(roleOfAccManifest.getAccId());
+                                    DataProvider dataProvider) {
+        AccManifestRecord roleOfAccManifest = dataProvider.findACCManifest(asccpManifest.getRoleOfAccManifestId());
+        AccRecord roleOfAcc = dataProvider.findACC(roleOfAccManifest.getAccId());
         if (roleOfAcc == null) {
             throw new IllegalStateException();
         }
