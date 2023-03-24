@@ -12,11 +12,12 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.common.ScoreConstants.ANY_ASCCP_DEN;
 
-public class DefaultExportContextBuilder {
+public class DefaultExportContextBuilder implements SchemaModuleTraversal {
 
     private ModuleRepository moduleRepository;
 
@@ -38,7 +39,8 @@ public class DefaultExportContextBuilder {
 
         List<ScoreModule> moduleList = moduleRepository.findAll(ULong.valueOf(moduleSetReleaseId));
         Map<ULong, SchemaModule> moduleMap = moduleList.stream()
-                .collect(Collectors.toMap(ScoreModule::getModuleId, SchemaModule::new));
+                .map(e -> new SchemaModule(e, this))
+                .collect(Collectors.toMap(SchemaModule::getModuleId, Function.identity()));
 
         createSchemaModules(context, moduleMap);
         createAgencyIdList(moduleMap);
@@ -154,7 +156,7 @@ public class DefaultExportContextBuilder {
             }
             DtRecord bdt = importedDataProvider.findDT(bdtManifest.getDtId());
             DtManifestRecord basedDtManifest =
-                    importedDataProvider.findDtManifest(bdtManifest.getBasedDtManifestId());
+                    importedDataProvider.findDtManifestByDtManifestId(bdtManifest.getBasedDtManifestId());
 
             DtRecord baseDataType = importedDataProvider.findDT(basedDtManifest.getDtId());
             ModuleCCID moduleCCID = importedDataProvider.findModuleDt(bdt.getDtId());
@@ -386,6 +388,57 @@ public class DefaultExportContextBuilder {
             }
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
             schemaModule.setContent(blobContent.getContent());
+        }
+    }
+
+    @Override
+    public void traverse(SchemaModule schemaModule, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+        for (SchemaModule include : schemaModule.getIncludeModules()) {
+            schemaModuleVisitor.visitIncludeModule(include);
+        }
+
+        for (SchemaModule imported : schemaModule.getImportModules()) {
+            schemaModuleVisitor.visitIncludeModule(imported);
+        }
+
+        for (AgencyId agencyId : schemaModule.getAgencyIdMap().values()) {
+            schemaModuleVisitor.visitAgencyId(agencyId);
+        }
+
+        for (SchemaCodeList codeList : schemaModule.getCodeListMap().values()) {
+            schemaModuleVisitor.visitCodeList(codeList);
+        }
+
+        for (XBTSimpleType xbtSimple : schemaModule.getXBTSimpleTypeMap().values()) {
+            schemaModuleVisitor.visitXBTSimpleType(xbtSimple);
+        }
+
+        for (BDTSimple bdtSimple : schemaModule.getBDTSimpleMap().values()) {
+            if (bdtSimple instanceof BDTSimpleType) {
+                schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
+            } else if (bdtSimple instanceof BDTSimpleContent) {
+                schemaModuleVisitor.visitBDTSimpleContent((BDTSimpleContent) bdtSimple);
+            }
+        }
+
+        for (BCCP bccp : schemaModule.getBCCPMap().values()) {
+            schemaModuleVisitor.visitBCCP(bccp);
+        }
+
+        for (ACC acc : schemaModule.getACCMap().values()) {
+            if (acc instanceof ACCComplexType) {
+                schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
+            } else if (acc instanceof ACCGroup) {
+                schemaModuleVisitor.visitACCGroup((ACCGroup) acc);
+            }
+        }
+
+        for (ASCCP asccp : schemaModule.getASCCPMap().values()) {
+            if (asccp instanceof ASCCPComplexType) {
+                schemaModuleVisitor.visitASCCPComplexType((ASCCPComplexType) asccp);
+            } else if (asccp instanceof ASCCPGroup) {
+                schemaModuleVisitor.visitASCCPGroup((ASCCPGroup) asccp);
+            }
         }
     }
 }

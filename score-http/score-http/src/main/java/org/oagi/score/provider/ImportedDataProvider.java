@@ -58,6 +58,9 @@ public class ImportedDataProvider {
         findDtMap = findDtList.stream()
                 .collect(Collectors.toMap(DtRecord::getDtId, Function.identity()));
 
+        findDtScByOwnerDtIdMap = ccRepository.findAllDtSc(ULong.valueOf(moduleSetReleaseId)).stream()
+                .collect(Collectors.groupingBy(DtScRecord::getOwnerDtId));
+
         findDtScManifestByOwnerDtManifestIdMap = ccRepository.findAllDtScManifest(ULong.valueOf(moduleSetReleaseId)).stream()
                 .collect(Collectors.groupingBy(DtScManifestRecord::getOwnerDtManifestId));
         findDtScMap = ccRepository.findAllDtSc(ULong.valueOf(moduleSetReleaseId)).stream()
@@ -132,9 +135,13 @@ public class ImportedDataProvider {
 
         findBccManifestMap = ccRepository.findAllBccManifest(ULong.valueOf(moduleSetReleaseId)).stream()
                 .collect(Collectors.toMap(BccManifestRecord::getBccManifestId, Function.identity()));
+        findBccManifestByAccManifestIdMap = findBccManifestMap.values().stream()
+                .collect(Collectors.groupingBy(BccManifestRecord::getFromAccManifestId));
 
         findAsccManifestMap = ccRepository.findAllAsccManifest(ULong.valueOf(moduleSetReleaseId)).stream()
                 .collect(Collectors.toMap(AsccManifestRecord::getAsccManifestId, Function.identity()));
+        findAsccManifestByAccManifestIdMap = findAsccManifestMap.values().stream()
+                .collect(Collectors.groupingBy(AsccManifestRecord::getFromAccManifestId));
 
         List<AsccRecord> asccList = ccRepository.findAllAscc(ULong.valueOf(moduleSetReleaseId));
         findAsccByFromAccIdMap = asccList.stream()
@@ -252,7 +259,7 @@ public class ImportedDataProvider {
 
     private Map<ULong, DtManifestRecord> findDtManifestMap;
 
-    public DtManifestRecord findDtManifest(ULong dtManifestId) {
+    public DtManifestRecord findDtManifestByDtManifestId(ULong dtManifestId) {
         return findDtManifestMap.get(dtManifestId);
     }
 
@@ -280,6 +287,13 @@ public class ImportedDataProvider {
 
     public DtScRecord findDtSc(ULong dtScId) {
         return findDtScMap.get(dtScId);
+    }
+
+    private Map<ULong, List<DtScRecord>> findDtScByOwnerDtIdMap;
+
+
+    public List<DtScRecord> findDtScByOwnerDtId(ULong ownerDtId) {
+        return (findDtScByOwnerDtIdMap.containsKey(ownerDtId)) ? findDtScByOwnerDtIdMap.get(ownerDtId) : Collections.emptyList();
     }
 
     private Map<ULong, List<BdtPriRestriRecord>> findBdtPriRestriListByDtManifestIdMap;
@@ -478,17 +492,33 @@ public class ImportedDataProvider {
     }
 
     private Map<ULong, AsccManifestRecord> findAsccManifestMap;
+    private Map<ULong, List<AsccManifestRecord>> findAsccManifestByAccManifestIdMap;
 
     
     public AsccManifestRecord findASCCManifest(ULong asccId) {
         return findAsccManifestMap.get(asccId);
     }
 
+    public List<AsccManifestRecord> findASCCManifestByFromAccManifestId(ULong fromAccManifestId) {
+        if (!findAsccManifestByAccManifestIdMap.containsKey(fromAccManifestId)) {
+            return Collections.emptyList();
+        }
+        return findAsccManifestByAccManifestIdMap.get(fromAccManifestId);
+    }
+
     private Map<ULong, BccManifestRecord> findBccManifestMap;
+    private Map<ULong, List<BccManifestRecord>> findBccManifestByAccManifestIdMap;
 
     
     public BccManifestRecord findBCCManifest(ULong bccId) {
         return findBccManifestMap.get(bccId);
+    }
+
+    public List<BccManifestRecord> findBCCManifestByFromAccManifestId(ULong fromAccManifestId) {
+        if (!findBccManifestByAccManifestIdMap.containsKey(fromAccManifestId)) {
+            return Collections.emptyList();
+        }
+        return findBccManifestByAccManifestIdMap.get(fromAccManifestId);
     }
 
     private Map<ULong, List<AsccRecord>> findAsccByFromAccIdMap;

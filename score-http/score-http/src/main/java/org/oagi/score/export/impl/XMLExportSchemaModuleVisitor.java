@@ -120,7 +120,6 @@ public class XMLExportSchemaModuleVisitor {
         return builder.build(new StringReader(text)).getRootElement();
     }
 
-
     public void visitIncludeModule(SchemaModule includeSchemaModule) throws Exception {
         Element includeElement = new Element("include", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(includeSchemaModule);
@@ -128,14 +127,12 @@ public class XMLExportSchemaModuleVisitor {
         rootElement.addContent(includeElement);
     }
 
-
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception {
         Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(importElement);
     }
-
 
     public void visitAgencyId(AgencyId agencyId) throws Exception {
         // ContentType part
@@ -187,7 +184,6 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception {
         String name = schemaCodeList.getName();
         if (schemaCodeList.getEnumTypeGuid() != null) {
@@ -227,7 +223,6 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitXBTSimpleType(XBTSimpleType xbtSimpleType) throws Exception {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
         String name = xbtSimpleType.getName();
@@ -254,7 +249,6 @@ public class XMLExportSchemaModuleVisitor {
 
         rootElement.addContent(simpleTypeElement);
     }
-
 
     public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
@@ -761,7 +755,6 @@ public class XMLExportSchemaModuleVisitor {
         return element;
     }
 
-
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
         switch (accComplexType.getOagisComponentType()) {
             case OAGIS10Nouns:
@@ -879,7 +872,6 @@ public class XMLExportSchemaModuleVisitor {
                         sequenceElement.addContent(element);
                         setDocumentation(element, ascc.getDefinition(), ascc.getDefinitionSource());
                     }
-
                 }
             } else {
                 BccManifestRecord bccManifest = importedDataProvider.findBCCManifest(seqKey.getBccManifestId());
@@ -988,11 +980,9 @@ public class XMLExportSchemaModuleVisitor {
         return null;
     }
 
-
     public void visitACCGroup(ACCGroup accGroup) throws Exception {
         // not implemented yet
     }
-
 
     public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception {
         /*
@@ -1008,11 +998,9 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception {
         // not implemented yet
     }
-
 
     public void visitBlobContent(byte[] content) throws Exception {
         this.document = createDocument(content);
@@ -1041,10 +1029,7 @@ public class XMLExportSchemaModuleVisitor {
         return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".xsd";
     }
 
-
     public File endSchemaModule(SchemaModule schemaModule) throws Exception {
-
-
         FileUtils.forceMkdir(this.moduleFile.getParentFile());
 
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
