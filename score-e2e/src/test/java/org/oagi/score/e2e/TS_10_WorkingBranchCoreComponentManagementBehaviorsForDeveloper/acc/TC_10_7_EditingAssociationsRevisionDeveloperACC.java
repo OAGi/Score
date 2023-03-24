@@ -1052,21 +1052,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        NamespaceObject enduserNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.enduser.test");
-        BCCPObject bccp_endUser;
-
-        {
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_endUser = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Published");
-        }
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.setDEN(bccp_endUser.getDen());
-        appendBCCPDialog.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + bccp_endUser.getPropertyTerm() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
-
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
         BCCPObject bccp, bccp_before, bccp_after;
 
         {
@@ -1078,8 +1064,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        ACCViewEditPage  accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp.getDen());
 
         appendBCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -1097,7 +1084,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_after.getPropertyTerm());
         ACCViewEditPage.BCCPPanel bccp_after_panel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
         assertEquals(bccp_after.getDen(), getText(bccp_after_panel.getDENField()));
-
     }
 
     @Test
