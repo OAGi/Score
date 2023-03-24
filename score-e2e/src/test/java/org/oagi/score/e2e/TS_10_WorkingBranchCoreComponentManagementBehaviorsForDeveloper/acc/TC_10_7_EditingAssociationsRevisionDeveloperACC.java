@@ -826,11 +826,103 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_7_5_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+        ccStates.add("Published");
+        ccStates.add("Deleted");
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
+            BCCPObject bccp;
+            WebElement bccNode;
+            String state = entry.getKey();
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+            appendBCCPDialog.selectAssociation(bccp.getDen());
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+            assertEquals(state, getText(bccpPanel.getStateField()));
+        }
     }
 
     @Test
     public void test_TA_10_7_5_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp_to_append.getBccpManifestId());
+        bccpViewEditPage.hitReviseButton();
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        bccpPanel.toggleDeprecated();
+        bccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.setDEN(bccp_to_append.getDen());
+        appendBCCPDialog.hitSearchButton();
+        By APPEND_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+                td = tr.findElement(By.className("mat-column-" + "den"));
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an association using " + bccp_to_append.getDen(), e);
+            }
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
+
+            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
+            waitFor(ofMillis(500));
+        });
 
     }
 
