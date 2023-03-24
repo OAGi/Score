@@ -490,21 +490,25 @@ public class ReleaseService implements InitializingBean {
 
         try {
             List<File> files = new ArrayList<>();
-            Map<BigInteger, ReleaseDataProvider> dataProviderMap = new HashMap();
+            Map<BigInteger, ReleaseDataProvider> dataProviderMap = new ConcurrentHashMap<>();
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
             List<Exception> exceptions = new ArrayList<>();
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
                 try {
                     BigInteger releaseId = releaseRepository.getReleaseIdByAsccpManifestId(ULong.valueOf(asccpManifestId));
-                    if (!dataProviderMap.containsKey(releaseId)) {
-                        dataProviderMap.put(releaseId, new ReleaseDataProvider(coreComponentRepositoryForRelease, releaseId));
+                    ReleaseDataProvider dataProvider;
+                    synchronized (dataProviderMap) {
+                        if (!dataProviderMap.containsKey(releaseId)) {
+                            dataProviderMap.put(releaseId, new ReleaseDataProvider(coreComponentRepositoryForRelease, releaseId));
+                        }
+                        dataProvider = dataProviderMap.get(releaseId);
                     }
-                    ReleaseDataProvider dataProvider = dataProviderMap.get(releaseId);
 
                     XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
                     visitor.setBaseDirectory(baseDir);
 
-                    StandaloneExportContextBuilder builder = new StandaloneExportContextBuilder(dataProvider, pathCounter);
+                    StandaloneExportContextBuilder builder =
+                            new StandaloneExportContextBuilder(dataProvider, coreComponentService, pathCounter);
                     ExportContext exportContext = builder.build(asccpManifestId);
 
                     SchemaModule schemaModule = exportContext.getSchemaModules().iterator().next();
