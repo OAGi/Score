@@ -3,7 +3,7 @@ package org.oagi.score.e2e.page.code_list;
 import org.oagi.score.e2e.page.Dialog;
 import org.openqa.selenium.WebElement;
 
-public interface AddCodeListCommentDialog extends Dialog {
+public interface AddCommentDialog extends Dialog {
     void setComment(String comment);
 
     WebElement getCommentField();

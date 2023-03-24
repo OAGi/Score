@@ -6,7 +6,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -216,7 +216,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
         }
@@ -257,7 +257,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
             editCodeListPage.hitRevise();
@@ -352,7 +352,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
         }
@@ -405,7 +405,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
         }
@@ -459,7 +459,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             pressEscape();
         }

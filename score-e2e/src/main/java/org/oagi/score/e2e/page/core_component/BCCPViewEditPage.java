@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.core_component;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -234,6 +235,8 @@ public interface BCCPViewEditPage extends Page {
      */
     ASCCPanelContainer getASCCPanelContainer(WebElement asccNode);
 
+    WebElement getAddCommentButton();
+
     /**
      * Return the BCC panel container.
      *
@@ -241,6 +244,8 @@ public interface BCCPViewEditPage extends Page {
      * @return the BCC panel container
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
+
+    AddCommentDialog hitAddCommentButton();
 
     /**
      * An interface of the ACC panel
