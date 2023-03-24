@@ -620,6 +620,220 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         assertDisabled(asccPanel.getDeprecatedCheckbox());
     }
 
+    @Test
+    public void test_TA_10_7_4_a() {
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMin(25);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        asccPanel.setCardinalityMinField("30");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Min must be less than or equals to\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
+    }
+
+    @Test
+    public void test_TA_10_7_4_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMin(25);
+            ascc.setCardinalityMax(75);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        asccPanel.setCardinalityMaxField("50");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Max must be greater than\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
+    }
+
+    @Test
+    public void test_TA_10_7_4_c() {
+
+    }
+
+
+    @Test
+    public void test_TA_10_7_4_d() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_5_a() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_5_b() {
+
+    }
+
+
+    @Test
+    public void test_TA_10_7_5_c() {
+
+    }
+
+
+    @Test
+    public void test_TA_10_7_5_d() {
+
+    }
+
+
+    @Test
+    public void test_TA_10_7_5_e() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_6() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_a() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_b() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_c() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_d() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_e() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_f() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_7_g() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_a() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_b() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_c() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_d() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_e() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_8_f() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_9() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_10() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_11() {
+
+    }
+
+    @Test
+    public void test_TA_10_7_12_a() {
+
+    }
+
+
+
+
+
+
 
 
 }
