@@ -284,7 +284,34 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
     @Test
     public void test_TA_10_7_1_f() {
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+        ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, endUserNamespace, "WIP");
+        ASCCPObject asccp_endUser = coreComponentAPI.createRandomASCCP(acc_association, endUser, endUserNamespace, "WIP");
+        ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp_endUser, "WIP");
+        ascc.setCardinalityMax(1);
+        coreComponentAPI.updateASCC(ascc);
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.setDEN(asccp_endUser.getDen());
+        appendASCCPDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + asccp_endUser.getPropertyTerm() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
     }
 
     @Test
