@@ -2,10 +2,16 @@ package org.oagi.score.gateway.http.api.cc_management.controller;
 
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcListService;
+import org.oagi.score.gateway.http.api.module_management.data.ExportStandaloneSchemaResponse;
+import org.oagi.score.gateway.http.api.module_management.service.ModuleSetReleaseService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.helper.DeleteOnCloseFileSystemResource;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -13,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -189,6 +197,32 @@ public class CcListController {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+
+    @Autowired
+    private ModuleSetReleaseService moduleSetReleaseService;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @RequestMapping(value = "/core_component/export/standalone", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "asccpManifestIdList", required = true) String asccpManifestIdList) throws Exception {
+
+        ExportStandaloneSchemaResponse response =
+                moduleSetReleaseService.exportStandaloneSchema(sessionService.asScoreUser(user),
+                        Arrays.stream(asccpManifestIdList.split(",")).map(e -> new BigInteger(e)).collect(Collectors.toList()));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType(
+                        (response.getFilename().endsWith(".zip") ? "application/zip" : "application/xml")
+                ))
+                .contentLength(response.getFile().length())
+                .body(new DeleteOnCloseFileSystemResource(response.getFile()));
     }
 
 }

@@ -1,13 +1,16 @@
 package org.oagi.score.gateway.http.api.module_management.service;
 
 import org.apache.commons.io.FileUtils;
+import org.jooq.types.ULong;
 import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.impl.DefaultExportContextBuilder;
+import org.oagi.score.export.impl.StandaloneExportContextBuilder;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.export.model.SchemaModule;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.gateway.http.api.module_management.data.AssignCCToModule;
 import org.oagi.score.gateway.http.api.module_management.data.ExportModuleSetReleaseResponse;
+import org.oagi.score.gateway.http.api.module_management.data.ExportStandaloneSchemaResponse;
 import org.oagi.score.gateway.http.api.module_management.data.ModuleAssignComponents;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.provider.ImportedDataProvider;
@@ -29,9 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -224,5 +226,66 @@ public class ModuleSetReleaseService {
             request.setModuleSetReleaseId(assignCCToModule.getModuleSetReleaseId());
             repo.deleteModuleManifest(request);
         });
+    }
+
+    public ExportStandaloneSchemaResponse exportStandaloneSchema(
+            ScoreUser user, List<BigInteger> asccpManifestIdList) throws Exception {
+        if (asccpManifestIdList == null || asccpManifestIdList.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        File baseDir = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
+        FileUtils.forceMkdir(baseDir);
+
+        try {
+            List<File> files = new ArrayList<>();
+            Map<BigInteger, ImportedDataProvider> dataProviderMap = new HashMap();
+            Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
+            List<Exception> exceptions = new ArrayList<>();
+            asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
+                try {
+                    BigInteger moduleSetReleaseId = moduleRepository.getModuleSetReleaseIdByAsccpManifestId(ULong.valueOf(asccpManifestId));
+                    if (!dataProviderMap.containsKey(moduleSetReleaseId)) {
+                        dataProviderMap.put(moduleSetReleaseId, new ImportedDataProvider(ccRepository, moduleSetReleaseId));
+                    }
+                    ImportedDataProvider dataProvider = dataProviderMap.get(moduleSetReleaseId);
+
+                    XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
+                    visitor.setBaseDirectory(baseDir);
+
+                    StandaloneExportContextBuilder builder = new StandaloneExportContextBuilder(moduleRepository, dataProvider, pathCounter);
+                    ExportContext exportContext = builder.build(moduleSetReleaseId, asccpManifestId);
+
+                    SchemaModule schemaModule = exportContext.getSchemaModules().iterator().next();
+                    schemaModule.visit(visitor);
+                    File file = schemaModule.getModuleFile();
+                    if (file != null) {
+                        files.add(file);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Unexpected error occurs while it generates a stand-alone schema for 'asccp_manifest_id' [" + asccpManifestId + "]", e);
+                    exceptions.add(e);
+                }
+            });
+
+            if (!exceptions.isEmpty()) {
+                throw new IllegalStateException(exceptions.stream().map(e -> e.getMessage()).collect(Collectors.joining("\n")));
+            }
+
+            if (files.size() == 1) {
+                File srcFile = files.get(0);
+                File destFile = File.createTempFile("oagis-", null);
+                if (!srcFile.renameTo(destFile)) {
+                    FileUtils.copyFile(srcFile, destFile);
+                }
+                String filename = srcFile.getName();
+                return new ExportStandaloneSchemaResponse(filename, destFile);
+            } else {
+                return new ExportStandaloneSchemaResponse(UUID.randomUUID() + ".zip",
+                        Zip.compressionHierarchy(baseDir, files));
+            }
+        } finally {
+            FileUtils.deleteDirectory(baseDir);
+        }
     }
 }
