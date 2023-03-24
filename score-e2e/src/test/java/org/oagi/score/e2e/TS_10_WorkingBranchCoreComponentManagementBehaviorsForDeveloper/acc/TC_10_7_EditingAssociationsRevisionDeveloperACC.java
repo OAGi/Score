@@ -701,14 +701,127 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_7_4_c() {
+    public void test_TA_10_7_4_c_deprecated_in_previous_version() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setDeprecated(true);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        assertChecked(asccPanel.getDeprecatedCheckbox());
+        assertDisabled(asccPanel.getDeprecatedCheckbox());
+
+    }
+
+    @Test
+    public void test_TA_10_7_4_c_not_deprecated_in_previous_version() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setDeprecated(false);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        assertNotChecked(asccPanel.getDeprecatedCheckbox());
+        assertEnabled(asccPanel.getDeprecatedCheckbox());
     }
 
 
     @Test
     public void test_TA_10_7_4_d() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        //check max greater than min
+        asccPanel.setCardinalityMinField("111");
+        asccPanel.setCardinalityMaxField("11");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be less than or equal\")]")).size());
+        accViewEditPage.hitUpdateButton();
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
+
+        assertEquals("11", getText(asccPanel.getCardinalityMinField()));
     }
 
     @Test
