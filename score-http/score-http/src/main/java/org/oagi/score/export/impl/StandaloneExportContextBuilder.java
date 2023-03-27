@@ -338,7 +338,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
 
         for (SchemaModule imported : schemaModule.getImportModules()) {
-            schemaModuleVisitor.visitIncludeModule(imported);
+            schemaModuleVisitor.visitImportModule(imported);
         }
 
         Map<String, ACC> accMap = new HashMap<>(schemaModule.getACCMap());

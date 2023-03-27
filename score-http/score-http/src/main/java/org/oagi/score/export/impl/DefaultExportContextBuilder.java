@@ -398,7 +398,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         }
 
         for (SchemaModule imported : schemaModule.getImportModules()) {
-            schemaModuleVisitor.visitIncludeModule(imported);
+            schemaModuleVisitor.visitImportModule(imported);
         }
 
         for (AgencyId agencyId : schemaModule.getAgencyIdMap().values()) {

@@ -130,6 +130,7 @@ public class XMLExportSchemaModuleVisitor {
         Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
+        importElement.setAttribute("namespace", importSchemaModule.getNamespaceUri());
         rootElement.addContent(importElement);
     }
 
