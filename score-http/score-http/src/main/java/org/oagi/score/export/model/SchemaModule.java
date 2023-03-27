@@ -4,31 +4,50 @@ import org.apache.commons.io.FilenameUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
+import org.springframework.data.util.Pair;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SchemaModule {
 
+    public enum OrderType {
+        AgencyId,
+        CodeList,
+        XBTSimple,
+        BDTSimple,
+        ACC,
+        BCCP,
+        ASCCP
+    }
+
     private final ScoreModule module;
 
     private List<SchemaModule> includeModules = new ArrayList();
     private List<SchemaModule> importModules = new ArrayList();
 
-    private List<AgencyId> agencyIdList = new ArrayList();
-    private List<SchemaCodeList> schemaCodeLists = new ArrayList();
-    private List<XBTSimpleType> xbtSimples = new ArrayList();
-    private List<BDTSimple> bdtSimples = new ArrayList();
+    private Map<String, AgencyId> agencyIdMap = new LinkedHashMap();
+    private Map<String, SchemaCodeList> schemaCodeListMap = new LinkedHashMap();
+    private Map<String, XBTSimpleType> xbtSimpleMap = new LinkedHashMap();
+    private Map<String, BDTSimple> bdtSimpleMap = new LinkedHashMap();
 
-    private List<BCCP> bccpList = new ArrayList();
-    private List<ACC> accList = new ArrayList();
-    private List<ASCCP> asccpList = new ArrayList();
+    private Map<String, BCCP> bccpMap = new LinkedHashMap();
+    private Map<String, ACC> accMap = new LinkedHashMap();
+    private Map<String, ASCCP> asccpMap = new LinkedHashMap();
+
+    private List<Pair<OrderType, String>> orders = new ArrayList<>();
 
     private byte[] content;
 
-    public SchemaModule(ScoreModule module) {
+    private File moduleFile;
+
+    private SchemaModuleTraversal schemaModuleTraversal;
+
+    public SchemaModule(ScoreModule module, SchemaModuleTraversal schemaModuleTraversal) {
         this.module = module;
+        this.schemaModuleTraversal = schemaModuleTraversal;
     }
 
     public String getPath() {
@@ -37,6 +56,14 @@ public class SchemaModule {
 
     public String getVersionNum() {
         return module.getVersionNum();
+    }
+
+    public ULong getModuleId() {
+        return module.getModuleId();
+    }
+
+    public ULong getModuleSetReleaseId() {
+        return module.getModuleSetReleaseId();
     }
 
     public ULong getNamespaceId() {
@@ -121,10 +148,18 @@ public class SchemaModule {
         }
     }
 
+    public List<SchemaModule> getIncludeModules() {
+        return includeModules;
+    }
+
     public void addImport(SchemaModule schemaModule) {
         if (!hasImport(schemaModule)) {
             importModules.add(schemaModule);
         }
+    }
+
+    public List<SchemaModule> getImportModules() {
+        return importModules;
     }
 
     public Collection<SchemaModule> getDependedModules() {
@@ -132,33 +167,95 @@ public class SchemaModule {
                 .collect(Collectors.toList());
     }
 
-    public void addAgencyId(AgencyId agencyId) {
-        this.agencyIdList.add(agencyId);
+    public boolean addAgencyId(AgencyId agencyId) {
+        if (this.agencyIdMap.containsKey(agencyId.getGuid())) {
+            return false;
+        }
+        this.agencyIdMap.put(agencyId.getGuid(), agencyId);
+        this.orders.add(Pair.of(OrderType.AgencyId, agencyId.getGuid()));
+        return true;
     }
 
-    public void addCodeList(SchemaCodeList schemaCodeList) {
-        this.schemaCodeLists.add(schemaCodeList);
+    public Map<String, AgencyId> getAgencyIdMap() {
+        return agencyIdMap;
     }
 
-    public void addXBTSimpleType(XBTSimpleType xbtSimple) {
-        this.xbtSimples.add(xbtSimple);
+    public boolean addCodeList(SchemaCodeList schemaCodeList) {
+        if (this.schemaCodeListMap.containsKey(schemaCodeList.getGuid())) {
+            return false;
+        }
+        this.schemaCodeListMap.put(schemaCodeList.getGuid(), schemaCodeList);
+        this.orders.add(Pair.of(OrderType.CodeList, schemaCodeList.getGuid()));
+        return true;
     }
 
-    public void addBDTSimple(BDTSimple bdtSimple) {
-
-        this.bdtSimples.add(bdtSimple);
+    public Map<String, SchemaCodeList> getCodeListMap() {
+        return schemaCodeListMap;
     }
 
-    public void addBCCP(BCCP bccp) {
-        this.bccpList.add(bccp);
+    public boolean addXBTSimpleType(XBTSimpleType xbtSimple) {
+        if (this.xbtSimpleMap.containsKey(xbtSimple.getGuid())) {
+            return false;
+        }
+        this.xbtSimpleMap.put(xbtSimple.getGuid(), xbtSimple);
+        this.orders.add(Pair.of(OrderType.XBTSimple, xbtSimple.getGuid()));
+        return true;
     }
 
-    public void addACC(ACC acc) {
-        this.accList.add(acc);
+    public Map<String, XBTSimpleType> getXBTSimpleTypeMap() {
+        return xbtSimpleMap;
     }
 
-    public void addASCCP(ASCCP asccp) {
-        this.asccpList.add(asccp);
+    public boolean addBDTSimple(BDTSimple bdtSimple) {
+        if (this.bdtSimpleMap.containsKey(bdtSimple.getGuid())) {
+            return false;
+        }
+        this.bdtSimpleMap.put(bdtSimple.getGuid(), bdtSimple);
+        this.orders.add(Pair.of(OrderType.BDTSimple, bdtSimple.getGuid()));
+        return true;
+    }
+
+    public Map<String, BDTSimple> getBDTSimpleMap() {
+        return bdtSimpleMap;
+    }
+
+    public boolean addBCCP(BCCP bccp) {
+        if (this.bccpMap.containsKey(bccp.getGuid())) {
+            return false;
+        }
+        this.bccpMap.put(bccp.getGuid(), bccp);
+        this.orders.add(Pair.of(OrderType.BCCP, bccp.getGuid()));
+        return true;
+    }
+
+    public Map<String, BCCP> getBCCPMap() {
+        return bccpMap;
+    }
+
+    public boolean addACC(ACC acc) {
+        if (this.accMap.containsKey(acc.getGuid())) {
+            return false;
+        }
+        this.accMap.put(acc.getGuid(), acc);
+        this.orders.add(Pair.of(OrderType.ACC, acc.getGuid()));
+        return true;
+    }
+
+    public Map<String, ACC> getACCMap() {
+        return accMap;
+    }
+
+    public boolean addASCCP(ASCCP asccp) {
+        if (this.asccpMap.containsKey(asccp.getGuid())) {
+            return false;
+        }
+        this.asccpMap.put(asccp.getGuid(), asccp);
+        this.orders.add(Pair.of(OrderType.ASCCP, asccp.getGuid()));
+        return true;
+    }
+
+    public Map<String, ASCCP> getASCCPMap() {
+        return asccpMap;
     }
 
     public void setContent(byte[] content) {
@@ -169,61 +266,17 @@ public class SchemaModule {
         schemaModuleVisitor.startSchemaModule(this);
 
         if (content == null) {
-            for (SchemaModule include: includeModules) {
-                schemaModuleVisitor.visitIncludeModule(include);
-            }
-
-            for (SchemaModule imported: importModules) {
-                schemaModuleVisitor.visitIncludeModule(imported);
-            }
-
-            for (AgencyId agencyId : agencyIdList) {
-                schemaModuleVisitor.visitAgencyId(agencyId);
-            }
-
-            for (SchemaCodeList codeList : schemaCodeLists) {
-                schemaModuleVisitor.visitCodeList(codeList);
-            }
-
-            for (XBTSimpleType xbtSimple : xbtSimples) {
-                schemaModuleVisitor.visitXBTSimpleType(xbtSimple);
-            }
-
-            for (BDTSimple bdtSimple : bdtSimples) {
-                if (bdtSimple instanceof BDTSimpleType) {
-                    schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
-                } else if (bdtSimple instanceof BDTSimpleContent) {
-                    schemaModuleVisitor.visitBDTSimpleContent((BDTSimpleContent) bdtSimple);
-                }
-            }
-
-            for (BCCP bccp : bccpList) {
-                schemaModuleVisitor.visitBCCP(bccp);
-            }
-
-            for (ACC acc : accList) {
-                if (acc instanceof ACCComplexType) {
-                    schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
-                } else if (acc instanceof ACCGroup) {
-                    schemaModuleVisitor.visitACCGroup((ACCGroup) acc);
-                }
-            }
-
-            for (ASCCP asccp : asccpList) {
-                if (asccp instanceof ASCCPComplexType) {
-                    schemaModuleVisitor.visitASCCPComplexType((ASCCPComplexType) asccp);
-                } else if (asccp instanceof ASCCPGroup) {
-                    schemaModuleVisitor.visitASCCPGroup((ASCCPGroup) asccp);
-                }
-            }
+            schemaModuleTraversal.traverse(this, schemaModuleVisitor);
         } else {
             schemaModuleVisitor.visitBlobContent(content);
         }
+
+        this.moduleFile = schemaModuleVisitor.endSchemaModule(this);
     }
 
     public void minimizeDependency() {
-        for (SchemaModule cur: new ArrayList<>(includeModules)) {
-            for (SchemaModule next: new ArrayList<>(includeModules)) {
+        for (SchemaModule cur : new ArrayList<>(includeModules)) {
+            for (SchemaModule next : new ArrayList<>(includeModules)) {
                 if (cur.equals(next)) {
                     continue;
                 }
@@ -233,8 +286,8 @@ public class SchemaModule {
             }
         }
 
-        for (SchemaModule cur: new ArrayList<>(importModules)) {
-            for (SchemaModule next: new ArrayList<>(importModules)) {
+        for (SchemaModule cur : new ArrayList<>(importModules)) {
+            for (SchemaModule next : new ArrayList<>(importModules)) {
                 if (cur.equals(next)) {
                     continue;
                 }
@@ -247,4 +300,13 @@ public class SchemaModule {
             }
         }
     }
+
+    public List<Pair<OrderType, String>> getOrders() {
+        return this.orders;
+    }
+
+    public File getModuleFile() {
+        return this.moduleFile;
+    }
+
 }

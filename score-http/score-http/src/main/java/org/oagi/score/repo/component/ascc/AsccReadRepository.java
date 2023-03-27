@@ -2,12 +2,13 @@ package org.oagi.score.repo.component.ascc;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.cc_management.data.CcList;
 import org.oagi.score.gateway.http.api.cc_management.data.CcRefactorValidationResponse;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccRecord;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.OagisComponentType;
@@ -21,12 +22,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.stripToNull;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.Acc.ACC;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest.ACC_MANIFEST;
-import static org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest.BCC_MANIFEST;
 
 @Repository
 public class AsccReadRepository {

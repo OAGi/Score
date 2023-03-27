@@ -3,32 +3,35 @@ package org.oagi.score.export.model;
 import org.jooq.types.ULong;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.common.util.Utility;
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpRecord;
+import org.oagi.score.repository.provider.DataProvider;
+import org.oagi.score.repository.provider.ModuleProvider;
 
 public abstract class ACC implements Component {
 
     private AccRecord acc;
     private ACC basedAcc;
 
-    private ImportedDataProvider importedDataProvider;
+    private DataProvider dataProvider;
     private Integer oagisComponentType;
 
     private ModuleCCID moduleCCID;
 
     ACC(AccRecord acc, ACC basedAcc,
-        ImportedDataProvider importedDataProvider) {
+        DataProvider dataProvider) {
         this.acc = acc;
         this.basedAcc = basedAcc;
-        this.importedDataProvider = importedDataProvider;
+        this.dataProvider = dataProvider;
         this.oagisComponentType = acc.getOagisComponentType();
-        this.moduleCCID = this.importedDataProvider.findModuleAcc(this.acc.getAccId());
+        if (dataProvider instanceof ModuleProvider) {
+            this.moduleCCID = ((ModuleProvider) this.dataProvider).findModuleAcc(this.acc.getAccId());
+        }
     }
 
     public static ACC newInstance(AccRecord acc, AccManifestRecord accManifest,
-                                  ImportedDataProvider importedDataProvider) {
+                                  DataProvider dataProvider) {
         switch (acc.getOagisComponentType()) {
             case 0: //Base
             case 1: //Semantics
@@ -39,16 +42,16 @@ public abstract class ACC implements Component {
             case 7: //OAGIS10BODs
                 ACC basedACC = null;
                 if (accManifest.getBasedAccManifestId() != null) {
-                    AccManifestRecord basedAccManifest = importedDataProvider.findACCManifest(accManifest.getBasedAccManifestId());
+                    AccManifestRecord basedAccManifest = dataProvider.findACCManifest(accManifest.getBasedAccManifestId());
                     if (basedAccManifest == null) {
                         throw new IllegalStateException();
                     }
-                    AccRecord basedAcc = importedDataProvider.findACC(basedAccManifest.getAccId());
-                    basedACC = newInstance(basedAcc, basedAccManifest, importedDataProvider);
+                    AccRecord basedAcc = dataProvider.findACC(basedAccManifest.getAccId());
+                    basedACC = newInstance(basedAcc, basedAccManifest, dataProvider);
                 }
-                return new ACCComplexType(acc, basedACC, accManifest, importedDataProvider);
+                return new ACCComplexType(acc, basedACC, accManifest, dataProvider);
             case 4: // UEG
-                return new ACCGroup(acc, null, importedDataProvider);
+                return new ACCGroup(acc, null, dataProvider);
             default:
                 throw new IllegalStateException();
         }
@@ -79,7 +82,7 @@ public abstract class ACC implements Component {
     }
 
     public boolean isGroup() {
-        AsccpRecord asccp = importedDataProvider.findASCCPByGuid(acc.getGuid());
+        AsccpRecord asccp = dataProvider.findASCCPByGuid(acc.getGuid());
         return asccp != null;
     }
 

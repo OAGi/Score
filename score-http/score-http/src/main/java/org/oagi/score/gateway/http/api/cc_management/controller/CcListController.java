@@ -2,10 +2,15 @@ package org.oagi.score.gateway.http.api.cc_management.controller;
 
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcListService;
+import org.oagi.score.gateway.http.api.module_management.data.ExportStandaloneSchemaResponse;
+import org.oagi.score.gateway.http.api.release_management.service.ReleaseService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.helper.DeleteOnCloseFileSystemResource;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -29,6 +34,12 @@ public class CcListController {
 
     @Autowired
     private CcListService service;
+
+    @Autowired
+    private ReleaseService releaseService;
+
+    @Autowired
+    private SessionService sessionService;
 
     private Date getDateFromString(String timeString) {
         DateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -189,6 +200,25 @@ public class CcListController {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/core_component/export/standalone", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "asccpManifestIdList", required = true) String asccpManifestIdList) throws Exception {
+
+        ExportStandaloneSchemaResponse response =
+                releaseService.exportStandaloneSchema(sessionService.asScoreUser(user),
+                        Arrays.stream(asccpManifestIdList.split(",")).map(e -> new BigInteger(e)).collect(Collectors.toList()));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType(
+                        (response.getFilename().endsWith(".zip") ? "application/zip" : "application/xml")
+                ))
+                .contentLength(response.getFile().length())
+                .body(new DeleteOnCloseFileSystemResource(response.getFile()));
     }
 
 }

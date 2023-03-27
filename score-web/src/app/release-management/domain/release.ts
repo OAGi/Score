@@ -26,6 +26,7 @@ export class ReleaseDetail {
   releaseLicense: string;
   state: string;
   namespaceId: number;
+  latestRelease: boolean;
 }
 
 export class ReleaseListRequest {

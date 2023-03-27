@@ -1,9 +1,7 @@
 package org.oagi.score.populate.helper;
 
 import com.sun.xml.xsom.*;
-import com.sun.xml.xsom.parser.XSOMParser;
 import net.sf.saxon.lib.NamespaceConstant;
-import org.oagi.score.common.ScoreConstants;
 import org.oagi.score.common.util.OAGiNamespaceContext;
 import org.oagi.score.common.util.Utility;
 import org.slf4j.Logger;
@@ -17,7 +15,6 @@ import org.xml.sax.Locator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.*;
 import java.io.File;
 import java.io.InputStream;

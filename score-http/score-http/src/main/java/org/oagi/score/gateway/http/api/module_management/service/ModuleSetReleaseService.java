@@ -9,14 +9,14 @@ import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.gateway.http.api.module_management.data.AssignCCToModule;
 import org.oagi.score.gateway.http.api.module_management.data.ExportModuleSetReleaseResponse;
 import org.oagi.score.gateway.http.api.module_management.data.ModuleAssignComponents;
+import org.oagi.score.gateway.http.api.module_management.provider.ModuleSetReleaseDataProvider;
 import org.oagi.score.gateway.http.helper.Zip;
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.corecomponent.model.CcType;
 import org.oagi.score.repo.api.module.ModuleSetReleaseWriteRepository;
 import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
-import org.oagi.score.repository.CcRepository;
+import org.oagi.score.repository.CoreComponentRepositoryForModuleSetRelease;
 import org.oagi.score.repository.ModuleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class ModuleSetReleaseService {
     private ScoreRepositoryFactory scoreRepositoryFactory;
 
     @Autowired
-    private CcRepository ccRepository;
+    private CoreComponentRepositoryForModuleSetRelease coreComponentRepositoryForModuleSetRelease;
 
     @Autowired
     private ModuleRepository moduleRepository;
@@ -114,7 +114,8 @@ public class ModuleSetReleaseService {
     public ExportModuleSetReleaseResponse exportModuleSetRelease(ScoreUser user, BigInteger moduleSetReleaseId) throws Exception {
         GetModuleSetReleaseRequest request = new GetModuleSetReleaseRequest(user);
         request.setModuleSetReleaseId(moduleSetReleaseId);
-        ModuleSetRelease moduleSetRelease = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getModuleSetRelease(request).getModuleSetRelease();
+        ModuleSetRelease moduleSetRelease = scoreRepositoryFactory.createModuleSetReleaseReadRepository()
+                .getModuleSetRelease(request).getModuleSetRelease();
         String fileName = moduleSetRelease.getModuleSetName().replace(" ", "");
         File baseDirectory = new File(new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString()), fileName);
         FileUtils.forceMkdir(baseDirectory);
@@ -127,7 +128,7 @@ public class ModuleSetReleaseService {
 
     private List<File> exportModuleSetReleaseWithoutCompression(ScoreUser user, BigInteger moduleSetReleaseId,
                                                                 File baseDirectory) throws Exception {
-        ImportedDataProvider dataProvider = new ImportedDataProvider(ccRepository, moduleSetReleaseId);
+        ModuleSetReleaseDataProvider dataProvider = new ModuleSetReleaseDataProvider(coreComponentRepositoryForModuleSetRelease, moduleSetReleaseId);
         DefaultExportContextBuilder builder = new DefaultExportContextBuilder(moduleRepository, dataProvider, moduleSetReleaseId);
         XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
         ExportContext exportContext = builder.build(moduleSetReleaseId);

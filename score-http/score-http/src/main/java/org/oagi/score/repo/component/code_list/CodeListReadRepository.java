@@ -1,9 +1,11 @@
 package org.oagi.score.repo.component.code_list;
 
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record2;
+import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CodeListManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScManifestRecord;
@@ -11,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;

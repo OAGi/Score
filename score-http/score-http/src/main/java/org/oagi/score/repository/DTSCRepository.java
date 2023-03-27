@@ -1,6 +1,8 @@
 package org.oagi.score.repository;
 
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record16;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.data.DTSC;

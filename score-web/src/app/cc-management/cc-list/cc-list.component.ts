@@ -37,6 +37,7 @@ import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'score-cc-list',
@@ -411,6 +412,27 @@ export class CcListComponent implements OnInit {
       });
   }
 
+  exportStandaloneSchemas() {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    this.loading = true;
+    this.service.exportStandaloneSchemas(this.selection.selected).subscribe(resp => {
+      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+    });
+  }
+
+  _getFilenameFromContentDisposition(resp) {
+    const contentDisposition = resp.headers.get('Content-Disposition') || '';
+    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
+  }
+
   hasCreatePermission(): boolean {
     const userToken = this.auth.getUserToken();
     if (this.request.release.state !== 'Published') {
@@ -689,6 +711,12 @@ export class CcListComponent implements OnInit {
       case 'Purge':
         return this.selection.selected.filter(e => {
           if (e.state === 'Deleted') {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Export':
+        return this.selection.selected.filter(e => {
+          if (e.type === 'ASCCP') {
             return e;
           }
         }).length === this.selection.selected.length;

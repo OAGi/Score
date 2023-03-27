@@ -1,8 +1,8 @@
 package org.oagi.score.repo.component.acc;
 
-import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.data.RepositoryRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcACCType;
+import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.math.BigInteger;

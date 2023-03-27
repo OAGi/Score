@@ -2,15 +2,14 @@ package org.oagi.score.export.service;
 
 
 import org.jooq.types.ULong;
-import org.oagi.score.provider.ImportedDataProvider;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.SeqKeyRecord;
+import org.oagi.score.repository.provider.DataProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 public class CoreComponentService {
 
     public List<SeqKeyRecord> getCoreComponents(
-            ULong accManifestId, ImportedDataProvider provider) {
+            ULong accManifestId, DataProvider provider) {
         List<SeqKeyRecord> seqKeyList = provider.getSeqKeys(accManifestId);
 
         return sort(seqKeyList);

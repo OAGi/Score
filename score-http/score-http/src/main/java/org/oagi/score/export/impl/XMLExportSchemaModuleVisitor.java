@@ -12,9 +12,8 @@ import org.oagi.score.common.util.Utility;
 import org.oagi.score.export.model.*;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.populate.helper.Context;
-import org.oagi.score.provider.ImportedDataProvider;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repository.provider.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -52,11 +51,11 @@ public class XMLExportSchemaModuleVisitor {
 
     private CoreComponentService coreComponentService;
 
-    private ImportedDataProvider importedDataProvider;
+    private DataProvider dataProvider;
 
-    public XMLExportSchemaModuleVisitor(CoreComponentService coreComponentService, ImportedDataProvider importedDataProvider) {
+    public XMLExportSchemaModuleVisitor(CoreComponentService coreComponentService, DataProvider dataProvider) {
         this.coreComponentService = coreComponentService;
-        this.importedDataProvider = importedDataProvider;
+        this.dataProvider = dataProvider;
     }
 
     public void setBaseDirectory(File baseDirectory) throws IOException {
@@ -120,7 +119,6 @@ public class XMLExportSchemaModuleVisitor {
         return builder.build(new StringReader(text)).getRootElement();
     }
 
-
     public void visitIncludeModule(SchemaModule includeSchemaModule) throws Exception {
         Element includeElement = new Element("include", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(includeSchemaModule);
@@ -128,14 +126,12 @@ public class XMLExportSchemaModuleVisitor {
         rootElement.addContent(includeElement);
     }
 
-
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception {
         Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(importElement);
     }
-
 
     public void visitAgencyId(AgencyId agencyId) throws Exception {
         // ContentType part
@@ -187,7 +183,6 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception {
         String name = schemaCodeList.getName();
         if (schemaCodeList.getEnumTypeGuid() != null) {
@@ -227,7 +222,6 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitXBTSimpleType(XBTSimpleType xbtSimpleType) throws Exception {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
         String name = xbtSimpleType.getName();
@@ -254,7 +248,6 @@ public class XMLExportSchemaModuleVisitor {
 
         rootElement.addContent(simpleTypeElement);
     }
-
 
     public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
@@ -413,26 +406,26 @@ public class XMLExportSchemaModuleVisitor {
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                importedDataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
+                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
                         .filter(e -> e.getCodeListManifestId() != null).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
-        CodeListManifestRecord codeListManifest = importedDataProvider.findCodeListManifest(bdtPriRestriList.get(0).getCodeListManifestId());
-        CodeListRecord codeList = importedDataProvider.findCodeList(codeListManifest.getCodeListId());
+        CodeListManifestRecord codeListManifest = dataProvider.findCodeListManifest(bdtPriRestriList.get(0).getCodeListManifestId());
+        CodeListRecord codeList = dataProvider.findCodeList(codeListManifest.getCodeListId());
         return codeList.getName();
     }
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                importedDataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
+                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
                         .filter(e -> e.getAgencyIdListManifestId() != null).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
 
-        AgencyIdListManifestRecord agencyIdListManifest = importedDataProvider.findAgencyIdListManifest(bdtPriRestriList.get(0).getAgencyIdListManifestId());
-        AgencyIdListRecord agencyIdList = importedDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
+        AgencyIdListManifestRecord agencyIdListManifest = dataProvider.findAgencyIdListManifest(bdtPriRestriList.get(0).getAgencyIdListManifestId());
+        AgencyIdListRecord agencyIdList = dataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
         return agencyIdList.getName();
     }
 
@@ -607,7 +600,7 @@ public class XMLExportSchemaModuleVisitor {
                 String name = codeList.getName();
 
                 while (name.startsWith("oacl")) {
-                    codeList = importedDataProvider.findCodeList(codeList.getBasedCodeListId());
+                    codeList = dataProvider.findCodeList(codeList.getBasedCodeListId());
                     if (codeList == null) {
                         break;
                     }
@@ -761,7 +754,6 @@ public class XMLExportSchemaModuleVisitor {
         return element;
     }
 
-
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
         switch (accComplexType.getOagisComponentType()) {
             case OAGIS10Nouns:
@@ -829,14 +821,14 @@ public class XMLExportSchemaModuleVisitor {
         Element sequenceElement = new Element("sequence", XSD_NS);
 
         List<SeqKeyRecord> seqKeys = coreComponentService.getCoreComponents(
-                accComplexType.getAccManifest().getAccManifestId(), importedDataProvider);
+                accComplexType.getAccManifest().getAccManifestId(), dataProvider);
 
         String guidPrefix = "oagis-id-";
         // for ASCC or BCC (Sequence Key != 0)
         for (SeqKeyRecord seqKey : seqKeys) {
             if (seqKey.getAsccManifestId() != null) {
-                AsccManifestRecord asccManifest = importedDataProvider.findASCCManifest(seqKey.getAsccManifestId());
-                AsccRecord ascc = importedDataProvider.findASCC(asccManifest.getAsccId());
+                AsccManifestRecord asccManifest = dataProvider.findASCCManifest(seqKey.getAsccManifestId());
+                AsccRecord ascc = dataProvider.findASCC(asccManifest.getAsccId());
                 if (ascc.getDen().endsWith("Any Structured Content")) {
                     Element anyElement = new Element("any", XSD_NS);
 
@@ -848,11 +840,11 @@ public class XMLExportSchemaModuleVisitor {
                     sequenceElement.addContent(anyElement);
 
                 } else {
-                    AsccpManifestRecord asccpManifest = importedDataProvider.findASCCPManifest(asccManifest.getToAsccpManifestId());
-                    AccManifestRecord accManifest = importedDataProvider.findACCManifest(asccpManifest.getRoleOfAccManifestId());
+                    AsccpManifestRecord asccpManifest = dataProvider.findASCCPManifest(asccManifest.getToAsccpManifestId());
+                    AccManifestRecord accManifest = dataProvider.findACCManifest(asccpManifest.getRoleOfAccManifestId());
 
-                    AsccpRecord asccp = importedDataProvider.findASCCP(asccpManifest.getAsccpId());
-                    AccRecord acc = importedDataProvider.findACC(accManifest.getAccId());
+                    AsccpRecord asccp = dataProvider.findASCCP(asccpManifest.getAsccpId());
+                    AccRecord acc = dataProvider.findACC(accManifest.getAccId());
 
                     if (asccp.getGuid().equals(acc.getGuid())) {
                         Element groupElement = new Element("group", XSD_NS);
@@ -879,15 +871,14 @@ public class XMLExportSchemaModuleVisitor {
                         sequenceElement.addContent(element);
                         setDocumentation(element, ascc.getDefinition(), ascc.getDefinitionSource());
                     }
-
                 }
             } else {
-                BccManifestRecord bccManifest = importedDataProvider.findBCCManifest(seqKey.getBccManifestId());
-                BccRecord bcc = importedDataProvider.findBCC(bccManifest.getBccId());
+                BccManifestRecord bccManifest = dataProvider.findBCCManifest(seqKey.getBccManifestId());
+                BccRecord bcc = dataProvider.findBCC(bccManifest.getBccId());
 
                 if (bcc.getEntityType() == 1) {
-                    BccpManifestRecord bccpManifest = importedDataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
-                    BccpRecord bccp = importedDataProvider.findBCCP(bccpManifest.getBccpId());
+                    BccpManifestRecord bccpManifest = dataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
+                    BccpRecord bccp = dataProvider.findBCCP(bccpManifest.getBccpId());
                     Element element = new Element("element", XSD_NS);
 
                     element.setAttribute("ref", Utility.toCamelCase(bccp.getPropertyTerm()));
@@ -920,11 +911,11 @@ public class XMLExportSchemaModuleVisitor {
 
         for (SeqKeyRecord seqKey : seqKeys) {
             if (seqKey.getBccManifestId() != null) {
-                BccManifestRecord bccManifest = importedDataProvider.findBCCManifest(seqKey.getBccManifestId());
-                BccRecord bcc = importedDataProvider.findBCC(bccManifest.getBccId());
-                BccpManifestRecord bccpManifest = importedDataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
-                BccpRecord bccp = importedDataProvider.findBCCP(bccpManifest.getBccpId());
-                DtRecord bdt = importedDataProvider.findDT(bccp.getBdtId());
+                BccManifestRecord bccManifest = dataProvider.findBCCManifest(seqKey.getBccManifestId());
+                BccRecord bcc = dataProvider.findBCC(bccManifest.getBccId());
+                BccpManifestRecord bccpManifest = dataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
+                BccpRecord bccp = dataProvider.findBCCP(bccpManifest.getBccpId());
+                DtRecord bdt = dataProvider.findDT(bccp.getBdtId());
 
                 if (bcc.getEntityType() == 0) {
                     Element attributeElement = new Element("attribute", XSD_NS);
@@ -988,11 +979,9 @@ public class XMLExportSchemaModuleVisitor {
         return null;
     }
 
-
     public void visitACCGroup(ACCGroup accGroup) throws Exception {
         // not implemented yet
     }
-
 
     public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception {
         /*
@@ -1008,11 +997,9 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-
     public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception {
         // not implemented yet
     }
-
 
     public void visitBlobContent(byte[] content) throws Exception {
         this.document = createDocument(content);
@@ -1041,10 +1028,7 @@ public class XMLExportSchemaModuleVisitor {
         return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".xsd";
     }
 
-
     public File endSchemaModule(SchemaModule schemaModule) throws Exception {
-
-
         FileUtils.forceMkdir(this.moduleFile.getParentFile());
 
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));

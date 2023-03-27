@@ -1,11 +1,11 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
-import {CcDtNodeDetail, CcXbt, OagisComponentType, XbtForList} from '../../domain/core-component-node';
+import {CcDtNodeDetail, OagisComponentType, XbtForList} from '../../domain/core-component-node';
 import {base64Encode} from '../../../common/utility';
 import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
 
@@ -250,6 +250,16 @@ export class CcListService {
       dtManifestId: dtManifestId,
       restrictionType: type,
       agencyIdListManifestId: agencyIdListManifestId,
+    });
+  }
+
+  exportStandaloneSchemas(asccpManifestIdList: CcList[]): Observable<HttpResponse<Blob>> {
+    const params = new HttpParams().set('asccpManifestIdList',
+      asccpManifestIdList.map(e => e.manifestId.toString().toLowerCase()).join(','));
+    return this.http.get('/api/core_component/export/standalone', {
+      params,
+      observe: 'response',
+      responseType: 'blob'
     });
   }
 }

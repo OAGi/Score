@@ -3,7 +3,6 @@ package org.oagi.score.populate.helper;
 import org.w3c.dom.Element;
 
 import java.io.File;
-import java.util.Collection;
 
 public interface Declaration {
     public String getName();

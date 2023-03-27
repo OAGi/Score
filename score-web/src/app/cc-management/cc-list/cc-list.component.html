@@ -61,6 +61,11 @@
               (click)="openTransferDialogMultiple()">
         <mat-icon>swap_horiz</mat-icon>
       </button>
+      <button mat-icon-button class="ml-2" matTooltip="Export"
+              [hidden]="!canToolbarAction('Export')"
+              (click)="exportStandaloneSchemas()">
+        <mat-icon>print</mat-icon>
+      </button>
     </mat-toolbar>
   </div>
 
