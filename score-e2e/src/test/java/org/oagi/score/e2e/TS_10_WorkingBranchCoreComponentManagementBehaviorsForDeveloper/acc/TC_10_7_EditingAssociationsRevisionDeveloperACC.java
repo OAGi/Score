@@ -2059,28 +2059,334 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_7_13() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        assertFalse(accBaseNode.isDisplayed());
 
     }
 
     @Test
     public void test_TA_10_7_14() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
 
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage =viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
+        {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
+
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
+            assertEquals(anotherDeveloper.getLoginId(), getText(td));
+
+            //verify the ownership of all associations (ASCC and BCC) are  transferred as well
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals(anotherDeveloper.getLoginId(), getText(asccPanel.getOwnerField()));
+
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+            assertEquals(anotherDeveloper.getLoginId(), getText(bccPanel.getOwnerField()));
+        }
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(endUser.getLoginId()));
+        }
     }
 
 
     @Test
     public void test_TA_10_7_15() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association, accForBase;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc.setBasedAccManifestId(accForBase.getAccManifestId());
+            coreComponentAPI.updateACC(acc);
+
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+
+        String nodePath;
+
+        {
+            nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
+            assertTrue(movedASCCPNode.isDisplayed());
+
+        }
+
+        {
+            nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+        }
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitCancelButton();
+
+        {
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            assertTrue(movedASCCPNode.isDisplayed());
+
+        }
+
+        {
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+        }
 
     }
 
     @Test
     public void test_TA_10_7_16() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association, accForBaseLv1, accForBaseLv2, accForBaseLv3;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accForBaseLv1 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc.setBasedAccManifestId(accForBaseLv1.getAccManifestId());
+            coreComponentAPI.updateACC(acc);
+
+            accForBaseLv2 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv1.setBasedAccManifestId(accForBaseLv2.getAccManifestId());
+            coreComponentAPI.updateACC(accForBaseLv1);
+
+            accForBaseLv3 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv2.setBasedAccManifestId(accForBaseLv3.getAccManifestId());
+            coreComponentAPI.updateACC(accForBaseLv2);
+
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBaseLv1, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
+        {
+            String nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBaseLv2.getObjectClassTerm());
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBaseLv2.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            movedBCCPNode = accViewEditPage.getNodeByPath(nodePath);
+            assertFalse(movedBCCPNode.isDisplayed());
+        }
+
+        {
+            String nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBaseLv3.getObjectClassTerm());
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBaseLv3.getDen() + "/" + asccp.getPropertyTerm());
+            assertTrue(movedASCCPNode.isDisplayed());
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            movedASCCPNode = accViewEditPage.getNodeByPath(nodePath);
+            assertFalse(movedASCCPNode.isDisplayed());
+        }
 
     }
-
 
 }
