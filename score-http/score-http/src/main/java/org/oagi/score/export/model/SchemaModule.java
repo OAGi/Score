@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
+import org.springframework.data.util.Pair;
 
 import java.io.File;
 import java.util.*;
@@ -11,6 +12,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SchemaModule {
+
+    public enum OrderType {
+        AgencyId,
+        CodeList,
+        XBTSimple,
+        BDTSimple,
+        ACC,
+        BCCP,
+        ASCCP
+    }
 
     private final ScoreModule module;
 
@@ -25,6 +36,8 @@ public class SchemaModule {
     private Map<String, BCCP> bccpMap = new LinkedHashMap();
     private Map<String, ACC> accMap = new LinkedHashMap();
     private Map<String, ASCCP> asccpMap = new LinkedHashMap();
+
+    private List<Pair<OrderType, String>> orders = new ArrayList<>();
 
     private byte[] content;
 
@@ -159,6 +172,7 @@ public class SchemaModule {
             return false;
         }
         this.agencyIdMap.put(agencyId.getGuid(), agencyId);
+        this.orders.add(Pair.of(OrderType.AgencyId, agencyId.getGuid()));
         return true;
     }
 
@@ -171,6 +185,7 @@ public class SchemaModule {
             return false;
         }
         this.schemaCodeListMap.put(schemaCodeList.getGuid(), schemaCodeList);
+        this.orders.add(Pair.of(OrderType.CodeList, schemaCodeList.getGuid()));
         return true;
     }
 
@@ -183,6 +198,7 @@ public class SchemaModule {
             return false;
         }
         this.xbtSimpleMap.put(xbtSimple.getGuid(), xbtSimple);
+        this.orders.add(Pair.of(OrderType.XBTSimple, xbtSimple.getGuid()));
         return true;
     }
 
@@ -195,6 +211,7 @@ public class SchemaModule {
             return false;
         }
         this.bdtSimpleMap.put(bdtSimple.getGuid(), bdtSimple);
+        this.orders.add(Pair.of(OrderType.BDTSimple, bdtSimple.getGuid()));
         return true;
     }
 
@@ -207,6 +224,7 @@ public class SchemaModule {
             return false;
         }
         this.bccpMap.put(bccp.getGuid(), bccp);
+        this.orders.add(Pair.of(OrderType.BCCP, bccp.getGuid()));
         return true;
     }
 
@@ -219,6 +237,7 @@ public class SchemaModule {
             return false;
         }
         this.accMap.put(acc.getGuid(), acc);
+        this.orders.add(Pair.of(OrderType.ACC, acc.getGuid()));
         return true;
     }
 
@@ -231,6 +250,7 @@ public class SchemaModule {
             return false;
         }
         this.asccpMap.put(asccp.getGuid(), asccp);
+        this.orders.add(Pair.of(OrderType.ASCCP, asccp.getGuid()));
         return true;
     }
 
@@ -279,6 +299,10 @@ public class SchemaModule {
                 }
             }
         }
+    }
+
+    public List<Pair<OrderType, String>> getOrders() {
+        return this.orders;
     }
 
     public File getModuleFile() {
