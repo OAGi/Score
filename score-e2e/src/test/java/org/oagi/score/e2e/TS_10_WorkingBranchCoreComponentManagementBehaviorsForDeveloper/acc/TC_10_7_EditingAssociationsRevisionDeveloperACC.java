@@ -1783,38 +1783,278 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_7_12_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+        ccStates.add("Published");
+        ccStates.add("Deleted");
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
+            WebElement accBaseNode;
+            ACCViewEditPage.ACCPanel accBasePanel;
+            ACCSetBaseACCDialog accSetBaseACCDialog;
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+            accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+            assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+            accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+            String state = entry.getKey();
+            accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
+
+            accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+            accViewEditPage = accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+            accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+            accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+            assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+            assertEquals(state, getText(accBasePanel.getStateField()));
+        }
     }
 
     @Test
     public void test_TA_10_7_12_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+
+        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper, release, namespace, "WIP");
+        accForBase.setDeprecated(true);
+        getAPIFactory().getCoreComponentAPI().updateACC(accForBase);
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.setDEN(accForBase.getDen());
+        accSetBaseACCDialog.hitSearchButton();
+        By APPLY_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Apply\")]//ancestor::button[1]");
+
+        ACCObject finalAccForBase = accForBase;
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+                td = tr.findElement(By.className("mat-column-" + "den"));
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+            }
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
+
+            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+
+        });
     }
 
     @Test
     public void test_TA_10_7_12_c() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.setDEN("Ledger Amount Group. Details");
+        accSetBaseACCDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Ledger Amount Group. Details\")]//ancestor::tr/td[1]//label/span[1]")).size());
+        accSetBaseACCDialog.hitCancelButton();
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.setDEN("Any Structured Content. Details");
+        accSetBaseACCDialog.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]//ancestor::tr/td[1]//label/span[1]")).size());
+        accSetBaseACCDialog.hitCancelButton();
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.hitApplyButton("Any Structured Content. Details");
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Any Structured Content. Details");
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals("Semantics", getText(accBasePanel.getComponentTypeSelectField()));
 
     }
 
     @Test
     public void test_TA_10_7_12_d() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+        ACCSetBaseACCDialog accSetBaseACCDialog;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+
+        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper, release, namespace, "WIP");
+
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertDisabled(accBasePanel.getObjectClassTermField());
+        assertDisabled(accBasePanel.getComponentTypeSelectField());
+        assertDisabled(accBasePanel.getAbstractCheckbox());
+        assertDisabled(accBasePanel.getDeprecatedCheckbox());
+        assertDisabled(accBasePanel.getNamespaceSelectField());
+        assertDisabled(accBasePanel.getDefinitionField());
+        assertDisabled(accBasePanel.getDefinitionSourceField());
 
     }
 
     @Test
-    public void test_TA_10_7_12_e() {
+    public void test_TA_10_7_12_ef() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, accForBase, acc_association;
+        ASCCObject ascc, asccForBase;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
 
-    }
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-    @Test
-    public void test_TA_10_7_12_f() {
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
 
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+            asccForBase = coreComponentAPI.appendASCC(accForBase, asccp, "WIP");
+            asccForBase.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(asccForBase);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.setDEN(accForBase.getDen());
+        accSetBaseACCDialog.hitSearchButton();
+        By APPLY_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Apply\")]//ancestor::button[1]");
+
+        ACCObject finalAccForBase = accForBase;
+        String asccpPropertyTerm = asccp.getPropertyTerm();
+        String duplicateWarning = "There is a conflict in ASCCPs between the current ACC and the base ACC [" + asccpPropertyTerm + "]";
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+                td = tr.findElement(By.className("mat-column-" + "den"));
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+            }
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
+            assertTrue(duplicateWarning.equals(getSnackBarMessage(getDriver())));
+        });
     }
 
     @Test
