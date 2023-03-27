@@ -974,14 +974,16 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
 
-        bccPanel.setCardinalityMinField("-1");
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Min\")]")).size());
+        bccPanel.setCardinalityMinField("-9");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Max\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
 
-        bccPanel.setCardinalityMinField("10");
+        bccPanel.setCardinalityMaxField("11");
+        bccPanel.setCardinalityMinField("111");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"must be less than or equal\")]")).size());
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
-        assertEquals("10", getText(bccPanel.getCardinalityMinField()));
+        assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
     }
 
     @Test
