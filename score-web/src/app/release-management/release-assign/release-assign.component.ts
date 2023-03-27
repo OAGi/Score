@@ -158,6 +158,14 @@ export class ReleaseAssignComponent implements OnInit {
     }
   }
 
+  classList(node: AssignableNode): string[] {
+    const classList = ['drop-box-item'];
+    if (node.state !== 'Candidate') {
+      classList.push('disabled');
+    }
+    return classList;
+  }
+
   drop(event: CdkDragDrop<AssignableNode[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
