@@ -115,7 +115,7 @@ The developer cannot discard a Release if it is used in a Module Set Release.
 The developer can move the Release to Draft state again. In this case, the Release Module set is updated accordingly so that to contain the CCs of the Draft Release.
 
 #### Test Assertion #21.2.7
-The developer can validate all schemas in the release module set. 
+The developer can validate all schemas in the release module set.  The validated result can be downloaded or copy-pasted. 
 
 ### Test Step Pre-condition:
 
