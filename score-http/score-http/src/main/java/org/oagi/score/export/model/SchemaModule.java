@@ -74,14 +74,14 @@ public class SchemaModule {
     }
 
     public String getNamespaceUri() {
-        if (StringUtils.hasLength(module.getModuleNamespaceUri())) {
+        if (module.getModuleNamespaceUri() != null) {
             return module.getModuleNamespaceUri();
         }
         return module.getReleaseNamespaceUri();
     }
 
     public String getNamespacePrefix() {
-        if (StringUtils.hasLength(module.getModuleNamespacePrefix())) {
+        if (module.getModuleNamespacePrefix() != null) {
             return module.getModuleNamespacePrefix();
         }
         return module.getReleaseNamespacePrefix();
