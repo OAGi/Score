@@ -20,6 +20,7 @@ export class CodeListForListRequest {
     start: Date,
     end: Date,
   };
+  namespaces: number[] = [];
   ownedByDeveloper: boolean;
   cookieType: string;
   page: PageRequest = new PageRequest();
@@ -56,6 +57,7 @@ export class CodeListForListRequest {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
+    this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.filters = {
       name: params.get('name') || '',
       definition: params.get('definition') || '',
@@ -91,6 +93,9 @@ export class CodeListForListRequest {
     }
     if (this.updatedDate.end) {
       params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
+    if (this.namespaces && this.namespaces.length > 0) {
+      params = params.set('namespaces', this.namespaces.map(e => '' + e).join(','));
     }
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);

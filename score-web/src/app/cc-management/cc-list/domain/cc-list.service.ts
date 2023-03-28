@@ -74,6 +74,9 @@ export class CcListService {
     if (request.tags && request.tags.length > 0) {
       params = params.set('tags', request.tags.join(','));
     }
+    if (request.namespaces && request.namespaces.length > 0) {
+      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+    }
     if (request.componentTypes && request.componentTypes.length > 0) {
       params = params.set('componentTypes', request.componentTypes
         .map((elm: OagisComponentType) => elm.value).join(','));

@@ -53,6 +53,9 @@ export class AgencyIdListService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (request.ownedByDeveloper) ? 'true' : 'false');
     }
+    if (request.namespaces && request.namespaces.length > 0) {
+      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+    }
 
     return this.http.get<PaginationResponse<AgencyIdList>>('/api/agency_id_list', {params});
   }

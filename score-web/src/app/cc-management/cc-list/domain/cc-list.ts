@@ -5,6 +5,7 @@ import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ShortTag} from "../../../tag-management/domain/tag";
+import {toNumbers} from "@angular/compiler-cli/src/version_helpers";
 
 export class CcListRequest {
   release: SimpleRelease;
@@ -21,6 +22,7 @@ export class CcListRequest {
   };
   componentTypes: OagisComponentType[];
   tags: string[];
+  namespaces: number[] = [];
 
   dtTypes: string[] = [];
   asccpTypes: string[] = [];
@@ -69,6 +71,7 @@ export class CcListRequest {
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.tags = (params.get('tags')) ? Array.from(params.get('tags').split(',')) : [];
+    this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
       .map(elm => OagisComponentTypes[elm]) : [];
     this.updatedDate = {
@@ -133,6 +136,9 @@ export class CcListRequest {
     }
     if (this.tags && this.tags.length > 0) {
       params = params.set('tags', this.tags.join(','));
+    }
+    if (this.namespaces && this.namespaces.length > 0) {
+      params = params.set('namespaces', this.namespaces.map(e => '' + e).join(','));
     }
     if (this.componentTypes && this.componentTypes.length > 0) {
       params = params.set('componentTypes', this.componentTypes
