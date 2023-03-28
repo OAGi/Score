@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.switchToMainTab;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_9_DeletingDeveloperACC extends BaseTest {
@@ -267,6 +268,44 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_9_6() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, new_acc_base, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
+            new_acc_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc.setBasedAccManifestId(new_acc_base.getAccManifestId());
+            coreComponentAPI.updateACC(acc);
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen());
+        assertEquals(1, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
+
+        ACCViewEditPage accViewEditPage = asccpViewEditPage.openACCInNewTab(accNode);
+        accViewEditPage.hitRestoreButton();
+
+        switchToMainTab(getDriver());
+        WebElement asccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
 
     }
 

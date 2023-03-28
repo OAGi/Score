@@ -171,6 +171,14 @@ public interface ASCCPViewEditPage extends Page {
     void hitUpdateButton();
 
     /**
+     * Open the ACC page through 'Open in new tab' context menu for the given ACC node.
+     *
+     * @param accNode ACC node
+     * @return the ACC page object
+     */
+    ACCViewEditPage openACCInNewTab(WebElement accNode);
+
+    /**
      * Return the UI element of the 'Deprecated' checkbox.
      *
      * @return the UI element of the 'Deprecated' checkbox
