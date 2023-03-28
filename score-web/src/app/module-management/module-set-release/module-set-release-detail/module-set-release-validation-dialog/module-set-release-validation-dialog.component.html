@@ -33,6 +33,9 @@
 
 <div class="actions ml-auto">
   <button mat-button class="btn" color="warn" (click)="onNoClick()" *ngIf="resp.done">
-    {{ 'Close' }}
+    <span>Close</span>
+  </button>
+  <button mat-button class="btn" color="primary" (click)="copyToClipboard()" *ngIf="resp.done">
+    <span>Copy to clipboard</span>
   </button>
 </div>

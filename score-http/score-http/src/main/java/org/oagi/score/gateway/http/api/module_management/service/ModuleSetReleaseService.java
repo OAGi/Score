@@ -152,7 +152,6 @@ public class ModuleSetReleaseService implements InitializingBean {
      *
      * @param event
      */
-    @Transactional
     public void onModuleSetReleaseValidationRequestEventReceived(ModuleSetReleaseValidationRequestEvent event) {
         RLock lock = redissonClient.getLock("ModuleSetReleaseValidationRequestEvent:" + event.getRequestId());
         if (!lock.tryLock()) {
