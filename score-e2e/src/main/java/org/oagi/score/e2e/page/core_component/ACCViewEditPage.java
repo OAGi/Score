@@ -450,6 +450,19 @@ public interface ACCViewEditPage extends Page {
      */
     void hitUpdateButton();
 
+    /**
+     * Return the UI element of the 'Delete' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton(boolean enabled);
+
+    /**
+     *
+     */
+    void hitDeleteButton();
+
     void expandTree(String nodeName);
 
     String getCardinalityLabel();

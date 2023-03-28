@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)

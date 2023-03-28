@@ -35,6 +35,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                     "//ancestor::mat-tab-group//descendant::mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+
+    public static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
     public static final By REVISE_BUTTON_LOCATOR =
@@ -1321,6 +1324,26 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         retry(() -> click(getUpdateButton(true)));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getDeleteButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), DELETE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton(true));
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Deleted".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
