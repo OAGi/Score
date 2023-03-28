@@ -7,11 +7,13 @@ import org.jdom2.input.DOMBuilder;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.jooq.types.ULong;
 import org.oagi.score.common.ScoreConstants;
 import org.oagi.score.common.util.Utility;
 import org.oagi.score.export.model.*;
 import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.populate.helper.Context;
+import org.oagi.score.repo.api.corecomponent.model.OagisComponentType;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repository.provider.DataProvider;
 import org.slf4j.Logger;
@@ -32,6 +34,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.common.util.OagisComponentType.Extension;
+import static org.oagi.score.repo.api.corecomponent.model.OagisComponentType.SemanticGroup;
+import static org.oagi.score.repo.api.corecomponent.model.OagisComponentType.UserExtensionGroup;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Scope(SCOPE_PROTOTYPE)
@@ -44,6 +49,7 @@ public class XMLExportSchemaModuleVisitor {
 
     private Document document;
     private Element rootElement;
+    private Namespace targetNamespace;
     private File moduleFile;
 
     private final Namespace OAGI_NS = Namespace.getNamespace("", ScoreConstants.OAGI_NS);
@@ -71,9 +77,9 @@ public class XMLExportSchemaModuleVisitor {
         this.document = createDocument();
 
         Element schemaElement = new Element("schema", XSD_NS);
-        Namespace namespace = getNamespace(schemaModule);
-        schemaElement.addNamespaceDeclaration(namespace);
-        schemaElement.setAttribute("targetNamespace", namespace.getURI());
+        this.targetNamespace = getNamespace(schemaModule);
+        schemaElement.addNamespaceDeclaration(targetNamespace);
+        schemaElement.setAttribute("targetNamespace", targetNamespace.getURI());
         schemaElement.setAttribute("elementFormDefault", "qualified");
         schemaElement.setAttribute("attributeFormDefault", "unqualified");
         String versionNum = schemaModule.getVersionNum();
@@ -124,13 +130,20 @@ public class XMLExportSchemaModuleVisitor {
         String schemaLocation = getRelativeSchemaLocation(includeSchemaModule);
         includeElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(includeElement);
+
+        Namespace namespace = getNamespace(includeSchemaModule);
+        this.rootElement.addNamespaceDeclaration(namespace);
     }
 
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception {
         Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
+        importElement.setAttribute("namespace", importSchemaModule.getNamespaceUri());
         rootElement.addContent(importElement);
+
+        Namespace namespace = getNamespace(importSchemaModule);
+        this.rootElement.addNamespaceDeclaration(namespace);
     }
 
     public void visitAgencyId(AgencyId agencyId) throws Exception {
@@ -142,7 +155,8 @@ public class XMLExportSchemaModuleVisitor {
         simpleTypeElement.setAttribute("id", agencyId.getGuid());
 
         Element unionElement = new Element("union", XSD_NS);
-        unionElement.setAttribute("memberTypes", "xsd:token " + agencyId.getName() + "ContentEnumerationType");
+        String agencyIdTypeName = attachNamespacePrefixIfExists(agencyId.getName() + "ContentEnumerationType", agencyId.getNamespaceId());
+        unionElement.setAttribute("memberTypes", "xsd:token " + agencyIdTypeName);
         simpleTypeElement.addContent(unionElement);
 
         // ContentEnumerationType part
@@ -199,9 +213,9 @@ public class XMLExportSchemaModuleVisitor {
             Element unionElement = new Element("union", XSD_NS);
             SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
             if (baseCodeList == null) {
-                unionElement.setAttribute("memberTypes", name + "EnumerationType" + " xsd:token");
+                unionElement.setAttribute("memberTypes", attachNamespacePrefixIfExists(name + "EnumerationType", schemaCodeList.getNamespaceId()) + " xsd:token");
             } else {
-                unionElement.setAttribute("memberTypes", baseCodeList.getName() + "ContentType" + " xsd:token");
+                unionElement.setAttribute("memberTypes", attachNamespacePrefixIfExists(baseCodeList.getName() + "ContentType", baseCodeList.getNamespaceId()) + " xsd:token");
             }
             codeListElement.addContent(unionElement);
             rootElement.addContent(codeListElement);
@@ -335,6 +349,15 @@ public class XMLExportSchemaModuleVisitor {
             String memberTypes = String.join(" ",
                     bdtSimpleType.getXbtBuiltInTypes().stream()
                             .filter(e -> !"xsd:token".equals(e))
+                            .map(e -> {
+                                if (e.startsWith(XSD_NS.getPrefix())) {
+                                    return e;
+                                }
+                                if (!hasLength(targetNamespace.getPrefix())) {
+                                    return e;
+                                }
+                                return targetNamespace.getPrefix() + ":" + e;
+                            })
                             .collect(Collectors.toList())
             );
             unionElement.setAttribute("memberTypes", memberTypes);
@@ -358,9 +381,15 @@ public class XMLExportSchemaModuleVisitor {
                 restrictionElement.setAttribute("base", baseName + "ContentType");
             } else {
                 if (bdtSimpleType.isDefaultBDT()) {
-                    restrictionElement.setAttribute("base", bdtSimpleType.getXbtName());
+                    String xbtName = bdtSimpleType.getXbtName();
+                    // TODO:
+                    // xbtName = attachNamespacePrefixIfExists(xbtName, xbt.getNamespaceId());
+                    if (!xbtName.startsWith(XSD_NS.getPrefix()) && hasLength(targetNamespace.getPrefix())) {
+                        xbtName = targetNamespace.getPrefix() + ":" + xbtName;
+                    }
+                    restrictionElement.setAttribute("base", xbtName);
                 } else {
-                    restrictionElement.setAttribute("base", bdtSimpleType.getBaseDTName());
+                    restrictionElement.setAttribute("base", attachNamespacePrefixIfExists(bdtSimpleType.getBaseDTName(), bdtSimpleType.getNamespaceId()));
                 }
             }
 
@@ -413,7 +442,7 @@ public class XMLExportSchemaModuleVisitor {
         }
         CodeListManifestRecord codeListManifest = dataProvider.findCodeListManifest(bdtPriRestriList.get(0).getCodeListManifestId());
         CodeListRecord codeList = dataProvider.findCodeList(codeListManifest.getCodeListId());
-        return codeList.getName();
+        return attachNamespacePrefixIfExists(codeList.getName(), codeList.getNamespaceId());
     }
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
@@ -426,7 +455,7 @@ public class XMLExportSchemaModuleVisitor {
 
         AgencyIdListManifestRecord agencyIdListManifest = dataProvider.findAgencyIdListManifest(bdtPriRestriList.get(0).getAgencyIdListManifestId());
         AgencyIdListRecord agencyIdList = dataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-        return agencyIdList.getName();
+        return attachNamespacePrefixIfExists(agencyIdList.getName(), agencyIdList.getNamespaceId());
     }
 
 
@@ -452,9 +481,14 @@ public class XMLExportSchemaModuleVisitor {
         String name = bdtSimpleContent.getName();
         if (bdtSimpleContent.isDefaultBDT()) {
             String xbtName = bdtSimpleContent.getXbtName();
+            // TODO:
+            // xbtName = attachNamespacePrefixIfExists(xbtName, xbt.getNamespaceId());
+            if (!xbtName.startsWith(XSD_NS.getPrefix()) && hasLength(targetNamespace.getPrefix())) {
+                xbtName = targetNamespace.getPrefix() + ":" + xbtName;
+            }
             extensionElement.setAttribute("base", xbtName);
         } else {
-            extensionElement.setAttribute("base", baseName);
+            extensionElement.setAttribute("base", attachNamespacePrefixIfExists(baseName, bdtSimpleContent.getNamespaceId()));
         }
 
         List<BDTSC> dtScList;
@@ -476,7 +510,7 @@ public class XMLExportSchemaModuleVisitor {
             attributeElement.setAttribute("name", attrName);
 
             String typeName = dtSc.getTypeName();
-            attributeElement.setAttribute("type", typeName);
+            attributeElement.setAttribute("type", attachNamespacePrefixIfExists(typeName, dtSc.getNamespaceId()));
 
             String useVal;
             if (bdtSimpleContent.isDefaultBDT() && "timeZoneCode".equals(name)) {
@@ -744,7 +778,7 @@ public class XMLExportSchemaModuleVisitor {
         Element element = new Element("element", XSD_NS);
 
         element.setAttribute("name", component.getName());
-        element.setAttribute("type", component.getTypeName());
+        element.setAttribute("type", attachNamespacePrefixIfExists(component.getTypeName(), component.getNamespaceId()));
         element.setAttribute("id", component.getGuid());
 
         setDocumentation(element, component);
@@ -792,7 +826,7 @@ public class XMLExportSchemaModuleVisitor {
                 Element element = new Element("element", XSD_NS);
 
                 String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length());
-                element.setAttribute("ref", bodName);
+                element.setAttribute("ref", attachNamespacePrefixIfExists(bodName, dependedModule.getNamespaceId()));
                 element.setAttribute("id", Utility.generateGUID((name + path).getBytes()));
                 element.setAttribute("minOccurs", "0");
 
@@ -849,7 +883,8 @@ public class XMLExportSchemaModuleVisitor {
                     if (asccp.getGuid().equals(acc.getGuid())) {
                         Element groupElement = new Element("group", XSD_NS);
 
-                        groupElement.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                        String ref = Utility.toCamelCase(asccp.getPropertyTerm());
+                        groupElement.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.getNamespaceId()));
                         groupElement.setAttribute("id", guidPrefix + ascc.getGuid());
                         setCardinalities(groupElement, ascc.getCardinalityMin(), ascc.getCardinalityMax());
 
@@ -859,10 +894,12 @@ public class XMLExportSchemaModuleVisitor {
                         Element element = new Element("element", XSD_NS);
 
                         if (asccp.getReusableIndicator() == 1) {
-                            element.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                            String ref = Utility.toCamelCase(asccp.getPropertyTerm());
+                            element.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.getNamespaceId()));
                         } else {
                             element.setAttribute("name", Utility.toCamelCase(asccp.getPropertyTerm()));
-                            element.setAttribute("type", Utility.toCamelCase(asccp.getDen().substring((asccp.getPropertyTerm() + ". ").length())) + "Type");
+                            String typeName = Utility.toCamelCase(asccp.getDen().substring((asccp.getPropertyTerm() + ". ").length())) + "Type";
+                            element.setAttribute("type", attachNamespacePrefixIfExists(typeName, asccp.getNamespaceId()));
                         }
 
                         element.setAttribute("id", guidPrefix + ascc.getGuid());
@@ -881,7 +918,8 @@ public class XMLExportSchemaModuleVisitor {
                     BccpRecord bccp = dataProvider.findBCCP(bccpManifest.getBccpId());
                     Element element = new Element("element", XSD_NS);
 
-                    element.setAttribute("ref", Utility.toCamelCase(bccp.getPropertyTerm()));
+                    String ref = Utility.toCamelCase(bccp.getPropertyTerm());
+                    element.setAttribute("ref", attachNamespacePrefixIfExists(ref, bccp.getNamespaceId()));
                     element.setAttribute("id", guidPrefix + bcc.getGuid());
                     setCardinalities(element, bcc.getCardinalityMin(), bcc.getCardinalityMax());
 
@@ -897,7 +935,7 @@ public class XMLExportSchemaModuleVisitor {
             complexTypeElement.addContent(complexContentElement);
 
             Element extensionElement = new Element("extension", XSD_NS);
-            extensionElement.setAttribute("base", basedACC.getTypeName());
+            extensionElement.setAttribute("base", attachNamespacePrefixIfExists(basedACC.getTypeName(), basedACC.getNamespaceId()));
             complexContentElement.addContent(extensionElement);
 
             if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType() == Extension) {
@@ -921,7 +959,7 @@ public class XMLExportSchemaModuleVisitor {
                     Element attributeElement = new Element("attribute", XSD_NS);
 
                     attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.getPropertyTerm()));
-                    attributeElement.setAttribute("type", ModelUtils.getTypeName(bdt));
+                    attributeElement.setAttribute("type", attachNamespacePrefixIfExists(ModelUtils.getTypeName(bdt), bdt.getNamespaceId()));
 
                     int useInt = bcc.getCardinalityMin() * 2 + bcc.getCardinalityMax();
                     String useVal = getUseAttributeValue(useInt);
@@ -1038,5 +1076,21 @@ public class XMLExportSchemaModuleVisitor {
         }
 
         return this.moduleFile;
+    }
+
+    private boolean isGroup(AccRecord acc) {
+        OagisComponentType componentType = OagisComponentType.valueOf(acc.getOagisComponentType());
+        return componentType == SemanticGroup || componentType == UserExtensionGroup;
+    }
+
+    private String attachNamespacePrefixIfExists(String str, ULong namespaceId) {
+        if (namespaceId == null) {
+            return str;
+        }
+        NamespaceRecord namespace = dataProvider.findNamespace(namespaceId);
+        if (StringUtils.hasLength(namespace.getPrefix())) {
+            return namespace.getPrefix() + ":" + str;
+        }
+        return str;
     }
 }

@@ -145,6 +145,9 @@ public class CodeListService extends EventHandler {
         if (request.getExtensible() != null) {
             conditions.add(CODE_LIST.EXTENSIBLE_INDICATOR.eq((byte) (request.getExtensible() ? 1 : 0)));
         }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(CODE_LIST.NAMESPACE_ID.in(request.getNamespaces()));
+        }
         if (!request.getOwnerLoginIds().isEmpty()) {
             conditions.add(APP_USER.as("owner").LOGIN_ID.in(request.getOwnerLoginIds()));
         }

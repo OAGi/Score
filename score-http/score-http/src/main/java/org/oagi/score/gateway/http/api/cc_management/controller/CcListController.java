@@ -74,6 +74,7 @@ public class CcListController {
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
             @RequestParam(name = "tags", required = false) String tags,
+            @RequestParam(name = "namespaces", required = false) String namespaces,
             @RequestParam(name = "componentTypes", required = false) String componentTypes,
             @RequestParam(name = "dtTypes", required = false) String dtTypes,
             @RequestParam(name = "asccpTypes", required = false) String asccpTypes,
@@ -124,6 +125,9 @@ public class CcListController {
         request.setModule(module);
         request.setTags(!StringUtils.hasLength(tags) ? Collections.emptyList() :
                 Arrays.asList(tags.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+        request.setNamespaces(!StringUtils.hasLength(namespaces) ? Collections.emptyList() :
+                Arrays.asList(namespaces.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e))
+                        .map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setComponentTypes(componentTypes);
         request.setDtTypes(!StringUtils.hasLength(dtTypes) ? Collections.emptyList() :
                 Arrays.asList(dtTypes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));

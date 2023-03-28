@@ -319,7 +319,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             addCodeList(schemaModule, baseCodeList);
         }
 
-        SchemaCodeList schemaCodeList = new SchemaCodeList();
+        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList.getNamespaceId());
         schemaCodeList.setGuid(codeList.getGuid());
         schemaCodeList.setName(codeList.getName());
         schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
@@ -338,7 +338,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
 
         for (SchemaModule imported : schemaModule.getImportModules()) {
-            schemaModuleVisitor.visitIncludeModule(imported);
+            schemaModuleVisitor.visitImportModule(imported);
         }
 
         Map<String, ACC> accMap = new HashMap<>(schemaModule.getACCMap());

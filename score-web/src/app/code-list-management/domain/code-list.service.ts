@@ -35,6 +35,9 @@ export class CodeListService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
+    if (request.namespaces && request.namespaces.length > 0) {
+      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+    }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
     }

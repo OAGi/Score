@@ -81,6 +81,10 @@ public abstract class ACC implements Component {
         return basedAcc;
     }
 
+    public ULong getNamespaceId() {
+        return acc.getNamespaceId();
+    }
+
     public boolean isGroup() {
         AsccpRecord asccp = dataProvider.findASCCPByGuid(acc.getGuid());
         return asccp != null;

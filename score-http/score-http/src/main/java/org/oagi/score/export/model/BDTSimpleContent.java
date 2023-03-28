@@ -85,6 +85,10 @@ public class BDTSimpleContent extends AbstractBDTSimple {
         return ModelUtils.getTypeName(baseDataType);
     }
 
+    public ULong getNamespaceId() {
+        return dataType.getNamespaceId();
+    }
+
     public List<BDTSC> getDtScList() {
         return dtScList;
     }

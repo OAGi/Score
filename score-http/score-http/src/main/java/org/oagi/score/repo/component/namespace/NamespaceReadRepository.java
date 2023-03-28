@@ -1,6 +1,7 @@
 package org.oagi.score.repo.component.namespace;
 
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceListRequest;
@@ -40,6 +41,10 @@ public class NamespaceReadRepository {
                 .on(NAMESPACE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("updater"))
                 .on(APP_USER.as("updater").APP_USER_ID.eq(NAMESPACE.LAST_UPDATED_BY));
+    }
+
+    public List<NamespaceList> findAll() {
+        return getSelectOnConditionStep().fetch(this::mapper);
     }
 
     public PageResponse<NamespaceList> fetch(AppUser requester,
@@ -126,18 +131,7 @@ public class NamespaceReadRepository {
             }
         }
 
-        List<NamespaceList> results = query.fetchStream().map(record -> {
-            NamespaceList namespaceList = new NamespaceList();
-            namespaceList.setNamespaceId(record.get(NAMESPACE.NAMESPACE_ID).toBigInteger());
-            namespaceList.setUri(record.get(NAMESPACE.URI));
-            namespaceList.setPrefix(record.get(NAMESPACE.PREFIX));
-            namespaceList.setDescription(record.get(NAMESPACE.DESCRIPTION));
-            namespaceList.setStd(record.get(NAMESPACE.IS_STD_NMSP) == 1);
-            namespaceList.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")));
-            namespaceList.setLastUpdateTimestamp(Date.from(record.get(NAMESPACE.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
-            namespaceList.setLastUpdateUser(record.get(APP_USER.as("updater").LOGIN_ID.as("last_update_user")));
-            return namespaceList;
-        }).collect(Collectors.toList());
+        List<NamespaceList> results = query.fetch(this::mapper);
 
         PageResponse<NamespaceList> response = new PageResponse();
         response.setList(results);
@@ -146,5 +140,18 @@ public class NamespaceReadRepository {
         response.setLength(length);
 
         return response;
+    }
+
+    private NamespaceList mapper(Record record) {
+        NamespaceList namespaceList = new NamespaceList();
+        namespaceList.setNamespaceId(record.get(NAMESPACE.NAMESPACE_ID).toBigInteger());
+        namespaceList.setUri(record.get(NAMESPACE.URI));
+        namespaceList.setPrefix(record.get(NAMESPACE.PREFIX));
+        namespaceList.setDescription(record.get(NAMESPACE.DESCRIPTION));
+        namespaceList.setStd(record.get(NAMESPACE.IS_STD_NMSP) == 1);
+        namespaceList.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")));
+        namespaceList.setLastUpdateTimestamp(Date.from(record.get(NAMESPACE.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+        namespaceList.setLastUpdateUser(record.get(APP_USER.as("updater").LOGIN_ID.as("last_update_user")));
+        return namespaceList;
     }
 }

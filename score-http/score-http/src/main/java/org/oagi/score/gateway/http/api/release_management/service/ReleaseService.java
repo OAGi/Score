@@ -51,8 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.RELEASE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -198,6 +197,9 @@ public class ReleaseService implements InitializingBean {
         }
         if (!request.getStates().isEmpty()) {
             conditions.add(RELEASE.STATE.in(request.getStates()));
+        }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(RELEASE.NAMESPACE_ID.in(request.getNamespaces()));
         }
         if (!request.getCreatorLoginIds().isEmpty()) {
             conditions.add(APP_USER.as("creator").LOGIN_ID.in(request.getCreatorLoginIds()));

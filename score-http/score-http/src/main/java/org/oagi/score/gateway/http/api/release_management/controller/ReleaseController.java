@@ -60,6 +60,7 @@ public class ReleaseController {
                                                  @RequestParam(name = "releaseNum", required = false) String releaseNum,
                                                  @RequestParam(name = "states", required = false) String states,
                                                  @RequestParam(name = "excludes", required = false) String excludes,
+                                                 @RequestParam(name = "namespaces", required = false) String namespaces,
                                                  @RequestParam(name = "creatorLoginIds", required = false) String creatorLoginIds,
                                                  @RequestParam(name = "createStart", required = false) String createStart,
                                                  @RequestParam(name = "createEnd", required = false) String createEnd,
@@ -79,6 +80,9 @@ public class ReleaseController {
                         .map(e -> ReleaseState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
         request.setExcludes(!StringUtils.hasLength(excludes) ? Collections.emptyList() :
                 Arrays.asList(excludes.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+        request.setNamespaces(!StringUtils.hasLength(namespaces) ? Collections.emptyList() :
+                Arrays.asList(namespaces.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e))
+                        .map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setCreatorLoginIds(!StringUtils.hasLength(creatorLoginIds) ? Collections.emptyList() :
                 Arrays.asList(creatorLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
 

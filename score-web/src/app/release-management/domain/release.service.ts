@@ -68,7 +68,10 @@ export class ReleaseService {
     if (request.excludes.length > 0) {
       params = params.set('excludes', request.excludes.join(','));
     }
-    return this.http.get<PageResponse<ReleaseList>>('/api/releases', {params: params});
+    if (request.namespaces && request.namespaces.length > 0) {
+      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+    }
+    return this.http.get<PageResponse<ReleaseList>>('/api/releases', {params});
   }
 
   createRelease(releaseDetail: ReleaseDetail): Observable<any> {

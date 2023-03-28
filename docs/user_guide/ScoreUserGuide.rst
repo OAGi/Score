@@ -8937,7 +8937,7 @@ To create a business term:
 4. On the returned "Create Business Term" page, fill out the following fields:
    
    1. Business Term (Mandatory) the main name of the business term
-   2. External Reference URI (Mandatory) This uri should uniquely identify each business term. 
+   2. External Reference URI (Mandatory) This uri should uniquely identify each business term. Note, up to 65535 characters allowed for this URI.
    3. External Reference Id(Optional) 
    4. Comment(Optional) This is free-form text field for adding information about the business term in the context of the Score tool. An example comment may be
       "This business term is not from the enterprise data dictionary."
