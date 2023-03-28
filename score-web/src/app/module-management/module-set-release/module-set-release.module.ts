@@ -10,6 +10,9 @@ import {ModuleSetReleaseAssignComponent} from './module-set-release-assign/modul
 import {ModuleSetReleaseCreateComponent} from './module-set-release-create/module-set-release-create.component';
 import {ModuleSetReleaseDetailComponent} from './module-set-release-detail/module-set-release-detail.component';
 import {ModuleSetReleaseListComponent} from './module-set-release-list/module-set-release-list.component';
+import {
+  ModuleSetReleaseValidationDialogComponent
+} from "./module-set-release-detail/module-set-release-validation-dialog/module-set-release-validation-dialog.component";
 
 const routes: Routes = [
   {
@@ -52,7 +55,8 @@ const routes: Routes = [
     ModuleSetReleaseListComponent,
     ModuleSetReleaseCreateComponent,
     ModuleSetReleaseDetailComponent,
-    ModuleSetReleaseAssignComponent
+    ModuleSetReleaseAssignComponent,
+    ModuleSetReleaseValidationDialogComponent
   ],
 })
 export class ModuleSetReleaseModule {

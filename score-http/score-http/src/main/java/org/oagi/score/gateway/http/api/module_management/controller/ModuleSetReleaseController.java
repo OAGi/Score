@@ -123,11 +123,24 @@ public class ModuleSetReleaseController {
 
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/validate", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ValidateModuleSetReleaseResponse validateModuleSetRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                                     @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
+    public ValidateModuleSetReleaseResponse validateModuleSetRelease(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") BigInteger moduleSetReleaseId) throws Exception {
         ValidateModuleSetReleaseRequest request = new ValidateModuleSetReleaseRequest(sessionService.asScoreUser(user));
         request.setModuleSetReleaseId(moduleSetReleaseId);
         return service.validateModuleSetRelease(request);
+    }
+
+    @RequestMapping(value = "/module_set_release/{id:[\\d]+}/validate/{requestId}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ValidateModuleSetReleaseResponse progressValidationModuleSetRelease(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") BigInteger moduleSetReleaseId,
+            @PathVariable("requestId") String requestId) {
+        ValidateModuleSetReleaseRequest request = new ValidateModuleSetReleaseRequest(sessionService.asScoreUser(user));
+        request.setModuleSetReleaseId(moduleSetReleaseId);
+        request.setRequestId(requestId);
+        return service.progressValidationModuleSetRelease(request);
     }
 
     @RequestMapping(value = "/module_set_release/{id:[\\d]+}/export", method = RequestMethod.GET,
