@@ -21,8 +21,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 import static org.oagi.score.e2e.impl.PageHelper.switchToMainTab;
 
@@ -253,7 +251,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
             coreComponentAPI.updateACC(acc);
         }
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen() );
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         assertEquals(1, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
 
         viewEditCoreComponentPage.openPage();
@@ -311,6 +309,33 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_9_7() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertEquals("2", getText(accPanel.getRevisionField()));
+        assertEquals("WIP", getText(accPanel.getStateField()));
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Delete\")]//ancestor::button[1]")).size());
+
+        accViewEditPage.moveToDraft();
+        assertEquals("2", getText(accPanel.getRevisionField()));
+        assertEquals("Draft", getText(accPanel.getStateField()));
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Delete\")]//ancestor::button[1]")).size());
+
+        accViewEditPage.moveToCandidate();
+        assertEquals("2", getText(accPanel.getRevisionField()));
+        assertEquals("Candidate", getText(accPanel.getStateField()));
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Delete\")]//ancestor::button[1]")).size());
     }
 }
