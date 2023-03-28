@@ -9,6 +9,8 @@ public class ValidateModuleSetReleaseRequest extends Request {
 
     private BigInteger moduleSetReleaseId;
 
+    private String requestId;
+
     public ValidateModuleSetReleaseRequest(ScoreUser requester) {
         super(requester);
     }
@@ -21,5 +23,12 @@ public class ValidateModuleSetReleaseRequest extends Request {
         this.moduleSetReleaseId = moduleSetReleaseId;
     }
 
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 
 }

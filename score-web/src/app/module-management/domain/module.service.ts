@@ -224,6 +224,10 @@ export class ModuleService {
     return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate');
   }
 
+  progressValidation(moduleSetReleaseId: number, requestId: string): Observable<ModuleSetReleaseValidateResponse> {
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate/' + requestId);
+  }
+
   export(moduleSetReleaseId: number): Observable<HttpResponse<Blob>> {
     return this.http.get('/api/module_set_release/' + moduleSetReleaseId + '/export', {
       observe: 'response',
