@@ -319,7 +319,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             addCodeList(schemaModule, baseCodeList);
         }
 
-        SchemaCodeList schemaCodeList = new SchemaCodeList();
+        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList.getNamespaceId());
         schemaCodeList.setGuid(codeList.getGuid());
         schemaCodeList.setName(codeList.getName());
         schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());

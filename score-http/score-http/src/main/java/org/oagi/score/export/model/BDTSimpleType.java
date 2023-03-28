@@ -90,6 +90,10 @@ public class BDTSimpleType extends AbstractBDTSimple {
         return ModelUtils.getTypeName(baseDataType);
     }
 
+    public ULong getNamespaceId() {
+        return this.dataType.getNamespaceId();
+    }
+
     public boolean isTimepointCDT() {
         String dataTypeTerm = dataType.getDataTypeTerm();
         return (dataTypeTerm.contains("Date") || dataTypeTerm.contains("Time") || dataTypeTerm.contains("Duration"));

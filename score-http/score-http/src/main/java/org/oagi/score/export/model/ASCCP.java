@@ -1,5 +1,6 @@
 package org.oagi.score.export.model;
 
+import org.jooq.types.ULong;
 import org.oagi.score.common.util.Utility;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
@@ -74,4 +75,9 @@ public abstract class ASCCP implements Component {
     public String getDefinitionSource() {
         return asccp.getDefinitionSource();
     }
+
+    public ULong getNamespaceId() {
+        return asccp.getNamespaceId();
+    }
+
 }

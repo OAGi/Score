@@ -97,7 +97,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         List<CodeListRecord> codeLists = moduleSetReleaseDataProvider.findCodeList();
         Map<ULong, SchemaCodeList> schemaCodeListMap = new HashMap();
         codeLists.forEach(codeList -> {
-            SchemaCodeList schemaCodeList = new SchemaCodeList();
+            SchemaCodeList schemaCodeList = new SchemaCodeList(codeList.getNamespaceId());
             schemaCodeList.setGuid(codeList.getGuid());
             schemaCodeList.setName(codeList.getName());
             schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
