@@ -463,6 +463,19 @@ public interface ACCViewEditPage extends Page {
      */
     void hitDeleteButton();
 
+    /**
+     * Return the UI element of the 'Restore' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Restore' button
+     */
+    WebElement getRestoreButton(boolean enabled);
+
+    /**
+     *
+     */
+    void hitRestoreButton();
+
     void expandTree(String nodeName);
 
     String getCardinalityLabel();
