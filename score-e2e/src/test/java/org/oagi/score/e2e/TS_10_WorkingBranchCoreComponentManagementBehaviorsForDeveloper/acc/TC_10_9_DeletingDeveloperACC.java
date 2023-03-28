@@ -231,7 +231,38 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_9_5() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_descendant_base;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc_descendant_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
+            acc.setBasedAccManifestId(acc_descendant_base.getAccManifestId());
+            coreComponentAPI.updateACC(acc);
+        }
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen() );
+        assertEquals(1, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc_descendant_base.getAccManifestId());
+        accViewEditPage.hitRestoreButton();
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
     }
 
     @Test
