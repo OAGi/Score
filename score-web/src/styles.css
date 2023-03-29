@@ -915,3 +915,10 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
 .flex-11-auto {
   flex: 1 1 auto;
 }
+
+.mat-snack-bar-container {
+  color: #333;
+  background-color: #fff;
+  border-color: #333;
+  border: 1px solid;
+}
