@@ -66,8 +66,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.setComponentType("Base(Abstract)");
+        assertFalse(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
+        accPanel.setComponentType("Base");
         assertDisabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }

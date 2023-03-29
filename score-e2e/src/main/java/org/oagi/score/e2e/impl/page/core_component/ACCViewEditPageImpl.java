@@ -869,7 +869,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                     "//span[contains(text(), \"" + componentType + "\")]//ancestor::mat-option"));
             click(option);
             waitFor(ofMillis(1000L));
-            assert getText(getComponentTypeSelectField()).equals(componentType);
+            assert getText(getComponentTypeSelectField()).contains(componentType);
         }
 
         @Override
