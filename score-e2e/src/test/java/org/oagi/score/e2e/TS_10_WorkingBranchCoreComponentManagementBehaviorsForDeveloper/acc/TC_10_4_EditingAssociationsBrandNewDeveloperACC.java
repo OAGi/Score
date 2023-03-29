@@ -321,7 +321,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        NamespaceObject enduserNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.enduser.test");
+        NamespaceObject enduserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         ACCObject acc_endUser = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, enduserNamespace, "WIP");
         ASCCPObject asccp_endUser = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_endUser, endUser, enduserNamespace, "WIP");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
@@ -331,8 +331,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         appendASCCPDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + asccp_endUser.getPropertyTerm() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
     }
-
-
     @Test
     public void test_TA_10_4_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
