@@ -687,6 +687,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("Draft");
         ccStates.add("Candidate");
+        ccStates.add("Published");
         ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
