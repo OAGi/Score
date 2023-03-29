@@ -1157,7 +1157,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setEntityType(String entityType) {
-            sendKeys(getEntityTypeSelectField(), entityType);
+            click(getEntityTypeSelectField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + entityType + "\")]//ancestor::mat-option"));
+            click(option);
+            waitFor(ofMillis(1000L));
+            assert getText(getEntityTypeSelectField()).contains(entityType);
         }
 
         @Override
@@ -1172,7 +1178,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setValueConstraint(String valueConstraint) {
-            sendKeys(getValueConstraintSelectField(), valueConstraint);
+            click(getValueConstraintSelectField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + valueConstraint + "\")]//ancestor::mat-option"));
+            click(option);
+            waitFor(ofMillis(1000L));
+            assert getText(getValueConstraintSelectField()).contains(valueConstraint);
         }
 
         @Override
