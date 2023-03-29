@@ -296,7 +296,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         // cannot create extension component when the component type isn't Semantics
         String accOwner = getText(accPanel.getOwnerField());
-        accPanel.setComponentType("Base(Abstract)");
+        accPanel.setComponentType("Base (Abstract)");
         accPanel.setNamespace(namespace.getUri());
         accViewEditPage.hitUpdateButton();
         accViewEditPage.clickOnDropDownMenuByPath("/" + acc.getDen());
@@ -307,6 +307,11 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         accPanel.setComponentType("Semantics");
         accViewEditPage.hitUpdateButton();
         accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]")));
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getObjectClassTerm() + " Extension. Details");
         ACCViewEditPage.ACCPanel extensionACCPanel = accViewEditPage.getACCPanel(extensionNode);
         String extensionObjectClassTerm = getText(extensionACCPanel.getObjectClassTermField());
