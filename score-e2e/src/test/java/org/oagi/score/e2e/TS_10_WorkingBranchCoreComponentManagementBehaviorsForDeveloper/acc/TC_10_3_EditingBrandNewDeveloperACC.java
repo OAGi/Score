@@ -430,7 +430,10 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         // cannot create extension component when the namespace is not set
         accViewEditPage.clickOnDropDownMenuByPath("/" + acc.getDen());
         assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]")).size());
+        escape(getDriver());
         accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]")));
         assertTrue("Namespace is required.".equals(getSnackBarMessage(getDriver())));
 
     }
