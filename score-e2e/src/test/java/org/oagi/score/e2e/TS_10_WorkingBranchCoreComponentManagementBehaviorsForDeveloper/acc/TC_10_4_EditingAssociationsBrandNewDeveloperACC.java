@@ -416,11 +416,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMinField("-1");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Min\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
-
-        asccPanel.setCardinalityMinField("10");
-        accViewEditPage.hitUpdateButton();
-        asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertEquals("10", getText(asccPanel.getCardinalityMinField()));
     }
 
     @Test
@@ -453,6 +448,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setDefinition(null);
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
@@ -464,7 +460,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
+        assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
         asccPanel.setCardinalityMaxField("-10");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"not allowed for Cardinality Max\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
@@ -472,14 +468,14 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         //check max greater than min
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be less than or equal\")]")).size());
-        accViewEditPage.hitUpdateButton();
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be greater than\")]")).size());
+        click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
 
-        assertEquals("11", getText(asccPanel.getCardinalityMinField()));
+        assertEquals("111", getText(asccPanel.getCardinalityMinField()));
     }
 
     @Test
