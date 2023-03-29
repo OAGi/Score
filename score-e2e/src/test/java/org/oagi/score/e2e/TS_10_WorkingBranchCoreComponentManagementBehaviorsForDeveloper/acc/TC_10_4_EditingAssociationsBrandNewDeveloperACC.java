@@ -209,8 +209,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertNotChecked(asccPanel.getDeprecatedCheckbox());
         assertDisabled(asccPanel.getDeprecatedCheckbox());
     }
-
-
     @Test
     public void test_TA_10_4_1_d() {
 
@@ -228,7 +226,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(appendASCCPDialog.getAppendButton(true));
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
@@ -249,18 +246,46 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject acc, acc_association, acc_with_nonReusableASCCP;
+        ASCCPObject asccp_NotReusable;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc_with_nonReusableASCCP = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            asccp_NotReusable = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc_with_nonReusableASCCP, asccp_NotReusable, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+        asccpPanel.toggleReusable();
+        asccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendASCCPDialog.selectAssociation("Data Area. Acknowledge Batch Certificate Of Analysis Data Area");
-        assertTrue("Target ASCCP is not resuable.".equals(getSnackBarMessage(getDriver())));
+        appendASCCPDialog.setDEN(asccp_NotReusable.getDen());
+        appendASCCPDialog.hitSearchButton();
+        By APPEND_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + asccp_NotReusable.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
+        assertTrue("Target ASCCP is not reusable.".equals(getSnackBarMessage(getDriver())));
 
         // Also test for when non-reusable ASCCP has been deleted while still having an association and
-        // the developer still try to user the ASCCP in another association.
-
-        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ASCCPObject asccp_NotReusable = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "Published");
-
+        // the developer still try to use the ASCCP in another association.
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
@@ -268,17 +293,17 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         //delete the asccp_NotReusable
         viewEditCoreComponentPage.openPage();
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
         asccpViewEditPage.hitDeleteButton();
 
         //Verify that the asccp_NotReusable is still in assocation and in "Deleted" state
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp_NotReusable.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("Deleted", getText(asccpPanel.getStateField()));
-        assertNotChecked(asccpPanel.getReusableCheckbox());
-        assertDisabled(asccpPanel.getReusableCheckbox());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc_with_nonReusableASCCP.getAccManifestId());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc_with_nonReusableASCCP.getDen() + "/" + asccp_NotReusable.getPropertyTerm());
+        ACCViewEditPage.ASCCPPanel asccpPanel2 = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        assertEquals("Deleted", getText(asccpPanel2.getStateField()));
+        assertNotChecked(asccpPanel2.getReusableCheckbox());
+        assertDisabled(asccpPanel2.getReusableCheckbox());
     }
 
     @Test
