@@ -187,6 +187,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        acc.setDefinition(null);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
