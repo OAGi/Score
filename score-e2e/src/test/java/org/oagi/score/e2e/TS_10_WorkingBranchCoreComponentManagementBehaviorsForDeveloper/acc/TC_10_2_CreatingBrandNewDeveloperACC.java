@@ -59,8 +59,6 @@ public class TC_10_2_CreatingBrandNewDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCViewEditPage accCreatePage = viewEditCoreComponentPage.createACC(branch);
         String url = getDriver().getCurrentUrl();
         BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));

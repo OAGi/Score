@@ -273,8 +273,10 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public ACCViewEditPage createACC(String branch) {
         setBranch(branch);
         click(getCreateACCButton());
-
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term", branch);
+        String url = getDriver().getCurrentUrl();
+        int idx = url.lastIndexOf("/");
+        BigInteger manifestId = new BigInteger(url.substring(idx + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(manifestId);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
