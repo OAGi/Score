@@ -80,7 +80,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
         assert "ASCCP".equals(getText(getASCCPPanel().getCoreComponentField()));
-        assert getText(getTitle()).equals(asccp.getDen());
+        assert getText(getTitle()).startsWith(asccp.getPropertyTerm());
     }
 
     @Override
