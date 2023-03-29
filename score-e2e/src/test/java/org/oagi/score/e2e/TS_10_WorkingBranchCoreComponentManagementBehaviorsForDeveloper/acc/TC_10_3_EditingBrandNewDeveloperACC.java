@@ -114,9 +114,9 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("true", accPanel.getObjectClassTermField().getAttribute("aria-required"));
-        assertEquals("true", accPanel.getComponentTypeSelectField().getAttribute("aria-required"));
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
         assertEquals("true", accPanel.getNamespaceSelectField().getAttribute("aria-required"));
-        assertEquals("true", accPanel.getAbstractCheckbox().getAttribute("aria-required"));
+        assertNotChecked(accPanel.getAbstractCheckbox());
 
         //only standard namespace shall be allowed
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
