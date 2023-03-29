@@ -603,6 +603,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
             ascc.setCardinalityMax(1);
+            ascc.setDefinition(null);
             coreComponentAPI.updateASCC(ascc);
         }
 
@@ -616,9 +617,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         asccPanel.setCardinalityMinField("11");
         asccPanel.setCardinalityMaxField("111");
-        accViewEditPage.hitUpdateButton();
+        click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
     }
 
     @Test
