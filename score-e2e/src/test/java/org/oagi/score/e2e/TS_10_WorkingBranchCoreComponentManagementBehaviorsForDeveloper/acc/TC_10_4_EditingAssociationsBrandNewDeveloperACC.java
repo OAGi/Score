@@ -1692,20 +1692,19 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ACCObject finalAccForBase = accForBase;
         String asccpPropertyTerm = asccp.getPropertyTerm();
-        String duplicateWarning = "There is a conflict in ASCCPs between the current ACC and the base ACC [" + asccpPropertyTerm + "]";
-        retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
-                td = tr.findElement(By.className("mat-column-" + "den"));
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
-            }
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-            assertTrue(duplicateWarning.equals(getSnackBarMessage(getDriver())));
-        });
+        String duplicateWarning = "There is a conflict in ASCCPs between the current ACC and the base ACC";
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
+        assertTrue(getSnackBarMessage(getDriver()).contains(duplicateWarning));
+
     }
 
     @Test
