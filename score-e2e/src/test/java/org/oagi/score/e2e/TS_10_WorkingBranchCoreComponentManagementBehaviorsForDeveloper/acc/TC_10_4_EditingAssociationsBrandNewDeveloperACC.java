@@ -1395,8 +1395,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
 
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        assertFalse(asccNode.isDisplayed());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp.getPropertyTerm() + "\")]";
+        assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
     @Test
