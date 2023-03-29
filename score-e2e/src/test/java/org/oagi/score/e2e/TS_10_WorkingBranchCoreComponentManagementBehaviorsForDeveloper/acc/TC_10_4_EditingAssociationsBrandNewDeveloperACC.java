@@ -985,18 +985,19 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
 
-        bccPanel.setCardinalityMinField("-9");
+        bccPanel.setCardinalityMaxField("-9");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Max\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
 
         bccPanel.setCardinalityMaxField("11");
         bccPanel.setCardinalityMinField("111");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"must be less than or equal\")]")).size());
+        bccPanel.setDefinition("Test Max >= Min");
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
@@ -1032,7 +1033,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
