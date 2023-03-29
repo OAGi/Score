@@ -126,7 +126,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
             appendASCCPDialog.selectAssociation(asccp.getDen());
-            click(appendASCCPDialog.getAppendButton(true));
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
