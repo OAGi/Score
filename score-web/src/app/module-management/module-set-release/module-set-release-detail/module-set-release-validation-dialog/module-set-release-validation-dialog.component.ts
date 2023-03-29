@@ -1,9 +1,11 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {interval, mergeMap, Subject, takeUntil} from "rxjs";
-import {finalize, switchMap} from "rxjs/operators";
-import {ModuleService} from "../../../domain/module.service";
-import {ModuleSetReleaseValidateResponse} from "../../../domain/module";
+import {interval, mergeMap, Subject, takeUntil} from 'rxjs';
+import {ModuleService} from '../../../domain/module.service';
+import {ModuleSetReleaseValidateResponse} from '../../../domain/module';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'score-module-set-release-validation-dialog',
@@ -18,6 +20,8 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<ModuleSetReleaseValidationDialogComponent>,
     public moduleService: ModuleService,
+    public clipboard: Clipboard,
+    public snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: any) {
 
     this.determinate = false;
@@ -40,7 +44,9 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
             closeTimer$.next('Done');
           }
         },
-        error: (res) => {
+        error: (res: HttpErrorResponse) => {
+          this.resp.done = true;
+          this.resp.results[resp.requestId] = res.message;
         }
       });
     });
@@ -71,6 +77,18 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
 
   value(key: string): string {
     return this.resp.results[key];
+  }
+
+  copyToClipboard() {
+    this.clipboard.copy(
+      '# Invalid: ' + this.invalidKeys.length + '\n' +
+      this.invalidKeys.map(e => '- ' + e + ': ' + this.value(e)).join('\n') +
+      '# Valid: ' + this.validKeys.length + '\n' +
+      this.validKeys.map(e => '- ' + e + ': ' + this.value(e)).join('\n')
+    );
+    this.snackBar.open('Copied to clipboard', '', {
+      duration: 3000,
+    });
   }
 
   onNoClick(): void {
