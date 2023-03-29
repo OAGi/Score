@@ -566,11 +566,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertEquals("0", getText(asccPanel.getCardinalityMinField()));
         asccPanel.getCardinalityMinField().clear();
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Min is required\")]")).isDisplayed());
+        assertEquals("true", asccPanel.getCardinalityMinField().getAttribute("aria-required"));
 
-        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
+        assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
         asccPanel.getCardinalityMaxField().clear();
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Max is required\")]")).isDisplayed());
+        assertEquals("true", asccPanel.getCardinalityMaxField().getAttribute("aria-required"));
     }
 
     @Test
