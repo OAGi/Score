@@ -518,7 +518,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
+        assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
         asccPanel.setCardinalityMaxField("-1");
         waitFor(ofMillis(500L));
         assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
