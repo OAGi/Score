@@ -132,7 +132,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Remove\")]");
 
     private static final By DELETE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Delete\")]");
+            By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(),\"Delete\")]");
     private final ACCObject acc;
 
     public ACCViewEditPageImpl(BasePage parent, ACCObject acc) {
@@ -382,7 +382,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]")).isDisplayed();
 
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));

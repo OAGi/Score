@@ -78,7 +78,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//span[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title[contains(@class, \"mat-card-title\")]"));
     }
 
     @Override
