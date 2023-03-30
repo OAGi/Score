@@ -1886,7 +1886,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -1904,7 +1904,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -1957,29 +1957,35 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
-
+        String oldBase = null;
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Published");
         ccStates.add("Draft");
         ccStates.add("Candidate");
         ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
-
+        boolean noBase = false;
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             String state = entry.getKey();
             accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            getAPIFactory().getCoreComponentAPI().updateACC(acc);
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            if (noBase){
+                accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + oldBase);
+            }
+            ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
+            accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+            oldBase = accForBase.getDen();
+            noBase = true;
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            String basePath = "/" + acc.getDen() + "/" + accForBase.getDen();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, asccp.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
         }
     }
 
@@ -2049,7 +2055,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
         }
     }
 
@@ -2118,7 +2124,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
 
             //move accForBase to "WIP" so the "Refactor" will be enabled
             accForBase.setState("WIP");
@@ -2130,7 +2136,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             //Verify the asccp is moved to under the accForBase node
@@ -2205,7 +2211,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
 
             //take the ownership of the accForBase and moved it to "WIP" state for Refactor
             accForBase.setOwnerUserId(developer.getAppUserId());
@@ -2218,7 +2224,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             //Verify the asccp is moved to under the accForBase node
@@ -2255,7 +2261,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
 
         //Click on the selected base to revise
         By SELECTED_BASE_OPTION_LOCATOR =
@@ -2289,7 +2295,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
     }
 
     @Test
@@ -2351,7 +2357,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2369,7 +2375,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2459,7 +2465,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2477,7 +2483,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2565,7 +2571,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2650,7 +2656,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
         selectBaseACCToRefactorDialog.hitRefactorButton();
 
         viewEditCoreComponentPage.openPage();
@@ -2734,7 +2740,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
         }
     }
 
@@ -2803,7 +2809,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
         }
     }
 
@@ -2841,7 +2847,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
         selectBaseACCToRefactorDialog.hitRefactorButton();
 
         viewEditCoreComponentPage.openPage();
@@ -2873,7 +2879,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
         selectBaseACCToRefactorDialog.hitRefactorButton();
 
         viewEditCoreComponentPage.openPage();
@@ -2918,7 +2924,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
         assertEquals(1, getDriver().findElements(By.xpath("//score-based-acc-dialog//*[contains(text(),\"Ungrouping 'Free Form Text Group' required.\")]")).size());
         selectBaseACCToRefactorDialog.hitCancelButton();
     }
@@ -2976,7 +2982,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -3031,7 +3037,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
         selectBaseACCToRefactorDialog.hitRefactorButton();
 
         viewEditCoreComponentPage.openPage();

@@ -2240,7 +2240,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2258,7 +2258,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2351,7 +2351,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();
@@ -2373,7 +2373,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
             selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton());
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             viewEditCoreComponentPage.openPage();

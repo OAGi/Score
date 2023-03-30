@@ -216,12 +216,12 @@ public interface ACCViewEditPage extends Page {
     ACCSetBaseACCDialog setBaseACC(String path);
 
     /**
-     * Open the 'Delete based ACC' confirmation dialog by clicking 'Delete' context menu.
+     * remove the base ACC by clicking 'Delete' context menu.
      *
      * @param path node path
-     * @return ACCViewEditPage
+     *
      */
-    ACCViewEditPage deleteBaseACC(String path);
+    void deleteBaseACC(String path);
 
     /**
      * Open the 'Create Extension Component' dialog by clicking 'Create OAGi Extension Component' context menu.

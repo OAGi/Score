@@ -53,7 +53,7 @@ public interface SelectBaseACCToRefactorDialog extends Dialog {
      *
      * @return the UI element of the 'Refactor' button
      */
-    WebElement getRefactorButton();
+    WebElement getRefactorButton(boolean enabled);
 
     ACCViewEditPage hitRefactorButton();
 

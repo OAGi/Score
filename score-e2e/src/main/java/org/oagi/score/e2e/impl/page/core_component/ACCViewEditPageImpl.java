@@ -470,7 +470,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public ACCViewEditPage deleteBaseACC(String path) {
+    public void deleteBaseACC(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
             click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
@@ -484,9 +484,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
-        assert this.isOpened();
+
         assert "Updated".equals(getSnackBarMessage(getDriver()));
-        return this;
     }
 
     @Override

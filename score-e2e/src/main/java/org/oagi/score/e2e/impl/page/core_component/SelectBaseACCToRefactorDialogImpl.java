@@ -18,7 +18,7 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
     private static final By REFACTOR_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//button//*[contains(text(),\"Refactor\")]");
+            By.xpath("//score-based-acc-dialog//span[contains(text(),\"Refactor\")]//ancestor::button[1]");
 
     private ACCViewEditPageImpl parent;
     private String associationToRefactor;
@@ -31,6 +31,7 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
     private WebDriver getDriver() {
         return this.parent.getDriver();
     }
+
     @Override
     public boolean isOpened() {
         WebElement title;
@@ -39,8 +40,8 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
         } catch (TimeoutException e) {
             return false;
         }
-        assert(getText(title).startsWith("Select a base ACC to move"));
-        assert(getText(title).contains(this.associationToRefactor));
+        assert (getText(title).startsWith("Select a base ACC to move"));
+        assert (getText(title).contains(this.associationToRefactor));
         return true;
     }
 
@@ -87,13 +88,17 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
     }
 
     @Override
-    public WebElement getRefactorButton() {
-        return elementToBeClickable(getDriver(), REFACTOR_BUTTON_LOCATOR);
+    public WebElement getRefactorButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), REFACTOR_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), REFACTOR_BUTTON_LOCATOR);
+        }
     }
 
     @Override
     public ACCViewEditPage hitRefactorButton() {
-        click(getRefactorButton());
+        click(getRefactorButton(true));
         return parent;
     }
 }
