@@ -43,6 +43,12 @@ public class MessageService {
         return response;
     }
 
+    @Transactional
+    public void discardMessage(ScoreUser requester, BigInteger messageId) {
+        MessageWriteRepository messageWriteRepository = scoreRepositoryFactory.createMessageWriteRepository();
+        messageWriteRepository.discardMessage(new DiscardMessageRequest(requester, messageId));
+    }
+
     @Async
     @Transactional
     public CompletableFuture<SendMessageResponse> asyncSendMessage(SendMessageRequest request) {

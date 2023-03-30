@@ -11,6 +11,7 @@ import org.oagi.score.service.common.data.PageResponse;
 import org.oagi.score.service.message.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
@@ -103,5 +104,15 @@ public class MessageController {
         return messageService.getMessage(
                 sessionService.asScoreUser(requester),
                 messageId);
+    }
+
+    @RequestMapping(value = "/message/{id:[\\d]+}", method = RequestMethod.DELETE)
+    public ResponseEntity discardMessage(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @PathVariable("id") BigInteger messageId) {
+        messageService.discardMessage(
+                sessionService.asScoreUser(requester),
+                messageId);
+        return ResponseEntity.accepted().build();
     }
 }
