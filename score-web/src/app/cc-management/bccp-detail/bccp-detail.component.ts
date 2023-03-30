@@ -41,7 +41,7 @@ import {MatMenuTrigger} from '@angular/material/menu';
 import {Tag, ShortTag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
-import {FormControl} from "@angular/forms";
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'score-bccp-detail',

@@ -6,6 +6,7 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.MessageRecord;
 import org.oagi.score.repo.api.message.MessageWriteRepository;
+import org.oagi.score.repo.api.message.model.DiscardMessageRequest;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.api.message.model.SendMessageResponse;
 import org.oagi.score.repo.api.user.model.ScoreUser;
@@ -46,6 +47,27 @@ public class JooqMessageWriteRepository
         }
 
         return new SendMessageResponse(messageIds);
+    }
+
+    @Override
+    public void discardMessage(DiscardMessageRequest request) throws ScoreDataAccessException {
+        ScoreUser requester = request.getRequester();
+        if (requester == null) {
+            throw new IllegalArgumentException();
+        }
+
+        ULong recipientId = dslContext().select(MESSAGE.RECIPIENT_ID)
+                .from(MESSAGE)
+                .where(MESSAGE.MESSAGE_ID.eq(ULong.valueOf(request.getMessageId())))
+                .fetchOptionalInto(ULong.class).orElse(null);
+
+        if (!recipientId.equals(ULong.valueOf(requester.getUserId()))) {
+            throw new ScoreDataAccessException("You do not have a permission to access this message.");
+        }
+
+        dslContext().deleteFrom(MESSAGE)
+                .where(MESSAGE.MESSAGE_ID.eq(ULong.valueOf(request.getMessageId())))
+                .execute();
     }
 
 }

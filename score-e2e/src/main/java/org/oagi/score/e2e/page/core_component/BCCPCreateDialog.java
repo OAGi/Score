@@ -220,4 +220,7 @@ public interface BCCPCreateDialog extends Dialog {
      */
     BCCPViewEditPage create(String den);
 
+    void selectDataTypeByDEN(String dataType);
+
+    void hitCreateButton();
 }

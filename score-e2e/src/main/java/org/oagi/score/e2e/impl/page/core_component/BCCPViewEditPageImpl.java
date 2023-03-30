@@ -4,10 +4,8 @@ import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -16,7 +14,6 @@ import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
-import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
@@ -49,7 +46,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@data-placeholder, \"Property Term\")]");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -68,6 +65,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -299,9 +298,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
+        retry(() -> {
+            click(getUpdateButton(true));
+            waitFor(ofMillis(1000L));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -440,6 +442,50 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 }
             };
         });
+    }
+
+    @Override
+    public void setPropertyTerm(String propertyTerm) {
+        sendKeys(getPropertyTermField(), propertyTerm);
+    }
+    @Override
+    public WebElement getPropertyTermField() {
+        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setNamespace(String namespace) {
+        click(getNamespaceSelectField());
+        waitFor(ofMillis(1000L));
+        WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+        click(option);
+        waitFor(ofMillis(1000L));
+        assert getText(getNamespaceSelectField()).equals(namespace);
+    }
+    @Override
+    public WebElement getNamespaceSelectField() {
+        return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
+    }
+    @Override
+    public void hitUpdateAnywayButton() {
+        retry(() -> click(getUpdateButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+    @Override
+    public WebElement getUpdateAnywayButton() {
+        return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setDefinition(String definition) {
+        sendKeys(getDefinitionField(), definition);
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {

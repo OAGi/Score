@@ -116,6 +116,9 @@ The developer can move the Release to Draft state again. In this case, the Relea
 #### Test Assertion #21.2.7
 The developer can validate all the schemas in a Module Set Release.
 
+#### Test Assertion #21.2.7
+The developer can validate all schemas in the release module set.  The validated result can be downloaded or copy-pasted. 
+
 ### Test Step Pre-condition:
 
 

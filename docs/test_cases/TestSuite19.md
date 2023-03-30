@@ -75,6 +75,10 @@ End users cannot manage releases, i.e., cannot initialize a release and move it 
 #### Test Assertion #19.1.13
 End users can view the list of releases and individual details.
 
+#### Test Assertion #19.1.14
+A developer can generate a migration script only for the most recent published release. The migration script can be used 
+in the external data loader to update other instances to the recent published release. 
+
 ### Test Step Pre-condition:
 
 
