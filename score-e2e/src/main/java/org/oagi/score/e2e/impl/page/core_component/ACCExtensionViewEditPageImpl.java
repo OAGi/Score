@@ -8,7 +8,6 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 
@@ -61,6 +60,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
 
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
@@ -73,6 +74,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+    public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
 
     public ACCExtensionViewEditPageImpl(BasePage parent) {
         super(parent);
@@ -218,6 +221,22 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public void setDefinition(String definition) {
         clear(getDefinitionField());
         sendKeys(getDefinitionField(), definition);
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> click(getDeleteButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        click(elementToBeClickable(getDriver(), CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR));
+        waitFor(ofMillis(1000L));
+    }
+    @Override
+    public WebElement getDeleteButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), DELETE_BUTTON_LOCATOR);
+        }
     }
 
     @Override

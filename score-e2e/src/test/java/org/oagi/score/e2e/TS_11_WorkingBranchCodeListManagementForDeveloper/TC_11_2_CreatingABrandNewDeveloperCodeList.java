@@ -12,7 +12,7 @@ import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -61,7 +61,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
         assertNotChecked(editCodeListPage.getDeprecatedSelectField());
         assertEquals("Namespace", getText(editCodeListPage.getNamespaceSelectField()));
-        AddCodeListCommentDialog addCodeListCommentDialog = editCodeListPage.hitAddCommentButton();
+        AddCommentDialog addCodeListCommentDialog = editCodeListPage.hitAddCommentButton();
         assertEquals(null, getText(addCodeListCommentDialog.getCommentField()));
         addCodeListCommentDialog.hitCloseButton();
         assertEquals("Working", getText(editCodeListPage.getReleaseField()));

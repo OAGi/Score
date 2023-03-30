@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -11,7 +11,7 @@ import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
-public class AddCodeListCommentDialogImpl implements AddCodeListCommentDialog {
+public class AddCommentDialogImpl implements AddCommentDialog {
     private static final By COMMENT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Comment\")]//ancestor::button[1]");
     private static final By COMMENT_FIELD_LOCATOR =
@@ -21,7 +21,7 @@ public class AddCodeListCommentDialogImpl implements AddCodeListCommentDialog {
 
     private final BasePageImpl parent;
 
-    public AddCodeListCommentDialogImpl(BasePageImpl parent) {
+    public AddCommentDialogImpl(BasePageImpl parent) {
         this.parent = parent;
     }
 
