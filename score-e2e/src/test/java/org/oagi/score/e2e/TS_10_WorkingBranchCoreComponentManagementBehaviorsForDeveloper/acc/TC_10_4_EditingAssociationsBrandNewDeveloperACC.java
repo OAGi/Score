@@ -2319,7 +2319,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         //ungroup the ASCC node to fix "Refactoring" issue
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
-        String nodePathForUngroup = "/" + accForBase.getDen() + "/" + accGroup.getDen();
+        String nodePathForUngroup = "/" + accForBase.getDen() + "/" + asccpGroup.getPropertyTerm();
         accViewEditPage.unGroup(nodePathForUngroup);
         WebElement nodeAfterUngroup = accViewEditPage.getNodeByPath("/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
         assertTrue(nodeAfterUngroup.isDisplayed());

@@ -299,9 +299,9 @@ public interface ACCViewEditPage extends Page {
     /**
      * Ungroup the association by clicking 'Refactor/Ungroup' context menu
      * @param path
-     * @return the ACCViewEditPage
+     *
      */
-    ACCViewEditPage unGroup(String path);
+    void unGroup(String path);
 
     /**
      * Remove the association by clicking 'Remove' context menu.

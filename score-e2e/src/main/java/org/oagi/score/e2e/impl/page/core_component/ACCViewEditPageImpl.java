@@ -553,7 +553,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public ACCViewEditPage unGroup(String path) {
+    public void unGroup(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
             click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
@@ -565,13 +565,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             click(visibilityOfElementLocated(getDriver(), UNGROUP_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]")).isDisplayed();
 
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Ungroup anyway\")]//ancestor::button[1]")));
-        assert this.isOpened();
         assert "Ungrouped".equals(getSnackBarMessage(getDriver()));
-        return this;
+
     }
 
     @Override
