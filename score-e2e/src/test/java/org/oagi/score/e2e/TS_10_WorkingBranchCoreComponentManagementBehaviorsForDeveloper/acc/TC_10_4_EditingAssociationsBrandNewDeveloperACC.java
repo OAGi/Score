@@ -2032,6 +2032,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
+        boolean noBase = false;
+        String oldBase = null;
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -2044,12 +2046,18 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             String state = entry.getKey();
             accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            getAPIFactory().getCoreComponentAPI().updateACC(acc);
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            if (noBase){
+                accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + oldBase);
+            }
+            ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
+            accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+            oldBase = accForBase.getDen();
+            noBase = true;
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            String basePath = "/" + acc.getDen() + "/" + accForBase.getDen();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, asccp.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
