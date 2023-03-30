@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
+import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -326,4 +328,7 @@ public interface ViewEditCoreComponentPage extends Page {
      */
     void setItemsPerPage(int items);
 
+    DTViewEditPage createDT(String den, String branch);
+
+    BCCPViewEditPage createBCCP(String dataType, String branch, AppUserObject user);
 }
