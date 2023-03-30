@@ -301,6 +301,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleAgencyIdListManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_ID,
+                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.as("manifestId"),
                 AGENCY_ID_LIST.AGENCY_ID_LIST_ID.as("ccId"),
                 MODULE.PATH.as("path"))
                 .from(AGENCY_ID_LIST)
@@ -313,6 +314,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleCodeListManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_CODE_LIST_MANIFEST.MODULE_ID,
+                CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.as("manifestId"),
                 CODE_LIST.CODE_LIST_ID.as("ccId"),
                 MODULE.PATH.as("path"))
                 .from(CODE_LIST)
@@ -325,6 +327,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleAccManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_ACC_MANIFEST.MODULE_ID,
+                ACC_MANIFEST.ACC_MANIFEST_ID.as("manifestId"),
                 ACC.ACC_ID.as("ccId"),
                 MODULE.PATH.as("path"))
                 .from(ACC)
@@ -337,6 +340,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleAsccpManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_ASCCP_MANIFEST.MODULE_ID,
+                ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifestId"),
                 ASCCP.ASCCP_ID.as("ccId"),
                 MODULE.PATH.as("path"))
                 .from(ASCCP)
@@ -349,6 +353,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleBccpManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_BCCP_MANIFEST.MODULE_ID,
+                BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifestId"),
                 BCCP.BCCP_ID.as("ccId"),
                 MODULE.PATH.as("path"))
                 .from(BCCP)
@@ -361,6 +366,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleDtManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_DT_MANIFEST.MODULE_ID,
+                DT_MANIFEST.DT_MANIFEST_ID.as("manifestId"),
                 DT.DT_ID.as("ccId"),
                 MODULE.PATH)
                 .from(DT)
@@ -373,6 +379,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleXbtManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_XBT_MANIFEST.MODULE_ID,
+                XBT_MANIFEST.XBT_MANIFEST_ID.as("manifestId"),
                 XBT.XBT_ID.as("ccId"),
                 MODULE.PATH)
                 .from(XBT)
@@ -385,6 +392,7 @@ public class CoreComponentRepositoryForModuleSetRelease {
 
     public List<ModuleCCID> findAllModuleBlobContentManifest(ULong moduleSetReleaseId) {
         return dslContext.select(MODULE_BLOB_CONTENT_MANIFEST.MODULE_ID,
+                BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID.as("manifestId"),
                 BLOB_CONTENT.BLOB_CONTENT_ID.as("ccId"),
                 MODULE.PATH)
                 .from(BLOB_CONTENT)

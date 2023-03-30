@@ -6,16 +6,9 @@ import org.oagi.score.repository.provider.DataProvider;
 
 public class ACCComplexType extends ACC {
 
-    AccManifestRecord accManifest;
-
-    ACCComplexType(AccRecord acc, ACC basedAcc, AccManifestRecord accManifestRecord,
+    ACCComplexType(AccManifestRecord accManifest, AccRecord acc, ACC basedAcc,
                    DataProvider dataProvider) {
-        super(acc, basedAcc, dataProvider);
-        this.accManifest = accManifestRecord;
-    }
-
-    public AccManifestRecord getAccManifest() {
-        return accManifest;
+        super(accManifest, acc, basedAcc, dataProvider);
     }
 
 }

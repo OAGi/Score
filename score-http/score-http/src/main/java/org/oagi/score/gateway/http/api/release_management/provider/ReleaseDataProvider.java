@@ -30,7 +30,8 @@ public class ReleaseDataProvider implements DataProvider {
     public void init() {
         long s = System.currentTimeMillis();
 
-        findAgencyIdListManifestMap = coreComponentRepositoryForRelease.findAllAgencyIdListManifest(ULong.valueOf(releaseId)).stream()
+        findAgencyIdListManifestList = coreComponentRepositoryForRelease.findAllAgencyIdListManifest(ULong.valueOf(releaseId));
+        findAgencyIdListManifestMap = findAgencyIdListManifestList.stream()
                 .collect(Collectors.toMap(AgencyIdListManifestRecord::getAgencyIdListManifestId, Function.identity()));
         findAgencyIdListList = coreComponentRepositoryForRelease.findAllAgencyIdList(ULong.valueOf(releaseId));
         findAgencyIdListMap = findAgencyIdListList.stream()
@@ -39,7 +40,8 @@ public class ReleaseDataProvider implements DataProvider {
         findAgencyIdListValueByOwnerListIdMap = coreComponentRepositoryForRelease.findAllAgencyIdListValue(ULong.valueOf(releaseId)).stream()
                 .collect(Collectors.groupingBy(AgencyIdListValueRecord::getOwnerListId));
 
-        findCodeListManifestMap = coreComponentRepositoryForRelease.findAllCodeListManifest(ULong.valueOf(releaseId)).stream()
+        findCodeListManifestList = coreComponentRepositoryForRelease.findAllCodeListManifest(ULong.valueOf(releaseId));
+        findCodeListManifestMap = findCodeListManifestList.stream()
                 .collect(Collectors.toMap(CodeListManifestRecord::getCodeListManifestId, Function.identity()));
         findCodeListList = coreComponentRepositoryForRelease.findAllCodeList(ULong.valueOf(releaseId));
         findCodeListMap = findCodeListList.stream()
@@ -171,7 +173,12 @@ public class ReleaseDataProvider implements DataProvider {
         return findSeqKeyMap.containsKey(accManifestId) ? findSeqKeyMap.get(accManifestId) : Collections.emptyList();
     }
 
+    private List<AgencyIdListManifestRecord> findAgencyIdListManifestList;
     private Map<ULong, AgencyIdListManifestRecord> findAgencyIdListManifestMap;
+
+    public List<AgencyIdListManifestRecord> findAgencyIdListManifest() {
+        return Collections.unmodifiableList(findAgencyIdListManifestList);
+    }
 
     public AgencyIdListManifestRecord findAgencyIdListManifest(ULong agencyIdListManifestId) {
         return findAgencyIdListManifestMap.get(agencyIdListManifestId);
@@ -193,6 +200,12 @@ public class ReleaseDataProvider implements DataProvider {
     
     public List<AgencyIdListValueRecord> findAgencyIdListValueByOwnerListId(ULong ownerListId) {
         return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ? findAgencyIdListValueByOwnerListIdMap.get(ownerListId) : Collections.emptyList();
+    }
+
+    private List<CodeListManifestRecord> findCodeListManifestList;
+
+    public List<CodeListManifestRecord> findCodeListManifest() {
+        return Collections.unmodifiableList(findCodeListManifestList);
     }
 
     private Map<ULong, CodeListManifestRecord> findCodeListManifestMap;
