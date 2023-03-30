@@ -2080,9 +2080,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         String branch = "Working";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc, acc_association, accForBase;
+        ACCObject acc, acc_association, accForBase, random_acc;
         ASCCObject ascc;
-        ASCCPObject asccp;
+        ASCCPObject asccp, random_asccp;
         BCCPObject bccp, bccp_to_append;
 
         {
@@ -2109,7 +2109,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
         ACCViewEditPage accViewEditPage;
+        SelectAssociationDialog appendAssociationDialog;
+        boolean noBase = false;
+        String oldBase = null;
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Published");
@@ -2121,12 +2125,23 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             String state = entry.getKey();
             accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            getAPIFactory().getCoreComponentAPI().updateACC(acc);
+            random_acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer,release, namespace, "Published");
+            random_asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(random_acc, developer, namespace, "Published");
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+            appendAssociationDialog.selectAssociation(random_asccp.getDen());
+
+            if (noBase){
+                accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + oldBase);
+            }
+            ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
+            accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+            oldBase = accForBase.getDen();
+            noBase = true;
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            String basePath = "/" + acc.getDen() + "/" + accForBase.getDen();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, asccp.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + random_asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, random_asccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
@@ -2139,7 +2154,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             getAPIFactory().getCoreComponentAPI().updateACC(accForBase);
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, asccp.getPropertyTerm());
+            selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, random_asccp.getPropertyTerm());
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
             click(tr.findElement(By.className("mat-column-" + "select")));
@@ -2148,7 +2163,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             selectBaseACCToRefactorDialog.hitRefactorButton();
 
             //Verify the asccp is moved to under the accForBase node
-            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + random_asccp.getPropertyTerm());
             assertTrue(movedASCCPNode.isDisplayed());
         }
     }
