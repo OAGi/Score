@@ -59,16 +59,13 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private String getPath(ULong asccpManifestId) {
         AsccpManifestRecord asccpManifest = releaseDataProvider.findASCCPManifest(asccpManifestId);
         AsccpRecord asccp = releaseDataProvider.findASCCP(asccpManifest.getAsccpId());
-        String den = asccp.getDen();
+        AccRecord acc = releaseDataProvider.findACC(asccp.getRoleOfAccId());
+
         String term;
-        // TODO:
-        // OAGIS has many duplicate property terms in ASCCP for 'Extension' and 'Data Area'.
-        if (den.startsWith("Extension. ")) {
-            term = den.substring("Extension. ".length());
-        } else if (den.startsWith("Data Area. ")) {
-            term = den.substring("Data Area. ".length());
-        } else {
+        if (asccp.getPropertyTerm().equals(acc.getObjectClassTerm())) {
             term = asccp.getPropertyTerm();
+        } else {
+            term = asccp.getPropertyTerm() + acc.getObjectClassTerm();
         }
         String path = term.replaceAll(" ", "").replace("Identifier", "ID");
         synchronized (pathCounter) {
