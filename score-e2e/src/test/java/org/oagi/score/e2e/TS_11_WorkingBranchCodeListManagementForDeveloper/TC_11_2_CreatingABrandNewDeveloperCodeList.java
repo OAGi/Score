@@ -66,7 +66,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         addCodeListCommentDialog.hitCloseButton();
         assertEquals("Working", getText(editCodeListPage.getReleaseField()));
         assertEquals("1", getText(editCodeListPage.getRevisionField()));
-        ArrayList<String> oagisOwnedLists = getAPIFactory().getCodeListAPI().getOAGISOwnedLists();
+        List<String> oagisOwnedLists = getAPIFactory().getCodeListAPI().getOAGISOwnedLists(workingBranch.getReleaseId());
         assertTrue(oagisOwnedLists.contains(getText(editCodeListPage.getAgencyIDListField())));
     }
 

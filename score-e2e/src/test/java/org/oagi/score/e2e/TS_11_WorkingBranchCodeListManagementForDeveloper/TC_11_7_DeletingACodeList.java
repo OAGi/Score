@@ -16,10 +16,16 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_7_DeletingACodeList extends BaseTest {
@@ -86,40 +92,44 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             codeListCodeListValueMap.put(codeList, codeListValue);
             codeListForTesting.add(codeList);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         for (CodeListObject codeList : codeListForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
             dtViewEditPage.showValueDomain();
             dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            String qualifier = "testDataType";
+            String qualifier = "testDataType" + randomAlphabetic(5, 10);
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
             dtViewEditPage.hitUpdateButton();
-            if (definition == null){
+            if (definition == null) {
                 dtViewEditPage.hitUpdateAnywayButton();
             }
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
             editCodeListPage.hitDeleteButton();
-            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openPage();
             DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
-            dtViewEditPage.showValueDomain();
+            dtViewEditPageNew.showValueDomain();
             assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
             escape(getDriver());
             CodeListObject oagiCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_StateCode", workingBranch.getReleaseNumber());
-            dtViewEditPage.changeCodeListValueDomain(oagiCodeList.getName());
+            dtViewEditPageNew.changeCodeListValueDomain(oagiCodeList.getName());
 
-            viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            viewEditCodeListPage.openPage();
             editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
             editCodeListPage.hitRestoreButton();
-            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
-            dtViewEditPage.showValueDomain();
-            assertThrows(NoSuchElementException.class, () -> {dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName());});
+
+            dtViewEditPageNew.openPage();
+            dtViewEditPageNew.showValueDomain();
+            assertThrows(NoSuchElementException.class, () -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
             escape(getDriver());
+
+            viewEditCoreComponentPage.openPage();
         }
     }
+
     @Test
     @DisplayName("TC_11_7_TA_3")
     public void test_TA_3() {
@@ -139,6 +149,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             codeListCodeListValueMap.put(codeList, codeListValue);
             codeListForTesting.add(codeList);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             /**
@@ -149,17 +160,17 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             dtViewEditPage.showValueDomain();
             dtViewEditPage.addCodeListValueDomain(codeList.getName());
             dtViewEditPage.setDefaultValueDomain(codeList.getName());
-            String qualifier = "testDataType";
+            String qualifier = "testDataType" + randomAlphabetic(5, 10);
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
             dtViewEditPage.hitUpdateButton();
-            if (definition == null){
+            if (definition == null) {
                 dtViewEditPage.hitUpdateAnywayButton();
             }
             /**
              * Create new BCCP that uses previously created BDT
              */
-            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openPage();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.createBCCP(qualifier + "_ Code. Type", workingBranch.getReleaseNumber(), developerA);
             String BCCPPropertyTerm = "testBCCPProperty";
             bccpViewEditPage.setPropertyTerm(BCCPPropertyTerm);
@@ -167,14 +178,14 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             bccpViewEditPage.setDefinition("definition");
             definition = getText(bccpViewEditPage.getDefinitionField());
             bccpViewEditPage.hitUpdateButton();
-            if (definition == null){
+            if (definition == null) {
                 bccpViewEditPage.hitUpdateAnywayButton();
             }
             BCCPObject createdBCCP = getAPIFactory().getCoreComponentAPI().getLatestBCCPCreatedByUser(developerA, workingBranch.getReleaseNumber());
             /**
              * Create ACC that has previously created BCCP
              */
-            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openPage();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.createACC(workingBranch.getReleaseNumber());
             ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term. Details", workingBranch.getReleaseNumber());
             SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
@@ -189,13 +200,13 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             /*TODO:
             As the developer expands the tree down to the BCCP using the BDT that the deleted CL, the CL shall be flagged as deleted.
              */
-            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm());
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-
         }
     }
+
     @Test
     @DisplayName("TC_11_7_TA_4")
     public void test_TA_4() {

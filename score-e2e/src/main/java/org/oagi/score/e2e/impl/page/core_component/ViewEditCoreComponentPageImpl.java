@@ -270,8 +270,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public ACCViewEditPage createACC(String branch) {
         setBranch(branch);
         click(getCreateACCButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
 
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term. Details", branch);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
@@ -415,11 +419,19 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public DTViewEditPage createDT(String den, String branch) {
         setBranch(branch);
         click(getCreateDTButton());
+        waitFor(ofMillis(2000L));
+
         DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
+        assert dtCreateDialog.isOpened();
         dtCreateDialog.selectBasedDTByDEN(den);
         dtCreateDialog.hitCreateButton();
-        DTObject dt = getAPIFactory().getCoreComponentAPI().getLatestDTCreated(den, branch);
+        waitFor(ofMillis(2000L));
+        invisibilityOfLoadingContainerElement(getDriver());
 
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger dtManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+
+        DTObject dt = getAPIFactory().getCoreComponentAPI().getBDTByManifestId(dtManifestId);
         DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
         assert dtViewEditPage.isOpened();
         return dtViewEditPage;
