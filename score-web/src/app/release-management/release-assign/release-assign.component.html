@@ -17,7 +17,8 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>DEN</mat-label>
-                <input matInput [(ngModel)]="filter.den"/>
+                <input matInput [(ngModel)]="filter.den"
+                       (keyup.enter)="this.filterList();"/>
               </mat-form-field>
             </div>
 
@@ -35,8 +36,7 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Owner</mat-label>
-                <mat-select [(ngModel)]="filter.owner"
-                            multiple>
+                <mat-select [(ngModel)]="filter.owner" multiple>
                   <mat-option>
                     <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
                                            [placeholderLabel]="'Search...'"
@@ -96,10 +96,9 @@
                  [cdkDropListData]="itemsList.assignableList"
                  [cdkDropListConnectedTo]="[assignedListAll]"
                  (cdkDropListDropped)="drop($event)">
-              <div class="drop-box-item"
-                   [hidden]="!item.visible"
-                   [class]="item.state === 'Candidate'? 'drop-box-item': 'drop-box-item, disabled'"
-                   [cdkDragDisabled]="item.state !== 'Candidate'"
+              <div [class]="classList(item)"
+                   [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
+                   [class.cdk-visually-hidden]="!item.visible"
                    *ngFor="let item of itemsList.assignableList" cdkDrag>
                 <div class="dragPlaceholder" *cdkDragPlaceholder></div>
                 <div class="head">
@@ -162,11 +161,10 @@
                  [cdkDropListData]="itemsList.assignedList"
                  [cdkDropListConnectedTo]="[assignableListAll]"
                  (cdkDropListDropped)="drop($event)">
-              <div class="drop-box-item"
-                   *ngFor="let item of itemsList.assignedList" cdkDrag
-                   [class]="item.state === 'Candidate'? 'drop-box-item': 'drop-box-item, disabled'"
-                   [cdkDragDisabled]="item.state !== 'Candidate'"
-                   [hidden]="!item.visible">
+              <div [class]="classList(item)"
+                   [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
+                   [class.cdk-visually-hidden]="!item.visible"
+                   *ngFor="let item of itemsList.assignedList" cdkDrag>
                 <div class="dragPlaceholder" *cdkDragPlaceholder></div>
                 <div class="head">
                   <span class="item-type">

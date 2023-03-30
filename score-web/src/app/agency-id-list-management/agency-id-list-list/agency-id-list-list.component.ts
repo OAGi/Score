@@ -26,6 +26,8 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {SimpleNamespace} from "../../namespace-management/domain/namespace";
+import {NamespaceService} from "../../namespace-management/domain/namespace.service";
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -64,6 +66,9 @@ export class AgencyIdListListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: AgencyIdListForListRequest;
+  namespaces: SimpleNamespace[] = [];
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -72,6 +77,7 @@ export class AgencyIdListListComponent implements OnInit {
   constructor(private service: AgencyIdListService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
+              private namespaceService: NamespaceService,
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
@@ -99,8 +105,9 @@ export class AgencyIdListListComponent implements OnInit {
     this.releases = [];
     forkJoin([
       this.releaseService.getSimpleReleases(['Published', 'Draft']),
+      this.namespaceService.getSimpleNamespaces(),
       this.accountService.getAccountNames()
-    ]).subscribe(([releases, loginIds]) => {
+    ]).subscribe(([releases, namespaces, loginIds]) => {
       this.releases.push(...releases);
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
@@ -115,6 +122,9 @@ export class AgencyIdListListComponent implements OnInit {
           this.request.release = this.releases[0];
         }
       }
+
+      this.namespaces.push(...namespaces);
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
 
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);

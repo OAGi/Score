@@ -100,7 +100,7 @@ CREATE TABLE `acc` (
   CONSTRAINT `acc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `acc_prev_acc_id_fk` FOREIGN KEY (`prev_acc_id`) REFERENCES `acc` (`acc_id`),
   CONSTRAINT `acc_replacement_acc_id_fk` FOREIGN KEY (`replacement_acc_id`) REFERENCES `acc` (`acc_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5311 DEFAULT CHARSET=utf8 COMMENT='The ACC table holds information about complex data structured concepts. For example, OAGIS''s Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The ACC table holds information about complex data structured concepts. For example, OAGIS''s Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `acc_manifest` (
   CONSTRAINT `acc_manifest_prev_acc_manifest_id_fk` FOREIGN KEY (`prev_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
   CONSTRAINT `acc_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `acc_replacement_acc_manifest_id_fk` FOREIGN KEY (`replacement_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=250000 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -209,7 +209,7 @@ CREATE TABLE `agency_id_list` (
   CONSTRAINT `agency_id_list_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `agency_id_list_prev_agency_id_list_id_fk` FOREIGN KEY (`prev_agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
   CONSTRAINT `agency_id_list_replacement_agency_id_list_id_fk` FOREIGN KEY (`replacement_agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='The AGENCY_ID_LIST table stores information about agency identification lists. The list''s values are however kept in the AGENCY_ID_LIST_VALUE.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The AGENCY_ID_LIST table stores information about agency identification lists. The list''s values are however kept in the AGENCY_ID_LIST_VALUE.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -247,7 +247,7 @@ CREATE TABLE `agency_id_list_manifest` (
   CONSTRAINT `agency_id_list_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `agency_id_list_replacement_agency_id_list_manifest_id_fk` FOREIGN KEY (`replacement_agency_id_list_manifest_id`) REFERENCES `agency_id_list_manifest` (`agency_id_list_manifest_id`),
   CONSTRAINT `agency_id_list_value_manifest_id_fk` FOREIGN KEY (`agency_id_list_value_manifest_id`) REFERENCES `agency_id_list_value_manifest` (`agency_id_list_value_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -292,7 +292,7 @@ CREATE TABLE `agency_id_list_value` (
   CONSTRAINT `agency_id_list_value_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `agency_id_list_value_prev_agency_id_list_value_id_fk` FOREIGN KEY (`prev_agency_id_list_value_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`),
   CONSTRAINT `agency_id_list_value_replacement_agency_id_list_value_id_fk` FOREIGN KEY (`replacement_agency_id_list_value_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=806 DEFAULT CHARSET=utf8 COMMENT='This table captures the values within an agency identification list.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the values within an agency identification list.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -327,7 +327,7 @@ CREATE TABLE `agency_id_list_value_manifest` (
   CONSTRAINT `agency_id_list_value_manifest_prev_agency_id_list_value_manif_fk` FOREIGN KEY (`prev_agency_id_list_value_manifest_id`) REFERENCES `agency_id_list_value_manifest` (`agency_id_list_value_manifest_id`),
   CONSTRAINT `agency_id_list_value_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `agency_id_list_value_replacement_agency_id_list_manif_fk` FOREIGN KEY (`replacement_agency_id_list_value_manifest_id`) REFERENCES `agency_id_list_value_manifest` (`agency_id_list_value_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16582 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -374,7 +374,7 @@ CREATE TABLE `app_user` (
   `is_enabled` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`app_user_id`),
   UNIQUE KEY `app_user_uk1` (`login_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='This table captures the user information for authentication and authorization purposes.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the user information for authentication and authorization purposes.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -532,7 +532,7 @@ CREATE TABLE `ascc` (
   CONSTRAINT `ascc_prev_ascc_id_fk` FOREIGN KEY (`prev_ascc_id`) REFERENCES `ascc` (`ascc_id`),
   CONSTRAINT `ascc_replacement_ascc_id_fk` FOREIGN KEY (`replacement_ascc_id`) REFERENCES `ascc` (`ascc_id`),
   CONSTRAINT `ascc_to_asccp_id_fk` FOREIGN KEY (`to_asccp_id`) REFERENCES `asccp` (`asccp_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8978 DEFAULT CHARSET=utf8 COMMENT='An ASCC represents a relationship/association between two ACCs through an ASCCP. ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASCC represents a relationship/association between two ACCs through an ASCCP. ';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -593,7 +593,7 @@ CREATE TABLE `ascc_manifest` (
   CONSTRAINT `ascc_manifest_seq_key_id_fk` FOREIGN KEY (`seq_key_id`) REFERENCES `seq_key` (`seq_key_id`),
   CONSTRAINT `ascc_manifest_to_asccp_manifest_id_fk` FOREIGN KEY (`to_asccp_manifest_id`) REFERENCES `asccp_manifest` (`asccp_manifest_id`),
   CONSTRAINT `ascc_replacement_ascc_manifest_id_fk` FOREIGN KEY (`replacement_ascc_manifest_id`) REFERENCES `ascc_manifest` (`ascc_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=273124 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -644,7 +644,7 @@ CREATE TABLE `asccp` (
   CONSTRAINT `asccp_prev_asccp_id_fk` FOREIGN KEY (`prev_asccp_id`) REFERENCES `asccp` (`asccp_id`),
   CONSTRAINT `asccp_replacement_asccp_id_fk` FOREIGN KEY (`replacement_asccp_id`) REFERENCES `asccp` (`asccp_id`),
   CONSTRAINT `asccp_role_of_acc_id_fk` FOREIGN KEY (`role_of_acc_id`) REFERENCES `acc` (`acc_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5184 DEFAULT CHARSET=utf8 COMMENT='An ASCCP specifies a role (or property) an ACC may play under another ACC.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASCCP specifies a role (or property) an ACC may play under another ACC.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -679,7 +679,7 @@ CREATE TABLE `asccp_manifest` (
   CONSTRAINT `asccp_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `asccp_manifest_role_of_acc_manifest_id_fk` FOREIGN KEY (`role_of_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
   CONSTRAINT `asccp_replacement_asccp_manifest_id_fk` FOREIGN KEY (`replacement_asccp_manifest_id`) REFERENCES `asccp_manifest` (`asccp_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=211052 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -932,7 +932,7 @@ CREATE TABLE `bcc` (
   CONSTRAINT `bcc_prev_bcc_id_fk` FOREIGN KEY (`prev_bcc_id`) REFERENCES `bcc` (`bcc_id`),
   CONSTRAINT `bcc_replacement_bcc_id_fk` FOREIGN KEY (`replacement_bcc_id`) REFERENCES `bcc` (`bcc_id`),
   CONSTRAINT `bcc_to_bccp_id_fk` FOREIGN KEY (`to_bccp_id`) REFERENCES `bccp` (`bccp_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3565 DEFAULT CHARSET=utf8 COMMENT='A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. ';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -993,7 +993,7 @@ CREATE TABLE `bcc_manifest` (
   CONSTRAINT `bcc_manifest_seq_key_id_fk` FOREIGN KEY (`seq_key_id`) REFERENCES `seq_key` (`seq_key_id`),
   CONSTRAINT `bcc_manifest_to_bccp_manifest_id_fk` FOREIGN KEY (`to_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`),
   CONSTRAINT `bcc_replacement_bcc_manifest_id_fk` FOREIGN KEY (`replacement_bcc_manifest_id`) REFERENCES `bcc_manifest` (`bcc_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=125723 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1045,7 +1045,7 @@ CREATE TABLE `bccp` (
   CONSTRAINT `bccp_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `bccp_prev_bccp_id_fk` FOREIGN KEY (`prev_bccp_id`) REFERENCES `bccp` (`bccp_id`),
   CONSTRAINT `bccp_replacement_bccp_id_fk` FOREIGN KEY (`replacement_bccp_id`) REFERENCES `bccp` (`bccp_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1188 DEFAULT CHARSET=utf8 COMMENT='An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1080,7 +1080,7 @@ CREATE TABLE `bccp_manifest` (
   CONSTRAINT `bccp_manifest_prev_bccp_manifest_id_fk` FOREIGN KEY (`prev_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`),
   CONSTRAINT `bccp_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `bccp_replacement_bccp_manifest_id_fk` FOREIGN KEY (`replacement_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=61293 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1128,7 +1128,7 @@ CREATE TABLE `bdt_pri_restri` (
   CONSTRAINT `bdt_pri_restri_bdt_manifest_id_fk` FOREIGN KEY (`bdt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`),
   CONSTRAINT `bdt_pri_restri_cdt_awd_pri_xps_type_map_id_fk` FOREIGN KEY (`cdt_awd_pri_xps_type_map_id`) REFERENCES `cdt_awd_pri_xps_type_map` (`cdt_awd_pri_xps_type_map_id`),
   CONSTRAINT `bdt_pri_restri_code_list_manifest_id_fk` FOREIGN KEY (`code_list_manifest_id`) REFERENCES `code_list_manifest` (`code_list_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=514014 DEFAULT CHARSET=utf8 COMMENT='This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1154,7 +1154,7 @@ CREATE TABLE `bdt_sc_pri_restri` (
   CONSTRAINT `bdt_sc_pri_restri_bdt_manifest_id_fk` FOREIGN KEY (`bdt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`),
   CONSTRAINT `bdt_sc_pri_restri_cdt_sc_awd_pri_xps_type_map_id_fk` FOREIGN KEY (`cdt_sc_awd_pri_xps_type_map_id`) REFERENCES `cdt_sc_awd_pri_xps_type_map` (`cdt_sc_awd_pri_xps_type_map_id`),
   CONSTRAINT `bdt_sc_pri_restri_code_list_manifest_id_fk` FOREIGN KEY (`code_list_manifest_id`) REFERENCES `code_list_manifest` (`code_list_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=271992 DEFAULT CHARSET=utf8 COMMENT='This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.\n\nIt should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the BDT_SC_PRI_RESTRI key.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.\n\nIt should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the BDT_SC_PRI_RESTRI key.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1288,7 +1288,7 @@ CREATE TABLE `blob_content` (
   `blob_content_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
   `content` mediumblob NOT NULL COMMENT 'The Blob content of the schema file.',
   PRIMARY KEY (`blob_content_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8 COMMENT='This table stores schemas whose content is only imported as a whole and is represented in Blob.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores schemas whose content is only imported as a whole and is represented in Blob.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1314,7 +1314,7 @@ CREATE TABLE `blob_content_manifest` (
   CONSTRAINT `blob_content_manifest_next_blob_content_manifest_id_fk` FOREIGN KEY (`next_blob_content_manifest_id`) REFERENCES `blob_content_manifest` (`blob_content_manifest_id`),
   CONSTRAINT `blob_content_manifest_prev_blob_content_manifest_id_fk` FOREIGN KEY (`prev_blob_content_manifest_id`) REFERENCES `blob_content_manifest` (`blob_content_manifest_id`),
   CONSTRAINT `blob_content_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1357,7 +1357,7 @@ CREATE TABLE `cdt_awd_pri` (
   KEY `cdt_awd_pri_cdt_pri_id_fk` (`cdt_pri_id`),
   CONSTRAINT `cdt_awd_pri_cdt_id_fk` FOREIGN KEY (`cdt_id`) REFERENCES `dt` (`dt_id`),
   CONSTRAINT `cdt_awd_pri_cdt_pri_id_fk` FOREIGN KEY (`cdt_pri_id`) REFERENCES `cdt_pri` (`cdt_pri_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COMMENT='This table capture allowed primitives of the CDT?s Content Component.  The information in this table is captured from the Allowed Primitive column in each of the CDT Content Component section/table in CCTS DTC3.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table capture allowed primitives of the CDT?s Content Component.  The information in this table is captured from the Allowed Primitive column in each of the CDT Content Component section/table in CCTS DTC3.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1377,7 +1377,7 @@ CREATE TABLE `cdt_awd_pri_xps_type_map` (
   KEY `cdt_awd_pri_xps_type_map_xbt_id_fk` (`xbt_id`),
   CONSTRAINT `cdt_awd_pri_xps_type_map_cdt_awd_pri_id_fk` FOREIGN KEY (`cdt_awd_pri_id`) REFERENCES `cdt_awd_pri` (`cdt_awd_pri_id`),
   CONSTRAINT `cdt_awd_pri_xps_type_map_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=250 DEFAULT CHARSET=utf8 COMMENT='This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. ';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1392,7 +1392,7 @@ CREATE TABLE `cdt_pri` (
   `name` varchar(45) NOT NULL COMMENT 'Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.',
   PRIMARY KEY (`cdt_pri_id`),
   UNIQUE KEY `cdt_pri_uk1` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='This table stores the CDT primitives.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores the CDT primitives.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1411,7 +1411,7 @@ CREATE TABLE `cdt_ref_spec` (
   KEY `cdt_ref_spec_ref_spec_id_fk` (`ref_spec_id`),
   CONSTRAINT `cdt_ref_spec_cdt_id_fk` FOREIGN KEY (`cdt_id`) REFERENCES `dt` (`dt_id`),
   CONSTRAINT `cdt_ref_spec_ref_spec_id_fk` FOREIGN KEY (`ref_spec_id`) REFERENCES `ref_spec` (`ref_spec_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1431,7 +1431,7 @@ CREATE TABLE `cdt_sc_awd_pri` (
   KEY `cdt_sc_awd_pri_cdt_pri_id_fk` (`cdt_pri_id`),
   CONSTRAINT `cdt_sc_awd_pri_cdt_pri_id_fk` FOREIGN KEY (`cdt_pri_id`) REFERENCES `cdt_pri` (`cdt_pri_id`),
   CONSTRAINT `cdt_sc_awd_pri_cdt_sc_id_fk` FOREIGN KEY (`cdt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=484 DEFAULT CHARSET=utf8 COMMENT='This table capture the CDT primitives allowed for a particular SC of a CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends its base (such SC is not defined in the CCTS data type catalog specification).';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table capture the CDT primitives allowed for a particular SC of a CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends its base (such SC is not defined in the CCTS data type catalog specification).';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1451,7 +1451,7 @@ CREATE TABLE `cdt_sc_awd_pri_xps_type_map` (
   KEY `cdt_sc_awd_pri_xps_type_map_xbt_id_fk` (`xbt_id`),
   CONSTRAINT `cdt_sc_awd_pri_xps_type_map_cdt_sc_awd_pri_id_fk` FOREIGN KEY (`cdt_sc_awd_pri_id`) REFERENCES `cdt_sc_awd_pri` (`cdt_sc_awd_pri_id`),
   CONSTRAINT `cdt_sc_awd_pri_xps_type_map_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=589 DEFAULT CHARSET=utf8 COMMENT='The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It allows for the concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It allows for the concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. ';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1470,7 +1470,7 @@ CREATE TABLE `cdt_sc_ref_spec` (
   KEY `cdt_sc_ref_spec_ref_spec_id_fk` (`ref_spec_id`),
   CONSTRAINT `cdt_sc_ref_spec_cdt_sc_id_fk` FOREIGN KEY (`cdt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
   CONSTRAINT `cdt_sc_ref_spec_ref_spec_id_fk` FOREIGN KEY (`ref_spec_id`) REFERENCES `ref_spec` (`ref_spec_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1520,7 +1520,7 @@ CREATE TABLE `code_list` (
   CONSTRAINT `code_list_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `code_list_prev_code_list_id_fk` FOREIGN KEY (`prev_code_list_id`) REFERENCES `code_list` (`code_list_id`),
   CONSTRAINT `code_list_replacement_code_list_id_fk` FOREIGN KEY (`replacement_code_list_id`) REFERENCES `code_list` (`code_list_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8 COMMENT='This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1558,7 +1558,7 @@ CREATE TABLE `code_list_manifest` (
   CONSTRAINT `code_list_manifest_prev_code_list_manifest_id_fk` FOREIGN KEY (`prev_code_list_manifest_id`) REFERENCES `code_list_manifest` (`code_list_manifest_id`),
   CONSTRAINT `code_list_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `code_list_replacement_code_list_manifest_id_fk` FOREIGN KEY (`replacement_code_list_manifest_id`) REFERENCES `code_list_manifest` (`code_list_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3874 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1603,7 +1603,7 @@ CREATE TABLE `code_list_value` (
   CONSTRAINT `code_list_value_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `code_list_value_prev_code_list_value_id_fk` FOREIGN KEY (`prev_code_list_value_id`) REFERENCES `code_list_value` (`code_list_value_id`),
   CONSTRAINT `code_list_value_replacement_code_list_value_id_fk` FOREIGN KEY (`replacement_code_list_value_id`) REFERENCES `code_list_value` (`code_list_value_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1474 DEFAULT CHARSET=utf8 COMMENT='Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1638,7 +1638,7 @@ CREATE TABLE `code_list_value_manifest` (
   CONSTRAINT `code_list_value_manifest_prev_code_list_value_manifest_id_fk` FOREIGN KEY (`prev_code_list_value_manifest_id`) REFERENCES `code_list_value_manifest` (`code_list_value_manifest_id`),
   CONSTRAINT `code_list_value_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `code_list_value_replacement_code_list_value_manifest_id_fk` FOREIGN KEY (`replacement_code_list_value_manifest_id`) REFERENCES `code_list_value_manifest` (`code_list_value_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64213 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1664,7 +1664,7 @@ CREATE TABLE `comment` (
   KEY `comment_prev_comment_id_fk` (`prev_comment_id`),
   CONSTRAINT `comment_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `comment_prev_comment_id_fk` FOREIGN KEY (`prev_comment_id`) REFERENCES `comment` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1680,7 +1680,7 @@ CREATE TABLE `configuration` (
   `type` varchar(100) DEFAULT NULL COMMENT 'The type of configuration property.',
   `value` varchar(100) DEFAULT NULL COMMENT 'The value of configuration property.',
   PRIMARY KEY (`configuration_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='The table stores configuration properties of the application.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The table stores configuration properties of the application.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1812,7 +1812,7 @@ CREATE TABLE `dt` (
   CONSTRAINT `dt_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `dt_prev_dt_id_fk` FOREIGN KEY (`prev_dt_id`) REFERENCES `dt` (`dt_id`),
   CONSTRAINT `dt_replacement_dt_id_fk` FOREIGN KEY (`replacement_dt_id`) REFERENCES `dt` (`dt_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=597 DEFAULT CHARSET=utf8 COMMENT='The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1847,7 +1847,7 @@ CREATE TABLE `dt_manifest` (
   CONSTRAINT `dt_manifest_prev_dt_manifest_id_fk` FOREIGN KEY (`prev_dt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`),
   CONSTRAINT `dt_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `dt_replacement_dt_manifest_id_fk` FOREIGN KEY (`replacement_dt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30684 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1920,7 +1920,7 @@ CREATE TABLE `dt_sc` (
   CONSTRAINT `dt_sc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `dt_sc_prev_dt_sc_id_fk` FOREIGN KEY (`prev_dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
   CONSTRAINT `dt_sc_replacement_dt_sc_id_fk` FOREIGN KEY (`replacement_dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3581 DEFAULT CHARSET=utf8 COMMENT='This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. ';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1955,7 +1955,7 @@ CREATE TABLE `dt_sc_manifest` (
   CONSTRAINT `dt_sc_next_dt_sc_manifest_id_fk` FOREIGN KEY (`next_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`),
   CONSTRAINT `dt_sc_prev_dt_sc_manifest_id_fk` FOREIGN KEY (`prev_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`),
   CONSTRAINT `dt_sc_replacement_dt_sc_manifest_id_fk` FOREIGN KEY (`replacement_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=114611 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2028,7 +2028,7 @@ CREATE TABLE `log` (
   CONSTRAINT `log_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `log_next_log_id_fk` FOREIGN KEY (`next_log_id`) REFERENCES `log` (`log_id`),
   CONSTRAINT `log_prev_log_id_fk` FOREIGN KEY (`prev_log_id`) REFERENCES `log` (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1031925 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2089,7 +2089,7 @@ CREATE TABLE `module` (
   CONSTRAINT `module_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
   CONSTRAINT `module_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_parent_module_id_fk` FOREIGN KEY (`parent_module_id`) REFERENCES `module` (`module_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32178 DEFAULT CHARSET=utf8 COMMENT='The module table stores information about a physical file, into which CC components will be generated during the expression generation.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The module table stores information about a physical file, into which CC components will be generated during the expression generation.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2119,7 +2119,7 @@ CREATE TABLE `module_acc_manifest` (
   CONSTRAINT `module_acc_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_acc_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_acc_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=178490 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2149,7 +2149,7 @@ CREATE TABLE `module_agency_id_list_manifest` (
   CONSTRAINT `module_agency_id_list_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_agency_id_list_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_agency_id_list_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2179,7 +2179,7 @@ CREATE TABLE `module_asccp_manifest` (
   CONSTRAINT `module_asccp_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_asccp_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_asccp_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=153786 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2209,7 +2209,7 @@ CREATE TABLE `module_bccp_manifest` (
   CONSTRAINT `module_bccp_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_bccp_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_bccp_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44172 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2239,7 +2239,7 @@ CREATE TABLE `module_blob_content_manifest` (
   CONSTRAINT `module_blob_content_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_blob_content_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_blob_content_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1313 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2269,7 +2269,7 @@ CREATE TABLE `module_code_list_manifest` (
   CONSTRAINT `module_code_list_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_code_list_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_code_list_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2492 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2299,7 +2299,7 @@ CREATE TABLE `module_dt_manifest` (
   CONSTRAINT `module_dt_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_dt_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_dt_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19483 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2323,7 +2323,7 @@ CREATE TABLE `module_set` (
   KEY `module_set_last_updated_by_fk` (`last_updated_by`),
   CONSTRAINT `module_set_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_set_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2353,7 +2353,7 @@ CREATE TABLE `module_set_release` (
   CONSTRAINT `module_set_release_assignment_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_set_release_module_set_id_fk` FOREIGN KEY (`module_set_id`) REFERENCES `module_set` (`module_set_id`),
   CONSTRAINT `module_set_release_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2383,7 +2383,7 @@ CREATE TABLE `module_xbt_manifest` (
   CONSTRAINT `module_xbt_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_xbt_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `module_xbt_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2652 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2412,7 +2412,7 @@ CREATE TABLE `namespace` (
   CONSTRAINT `namespace_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `namespace_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `namespace_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='This table stores information about a namespace. Namespace is the namespace as in the XML schema specification.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores information about a namespace. Namespace is the namespace as in the XML schema specification.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2474,7 +2474,7 @@ CREATE TABLE `ref_spec` (
   `ref_spec_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `spec` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`ref_spec_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2503,7 +2503,7 @@ CREATE TABLE `release` (
   CONSTRAINT `release_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `release_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `release_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='The is table store the release information.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The is table store the release information.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2531,7 +2531,7 @@ CREATE TABLE `seq_key` (
   CONSTRAINT `seq_key_from_acc_manifest_id_fk` FOREIGN KEY (`from_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
   CONSTRAINT `seq_key_next_seq_key_id_fk` FOREIGN KEY (`next_seq_key_id`) REFERENCES `seq_key` (`seq_key_id`),
   CONSTRAINT `seq_key_prev_seq_key_id_fk` FOREIGN KEY (`prev_seq_key_id`) REFERENCES `seq_key` (`seq_key_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=412047 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2556,7 +2556,7 @@ CREATE TABLE `tag` (
   KEY `tag_last_updated_by_fk` (`last_updated_by`),
   CONSTRAINT `tag_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `tag_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2711,7 +2711,7 @@ CREATE TABLE `xbt` (
   CONSTRAINT `xbt_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `xbt_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `xbt_subtype_of_xbt_id_fk` FOREIGN KEY (`subtype_of_xbt_id`) REFERENCES `xbt` (`xbt_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8 COMMENT='This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2740,7 +2740,7 @@ CREATE TABLE `xbt_manifest` (
   CONSTRAINT `xbt_manifest_prev_xbt_manifest_id_fk` FOREIGN KEY (`prev_xbt_manifest_id`) REFERENCES `xbt_manifest` (`xbt_manifest_id`),
   CONSTRAINT `xbt_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `xbt_manifest_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4422 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

@@ -214,6 +214,10 @@ public class JooqAgencyIdListReadRepository
             conditions.add(AGENCY_ID_LIST.STATE.in(request.getStates()));
         }
 
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(AGENCY_ID_LIST.NAMESPACE_ID.in(request.getNamespaces()));
+        }
+
         if (!request.getOwnerLoginIds().isEmpty()) {
             conditions.add(APP_USER.as("owner").LOGIN_ID.in(
                     new HashSet<>(request.getOwnerLoginIds()).stream()

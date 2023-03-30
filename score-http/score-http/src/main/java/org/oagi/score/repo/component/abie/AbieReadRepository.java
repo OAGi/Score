@@ -2,10 +2,10 @@ package org.oagi.score.repo.component.abie;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AbieRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.component.acc.AccReadRepository;
+import org.oagi.score.service.common.data.CcState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -39,7 +38,7 @@ public class Zip {
             }
         }
 
-        File renamedFile = new File(file.getParentFile(), filename + ".zip");
+        File renamedFile = new File(FileUtils.getTempDirectory(), filename + ".zip");
         if (file.renameTo(renamedFile)) {
             FileUtils.deleteQuietly(file);
             file = renamedFile;
@@ -47,23 +46,17 @@ public class Zip {
         return file;
     }
 
-    public static File compressionHierarchy(Collection<File> targetFiles, String filename) throws IOException {
+    public static File compressionHierarchy(File baseDirectory, Collection<File> targetFiles) throws IOException {
         File file = File.createTempFile("oagis-", null);
-        URI currentPath = Paths.get("./data").toAbsolutePath().toUri();
+        URI currentPath = baseDirectory.toURI();
         FileOutputStream dest = new FileOutputStream(file);
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {
-            logger.info("Compressing files in Zip format...");
+            logger.info("Compressing files in Zip format... " + file);
             for (File targetFile : targetFiles) {
                 logger.info("Adding: " + targetFile);
                 URI relativePath = currentPath.relativize(targetFile.toURI());
                 zipFile(targetFile, relativePath.toString(), out);
             }
-        }
-
-        File renamedFile = new File(file.getParentFile(), filename + ".zip");
-        if (file.renameTo(renamedFile)) {
-            FileUtils.deleteQuietly(file);
-            file = renamedFile;
         }
         return file;
     }

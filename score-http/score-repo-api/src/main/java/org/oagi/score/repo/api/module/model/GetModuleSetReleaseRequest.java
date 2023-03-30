@@ -20,4 +20,10 @@ public class GetModuleSetReleaseRequest extends Request {
     public void setModuleSetReleaseId(BigInteger moduleSetReleaseId) {
         this.moduleSetReleaseId = moduleSetReleaseId;
     }
+
+    public GetModuleSetReleaseRequest withModuleSetReleaseId(BigInteger moduleSetReleaseId) {
+        setModuleSetReleaseId(moduleSetReleaseId);
+        return this;
+    }
+
 }

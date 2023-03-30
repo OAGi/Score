@@ -1,11 +1,11 @@
 import {Location} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {saveAs} from 'file-saver';
-import {ReplaySubject} from 'rxjs';
+import {interval, ReplaySubject, retry, retryWhen, Subject, takeUntil, timer} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
@@ -16,6 +16,12 @@ import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../do
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {PageRequest} from '../../../basis/basis';
+import {
+  ModuleSetReleaseValidationDialogComponent
+} from "./module-set-release-validation-dialog/module-set-release-validation-dialog.component";
+import {
+  AgencyIdListValueDialogComponent
+} from "../../../agency-id-list-management/agency-id-list-value-dialog/agency-id-list-value-dialog.component";
 
 @Component({
   selector: 'score-module-set-detail',
@@ -124,7 +130,20 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.filteredReleaseList.next(this.releaseList.slice());
   }
 
-  exportScheme() {
+  validateSchemas() {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.width = '80vw';
+    dialogConfig.height = '60%';
+    dialogConfig.data = {
+      moduleSetReleaseId: this.moduleSetRelease.moduleSetReleaseId
+    };
+    const dialogRef = this.dialog.open(ModuleSetReleaseValidationDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  exportSchemas() {
     this.isUpdating = true;
     this.moduleService.export(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});

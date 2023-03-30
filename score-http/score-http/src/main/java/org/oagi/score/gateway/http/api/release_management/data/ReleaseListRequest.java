@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.release_management.data;
 import lombok.Data;
 import org.oagi.score.service.common.data.PageRequest;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ public class ReleaseListRequest {
     private String releaseNum;
     private List<String> excludes = Collections.emptyList();
     private List<ReleaseState> states = Collections.emptyList();
+    private List<BigInteger> namespaces = Collections.emptyList();
 
     private List<String> creatorLoginIds = Collections.emptyList();
     private Date createStartDate;

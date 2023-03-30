@@ -71,7 +71,13 @@
         Update
       </button>
 
-      <button (click)="exportScheme()"
+      <button (click)="validateSchemas()"
+              *ngIf="roles.includes('developer')"
+              color="accent" mat-raised-button>
+        Validate
+      </button>
+
+      <button (click)="exportSchemas()"
               *ngIf="roles.includes('developer')"
               color="primary" mat-raised-button>
         Export

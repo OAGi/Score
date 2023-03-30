@@ -12,7 +12,8 @@ import {
   ModuleSetModule,
   ModuleSetModuleListRequest,
   ModuleSetRelease,
-  ModuleSetReleaseListRequest
+  ModuleSetReleaseListRequest,
+  ModuleSetReleaseValidateResponse
 } from './module';
 
 @Injectable()
@@ -217,6 +218,14 @@ export class ModuleService {
       namespaceId: element.namespaceId,
       versionNum: element.versionNum,
     });
+  }
+
+  validate(moduleSetReleaseId: number): Observable<ModuleSetReleaseValidateResponse> {
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate');
+  }
+
+  progressValidation(moduleSetReleaseId: number, requestId: string): Observable<ModuleSetReleaseValidateResponse> {
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate/' + requestId);
   }
 
   export(moduleSetReleaseId: number): Observable<HttpResponse<Blob>> {
