@@ -12,7 +12,8 @@ import java.util.List;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
-public class CcRepository {
+public class CoreComponentRepositoryForModuleSetRelease {
+
     @Autowired
     private DSLContext dslContext;
 
@@ -408,5 +409,17 @@ public class CcRepository {
         return dslContext.select(SEQ_KEY.fields())
                 .from(SEQ_KEY)
                 .fetchInto(SeqKeyRecord.class);
+    }
+
+    public List<ReleaseRecord> findAllRelease() {
+        return dslContext.select(RELEASE.fields())
+                .from(RELEASE)
+                .fetchInto(ReleaseRecord.class);
+    }
+
+    public List<NamespaceRecord> findAllNamespace() {
+        return dslContext.select(NAMESPACE.fields())
+                .from(NAMESPACE)
+                .fetchInto(NamespaceRecord.class);
     }
 }

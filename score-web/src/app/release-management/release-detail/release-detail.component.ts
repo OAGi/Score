@@ -12,6 +12,7 @@ import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'score-release-list',
@@ -150,5 +151,22 @@ export class ReleaseDetailComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  generateMigrationScript() {
+    this.isLoading = true;
+    this.service.generateMigrationScript(this.releaseDetail.releaseId).subscribe(resp => {
+      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      this.isLoading = false;
+    }, err => {
+      this.isLoading = false;
+    });
+  }
+
+  _getFilenameFromContentDisposition(resp) {
+    const contentDisposition = resp.headers.get('Content-Disposition') || '';
+    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 }

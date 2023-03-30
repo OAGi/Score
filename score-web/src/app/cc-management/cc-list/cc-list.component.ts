@@ -37,6 +37,9 @@ import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
+import {saveAs} from 'file-saver';
+import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {SimpleNamespace} from "../../namespace-management/domain/namespace";
 
 @Component({
   selector: 'score-cc-list',
@@ -81,6 +84,9 @@ export class CcListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
   tags: Tag[] = [];
+  namespaces: SimpleNamespace[] = [];
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: CcList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -90,6 +96,7 @@ export class CcListComponent implements OnInit {
               private nodeService: CcNodeService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
+              private namespaceService: NamespaceService,
               private auth: AuthService,
               private aboutService: AboutService,
               private tagService: TagService,
@@ -138,9 +145,10 @@ export class CcListComponent implements OnInit {
     forkJoin([
       this.releaseService.getSimpleReleases(['Draft', 'Published']),
       this.accountService.getAccountNames(),
+      this.namespaceService.getSimpleNamespaces(),
       this.aboutService.getProductInfo(),
       this.tagService.getTags()
-    ]).subscribe(([releases, loginIds, productInfos, tags]) => {
+    ]).subscribe(([releases, loginIds, namespaces, productInfos, tags]) => {
       for (const productInfo of productInfos) {
         if (productInfo.productName === 'Elasticsearch' && productInfo.productVersion !== '0.0.0.0') {
           this.isElasticsearchOn = true;
@@ -167,6 +175,9 @@ export class CcListComponent implements OnInit {
       }
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.tags = tags;
+
+      this.namespaces.push(...namespaces);
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
 
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
@@ -409,6 +420,27 @@ export class CcListComponent implements OnInit {
           }, error => {
           });
       });
+  }
+
+  exportStandaloneSchemas() {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    this.loading = true;
+    this.service.exportStandaloneSchemas(this.selection.selected).subscribe(resp => {
+      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+    });
+  }
+
+  _getFilenameFromContentDisposition(resp) {
+    const contentDisposition = resp.headers.get('Content-Disposition') || '';
+    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   hasCreatePermission(): boolean {
@@ -689,6 +721,12 @@ export class CcListComponent implements OnInit {
       case 'Purge':
         return this.selection.selected.filter(e => {
           if (e.state === 'Deleted') {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Export':
+        return this.selection.selected.filter(e => {
+          if (e.type === 'ASCCP') {
             return e;
           }
         }).length === this.selection.selected.length;

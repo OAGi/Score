@@ -5,7 +5,6 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
-import org.oagi.score.data.ACC;
 import org.oagi.score.data.CodeList;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.springframework.beans.factory.annotation.Autowired;

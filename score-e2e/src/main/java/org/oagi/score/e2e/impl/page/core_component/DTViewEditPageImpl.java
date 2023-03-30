@@ -29,6 +29,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By OWNER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+    private static final By QUALIFIER_FIELD_LOCATOR =
+            By.xpath("//label/span[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
 
     private static final By GUID_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
@@ -50,7 +52,17 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By VALUE_DOMAIN_LOCATOR =
+            By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
+    private static final By ADD_VALUE_DOMAIN_LOCATOR =
+            By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
 
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+    public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
+            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -210,4 +222,108 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         return getText(getDefinitionField());
     }
 
+    @Override
+    public void showValueDomain() {
+        click(getShowValueDomain());
+    }
+    @Override
+    public WebElement getShowValueDomain() {
+        return elementToBeClickable(getDriver(), VALUE_DOMAIN_LOCATOR);
+    }
+    @Override
+    public WebElement getAddValueDomainButton() {
+        return elementToBeClickable(getDriver(), ADD_VALUE_DOMAIN_LOCATOR);
+    }
+
+    @Override
+    public void addCodeListValueDomain(String valueDomainName) {
+        click(getAddValueDomainButton());
+        WebElement tr = getTheLastTableRecord();
+        WebElement tdDomainType = getColumnByName(tr, "type");
+        click(tdDomainType);
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+        WebElement tdDomainName = getColumnByName(tr, "name");
+        click(tdDomainName);
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \""+ valueDomainName +"\")]//ancestor::mat-option[1]")));
+    }
+    @Override
+    public WebElement getTheLastTableRecord() {
+        defaultWait(getDriver());
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//tr[last()]"));
+    }
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        retry(() -> {
+            click(getUpdateButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public void hitUpdateAnywayButton() {
+        retry(() -> {
+            click(getUpdateAnywayButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getUpdateAnywayButton() {
+        return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
+    }
+    @Override
+    public WebElement getUpdateButton() {
+        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void setQualifier(String qualifier) {
+        sendKeys(getQualifierField(), qualifier);
+    }
+    @Override
+    public WebElement getQualifierField() {
+        return visibilityOfElementLocated(getDriver(), QUALIFIER_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void codeListIdMarkedAsDeleted(String name) {
+        WebElement tr = getTheLastTableRecord();
+        WebElement tdDomainName = getColumnByName(tr, "name");
+        click(tdDomainName);
+        WebElement codeList = findElement(getDriver(), By.xpath("//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]"));
+        codeList.findElement(By.xpath("//span[@class=\"text-line-through\"]"));
+    }
+
+    @Override
+    public void changeCodeListValueDomain(String codeListName) {
+        WebElement tr = getTheLastTableRecord();
+        WebElement tdDomainType = getColumnByName(tr, "type");
+        click(tdDomainType);
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+        WebElement tdDomainName = getColumnByName(tr, "name");
+        click(tdDomainName);
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \""+ codeListName +"\")]//ancestor::mat-option[1]")));
+    }
+
+    @Override
+    public void setDefaultValueDomain(String name) {
+        click(getDefaultValueDomainField());
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]")));
+    }
+    @Override
+    public WebElement getDefaultValueDomainField() {
+        return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+    }
 }

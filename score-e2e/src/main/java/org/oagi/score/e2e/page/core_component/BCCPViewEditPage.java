@@ -247,13 +247,25 @@ public interface BCCPViewEditPage extends Page {
 
     AddCommentDialog hitAddCommentButton();
 
-    WebElement getDefinitionField();
-
     WebElement getDefinitionSourceField();
 
     WebElement getDENField();
 
     WebElement getPropertyTermField();
+
+    void setPropertyTerm(String propertyTerm);
+
+    void setNamespace(String namespace);
+
+    WebElement getNamespaceSelectField();
+
+    void hitUpdateAnywayButton();
+
+    WebElement getUpdateAnywayButton();
+
+    WebElement getDefinitionField();
+
+    void setDefinition(String definition);
 
     /**
      * An interface of the ACC panel

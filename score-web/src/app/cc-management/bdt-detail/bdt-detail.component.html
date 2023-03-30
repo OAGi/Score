@@ -339,7 +339,7 @@
                       <mat-icon>{{ contains(contextMenuItem, tag) ? 'check' : '' }}</mat-icon>
                       <span>{{ tag.name }}</span>
                     </button>
-                    <mat-divider></mat-divider>
+                    <mat-divider *ngIf="tags.length > 0"></mat-divider>
                     <button mat-menu-item (click)="openEditTags()">
                       <mat-icon>edit</mat-icon>
                       <span>Edit Tags</span>

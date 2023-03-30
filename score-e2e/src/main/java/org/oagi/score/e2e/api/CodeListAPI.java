@@ -7,6 +7,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * APIs for the code list management.
@@ -40,7 +41,7 @@ public interface CodeListAPI {
 
     boolean isListIdUnique(String listId);
 
-    ArrayList<String> getOAGISOwnedLists();
+    List<String> getOAGISOwnedLists(BigInteger releaseId);
 
     boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList);
 }

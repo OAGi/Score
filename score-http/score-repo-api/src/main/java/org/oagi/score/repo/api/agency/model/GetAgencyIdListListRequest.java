@@ -20,6 +20,9 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
     private String definition;
     private String module;
     private BigInteger releaseId;
+
+    private Boolean deprecated;
+    private List<BigInteger> namespaces;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -35,8 +38,6 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
         this.deprecated = deprecated;
     }
 
-    private Boolean deprecated;
-
     public String getModule() {
         return module;
     }
@@ -51,6 +52,14 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
 
     public void setStates(List<CcState> states) {
         this.states = states;
+    }
+
+    public List<BigInteger> getNamespaces() {
+        return (namespaces != null) ? namespaces : Collections.emptyList();
+    }
+
+    public void setNamespaces(List<BigInteger> namespaces) {
+        this.namespaces = namespaces;
     }
 
     public List<String> getOwnerLoginIds() {

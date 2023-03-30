@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="header pb-1">
+    <mat-icon>{{ data.titleIcon }}</mat-icon>
+    <span class="pl-1">{{ data.title }}</span>
+  </div>
+  <mat-divider></mat-divider>
+  <div class="message pt-1" matSnackBarLabel>
+    <span>{{ data.message }}</span>
+  </div>
+  <div class="actions pt-3" matSnackBarActions>
+    <button mat-raised-button color="accent" matSnackBarAction (click)="data.onAction(data, snackBarRef)">{{ data.action }}</button>
+    <button mat-raised-button color="primary" matSnackBarAction (click)="snackBarRef.dismissWithAction()">Close</button>
+  </div>
+</div>

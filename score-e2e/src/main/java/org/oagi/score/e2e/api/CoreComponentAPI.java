@@ -184,4 +184,7 @@ public interface CoreComponentAPI {
     ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,
                                                NamespaceObject namespace, String state);
 
+    DTObject getLatestDTCreated(String den, String branch);
+
+    BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 }

@@ -1,0 +1,17 @@
+.container {
+
+}
+
+.header {
+  display: flex;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  place-content: flex-end;
+}

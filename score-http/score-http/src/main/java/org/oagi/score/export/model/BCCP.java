@@ -1,5 +1,6 @@
 package org.oagi.score.export.model;
 
+import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 
@@ -40,5 +41,9 @@ public class BCCP implements Component {
 
     public String getDefinitionSource() {
         return bccp.getDefinitionSource();
+    }
+
+    public ULong getNamespaceId() {
+        return bccp.getNamespaceId();
     }
 }

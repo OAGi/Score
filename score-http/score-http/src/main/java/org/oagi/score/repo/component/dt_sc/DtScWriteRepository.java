@@ -9,7 +9,8 @@ import org.oagi.score.gateway.http.api.cc_management.data.node.PrimitiveRestriTy
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.repo.component.dt.*;
+import org.oagi.score.repo.component.dt.UpdateDtStateRepositoryRequest;
+import org.oagi.score.repo.component.dt.UpdateDtStateRepositoryResponse;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.log.LogRepository;

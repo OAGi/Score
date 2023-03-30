@@ -1,4 +1,4 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {
@@ -68,7 +68,10 @@ export class ReleaseService {
     if (request.excludes.length > 0) {
       params = params.set('excludes', request.excludes.join(','));
     }
-    return this.http.get<PageResponse<ReleaseList>>('/api/releases', {params: params});
+    if (request.namespaces && request.namespaces.length > 0) {
+      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+    }
+    return this.http.get<PageResponse<ReleaseList>>('/api/releases', {params});
   }
 
   createRelease(releaseDetail: ReleaseDetail): Observable<any> {
@@ -112,4 +115,12 @@ export class ReleaseService {
   updateState(releaseId: number, state: string): Observable<any> {
     return this.http.post<ReleaseValidationResponse>('/api/release/' + releaseId + '/state', {state});
   }
+
+  generateMigrationScript(releaseId: number): Observable<HttpResponse<Blob>> {
+    return this.http.get('/api/release/' + releaseId + '/generate_migration_script', {
+      observe: 'response',
+      responseType: 'blob'
+    });
+  }
+
 }

@@ -1,16 +1,27 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
+import org.apache.commons.io.FileUtils;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
+import org.oagi.score.export.ExportContext;
+import org.oagi.score.export.impl.StandaloneExportContextBuilder;
+import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.export.model.SchemaModule;
+import org.oagi.score.export.service.CoreComponentService;
+import org.oagi.score.gateway.http.api.module_management.data.ExportStandaloneSchemaResponse;
 import org.oagi.score.gateway.http.api.release_management.data.*;
+import org.oagi.score.gateway.http.api.release_management.provider.ReleaseDataProvider;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.event.ReleaseCleanupEvent;
 import org.oagi.score.gateway.http.event.ReleaseCreateRequestEvent;
+import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.release.ReleaseRepositoryDiscardRequest;
+import org.oagi.score.repository.CoreComponentRepositoryForRelease;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -20,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -29,15 +41,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.RELEASE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,6 +61,18 @@ public class ReleaseService implements InitializingBean {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
+    @Autowired
+    private CoreComponentRepositoryForRelease coreComponentRepositoryForRelease;
+
+    @Autowired
+    private CoreComponentService coreComponentService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private SessionService sessionService;
@@ -171,6 +197,9 @@ public class ReleaseService implements InitializingBean {
         }
         if (!request.getStates().isEmpty()) {
             conditions.add(RELEASE.STATE.in(request.getStates()));
+        }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(RELEASE.NAMESPACE_ID.in(request.getNamespaces()));
         }
         if (!request.getCreatorLoginIds().isEmpty()) {
             conditions.add(APP_USER.as("creator").LOGIN_ID.in(request.getCreatorLoginIds()));
@@ -307,6 +336,7 @@ public class ReleaseService implements InitializingBean {
         detail.setReleaseNote(release.getReleaseNote());
         detail.setReleaseLicense(release.getReleaseLicense());
         detail.setState(release.getState());
+        detail.setLatestRelease(repository.isLatestRelease(releaseId));
         return detail;
     }
 
@@ -437,6 +467,82 @@ public class ReleaseService implements InitializingBean {
                     releaseCleanupEvent.getReleaseId(), ReleaseState.Published);
         } finally {
             lock.unlock();
+        }
+    }
+
+    public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser user, BigInteger releaseId) throws IOException {
+        Release release = repository.findById(releaseId);
+
+        MigrationScriptGenerator generator = new MigrationScriptGenerator(dslContext, resourceLoader,
+                BigInteger.valueOf(100000000L));
+        File file = generator.generate(user, release);
+
+        String fileName = release.getReleaseNum().replace(".", "_") + ".zip";
+        return new GenerateMigrationScriptResponse(fileName, file);
+    }
+
+    public ExportStandaloneSchemaResponse exportStandaloneSchema(
+            ScoreUser user, List<BigInteger> asccpManifestIdList) throws Exception {
+        if (asccpManifestIdList == null || asccpManifestIdList.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        File baseDir = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
+        FileUtils.forceMkdir(baseDir);
+
+        try {
+            List<File> files = new ArrayList<>();
+            Map<BigInteger, ReleaseDataProvider> dataProviderMap = new ConcurrentHashMap<>();
+            Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
+            List<Exception> exceptions = new ArrayList<>();
+            asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
+                try {
+                    BigInteger releaseId = releaseRepository.getReleaseIdByAsccpManifestId(ULong.valueOf(asccpManifestId));
+                    ReleaseDataProvider dataProvider;
+                    synchronized (dataProviderMap) {
+                        if (!dataProviderMap.containsKey(releaseId)) {
+                            dataProviderMap.put(releaseId, new ReleaseDataProvider(coreComponentRepositoryForRelease, releaseId));
+                        }
+                        dataProvider = dataProviderMap.get(releaseId);
+                    }
+
+                    XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
+                    visitor.setBaseDirectory(baseDir);
+
+                    StandaloneExportContextBuilder builder =
+                            new StandaloneExportContextBuilder(dataProvider, coreComponentService, pathCounter);
+                    ExportContext exportContext = builder.build(asccpManifestId);
+
+                    SchemaModule schemaModule = exportContext.getSchemaModules().iterator().next();
+                    schemaModule.visit(visitor);
+                    File file = schemaModule.getModuleFile();
+                    if (file != null) {
+                        files.add(file);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Unexpected error occurs while it generates a stand-alone schema for 'asccp_manifest_id' [" + asccpManifestId + "]", e);
+                    exceptions.add(e);
+                }
+            });
+
+            if (!exceptions.isEmpty()) {
+                throw new IllegalStateException(exceptions.stream().map(e -> e.getMessage()).collect(Collectors.joining("\n")));
+            }
+
+            if (files.size() == 1) {
+                File srcFile = files.get(0);
+                File destFile = File.createTempFile("oagis-", null);
+                if (!srcFile.renameTo(destFile)) {
+                    FileUtils.copyFile(srcFile, destFile);
+                }
+                String filename = srcFile.getName();
+                return new ExportStandaloneSchemaResponse(filename, destFile);
+            } else {
+                return new ExportStandaloneSchemaResponse(UUID.randomUUID() + ".zip",
+                        Zip.compressionHierarchy(baseDir, files));
+            }
+        } finally {
+            FileUtils.deleteDirectory(baseDir);
         }
     }
 }

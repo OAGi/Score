@@ -22,6 +22,7 @@ export class AgencyIdListForListRequest {
     start: Date,
     end: Date,
   };
+  namespaces: number[] = [];
   ownedByDeveloper: boolean;
   cookieType: string;
   page: PageRequest = new PageRequest();
@@ -53,6 +54,7 @@ export class AgencyIdListForListRequest {
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.extensible = (params.get('extensible')) ? (('true' === params.get('extensible'))) : undefined;
+    this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updatedDate = {
@@ -97,6 +99,9 @@ export class AgencyIdListForListRequest {
     }
     if (this.updatedDate.end) {
       params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
+    if (this.namespaces && this.namespaces.length > 0) {
+      params = params.set('namespaces', this.namespaces.map(e => '' + e).join(','));
     }
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);

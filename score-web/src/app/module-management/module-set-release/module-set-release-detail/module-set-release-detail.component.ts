@@ -1,11 +1,11 @@
 import {Location} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {saveAs} from 'file-saver';
-import {ReplaySubject} from 'rxjs';
+import {interval, ReplaySubject, retry, retryWhen, Subject, takeUntil, timer} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
@@ -16,6 +16,12 @@ import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../do
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {PageRequest} from '../../../basis/basis';
+import {
+  ModuleSetReleaseValidationDialogComponent
+} from "./module-set-release-validation-dialog/module-set-release-validation-dialog.component";
+import {
+  AgencyIdListValueDialogComponent
+} from "../../../agency-id-list-management/agency-id-list-value-dialog/agency-id-list-value-dialog.component";
 
 @Component({
   selector: 'score-module-set-detail',
@@ -125,27 +131,15 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   }
 
   validateSchemas() {
-    this.isUpdating = true;
-    this.moduleService.validate(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
-      const dialogConfig = this.confirmDialogService.newConfig();
-      dialogConfig.data.header = 'Validation Result';
+    const dialogConfig = new MatDialogConfig();
 
-      const entries = Object.entries(resp.results);
-      if (entries.length === 0) {
-        dialogConfig.data.content = ['All schemas are valid.'];
-      } else {
-        dialogConfig.data.content = [];
-        entries.forEach(([key, value]) => {
-          dialogConfig.data.content.push(key + ': ' + value);
-        });
-      }
-
-      this.confirmDialogService.open(dialogConfig).afterClosed()
-        .subscribe(result => {
-          this.isUpdating = false;
-        });
-    }, err => {
-      this.isUpdating = false;
+    dialogConfig.width = '80vw';
+    dialogConfig.height = '60%';
+    dialogConfig.data = {
+      moduleSetReleaseId: this.moduleSetRelease.moduleSetReleaseId
+    };
+    const dialogRef = this.dialog.open(ModuleSetReleaseValidationDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
     });
   }
 

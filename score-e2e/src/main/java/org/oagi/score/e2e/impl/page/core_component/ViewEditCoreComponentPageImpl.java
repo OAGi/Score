@@ -2,10 +2,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.bie.TransferBIEOwnershipDialogImpl;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.ASCCPObject;
-import org.oagi.score.e2e.obj.BCCPObject;
-import org.oagi.score.e2e.obj.DTObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.*;
@@ -274,8 +271,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public ACCViewEditPage createACC(String branch) {
         setBranch(branch);
         click(getCreateACCButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
 
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term", branch);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
@@ -420,18 +421,52 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         click(getTypeSelectField());
         ArrayList<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
         boolean selected;
-        for (String componentType : componentTypes){
+        for (String componentType : componentTypes) {
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//span[text()=\"" + componentType + "\"]//ancestor::mat-option"));
-            if (optionField.getAttribute("aria-selected").equals("true")){
+            if (optionField.getAttribute("aria-selected").equals("true")) {
                 selected = true;
-            }else{
+            } else {
                 selected = false;
             }
-            if (!selected){
+            if (!selected) {
                 click(optionField);
             }
         }
         escape(getDriver());
+    }
+
+    public DTViewEditPage createDT(String den, String branch) {
+        setBranch(branch);
+        click(getCreateDTButton());
+        waitFor(ofMillis(2000L));
+
+        DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
+        assert dtCreateDialog.isOpened();
+        dtCreateDialog.selectBasedDTByDEN(den);
+        dtCreateDialog.hitCreateButton();
+        waitFor(ofMillis(2000L));
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger dtManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+
+        DTObject dt = getAPIFactory().getCoreComponentAPI().getBDTByManifestId(dtManifestId);
+        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
+        assert dtViewEditPage.isOpened();
+        return dtViewEditPage;
+    }
+
+    @Override
+    public BCCPViewEditPage createBCCP(String dataType, String branch, AppUserObject user) {
+        setBranch(branch);
+        click(getCreateBCCPButton());
+        BCCPCreateDialog bccpCreateDialog = new BCCPCreateDialogImpl(this, branch);
+        bccpCreateDialog.selectDataTypeByDEN(dataType);
+        bccpCreateDialog.hitCreateButton();
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getLatestBCCPCreatedByUser(user, branch);
+        BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        assert bccpViewEditPage.isOpened();
+        return bccpViewEditPage;
     }
 }

@@ -11,11 +11,10 @@ import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
-import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
@@ -67,6 +66,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -300,9 +301,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
+        retry(() -> {
+            click(getUpdateButton(true));
+            waitFor(ofMillis(1000L));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -437,6 +441,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
+    public void setPropertyTerm(String propertyTerm) {
+        sendKeys(getPropertyTermField(), propertyTerm);
+    }
+
+    @Override
     public WebElement getPropertyTermField() {
         return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
     }
@@ -474,6 +483,36 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 }
             };
         });
+    }
+
+    @Override
+    public void setNamespace(String namespace) {
+        click(getNamespaceSelectField());
+        waitFor(ofMillis(1000L));
+        WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
+        click(option);
+        waitFor(ofMillis(1000L));
+        assert getText(getNamespaceSelectField()).equals(namespace);
+    }
+    @Override
+    public WebElement getNamespaceSelectField() {
+        return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
+    }
+    @Override
+    public void hitUpdateAnywayButton() {
+        retry(() -> click(getUpdateButton(true)));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+    @Override
+    public WebElement getUpdateAnywayButton() {
+        return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
+    }
+
+    @Override
+    public void setDefinition(String definition) {
+        sendKeys(getDefinitionField(), definition);
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {

@@ -2,12 +2,12 @@ package org.oagi.score.repo.component.bbiep;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.component.bccp.BccpReadRepository;
 import org.oagi.score.repo.component.dt.BdtReadRepository;
+import org.oagi.score.service.common.data.CcState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

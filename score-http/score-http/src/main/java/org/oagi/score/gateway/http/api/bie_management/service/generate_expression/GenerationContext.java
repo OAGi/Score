@@ -3,8 +3,10 @@ package org.oagi.score.gateway.http.api.bie_management.service.generate_expressi
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.oagi.score.data.*;
+import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.component.asbiep.AsbiepReadRepository;
+import org.oagi.score.repo.component.namespace.NamespaceReadRepository;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.top_level_asbiep.TopLevelAsbiepReadRepository;
 import org.oagi.score.repository.*;
@@ -123,6 +125,10 @@ public class GenerationContext implements InitializingBean {
 
     @Autowired
     private ReleaseRepository releaseRepository;
+
+    @Autowired
+    private NamespaceReadRepository namespaceReadRepository;
+
     // Prepared Datas
     private Map<BigInteger, BigInteger> findBdtManifestIdByBbieIdMap;
     private Map<BigInteger, BdtPriRestri> findBdtPriRestriByBdtManifestIdAndDefaultIsTrueMap;
@@ -161,6 +167,7 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, Release> findReleaseMap;
     private Map<BigInteger, ContextScheme> findContextSchemeMap;
     private Map<BigInteger, ContextCategory> findContextCategoryMap;
+    private Map<BigInteger, NamespaceList> findNamespaceMap;
 
     @Data
     @AllArgsConstructor
@@ -339,6 +346,9 @@ public class GenerationContext implements InitializingBean {
                 .collect(Collectors.toMap(e -> e.getCtxSchemeId(), Function.identity()));
         findContextCategoryMap = ctxCategoryRepository.findAll().stream()
                 .collect(Collectors.toMap(e -> e.getCtxCategoryId(), Function.identity()));
+
+        findNamespaceMap = namespaceReadRepository.findAll().stream()
+                .collect(Collectors.toMap(e -> e.getNamespaceId(), Function.identity()));
     }
 
     private static BigInteger BASE_ID_FOR_DUMMIES = BigInteger.valueOf(100000000L);
@@ -1027,6 +1037,10 @@ public class GenerationContext implements InitializingBean {
         }
 
         return null;
+    }
+
+    public NamespaceList findNamespace(BigInteger namespaceId) {
+        return findNamespaceMap.get(namespaceId);
     }
 
     class ValueComparator implements Comparator<BIE> {
