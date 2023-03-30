@@ -2,10 +2,12 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -109,6 +111,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
+    private static final By ADD_COMMENT_ICON_LOCATOR =
+            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
 
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
@@ -142,7 +146,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
+        if (this.acc.isLocalExtension()) {
+            return getConfig().getBaseUrl().resolve("/core_component/extension/" + this.acc.getAccManifestId()).toString();
+        } else {
+            return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
+        }
     }
 
     @Override
@@ -781,6 +789,19 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 }
             };
         });
+    }
+
+    @Override
+    public AddCommentDialog hitAddCommentButton() {
+        click(getAddCommentButton());
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
+        assert addCodeListCommentDialog.isOpened();
+        return addCodeListCommentDialog;
+    }
+
+    @Override
+    public WebElement getAddCommentButton() {
+        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {

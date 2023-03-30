@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
@@ -416,6 +417,25 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public void selectAllComponentTypes() {
+        click(getTypeSelectField());
+        ArrayList<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
+        boolean selected;
+        for (String componentType : componentTypes) {
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[text()=\"" + componentType + "\"]//ancestor::mat-option"));
+            if (optionField.getAttribute("aria-selected").equals("true")) {
+                selected = true;
+            } else {
+                selected = false;
+            }
+            if (!selected) {
+                click(optionField);
+            }
+        }
+        escape(getDriver());
+    }
+
     public DTViewEditPage createDT(String den, String branch) {
         setBranch(branch);
         click(getCreateDTButton());

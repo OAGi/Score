@@ -9,7 +9,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.NoSuchElementException;
@@ -128,7 +128,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
             assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
             CodeListValueObject value = codeListValuesMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
-            AddCodeListCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             escape(getDriver());
         }

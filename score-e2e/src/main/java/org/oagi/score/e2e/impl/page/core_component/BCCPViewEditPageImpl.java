@@ -2,18 +2,19 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
-import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
@@ -46,7 +47,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Property Term\")]");
+            By.xpath("//label/span[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -77,6 +78,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
+    private static final By ADD_COMMENT_ICON_LOCATOR =
+            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
 
     private final BCCPObject bccp;
 
@@ -423,6 +426,44 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefinitionSourceField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDENField() {
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setPropertyTerm(String propertyTerm) {
+        sendKeys(getPropertyTermField(), propertyTerm);
+    }
+
+    @Override
+    public WebElement getPropertyTermField() {
+        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+    }
+
+    @Override
+    public AddCommentDialog hitAddCommentButton() {
+        click(getAddCommentButton());
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
+        assert addCodeListCommentDialog.isOpened();
+        return addCodeListCommentDialog;
+    }
+
+    @Override
+    public WebElement getAddCommentButton() {
+        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
+    }
+
+    @Override
     public BCCPanelContainer getBCCPanelContainer(WebElement bccNode) {
         return retry(() -> {
             click(bccNode);
@@ -442,15 +483,6 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 }
             };
         });
-    }
-
-    @Override
-    public void setPropertyTerm(String propertyTerm) {
-        sendKeys(getPropertyTermField(), propertyTerm);
-    }
-    @Override
-    public WebElement getPropertyTermField() {
-        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
     }
 
     @Override
@@ -476,11 +508,6 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     @Override
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
-    }
-
-    @Override
-    public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
 
     @Override

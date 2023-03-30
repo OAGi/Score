@@ -81,6 +81,10 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setAbstract(record.get(ACC.IS_ABSTRACT) == 1);
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
+        String den = record.get(ACC.DEN);
+        if (den.contains("User Extension Group")){
+            acc.setLocalExtension(true);
+        }
         acc.setOwnerUserId(record.get(ACC.OWNER_USER_ID).toBigInteger());
         acc.setCreatedBy(record.get(ACC.CREATED_BY).toBigInteger());
         acc.setLastUpdatedBy(record.get(ACC.LAST_UPDATED_BY).toBigInteger());

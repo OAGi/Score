@@ -5,7 +5,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.code_list.AddCodeListCommentDialog;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.openqa.selenium.By;
@@ -161,9 +161,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     }
 
     @Override
-    public AddCodeListCommentDialog hitAddCommentButton() {
+    public AddCommentDialog hitAddCommentButton() {
         click(getAddCommentButton());
-        AddCodeListCommentDialog addCodeListCommentDialog = new AddCodeListCommentDialogImpl(this);
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
         return addCodeListCommentDialog;
     }
