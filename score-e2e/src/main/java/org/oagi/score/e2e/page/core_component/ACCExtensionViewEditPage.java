@@ -148,6 +148,8 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     void setNamespace(NamespaceObject namespace);
 
+    WebElement getDeleteButton(boolean enabled);
+
     /**
      * Return the UI element of the 'Definition Source' field.
      *
@@ -271,4 +273,6 @@ public interface ACCExtensionViewEditPage extends Page {
     WebElement getAmendButton(boolean enabled);
 
     void setDefinition(String asccpDefinition);
+
+    void hitDeleteButton();
 }

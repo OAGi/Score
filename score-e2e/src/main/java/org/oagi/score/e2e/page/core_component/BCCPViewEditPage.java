@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.core_component;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -234,6 +235,8 @@ public interface BCCPViewEditPage extends Page {
      */
     ASCCPanelContainer getASCCPanelContainer(WebElement asccNode);
 
+    WebElement getAddCommentButton();
+
     /**
      * Return the BCC panel container.
      *
@@ -242,9 +245,15 @@ public interface BCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
-    void setPropertyTerm(String propertyTerm);
+    AddCommentDialog hitAddCommentButton();
+
+    WebElement getDefinitionSourceField();
+
+    WebElement getDENField();
 
     WebElement getPropertyTermField();
+
+    void setPropertyTerm(String propertyTerm);
 
     void setNamespace(String namespace);
 

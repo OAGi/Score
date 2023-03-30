@@ -38,6 +38,8 @@ public class ACCObject {
 
     private boolean deprecated;
 
+    private boolean localExtension;
+
     private String state;
 
     private BigInteger ownerUserId;
@@ -71,5 +73,4 @@ public class ACCObject {
         acc.setLastUpdateTimestamp(LocalDateTime.now());
         return acc;
     }
-
 }

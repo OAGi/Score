@@ -2,8 +2,10 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
@@ -57,6 +59,16 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private static final By CHANGE_ACC_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Change ACC\")]");
+    private static final By ADD_COMMENT_ICON_LOCATOR =
+            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+    private static final By PROPERTY_TERM_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+    private static final By DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By DEN_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
     private final ASCCPObject asccp;
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
@@ -385,6 +397,38 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 }
             };
         });
+    }
+    @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefinitionSourceField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDENField() {
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getPropertyTermField() {
+        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+    }
+
+    @Override
+    public AddCommentDialog hitAddCommentButton() {
+        click(getAddCommentButton());
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
+        assert addCodeListCommentDialog.isOpened();
+        return addCodeListCommentDialog;
+    }
+
+    @Override
+    public WebElement getAddCommentButton() {
+        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     @Override

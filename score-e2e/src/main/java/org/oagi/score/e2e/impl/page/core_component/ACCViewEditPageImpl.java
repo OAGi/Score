@@ -2,10 +2,12 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -102,6 +104,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
+    private static final By ADD_COMMENT_ICON_LOCATOR =
+            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
 
     private final ACCObject acc;
 
@@ -112,7 +116,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
+        if (this.acc.isLocalExtension()) {
+            return getConfig().getBaseUrl().resolve("/core_component/extension/" + this.acc.getAccManifestId()).toString();
+        } else {
+            return getConfig().getBaseUrl().resolve("/core_component/acc/" + this.acc.getAccManifestId()).toString();
+        }
     }
 
     @Override
@@ -217,7 +225,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public void setObjectClassTerm(String objectClassTerm){
+    public void setObjectClassTerm(String objectClassTerm) {
         sendKeys(getObjectClassTermField(), objectClassTerm);
     }
 
@@ -280,10 +288,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public String getDefinitionFieldValue() {
         return getText(getDefinitionField());
     }
+
     @Override
-    public WebElement getCommentsIcon(){
+    public WebElement getCommentsIcon() {
         return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
     }
+
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
@@ -412,8 +422,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         assert findWhereUsedDialog.isOpened();
         return findWhereUsedDialog;
     }
+
     @Override
-    public WebElement createASCCPfromThis(String path){
+    public WebElement createASCCPfromThis(String path) {
         WebElement confirmDialog;
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
@@ -583,6 +594,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 public ASCCPanel getASCCPanel() {
                     return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public ASCCPPanel getASCCPPanel() {
                     return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -601,12 +613,26 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 public BCCPanel getBCCPanel() {
                     return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
                 }
             };
         });
+    }
+
+    @Override
+    public AddCommentDialog hitAddCommentButton() {
+        click(getAddCommentButton());
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
+        assert addCodeListCommentDialog.isOpened();
+        return addCodeListCommentDialog;
+    }
+
+    @Override
+    public WebElement getAddCommentButton() {
+        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
@@ -864,8 +890,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+
         @Override
-        public WebElement getCommentsIcon(){
+        public WebElement getCommentsIcon() {
             return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
@@ -914,7 +941,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
-        public WebElement getPropertyTermField(){
+        public WebElement getPropertyTermField() {
             return getInputFieldByName(baseXPath, "Property Term");
         }
 
@@ -944,7 +971,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
-        public WebElement getNamespaceSelectField(){
+        public WebElement getNamespaceSelectField() {
             return getSelectFieldByName(baseXPath, "Namespace");
         }
 
@@ -967,8 +994,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+
         @Override
-        public WebElement getCommentsIcon(){
+        public WebElement getCommentsIcon() {
             return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
         }
     }
