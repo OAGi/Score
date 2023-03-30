@@ -2248,7 +2248,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
         assertTrue(movedASCCPNode.isDisplayed());
     }
-
     @Test
     public void test_TA_10_4_16() {
 
@@ -2264,13 +2263,13 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
         ACCObject acc, acc_association, accForBase, accGroup;
-        ASCCObject ascc;
-        ASCCPObject asccp;
+        ASCCObject ascc, asccGroup;
+        ASCCPObject asccp, asccpGroup;
         BCCPObject bccp, bccp_to_append;
 
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
+            accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             coreComponentAPI.updateACC(acc);
 
@@ -2282,35 +2281,34 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
 
             accGroup = coreComponentAPI.createRandomACCSemanticGroupType(developer, release, namespace, "WIP");
             coreComponentAPI.appendBCC(accGroup, bccp_to_append, "Production");
 
-            asccp = coreComponentAPI.createRandomASCCP(accGroup, developer, namespace, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
+
+            asccpGroup = coreComponentAPI.createRandomASCCP(accGroup, developer, namespace, "WIP");
+            asccGroup = coreComponentAPI.appendASCC(accForBase, asccpGroup, "WIP");
+            coreComponentAPI.updateASCC(asccGroup);
+
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
-        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper, release, namespace, "WIP");
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
         accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
-        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + accForBase.getDen());
-        appendAssociationDialog.selectAssociation(bccp_to_append.getDen());
-
-        viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
 
-        String nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
-        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+        String nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
         WebElement tr;
         tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
         assertTrue(tr.isDisplayed());
@@ -2318,31 +2316,18 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
         assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
 
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-
-        //Click on the selected base to revise
-        By SELECTED_BASE_OPTION_LOCATOR =
-                By.xpath("//score-based-acc-dialog//*[contains(text(),\"Header Base. Details\")]");
-        click(visibilityOfElementLocated(getDriver(), SELECTED_BASE_OPTION_LOCATOR));
-        switchToNextTab(getDriver());
+        //ungroup the ASCC node to fix "Refactoring" issue
         viewEditCoreComponentPage.openPage();
-
-        //Switch to main tab
-        switchToMainTab(getDriver());
-        selectBaseACCToRefactorDialog.hitCancelButton();
-
-        //Revise the ACC and ungroup the ASCC node to fix "Refactoring" issue
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        String nodePathForUngroup = "/" + acc.getDen() + "/" + accGroup.getDen();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        String nodePathForUngroup = "/" + accForBase.getDen() + "/" + accGroup.getDen();
         accViewEditPage.unGroup(nodePathForUngroup);
-        WebElement nodeAfterUngroup = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        WebElement nodeAfterUngroup = accViewEditPage.getNodeByPath("/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
         assertTrue(nodeAfterUngroup.isDisplayed());
 
         //Verify that "Refactor" is enabled
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+        selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
         tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBase.getDen());
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
