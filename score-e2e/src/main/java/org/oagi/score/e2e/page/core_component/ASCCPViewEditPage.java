@@ -206,6 +206,8 @@ public interface ASCCPViewEditPage extends Page {
      */
     ASCCPChangeACCDialog openChangeACCDialog(String path);
 
+    SelectAssociationDialog changeACC(String path);
+
     /**
      * Click the drop-down menu to open the context menu on the node.
      *
