@@ -1,11 +1,11 @@
 package org.oagi.score.export.model;
 
 import org.jooq.types.ULong;
-import org.oagi.score.provider.ImportedDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BdtPriRestriRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.XbtRecord;
+import org.oagi.score.repository.provider.DataProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,13 +27,13 @@ public class BDTSimpleType extends AbstractBDTSimple {
 
     private List<XbtRecord> xbtList;
 
-    private ImportedDataProvider importedDataProvider;
+    private DataProvider dataProvider;
 
     public BDTSimpleType(DtManifestRecord dtManifestRecord, DtRecord dataType,
                          DtManifestRecord baseDtManifestRecord, DtRecord baseDataType,
-                         boolean isDefaultBDT, ImportedDataProvider importedDataProvider) {
+                         boolean isDefaultBDT, DataProvider dataProvider) {
         this(dtManifestRecord, dataType, baseDtManifestRecord, baseDataType,
-                isDefaultBDT, null, null, importedDataProvider);
+                isDefaultBDT, null, null, dataProvider);
     }
 
     public BDTSimpleType(DtManifestRecord dtManifestRecord, DtRecord dataType,
@@ -41,8 +41,8 @@ public class BDTSimpleType extends AbstractBDTSimple {
                          boolean isDefaultBDT,
                          List<BdtPriRestriRecord> bdtPriRestriList,
                          List<XbtRecord> xbtList,
-                         ImportedDataProvider importedDataProvider) {
-        super(importedDataProvider);
+                         DataProvider dataProvider) {
+        super(dataProvider);
 
         this.dtManifestRecord = dtManifestRecord;
         this.dataType = dataType;
@@ -51,7 +51,7 @@ public class BDTSimpleType extends AbstractBDTSimple {
         this.isDefaultBDT = isDefaultBDT;
         this.bdtPriRestriList = (bdtPriRestriList != null) ? bdtPriRestriList : Collections.emptyList();
         this.xbtList = (xbtList != null) ? xbtList : Collections.emptyList();
-        this.importedDataProvider = importedDataProvider;
+        this.dataProvider = dataProvider;
     }
 
     public ULong getBdtManifestId() {
@@ -88,6 +88,10 @@ public class BDTSimpleType extends AbstractBDTSimple {
 
     public String getBaseDTName() {
         return ModelUtils.getTypeName(baseDataType);
+    }
+
+    public ULong getNamespaceId() {
+        return this.dataType.getNamespaceId();
     }
 
     public boolean isTimepointCDT() {

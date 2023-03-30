@@ -1,12 +1,10 @@
 package org.oagi.score.repo.component.acc;
 
-import com.nimbusds.jose.util.ArrayUtils;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.CcACCType;
 import org.oagi.score.gateway.http.api.cc_management.data.CcList;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
-import org.oagi.score.repo.api.corecomponent.model.Acc;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
@@ -23,7 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository

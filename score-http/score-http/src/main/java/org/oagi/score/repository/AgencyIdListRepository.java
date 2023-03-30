@@ -2,7 +2,6 @@ package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record10;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.AgencyIdList;

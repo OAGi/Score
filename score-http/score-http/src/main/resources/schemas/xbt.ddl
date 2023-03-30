@@ -1,0 +1,31 @@
+CREATE TABLE `xbt`
+(
+    `xbt_id`                bigint(20) unsigned          NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
+    `guid`                  char(32) CHARACTER SET ascii NOT NULL COMMENT 'A globally unique identifier (GUID).',
+    `name`                  varchar(45)         DEFAULT NULL COMMENT 'Human understandable name of the built-in type.',
+    `builtIn_type`          varchar(45)         DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
+    `jbt_draft05_map`       varchar(500)        DEFAULT NULL,
+    `openapi30_map`         varchar(500)        DEFAULT NULL,
+    `subtype_of_xbt_id`     bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.',
+    `schema_definition`     text,
+    `revision_doc`          text,
+    `state`                 int(11)             DEFAULT NULL,
+    `created_by`            bigint(20) unsigned          NOT NULL,
+    `owner_user_id`         bigint(20) unsigned          NOT NULL,
+    `last_updated_by`       bigint(20) unsigned          NOT NULL,
+    `creation_timestamp`    datetime(6)                  NOT NULL,
+    `last_update_timestamp` datetime(6)                  NOT NULL,
+    `is_deprecated`         tinyint(1)          DEFAULT '0',
+    PRIMARY KEY (`xbt_id`),
+    KEY `xbt_subtype_of_xbt_id_fk` (`subtype_of_xbt_id`),
+    KEY `xbt_created_by_fk` (`created_by`),
+    KEY `xbt_last_updated_by_fk` (`last_updated_by`),
+    KEY `xbt_owner_user_id_fk` (`owner_user_id`),
+    KEY `xbt_guid_idx` (`guid`),
+    KEY `xbt_last_update_timestamp_desc_idx` (`last_update_timestamp`),
+    CONSTRAINT `xbt_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `xbt_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `xbt_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `xbt_subtype_of_xbt_id_fk` FOREIGN KEY (`subtype_of_xbt_id`) REFERENCES `xbt` (`xbt_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8 COMMENT ='This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.';

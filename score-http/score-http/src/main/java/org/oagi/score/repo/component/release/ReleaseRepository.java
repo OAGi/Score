@@ -5,10 +5,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record8;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdService;
-import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.data.Release;
-import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdService;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
 import org.oagi.score.gateway.http.api.code_list_management.service.CodeListService;
@@ -16,6 +14,8 @@ import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.repository.ScoreRepository;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.CcState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
@@ -26,11 +26,11 @@ import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.jooq.impl.DSL.*;
-import static org.oagi.score.service.common.data.CcState.Candidate;
-import static org.oagi.score.service.common.data.CcState.ReleaseDraft;
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.*;
 import static org.oagi.score.gateway.http.helper.ScoreGuid.randomGuid;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.service.common.data.CcState.Candidate;
+import static org.oagi.score.service.common.data.CcState.ReleaseDraft;
 
 @Repository
 public class ReleaseRepository implements ScoreRepository<Release> {
@@ -79,6 +79,13 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 RELEASE.LAST_UPDATED_BY, RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(RELEASE).where(RELEASE.RELEASE_NUM.eq(releaseNum))
                 .fetchInto(Release.class);
+    }
+
+    public BigInteger getReleaseIdByAsccpManifestId(ULong asccpManifestId) {
+        return dslContext.select(ASCCP_MANIFEST.RELEASE_ID)
+                .from(ASCCP_MANIFEST)
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                .fetchOneInto(BigInteger.class);
     }
 
     public Release getWorkingRelease() {
@@ -2130,6 +2137,11 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         RELEASE.RELEASE_ID.ne(ULong.valueOf(releaseId))
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0) > 0;
+    }
+
+    public boolean isLatestRelease(BigInteger releaseId) {
+        return dslContext.resultQuery("SELECT max(`release_id`) FROM `release` WHERE `release_num` != 'Working'")
+                .fetchOneInto(BigInteger.class).equals(releaseId);
     }
 
     public void cleanUp(BigInteger releaseId) {

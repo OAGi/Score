@@ -25,14 +25,34 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By VERSION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+    private static final By OWNER_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+    private static final By STATE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+    private static final By LIST_ID_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-form-field//input");
+    private static final By GUID_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    private static final By RESTORE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
@@ -43,6 +63,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
@@ -57,6 +83,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-dialog-container//p");
     private static final By UPDATE_ANYWAY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button/span");
+    private static final By CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -282,5 +310,123 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
         return editCodeListValueDialog;
+    }
+
+    @Override
+    public WebElement getStateField() {
+        return visibilityOfElementLocated(getDriver(), STATE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getGuidField() {
+        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getListIDField() {
+        return visibilityOfElementLocated(getDriver(), LIST_ID_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        retry(() -> {
+            click(getCancelButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_REVISION_VALUE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void valueExists(String value) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(value);
+        });
+    }
+
+    @Override
+    public WebElement getOwnerField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void moveToDraft() {
+        retry(() -> {
+            click(getMoveToDraftButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getMoveToDraftButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void backToWIP() {
+        retry(() -> {
+            click(getBackToWIPButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public void moveToCandidate() {
+        retry(() -> {
+            click(getMoveToCandidateButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getBackToWIPButton() {
+        return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+    }
+    @Override
+    public WebElement getMoveToCandidateButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitRestoreButton() {
+        retry(() -> {
+            click(getRestoreButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getRestoreButton() {
+        return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
     }
 }

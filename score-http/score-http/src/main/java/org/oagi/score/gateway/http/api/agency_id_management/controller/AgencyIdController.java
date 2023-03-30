@@ -58,6 +58,7 @@ public class AgencyIdController {
                                                            @RequestParam(name = "definition", required = false) String definition,
                                                            @RequestParam(name = "module", required = false) String module,
                                                            @RequestParam(name = "deprecated", required = false) String deprecated,
+                                                           @RequestParam(name = "namespaces", required = false) String namespaces,
                                                            @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                                            @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
                                                            @RequestParam(name = "updateStart", required = false) String updateStart,
@@ -79,6 +80,9 @@ public class AgencyIdController {
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
                         .map(e -> CcState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
+        request.setNamespaces(!StringUtils.hasLength(namespaces) ? Collections.emptyList() :
+                Arrays.asList(namespaces.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e))
+                        .map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
                 Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :

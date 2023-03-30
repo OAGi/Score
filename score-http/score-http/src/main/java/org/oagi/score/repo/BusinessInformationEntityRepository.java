@@ -1,7 +1,7 @@
 package org.oagi.score.repo;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;

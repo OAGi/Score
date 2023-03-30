@@ -3,7 +3,6 @@ package org.oagi.score.repository;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
-import org.jooq.Table;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BCC;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;

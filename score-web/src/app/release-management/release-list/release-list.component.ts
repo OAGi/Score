@@ -13,11 +13,13 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
+import {SimpleNamespace} from "../../namespace-management/domain/namespace";
+import {NamespaceService} from "../../namespace-management/domain/namespace.service";
 
 @Component({
   selector: 'score-release-list',
@@ -42,6 +44,9 @@ export class ReleaseListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Initialized', 'Draft', 'Published'];
   request: ReleaseListRequest;
+  namespaces: SimpleNamespace[] = [];
+  namespaceListFilterCtrl: FormControl = new FormControl();
+  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: ReleaseList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -49,6 +54,7 @@ export class ReleaseListComponent implements OnInit {
 
   constructor(private service: ReleaseService,
               private accountService: AccountListService,
+              private namespaceService: NamespaceService,
               private snackBar: MatSnackBar,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
@@ -73,13 +79,19 @@ export class ReleaseListComponent implements OnInit {
       this.loadReleases();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.namespaceService.getSimpleNamespaces(),
+      this.accountService.getAccountNames()
+    ]).subscribe(([namespaces, loginIds]) => {
+      this.namespaces.push(...namespaces);
+      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
+
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
       initFilter(this.creatorIdListFilterCtrl, this.filteredCreatorIdList, this.loginIdList);
-    });
 
-    this.loadReleases(true);
+      this.loadReleases(true);
+    });
   }
 
   get userToken() {

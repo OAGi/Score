@@ -2,8 +2,8 @@ package org.oagi.score.repo.component.asccp;
 
 import org.oagi.score.data.RepositoryRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcASCCPType;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
+import org.oagi.score.service.common.data.CcState;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.math.BigInteger;

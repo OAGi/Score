@@ -26,6 +26,7 @@ export class ReleaseDetail {
   releaseLicense: string;
   state: string;
   namespaceId: number;
+  latestRelease: boolean;
 }
 
 export class ReleaseListRequest {
@@ -34,6 +35,7 @@ export class ReleaseListRequest {
   };
   excludes: string[] = [];
   states: string[] = [];
+  namespaces: number[] = [];
   creatorLoginIds: string[] = [];
   createdDate: {
     start: Date,
@@ -71,6 +73,7 @@ export class ReleaseListRequest {
 
     this.excludes = [];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
 
     this.creatorLoginIds = (params.get('creatorLoginIds')) ? Array.from(params.get('creatorLoginIds').split(',')) : [];
     this.createdDate = {
@@ -119,6 +122,9 @@ export class ReleaseListRequest {
     }
     if (this.filters.releaseNum && this.filters.releaseNum.length > 0) {
       params = params.set('releaseNum', '' + this.filters.releaseNum);
+    }
+    if (this.namespaces && this.namespaces.length > 0) {
+      params = params.set('namespaces', this.namespaces.map(e => '' + e).join(','));
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

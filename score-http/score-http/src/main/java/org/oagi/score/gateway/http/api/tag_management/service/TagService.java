@@ -2,8 +2,8 @@ package org.oagi.score.gateway.http.api.tag_management.service;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
-import org.oagi.score.gateway.http.api.tag_management.data.Tag;
 import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
+import org.oagi.score.gateway.http.api.tag_management.data.Tag;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.tag.TagRepository;

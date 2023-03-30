@@ -1,10 +1,13 @@
 package org.oagi.score.export.model;
 
+import org.jooq.types.ULong;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class SchemaCodeList {
+
 
     public String GUID_PREFIX = "oagis-id-";
 
@@ -17,6 +20,12 @@ public class SchemaCodeList {
     private List<String> values = new ArrayList();
 
     private SchemaCodeList baseCodeList;
+
+    private ULong namespaceId;
+
+    public SchemaCodeList(ULong namespaceId) {
+        this.namespaceId = namespaceId;
+    }
 
     public String getGuid() {
         return GUID_PREFIX + guid;
@@ -56,5 +65,9 @@ public class SchemaCodeList {
 
     public SchemaCodeList getBaseCodeList() {
         return baseCodeList;
+    }
+
+    public ULong getNamespaceId() {
+        return this.namespaceId;
     }
 }

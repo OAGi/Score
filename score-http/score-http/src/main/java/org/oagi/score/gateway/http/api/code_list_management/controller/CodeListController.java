@@ -52,6 +52,7 @@ public class CodeListController {
             @RequestParam(name = "deprecated", required = false) String deprecated,
             @RequestParam(name = "extensible", required = false) Boolean extensible,
             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
+            @RequestParam(name = "namespaces", required = false) String namespaces,
             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
             @RequestParam(name = "updateStart", required = false) String updateStart,
@@ -82,6 +83,9 @@ public class CodeListController {
         }
         request.setExtensible(extensible);
         request.setOwnedByDeveloper(ownedByDeveloper);
+        request.setNamespaces(!StringUtils.hasLength(namespaces) ? Collections.emptyList() :
+                Arrays.asList(namespaces.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e))
+                        .map(e -> new BigInteger(e)).collect(Collectors.toList()));
 
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
                 Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));

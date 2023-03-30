@@ -5,9 +5,9 @@ import lombok.Data;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.graph.data.Node;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CodeListManifestRecord;
+import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
 import java.util.*;

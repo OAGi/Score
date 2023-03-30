@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST_VALUE;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST_VALUE_MANIFEST;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST;
 
 public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
 
@@ -163,5 +163,13 @@ public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
                 .set(codeListValueManifestRecord)
                 .returning(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID)
                 .fetchOne().getCodeListValueManifestId();
+    }
+
+    @Override
+    public void updateCodeListValue(CodeListValueObject codeListValue) {
+        dslContext.update(CODE_LIST_VALUE)
+                .set(CODE_LIST_VALUE.IS_DEPRECATED, (byte) (codeListValue.isDeprecated() ? 1 : 0))
+                .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(ULong.valueOf(codeListValue.getCodeListValueId())))
+                .execute();
     }
 }

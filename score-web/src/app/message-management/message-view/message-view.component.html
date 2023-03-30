@@ -3,6 +3,22 @@
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
 
+  <div class="row p-3">
+    <div class="col-3">
+      <button mat-raised-button color="primary" (click)="backToMessages()">
+        <span class="pr-2">&larr;</span>
+        <span>Back to messages</span>
+      </button>
+    </div>
+    <div class="col-9 d-flex place-content-flex-end" (click)="discard()">
+      <button mat-raised-button color="warn">
+        Discard
+      </button>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
   <div class="row action-group m-0">
     <div class="col-3 title-wrap">
       <mat-label class="title">{{ message.subject }}</mat-label>

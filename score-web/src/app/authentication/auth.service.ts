@@ -11,10 +11,12 @@ import {
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {catchError, finalize, map} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OAuth2AppInfo, UserToken} from './domain/auth';
+import {MultiActionsSnackBarComponent} from "../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
+import {Clipboard} from "@angular/cdk/clipboard";
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
@@ -176,7 +178,8 @@ export class XhrInterceptor implements HttpInterceptor {
 export class ErrorAlertInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService,
               private router: Router,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private clipboard: Clipboard) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -205,14 +208,29 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
               const errorMessageId = error.headers.get('x-error-message-id');
               const errorMessage = error.headers.get('x-error-message');
               if (!!errorMessageId) {
-                this.snackBar.open(((!!errorMessage) ? errorMessage : error.message), 'View detail in Notifications', {
-                  duration: 10000,
-                }).onAction().subscribe(_ => {
-                  return this.router.navigate(['/message/' + errorMessageId]);
+                this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+                  data: {
+                    titleIcon: 'error',
+                    title: 'Error',
+                    message: ((!!errorMessage) ? errorMessage : error.message),
+                    action: 'View detail in Notifications',
+                    onAction: (data, snackBarRef) => {
+                      this.router.navigate(['/message/' + errorMessageId]);
+                      snackBarRef.dismissWithAction();
+                    }
+                  }
                 });
               } else {
-                this.snackBar.open(((!!errorMessage) ? errorMessage : error.message), '', {
-                  duration: 5000,
+                this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+                  data: {
+                    titleIcon: 'error',
+                    title: 'Error',
+                    message: ((!!errorMessage) ? errorMessage : error.message),
+                    action: 'Copy to clipboard',
+                    onAction: (data, snackBarRef) => {
+                      this.clipboard.copy(data.message);
+                    }
+                  }
                 });
               }
 

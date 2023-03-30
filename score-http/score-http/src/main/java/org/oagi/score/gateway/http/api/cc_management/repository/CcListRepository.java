@@ -64,11 +64,11 @@ public class CcListRepository {
         if (request.getTypes().isBccp() && !hasLength(request.getComponentTypes())) {
             select = (select != null) ? select.union(getBccpList(request, release, defaultModuleSetReleaseId)) : getBccpList(request, release, defaultModuleSetReleaseId);
         }
-        // Tags are only allowed by ACC, ASCCP, BCCP, and DT.
-        if (request.getTypes().isAscc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()) {
+        // Tags/Namespaces are only allowed by ACC, ASCCP, BCCP, and DT.
+        if (request.getTypes().isAscc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty() && request.getNamespaces().isEmpty()) {
             select = (select != null) ? select.union(getAsccList(request, release, defaultModuleSetReleaseId)) : getAsccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isBcc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()) {
+        if (request.getTypes().isBcc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty() && request.getNamespaces().isEmpty()) {
             select = (select != null) ? select.union(getBccList(request, release, defaultModuleSetReleaseId)) : getBccList(request, release, defaultModuleSetReleaseId);
         }
         if (request.getTypes().isDt() && !hasLength(request.getComponentTypes())) {
@@ -247,6 +247,9 @@ public class CcListRepository {
         }
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             conditions.add(TAG.NAME.in(request.getTags()));
+        }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(ACC.NAMESPACE_ID.in(request.getNamespaces()));
         }
         if (request.getComponentTypes() != null && !request.getComponentTypes().isEmpty()) {
             List<OagisComponentType> componentTypes = Arrays.asList(request.getComponentTypes().split(","))
@@ -591,6 +594,9 @@ public class CcListRepository {
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             conditions.add(TAG.NAME.in(request.getTags()));
         }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(ASCCP.NAMESPACE_ID.in(request.getNamespaces()));
+        }
         if (StringUtils.hasLength(request.getModule())) {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
@@ -699,6 +705,9 @@ public class CcListRepository {
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             conditions.add(TAG.NAME.in(request.getTags()));
         }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(BCCP.NAMESPACE_ID.in(request.getNamespaces()));
+        }
         if (StringUtils.hasLength(request.getModule())) {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
@@ -806,6 +815,9 @@ public class CcListRepository {
         }
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             conditions.add(TAG.NAME.in(request.getTags()));
+        }
+        if (request.getNamespaces() != null && !request.getNamespaces().isEmpty()) {
+            conditions.add(DT.NAMESPACE_ID.in(request.getNamespaces()));
         }
         if (StringUtils.hasLength(request.getDen())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), DT.DEN));

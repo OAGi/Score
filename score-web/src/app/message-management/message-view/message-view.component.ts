@@ -5,6 +5,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {MessageService} from '../domain/message.service';
 import {Message} from '../domain/message';
 import {finalize} from 'rxjs/operators';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'score-message-view',
@@ -22,6 +23,7 @@ export class MessageViewComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
+    private snackBar: MatSnackBar,
     private messageService: MessageService) {
   }
 
@@ -34,6 +36,24 @@ export class MessageViewComponent implements OnInit {
           this.loading = false;
         })
       ).subscribe(message => this.message = message);
+    });
+  }
+
+  backToMessages() {
+    this.router.navigateByUrl('/message');
+  }
+
+  discard() {
+    this.loading = true;
+    this.messageService.discard(this.messageId).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe(_ => {
+      this.snackBar.open('Discarded', '', {
+        duration: 3000,
+      });
+      this.backToMessages();
     });
   }
 

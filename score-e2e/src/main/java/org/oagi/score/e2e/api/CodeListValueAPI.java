@@ -21,4 +21,6 @@ public interface CodeListValueAPI {
                                                    CodeListObject codeList, AppUserObject creator);
 
     void addCodeListValueToAnotherRelease(CodeListValueObject codeListValue, CodeListObject codeList, AppUserObject creator, BigInteger newCodeListManifestId, ReleaseObject release);
+
+    void updateCodeListValue(CodeListValueObject codeListValue);
 }

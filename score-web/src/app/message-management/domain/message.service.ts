@@ -26,6 +26,10 @@ export class MessageService {
       }));
   }
 
+  discard(messageId: number): Observable<any> {
+    return this.http.delete('/api/message/' + messageId);
+  }
+
   getMessageList(request: MessageListRequest): Observable<PageResponse<MessageList>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)

@@ -1,9 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
 
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -11,6 +8,7 @@ import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
+import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Utility;
 import org.oagi.score.service.common.data.BCCEntityType;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
@@ -56,6 +55,14 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         this.processedElements.clear();
         this.document = new Document();
         this.schemaNode = generateSchema(document);
+    }
+
+    private Namespace getNamespace(GenerationContext generationContext, BigInteger namespaceId) {
+        NamespaceList namespaceList = generationContext.findNamespace(namespaceId);
+        if (namespaceList == null) {
+            return null;
+        }
+        return org.jdom2.Namespace.getNamespace(namespaceList.getPrefix(), namespaceList.getUri());
     }
 
     private Element generateSchema(Document doc) {
@@ -539,6 +546,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
+        Namespace namespace = getNamespace(generationContext, asccp.getNamespaceId());
+        this.schemaNode.setAttribute("targetNamespace", namespace.getURI());
+        this.schemaNode.addNamespaceDeclaration(namespace);
         Element rootEleNode = newElement("element");
         schemaNode.addContent(rootEleNode);
 

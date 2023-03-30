@@ -190,4 +190,35 @@ public interface DTViewEditPage extends Page {
      */
     String getDefinitionFieldValue();
 
+    void showValueDomain();
+
+    WebElement getShowValueDomain();
+
+    WebElement getAddValueDomainButton();
+
+    void addCodeListValueDomain(String name);
+
+    WebElement getTheLastTableRecord();
+
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    void hitUpdateButton();
+
+    void hitUpdateAnywayButton();
+
+    WebElement getUpdateAnywayButton();
+
+    WebElement getUpdateButton();
+
+    void setQualifier(String qualifier);
+
+    WebElement getQualifierField();
+
+    void codeListIdMarkedAsDeleted(String name);
+
+    void changeCodeListValueDomain(String codeListName);
+
+    void setDefaultValueDomain(String name);
+
+    WebElement getDefaultValueDomainField();
 }

@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -337,25 +337,16 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
-    public ArrayList<String> getOAGISOwnedLists() {
-        ArrayList<String> oagisOwnedLists = new ArrayList<>();
-        ULong oagisUserId = dslContext.select(APP_USER.APP_USER_ID)
-                .from(APP_USER)
-                .where(APP_USER.ORGANIZATION.eq("Open Applications Group"))
-                .fetchOneInto(ULong.class);
-        List<Result<Record>> records = dslContext.select(AGENCY_ID_LIST.NAME)
+    public List<String> getOAGISOwnedLists(BigInteger releaseId) {
+        return dslContext.select(AGENCY_ID_LIST.NAME)
                 .from(AGENCY_ID_LIST)
-                .where(AGENCY_ID_LIST.OWNER_USER_ID.eq(oagisUserId))
-                .fetchMany();
-        for (Result result : records) {
-            if (result.isNotEmpty()) {
-                for (int i=0; i<result.size(); i++){
-                    Record record = (Record) result.get(i);
-                    oagisOwnedLists.add(record.get(AGENCY_ID_LIST.NAME));
-                }
-            }
-        }
-        return oagisOwnedLists;
+                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
+                .join(APP_USER).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        APP_USER.LOGIN_ID.eq("oagis")
+                ))
+                .fetchInto(String.class);
     }
 
     @Override

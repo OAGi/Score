@@ -310,6 +310,10 @@ export class ModuleSetReleaseListRequest {
 
 export class ModuleSetReleaseValidateResponse {
   results: Map<string, string>;
+  requestId: string;
+  progress: number;
+  length: number;
+  done: boolean;
 }
 
 export interface Tile {
