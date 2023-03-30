@@ -1853,8 +1853,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
@@ -1877,10 +1875,12 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        String basePath = "/" + acc.getDen() + "/" + accForBase.getDen();
+        ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
 
         {
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, asccp.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
@@ -1897,7 +1897,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         }
 
         {
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(basePath, bccp.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());

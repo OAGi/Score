@@ -39,13 +39,14 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
         } catch (TimeoutException e) {
             return false;
         }
-        assert ("Select a base ACC to move " + this.associationToRefactor).equals(getText(title));
+        assert(getText(title).startsWith("Select a base ACC to move"));
+        assert(getText(title).contains(this.associationToRefactor));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//span[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title[contains(@class, \"mat-card-title\")]"));
     }
 
     @Override
