@@ -2262,7 +2262,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-        ACCObject acc, acc_association, accForBase, accGroup;
+        ACCObject acc, acc_association, accForBase, accForBaseLv2, accGroup;
         ASCCObject ascc, asccGroup;
         ASCCPObject asccp, asccpGroup;
         BCCPObject bccp, bccp_to_append;
@@ -2270,6 +2270,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv2 = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             coreComponentAPI.updateACC(acc);
 
@@ -2292,7 +2293,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             coreComponentAPI.updateASCC(ascc);
 
             asccpGroup = coreComponentAPI.createRandomASCCP(accGroup, developer, namespace, "WIP");
-            asccGroup = coreComponentAPI.appendASCC(accForBase, asccpGroup, "WIP");
+            asccGroup = coreComponentAPI.appendASCC(accForBaseLv2, asccpGroup, "WIP");
             coreComponentAPI.updateASCC(asccGroup);
 
         }
@@ -2304,35 +2305,27 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCSetBaseACCDialog accSetBaseACCDialog =  accViewEditPage.setBaseACC("/" + acc.getDen());
         accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
 
+        //set the base for accForBase
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + accForBase.getDen());
+        accSetBaseACCDialog.hitApplyButton(accForBaseLv2.getDen());
+
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
 
         String nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
         SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
+
         WebElement tr;
-        tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBaseLv2.getDen());
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
         assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
-
-        //ungroup the ASCC node to fix "Refactoring" issue
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
-        String nodePathForUngroup = "/" + accForBase.getDen() + "/" + asccpGroup.getPropertyTerm();
-        accViewEditPage.unGroup(nodePathForUngroup);
-        WebElement nodeAfterUngroup = accViewEditPage.getNodeByPath("/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
-        assertTrue(nodeAfterUngroup.isDisplayed());
-
-        //Verify that "Refactor" is enabled
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
-        tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBase.getDen());
-        assertTrue(tr.isDisplayed());
-        click(tr.findElement(By.className("mat-column-" + "select")));
-        selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
+        String refactorIssue = "Ungrouping '" + asccpGroup.getPropertyTerm() +"' required.";
+        String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\""+refactorIssue+"\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
     @Test
