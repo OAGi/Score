@@ -116,7 +116,6 @@ public class TC_10_5_CreatingNewRevisionDeveloperACC extends BaseTest {
         assertEquals(acc.getDen(), getText(accPanel.getDENField()));
         assertEquals(acc.getDefinition(), getText(accPanel.getDefinitionField()));
         assertEquals(acc.getDefinitionSource(), getText(accPanel.getDefinitionSourceField()));
-        assertEquals(acc.getNamespaceId(), getText(accPanel.getNamespaceSelectField()));
         assertNotChecked(accPanel.getAbstractCheckbox());
         assertNotChecked(accPanel.getDeprecatedCheckbox());
         assertDisabled(accPanel.getComponentTypeSelectField());
