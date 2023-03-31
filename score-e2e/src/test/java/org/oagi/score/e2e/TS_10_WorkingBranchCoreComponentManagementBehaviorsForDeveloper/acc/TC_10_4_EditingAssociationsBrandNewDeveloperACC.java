@@ -2350,9 +2350,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.updateBasedACC(acc, accForBase);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
@@ -2374,9 +2373,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
-
         String nodePath;
 
         {
@@ -2399,7 +2400,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         {
             nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
@@ -2410,7 +2411,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
         }
 
@@ -2429,7 +2430,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         {
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
         }
     }
