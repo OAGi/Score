@@ -172,10 +172,9 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accPanel = accViewEditPage.getACCPanel(accNode);
-        String newObjectTermText = "Test Object" + randomPropertyTerm;
-        assertEquals(newObjectTermText, getText(accPanel.getObjectClassTermField()));
-        assertDisabled(accPanel.getNamespaceSelectField());
+        String newObjectTermText = "Test Object " + randomPropertyTerm;
+        assertEquals(newObjectTermText, getText(accViewEditPage.getObjectClassTermField()));
+        assertDisabled(accViewEditPage.getNamespaceField());
     }
 
     @Test
