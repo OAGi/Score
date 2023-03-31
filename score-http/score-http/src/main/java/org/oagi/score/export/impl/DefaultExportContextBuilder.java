@@ -80,11 +80,12 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     private void createAgencyIdList(Map<ULong, SchemaModule> moduleMap) {
-        for (AgencyIdListRecord agencyIdList : moduleSetReleaseDataProvider.findAgencyIdList()) {
+        for (AgencyIdListManifestRecord agencyIdListManifest : moduleSetReleaseDataProvider.findAgencyIdListManifest()) {
+            AgencyIdListRecord agencyIdList = moduleSetReleaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
             List<AgencyIdListValueRecord> agencyIdListValues =
                     moduleSetReleaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
 
-            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdList.getAgencyIdListId());
+            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdListManifest.getAgencyIdListManifestId());
             if (moduleCCID == null) {
                 throw new IllegalStateException("Did you assign the agency ID list ''" + agencyIdList.getName() + "'?");
             }
@@ -94,9 +95,10 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     private void createCodeLists(Map<ULong, SchemaModule> moduleMap) {
-        List<CodeListRecord> codeLists = moduleSetReleaseDataProvider.findCodeList();
+        List<CodeListManifestRecord> codeListManifests = moduleSetReleaseDataProvider.findCodeListManifest();
         Map<ULong, SchemaCodeList> schemaCodeListMap = new HashMap();
-        codeLists.forEach(codeList -> {
+        codeListManifests.forEach(codeListManifest -> {
+            CodeListRecord codeList = moduleSetReleaseDataProvider.findCodeList(codeListManifest.getCodeListId());
             SchemaCodeList schemaCodeList = new SchemaCodeList(codeList.getNamespaceId());
             schemaCodeList.setGuid(codeList.getGuid());
             schemaCodeList.setName(codeList.getName());
@@ -106,7 +108,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 schemaCodeList.addValue(codeListValue.getValue());
             }
 
-            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeList.getCodeListId());
+            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeListManifest.getCodeListManifestId());
             if (moduleCCID == null) {
                 return;
             }
@@ -116,14 +118,15 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             schemaCodeListMap.put(codeList.getCodeListId(), schemaCodeList);
         });
 
-        codeLists.forEach(codeList -> {
-            if (codeList.getBasedCodeListId() != null) {
-                SchemaCodeList schemaCodeList = schemaCodeListMap.get(codeList.getCodeListId());
-                SchemaCodeList baseSchemaCodeList = schemaCodeListMap.get(codeList.getBasedCodeListId());
+        codeListManifests.forEach(codeListManifest -> {
+            if (codeListManifest.getBasedCodeListManifestId() != null) {
+                SchemaCodeList schemaCodeList = schemaCodeListMap.get(codeListManifest.getCodeListId());
+                CodeListManifestRecord baseCodeListManifest = moduleSetReleaseDataProvider.findCodeListManifest(codeListManifest.getBasedCodeListManifestId());
+                SchemaCodeList baseSchemaCodeList = schemaCodeListMap.get(baseCodeListManifest.getCodeListId());
                 schemaCodeList.setBaseCodeList(baseSchemaCodeList);
 
-                ModuleCCID codeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeList.getCodeListId());
-                ModuleCCID baseCodeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeList.getBasedCodeListId());
+                ModuleCCID codeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeListManifest.getCodeListManifestId());
+                ModuleCCID baseCodeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(baseCodeListManifest.getCodeListManifestId());
 
                 if (baseCodeListModuleCCID == null) {
                     throw new IllegalStateException("CodeList '" + baseSchemaCodeList.getName() + "' required. ");
@@ -159,14 +162,14 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     moduleSetReleaseDataProvider.findDtManifestByDtManifestId(bdtManifest.getBasedDtManifestId());
 
             DtRecord baseDataType = moduleSetReleaseDataProvider.findDT(basedDtManifest.getDtId());
-            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleDt(bdt.getDtId());
+            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleDt(bdtManifest.getDtManifestId());
             if (moduleCCID == null) {
                 return;
             }
 
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
 
-            ModuleCCID baseModuleCCID = moduleSetReleaseDataProvider.findModuleDt(baseDataType.getDtId());
+            ModuleCCID baseModuleCCID = moduleSetReleaseDataProvider.findModuleDt(basedDtManifest.getDtManifestId());
 
             if (baseModuleCCID != null) {
                 SchemaModule baseSchemaModule = moduleMap.get(baseModuleCCID.getModuleId());
@@ -192,8 +195,8 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     bdtSimple = new BDTSimpleType(
                             bdtManifest, bdt, basedDtManifest, baseDataType, isDefaultBDT,
                             bdtPriRestriList, xbtList, moduleSetReleaseDataProvider);
-                    xbtList.forEach(xbtRecord -> {
-                        ModuleCCID xbtModuleCCID = moduleSetReleaseDataProvider.findModuleXbt(xbtRecord.getXbtId());
+                    xbtList.forEach(xbt -> {
+                        ModuleCCID xbtModuleCCID = moduleSetReleaseDataProvider.findModuleXbt(xbt.getXbtId());
 
                         if (xbtModuleCCID != null) {
                             addDependency(schemaModule,
@@ -250,14 +253,12 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                             }
                         } else {
                             AgencyIdListManifestRecord agencyIdListManifest = moduleSetReleaseDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
-                            AgencyIdListRecord agencyIdList = moduleSetReleaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                            ModuleCCID agencyIdListModuleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdList.getAgencyIdListId());
+                            ModuleCCID agencyIdListModuleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdListManifest.getAgencyIdListManifestId());
                             addDependency(schemaModule, moduleMap.get(agencyIdListModuleCCID.getModuleId()));
                         }
                     } else {
                         CodeListManifestRecord codeListManifest = moduleSetReleaseDataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
-                        CodeListRecord codeList = moduleSetReleaseDataProvider.findCodeList(codeListManifest.getCodeListId());
-                        ModuleCCID codeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeList.getCodeListId());
+                        ModuleCCID codeListModuleCCID = moduleSetReleaseDataProvider.findModuleCodeList(codeListManifest.getCodeListManifestId());
                         addDependency(schemaModule, moduleMap.get(codeListModuleCCID.getModuleId()));
                     }
                 });
@@ -268,11 +269,13 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     private void createBCCP(Map<ULong, SchemaModule> moduleMap) {
-        moduleSetReleaseDataProvider.findBCCP().forEach(bccp-> {
+        moduleSetReleaseDataProvider.findBCCPManifest().forEach(bccpManifest -> {
+            BccpRecord bccp = moduleSetReleaseDataProvider.findBCCP(bccpManifest.getBccpId());
             List<BccRecord> bccList = moduleSetReleaseDataProvider.findBCCByToBccpId(bccp.getBccpId());
             if (isAvailable(bccList)) {
-                DtRecord bdt = moduleSetReleaseDataProvider.findDT(bccp.getBdtId());
-                ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleBccp(bccp.getBccpId());
+                DtManifestRecord bdtManifest = moduleSetReleaseDataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
+                DtRecord bdt = moduleSetReleaseDataProvider.findDT(bdtManifest.getDtId());
+                ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleBccp(bccpManifest.getBccpManifestId());
                 /*
                  * Issue #98
                  *
@@ -284,7 +287,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
                 schemaModule.addBCCP(new BCCP(bccp, bdt));
 
-                ModuleCCID dtModuleCCID = moduleSetReleaseDataProvider.findModuleDt(bdt.getDtId());
+                ModuleCCID dtModuleCCID = moduleSetReleaseDataProvider.findModuleDt(bdtManifest.getDtManifestId());
                 if (dtModuleCCID == null) {
                     return;
                 }
@@ -305,12 +308,12 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     private void createACC(Map<ULong, SchemaModule> moduleMap) {
-        moduleSetReleaseDataProvider.findACCManifest().forEach(accManifest->{
+        moduleSetReleaseDataProvider.findACCManifest().forEach(accManifest -> {
             AccRecord acc = moduleSetReleaseDataProvider.findACC(accManifest.getAccId());
             if (acc.getDen().equals("Any Structured Content. Details")) {
                 return;
             }
-            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAcc(acc.getAccId());
+            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAcc(accManifest.getAccManifestId());
             if (moduleCCID == null) {
                 return;
             }
@@ -321,32 +324,33 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             }
             schemaModule.addACC(ACC.newInstance(acc, accManifest, moduleSetReleaseDataProvider));
 
-            if (acc.getBasedAccId() != null) {
-                AccRecord basedAcc = moduleSetReleaseDataProvider.findACC(acc.getBasedAccId());
-                if (basedAcc != null) {
-                    ModuleCCID basedAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(basedAcc.getAccId());
+            if (accManifest.getBasedAccManifestId() != null) {
+                AccManifestRecord basedAccManifest = moduleSetReleaseDataProvider.findACCManifest(accManifest.getBasedAccManifestId());
+                if (basedAccManifest != null) {
+                    ModuleCCID basedAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(basedAccManifest.getAccManifestId());
                     if (basedAccModuleCCID != null) {
                         addDependency(schemaModule, moduleMap.get(basedAccModuleCCID.getModuleId()));
                     }
                 }
             }
 
-            moduleSetReleaseDataProvider.findASCCByFromAccId(acc.getAccId()).forEach(e -> {
-                ModuleCCID asccpModuleCCID = moduleSetReleaseDataProvider.findModuleAsccp(e.getToAsccpId());
+            moduleSetReleaseDataProvider.findASCCManifestByFromAccManifestId(accManifest.getAccManifestId()).forEach(e -> {
+                AsccpManifestRecord asccpManifest = moduleSetReleaseDataProvider.findASCCPManifest(e.getToAsccpManifestId());
+                ModuleCCID asccpModuleCCID = moduleSetReleaseDataProvider.findModuleAsccp(asccpManifest.getAsccpManifestId());
                 if (asccpModuleCCID != null) {
                     addDependency(schemaModule, moduleMap.get(asccpModuleCCID.getModuleId()));
                 }
-                AsccpRecord asccp = moduleSetReleaseDataProvider.findASCCP(e.getToAsccpId());
+                AsccpRecord asccp = moduleSetReleaseDataProvider.findASCCP(asccpManifest.getAsccpId());
                 if (asccp != null && asccp.getReusableIndicator() == 0) {
-                    ModuleCCID roleOfAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(asccp.getRoleOfAccId());
+                    ModuleCCID roleOfAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(asccpManifest.getRoleOfAccManifestId());
                     if (roleOfAccModuleCCID != null) {
                         addDependency(schemaModule, moduleMap.get(roleOfAccModuleCCID.getModuleId()));
                     }
                 }
             });
 
-            moduleSetReleaseDataProvider.findBCCByFromAccId(acc.getAccId()).forEach(e -> {
-                ModuleCCID bccpModuleCCID = moduleSetReleaseDataProvider.findModuleBccp(e.getToBccpId());
+            moduleSetReleaseDataProvider.findBCCManifestByFromAccManifestId(accManifest.getAccManifestId()).forEach(e -> {
+                ModuleCCID bccpModuleCCID = moduleSetReleaseDataProvider.findModuleBccp(e.getToBccpManifestId());
                 if (bccpModuleCCID != null) {
                     addDependency(schemaModule, moduleMap.get(bccpModuleCCID.getModuleId()));
                 }
@@ -364,7 +368,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             if (asccp.getDen().equals(ANY_ASCCP_DEN)) {
                 return;
             }
-            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAsccp(asccp.getAsccpId());
+            ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAsccp(asccpManifest.getAsccpManifestId());
 
             if (moduleCCID == null) {
                 return;
@@ -372,7 +376,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
             schemaModule.addASCCP(ASCCP.newInstance(asccp, asccpManifest, moduleSetReleaseDataProvider));
 
-            ModuleCCID roleOfAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(asccp.getRoleOfAccId());
+            ModuleCCID roleOfAccModuleCCID = moduleSetReleaseDataProvider.findModuleAcc(asccpManifest.getRoleOfAccManifestId());
             if (roleOfAccModuleCCID == null) {
                 return;
             }
