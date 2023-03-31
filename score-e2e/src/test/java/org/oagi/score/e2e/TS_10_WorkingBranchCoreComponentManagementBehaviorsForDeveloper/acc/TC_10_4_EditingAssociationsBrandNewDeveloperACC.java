@@ -15,7 +15,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -3048,47 +3047,82 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_4_25() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, acc_association, accForBase;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
 
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.updateBasedACC(acc, accForBase);
+
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Published");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Operation Reference Base. Details", branch);
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        String url = getDriver().getCurrentUrl();
-        BigInteger baseACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+
+        String nodePath;
+        {
+            nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+            //BCCP node moved out
+            WebElement expandedTree = accViewEditPage.getNodeByPath("/" + acc.getDen());
+            String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + bccp_to_append.getPropertyTerm() + "\")]";
+            assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
+        }
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Manufacturing Route Operation Base. Details", branch);
-        url = getDriver().getCurrentUrl();
-        BigInteger refactorACCManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-        accViewEditPage.hitReviseButton();
-        String nodePath = "/Manufacturing Route Operation Base. Details/Container Identifier";
-        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Container Identifier");
-        WebElement tr;
-        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Operation Reference Base. Details");
-        assertTrue(tr.isDisplayed());
-        click(tr.findElement(By.className("mat-column-" + "select")));
-        selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
-        selectBaseACCToRefactorDialog.hitRefactorButton();
-
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
-        String movedNodePath = "/Operation Reference Base. Details/Container Identifier";
-        WebElement movedNode = accViewEditPage.getNodeByPath(movedNodePath);
-        assertTrue(movedNode.isDisplayed());
-
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
         accViewEditPage.hitCancelButton();
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(baseACCManifestId);
-        movedNode = accViewEditPage.getNodeByPath(movedNodePath);
-        assertFalse(movedNode.isDisplayed());
+
+        {
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+            WebElement expandedTree = accViewEditPage.getNodeByPath("/" + accForBase.getDen());
+            String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + bccp_to_append.getPropertyTerm() + "\")]";
+            assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
+        }
     }
 }
