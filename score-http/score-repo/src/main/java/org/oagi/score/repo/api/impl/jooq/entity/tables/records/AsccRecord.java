@@ -919,5 +919,6 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
         setState(state);
         setPrevAsccId(prevAsccId);
         setNextAsccId(nextAsccId);
+        resetChangedOnNotNull();
     }
 }

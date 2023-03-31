@@ -236,5 +236,6 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
         setConstraintType(constraintType);
         setConstraintText(constraintText);
         setRepresentedUsageRuleId(representedUsageRuleId);
+        resetChangedOnNotNull();
     }
 }

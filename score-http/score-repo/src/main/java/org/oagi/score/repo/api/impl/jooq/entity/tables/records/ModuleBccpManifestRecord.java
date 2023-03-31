@@ -384,5 +384,6 @@ public class ModuleBccpManifestRecord extends UpdatableRecordImpl<ModuleBccpMani
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

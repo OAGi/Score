@@ -945,5 +945,6 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
         setIsNillable(isNillable);
         setPrevAsccpId(prevAsccpId);
         setNextAsccpId(nextAsccpId);
+        resetChangedOnNotNull();
     }
 }

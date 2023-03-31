@@ -185,5 +185,6 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
         setBizCtxValueId(bizCtxValueId);
         setBizCtxId(bizCtxId);
         setCtxSchemeValueId(ctxSchemeValueId);
+        resetChangedOnNotNull();
     }
 }

@@ -155,13 +155,13 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
      * The column <code>oagi.agency_id_list.creation_timestamp</code>. Timestamp
      * when the agency ID list was created.
      */
-    public final TableField<AgencyIdListRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the agency ID list was created.");
+    public final TableField<AgencyIdListRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the agency ID list was created.");
 
     /**
      * The column <code>oagi.agency_id_list.last_update_timestamp</code>.
      * Timestamp when the agency ID list was last updated.
      */
-    public final TableField<AgencyIdListRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the agency ID list was last updated.");
+    public final TableField<AgencyIdListRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the agency ID list was last updated.");
 
     /**
      * The column <code>oagi.agency_id_list.state</code>. Life cycle state of

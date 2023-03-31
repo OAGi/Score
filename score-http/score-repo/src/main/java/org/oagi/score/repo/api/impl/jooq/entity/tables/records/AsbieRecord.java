@@ -859,5 +859,6 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
         setSeqKey(seqKey);
         setIsUsed(isUsed);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

@@ -382,5 +382,6 @@ public class ModuleXbtManifestRecord extends UpdatableRecordImpl<ModuleXbtManife
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

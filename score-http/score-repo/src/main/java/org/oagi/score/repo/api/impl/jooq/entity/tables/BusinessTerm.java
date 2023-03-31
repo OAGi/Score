@@ -65,9 +65,10 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
     public final TableField<BusinessTermRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.business_term.business_term</code>.
+     * The column <code>oagi.business_term.business_term</code>. A main name of
+     * the business term
      */
-    public final TableField<BusinessTermRecord, String> BUSINESS_TERM_ = createField(DSL.name("business_term"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<BusinessTermRecord, String> BUSINESS_TERM_ = createField(DSL.name("business_term"), SQLDataType.VARCHAR(255).nullable(false), this, "A main name of the business term");
 
     /**
      * The column <code>oagi.business_term.definition</code>. Definition of the
@@ -105,7 +106,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
      * The column <code>oagi.business_term.external_ref_uri</code>. TODO:
      * Definition is missing.
      */
-    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_URI = createField(DSL.name("external_ref_uri"), SQLDataType.CLOB, this, "TODO: Definition is missing.");
+    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_URI = createField(DSL.name("external_ref_uri"), SQLDataType.CLOB.nullable(false), this, "TODO: Definition is missing.");
 
     /**
      * The column <code>oagi.business_term.external_ref_id</code>. TODO:

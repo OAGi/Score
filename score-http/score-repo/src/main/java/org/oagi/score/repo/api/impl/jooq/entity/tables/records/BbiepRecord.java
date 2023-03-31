@@ -602,5 +602,6 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> implements Rec
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

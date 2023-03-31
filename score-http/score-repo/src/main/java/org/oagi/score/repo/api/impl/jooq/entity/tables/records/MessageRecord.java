@@ -374,5 +374,6 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> implements
         setBodyContentType(bodyContentType);
         setIsRead(isRead);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

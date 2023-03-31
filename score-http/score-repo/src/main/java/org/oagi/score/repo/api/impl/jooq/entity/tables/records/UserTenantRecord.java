@@ -181,5 +181,6 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
         setUserTenantId(userTenantId);
         setTenantId(tenantId);
         setAppUserId(appUserId);
+        resetChangedOnNotNull();
     }
 }

@@ -989,5 +989,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         setFixedValue(fixedValue);
         setPrevBccpId(prevBccpId);
         setNextBccpId(nextBccpId);
+        resetChangedOnNotNull();
     }
 }

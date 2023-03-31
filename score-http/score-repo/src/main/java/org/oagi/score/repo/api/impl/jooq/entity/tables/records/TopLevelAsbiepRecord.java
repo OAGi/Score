@@ -470,5 +470,6 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         setStatus(status);
         setState(state);
         setInverseMode(inverseMode);
+        resetChangedOnNotNull();
     }
 }

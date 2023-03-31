@@ -405,5 +405,6 @@ public class BccpManifestRecord extends UpdatableRecordImpl<BccpManifestRecord> 
         setReplacementBccpManifestId(replacementBccpManifestId);
         setPrevBccpManifestId(prevBccpManifestId);
         setNextBccpManifestId(nextBccpManifestId);
+        resetChangedOnNotNull();
     }
 }

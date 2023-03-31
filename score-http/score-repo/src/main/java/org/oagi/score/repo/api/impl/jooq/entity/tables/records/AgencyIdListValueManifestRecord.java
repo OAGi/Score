@@ -417,5 +417,6 @@ public class AgencyIdListValueManifestRecord extends UpdatableRecordImpl<AgencyI
         setReplacementAgencyIdListValueManifestId(replacementAgencyIdListValueManifestId);
         setPrevAgencyIdListValueManifestId(prevAgencyIdListValueManifestId);
         setNextAgencyIdListValueManifestId(nextAgencyIdListValueManifestId);
+        resetChangedOnNotNull();
     }
 }

@@ -424,5 +424,6 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

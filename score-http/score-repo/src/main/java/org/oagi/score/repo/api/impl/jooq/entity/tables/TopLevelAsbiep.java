@@ -76,7 +76,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * The column <code>oagi.top_level_asbiep.last_update_timestamp</code>. The
      * timestamp when among all related bie records was last updated.
      */
-    public final TableField<TopLevelAsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "The timestamp when among all related bie records was last updated.");
+    public final TableField<TopLevelAsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "The timestamp when among all related bie records was last updated.");
 
     /**
      * The column <code>oagi.top_level_asbiep.last_updated_by</code>. A foreign

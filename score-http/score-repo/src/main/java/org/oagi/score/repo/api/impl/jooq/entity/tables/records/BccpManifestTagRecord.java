@@ -220,5 +220,6 @@ public class BccpManifestTagRecord extends UpdatableRecordImpl<BccpManifestTagRe
         setTagId(tagId);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

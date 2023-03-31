@@ -953,5 +953,6 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevDtScId(prevDtScId);
         setNextDtScId(nextDtScId);
+        resetChangedOnNotNull();
     }
 }

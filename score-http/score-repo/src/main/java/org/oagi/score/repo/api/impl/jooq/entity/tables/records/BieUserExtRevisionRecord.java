@@ -342,5 +342,6 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
         setUserExtAccId(userExtAccId);
         setRevisedIndicator(revisedIndicator);
         setTopLevelAsbiepId(topLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

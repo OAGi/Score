@@ -30,7 +30,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ConfigurationReco
 
 
 /**
- * The table stores configuration properties of the application. 
+ * The table stores configuration properties of the application.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Configuration extends TableImpl<ConfigurationRecord> {
@@ -79,7 +79,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     }
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application. "), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table());
     }
 
     /**

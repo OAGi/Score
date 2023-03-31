@@ -413,5 +413,6 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record9
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

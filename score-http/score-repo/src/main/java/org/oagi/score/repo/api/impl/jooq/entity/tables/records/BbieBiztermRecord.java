@@ -424,5 +424,6 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }
