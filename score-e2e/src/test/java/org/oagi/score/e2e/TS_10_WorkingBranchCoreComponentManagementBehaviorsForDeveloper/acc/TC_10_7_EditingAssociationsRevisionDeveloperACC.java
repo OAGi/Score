@@ -93,6 +93,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
 
     }
+
     @Test
     public void test_TA_10_7_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -132,13 +133,12 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             selectAssociationDialog.selectAssociation(asccp.getDen());
 
             //Verify the asccp is associated
-            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/"  + asccp.getPropertyTerm());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
             assertEquals(state, getText(asccpPanel.getStateField()));
         }
 
     }
-
     @Test
     public void test_TA_10_7_1_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -168,25 +168,22 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         appendASCCPDialog.hitSearchButton();
         By APPEND_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
-        retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
-                td = tr.findElement(By.className("mat-column-" + "den"));
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate an association using " + asccp.getDen(), e);
-            }
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
-            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + asccp.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
-            waitFor(ofMillis(500));
-        });
-
+        assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
     }
+
     @Test
     public void test_TA_10_7_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -246,6 +243,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertEquals("WIP", getText(asccPanel.getStateField()));
     }
+
     @Test
     public void test_TA_10_7_1_e() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -268,7 +266,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         coreComponentAPI.updateASCC(ascc);
 
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel =asccpViewEditPage.getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         asccpPanel.toggleReusable();
         asccpViewEditPage.hitUpdateButton();
 
@@ -924,6 +922,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         });
 
     }
+
     @Test
     public void test_TA_10_7_5_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1063,7 +1062,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
 
         viewEditCoreComponentPage.openPage();
-        ACCViewEditPage  accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp.getDen());
@@ -1768,7 +1767,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        accViewEditPage.removeAssociation("/"  + acc.getDen() + "/" + asccp_after.getPropertyTerm());
+        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_after.getPropertyTerm());
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         assertFalse(asccNode.isDisplayed());
@@ -2130,7 +2129,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage =viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         viewEditCoreComponentPage.openPage();
         {
