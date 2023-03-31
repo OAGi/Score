@@ -280,31 +280,52 @@ export class ReleaseAssignComponent implements OnInit {
       e.errors = [];
     });
 
+    const levelCount = (map: Map<number, ValidationMessage[]>, level: string) => {
+      let count = 0;
+      Object.values(map).forEach(e => {
+        count += e.filter(ee => ee.level === level).length;
+      });
+      return count;
+    };
+
     this.isLoading = true;
     this.service.validate(request).pipe(finalize(() => {
       this.isLoading = false;
     })).subscribe(resp => {
       const map: ReleaseValidationResponse = resp;
+      let errorCount = 0;
       if (Object.getOwnPropertyNames(map.statusMapForAcc).length > 0) {
         this.addErrorsToNode(map.statusMapForAcc, 'ACC');
+        errorCount += levelCount(map.statusMapForAcc, 'Error');
       }
       if (Object.getOwnPropertyNames(map.statusMapForAsccp).length > 0) {
         this.addErrorsToNode(map.statusMapForAsccp, 'ASCCP');
+        errorCount += levelCount(map.statusMapForAsccp, 'Error');
       }
       if (Object.getOwnPropertyNames(map.statusMapForBccp).length > 0) {
         this.addErrorsToNode(map.statusMapForBccp, 'BCCP');
+        errorCount += levelCount(map.statusMapForBccp, 'Error');
       }
       if (Object.getOwnPropertyNames(map.statusMapForCodeList).length > 0) {
         this.addErrorsToNode(map.statusMapForCodeList, 'CODE_LIST');
+        errorCount += levelCount(map.statusMapForCodeList, 'Error');
       }
       if (Object.getOwnPropertyNames(map.statusMapForAgencyIdList).length > 0) {
         this.addErrorsToNode(map.statusMapForAgencyIdList, 'AGENCY_ID_LIST');
+        errorCount += levelCount(map.statusMapForAgencyIdList, 'Error');
       }
       if (Object.getOwnPropertyNames(map.statusMapForDt).length > 0) {
         this.addErrorsToNode(map.statusMapForDt, 'DT');
+        errorCount += levelCount(map.statusMapForDt, 'Error');
       }
       if (map.succeed) {
         this.snackBar.open('All components are valid.', '', {
+          duration: 3000,
+        });
+      } else {
+        const message = (errorCount > 1) ? ('There are ' + errorCount + ' errors. Please review components.') :
+          ('There is ' + errorCount + ' error. Please review the component.');
+        this.snackBar.open(message, '', {
           duration: 3000,
         });
       }
