@@ -204,7 +204,10 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        assertTrue(getSnackBarMessage(getDriver()).contains("already has ASCCP [Account Identifiers. Named Identifiers]"));
+        String duplicateWarning = "ACC [" + acc.getDen() + "] already has ASCCP [Account Identifiers. Named Identifiers]";
+        String xpathExpr = "//score-multi-actions-snack-bar/span";
+        WebElement snackBar = visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr));
+        assertTrue(getText(snackBar).contains(duplicateWarning));
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
