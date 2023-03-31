@@ -460,5 +460,6 @@ public class AppOauth2UserRecord extends UpdatableRecordImpl<AppOauth2UserRecord
         setPreferredUsername(preferredUsername);
         setPhoneNumber(phoneNumber);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

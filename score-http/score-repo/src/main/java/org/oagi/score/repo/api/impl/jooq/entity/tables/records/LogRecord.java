@@ -493,5 +493,6 @@ public class LogRecord extends UpdatableRecordImpl<LogRecord> implements Record1
         setNextLogId(nextLogId);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

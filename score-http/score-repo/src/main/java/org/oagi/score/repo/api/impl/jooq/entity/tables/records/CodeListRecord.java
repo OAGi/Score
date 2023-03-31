@@ -952,5 +952,6 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
         setState(state);
         setPrevCodeListId(prevCodeListId);
         setNextCodeListId(nextCodeListId);
+        resetChangedOnNotNull();
     }
 }

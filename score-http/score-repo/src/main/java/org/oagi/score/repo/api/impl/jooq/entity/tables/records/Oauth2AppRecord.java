@@ -769,5 +769,6 @@ public class Oauth2AppRecord extends UpdatableRecordImpl<Oauth2AppRecord> implem
         setFontColor(fontColor);
         setDisplayOrder(displayOrder);
         setIsDisabled(isDisabled);
+        resetChangedOnNotNull();
     }
 }

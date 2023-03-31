@@ -567,5 +567,6 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

@@ -302,5 +302,6 @@ public class ExceptionRecord extends UpdatableRecordImpl<ExceptionRecord> implem
         setStacktrace(stacktrace);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

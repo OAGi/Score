@@ -144,5 +144,6 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
 
         setCdtPriId(cdtPriId);
         setName(name);
+        resetChangedOnNotNull();
     }
 }

@@ -674,5 +674,6 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setIsDeprecated(isDeprecated);
+        resetChangedOnNotNull();
     }
 }

@@ -383,5 +383,6 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

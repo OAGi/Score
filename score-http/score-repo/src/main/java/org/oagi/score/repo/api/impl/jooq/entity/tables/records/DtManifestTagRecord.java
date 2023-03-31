@@ -220,5 +220,6 @@ public class DtManifestTagRecord extends UpdatableRecordImpl<DtManifestTagRecord
         setTagId(tagId);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

@@ -415,5 +415,6 @@ public class CodeListValueManifestRecord extends UpdatableRecordImpl<CodeListVal
         setReplacementCodeListValueManifestId(replacementCodeListValueManifestId);
         setPrevCodeListValueManifestId(prevCodeListValueManifestId);
         setNextCodeListValueManifestId(nextCodeListValueManifestId);
+        resetChangedOnNotNull();
     }
 }

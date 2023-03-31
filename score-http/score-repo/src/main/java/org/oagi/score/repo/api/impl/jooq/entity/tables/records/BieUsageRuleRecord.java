@@ -354,5 +354,6 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
         setTargetAsbiepId(targetAsbiepId);
         setTargetBbieId(targetBbieId);
         setTargetBbiepId(targetBbiepId);
+        resetChangedOnNotNull();
     }
 }

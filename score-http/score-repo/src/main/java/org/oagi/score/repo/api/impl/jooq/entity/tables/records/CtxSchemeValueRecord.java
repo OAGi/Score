@@ -264,5 +264,6 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
         setValue(value);
         setMeaning(meaning);
         setOwnerCtxSchemeId(ownerCtxSchemeId);
+        resetChangedOnNotNull();
     }
 }

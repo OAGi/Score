@@ -440,5 +440,6 @@ public class BccManifestRecord extends UpdatableRecordImpl<BccManifestRecord> im
         setReplacementBccManifestId(replacementBccManifestId);
         setPrevBccManifestId(prevBccManifestId);
         setNextBccManifestId(nextBccManifestId);
+        resetChangedOnNotNull();
     }
 }

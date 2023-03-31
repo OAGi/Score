@@ -14,7 +14,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Configuration;
 
 
 /**
- * The table stores configuration properties of the application. 
+ * The table stores configuration properties of the application.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord> implements Record4<ULong, String, String, String> {
@@ -222,5 +222,6 @@ public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord
         setName(name);
         setType(type);
         setValue(value);
+        resetChangedOnNotNull();
     }
 }

@@ -220,5 +220,6 @@ public class AsccpManifestTagRecord extends UpdatableRecordImpl<AsccpManifestTag
         setTagId(tagId);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

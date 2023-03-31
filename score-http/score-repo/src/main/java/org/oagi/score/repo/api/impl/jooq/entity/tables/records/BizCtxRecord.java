@@ -344,5 +344,6 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> implements R
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

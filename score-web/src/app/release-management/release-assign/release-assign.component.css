@@ -30,8 +30,8 @@
 }
 
 .drop-box-content {
-  min-height: 355px;
-  max-height: 655px;
+  min-height: 64vh;
+  max-height: 64vh;
   overflow-y: auto;
 }
 

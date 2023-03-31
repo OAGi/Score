@@ -697,5 +697,6 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
         setRemark(remark);
         setBizTerm(bizTerm);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

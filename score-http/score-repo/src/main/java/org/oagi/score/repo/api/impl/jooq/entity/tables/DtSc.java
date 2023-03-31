@@ -182,13 +182,13 @@ public class DtSc extends TableImpl<DtScRecord> {
      * The column <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
      * code list was created.
      */
-    public final TableField<DtScRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
+    public final TableField<DtScRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
 
     /**
      * The column <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
      * the code list was last updated.
      */
-    public final TableField<DtScRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
+    public final TableField<DtScRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
 
     /**
      * The column <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to

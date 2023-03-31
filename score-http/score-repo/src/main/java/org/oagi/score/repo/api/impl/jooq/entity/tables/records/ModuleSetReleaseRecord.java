@@ -464,5 +464,6 @@ public class ModuleSetReleaseRecord extends UpdatableRecordImpl<ModuleSetRelease
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

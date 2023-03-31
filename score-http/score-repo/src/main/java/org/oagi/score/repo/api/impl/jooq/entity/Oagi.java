@@ -478,7 +478,7 @@ public class Oagi extends SchemaImpl {
     public final Comment COMMENT = Comment.COMMENT;
 
     /**
-     * The table stores configuration properties of the application. 
+     * The table stores configuration properties of the application.
      */
     public final Configuration CONFIGURATION = Configuration.CONFIGURATION;
 

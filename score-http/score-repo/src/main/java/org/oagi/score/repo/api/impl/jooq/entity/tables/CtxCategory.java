@@ -95,13 +95,13 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
      * The column <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
      * when the context category was created.
      */
-    public final TableField<CtxCategoryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was created.");
+    public final TableField<CtxCategoryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was created.");
 
     /**
      * The column <code>oagi.ctx_category.last_update_timestamp</code>.
      * Timestamp when the context category was last updated.
      */
-    public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
+    public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
 
     private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased) {
         this(alias, aliased, null);

@@ -230,5 +230,6 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
         setAssignedUsageRuleId(assignedUsageRuleId);
         setTargetDtId(targetDtId);
         setTargetDtScId(targetDtScId);
+        resetChangedOnNotNull();
     }
 }

@@ -1003,5 +1003,6 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> implements Record2
         setIsAbstract(isAbstract);
         setPrevAccId(prevAccId);
         setNextAccId(nextAccId);
+        resetChangedOnNotNull();
     }
 }

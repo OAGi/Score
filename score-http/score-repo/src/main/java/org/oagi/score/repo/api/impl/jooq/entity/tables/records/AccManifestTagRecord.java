@@ -220,5 +220,6 @@ public class AccManifestTagRecord extends UpdatableRecordImpl<AccManifestTagReco
         setTagId(tagId);
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
+        resetChangedOnNotNull();
     }
 }

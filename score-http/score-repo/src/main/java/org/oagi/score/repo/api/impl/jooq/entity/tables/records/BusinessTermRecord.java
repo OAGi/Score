@@ -57,14 +57,16 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.business_term.business_term</code>.
+     * Setter for <code>oagi.business_term.business_term</code>. A main name of
+     * the business term
      */
     public void setBusinessTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.business_term</code>.
+     * Getter for <code>oagi.business_term.business_term</code>. A main name of
+     * the business term
      */
     public String getBusinessTerm() {
         return (String) get(2);
@@ -500,5 +502,6 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
         setExternalRefUri(externalRefUri);
         setExternalRefId(externalRefId);
         setComment(comment);
+        resetChangedOnNotNull();
     }
 }

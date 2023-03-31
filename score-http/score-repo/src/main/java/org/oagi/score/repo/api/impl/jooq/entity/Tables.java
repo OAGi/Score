@@ -465,7 +465,7 @@ public class Tables {
     public static final Comment COMMENT = Comment.COMMENT;
 
     /**
-     * The table stores configuration properties of the application. 
+     * The table stores configuration properties of the application.
      */
     public static final Configuration CONFIGURATION = Configuration.CONFIGURATION;
 

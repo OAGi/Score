@@ -405,5 +405,6 @@ public class DtManifestRecord extends UpdatableRecordImpl<DtManifestRecord> impl
         setReplacementDtManifestId(replacementDtManifestId);
         setPrevDtManifestId(prevDtManifestId);
         setNextDtManifestId(nextDtManifestId);
+        resetChangedOnNotNull();
     }
 }

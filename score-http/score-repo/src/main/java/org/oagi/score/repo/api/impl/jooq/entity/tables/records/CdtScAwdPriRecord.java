@@ -228,5 +228,6 @@ public class CdtScAwdPriRecord extends UpdatableRecordImpl<CdtScAwdPriRecord> im
         setCdtScId(cdtScId);
         setCdtPriId(cdtPriId);
         setIsDefault(isDefault);
+        resetChangedOnNotNull();
     }
 }

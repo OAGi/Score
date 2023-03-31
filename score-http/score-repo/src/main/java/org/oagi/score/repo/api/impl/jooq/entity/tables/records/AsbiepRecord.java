@@ -649,5 +649,6 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> implements R
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

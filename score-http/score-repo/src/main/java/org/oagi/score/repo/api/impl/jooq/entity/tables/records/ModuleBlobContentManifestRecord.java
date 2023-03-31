@@ -396,5 +396,6 @@ public class ModuleBlobContentManifestRecord extends UpdatableRecordImpl<ModuleB
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

@@ -440,5 +440,6 @@ public class AsccManifestRecord extends UpdatableRecordImpl<AsccManifestRecord> 
         setReplacementAsccManifestId(replacementAsccManifestId);
         setPrevAsccManifestId(prevAsccManifestId);
         setNextAsccManifestId(nextAsccManifestId);
+        resetChangedOnNotNull();
     }
 }

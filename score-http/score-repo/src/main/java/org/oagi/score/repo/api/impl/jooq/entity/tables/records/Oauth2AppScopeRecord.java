@@ -177,5 +177,6 @@ public class Oauth2AppScopeRecord extends UpdatableRecordImpl<Oauth2AppScopeReco
         setOauth2AppScopeId(oauth2AppScopeId);
         setOauth2AppId(oauth2AppId);
         setScope(scope);
+        resetChangedOnNotNull();
     }
 }

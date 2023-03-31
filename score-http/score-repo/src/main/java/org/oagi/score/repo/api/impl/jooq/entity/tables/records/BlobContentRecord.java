@@ -145,5 +145,6 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
 
         setBlobContentId(blobContentId);
         setContent(content);
+        resetChangedOnNotNull();
     }
 }
