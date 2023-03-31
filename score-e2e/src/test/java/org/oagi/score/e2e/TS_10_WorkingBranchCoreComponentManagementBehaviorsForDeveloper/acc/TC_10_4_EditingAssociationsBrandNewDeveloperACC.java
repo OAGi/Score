@@ -2815,12 +2815,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             String state = entry.getKey();
             accForBase = randomCoreComponentWithStateContainer.stateACCs.get(state);
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            getAPIFactory().getCoreComponentAPI().updateACC(acc);
+            getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            String nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
+            String nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
