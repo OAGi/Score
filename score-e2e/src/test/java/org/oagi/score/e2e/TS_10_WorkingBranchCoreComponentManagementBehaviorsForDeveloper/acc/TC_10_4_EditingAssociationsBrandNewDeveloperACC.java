@@ -2979,22 +2979,21 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.updateBasedACC(acc, accForBase);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
@@ -3003,13 +3002,16 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
 
         String nodePath;
         {
             nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
@@ -3020,21 +3022,25 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
-
-            movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
-            assertFalse(movedBCCPNode.isDisplayed());
+            //BCCP node moved out
+            WebElement expandedTree = accViewEditPage.getNodeByPath("/" + acc.getDen());
+            String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + bccp_to_append.getPropertyTerm() + "\")]";
+            assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
         }
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitCancelButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitCancelButton();
 
         {
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
         }
 
