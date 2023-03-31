@@ -359,7 +359,7 @@ public interface ACCViewEditPage extends Page {
     WebElement getCancelButton();
 
     /**
-     * Hit the 'Revise' button.
+     * Hit the 'Cancel' button.
      */
     void hitCancelButton();
 
