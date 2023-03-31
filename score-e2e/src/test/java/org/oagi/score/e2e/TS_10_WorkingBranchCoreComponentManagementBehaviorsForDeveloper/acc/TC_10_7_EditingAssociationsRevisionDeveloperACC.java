@@ -139,6 +139,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
 
     }
+
     @Test
     public void test_TA_10_7_1_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -282,7 +283,15 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         accViewEditPage.hitReviseButton();
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation(asccp_NotReusable.getDen());
-        assertTrue("Target ASCCP is not resuable.".equals(getSnackBarMessage(getDriver())));
+
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//snack-bar-container//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable."));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
