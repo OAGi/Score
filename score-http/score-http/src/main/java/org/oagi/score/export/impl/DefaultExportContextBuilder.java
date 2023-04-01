@@ -5,6 +5,7 @@ import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.model.*;
 import org.oagi.score.gateway.http.api.module_management.provider.ModuleSetReleaseDataProvider;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.ModuleRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,7 +181,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     moduleSetReleaseDataProvider.findDtScManifestByOwnerDtManifestId(bdtManifest.getDtManifestId()).stream()
                             .filter(e -> moduleSetReleaseDataProvider.findDtSc(e.getDtScId()).getCardinalityMax() > 0).collect(Collectors.toList());
 
-            boolean isDefaultBDT = schemaModule.getPath().contains("BusinessDataType_1");
+            boolean isDefaultBDT = baseDataType.getBasedDtId() == null || StringUtils.hasLength(bdt.getSixDigitId());
             BDTSimple bdtSimple;
             if (dtScManifestList.isEmpty()) {
                 ULong bdtManifestId = bdtManifest.getDtManifestId();
