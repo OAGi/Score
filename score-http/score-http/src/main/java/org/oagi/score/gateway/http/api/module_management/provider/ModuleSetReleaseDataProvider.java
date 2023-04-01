@@ -519,8 +519,8 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
     private Map<ULong, List<AsccManifestRecord>> findAsccManifestByAccManifestIdMap;
 
     
-    public AsccManifestRecord findASCCManifest(ULong asccId) {
-        return findAsccManifestMap.get(asccId);
+    public AsccManifestRecord findASCCManifest(ULong asccManifestId) {
+        return findAsccManifestMap.get(asccManifestId);
     }
 
     public List<AsccManifestRecord> findASCCManifestByFromAccManifestId(ULong fromAccManifestId) {
@@ -534,8 +534,8 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
     private Map<ULong, List<BccManifestRecord>> findBccManifestByAccManifestIdMap;
 
     
-    public BccManifestRecord findBCCManifest(ULong bccId) {
-        return findBccManifestMap.get(bccId);
+    public BccManifestRecord findBCCManifest(ULong bccManifestId) {
+        return findBccManifestMap.get(bccManifestId);
     }
 
     public List<BccManifestRecord> findBCCManifestByFromAccManifestId(ULong fromAccManifestId) {
