@@ -52,6 +52,7 @@ export class ModuleSetEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isUpdating = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const moduleSetId = Number(params.get('moduleSetId'));
@@ -70,6 +71,9 @@ export class ModuleSetEditComponent implements OnInit {
           }
         });
         this.moduleSetMetadata = moduleSetMetadata;
+        this.isUpdating = false;
+      }, error => {
+        this.isUpdating = false;
       });
   }
 

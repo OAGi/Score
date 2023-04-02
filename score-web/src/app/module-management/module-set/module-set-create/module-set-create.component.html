@@ -28,7 +28,12 @@
         <mat-form-field>
           <mat-label>Release</mat-label>
           <mat-select [(ngModel)]="moduleSet.targetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
-            <mat-option *ngFor="let release of releaseList" [value]="release.releaseId">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                     [noEntriesFoundLabel]="'No matching release found.'"
+                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
               <div class="d-flex">
                 <span class="release-num">{{release.releaseNum}}</span>
                 <span *ngIf="release.releaseNum !== 'Working'"
@@ -37,16 +42,20 @@
                       </span>
               </div>
             </mat-option>
-
           </mat-select>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Copy CC assignment from Module Set Release</mat-label>
           <mat-select [(ngModel)]="moduleSet.targetModuleSetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
-            <mat-option *ngFor="let moduleSetRelease of moduleSetReleaseList" [value]="moduleSetRelease.moduleSetReleaseId">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="moduleSetReleaseListFilterCtrl"
+                                     [noEntriesFoundLabel]="'No matching module set release found.'"
+                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let moduleSetRelease of filteredModuleSetReleaseList | async" [value]="moduleSetRelease.moduleSetReleaseId">
               <div class="d-flex">
-                <span class="release-num">{{moduleSetRelease.moduleSetName}}</span>
+                <span class="release-num">{{moduleSetRelease.moduleSetReleaseName}}</span>
                 &nbsp;<span class="release-num">{{moduleSetRelease.releaseNum}}</span>
               </div>
             </mat-option>

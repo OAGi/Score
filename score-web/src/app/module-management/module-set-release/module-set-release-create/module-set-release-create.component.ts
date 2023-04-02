@@ -4,12 +4,12 @@ import {FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {hashCode} from '../../../common/utility';
+import {hashCode, initFilter} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleSet, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
@@ -30,8 +30,10 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
 
   moduleSetListFilterCtrl: FormControl = new FormControl();
   releaseListFilterCtrl: FormControl = new FormControl();
+  moduleSetReleaseListFilterCtrl: FormControl = new FormControl();
   filteredModuleSetList: ReplaySubject<ModuleSet[]> = new ReplaySubject<ModuleSet[]>(1);
   filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
+  filteredModuleSetReleaseList: ReplaySubject<ModuleSetRelease[]> = new ReplaySubject<ModuleSetRelease[]>(1);
   moduleSetList: ModuleSet[] = [];
   releaseList: Release[] = [];
   moduleSetReleaseList: ModuleSetRelease[] = [];
@@ -65,44 +67,23 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     this.moduleSetList = [];
     this.releaseList = [];
     this.init(this.moduleSetRelease);
-    this.moduleService.getModuleSetList().subscribe(resp => {
-      this.moduleSetList.push(...resp.results);
-      this.moduleSetListFilterCtrl.valueChanges
-        .subscribe(() => {
-          let search = this.moduleSetListFilterCtrl.value;
-          if (!search) {
-            this.filteredModuleSetList.next(this.moduleSetList.slice());
-            return;
-          } else {
-            search = search.toLowerCase();
-          }
-          this.filteredModuleSetList.next(
-            this.moduleSetList.filter(e => e.name.toLowerCase().indexOf(search) > -1)
-          );
-        });
-      this.filteredModuleSetList.next(this.moduleSetList.slice());
-    });
 
-    this.releaseService.getSimpleReleases().subscribe(list => {
-      this.releaseList.push(...list);
-      this.releaseListFilterCtrl.valueChanges
-        .subscribe(() => {
-          let search = this.releaseListFilterCtrl.value;
-          if (!search) {
-            this.filteredReleaseList.next(this.releaseList.slice());
-            return;
-          } else {
-            search = search.toLowerCase();
-          }
-          this.filteredReleaseList.next(
-            this.releaseList.filter(e => e.releaseNum.toLowerCase().indexOf(search) > -1)
-          );
-        });
-      this.filteredReleaseList.next(this.releaseList.slice());
-    });
+    forkJoin([
+      this.moduleService.getModuleSetList(),
+      this.releaseService.getSimpleReleases(),
+      this.moduleService.getModuleSetReleaseList()
+    ]).subscribe(([moduleSetList, releaseList, moduleSetReleaseList]) => {
+      // Sorting by ID desc
+      this.moduleSetList.push(...moduleSetList.results.sort((a, b) => b.moduleSetId - a.moduleSetId));
+      initFilter(this.moduleSetListFilterCtrl, this.filteredModuleSetList, this.moduleSetList, (e) => e.name);
 
-    this.moduleService.getModuleSetReleaseList().subscribe(resp => {
-      this.moduleSetReleaseList = resp.results;
+      this.releaseList.push(...releaseList);
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releaseList, (e) => e.releaseNum);
+
+      // Sorting by ID desc
+      this.moduleSetReleaseList = moduleSetReleaseList.results.sort((a, b) => b.moduleSetReleaseId - a.moduleSetReleaseId);
+      initFilter(this.moduleSetReleaseListFilterCtrl, this.filteredModuleSetReleaseList, this.moduleSetReleaseList,
+        (e) => e.moduleSetReleaseName + ' ' + e.releaseNum);
     });
   }
 
