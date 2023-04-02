@@ -219,10 +219,11 @@ public class ModuleSetReleaseService implements InitializingBean {
         ModuleSetRelease moduleSetRelease = scoreRepositoryFactory.createModuleSetReleaseReadRepository()
                 .getModuleSetRelease(request).getModuleSetRelease();
         String fileName = moduleSetRelease.getModuleSetName().replace(" ", "");
-        File baseDirectory = new File(new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString()), fileName);
-        FileUtils.forceMkdir(baseDirectory);
+        File baseDirectory = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
+        File rootDirectory = new File(baseDirectory, fileName);
+        FileUtils.forceMkdir(rootDirectory);
 
-        List<File> files = exportModuleSetReleaseWithoutCompression(user, moduleSetReleaseId, baseDirectory);
+        List<File> files = exportModuleSetReleaseWithoutCompression(user, moduleSetReleaseId, rootDirectory);
         File zipFile = Zip.compressionHierarchy(baseDirectory, files);
         FileUtils.deleteDirectory(baseDirectory);
         return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);

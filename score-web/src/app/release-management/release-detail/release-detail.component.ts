@@ -120,6 +120,13 @@ export class ReleaseDetailComponent implements OnInit {
   }
 
   updateState(state: string) {
+    if (!this.auth.isAdmin()) {
+      this.snackBar.open('Only administrators can publish the release.', '', {
+        duration: 3000,
+      });
+      return;
+    }
+
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Update state to \'' + state + '\'?';
     dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];

@@ -93,11 +93,11 @@ public interface DataProvider {
 
     BccRecord findBCC(ULong bccId);
 
-    AsccManifestRecord findASCCManifest(ULong asccId);
+    AsccManifestRecord findASCCManifest(ULong asccManifestId);
 
     List<AsccManifestRecord> findASCCManifestByFromAccManifestId(ULong fromAccManifestId);
 
-    BccManifestRecord findBCCManifest(ULong bccId);
+    BccManifestRecord findBCCManifest(ULong bccManifestId);
 
     List<BccManifestRecord> findBCCManifestByFromAccManifestId(ULong fromAccManifestId);
 

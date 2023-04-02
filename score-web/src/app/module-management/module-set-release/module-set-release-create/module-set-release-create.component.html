@@ -25,7 +25,7 @@
           <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
             <mat-option>
               <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
-                                     [noEntriesFoundLabel]="'No matching release found.'"
+                                     [noEntriesFoundLabel]="'No matching module set found.'"
                                      [placeholderLabel]="'Search...'"></ngx-mat-select-search>
             </mat-option>
             <mat-option *ngFor="let moduleSet of filteredModuleSetList | async" [value]="moduleSet.moduleSetId">
@@ -60,9 +60,14 @@
         <mat-form-field>
           <mat-label>Module Set Release</mat-label>
           <mat-select [(ngModel)]="copyTargetModuleSetRelease" [disabled]="!copyFromOther">
-            <mat-option *ngFor="let moduleSetRelease of moduleSetReleaseList" [value]="moduleSetRelease">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="moduleSetReleaseListFilterCtrl"
+                                     [noEntriesFoundLabel]="'No matching module set release found.'"
+                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let moduleSetRelease of filteredModuleSetReleaseList | async" [value]="moduleSetRelease">
               <div class="d-flex">
-                <span class="release-num">{{moduleSetRelease.moduleSetName}}</span>
+                <span class="release-num">{{moduleSetRelease.moduleSetReleaseName}}</span>
                 &nbsp;<span class="release-num">{{moduleSetRelease.releaseNum}}</span>
               </div>
             </mat-option>

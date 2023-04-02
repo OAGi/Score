@@ -7,6 +7,7 @@ import org.oagi.score.export.service.CoreComponentService;
 import org.oagi.score.gateway.http.api.release_management.provider.ReleaseDataProvider;
 import org.oagi.score.repo.api.corecomponent.model.EntityType;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.springframework.data.util.Pair;
 
 import java.math.BigInteger;
@@ -170,7 +171,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 releaseDataProvider.findDtScManifestByOwnerDtManifestId(bdtManifest.getDtManifestId()).stream()
                         .filter(e -> releaseDataProvider.findDtSc(e.getDtScId()).getCardinalityMax() > 0).collect(Collectors.toList());
 
-        boolean isDefaultBDT = false;
+        boolean isDefaultBDT = baseDataType.getBasedDtId() == null || StringUtils.hasLength(bdt.getSixDigitId());
         BDTSimple bdtSimple;
         if (dtScList.isEmpty()) {
             List<BdtPriRestriRecord> bdtPriRestriList =
@@ -452,7 +453,5 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private void visit(AgencyId agencyId, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.visitAgencyId(agencyId);
     }
-
-
 
 }

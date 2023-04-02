@@ -21,12 +21,9 @@
                     rows="6" [disabled]="!roles.includes('developer')"></textarea>
         </mat-form-field>
         <div class="row action-group m-0">
-          <div class="col-12 actions-wrap">
+          <div class="actions-wrap">
             <button (click)="updateModuleSet()" [disabled]="!roles.includes('developer') || !canUpdate"
-                    class="float-right"
-                    color="primary"
-                    mat-raised-button>Update
-            </button>
+                    mat-raised-button class="float-right" color="primary">Update</button>
           </div>
         </div>
       </mat-card-content>

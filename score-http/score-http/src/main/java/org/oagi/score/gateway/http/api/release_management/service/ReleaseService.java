@@ -18,6 +18,7 @@ import org.oagi.score.gateway.http.event.ReleaseCreateRequestEvent;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.release.ReleaseRepositoryDiscardRequest;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 @Service
 @Transactional(readOnly = true)
@@ -356,11 +358,17 @@ public class ReleaseService implements InitializingBean {
     public void transitState(AuthenticatedPrincipal user,
                              TransitStateRequest request) {
 
+        ScoreUser scoreUser = sessionService.asScoreUser(user);
+        ReleaseState requestState = ReleaseState.valueOf(request.getState());
+        if (requestState == Published && !scoreUser.hasRole(ADMINISTRATOR)) {
+            throw new IllegalArgumentException("Only administrators can publish the release.");
+        }
+
         repository.transitState(user, request);
-        if (Published == ReleaseState.valueOf(request.getState())) {
+        if (Published == requestState) {
             // fire the create release draft event.
             ReleaseCleanupEvent releaseCleanupEvent = new ReleaseCleanupEvent(
-                    sessionService.userId(user), request.getReleaseId());
+                    scoreUser.getUserId(), request.getReleaseId());
 
             /*
              * Message Publishing
@@ -462,7 +470,8 @@ public class ReleaseService implements InitializingBean {
         }
         try {
             logger.debug("Received ReleaseCleanupEvent: " + releaseCleanupEvent);
-            repository.cleanUp(releaseCleanupEvent.getReleaseId());
+            ScoreUser requester = sessionService.getScoreUserByUserId(releaseCleanupEvent.getUserId());
+            repository.cleanUp(requester, releaseCleanupEvent.getReleaseId());
             repository.updateState(releaseCleanupEvent.getUserId(),
                     releaseCleanupEvent.getReleaseId(), ReleaseState.Published);
         } finally {
