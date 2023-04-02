@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.code_list_management.service.CodeListServ
 import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.ScoreRepository;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
@@ -2144,7 +2145,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .fetchOneInto(BigInteger.class).equals(releaseId);
     }
 
-    public void cleanUp(BigInteger releaseId) {
+    public void cleanUp(ScoreUser requester, BigInteger releaseId) {
+        ULong requesterId = ULong.valueOf(requester.getUserId());
 
         // ACCs
         dslContext.update(ACC_MANIFEST
@@ -2158,6 +2160,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("next").ACC_MANIFEST_ID)))
                 .set(ACC_MANIFEST.as("next").PREV_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
                 .where(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(ACC
+                .join(ACC_MANIFEST)
+                .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID)))
+                .set(ACC.OWNER_USER_ID, requesterId)
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ACC.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
 
         // ASCCs
@@ -2173,6 +2184,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(ASCC_MANIFEST.as("next").PREV_ASCC_MANIFEST_ID, ASCC_MANIFEST.ASCC_MANIFEST_ID)
                 .where(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(ASCC
+                .join(ASCC_MANIFEST)
+                .on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID)))
+                .set(ASCC.OWNER_USER_ID, requesterId)
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ASCC.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
         // BCCs
         dslContext.update(BCC_MANIFEST
@@ -2186,6 +2206,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(BCC_MANIFEST.NEXT_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("next").BCC_MANIFEST_ID)))
                 .set(BCC_MANIFEST.as("next").PREV_BCC_MANIFEST_ID, BCC_MANIFEST.BCC_MANIFEST_ID)
                 .where(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(BCC
+                .join(BCC_MANIFEST)
+                .on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID)))
+                .set(BCC.OWNER_USER_ID, requesterId)
+                .where(and(
+                        BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        BCC.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
 
         // ASCCPs
@@ -2201,6 +2230,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(ASCCP_MANIFEST.as("next").PREV_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
                 .where(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(ASCCP
+                .join(ASCCP_MANIFEST)
+                .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID)))
+                .set(ASCCP.OWNER_USER_ID, requesterId)
+                .where(and(
+                        ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ASCCP.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
         // BCCPs
         dslContext.update(BCCP_MANIFEST
@@ -2214,6 +2252,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("next").BCCP_MANIFEST_ID)))
                 .set(BCCP_MANIFEST.as("next").PREV_BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_MANIFEST_ID)
                 .where(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(BCCP
+                .join(BCCP_MANIFEST)
+                .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID)))
+                .set(BCCP.OWNER_USER_ID, requesterId)
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        BCCP.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
 
         // CODE_LISTs
@@ -2229,6 +2276,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(CODE_LIST_MANIFEST.as("next").PREV_CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
                 .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(CODE_LIST
+                .join(CODE_LIST_MANIFEST)
+                .on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID)))
+                .set(CODE_LIST.OWNER_USER_ID, requesterId)
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        CODE_LIST.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
         // CODE_LIST_VALUEs
         dslContext.update(CODE_LIST_VALUE_MANIFEST
@@ -2242,6 +2298,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("next").CODE_LIST_VALUE_MANIFEST_ID)))
                 .set(CODE_LIST_VALUE_MANIFEST.as("next").PREV_CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID)
                 .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(CODE_LIST_VALUE
+                .join(CODE_LIST_VALUE_MANIFEST)
+                .on(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID)))
+                .set(CODE_LIST_VALUE.OWNER_USER_ID, requesterId)
+                .where(and(
+                        CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        CODE_LIST_VALUE.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
 
         // DTs
@@ -2257,8 +2322,17 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(DT_MANIFEST.as("next").PREV_DT_MANIFEST_ID, DT_MANIFEST.DT_MANIFEST_ID)
                 .where(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(DT
+                .join(DT_MANIFEST)
+                .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID)))
+                .set(DT.OWNER_USER_ID, requesterId)
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        DT.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
-        //DTSCs
+        //DT_SCs
         dslContext.update(DT_SC_MANIFEST
                 .join(DT_SC_MANIFEST.as("prev"))
                 .on(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID)))
@@ -2270,6 +2344,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("next").DT_SC_MANIFEST_ID)))
                 .set(DT_SC_MANIFEST.as("next").PREV_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
                 .where(DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(DT_SC
+                .join(DT_SC_MANIFEST)
+                .on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID)))
+                .set(DT_SC.OWNER_USER_ID, requesterId)
+                .where(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        DT_SC.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
 
         //XBTs
@@ -2285,6 +2368,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(XBT_MANIFEST.as("next").PREV_XBT_MANIFEST_ID, XBT_MANIFEST.XBT_MANIFEST_ID)
                 .where(XBT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(XBT
+                .join(XBT_MANIFEST)
+                .on(XBT.XBT_ID.eq(XBT_MANIFEST.XBT_ID)))
+                .set(XBT.OWNER_USER_ID, requesterId)
+                .where(and(
+                        XBT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        XBT.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
         // AGENCY_ID_LIST
         dslContext.update(AGENCY_ID_LIST_MANIFEST
@@ -2299,6 +2391,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(AGENCY_ID_LIST_MANIFEST.as("next").PREV_AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
                 .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .execute();
+        dslContext.update(AGENCY_ID_LIST
+                .join(AGENCY_ID_LIST_MANIFEST)
+                .on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID)))
+                .set(AGENCY_ID_LIST.OWNER_USER_ID, requesterId)
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        AGENCY_ID_LIST.OWNER_USER_ID.notEqual(requesterId)
+                ))
+                .execute();
 
         // AGENCY_ID_LIST_VALUE
         dslContext.update(AGENCY_ID_LIST_VALUE_MANIFEST
@@ -2312,6 +2413,15 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .on(AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("next").AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
                 .set(AGENCY_ID_LIST_VALUE_MANIFEST.as("next").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
                 .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .execute();
+        dslContext.update(AGENCY_ID_LIST_VALUE
+                .join(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)))
+                .set(AGENCY_ID_LIST_VALUE.OWNER_USER_ID, requesterId)
+                .where(and(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        AGENCY_ID_LIST_VALUE.OWNER_USER_ID.notEqual(requesterId)
+                ))
                 .execute();
     }
 }
