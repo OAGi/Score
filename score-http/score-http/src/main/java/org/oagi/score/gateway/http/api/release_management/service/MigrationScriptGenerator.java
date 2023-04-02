@@ -169,135 +169,42 @@ public class MigrationScriptGenerator {
         writer.println("/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;");
         writer.println("");
 
-        dumpData(writer, "acc", false,
-                () -> dslContext.resultQuery("SELECT `acc`.* FROM `acc` " +
-                        "WHERE `acc`.`acc_id` < " + delta + " AND `acc`.`state` = 'Published'"));
-        dumpData(writer, "acc_manifest", false,
-                () -> dslContext.resultQuery("SELECT `acc_manifest`.* FROM `acc_manifest` " +
-                        "JOIN `acc` ON `acc_manifest`.`acc_id` = `acc`.`acc_id` " +
-                        "WHERE `acc_manifest`.`acc_manifest_id` < " + delta + " AND `acc`.`state` = 'Published'"));
-        dumpData(writer, "agency_id_list", false,
-                () -> dslContext.resultQuery("SELECT `agency_id_list`.* FROM `agency_id_list` " +
-                        "WHERE `agency_id_list`.`agency_id_list_id` < " + delta + " AND `agency_id_list`.`state` = 'Published'"));
-        dumpData(writer, "agency_id_list_manifest", false,
-                () -> dslContext.resultQuery("SELECT `agency_id_list_manifest`.* FROM `agency_id_list_manifest` " +
-                        "JOIN `agency_id_list` ON `agency_id_list_manifest`.`agency_id_list_id` = `agency_id_list`.`agency_id_list_id` " +
-                        "WHERE `agency_id_list_manifest`.`agency_id_list_manifest_id` < " + delta + " AND `agency_id_list`.`state` = 'Published'"));
-        dumpData(writer, "agency_id_list_value", false,
-                () -> dslContext.resultQuery("SELECT `agency_id_list_value`.* FROM `agency_id_list_value` " +
-                        "JOIN `agency_id_list` ON `agency_id_list_value`.`owner_list_id` = `agency_id_list`.`agency_id_list_id` " +
-                        "WHERE `agency_id_list_value`.`agency_id_list_value_id` < " + delta + " AND `agency_id_list`.`state` = 'Published'"));
-        dumpData(writer, "agency_id_list_value_manifest", false,
-                () -> dslContext.resultQuery("SELECT `agency_id_list_value_manifest`.* FROM `agency_id_list_value_manifest` " +
-                        "JOIN `agency_id_list_value` ON `agency_id_list_value_manifest`.`agency_id_list_value_id` = `agency_id_list_value`.`agency_id_list_value_id` " +
-                        "JOIN `agency_id_list` ON `agency_id_list_value`.`owner_list_id` = `agency_id_list`.`agency_id_list_id` " +
-                        "WHERE `agency_id_list_value_manifest`.`agency_id_list_value_manifest_id` < " + delta + " AND `agency_id_list`.`state` = 'Published'"));
+        dumpData(writer, "acc", false);
+        dumpData(writer, "acc_manifest", false);
+        dumpData(writer, "agency_id_list", false);
+        dumpData(writer, "agency_id_list_manifest", false);
+        dumpData(writer, "agency_id_list_value", false);
+        dumpData(writer, "agency_id_list_value_manifest", false);
         dumpData(writer, "app_user", false,
                 () -> dslContext.resultQuery("SELECT `app_user`.* FROM `app_user` " +
                         "WHERE `app_user`.`app_user_id` < " + delta + " AND `app_user`.`app_user_id` > 1"));
-        dumpData(writer, "ascc", false,
-                () -> dslContext.resultQuery("SELECT `ascc`.* FROM `ascc` " +
-                        "WHERE `ascc`.`ascc_id` < " + delta + " AND `ascc`.`state` = 'Published'"));
-        dumpData(writer, "ascc_manifest", false,
-                () -> dslContext.resultQuery("SELECT `ascc_manifest`.* FROM `ascc_manifest` " +
-                        "JOIN `ascc` ON `ascc_manifest`.`ascc_id` = `ascc`.`ascc_id` " +
-                        "WHERE `ascc_manifest`.`ascc_manifest_id` < " + delta + " AND `ascc`.`state` = 'Published'"));
-        dumpData(writer, "asccp", false,
-                () -> dslContext.resultQuery("SELECT `asccp`.* FROM `asccp` " +
-                        "WHERE `asccp`.`asccp_id` < " + delta + " AND `asccp`.`state` = 'Published'"));
-        dumpData(writer, "asccp_manifest", false,
-                () -> dslContext.resultQuery("SELECT `asccp_manifest`.* FROM `asccp_manifest` " +
-                        "JOIN `asccp` ON `asccp_manifest`.`asccp_id` = `asccp`.`asccp_id` " +
-                        "WHERE `asccp_manifest`.`asccp_manifest_id` < " + delta + " AND `asccp`.`state` = 'Published'"));
-        dumpData(writer, "bcc", false,
-                () -> dslContext.resultQuery("SELECT `bcc`.* FROM `bcc` " +
-                        "WHERE `bcc`.`bcc_id` < " + delta + " AND `bcc`.`state` = 'Published'"));
-        dumpData(writer, "bcc_manifest", false,
-                () -> dslContext.resultQuery("SELECT `bcc_manifest`.* FROM `bcc_manifest` " +
-                        "JOIN `bcc` ON `bcc_manifest`.`bcc_id` = `bcc`.`bcc_id` " +
-                        "WHERE `bcc_manifest`.`bcc_manifest_id` < " + delta + " AND `bcc`.`state` = 'Published'"));
-        dumpData(writer, "bccp", false,
-                () -> dslContext.resultQuery("SELECT `bccp`.* FROM `bccp` " +
-                        "WHERE `bccp`.`bccp_id` < " + delta + " AND `bccp`.`state` = 'Published'"));
-        dumpData(writer, "bccp_manifest", false,
-                () -> dslContext.resultQuery("SELECT `bccp_manifest`.* FROM `bccp_manifest` " +
-                        "JOIN `bccp` ON `bccp_manifest`.`bccp_id` = `bccp`.`bccp_id` " +
-                        "WHERE `bccp_manifest`.`bccp_manifest_id` < " + delta + " AND `bccp`.`state` = 'Published'"));
-        dumpData(writer, "bdt_pri_restri", false,
-                () -> dslContext.resultQuery("SELECT `bdt_pri_restri`.* FROM `bdt_pri_restri` " +
-                        "JOIN `dt_manifest` ON `bdt_pri_restri`.`bdt_manifest_id` = `dt_manifest`.`dt_manifest_id` " +
-                        "JOIN `dt` ON `dt_manifest`.`dt_id` = `dt`.`dt_id` " +
-                        "WHERE `bdt_pri_restri`.`bdt_pri_restri_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "bdt_sc_pri_restri", false,
-                () -> dslContext.resultQuery("SELECT `bdt_sc_pri_restri`.* FROM `bdt_sc_pri_restri` " +
-                        "JOIN `dt_sc_manifest` ON `bdt_sc_pri_restri`.`bdt_sc_manifest_id` = `dt_sc_manifest`.`dt_sc_manifest_id` " +
-                        "JOIN `dt_manifest` ON `dt_sc_manifest`.`owner_dt_manifest_id` = `dt_manifest`.`dt_manifest_id` " +
-                        "JOIN `dt` ON `dt_manifest`.`dt_id` = `dt`.`dt_id` " +
-                        "WHERE `bdt_sc_pri_restri`.`bdt_sc_pri_restri_id` < " + delta + " AND `dt`.`state` = 'Published'"));
+        dumpData(writer, "ascc", false);
+        dumpData(writer, "ascc_manifest", false);
+        dumpData(writer, "asccp", false);
+        dumpData(writer, "asccp_manifest", false);
+        dumpData(writer, "bcc", false);
+        dumpData(writer, "bcc_manifest", false);
+        dumpData(writer, "bccp", false);
+        dumpData(writer, "bccp_manifest", false);
+        dumpData(writer, "bdt_pri_restri", false);
+        dumpData(writer, "bdt_sc_pri_restri", false);
         dumpData(writer, "blob_content", true);
         dumpData(writer, "blob_content_manifest", true);
-        dumpData(writer, "cdt_awd_pri", false,
-                () -> dslContext.resultQuery("SELECT `cdt_awd_pri`.* FROM `cdt_awd_pri` " +
-                        "JOIN `dt` ON `cdt_awd_pri`.`cdt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_awd_pri`.`cdt_awd_pri_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "cdt_awd_pri_xps_type_map", false,
-                () -> dslContext.resultQuery("SELECT `cdt_awd_pri_xps_type_map`.* FROM `cdt_awd_pri_xps_type_map` " +
-                        "JOIN `cdt_awd_pri` ON `cdt_awd_pri_xps_type_map`.`cdt_awd_pri_id` = `cdt_awd_pri`.`cdt_awd_pri_id` " +
-                        "JOIN `dt` ON `cdt_awd_pri`.`cdt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_awd_pri_xps_type_map`.`cdt_awd_pri_xps_type_map_id` < " + delta + " AND `dt`.`state` = 'Published'"));
+        dumpData(writer, "cdt_awd_pri", false);
+        dumpData(writer, "cdt_awd_pri_xps_type_map", false);
         dumpData(writer, "cdt_pri", true);
-        dumpData(writer, "cdt_ref_spec", false,
-                () -> dslContext.resultQuery("SELECT `cdt_ref_spec`.* FROM `cdt_ref_spec` " +
-                        "JOIN `dt` ON `cdt_ref_spec`.`cdt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_ref_spec`.`cdt_ref_spec_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "cdt_sc_awd_pri", false,
-                () -> dslContext.resultQuery("SELECT `cdt_sc_awd_pri`.* FROM `cdt_sc_awd_pri` " +
-                        "JOIN `dt_sc` ON `cdt_sc_awd_pri`.`cdt_sc_id` = `dt_sc`.`dt_sc_id` " +
-                        "JOIN `dt` ON `dt_sc`.`owner_dt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_sc_awd_pri`.`cdt_sc_awd_pri_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "cdt_sc_awd_pri_xps_type_map", false,
-                () -> dslContext.resultQuery("SELECT `cdt_sc_awd_pri_xps_type_map`.* FROM `cdt_sc_awd_pri_xps_type_map` " +
-                        "JOIN `cdt_sc_awd_pri` ON `cdt_sc_awd_pri_xps_type_map`.`cdt_sc_awd_pri_id` = `cdt_sc_awd_pri`.`cdt_sc_awd_pri_id` " +
-                        "JOIN `dt_sc` ON `cdt_sc_awd_pri`.`cdt_sc_id` = `dt_sc`.`dt_sc_id` " +
-                        "JOIN `dt` ON `dt_sc`.`owner_dt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_sc_awd_pri_xps_type_map`.`cdt_sc_awd_pri_xps_type_map_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "cdt_sc_ref_spec", false,
-                () -> dslContext.resultQuery("SELECT `cdt_sc_ref_spec`.* FROM `cdt_sc_ref_spec` " +
-                        "JOIN `dt_sc` ON `cdt_sc_ref_spec`.`cdt_sc_id` = `dt_sc`.`dt_sc_id` " +
-                        "JOIN `dt` ON `dt_sc`.`owner_dt_id` = `dt`.`dt_id` " +
-                        "WHERE `cdt_sc_ref_spec`.`cdt_sc_ref_spec_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "code_list", false,
-                () -> dslContext.resultQuery("SELECT `code_list`.* FROM `code_list` " +
-                        "WHERE `code_list`.`code_list_id` < " + delta + " AND `code_list`.`state` = 'Published'"));
-        dumpData(writer, "code_list_manifest", false,
-                () -> dslContext.resultQuery("SELECT `code_list_manifest`.* FROM `code_list_manifest` " +
-                        "JOIN `code_list` ON `code_list_manifest`.`code_list_id` = `code_list`.`code_list_id` " +
-                        "WHERE `code_list_manifest`.`code_list_manifest_id` < " + delta + " AND `code_list`.`state` = 'Published'"));
-        dumpData(writer, "code_list_value", false,
-                () -> dslContext.resultQuery("SELECT `code_list_value`.* FROM `code_list_value` " +
-                        "JOIN `code_list` ON `code_list_value`.`code_list_id` = `code_list`.`code_list_id` " +
-                        "WHERE `code_list_value`.`code_list_value_id` < " + delta + " AND `code_list`.`state` = 'Published'"));
-        dumpData(writer, "code_list_value_manifest", false,
-                () -> dslContext.resultQuery("SELECT `code_list_value_manifest`.* FROM `code_list_value_manifest` " +
-                        "JOIN `code_list_value` ON `code_list_value_manifest`.`code_list_value_id` = `code_list_value`.`code_list_value_id` " +
-                        "JOIN `code_list` ON `code_list_value`.`code_list_id` = `code_list`.`code_list_id` " +
-                        "WHERE `code_list_value_manifest`.`code_list_value_manifest_id` < " + delta + " AND `code_list`.`state` = 'Published'"));
-        dumpData(writer, "dt", false,
-                () -> dslContext.resultQuery("SELECT `dt`.* FROM `dt` " +
-                        "WHERE `dt`.`dt_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "dt_manifest", false,
-                () -> dslContext.resultQuery("SELECT `dt_manifest`.* FROM `dt_manifest` " +
-                        "JOIN `dt` ON `dt_manifest`.`dt_id` = `dt`.`dt_id` " +
-                        "WHERE `dt_manifest`.`dt_manifest_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "dt_sc", false,
-                () -> dslContext.resultQuery("SELECT `dt_sc`.* FROM `dt_sc` " +
-                        "JOIN `dt` ON `dt_sc`.`owner_dt_id` = `dt`.`dt_id` " +
-                        "WHERE `dt_sc`.`dt_sc_id` < " + delta + " AND `dt`.`state` = 'Published'"));
-        dumpData(writer, "dt_sc_manifest", false,
-                () -> dslContext.resultQuery("SELECT `dt_sc_manifest`.* FROM `dt_sc_manifest` " +
-                        "JOIN `dt_manifest` ON `dt_sc_manifest`.`owner_dt_manifest_id` = `dt_manifest`.`dt_manifest_id` " +
-                        "JOIN `dt` ON `dt_manifest`.`dt_id` = `dt`.`dt_id` " +
-                        "WHERE `dt_sc_manifest`.`dt_sc_manifest_id` < " + delta + " AND `dt`.`state` = 'Published'"));
+        dumpData(writer, "cdt_ref_spec", false);
+        dumpData(writer, "cdt_sc_awd_pri", false);
+        dumpData(writer, "cdt_sc_awd_pri_xps_type_map", false);
+        dumpData(writer, "cdt_sc_ref_spec", false);
+        dumpData(writer, "code_list", false);
+        dumpData(writer, "code_list_manifest", false);
+        dumpData(writer, "code_list_value", false);
+        dumpData(writer, "code_list_value_manifest", false);
+        dumpData(writer, "dt", false);
+        dumpData(writer, "dt_manifest", false);
+        dumpData(writer, "dt_sc", false);
+        dumpData(writer, "dt_sc_manifest", false);
         dumpData(writer, "log", false, null, 50);
         dumpData(writer, "module", true);
         dumpData(writer, "module_acc_manifest", true);
@@ -313,11 +220,7 @@ public class MigrationScriptGenerator {
         dumpData(writer, "namespace");
         dumpData(writer, "ref_spec", true);
         dumpData(writer, "release");
-        dumpData(writer, "seq_key", false,
-                () -> dslContext.resultQuery("SELECT `seq_key`.* FROM `seq_key` " +
-                        "JOIN `acc_manifest` ON `seq_key`.`from_acc_manifest_id` = `acc_manifest`.`acc_manifest_id` " +
-                        "JOIN `acc` ON `acc_manifest`.`acc_id` = `acc`.`acc_id` " +
-                        "WHERE `seq_key`.`seq_key_id` < " + delta + " AND `acc`.`state` = 'Published'"));
+        dumpData(writer, "seq_key", false);
         dumpData(writer, "xbt", true);
         dumpData(writer, "xbt_manifest", true);
 
