@@ -131,6 +131,7 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeRequests()
                 .requestMatchers("/info/**").permitAll()
+                .requestMatchers("/csv/**").permitAll()
                 .requestMatchers("/messages/**").permitAll()
                 .requestMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated()
