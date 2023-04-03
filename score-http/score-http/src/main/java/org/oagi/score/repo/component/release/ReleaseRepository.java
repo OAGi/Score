@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.jooq.impl.DSL.*;
@@ -82,11 +83,17 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .fetchInto(Release.class);
     }
 
-    public BigInteger getReleaseIdByAsccpManifestId(ULong asccpManifestId) {
-        return dslContext.select(ASCCP_MANIFEST.RELEASE_ID)
+    public Map<BigInteger, BigInteger> getReleaseIdMapByAsccpManifestIdList(List<BigInteger> asccpManifestIdList) {
+        if (asccpManifestIdList == null || asccpManifestIdList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.RELEASE_ID)
                 .from(ASCCP_MANIFEST)
-                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
-                .fetchOneInto(BigInteger.class);
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.in(
+                        asccpManifestIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())))
+                .fetchStream().collect(Collectors.toMap(
+                        e -> e.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger(),
+                        e -> e.get(ASCCP_MANIFEST.RELEASE_ID).toBigInteger()));
     }
 
     public Release getWorkingRelease() {
