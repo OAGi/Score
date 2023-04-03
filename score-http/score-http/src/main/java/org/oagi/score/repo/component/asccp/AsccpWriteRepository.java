@@ -10,6 +10,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
+import org.oagi.score.repo.component.acc.PurgeAccRepositoryResponse;
 import org.oagi.score.repo.component.ascc.AsccWriteRepository;
 import org.oagi.score.repo.component.ascc.UpdateAsccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -561,7 +562,12 @@ public class AsccpWriteRepository {
 
         if (!request.isIgnoreState()) {
             if (!CcState.Deleted.equals(CcState.valueOf(asccpRecord.getState()))) {
-                throw new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+                IllegalArgumentException e = new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+                if (request.isIgnoreOnError()) {
+                    return new PurgeAsccpRepositoryResponse(asccpManifestRecord.getAsccpManifestId().toBigInteger(), e);
+                } else {
+                    throw e;
+                }
             }
         }
 
@@ -569,7 +575,12 @@ public class AsccpWriteRepository {
                 .where(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                 .fetch();
         if (!asccManifestRecords.isEmpty()) {
-            throw new IllegalArgumentException("Please purge deleted ASCCs used the ASCCP '" + asccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ASCCs used the ASCCP '" + asccpRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeAsccpRepositoryResponse(asccpManifestRecord.getAsccpManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         // discard Log
@@ -592,6 +603,11 @@ public class AsccpWriteRepository {
         // discard assigned ASCCP in modules
         dslContext.deleteFrom(MODULE_ASCCP_MANIFEST)
                 .where(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
+                .execute();
+
+        // discard corresponding tags
+        dslContext.deleteFrom(ASCCP_MANIFEST_TAG)
+                .where(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                 .execute();
 
         // discard ASCCP

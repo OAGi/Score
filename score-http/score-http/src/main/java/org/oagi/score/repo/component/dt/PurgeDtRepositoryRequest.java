@@ -10,6 +10,8 @@ public class PurgeDtRepositoryRequest extends RepositoryRequest {
 
     private final BigInteger dtManifestId;
 
+    private boolean ignoreOnError;
+
     public PurgeDtRepositoryRequest(AuthenticatedPrincipal user,
                                     BigInteger dtManifestId) {
         super(user);
@@ -25,5 +27,13 @@ public class PurgeDtRepositoryRequest extends RepositoryRequest {
 
     public BigInteger getDtManifestId() {
         return dtManifestId;
+    }
+
+    public boolean isIgnoreOnError() {
+        return ignoreOnError;
+    }
+
+    public void setIgnoreOnError(boolean ignoreOnError) {
+        this.ignoreOnError = ignoreOnError;
     }
 }

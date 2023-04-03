@@ -834,7 +834,12 @@ public class AccWriteRepository {
                 .fetchOne();
 
         if (!CcState.Deleted.equals(CcState.valueOf(accRecord.getState()))) {
-            throw new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            IllegalArgumentException e = new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         if (accRecord.getOagisComponentType() == OagisComponentType.UserExtensionGroup.getValue()) {
@@ -845,14 +850,24 @@ public class AccWriteRepository {
                 .where(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!asccpManifestRecords.isEmpty()) {
-            throw new IllegalArgumentException("Please purge deleted ASCCPs used the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ASCCPs used the ACC '" + accRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         List<AccManifestRecord> basedAccManifestRecords = dslContext.selectFrom(ACC_MANIFEST)
                 .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!basedAccManifestRecords.isEmpty()) {
-            throw new IllegalArgumentException("Please purge deleted ACCs used the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ACCs used the ACC '" + accRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         // discard Log
@@ -926,6 +941,11 @@ public class AccWriteRepository {
         // discard assigned ACC in modules
         dslContext.deleteFrom(MODULE_ACC_MANIFEST)
                 .where(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
+                .execute();
+
+        // discard corresponding tags
+        dslContext.deleteFrom(ACC_MANIFEST_TAG)
+                .where(ACC_MANIFEST_TAG.ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .execute();
 
         // discard ACC

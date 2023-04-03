@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 public class PurgeAsccpRepositoryRequest extends RepositoryRequest {
 
     private final BigInteger asccpManifestId;
+
     private boolean ignoreState;
+
+    private boolean ignoreOnError;
 
     public PurgeAsccpRepositoryRequest(AuthenticatedPrincipal user,
                                        BigInteger asccpManifestId) {
@@ -34,5 +37,13 @@ public class PurgeAsccpRepositoryRequest extends RepositoryRequest {
 
     public void setIgnoreState(boolean ignoreState) {
         this.ignoreState = ignoreState;
+    }
+
+    public boolean isIgnoreOnError() {
+        return ignoreOnError;
+    }
+
+    public void setIgnoreOnError(boolean ignoreOnError) {
+        this.ignoreOnError = ignoreOnError;
     }
 }
