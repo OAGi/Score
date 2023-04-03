@@ -18,7 +18,6 @@ import org.oagi.score.gateway.http.event.ReleaseCreateRequestEvent;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
-import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repo.component.release.ReleaseRepositoryDiscardRequest;
@@ -47,12 +46,17 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.RELEASE;
 import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 @Service
@@ -501,19 +505,15 @@ public class ReleaseService implements InitializingBean {
 
         try {
             List<File> files = new ArrayList<>();
-            Map<BigInteger, ReleaseDataProvider> dataProviderMap = new ConcurrentHashMap<>();
+
+            Map<BigInteger, BigInteger> releaseIdMap = releaseRepository.getReleaseIdMapByAsccpManifestIdList(asccpManifestIdList);
+            Map<BigInteger, ReleaseDataProvider> dataProviderMap = releaseIdMap.values().stream().distinct()
+                    .collect(Collectors.toMap(Function.identity(), e -> new ReleaseDataProvider(coreComponentRepositoryForRelease, e)));
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
             List<Exception> exceptions = new ArrayList<>();
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
                 try {
-                    BigInteger releaseId = releaseRepository.getReleaseIdByAsccpManifestId(ULong.valueOf(asccpManifestId));
-                    ReleaseDataProvider dataProvider;
-                    synchronized (dataProviderMap) {
-                        if (!dataProviderMap.containsKey(releaseId)) {
-                            dataProviderMap.put(releaseId, new ReleaseDataProvider(coreComponentRepositoryForRelease, releaseId));
-                        }
-                        dataProvider = dataProviderMap.get(releaseId);
-                    }
+                    ReleaseDataProvider dataProvider = dataProviderMap.get(releaseIdMap.get(asccpManifestId));
 
                     XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(coreComponentService, dataProvider);
                     visitor.setBaseDirectory(baseDir);
