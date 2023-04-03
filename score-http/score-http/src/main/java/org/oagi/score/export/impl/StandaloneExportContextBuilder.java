@@ -60,7 +60,8 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private String getPath(ULong asccpManifestId) {
         AsccpManifestRecord asccpManifest = releaseDataProvider.findASCCPManifest(asccpManifestId);
         AsccpRecord asccp = releaseDataProvider.findASCCP(asccpManifest.getAsccpId());
-        AccRecord acc = releaseDataProvider.findACC(asccp.getRoleOfAccId());
+        AccManifestRecord accManifest = releaseDataProvider.findACCManifest(asccpManifest.getRoleOfAccManifestId());
+        AccRecord acc = releaseDataProvider.findACC(accManifest.getAccId());
 
         String term;
         if (asccp.getPropertyTerm().equals(acc.getObjectClassTerm())) {
