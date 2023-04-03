@@ -10,6 +10,8 @@ public class PurgeAccRepositoryRequest extends RepositoryRequest {
 
     private final BigInteger accManifestId;
 
+    private boolean ignoreOnError;
+
     public PurgeAccRepositoryRequest(AuthenticatedPrincipal user,
                                      BigInteger accManifestId) {
         super(user);
@@ -25,5 +27,13 @@ public class PurgeAccRepositoryRequest extends RepositoryRequest {
 
     public BigInteger getAccManifestId() {
         return accManifestId;
+    }
+
+    public boolean isIgnoreOnError() {
+        return ignoreOnError;
+    }
+
+    public void setIgnoreOnError(boolean ignoreOnError) {
+        this.ignoreOnError = ignoreOnError;
     }
 }

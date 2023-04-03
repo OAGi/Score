@@ -369,7 +369,7 @@ public class ExtensionService {
 
         ccNodeService.deleteAscc(user, asccManifestRecord.getAsccManifestId().toBigInteger(), true);
 
-        ccNodeService.purgeAsccp(user, groupAsccpManifestRecord.getAsccpManifestId().toBigInteger(), true);
+        ccNodeService.purgeAsccp(user, groupAsccpManifestRecord.getAsccpManifestId().toBigInteger(), false, true);
 
         ccNodeService.purgeAcc(user, manifestId);
     }

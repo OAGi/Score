@@ -902,7 +902,7 @@ public class DtWriteRepository {
         return new DeleteDtRepositoryResponse(bdtManifestRecord.getDtManifestId().toBigInteger());
     }
 
-    public DiscardDtRepositoryResponse purgeDt(PurgeDtRepositoryRequest request) {
+    public PurgeDtRepositoryResponse purgeDt(PurgeDtRepositoryRequest request) {
         AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
         LocalDateTime timestamp = request.getLocalDateTime();
@@ -918,14 +918,24 @@ public class DtWriteRepository {
                 .fetchOne();
 
         if (!CcState.Deleted.equals(CcState.valueOf(dtRecord.getState()))) {
-            throw new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            IllegalArgumentException e = new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         List<BccpManifestRecord> bccpManifestRecords = dslContext.selectFrom(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!bccpManifestRecords.isEmpty()) {
-            throw new IllegalArgumentException("Please purge deleted BCCPs used the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCPs used the DT '" + dtRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         // discard Log
@@ -1016,6 +1026,11 @@ public class DtWriteRepository {
             }
         }
 
+        // discard corresponding tags
+        dslContext.deleteFrom(DT_MANIFEST_TAG)
+                .where(DT_MANIFEST_TAG.DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
+                .execute();
+
         // discard DT
         dslContext.deleteFrom(DT_MANIFEST)
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
@@ -1025,7 +1040,7 @@ public class DtWriteRepository {
                 .where(DT.DT_ID.eq(dtRecord.getDtId()))
                 .execute();
 
-        return new DiscardDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger());
+        return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger());
     }
 
     public UpdateDtOwnerRepositoryResponse updateDtOwner(UpdateDtOwnerRepositoryRequest request) {

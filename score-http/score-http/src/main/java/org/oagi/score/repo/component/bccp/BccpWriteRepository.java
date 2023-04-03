@@ -10,6 +10,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.component.asccp.PurgeAsccpRepositoryResponse;
 import org.oagi.score.repo.component.bcc.BccWriteRepository;
 import org.oagi.score.repo.component.bcc.UpdateBccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -506,14 +507,24 @@ public class BccpWriteRepository {
                 .fetchOne();
 
         if (!CcState.Deleted.equals(CcState.valueOf(bccpRecord.getState()))) {
-            throw new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            IllegalArgumentException e = new IllegalArgumentException("Only the core component in 'Deleted' state can be purged.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         List<BccManifestRecord> bccManifestRecords = dslContext.selectFrom(BCC_MANIFEST)
                 .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .fetch();
         if (!bccManifestRecords.isEmpty()) {
-            throw new IllegalArgumentException("Please purge deleted BCCs used the BCCP '" + bccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCs used the BCCP '" + bccpRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
         }
 
         // discard Log
@@ -536,6 +547,11 @@ public class BccpWriteRepository {
         // discard assigned BCCP in modules
         dslContext.deleteFrom(MODULE_BCCP_MANIFEST)
                 .where(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .execute();
+
+        // discard corresponding tags
+        dslContext.deleteFrom(BCCP_MANIFEST_TAG)
+                .where(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .execute();
 
         // discard BCCP

@@ -212,8 +212,14 @@ public class CcNodeService extends EventHandler {
 
     @Transactional
     public void purgeAcc(AuthenticatedPrincipal user, BigInteger manifestId) {
+        purgeAcc(user, manifestId, false);
+    }
+
+    @Transactional
+    public void purgeAcc(AuthenticatedPrincipal user, BigInteger manifestId, boolean ignoreOnError) {
         PurgeAccRepositoryRequest repositoryRequest =
                 new PurgeAccRepositoryRequest(user, manifestId);
+        repositoryRequest.setIgnoreOnError(ignoreOnError);
 
         PurgeAccRepositoryResponse repositoryResponse =
                 accWriteRepository.purgeAcc(repositoryRequest);
@@ -223,15 +229,15 @@ public class CcNodeService extends EventHandler {
 
     @Transactional
     public void purgeAsccp(AuthenticatedPrincipal user, BigInteger manifestId) {
-        purgeAsccp(user, manifestId, false);
+        purgeAsccp(user, manifestId, false, false);
     }
 
     @Transactional
-    public void purgeAsccp(AuthenticatedPrincipal user, BigInteger manifestId, boolean ignoreState) {
+    public void purgeAsccp(AuthenticatedPrincipal user, BigInteger manifestId, boolean ignoreOnError, boolean ignoreState) {
         PurgeAsccpRepositoryRequest repositoryRequest =
                 new PurgeAsccpRepositoryRequest(user, manifestId);
-
         repositoryRequest.setIgnoreState(ignoreState);
+        repositoryRequest.setIgnoreOnError(ignoreOnError);
 
         PurgeAsccpRepositoryResponse repositoryResponse =
                 asccpWriteRepository.purgeAsccp(repositoryRequest);
@@ -241,8 +247,14 @@ public class CcNodeService extends EventHandler {
 
     @Transactional
     public void purgeBccp(AuthenticatedPrincipal user, BigInteger manifestId) {
+        purgeBccp(user, manifestId, false);
+    }
+
+    @Transactional
+    public void purgeBccp(AuthenticatedPrincipal user, BigInteger manifestId, boolean ignoreOnError) {
         PurgeBccpRepositoryRequest repositoryRequest =
                 new PurgeBccpRepositoryRequest(user, manifestId);
+        repositoryRequest.setIgnoreOnError(ignoreOnError);
 
         PurgeBccpRepositoryResponse repositoryResponse =
                 bccpWriteRepository.purgeBccp(repositoryRequest);
@@ -252,10 +264,16 @@ public class CcNodeService extends EventHandler {
 
     @Transactional
     public void purgeDt(AuthenticatedPrincipal user, BigInteger dtManifestId) {
-        PurgeDtRepositoryRequest request =
-                new PurgeDtRepositoryRequest(user, dtManifestId);
+        purgeDt(user, dtManifestId);
+    }
 
-        dtWriteRepository.purgeDt(request);
+    @Transactional
+    public void purgeDt(AuthenticatedPrincipal user, BigInteger dtManifestId, boolean ignoreOnError) {
+        PurgeDtRepositoryRequest repositoryRequest =
+                new PurgeDtRepositoryRequest(user, dtManifestId);
+        repositoryRequest.setIgnoreOnError(ignoreOnError);
+
+        dtWriteRepository.purgeDt(repositoryRequest);
 
         fireEvent(new DeletedDtEvent());
     }

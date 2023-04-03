@@ -302,16 +302,16 @@ public class CcListService {
     @Transactional
     public void purgeCcs(AuthenticatedPrincipal user, CcUpdateStateListRequest request) {
         request.getAccManifestIds().forEach(e -> {
-            ccNodeService.purgeAcc(user, e);
+            ccNodeService.purgeAcc(user, e, true);
         });
         request.getAsccpManifestIds().forEach(e -> {
-            ccNodeService.purgeAsccp(user, e);
+            ccNodeService.purgeAsccp(user, e, true, false);
         });
         request.getBccpManifestIds().forEach(e -> {
-            ccNodeService.purgeBccp(user, e);
+            ccNodeService.purgeBccp(user, e, true);
         });
         request.getDtManifestIds().forEach(e -> {
-            ccNodeService.purgeDt(user, e);
+            ccNodeService.purgeDt(user, e, true);
         });
     }
 

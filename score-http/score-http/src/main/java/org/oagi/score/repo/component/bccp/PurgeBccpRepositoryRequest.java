@@ -10,6 +10,8 @@ public class PurgeBccpRepositoryRequest extends RepositoryRequest {
 
     private final BigInteger bccpManifestId;
 
+    private boolean ignoreOnError;
+
     public PurgeBccpRepositoryRequest(AuthenticatedPrincipal user,
                                       BigInteger bccpManifestId) {
         super(user);
@@ -25,5 +27,13 @@ public class PurgeBccpRepositoryRequest extends RepositoryRequest {
 
     public BigInteger getBccpManifestId() {
         return bccpManifestId;
+    }
+
+    public boolean isIgnoreOnError() {
+        return ignoreOnError;
+    }
+
+    public void setIgnoreOnError(boolean ignoreOnError) {
+        this.ignoreOnError = ignoreOnError;
     }
 }
