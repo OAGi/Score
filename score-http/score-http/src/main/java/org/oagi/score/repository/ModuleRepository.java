@@ -2,6 +2,7 @@ package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
+import org.oagi.score.export.model.Namespace;
 import org.oagi.score.export.model.ScoreModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,7 +39,40 @@ public class ModuleRepository {
                 .leftJoin(NAMESPACE.as("module_namespace")).on(MODULE.NAMESPACE_ID.eq(NAMESPACE.as("module_namespace").NAMESPACE_ID))
                 .leftJoin(NAMESPACE.as("release_namespace")).on(RELEASE.NAMESPACE_ID.eq(NAMESPACE.as("release_namespace").NAMESPACE_ID))
                 .where(and(MODULE.TYPE.eq("FILE"), MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId)))
-                .fetchInto(ScoreModule.class);
+                .fetch(record -> {
+                    ScoreModule scoreModule = new ScoreModule();
+                    scoreModule.setModuleSetReleaseId(record.get(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID));
+                    scoreModule.setModuleSetId(record.get(MODULE_SET_RELEASE.MODULE_SET_ID));
+                    scoreModule.setReleaseId(record.get(MODULE_SET_RELEASE.RELEASE_ID));
+                    scoreModule.setModuleId(record.get(MODULE.MODULE_ID));
+                    scoreModule.setName(record.get(MODULE.NAME));
+
+                    ULong moduleNamespaceId = record.get(
+                            MODULE.NAMESPACE_ID.as("module_namespace_id"));
+                    String moduleNamespaceUri = record.get(
+                            NAMESPACE.as("module_namespace").URI.as("module_namespace_uri"));
+                    String moduleNamespacePrefix = record.get(
+                            NAMESPACE.as("module_namespace").PREFIX.as("module_namespace_prefix"));
+                    if (moduleNamespaceId != null) {
+                        scoreModule.setModuleNamespace(new Namespace(
+                                moduleNamespaceId, moduleNamespaceUri, moduleNamespacePrefix));
+                    }
+
+                    ULong releaseNamespaceId = record.get(
+                            RELEASE.NAMESPACE_ID.as("release_namespace_id"));
+                    String releaseNamespaceUri = record.get(
+                            NAMESPACE.as("release_namespace").URI.as("release_namespace_uri"));
+                    String releaseNamespacePrefix = record.get(
+                            NAMESPACE.as("release_namespace").PREFIX.as("release_namespace_prefix"));
+                    if (releaseNamespaceId != null) {
+                        scoreModule.setReleaseNamespace(new Namespace(
+                                releaseNamespaceId, releaseNamespaceUri, releaseNamespacePrefix));
+                    }
+
+                    scoreModule.setVersionNum(record.get(MODULE.VERSION_NUM));
+                    scoreModule.setPath(record.get(MODULE.PATH));
+                    return scoreModule;
+                });
     }
 
     public ScoreModule findByModuleSetReleaseIdAndAsccpManifestId(

@@ -49,11 +49,10 @@ public class XMLExportSchemaModuleVisitor {
 
     private Document document;
     private Element rootElement;
-    private Namespace targetNamespace;
+    private org.jdom2.Namespace targetNamespace;
     private File moduleFile;
-
-    private final Namespace OAGI_NS = Namespace.getNamespace("", ScoreConstants.OAGI_NS);
-    private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+    private final org.jdom2.Namespace OAGI_NS = org.jdom2.Namespace.getNamespace("", ScoreConstants.OAGI_NS);
+    private final org.jdom2.Namespace XSD_NS = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
     private CoreComponentService coreComponentService;
 
@@ -68,8 +67,8 @@ public class XMLExportSchemaModuleVisitor {
         this.baseDir = baseDirectory.getCanonicalFile();
     }
 
-    private Namespace getNamespace(SchemaModule schemaModule) {
-        return Namespace.getNamespace(schemaModule.getNamespacePrefix(), schemaModule.getNamespaceUri());
+    private org.jdom2.Namespace getNamespace(SchemaModule schemaModule) {
+        return schemaModule.getNamespace().asJdom2Namespace();
     }
 
     public void startSchemaModule(SchemaModule schemaModule) throws Exception {
@@ -79,6 +78,9 @@ public class XMLExportSchemaModuleVisitor {
         Element schemaElement = new Element("schema", XSD_NS);
         this.targetNamespace = getNamespace(schemaModule);
         schemaElement.addNamespaceDeclaration(targetNamespace);
+        schemaModule.getAdditionalNamespaces().stream().forEach(e -> {
+            schemaElement.addNamespaceDeclaration(e.asJdom2Namespace());
+        });
         schemaElement.setAttribute("targetNamespace", targetNamespace.getURI());
         schemaElement.setAttribute("elementFormDefault", "qualified");
         schemaElement.setAttribute("attributeFormDefault", "unqualified");
@@ -131,7 +133,7 @@ public class XMLExportSchemaModuleVisitor {
         includeElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(includeElement);
 
-        Namespace namespace = getNamespace(includeSchemaModule);
+        org.jdom2.Namespace namespace = getNamespace(includeSchemaModule);
         this.rootElement.addNamespaceDeclaration(namespace);
     }
 
@@ -139,10 +141,10 @@ public class XMLExportSchemaModuleVisitor {
         Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
-        importElement.setAttribute("namespace", importSchemaModule.getNamespaceUri());
+        importElement.setAttribute("namespace", importSchemaModule.getNamespace().getNamespaceUri());
         rootElement.addContent(importElement);
 
-        Namespace namespace = getNamespace(importSchemaModule);
+        org.jdom2.Namespace namespace = getNamespace(importSchemaModule);
         this.rootElement.addNamespaceDeclaration(namespace);
     }
 
@@ -286,7 +288,7 @@ public class XMLExportSchemaModuleVisitor {
         Element documentationElement = new Element("documentation", XSD_NS);
         annotationElement.addContent(documentationElement);
 
-        documentationElement.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+        documentationElement.setAttribute("lang", "en", org.jdom2.Namespace.XML_NAMESPACE);
 
         String den = dataType.getDen();
 
@@ -548,7 +550,7 @@ public class XMLExportSchemaModuleVisitor {
         Element documentationElement = new Element("documentation", XSD_NS);
         annotationElement.addContent(documentationElement);
 
-        documentationElement.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+        documentationElement.setAttribute("lang", "en", org.jdom2.Namespace.XML_NAMESPACE);
 
         String definitionSource = bdtSc.getDefinitionSource();
         if (StringUtils.hasLength(definitionSource)) {
@@ -724,7 +726,7 @@ public class XMLExportSchemaModuleVisitor {
         Element documentationElement = new Element("documentation", XSD_NS);
         annotationElement.addContent(documentationElement);
 
-        documentationElement.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+        documentationElement.setAttribute("lang", "en", org.jdom2.Namespace.XML_NAMESPACE);
 
         if (StringUtils.hasLength(definitionSource)) {
             documentationElement.setAttribute("source", definitionSource);
@@ -741,7 +743,7 @@ public class XMLExportSchemaModuleVisitor {
                 Element doc = text2Element("<doc>" + definition + "</doc>");
                 doc.getChildren().forEach(e -> {
                     Element clone = e.clone();
-                    setNamespaceRecursively(clone, Namespace.getNamespace(ScoreConstants.OAGI_NS));
+                    setNamespaceRecursively(clone, org.jdom2.Namespace.getNamespace(ScoreConstants.OAGI_NS));
                     documentationElement.addContent(clone);
                 });
             } catch (IOException | JDOMException e) {
@@ -756,7 +758,7 @@ public class XMLExportSchemaModuleVisitor {
         }
     }
 
-    private void setNamespaceRecursively(Element element, Namespace namespace) {
+    private void setNamespaceRecursively(Element element, org.jdom2.Namespace namespace) {
         element.setNamespace(namespace);
         for (Element child : element.getChildren()) {
             setNamespaceRecursively(child, namespace);
@@ -826,7 +828,7 @@ public class XMLExportSchemaModuleVisitor {
                 Element element = new Element("element", XSD_NS);
 
                 String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length());
-                element.setAttribute("ref", attachNamespacePrefixIfExists(bodName, dependedModule.getNamespaceId()));
+                element.setAttribute("ref", attachNamespacePrefixIfExists(bodName, dependedModule.getNamespace().getNamespaceId()));
                 element.setAttribute("id", Utility.generateGUID((name + path).getBytes()));
                 element.setAttribute("minOccurs", "0");
 

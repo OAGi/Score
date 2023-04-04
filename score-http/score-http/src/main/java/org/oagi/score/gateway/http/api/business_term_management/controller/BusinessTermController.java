@@ -10,6 +10,7 @@ import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,6 +36,9 @@ import static org.oagi.score.repo.api.base.SortDirection.DESC;
 
 @RestController
 public class BusinessTermController {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -244,20 +248,11 @@ public class BusinessTermController {
     public ResponseEntity getTemplateFile(
             @AuthenticationPrincipal AuthenticatedPrincipal requester) {
 
-        Path root = FileSystems.getDefault().getPath("").toAbsolutePath();
-        Path filePath = Paths.get(root.toString(),
-                "score-http", "src", "main", "resources", "businessTermTemplateWithExample.csv");
-
-        Resource resource = null;
-        try {
-            resource = new UrlResource(filePath.toUri());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Unexpected error happen during template processing!");
-        }
+        String templateName = "businessTermTemplateWithExample.csv";
+        Resource resource = resourceLoader.getResource("classpath:" + templateName);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("text/csv"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + templateName + "\"")
                 .body(resource);
     }
 

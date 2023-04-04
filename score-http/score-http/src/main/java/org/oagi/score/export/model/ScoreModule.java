@@ -11,14 +11,9 @@ public class ScoreModule {
     private ULong releaseId;
     private ULong moduleId;
     private String name;
-    private ULong moduleNamespaceId;
-    private String moduleNamespaceUri;
-    private String moduleNamespacePrefix;
-    private ULong releaseNamespaceId;
-    private String releaseNamespaceUri;
-    private String releaseNamespacePrefix;
+    private Namespace moduleNamespace;
+    private Namespace releaseNamespace;
     private String versionNum;
-    private ULong moduleDirId;
     private String path;
 
     public String getModulePath() {

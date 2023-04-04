@@ -18,6 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.common.ScoreConstants.ANY_ASCCP_DEN;
+import static org.oagi.score.export.model.Namespace.newNamespace;
 
 public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
@@ -44,9 +45,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         DefaultExportContext context = new DefaultExportContext();
         ScoreModule scoreModule = new ScoreModule();
-        scoreModule.setReleaseNamespaceId(namespaceRecord.getNamespaceId());
-        scoreModule.setReleaseNamespacePrefix(namespaceRecord.getPrefix());
-        scoreModule.setReleaseNamespaceUri(namespaceRecord.getUri());
+        scoreModule.setReleaseNamespace(newNamespace(namespaceRecord));
         scoreModule.setPath(getPath(asccpManifestIdULong));
 
         SchemaModule schemaModule = new SchemaModule(scoreModule, this);
@@ -89,6 +88,9 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
 
         if (ignoreReusableIndicator || asccp.getReusableIndicator() != (byte) 0) {
+            NamespaceRecord namespace = releaseDataProvider.findNamespace(asccp.getNamespaceId());
+            schemaModule.addNamespace(newNamespace(namespace));
+
             if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, asccpManifest, releaseDataProvider))) {
                 return;
             }
@@ -103,7 +105,14 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         if (EntityType.Element == EntityType.valueOf(bcc.getEntityType())) {
             BccpRecord bccp = releaseDataProvider.findBCCP(bccpManifest.getBccpId());
-            DtRecord bdt = releaseDataProvider.findDT(bccp.getBdtId());
+            NamespaceRecord namespace = releaseDataProvider.findNamespace(bccp.getNamespaceId());
+            schemaModule.addNamespace(newNamespace(namespace));
+
+            DtManifestRecord dtManifest = releaseDataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
+            DtRecord bdt = releaseDataProvider.findDT(dtManifest.getDtId());
+            namespace = releaseDataProvider.findNamespace(bdt.getNamespaceId());
+            schemaModule.addNamespace(newNamespace(namespace));
+
             if (!schemaModule.addBCCP(new BCCP(bccp, bdt))) {
                 return;
             }
@@ -121,6 +130,9 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             if (acc.getDen().equals("Any Structured Content. Details")) {
                 return;
             }
+
+            NamespaceRecord namespace = releaseDataProvider.findNamespace(acc.getNamespaceId());
+            schemaModule.addNamespace(newNamespace(namespace));
 
             if (!schemaModule.addACC(ACC.newInstance(acc, accManifest, releaseDataProvider))) {
                 return;
@@ -164,6 +176,10 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         if (baseDataType == null) {
             return;
         }
+
+        NamespaceRecord namespace = releaseDataProvider.findNamespace(bdt.getNamespaceId());
+        schemaModule.addNamespace(newNamespace(namespace));
+
         List<DtScRecord> dtScList =
                 releaseDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
                         .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
