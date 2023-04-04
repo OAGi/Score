@@ -3,7 +3,6 @@ package org.oagi.score.export.model;
 import org.apache.commons.io.FilenameUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
-import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.springframework.data.util.Pair;
 
 import java.io.File;
@@ -24,6 +23,8 @@ public class SchemaModule {
     }
 
     private final ScoreModule module;
+
+    private Set<Namespace> additionalNamespaces = new HashSet<>();
 
     private List<SchemaModule> includeModules = new ArrayList();
     private List<SchemaModule> importModules = new ArrayList();
@@ -66,25 +67,22 @@ public class SchemaModule {
         return module.getModuleSetReleaseId();
     }
 
-    public ULong getNamespaceId() {
-        if (module.getModuleNamespaceId() != null) {
-            return module.getModuleNamespaceId();
+    public Namespace getNamespace() {
+        if (module.getModuleNamespace() != null) {
+            return module.getModuleNamespace();
         }
-        return module.getReleaseNamespaceId();
+        return module.getReleaseNamespace();
     }
 
-    public String getNamespaceUri() {
-        if (module.getModuleNamespaceUri() != null) {
-            return module.getModuleNamespaceUri();
+    public void addNamespace(Namespace namespace) {
+        if (namespace == null) {
+            return;
         }
-        return module.getReleaseNamespaceUri();
+        this.additionalNamespaces.add(namespace);
     }
 
-    public String getNamespacePrefix() {
-        if (module.getModuleNamespacePrefix() != null) {
-            return module.getModuleNamespacePrefix();
-        }
-        return module.getReleaseNamespacePrefix();
+    public Collection<Namespace> getAdditionalNamespaces() {
+        return this.additionalNamespaces;
     }
 
     public boolean hasInclude(SchemaModule schemaModule) {
