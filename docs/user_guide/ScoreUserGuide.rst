@@ -1251,6 +1251,11 @@ that is displayed:
    -  | Check the checkboxes to list core components that associated with
         the tag(s).
 
+-  *Namespace* enables filtering components based on the `namespace <#namespace-management>`__
+   assigned to components. To use this filter:
+
+   -  | Check the checkboxes to list core components that related to the namespace(s).
+
 -  Free form text filtering based on CCs’ *DEN* (dictionary entry name),
    *Definition*, *Module* or a combination of them. The matching is case
    insensitive. To use these filters:
@@ -3316,6 +3321,7 @@ a property of an ACC. The ACC should be deleted first.
 
 Tagging CCs
 ^^^^^^^^^^^
+
 The tagging feature in Score allows users to label and categorize core components
 for better management. With this feature, users can assign custom tags to core
 components making it easier to locate and work with them later. To label the tag
@@ -3340,6 +3346,17 @@ to core components:
 
    4. To discard existing tags, click on the "Edit Tags" menu item and then
       click on the "Discard" button located below the tag properties.
+
+Export ASCCPs
+^^^^^^^^^^^^^
+
+"Export ASCCPs" allows users to download the schema expression of the ASCCP(s) in XML.
+To export it:
+
+1. Select the ASCCP(s) in the list by clicking the checkbox(es). The export icon button
+   will appear on the upper right hand corner of the screen.
+
+2. Click the export icon button.
 
 Create an OAGIS BOD
 ~~~~~~~~~~~~~~~~~~~
@@ -4428,7 +4445,7 @@ changes.
 4. A dialog appears to confirm or cancel the release draft cancellation.
 
 Publish a release 
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 After a release draft has been reviewed and accepted, it can be
 published. Any developer can publish a release draft. He/she does not
@@ -4468,6 +4485,17 @@ after it is published. To publish a release draft:
    Component" page and on the *Branch* filter at the top-left of the
    page select the release from the list to see all CCs in the published
    release.
+
+Generate the migration script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+After a new release has published, developers can download the migration script
+for the new release. The script contains all developer records, including
+core components, code lists, agency ID lists, modules, etc. To download the script,
+
+1. `Open the detail page of the new release <#find-a-release>`__.
+
+2. Click the "Generate Migration Script" button.
 
 End user core component management
 ----------------------------------
@@ -5762,6 +5790,18 @@ Unassign a CC from a Module File
    3. Click the left arrow to unassign the selected CCs. At this point,
       you can see the CCs moved back from the Assigned section to the
       Unassigned section.
+
+Validate a Module Set Release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Developers can validate the all generated schemas of the module set release.
+See `Export a Module Set Release <#export-a-module-set-release>`__ for generating schemas.
+To validate:
+
+1. `View detail of a Module Set
+   Release <#view-detail-of-a-module-set-release>`__.
+
+2. Click "Validate" button.
 
 Export a Module Set Release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
