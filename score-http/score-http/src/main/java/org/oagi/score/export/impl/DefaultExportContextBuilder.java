@@ -1,5 +1,6 @@
 package org.oagi.score.export.impl;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.model.*;
@@ -13,6 +14,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,7 +63,9 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         if (source.equals(target)) {
             return;
         }
-        if (source.getNamespaceId().equals(target.getNamespaceId())) {
+        Namespace sourceNamespace = source.getNamespace();
+        Namespace targetNamespace = target.getNamespace();
+        if (Objects.equals(sourceNamespace, targetNamespace)) {
             source.addInclude(target);
         } else {
             source.addImport(target);
