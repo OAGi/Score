@@ -229,7 +229,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
                 List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                         bdtScPriRestriList.stream()
-                                .filter(e -> e.getCodeListManifestId() != null)
+                                .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
                                 .collect(Collectors.toList());
                 if (codeListBdtScPriRestri.size() > 1) {
                     throw new IllegalStateException();
@@ -238,7 +238,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 if (codeListBdtScPriRestri.isEmpty()) {
                     List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
                             bdtScPriRestriList.stream()
-                                    .filter(e -> e.getAgencyIdListManifestId() != null)
+                                    .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
                                     .collect(Collectors.toList());
                     if (agencyIdBdtScPriRestri.size() > 1) {
                         throw new IllegalStateException();
@@ -282,7 +282,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         List<BdtPriRestriRecord> codeListBdtPriRestri =
                 bdtPriRestriList.stream()
-                        .filter(e -> e.getCodeListManifestId() != null)
+                        .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
                         .collect(Collectors.toList());
         if (codeListBdtPriRestri.size() > 1) {
             throw new IllegalStateException();
@@ -290,7 +290,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         if (codeListBdtPriRestri.isEmpty()) {
             List<BdtPriRestriRecord> agencyIdBdtPriRestri =
                     codeListBdtPriRestri.stream()
-                            .filter(e -> e.getAgencyIdListManifestId() != null)
+                            .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
                             .collect(Collectors.toList());
             if (agencyIdBdtPriRestri.size() > 1) {
                 throw new IllegalStateException();
