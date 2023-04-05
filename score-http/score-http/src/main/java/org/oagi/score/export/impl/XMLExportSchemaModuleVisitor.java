@@ -970,9 +970,10 @@ public class XMLExportSchemaModuleVisitor {
                     }
 
                     attributeElement.setAttribute("id", guidPrefix + bcc.getGuid());
-                    if (bcc.getIsNillable() == 1) {
-                        attributeElement.setAttribute("nillable", "true");
-                    }
+                    // Attribute 'nillable' is not allowed in element <xsd:attribute>
+//                    if (bcc.getIsNillable() == 1) {
+//                        attributeElement.setAttribute("nillable", "true");
+//                    }
                     String defaultValue = bcc.getDefaultValue();
                     if (StringUtils.hasLength(defaultValue)) {
                         attributeElement.setAttribute("default", defaultValue);

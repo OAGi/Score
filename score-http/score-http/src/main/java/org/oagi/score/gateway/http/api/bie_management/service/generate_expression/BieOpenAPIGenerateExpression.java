@@ -689,7 +689,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                Map<String, Object> schemas,
                                CodeList codeList) {
 
-        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueId());
+        AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueManifestId());
         String codeListName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
         /*
          * Issue #589
@@ -713,7 +713,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     private String fillSchemas(Map<String, Object> schemas,
                                AgencyIdList agencyIdList) {
         AgencyIdListValue agencyIdListValue =
-                generationContext.findAgencyIdListValue(agencyIdList.getAgencyIdListValueId());
+                generationContext.findAgencyIdListValue(agencyIdList.getAgencyIdListValueManifestId());
         String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
         /*
          * Issue #589
@@ -725,7 +725,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             properties.put("type", "string");
 
             List<AgencyIdListValue> agencyIdListValues =
-                    generationContext.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+                    generationContext.findAgencyIdListValueByAgencyIdListManifestId(agencyIdList.getAgencyIdListManifestId());
             List<String> enumerations = agencyIdListValues.stream().map(e -> e.getValue()).collect(Collectors.toList());
             if (!enumerations.isEmpty()) {
                 properties.put("enum", enumerations);

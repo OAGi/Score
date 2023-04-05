@@ -7,6 +7,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.data.ACC;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.gateway.http.api.agency_id_management.data.AgencyIdListState;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAsbiepNode;
@@ -587,12 +588,22 @@ public class BieEditService implements InitializingBean {
 
     public List<AvailableAgencyIdList> availableAgencyIdListListByBccpManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bccpManifestId) {
-        return agencyIdListReadRepository.availableAgencyIdListByBccpManifestId(bccpManifestId);
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        List<AgencyIdListState> states = Collections.emptyList();
+        if (requester.isDeveloper()) {
+            states = Arrays.asList(AgencyIdListState.Published);
+        }
+        return agencyIdListReadRepository.availableAgencyIdListByBccpManifestId(bccpManifestId, states);
     }
 
     public List<AvailableAgencyIdList> availableAgencyIdListListByBdtScManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bdtScManifestId) {
-        return agencyIdListReadRepository.availableAgencyIdListByBdtScManifestId(bdtScManifestId);
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        List<AgencyIdListState> states = Collections.emptyList();
+        if (requester.isDeveloper()) {
+            states = Arrays.asList(AgencyIdListState.Published);
+        }
+        return agencyIdListReadRepository.availableAgencyIdListByBdtScManifestId(bdtScManifestId, states);
     }
 
     // ends supporting dynamic primitive type lists
