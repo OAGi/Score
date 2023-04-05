@@ -141,7 +141,7 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, CdtScAwdPriXpsTypeMap> findCdtScAwdPriXpsTypeMapMap;
     private Map<BigInteger, Xbt> findXbtMap;
     private Map<BigInteger, CodeList> findCodeListMap;
-    private Map<BigInteger, List<CodeListValue>> findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap;
+    private Map<BigInteger, List<CodeListValue>> findCodeListValueByCodeListManifestIdMap;
     private Map<BigInteger, ACC> findACCMap;
     private Map<BigInteger, BCC> findBCCMap;
     private Map<BigInteger, BCCP> findBCCPMap;
@@ -153,8 +153,8 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, DTSC> findDtScMap;
     private Map<BigInteger, List<DTSC>> findDtScByOwnerDtManifestIdMap;
     private Map<BigInteger, AgencyIdList> findAgencyIdListMap;
-    private Map<BigInteger, AgencyIdListValue> findAgencyIdListValueMap;
-    private Map<BigInteger, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
+    private Map<BigInteger, AgencyIdListValue> findAgencyIdListValueByAgencyIdListValueManifestIdMap;
+    private Map<BigInteger, List<AgencyIdListValue>> findAgencyIdListValueByAgencyIdListManifestIdMap;
     private Map<BigInteger, ABIE> findAbieMap;
     private Map<BigInteger, List<BBIE>> findBbieByFromAbieIdAndUsedIsTrueMap;
     private Map<BigInteger, List<BBIESC>>
@@ -257,9 +257,8 @@ public class GenerationContext implements InitializingBean {
                 .collect(Collectors.toMap(e -> e.getCodeListManifestId(), Function.identity()));
 
         List<CodeListValue> codeListValues = codeListValueRepository.findAll();
-        findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap = codeListValues.stream()
-                .filter(e -> e.isUsedIndicator())
-                .collect(Collectors.groupingBy(e -> e.getCodeListId()));
+        findCodeListValueByCodeListManifestIdMap = codeListValues.stream()
+                .collect(Collectors.groupingBy(e -> e.getCodeListManifestId()));
 
         List<ACC> accList = accRepository.findAllByReleaseId(releaseId);
         findACCMap = accList.stream()
@@ -300,10 +299,10 @@ public class GenerationContext implements InitializingBean {
                 .collect(Collectors.toMap(e -> e.getAgencyIdListManifestId(), Function.identity()));
 
         List<AgencyIdListValue> agencyIdListValues = agencyIdListValueRepository.findAll();
-        findAgencyIdListValueMap = agencyIdListValues.stream()
-                .collect(Collectors.toMap(e -> e.getAgencyIdListValueId(), Function.identity()));
-        findAgencyIdListValueByOwnerListIdMap = agencyIdListValues.stream()
-                .collect(Collectors.groupingBy(e -> e.getOwnerListId()));
+        findAgencyIdListValueByAgencyIdListValueManifestIdMap = agencyIdListValues.stream()
+                .collect(Collectors.toMap(e -> e.getAgencyIdListValueManifestId(), Function.identity()));
+        findAgencyIdListValueByAgencyIdListManifestIdMap = agencyIdListValues.stream()
+                .collect(Collectors.groupingBy(e -> e.getAgencyIdListManifestId()));
 
         List<ABIE> abieList = abieRepository.findByOwnerTopLevelAsbiepIds(topLevelAsbiepIds);
         findAbieMap = abieList.stream()
@@ -402,9 +401,9 @@ public class GenerationContext implements InitializingBean {
         return (codeListManifestId != null && codeListManifestId.longValue() > 0L) ? findCodeListMap.get(codeListManifestId) : null;
     }
 
-    public List<CodeListValue> findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(BigInteger codeListId) {
-        return findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap.containsKey(codeListId) ?
-                findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap.get(codeListId) :
+    public List<CodeListValue> findCodeListValueByCodeListManifestId(BigInteger codeListManifestId) {
+        return findCodeListValueByCodeListManifestIdMap.containsKey(codeListManifestId) ?
+                findCodeListValueByCodeListManifestIdMap.get(codeListManifestId) :
                 Collections.emptyList();
     }
 
@@ -440,13 +439,13 @@ public class GenerationContext implements InitializingBean {
         return (agencyIdListManifestId != null && agencyIdListManifestId.longValue() > 0L) ? findAgencyIdListMap.get(agencyIdListManifestId) : null;
     }
 
-    public AgencyIdListValue findAgencyIdListValue(BigInteger agencyIdListValueId) {
-        return (agencyIdListValueId != null && agencyIdListValueId.longValue() > 0L) ? findAgencyIdListValueMap.get(agencyIdListValueId) : null;
+    public AgencyIdListValue findAgencyIdListValue(BigInteger agencyIdListValueManifestId) {
+        return (agencyIdListValueManifestId != null && agencyIdListValueManifestId.longValue() > 0L) ? findAgencyIdListValueByAgencyIdListValueManifestIdMap.get(agencyIdListValueManifestId) : null;
     }
 
-    public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(BigInteger ownerListId) {
-        return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ?
-                findAgencyIdListValueByOwnerListIdMap.get(ownerListId) :
+    public List<AgencyIdListValue> findAgencyIdListValueByAgencyIdListManifestId(BigInteger agencyIdListManifestId) {
+        return findAgencyIdListValueByAgencyIdListManifestIdMap.containsKey(agencyIdListManifestId) ?
+                findAgencyIdListValueByAgencyIdListManifestIdMap.get(agencyIdListManifestId) :
                 Collections.emptyList();
     }
 
@@ -978,7 +977,7 @@ public class GenerationContext implements InitializingBean {
 
     public List<CodeListValue> getCodeListValues(CodeList codeList) {
         return (codeList != null) ?
-                findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(codeList.getCodeListId()) :
+                findCodeListValueByCodeListManifestId(codeList.getCodeListManifestId()) :
                 Collections.emptyList();
     }
 
