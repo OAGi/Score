@@ -476,6 +476,95 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+    @Test
+    @DisplayName("TC_14_1_TA_4")
+    public void test_TA_4() {
+        AppUserObject endUser;
+        ReleaseObject workingBranch;
+        ArrayList<ACCObject> accForTesting = new ArrayList<>();
+        ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
+        ArrayList<ASCCPObject> asccpForTesting = new ArrayList<>();
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            /**
+             * QA developer Core Components
+             */
+            ACCObject acc = coreComponentAPI.createRandomACC(developerB, workingBranch, namespace, "QA");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, developerB, namespace, "QA");
+            DTObject dtWorkingRelease = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", workingBranch.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dtWorkingRelease, developerB, namespace, "QA");
+            bccpForTesting.add(bccp);
+            coreComponentAPI.appendBCC(acc, bccp, "QA");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "QA");
+            asccpForTesting.add(asccp);
+
+            acc = coreComponentAPI.createRandomACC(developerA, workingBranch, namespace, "QA");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, developerA, namespace, "QA");
+            bccp = coreComponentAPI.createRandomBCCP(dtWorkingRelease, developerA, namespace, "QA");
+            bccpForTesting.add(bccp);
+            coreComponentAPI.appendBCC(acc, bccp, "QA");
+            asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "QA");
+            asccpForTesting.add(asccp);
+
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        for (ACCObject acc : accForTesting) {
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
+            assertTrue(owner.isDeveloper());
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
+            assertEquals("QA", acc.getState());
+            assertDisabled(accViewEditPage.getDefinitionField());
+            assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDENField());
+            AddCommentDialog addCommentDialog = accViewEditPage.hitAddCommentButton();
+            addCommentDialog.setComment("some comment");
+            addCommentDialog.hitCloseButton();
+        }
+
+        for (BCCPObject bccp : bccpForTesting) {
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
+            assertTrue(owner.isDeveloper());
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
+            assertDisabled(bccpViewEditPage.getDefinitionField());
+            assertDisabled(bccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(bccpViewEditPage.getDENField());
+            assertDisabled(bccpViewEditPage.getPropertyTermField());
+            assertEquals("QA", bccp.getState());
+            AddCommentDialog addCommentDialog = bccpViewEditPage.hitAddCommentButton();
+            addCommentDialog.setComment("some comment");
+            addCommentDialog.hitCloseButton();
+        }
+
+        for (ASCCPObject asccp : asccpForTesting) {
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
+            assertTrue(owner.isDeveloper());
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
+            assertDisabled(asccpViewEditPage.getDefinitionField());
+            assertDisabled(asccpViewEditPage.getDefinitionSourceField());
+            assertDisabled(asccpViewEditPage.getDENField());
+            assertDisabled(asccpViewEditPage.getPropertyTermField());
+            assertEquals("QA", asccp.getState());
+            AddCommentDialog addCommentDialog = asccpViewEditPage.hitAddCommentButton();
+            addCommentDialog.setComment("some comment");
+            addCommentDialog.hitCloseButton();
+        }
+    }
 
     @AfterEach
     public void tearDown() {
