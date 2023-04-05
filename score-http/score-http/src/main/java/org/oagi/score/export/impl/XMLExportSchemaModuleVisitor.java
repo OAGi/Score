@@ -437,8 +437,8 @@ public class XMLExportSchemaModuleVisitor {
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
-                        .filter(e -> e.getCodeListManifestId() != null).collect(Collectors.toList());
+                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtManifestId()).stream()
+                        .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
@@ -449,8 +449,8 @@ public class XMLExportSchemaModuleVisitor {
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
         List<BdtPriRestriRecord> bdtPriRestriList =
-                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtId()).stream()
-                        .filter(e -> e.getAgencyIdListManifestId() != null).collect(Collectors.toList());
+                dataProvider.findBdtPriRestriListByDtManifestId(bdtSimpleType.getBdtManifestId()).stream()
+                        .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
