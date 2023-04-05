@@ -81,7 +81,7 @@ class Helper {
         }
         sb.append(codeList.getListId());
 
-        return sb.toString();
+        return sb.toString().replaceAll(" ", "_");
     }
 
     static String getAgencyListTypeName(AgencyIdList agencyIdList, AgencyIdListValue agencyIdListValue) {
@@ -99,7 +99,7 @@ class Helper {
         }
         sb.append(agencyIdList.getListId());
 
-        return sb.toString();
+        return sb.toString().replaceAll(" ", "_");
     }
 
     public static String convertIdentifierToId(String str) {
