@@ -23,7 +23,9 @@ public interface DataProvider {
 
     CodeListRecord findCodeList(ULong codeListId);
 
-    List<CodeListValueRecord> findCodeListValueByCodeListId(ULong codeListId);
+    CodeListValueRecord findCodeListValue(ULong codeListId);
+
+    List<CodeListValueManifestRecord> findCodeListValueManifestByCodeListManifestId(ULong codeListManifestId);
 
     List<DtManifestRecord> findDtManifest();
 

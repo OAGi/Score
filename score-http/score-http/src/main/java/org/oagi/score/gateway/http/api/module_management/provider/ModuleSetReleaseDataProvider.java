@@ -51,8 +51,10 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
         findCodeListMap = findCodeListList.stream()
                 .collect(Collectors.toMap(CodeListRecord::getCodeListId, Function.identity()));
 
-        findCodeListValueByCodeListIdMap = coreComponentRepositoryForModuleSetRelease.findAllCodeListValue(ULong.valueOf(moduleSetReleaseId)).stream()
-                .collect(Collectors.groupingBy(CodeListValueRecord::getCodeListId));
+        findCodeListValueManifestByCodeListManifestIdMap = coreComponentRepositoryForModuleSetRelease.findAllCodeListValueManifest(ULong.valueOf(moduleSetReleaseId)).stream()
+                .collect(Collectors.groupingBy(CodeListValueManifestRecord::getCodeListManifestId));
+        findCodeListValueMap = coreComponentRepositoryForModuleSetRelease.findAllCodeListValue(ULong.valueOf(moduleSetReleaseId)).stream()
+                .collect(Collectors.toMap(CodeListValueRecord::getCodeListValueId, Function.identity()));
 
         findDtManifestList = coreComponentRepositoryForModuleSetRelease.findAllDtManifest(ULong.valueOf(moduleSetReleaseId));
         findDtManifestMap = findDtManifestList.stream()
@@ -268,11 +270,16 @@ public class ModuleSetReleaseDataProvider implements DataProvider, ModuleProvide
         return findCodeListMap.get(codeListId);
     }
 
-    private Map<ULong, List<CodeListValueRecord>> findCodeListValueByCodeListIdMap;
+    private Map<ULong, CodeListValueRecord> findCodeListValueMap;
 
-    
-    public List<CodeListValueRecord> findCodeListValueByCodeListId(ULong codeListId) {
-        return (findCodeListValueByCodeListIdMap.containsKey(codeListId)) ? findCodeListValueByCodeListIdMap.get(codeListId) : Collections.emptyList();
+    public CodeListValueRecord findCodeListValue(ULong codeListId) {
+        return findCodeListValueMap.get(codeListId);
+    }
+
+    private Map<ULong, List<CodeListValueManifestRecord>> findCodeListValueManifestByCodeListManifestIdMap;
+
+    public List<CodeListValueManifestRecord> findCodeListValueManifestByCodeListManifestId(ULong codeListManifestId) {
+        return (findCodeListValueManifestByCodeListManifestIdMap.containsKey(codeListManifestId)) ? findCodeListValueManifestByCodeListManifestIdMap.get(codeListManifestId) : Collections.emptyList();
     }
 
     private List<DtManifestRecord> findDtManifestList;

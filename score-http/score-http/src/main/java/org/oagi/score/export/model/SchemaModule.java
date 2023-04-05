@@ -51,6 +51,10 @@ public class SchemaModule {
         this.schemaModuleTraversal = schemaModuleTraversal;
     }
 
+    public void setPath(String path) {
+        this.module.setPath(path);
+    }
+
     public String getPath() {
         return FilenameUtils.separatorsToSystem(module.getModulePath());
     }

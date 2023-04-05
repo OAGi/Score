@@ -391,7 +391,8 @@ public class XMLExportSchemaModuleVisitor {
                     }
                     restrictionElement.setAttribute("base", xbtName);
                 } else {
-                    restrictionElement.setAttribute("base", attachNamespacePrefixIfExists(bdtSimpleType.getBaseDTName(), bdtSimpleType.getNamespaceId()));
+                    DtRecord baseDataType = bdtSimpleType.getBaseDataType();
+                    restrictionElement.setAttribute("base", attachNamespacePrefixIfExists(bdtSimpleType.getBaseDTName(), baseDataType.getNamespaceId()));
                 }
             }
 
@@ -490,7 +491,8 @@ public class XMLExportSchemaModuleVisitor {
             }
             extensionElement.setAttribute("base", xbtName);
         } else {
-            extensionElement.setAttribute("base", attachNamespacePrefixIfExists(baseName, bdtSimpleContent.getNamespaceId()));
+            DtRecord baseDataType = bdtSimpleContent.getBaseDataType();
+            extensionElement.setAttribute("base", attachNamespacePrefixIfExists(baseName, baseDataType.getNamespaceId()));
         }
 
         List<BDTSC> dtScList;

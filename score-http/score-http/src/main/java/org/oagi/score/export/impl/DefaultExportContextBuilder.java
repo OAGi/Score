@@ -1,6 +1,5 @@
 package org.oagi.score.export.impl;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.model.*;
@@ -109,7 +108,9 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             schemaCodeList.setName(codeList.getName());
             schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
 
-            for (CodeListValueRecord codeListValue : moduleSetReleaseDataProvider.findCodeListValueByCodeListId(codeList.getCodeListId())) {
+            for (CodeListValueManifestRecord codeListValueManifest : moduleSetReleaseDataProvider.findCodeListValueManifestByCodeListManifestId(
+                    codeListManifest.getCodeListManifestId())) {
+                CodeListValueRecord codeListValue = moduleSetReleaseDataProvider.findCodeListValue(codeListValueManifest.getCodeListValueId());
                 schemaCodeList.addValue(codeListValue.getValue());
             }
 
