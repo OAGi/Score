@@ -8,13 +8,19 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -210,6 +216,171 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             viewEditCoreComponentPage.setDEN(ascc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertDoesNotThrow(() -> {
+                viewEditCoreComponentPage.getTableRecordByValue(ascc.getDen());
+            });
+        }
+    }
+
+    @Test
+    @DisplayName("TC_14_1_TA_2")
+    public void test_TA_2() {
+        AppUserObject endUserA;
+        AppUserObject endUserB;
+        ReleaseObject workingBranch;
+        ReleaseObject release;
+        ArrayList<ACCObject> accForTesting = new ArrayList<>();
+        ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
+        ArrayList<BCCObject> bccForTesting = new ArrayList<>();
+        ArrayList<ASCCPObject> asccpForTesting = new ArrayList<>();
+        ArrayList<ASCCObject> asccForTesting = new ArrayList<>();
+        Map<TopLevelASBIEPObject, ASCCPObject> topLevelAsbiepASCCPMap = new HashMap<>();
+        Map<AppUserObject, NamespaceObject> userNamespaceMap = new HashMap<>();
+        Map<TopLevelASBIEPObject, AppUserObject> topLevelASBIEPOwnerMap = new HashMap<>();
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+            endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+            userNamespaceMap.put(endUserB, namespaceEU);
+
+            ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUserB);
+            TopLevelASBIEPObject topLevelAsbiepEU = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, endUserB, "WIP");
+            topLevelAsbiepASCCPMap.put(topLevelAsbiepEU, asccp);
+            topLevelASBIEPOwnerMap.put(topLevelAsbiepEU, endUserB);
+
+            /**
+             * WIP end-user Core Components
+             */
+            acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "WIP");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dt, endUserB, namespaceEU, "WIP");
+            bccpForTesting.add(bccp);
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bccForTesting.add(bcc);
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserB, namespaceEU, "WIP");
+            asccpForTesting.add(asccp);
+
+            /**
+             * QA end-user Core Components
+             */
+            acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "QA");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "QA");
+            bccp = coreComponentAPI.createRandomBCCP(dt, endUserB, namespaceEU, "QA");
+            bccpForTesting.add(bccp);
+            bcc = coreComponentAPI.appendBCC(acc, bccp, "QA");
+            bccForTesting.add(bcc);
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserB, namespaceEU, "QA");
+            asccpForTesting.add(asccp);
+
+            /**
+             * Production end-user Core Components
+             */
+            acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "Production");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(dt, endUserB, namespaceEU, "Production");
+            bccpForTesting.add(bccp);
+            bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bccForTesting.add(bcc);
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserB, namespaceEU, "Production");
+            asccpForTesting.add(asccp);
+
+            /**
+             * Deleted end-user Core Components
+             */
+            acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "Deleted");
+            accForTesting.add(acc);
+            coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "Deleted");
+            bccp = coreComponentAPI.createRandomBCCP(dt, endUserB, namespaceEU, "Deleted");
+            bccpForTesting.add(bccp);
+            bcc = coreComponentAPI.appendBCC(acc, bccp, "Deleted");
+            bccForTesting.add(bcc);
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUserB, namespaceEU, "Deleted");
+            asccpForTesting.add(asccp);
+        }
+
+        /**
+         * login as end user to create UEGACC
+         */
+        ArrayList<ACCObject> userExtensions = new ArrayList<>();
+        HomePage homePage = loginPage().signIn(endUserB.getLoginId(), endUserB.getPassword());
+        for (TopLevelASBIEPObject topLevelASBIEP : topLevelAsbiepASCCPMap.keySet()) {
+            ASCCPObject asccp = topLevelAsbiepASCCPMap.get(topLevelASBIEP);
+            AppUserObject owner = topLevelASBIEPOwnerMap.get(topLevelASBIEP);
+            NamespaceObject namespace = userNamespaceMap.get(owner);
+            BIEMenu bieMenu = homePage.getBIEMenu();
+            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+            ACCExtensionViewEditPage accExtensionViewEditPage =
+                    editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+            String den = accExtensionViewEditPage.getDENFieldValue();
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            userExtensions.add(accExtension);
+            accExtensionViewEditPage.setNamespace(namespace);
+            accExtensionViewEditPage.hitUpdateButton();
+            homePage.logout();
+        }
+        homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(workingBranch.getReleaseNumber());
+        viewEditCoreComponentPage.selectAllComponentTypes();
+        for (ACCObject acc : accForTesting) {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
+                viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            });
+        }
+        for (ACCObject acc : userExtensions) {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
+                viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            });
+        }
+        for (BCCPObject bccp : bccpForTesting) {
+            viewEditCoreComponentPage.setDEN(bccp.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
+                viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
+            });
+        }
+        for (BCCObject bcc : bccForTesting) {
+            viewEditCoreComponentPage.setDEN(bcc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
+                viewEditCoreComponentPage.getTableRecordByValue(bcc.getDen());
+            });
+        }
+        for (ASCCPObject asccp : asccpForTesting) {
+            viewEditCoreComponentPage.setDEN(asccp.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
+                viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
+            });
+        }
+        for (ASCCObject ascc : asccForTesting) {
+            viewEditCoreComponentPage.setDEN(ascc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertThrows(TimeoutException.class, () -> {
                 viewEditCoreComponentPage.getTableRecordByValue(ascc.getDen());
             });
         }
