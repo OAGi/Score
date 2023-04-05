@@ -821,9 +821,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             eNode.setAttribute("id", getGuidWithPrefix(bbie.getGuid()));
         }
 
-        if (bbie.isNillable()) {
-            eNode.setAttribute("nillable", "true");
-        }
+        // Attribute 'nillable' is not allowed in element <xsd:attribute>
+//        if (bbie.isNillable()) {
+//            eNode.setAttribute("nillable", "true");
+//        }
         if (bbie.getDefaultValue() != null && bbie.getDefaultValue().length() != 0) {
             eNode.setAttribute("default", bbie.getDefaultValue());
         }
