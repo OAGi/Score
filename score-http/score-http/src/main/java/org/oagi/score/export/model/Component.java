@@ -4,8 +4,6 @@ import org.jooq.types.ULong;
 
 public interface Component {
 
-    final String GUID_PREFIX = "oagis-id-";
-
     String getName();
 
     String getGuid();

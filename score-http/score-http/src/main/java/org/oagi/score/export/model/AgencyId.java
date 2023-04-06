@@ -26,7 +26,7 @@ public class AgencyId implements Component {
 
     @Override
     public String getGuid() {
-        return GUID_PREFIX + agencyIdList.getGuid();
+        return agencyIdList.getGuid();
     }
 
     public String getEnumGuid() {
@@ -35,7 +35,7 @@ public class AgencyId implements Component {
 
     @Override
     public String getTypeName() {
-        return agencyIdList.getName() + "ContentType";
+        return agencyIdList.getName().replaceAll(" ", "").replace("Identifier", "ID") + "ContentType";
     }
 
     public int getMinLengthOfValues() {

@@ -53,7 +53,7 @@ public abstract class ASCCP implements Component {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + asccp.getGuid();
+        return asccp.getGuid();
     }
 
     public boolean isGroup() {

@@ -4,8 +4,6 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.XbtRecord;
 
 public class XBTSimpleType {
 
-    private String GUID_PREFIX = "oagis-id-";
-
     private XbtRecord xbt;
     private XbtRecord baseXbt;
 
@@ -19,7 +17,7 @@ public class XBTSimpleType {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + xbt.getGuid();
+        return xbt.getGuid();
     }
 
     public String getSchemaDefinition() {

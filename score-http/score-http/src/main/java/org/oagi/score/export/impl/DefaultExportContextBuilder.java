@@ -91,7 +91,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
 
             ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdListManifest.getAgencyIdListManifestId());
             if (moduleCCID == null) {
-                throw new IllegalStateException("Did you assign the agency ID list ''" + agencyIdList.getName() + "'?");
+                continue;
             }
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
             schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
