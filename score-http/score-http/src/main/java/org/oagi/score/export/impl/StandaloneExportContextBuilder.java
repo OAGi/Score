@@ -213,17 +213,13 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             schemaModule.addNamespace(baseSchemaModule.getNamespace());
         }
 
-        List<DtScRecord> dtScList =
-                releaseDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
-                        .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
-
         List<DtScManifestRecord> dtScManifestList =
                 releaseDataProvider.findDtScManifestByOwnerDtManifestId(bdtManifest.getDtManifestId()).stream()
                         .filter(e -> releaseDataProvider.findDtSc(e.getDtScId()).getCardinalityMax() > 0).collect(Collectors.toList());
 
         boolean isDefaultBDT = baseDataType.getBasedDtId() == null || StringUtils.hasLength(bdt.getSixDigitId());
         BDTSimple bdtSimple;
-        if (dtScList.isEmpty()) {
+        if (dtScManifestList.isEmpty()) {
             List<BdtPriRestriRecord> bdtPriRestriList =
                     releaseDataProvider.findBdtPriRestriListByDtManifestId(bdtManifestId);
             List<CdtAwdPriXpsTypeMapRecord> cdtAwdPriXpsTypeMapList =
@@ -286,9 +282,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                             throw new IllegalStateException();
                         }
                     } else {
-                        AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
+                        AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(
+                                agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
                         AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                        List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+                        List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(agencyIdListManifest.getAgencyIdListManifestId())
+                                .stream().map(e -> releaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
                         schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
                     }
                 } else {
@@ -337,9 +335,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                     throw new IllegalStateException();
                 }
             } else {
-                AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(agencyIdBdtPriRestri.get(0).getAgencyIdListManifestId());
+                AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(
+                        agencyIdBdtPriRestri.get(0).getAgencyIdListManifestId());
                 AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+                List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(agencyIdListManifest.getAgencyIdListManifestId())
+                        .stream().map(e -> releaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
                 schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
             }
         } else {

@@ -15,7 +15,9 @@ public interface DataProvider {
 
     AgencyIdListRecord findAgencyIdList(ULong agencyIdListId);
 
-    List<AgencyIdListValueRecord> findAgencyIdListValueByOwnerListId(ULong ownerListId);
+    List<AgencyIdListValueManifestRecord> findAgencyIdListValueManifestByAgencyIdListManifestId(ULong agencyIdListManifestId);
+
+    AgencyIdListValueRecord findAgencyIdListValue(ULong agencyIdListValueId);
 
     CodeListManifestRecord findCodeListManifest(ULong codeListManifestId);
 
@@ -23,7 +25,7 @@ public interface DataProvider {
 
     CodeListRecord findCodeList(ULong codeListId);
 
-    CodeListValueRecord findCodeListValue(ULong codeListId);
+    CodeListValueRecord findCodeListValue(ULong codeListValueId);
 
     List<CodeListValueManifestRecord> findCodeListValueManifestByCodeListManifestId(ULong codeListManifestId);
 
@@ -38,8 +40,6 @@ public interface DataProvider {
     List<DtScManifestRecord> findDtScManifestByOwnerDtManifestId(ULong ownerDtManifestId);
 
     DtScRecord findDtSc(ULong dtScId);
-
-    List<DtScRecord> findDtScByOwnerDtId(ULong ownerDtId);
 
     List<BdtPriRestriRecord> findBdtPriRestriListByDtManifestId(ULong dtManifestId);
 

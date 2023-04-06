@@ -86,8 +86,8 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     private void createAgencyIdList(Map<ULong, SchemaModule> moduleMap) {
         for (AgencyIdListManifestRecord agencyIdListManifest : moduleSetReleaseDataProvider.findAgencyIdListManifest()) {
             AgencyIdListRecord agencyIdList = moduleSetReleaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-            List<AgencyIdListValueRecord> agencyIdListValues =
-                    moduleSetReleaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+            List<AgencyIdListValueRecord> agencyIdListValues = moduleSetReleaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(agencyIdListManifest.getAgencyIdListManifestId())
+                    .stream().map(e -> moduleSetReleaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
 
             ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdListManifest.getAgencyIdListManifestId());
             if (moduleCCID == null) {
