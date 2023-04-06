@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -120,7 +119,6 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 releaseDataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
 
         SchemaModule bccpSchemaModule = null;
-        SchemaModule dtSchemaModule = null;
         if (EntityType.Element == EntityType.valueOf(bcc.getEntityType())) {
             BccpRecord bccp = releaseDataProvider.findBCCP(bccpManifest.getBccpId());
             NamespaceRecord namespace = releaseDataProvider.findNamespace(bccp.getNamespaceId());
@@ -132,13 +130,6 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
             DtManifestRecord dtManifest = releaseDataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
             DtRecord bdt = releaseDataProvider.findDT(dtManifest.getDtId());
-            namespace = releaseDataProvider.findNamespace(bdt.getNamespaceId());
-            dtSchemaModule = getModuleByNamespace(namespace);
-            if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(dtSchemaModule.getNamespace())) {
-                parentSchemaModule.addImport(dtSchemaModule);
-                parentSchemaModule.addNamespace(dtSchemaModule.getNamespace());
-            }
-
             if (!bccpSchemaModule.addBCCP(new BCCP(bccp, bdt))) {
                 return;
             }
@@ -213,6 +204,13 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
             parentSchemaModule.addImport(schemaModule);
             parentSchemaModule.addNamespace(schemaModule.getNamespace());
+        }
+
+        NamespaceRecord baseNamespace = releaseDataProvider.findNamespace(baseDataType.getNamespaceId());
+        SchemaModule baseSchemaModule = getModuleByNamespace(baseNamespace);
+        if (baseSchemaModule != null && !baseSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+            schemaModule.addImport(baseSchemaModule);
+            schemaModule.addNamespace(baseSchemaModule.getNamespace());
         }
 
         List<DtScRecord> dtScList =

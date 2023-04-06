@@ -67,4 +67,9 @@ public class AgencyId implements Component {
     public ULong getNamespaceId() {
         return agencyIdList.getNamespaceId();
     }
+
+    public ULong getTypeNamespaceId() {
+        return this.getNamespaceId();
+    }
+
 }

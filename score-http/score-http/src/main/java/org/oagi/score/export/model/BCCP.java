@@ -46,4 +46,8 @@ public class BCCP implements Component {
     public ULong getNamespaceId() {
         return bccp.getNamespaceId();
     }
+
+    public ULong getTypeNamespaceId() {
+        return bdt.getNamespaceId();
+    }
 }

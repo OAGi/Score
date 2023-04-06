@@ -136,11 +136,6 @@ public class SchemaModule {
         if (this.importModules.indexOf(schemaModule) > -1) {
             return true;
         }
-        for (SchemaModule imported : this.importModules) {
-            if (imported.hasImport(schemaModule)) {
-                return true;
-            }
-        }
         return false;
     }
 

@@ -39,16 +39,25 @@ public abstract class AbstractBDTSimple implements BDTSimple {
 
     public CdtAwdPriRecord getDefaultCdtAwdPri() {
         CdtAwdPriXpsTypeMapRecord cdtAwdPriXpsTypeMap = getDefaultCdtAwdPriTypeMap();
+        if (cdtAwdPriXpsTypeMap == null) {
+            return null;
+        }
         return dataProvider.findCdtAwdPri(cdtAwdPriXpsTypeMap.getCdtAwdPriId());
     }
 
     public String getCdtPriName() {
         CdtAwdPriRecord cdtAwdPri = getDefaultCdtAwdPri();
+        if (cdtAwdPri == null) {
+            return null;
+        }
         return dataProvider.findCdtPri(cdtAwdPri.getCdtPriId()).getName();
     }
 
     public String getXbtName() {
         CdtAwdPriXpsTypeMapRecord cdtAwdPriXpsTypeMap = getDefaultCdtAwdPriTypeMap();
+        if (cdtAwdPriXpsTypeMap == null) {
+            return null;
+        }
         return dataProvider.findXbt(cdtAwdPriXpsTypeMap.getXbtId()).getBuiltinType();
     }
 

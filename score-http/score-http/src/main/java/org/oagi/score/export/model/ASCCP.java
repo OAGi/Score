@@ -80,4 +80,8 @@ public abstract class ASCCP implements Component {
         return asccp.getNamespaceId();
     }
 
+    public ULong getTypeNamespaceId() {
+        return roleOfAcc.getNamespaceId();
+    }
+
 }

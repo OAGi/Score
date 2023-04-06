@@ -425,14 +425,16 @@ public class XMLExportSchemaModuleVisitor {
         ccts_Definition.setText(definition);
 
         CdtAwdPriRecord cdtAwdPri = bdtSimple.getDefaultCdtAwdPri();
-        Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
-        ccts_ContentComponentValueDomain.addContent(ccts_DefaultIndicator);
-        ccts_DefaultIndicator.setText((cdtAwdPri.getIsDefault() == 1) ? "True" : "False");
+        if (cdtAwdPri != null) {
+            Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
+            ccts_ContentComponentValueDomain.addContent(ccts_DefaultIndicator);
+            ccts_DefaultIndicator.setText((cdtAwdPri.getIsDefault() == 1) ? "True" : "False");
 
-        Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
-        ccts_ContentComponentValueDomain.addContent(ccts_PrimitiveTypeName);
-        String primitiveTypeName = bdtSimple.getCdtPriName();
-        ccts_PrimitiveTypeName.setText(primitiveTypeName);
+            Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
+            ccts_ContentComponentValueDomain.addContent(ccts_PrimitiveTypeName);
+            String primitiveTypeName = bdtSimple.getCdtPriName();
+            ccts_PrimitiveTypeName.setText(primitiveTypeName);
+        }
 
     }
 
@@ -782,7 +784,7 @@ public class XMLExportSchemaModuleVisitor {
         Element element = new Element("element", XSD_NS);
 
         element.setAttribute("name", component.getName());
-        element.setAttribute("type", attachNamespacePrefixIfExists(component.getTypeName(), component.getNamespaceId()));
+        element.setAttribute("type", attachNamespacePrefixIfExists(component.getTypeName(), component.getTypeNamespaceId()));
         element.setAttribute("id", component.getGuid());
 
         setDocumentation(element, component);

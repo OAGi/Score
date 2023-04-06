@@ -121,7 +121,7 @@ public class BDTSC implements Component {
 
         List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                 bdtScPriRestriList.stream()
-                        .filter(e -> e.getCodeListManifestId() != null)
+                        .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
                         .collect(Collectors.toList());
         if (codeListBdtScPriRestri.size() > 1) {
             throw new IllegalStateException();
@@ -130,7 +130,7 @@ public class BDTSC implements Component {
         if (codeListBdtScPriRestri.isEmpty()) {
             List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
                     bdtScPriRestriList.stream()
-                            .filter(e -> e.getAgencyIdListManifestId() != null)
+                            .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
                             .collect(Collectors.toList());
             if (agencyIdBdtScPriRestri.size() > 1) {
                 throw new IllegalStateException();
@@ -192,4 +192,9 @@ public class BDTSC implements Component {
         ensureTypeName();
         return namespaceId;
     }
+
+    public ULong getTypeNamespaceId() {
+        return this.getNamespaceId();
+    }
+
 }

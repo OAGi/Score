@@ -6,16 +6,18 @@ public interface Component {
 
     final String GUID_PREFIX = "oagis-id-";
 
-    public String getName();
+    String getName();
 
-    public String getGuid();
+    String getGuid();
 
-    public String getTypeName();
+    String getTypeName();
 
-    public String getDefinition();
+    String getDefinition();
 
-    public String getDefinitionSource();
+    String getDefinitionSource();
 
-    public ULong getNamespaceId();
+    ULong getNamespaceId();
+
+    ULong getTypeNamespaceId();
 
 }
