@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
-import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -926,11 +925,23 @@ public class DtWriteRepository {
             }
         }
 
+        List<DtManifestRecord> derivationDtManifestRecords = dslContext.selectFrom(DT_MANIFEST)
+                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
+                .fetch();
+        if (!derivationDtManifestRecords.isEmpty()) {
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the DT '" + dtRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
+        }
+
         List<BccpManifestRecord> bccpManifestRecords = dslContext.selectFrom(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!bccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCPs used the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCPs first before purging the DT '" + dtRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
             } else {
