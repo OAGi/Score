@@ -285,8 +285,7 @@ public class DtScWriteRepository {
                     .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId()))
                     .execute();
 
-            updateDerivedSc(dtScManifestRecord, dslContext.selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId())).fetchOne());
+            updateDerivedSc(dtScManifestRecord, dtScRecord);
         }
 
         if (isRepresentationTermChanged) {

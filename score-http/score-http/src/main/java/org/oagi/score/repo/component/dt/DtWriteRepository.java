@@ -568,20 +568,16 @@ public class DtWriteRepository {
         for (DtManifestRecord dtManifest : derivedDtManifestList) {
             deleteDerivedValueDomain(dtManifest.getDtManifestId(), deleteList);
 
-            BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
-                    BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
-                    BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
-
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.in(cdtAwdPriXpsTypeMapIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.in(codeListManifestIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIdListManifestIdList))
                     .execute();
 
@@ -590,6 +586,10 @@ public class DtWriteRepository {
                     BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)).fetchOne();
 
             if (defaultRecord == null) {
+                BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
+
                 if (baseDefaultRecord.getCdtAwdPriXpsTypeMapId() != null) {
                     dslContext.update(BDT_PRI_RESTRI).set(BDT_PRI_RESTRI.IS_DEFAULT, (byte) 1)
                             .where(and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId()),
