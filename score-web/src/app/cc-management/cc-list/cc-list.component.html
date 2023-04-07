@@ -421,11 +421,11 @@
           <ng-container matColumnDef="transferOwnership">
             <th mat-header-cell *matHeaderCellDef style="width: 40px;"></th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button
-                      *ngIf="isEditable(element) && !isAssociation(element)"
-                      (click)="openTransferDialog(element, $event)">
-                <mat-icon>swap_horiz</mat-icon>
-              </button>
+              <div class="d-flex">
+                <mat-icon class="pr-4 pointer align-self-center"
+                          *ngIf="isEditable(element) && !isAssociation(element)"
+                          (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
+              </div>
             </td>
           </ng-container>
 
