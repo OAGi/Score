@@ -618,14 +618,14 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         String name = "type_" + guid;
 
         Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getMinLength() != null) {
-            content.put("minLength", facetRestri.getMinLength().longValue());
+        if (facetRestri.getFacetMinLength() != null) {
+            content.put("minLength", facetRestri.getFacetMinLength().longValue());
         }
-        if (facetRestri.getMaxLength() != null) {
-            content.put("maxLength", facetRestri.getMaxLength().longValue());
+        if (facetRestri.getFacetMaxLength() != null) {
+            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
-        if (StringUtils.hasLength(facetRestri.getPattern())) {
-            content.put("pattern", facetRestri.getPattern());
+        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            content.put("pattern", facetRestri.getFacetPattern());
         }
 
         schemas.put(name, content);
@@ -980,7 +980,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
                     Xbt xbt = getXbt(bbie, bdt);
                     ref = fillSchemas(schemas, xbt, bbie);
                 } else if (!isFriendly()) {
@@ -1066,7 +1066,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
+                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
                     ref = fillSchemas(schemas, xbt, bbieSc);
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);

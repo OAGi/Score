@@ -682,7 +682,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -713,7 +713,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findXbt(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -860,7 +860,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -892,19 +892,19 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         restrictionNode.setAttribute("base", xbt.getBuiltinType());
         xbtNode.addContent(restrictionNode);
 
-        if (facetRestri.getMinLength() != null) {
+        if (facetRestri.getFacetMinLength() != null) {
             Element minLengthNode = newElement("minLength");
-            minLengthNode.setAttribute("value", facetRestri.getMinLength().toString());
+            minLengthNode.setAttribute("value", facetRestri.getFacetMinLength().toString());
             restrictionNode.addContent(minLengthNode);
         }
-        if (facetRestri.getMaxLength() != null) {
+        if (facetRestri.getFacetMaxLength() != null) {
             Element maxLengthNode = newElement("maxLength");
-            maxLengthNode.setAttribute("value", facetRestri.getMaxLength().toString());
+            maxLengthNode.setAttribute("value", facetRestri.getFacetMaxLength().toString());
             restrictionNode.addContent(maxLengthNode);
         }
-        if (facetRestri.getPattern() != null) {
+        if (facetRestri.getFacetPattern() != null) {
             Element patternNode = newElement("pattern");
-            patternNode.setAttribute("value", facetRestri.getPattern().toString());
+            patternNode.setAttribute("value", facetRestri.getFacetPattern().toString());
             restrictionNode.addContent(patternNode);
         }
 
@@ -1224,7 +1224,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
 
                     String typeName = null;
-                    if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+                    if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || bbieSc.getFacetPattern() != null) {
                         typeName = addXbtSimpleType(xbt, bbieSc);
                     } else {
                         addXbtSimpleType(xbt);
@@ -1245,7 +1245,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
 
         String typeName = null;
-        if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+        if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || bbieSc.getFacetPattern() != null) {
             typeName = addXbtSimpleType(xbt, bbieSc);
         } else {
             addXbtSimpleType(xbt);
