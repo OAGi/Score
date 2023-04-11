@@ -944,9 +944,23 @@
                             </div>
                             <div class="col-3">
                               <mat-form-field>
-                                <input matInput placeholder="Pattern" maxlength="255"
-                                       [(ngModel)]="asBbiepDetail().bbie.pattern"
-                                       [disabled]="!isEditable(selectedNode)">
+                                <input matInput placeholder="Pattern"
+                                       [formControl]="biePattern">
+                                <mat-error *ngIf="biePattern.hasError('pattern')">
+                                  {{ biePattern.getError('pattern') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Pattern Test"
+                                       [formControl]="biePatternTest">
+                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
+                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
+                                </mat-hint>
+                                <mat-error *ngIf="biePatternTest.hasError('pattern')">
+                                  The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
+                                </mat-error>
                               </mat-form-field>
                             </div>
                           </div>
@@ -1258,9 +1272,23 @@
                             </div>
                             <div class="col-3">
                               <mat-form-field>
-                                <input matInput placeholder="Pattern" maxlength="255"
-                                       [(ngModel)]="asBbieScDetail().bbieSc.pattern"
-                                       [disabled]="!isEditable(selectedNode)">
+                                <input matInput placeholder="Pattern"
+                                       [formControl]="biePattern">
+                                <mat-error *ngIf="biePattern.hasError('pattern')">
+                                  {{ biePattern.getError('pattern') }}
+                                </mat-error>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                              <mat-form-field>
+                                <input matInput placeholder="Pattern Test"
+                                       [formControl]="biePatternTest">
+                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
+                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
+                                </mat-hint>
+                                <mat-error *ngIf="biePatternTest.hasError('pattern')">
+                                  The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
+                                </mat-error>
                               </mat-form-field>
                             </div>
                           </div>
