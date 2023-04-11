@@ -1440,10 +1440,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   _setPatternTestFormControl() {
-    if (!this.biePattern) {
-      return;
-    }
-    this.biePatternTest = new FormControl('', [
+    this.biePatternTest = new FormControl({
+      value: '',
+      disabled: !this.biePattern || !this.biePattern.value || !this.biePattern.valid
+    }, [
       (this.biePattern.valid) ? Validators.pattern(this.biePattern.value) : Validators.nullValidator
     ]);
   }
