@@ -176,6 +176,36 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
         assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
     }
+    @Test
+    @DisplayName("TC_17_2_TA_5")
+    public void test_TA_5() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        CodeListObject codeListPublished;
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+
+            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            /**
+             * Create Published developer Code List for a particular release branch.
+             */
+            codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, branch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branch.getReleaseNumber());
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeListPublished.getOwnerUserId());
+        assertTrue(codeListPublished.getState().equals("Published"));
+        assertTrue(owner.isDeveloper());
+        assertDoesNotThrow(() -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+    }
 
     @AfterEach
     public void tearDown() {
