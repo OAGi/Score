@@ -53,7 +53,7 @@ public class TC_16_1_CodeListAccess extends BaseTest {
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
             NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
             /**
-             * Create developer Code List for a particular release branch. States - Published
+             * Create developer Code List for a particular release branch. States - WIP, Draft, Candidate and Published
              */
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
             ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
@@ -110,6 +110,43 @@ public class TC_16_1_CodeListAccess extends BaseTest {
             }else{
                 assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
             }
+        }
+    }
+    @Test
+    @DisplayName("TC_16_1_TA_2")
+    public void test_TA_2() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerA;
+        ReleaseObject branch;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            /**
+             * Create Published developer Code List for a particular release branch
+             */
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerB, namespace, branch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerB);
+            codeListForTesting.add(codeListPublished);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        for (CodeListObject cl : codeListForTesting) {
+            assertNotEquals(developerA.getAppUserId(), cl.getOwnerUserId());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
+            assertTrue(owner.isDeveloper());
+            assertTrue(cl.getState().equals("Published"));
+            viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
         }
     }
 
