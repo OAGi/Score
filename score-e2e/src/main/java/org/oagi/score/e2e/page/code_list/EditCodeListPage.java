@@ -104,4 +104,8 @@ public interface EditCodeListPage extends Page {
     void hitRestoreButton();
 
     WebElement getRestoreButton();
+
+    WebElement getRemarkField();
+
+    WebElement getAgencyIDListValueField();
 }

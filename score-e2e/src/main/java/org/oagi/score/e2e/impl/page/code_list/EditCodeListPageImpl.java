@@ -39,6 +39,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By REMARK_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
@@ -75,6 +77,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
             By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select");
+    private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[text()= \"Agency ID List Value\"]//ancestor::div[1]/mat-select");
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
@@ -130,6 +134,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
+
+    @Override
+    public WebElement getRemarkField() {
+        return visibilityOfElementLocated(getDriver(), REMARK_FIELD_LOCATOR);
+    }
+
     @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
@@ -215,6 +225,11 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getAgencyIDListField() {
         return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getAgencyIDListValueField() {
+        return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
