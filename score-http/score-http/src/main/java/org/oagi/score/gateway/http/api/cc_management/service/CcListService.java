@@ -19,6 +19,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.AppUser;
@@ -82,6 +83,13 @@ public class CcListService {
                     tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList())
             );
         });
+        return response;
+    }
+
+    public CcChangesResponse getCcChanges(ScoreUser requester, BigInteger releaseId) {
+        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester, ULong.valueOf(releaseId));
+        CcChangesResponse response = new CcChangesResponse();
+        response.addCcChangeList(changeList);
         return response;
     }
 

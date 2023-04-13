@@ -202,5 +202,4 @@ public class ReleaseController {
                 .body(new DeleteOnCloseFileSystemResource(response.getFile()));
     }
 
-
 }

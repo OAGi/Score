@@ -1,0 +1,146 @@
+<div class="close">
+  <button mat-icon-button (click)="onNoClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<div class="header">
+  <span>What's New</span>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newACCs.length > 0">
+  <h2 class="title pb-2">{{ newACCs.length }} new ACC{{ newACCs.length > 1 ? 's' : ''}} {{ getTagInfo(newACCs) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newACC of newACCs">
+      <li>
+        <div>
+          <a href="/core_component/acc/{{ newACC.manifestId }}">
+            <span>{{ newACC.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newACC.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newASCCPs.length > 0">
+  <h2 class="title pb-2">{{ newASCCPs.length }} ASCCP{{ newASCCPs.length > 1 ? 's' : ''}} {{ getTagInfo(newASCCPs) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newASCCP of newASCCPs">
+      <li>
+        <div>
+          <a href="/core_component/asccp/{{ newASCCP.manifestId }}">
+            <span>{{ newASCCP.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newASCCP.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newBCCPs.length > 0">
+  <h2 class="title pb-2">{{ newBCCPs.length }} BCCP{{ newBCCPs.length > 1 ? 's' : ''}} {{ getTagInfo(newBCCPs) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newBCCP of newBCCPs">
+      <li>
+        <div>
+          <a href="/core_component/bccp/{{ newBCCP.manifestId }}">
+            <span>{{ newBCCP.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newBCCP.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newASCCs.length > 0">
+  <h2 class="title pb-2">{{ newASCCs.length }} ASCC{{ newASCCs.length > 1 ? 's' : ''}}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newASCC of newASCCs">
+      <li>
+        <div>
+          <span>{{ newASCC.den }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newBCCs.length > 0">
+  <h2 class="title pb-2">{{ newBCCs.length }} BCC{{ newBCCs.length > 1 ? 's' : ''}}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newBCC of newBCCs">
+      <li>
+        <div>
+          <span>{{ newBCC.den }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newDTs.length > 0">
+  <h2 class="title pb-2">{{ newDTs.length }} DT{{ newDTs.length > 1 ? 's' : ''}} {{ getTagInfo(newDTs) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newDT of newDTs">
+      <li>
+        <div>
+          <a href="/core_component/dt/{{ newDT.manifestId }}">
+            <span>{{ newDT.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newDT.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newCodeLists.length > 0">
+  <h2 class="title pb-2">{{ newCodeLists.length }} Code List{{ newCodeLists.length > 1 ? 's' : ''}} {{ getTagInfo(newCodeLists) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newCodeList of newCodeLists">
+      <li>
+        <div>
+          <a href="/code_list/{{ newCodeList.manifestId }}">
+            <span>{{ newCodeList.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newCodeList.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="new-components-container container-fluid pt-2 pb-2" *ngIf="newAgencyIdLists.length > 0">
+  <h2 class="title pb-2">{{ newAgencyIdLists.length }} Agency ID List{{ newAgencyIdLists.length > 1 ? 's' : ''}} {{ getTagInfo(newAgencyIdLists) }}</h2>
+  <div class="new-components-row row">
+    <ul class="new-component col-4 mb-1" *ngFor="let newAgencyIdList of newAgencyIdLists">
+      <li>
+        <div>
+          <a href="/agency_id_list/{{ newAgencyIdList.manifestId }}">
+            <span>{{ newAgencyIdList.den }}</span>
+          </a>
+          <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of newAgencyIdList.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

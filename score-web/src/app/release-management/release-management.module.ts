@@ -12,6 +12,9 @@ import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {
+  ReleaseWhatsNewDialogComponent
+} from "./release-detail/release-whats-new-dialog/release-whats-new-dialog.component";
 
 const routes: Routes = [
   {
@@ -56,7 +59,8 @@ const routes: Routes = [
     ReleaseListComponent,
     ReleaseCreateComponent,
     ReleaseDetailComponent,
-    ReleaseAssignComponent
+    ReleaseAssignComponent,
+    ReleaseWhatsNewDialogComponent
   ],
   providers: [
     ReleaseService
