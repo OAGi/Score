@@ -276,18 +276,18 @@ export class CcListComponent implements OnInit {
     switch (ccList.type.toUpperCase()) {
       case 'ACC':
         if (ccList.oagisComponentType === 'UserExtensionGroup') {
-          return 'extension/' + ccList.manifestId;
+          return '/core_component/extension/' + ccList.manifestId;
         } else {
-          return 'acc/' + ccList.manifestId;
+          return '/core_component/acc/' + ccList.manifestId;
         }
       case 'ASCCP':
-        return 'asccp/' + ccList.manifestId;
+        return '/core_component/asccp/' + ccList.manifestId;
 
       case 'BCCP':
-        return 'bccp/' + ccList.manifestId;
+        return '/core_component/bccp/' + ccList.manifestId;
 
       case 'DT':
-        return 'dt/' + ccList.manifestId;
+        return '/core_component/dt/' + ccList.manifestId;
 
       default:
         return window.location.pathname;

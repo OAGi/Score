@@ -391,8 +391,7 @@
             <td mat-cell *matCellDef="let element">
               <div class="den word-break-all">
                 <span class="new-component mr-2" *ngIf="element.newComponent">New</span>
-                <a routerLink="/core_component/{{ getRouterLink(element) }}"
-                   matTooltip="{{ element.den }}">
+                <a routerLink="{{ getRouterLink(element) }}" matTooltip="{{ element.den }}">
                   <span>{{ element.den }}</span>
                 </a>
                 <div class="tag-list">
