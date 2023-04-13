@@ -575,7 +575,7 @@ public class AsccpWriteRepository {
                 .where(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                 .fetch();
         if (!asccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ASCCs used the ASCCP '" + asccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCs first before purging the ASCCP '" + asccpRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAsccpRepositoryResponse(asccpManifestRecord.getAsccpManifestId().toBigInteger(), e);
             } else {

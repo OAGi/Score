@@ -50,6 +50,7 @@ public class CodeListController {
             @RequestParam(name = "access", required = false) String access,
             @RequestParam(name = "states", required = false) String states,
             @RequestParam(name = "deprecated", required = false) String deprecated,
+            @RequestParam(name = "newComponent", required = false) String newComponent,
             @RequestParam(name = "extensible", required = false) Boolean extensible,
             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
             @RequestParam(name = "namespaces", required = false) String namespaces,
@@ -79,6 +80,13 @@ public class CodeListController {
                 request.setDeprecated(true);
             } else if ("false".equalsIgnoreCase(deprecated.toLowerCase())) {
                 request.setDeprecated(false);
+            }
+        }
+        if (StringUtils.hasLength(newComponent)) {
+            if ("true".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(true);
+            } else if ("false".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(false);
             }
         }
         request.setExtensible(extensible);

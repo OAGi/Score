@@ -519,7 +519,7 @@ public class BccpWriteRepository {
                 .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .fetch();
         if (!bccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCs used the BCCP '" + bccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccpRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), e);
             } else {

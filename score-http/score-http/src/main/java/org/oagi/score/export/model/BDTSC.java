@@ -60,7 +60,7 @@ public class BDTSC implements Component {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + dtSc.getGuid();
+        return dtSc.getGuid();
     }
 
     public DtScManifestRecord getBdtScManifest() {
@@ -121,7 +121,7 @@ public class BDTSC implements Component {
 
         List<BdtScPriRestriRecord> codeListBdtScPriRestri =
                 bdtScPriRestriList.stream()
-                        .filter(e -> e.getCodeListManifestId() != null)
+                        .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
                         .collect(Collectors.toList());
         if (codeListBdtScPriRestri.size() > 1) {
             throw new IllegalStateException();
@@ -130,7 +130,7 @@ public class BDTSC implements Component {
         if (codeListBdtScPriRestri.isEmpty()) {
             List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
                     bdtScPriRestriList.stream()
-                            .filter(e -> e.getAgencyIdListManifestId() != null)
+                            .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
                             .collect(Collectors.toList());
             if (agencyIdBdtScPriRestri.size() > 1) {
                 throw new IllegalStateException();
@@ -157,13 +157,13 @@ public class BDTSC implements Component {
             } else {
                 AgencyIdListManifestRecord agencyIdListManifest = dataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
                 agencyIdList = dataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                typeName = agencyIdList.getName() + "ContentType";
+                typeName = agencyIdList.getName().replaceAll(" ", "").replace("Identifier", "ID") + "ContentType";
                 namespaceId = agencyIdList.getNamespaceId();
             }
         } else {
             CodeListManifestRecord codeListManifest = dataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
             codeList = dataProvider.findCodeList(codeListManifest.getCodeListId());
-            typeName = codeList.getName() + "ContentType";
+            typeName = codeList.getName().replaceAll(" ", "").replace("Identifier", "ID") + "ContentType";
             namespaceId = codeList.getNamespaceId();
         }
     }
@@ -192,4 +192,9 @@ public class BDTSC implements Component {
         ensureTypeName();
         return namespaceId;
     }
+
+    public ULong getTypeNamespaceId() {
+        return this.getNamespaceId();
+    }
+
 }

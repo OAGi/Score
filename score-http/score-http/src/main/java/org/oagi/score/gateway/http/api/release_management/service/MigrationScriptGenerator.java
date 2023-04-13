@@ -138,6 +138,11 @@ public class MigrationScriptGenerator {
         writer.println("DELETE FROM `xbt` WHERE `xbt_id` < " + delta + ";");
         writer.println("DELETE FROM `xbt_manifest` WHERE `xbt_manifest_id` < " + delta + ";");
         writer.println("");
+        writer.println("DELETE FROM `acc_manifest_tag` WHERE `acc_manifest_id` < " + delta + ";");
+        writer.println("DELETE FROM `asccp_manifest_tag` WHERE `asccp_manifest_id` < " + delta + ";");
+        writer.println("DELETE FROM `bccp_manifest_tag` WHERE `bccp_manifest_id` < " + delta + ";");
+        writer.println("DELETE FROM `dt_manifest_tag` WHERE `dt_manifest_id` < " + delta + ";");
+        writer.println("");
         writer.println("DROP TABLE IF EXISTS `module`;");
         writer.println("DROP TABLE IF EXISTS `module_acc_manifest`;");
         writer.println("DROP TABLE IF EXISTS `module_agency_id_list_manifest`;");
@@ -223,6 +228,14 @@ public class MigrationScriptGenerator {
         dumpData(writer, "seq_key", false);
         dumpData(writer, "xbt", true);
         dumpData(writer, "xbt_manifest", true);
+        dumpData(writer, "acc_manifest_tag", false, () -> dslContext.resultQuery(
+                "SELECT `acc_manifest_tag`.* FROM `acc_manifest_tag` WHERE `acc_manifest_id` < " + delta));
+        dumpData(writer, "asccp_manifest_tag", false, () -> dslContext.resultQuery(
+                "SELECT `asccp_manifest_tag`.* FROM `asccp_manifest_tag` WHERE `asccp_manifest_id` < " + delta));
+        dumpData(writer, "bccp_manifest_tag", false, () -> dslContext.resultQuery(
+                "SELECT `bccp_manifest_tag`.* FROM `bccp_manifest_tag` WHERE `bccp_manifest_id` < " + delta));
+        dumpData(writer, "dt_manifest_tag", false, () -> dslContext.resultQuery(
+                "SELECT `dt_manifest_tag`.* FROM `dt_manifest_tag` WHERE `dt_manifest_id` < " + delta));
 
         writer.println("/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;");
         writer.println("");

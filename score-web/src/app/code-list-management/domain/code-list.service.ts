@@ -53,8 +53,11 @@ export class CodeListService {
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
-    if (request.deprecated.length === 1) {
+    if (request.deprecated && request.deprecated.length === 1) {
       params = params.set('deprecated', '' + request.deprecated[0]);
+    }
+    if (request.newComponent && request.newComponent.length === 1) {
+      params = params.set('newComponent', '' + request.newComponent[0]);
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (request.ownedByDeveloper) ? 'true' : 'false');

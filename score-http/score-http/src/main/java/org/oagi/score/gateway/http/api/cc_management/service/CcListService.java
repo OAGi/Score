@@ -301,17 +301,22 @@ public class CcListService {
 
     @Transactional
     public void purgeCcs(AuthenticatedPrincipal user, CcUpdateStateListRequest request) {
+        boolean isRequestForSingle = request.getAccManifestIds().size() +
+                request.getAsccpManifestIds().size() +
+                request.getBccpManifestIds().size() +
+                request.getDtManifestIds().size() == 1;
+
         request.getAccManifestIds().forEach(e -> {
-            ccNodeService.purgeAcc(user, e, true);
+            ccNodeService.purgeAcc(user, e, (isRequestForSingle) ? false : true);
         });
         request.getAsccpManifestIds().forEach(e -> {
-            ccNodeService.purgeAsccp(user, e, true, false);
+            ccNodeService.purgeAsccp(user, e, (isRequestForSingle) ? false : true, false);
         });
         request.getBccpManifestIds().forEach(e -> {
-            ccNodeService.purgeBccp(user, e, true);
+            ccNodeService.purgeBccp(user, e, (isRequestForSingle) ? false : true);
         });
         request.getDtManifestIds().forEach(e -> {
-            ccNodeService.purgeDt(user, e, true);
+            ccNodeService.purgeDt(user, e, (isRequestForSingle) ? false : true);
         });
     }
 

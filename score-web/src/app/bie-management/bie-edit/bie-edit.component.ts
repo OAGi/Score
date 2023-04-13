@@ -98,6 +98,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   bieMinimumLength: FormControl;
   bieMaximumLength: FormControl;
   biePattern: FormControl;
+  biePatternTest: FormControl;
 
   /* valueDomain */
   valueDomainFilterCtrl: FormControl = new FormControl();
@@ -1071,6 +1072,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     this._setMinLengthFormControl(node);
     this._setMaxLengthFormControl(node);
+    this._setPatternFormControl(node);
   }
 
   initFixedOrDefault(detail?: BieFlatNode) {
@@ -1261,8 +1263,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(this.selectedNode) ||
-      !this.selectedNode.used || this.selectedNode.locked;
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
@@ -1324,9 +1326,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(this.selectedNode) ||
-      !this.selectedNode.used ||
-      this.selectedNode.locked;
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
@@ -1379,6 +1380,72 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         this._setMinLengthFormControl(detailNode);
       }
     });
+  }
+
+  _setPatternFormControl(detailNode?: BieFlatNode) {
+    if (!detailNode) {
+      detailNode = this.selectedNode;
+    } else if (detailNode !== this.selectedNode) {
+      return;
+    }
+
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
+
+    let biePattern;
+    if (this.isBbiepDetail(detailNode)) {
+      biePattern = this.asBbiepDetail(detailNode).bbie.pattern;
+    } else if (this.isBbieScDetail(detailNode)) {
+      biePattern = this.asBbieScDetail(detailNode).bbieSc.pattern;
+    } else {
+      this.biePattern = undefined;
+      return;
+    }
+
+    this.biePattern = new FormControl({
+      value: biePattern,
+      disabled
+    }, [
+      (control: AbstractControl): ValidationErrors | null => {
+        const value = (!!control.value) ? control.value.toString().trim() : undefined;
+        if (!value) {
+          return null;
+        }
+
+        try {
+          const regexp = new RegExp(value);
+        } catch (e) {
+          return {pattern: 'The pattern \'' + value + '\' is invalid.'};
+        }
+
+        return null;
+      }
+    ]);
+
+    this.biePattern.valueChanges.subscribe(value => {
+      if (this.biePattern.valid) {
+        if (this.isBbiepDetail(detailNode)) {
+          this.asBbiepDetail(detailNode).bbie.pattern = value;
+        } else if (this.isBbieScDetail(detailNode)) {
+          this.asBbieScDetail(detailNode).bbieSc.pattern = value;
+        } else {
+          return;
+        }
+      }
+
+      this._setPatternTestFormControl();
+    });
+
+    this._setPatternTestFormControl();
+  }
+
+  _setPatternTestFormControl() {
+    this.biePatternTest = new FormControl({
+      value: '',
+      disabled: !this.biePattern || !this.biePattern.value || !this.biePattern.valid
+    }, [
+      (this.biePattern.valid) ? Validators.pattern(this.biePattern.value) : Validators.nullValidator
+    ]);
   }
 
   onChangeFixedOrDefault(value: string) {

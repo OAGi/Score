@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
-import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -568,20 +567,16 @@ public class DtWriteRepository {
         for (DtManifestRecord dtManifest : derivedDtManifestList) {
             deleteDerivedValueDomain(dtManifest.getDtManifestId(), deleteList);
 
-            BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
-                    BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
-                    BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
-
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.in(cdtAwdPriXpsTypeMapIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.in(codeListManifestIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIdListManifestIdList))
                     .execute();
 
@@ -590,6 +585,10 @@ public class DtWriteRepository {
                     BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)).fetchOne();
 
             if (defaultRecord == null) {
+                BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
+
                 if (baseDefaultRecord.getCdtAwdPriXpsTypeMapId() != null) {
                     dslContext.update(BDT_PRI_RESTRI).set(BDT_PRI_RESTRI.IS_DEFAULT, (byte) 1)
                             .where(and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId()),
@@ -926,11 +925,23 @@ public class DtWriteRepository {
             }
         }
 
+        List<DtManifestRecord> derivationDtManifestRecords = dslContext.selectFrom(DT_MANIFEST)
+                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
+                .fetch();
+        if (!derivationDtManifestRecords.isEmpty()) {
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the DT '" + dtRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
+        }
+
         List<BccpManifestRecord> bccpManifestRecords = dslContext.selectFrom(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!bccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCPs used the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCPs first before purging the DT '" + dtRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
             } else {

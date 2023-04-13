@@ -16,6 +16,7 @@ public class CcListRequest {
     private CcListTypes types;
     private List<CcState> states;
     private Boolean deprecated;
+    private Boolean newComponent;
     private List<String> ownerLoginIds;
     private List<String> updaterLoginIds;
     private List<String> dtTypes;

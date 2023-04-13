@@ -14,6 +14,7 @@ export class CodeListForListRequest {
   access: string;
   states: string[] = [];
   deprecated: boolean[] = [];
+  newComponent: boolean[] = [];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   updatedDate: {
@@ -51,6 +52,8 @@ export class CodeListForListRequest {
 
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
+    this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updatedDate = {
@@ -81,6 +84,12 @@ export class CodeListForListRequest {
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.deprecated !== undefined && this.deprecated.length > 0) {
+      params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
+    }
+    if (this.newComponent !== undefined && this.newComponent.length > 0) {
+      params = params.set('newComponent', this.newComponent.map(e => (e) ? 'true' : 'false').join(','));
     }
     if (this.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (this.ownedByDeveloper) ? 'true' : 'false');
@@ -131,6 +140,7 @@ export class CodeListForList {
   access: string;
   revision: string;
   deprecated: boolean;
+  newComponent: boolean;
 }
 
 export class CodeList {
