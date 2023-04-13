@@ -57,6 +57,7 @@ public class JooqAgencyIdListReadRepository
                 AGENCY_ID_LIST.REMARK,
                 AGENCY_ID_LIST.NAMESPACE_ID,
                 AGENCY_ID_LIST.IS_DEPRECATED,
+                iif(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
                 AGENCY_ID_LIST.STATE,
                 AGENCY_ID_LIST.CREATION_TIMESTAMP,
                 AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP,
@@ -129,6 +130,7 @@ public class JooqAgencyIdListReadRepository
                     (byte) 1 == e.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             agencyIdList.setDeprecated(e.get(AGENCY_ID_LIST.IS_DEPRECATED) == 1);
+            agencyIdList.setNewComponent(e.get(field("new_component", Boolean.class)));
             agencyIdList.setState(CcState.valueOf(e.get(AGENCY_ID_LIST.STATE)));
             agencyIdList.setReleaseState(e.get(RELEASE.STATE.as("release_state")));
             agencyIdList.setReleaseNum(e.get(RELEASE.RELEASE_NUM));
@@ -226,7 +228,13 @@ public class JooqAgencyIdListReadRepository
         }
 
         if (request.getDeprecated() != null) {
-            conditions.add(AGENCY_ID_LIST.IS_DEPRECATED.eq(request.getDeprecated() ? (byte) 1:0));
+            conditions.add(AGENCY_ID_LIST.IS_DEPRECATED.eq(request.getDeprecated() ? (byte) 1 : 0));
+        }
+
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ?
+                    AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull() :
+                    AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNotNull());
         }
 
         if (!request.getUpdaterUsernameList().isEmpty()) {

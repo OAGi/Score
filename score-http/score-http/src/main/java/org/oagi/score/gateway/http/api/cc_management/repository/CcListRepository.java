@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 
 import org.jooq.Record;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
 import org.oagi.score.gateway.http.api.cc_management.data.CcList;
@@ -171,6 +172,7 @@ public class CcListRepository {
             }
             ccList.setSixDigitId(row.getValue("six_digit_id", String.class));
             ccList.setDefaultValueDomain(row.getValue("default_value_domain", String.class));
+            ccList.setNewComponent(row.getValue("new_component", Byte.class) == 1);
             return ccList;
         });
 
@@ -216,6 +218,9 @@ public class CcListRepository {
         }
         if (request.getDeprecated() != null) {
             conditions.add(ACC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull() : ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(ACC.STATE.in(
@@ -332,7 +337,8 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 ACC_MANIFEST.BASED_ACC_MANIFEST_ID.as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain")
+                val((String) null).as("default_value_domain"),
+                iif(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
@@ -375,6 +381,9 @@ public class CcListRepository {
 
         if (request.getDeprecated() != null) {
             conditions.add(ASCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull() : ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(ASCC.STATE.in(
@@ -428,7 +437,8 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain")
+                val((String) null).as("default_value_domain"),
+                iif(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
@@ -473,6 +483,9 @@ public class CcListRepository {
 
         if (request.getDeprecated() != null) {
             conditions.add(BCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull() : BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(BCC.STATE.in(
@@ -526,7 +539,8 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain")
+                val((String) null).as("default_value_domain"),
+                iif(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
@@ -571,6 +585,9 @@ public class CcListRepository {
 
         if (request.getDeprecated() != null) {
             conditions.add(ASCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull() : ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(ASCCP.STATE.in(
@@ -636,7 +653,8 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain")
+                val((String) null).as("default_value_domain"),
+                iif(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
@@ -682,6 +700,9 @@ public class CcListRepository {
         conditions.add(BCCP.DEN.notContains("User Extension Group"));
         if (request.getDeprecated() != null) {
             conditions.add(BCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull() : BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(BCCP.STATE.in(
@@ -741,7 +762,8 @@ public class CcListRepository {
                 RELEASE.RELEASE_NUM,
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
-                val((String) null).as("default_value_domain")
+                val((String) null).as("default_value_domain"),
+                iif(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
@@ -799,6 +821,9 @@ public class CcListRepository {
         }
         if (request.getDeprecated() != null) {
             conditions.add(DT.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
+        }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ? DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull() : DT_MANIFEST.PREV_DT_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null) {
             conditions.add(DT.STATE.in(
@@ -864,7 +889,8 @@ public class CcListRepository {
                 concat(ifnull(CDT_PRI.NAME, ""),
                         ifnull(CODE_LIST.NAME, ""),
                         ifnull(AGENCY_ID_LIST.NAME, ""),
-                        ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain")
+                        ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain"),
+                iif(DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull(), true, false).as("new_component")
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(

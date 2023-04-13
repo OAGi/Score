@@ -159,3 +159,11 @@ mat-toolbar .mat-icon {
   padding: 0 8px;
   display: inline-block;
 }
+
+.new-component {
+  border: 2px dotted rgb(220, 20, 60);
+  font-size: 11px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
+}

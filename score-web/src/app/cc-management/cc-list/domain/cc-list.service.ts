@@ -53,6 +53,9 @@ export class CcListService {
     if (request.deprecated && request.deprecated.length === 1) {
       params = params.set('deprecated', '' + request.deprecated[0]);
     }
+    if (request.newComponent && request.newComponent.length === 1) {
+      params = params.set('newComponent', '' + request.newComponent[0]);
+    }
     if (request.commonlyUsed && request.commonlyUsed.length === 1) {
       params = params.set('commonlyUsed', '' + request.commonlyUsed[0]);
     }

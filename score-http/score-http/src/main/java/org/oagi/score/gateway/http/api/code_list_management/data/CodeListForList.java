@@ -25,6 +25,7 @@ public class CodeListForList {
     private String versionId;
     private boolean extensible;
     private boolean deprecated;
+    private boolean newComponent;
     private String revision;
     private String state;
     private AccessPrivilege access;

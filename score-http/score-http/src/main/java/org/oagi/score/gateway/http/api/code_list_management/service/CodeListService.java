@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.code_list_management.service;
 
+import org.jooq.Record;
 import org.jooq.*;
-import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.code_list_management.data.*;
@@ -24,8 +24,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.or;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 import static org.oagi.score.repo.api.bie.model.BieState.Production;
 import static org.oagi.score.repo.api.bie.model.BieState.QA;
@@ -44,12 +43,7 @@ public class CodeListService extends EventHandler {
     @Autowired
     private CodeListWriteRepository codeListWriteRepository;
 
-    private SelectOnConditionStep<Record22<
-            ULong, ULong, String, String, ULong,
-            String, String, ULong, String, String,
-            String, LocalDateTime, ULong, String, String,
-            Byte, String, Byte, String, String,
-            String, UInteger>> getSelectOnConditionStep(ULong defaultModuleSetReleaseId) {
+    private SelectOnConditionStep<Record> getSelectOnConditionStep(ULong defaultModuleSetReleaseId) {
         return dslContext.select(
                 CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
                 CODE_LIST.CODE_LIST_ID,
@@ -69,6 +63,7 @@ public class CodeListService extends EventHandler {
                 CODE_LIST.EXTENSIBLE_INDICATOR.as("extensible"),
                 CODE_LIST.STATE,
                 CODE_LIST.IS_DEPRECATED.as("deprecated"),
+                iif(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
                 CODE_LIST.DEFINITION,
                 CODE_LIST.DEFINITION_SOURCE,
                 MODULE.PATH.as("module_path"),
@@ -99,12 +94,7 @@ public class CodeListService extends EventHandler {
             defaultModuleSetReleaseId = defaultModuleSetRelease.getModuleSetReleaseId();
         }
 
-        SelectOnConditionStep<Record22<
-                ULong, ULong, String, String, ULong,
-                String, String, ULong, String, String,
-                String, LocalDateTime, ULong, String, String,
-                Byte, String, Byte, String, String,
-                String, UInteger>> step = getSelectOnConditionStep(defaultModuleSetReleaseId);
+        SelectOnConditionStep<Record> step = getSelectOnConditionStep(defaultModuleSetReleaseId);
 
         List<Condition> conditions = new ArrayList();
         conditions.add(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
@@ -142,6 +132,11 @@ public class CodeListService extends EventHandler {
         if (request.getDeprecated() != null) {
             conditions.add(CODE_LIST.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
+        if (request.getNewComponent() != null) {
+            conditions.add(request.getNewComponent() ?
+                    CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull() :
+                    CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNotNull());
+        }
         if (request.getExtensible() != null) {
             conditions.add(CODE_LIST.EXTENSIBLE_INDICATOR.eq((byte) (request.getExtensible() ? 1 : 0)));
         }
@@ -164,12 +159,7 @@ public class CodeListService extends EventHandler {
             conditions.add(APP_USER.as("owner").IS_DEVELOPER.eq(request.getOwnedByDeveloper() ? (byte) 1 : 0));
         }
 
-        SelectConnectByStep<Record22<
-                ULong, ULong, String, String, ULong,
-                String, String, ULong, String, String,
-                String, LocalDateTime, ULong, String, String,
-                Byte, String, Byte, String, String,
-                String, UInteger>> conditionStep = step;
+        SelectConnectByStep<Record> conditionStep = step;
         if (!conditions.isEmpty()) {
             conditionStep = step.where(conditions);
         }
@@ -200,12 +190,7 @@ public class CodeListService extends EventHandler {
         }
 
 
-        SelectWithTiesAfterOffsetStep<Record22<
-                ULong, ULong, String, String, ULong,
-                String, String, ULong, String, String,
-                String, LocalDateTime, ULong, String, String,
-                Byte, String, Byte, String, String,
-                String, UInteger>> offsetStep = null;
+        SelectWithTiesAfterOffsetStep<Record> offsetStep = null;
         if (sortField != null) {
             offsetStep = conditionStep.orderBy(sortField)
                     .limit(pageRequest.getOffset(), pageRequest.getPageSize());

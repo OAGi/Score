@@ -63,6 +63,8 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
 
     private boolean deprecated;
 
+    private boolean newComponent;
+
     private BigInteger prevAgencyIdListId;
 
     private BigInteger nextAgencyIdListId;
@@ -267,6 +269,14 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    public boolean isNewComponent() {
+        return newComponent;
+    }
+
+    public void setNewComponent(boolean newComponent) {
+        this.newComponent = newComponent;
     }
 
     public BigInteger getPrevAgencyIdListId() {

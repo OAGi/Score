@@ -20,6 +20,7 @@ public class CodeListForListRequest {
     private AccessPrivilege access;
     private List<CcState> states = Collections.emptyList();
     private Boolean deprecated;
+    private Boolean newComponent;
     private Boolean extensible;
     private Boolean ownedByDeveloper;
     private List<BigInteger> namespaces;
