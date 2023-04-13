@@ -14,6 +14,7 @@ import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,6 +206,49 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         assertTrue(codeListPublished.getState().equals("Published"));
         assertTrue(owner.isDeveloper());
         assertDoesNotThrow(() -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+    }
+    @Test
+    @DisplayName("TC_17_2_TA_6")
+    public void test_TA_6() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create end-user Code List for a particular release branch. States - WIP, Draft and Production
+             */
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, euNamespace, branch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, endUserB);
+            codeListForTesting.add(codeListWIP);
+
+            CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, euNamespace, branch, "Draft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, endUserB);
+            codeListForTesting.add(codeListDraft);
+
+            CodeListObject codeListProduction = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, euNamespace, branch, "Production");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListProduction, endUserB);
+            codeListForTesting.add(codeListProduction);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        for (CodeListObject cl: codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
+            assertFalse(owner.isDeveloper());
+            assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
+        }
     }
 
     @AfterEach
