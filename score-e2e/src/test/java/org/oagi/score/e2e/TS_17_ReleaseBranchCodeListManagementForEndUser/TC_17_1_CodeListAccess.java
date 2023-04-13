@@ -7,19 +7,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_17_1_CodeListAccess extends BaseTest {
@@ -116,6 +121,100 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             }else{
                 assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
             }
+        }
+    }
+    @Test
+    @DisplayName("TC_17_1_TA_2")
+    public void test_TA_2() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            /**
+             * Create end-user Code List for a particular release branch in WIP state.
+             */
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserA, euNamespace, branch, "WIP");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, endUserA);
+            codeListForTesting.add(codeListWIP);
+            codeListValuesMap.put(codeListWIP, value);
+        }
+
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        for (CodeListObject cl : codeListForTesting) {
+            assertEquals(endUserA.getAppUserId(), cl.getOwnerUserId());
+            assertFalse(endUserA.isDeveloper());
+            assertTrue(cl.getState().equals("WIP"));
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            editCodeListPage.setDefinition("new definition");
+            editCodeListPage.setDefinitionSource("new definition source");
+            editCodeListPage.setName("new name");
+            editCodeListPage.setVersion("new version");
+
+            CodeListValueObject value = codeListValuesMap.get(cl);
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
+            editCodeListValueDialog.setMeaning("new meaning");
+            editCodeListValueDialog.hitSaveButton();
+
+            editCodeListValueDialog = editCodeListPage.addCodeListValue();
+            editCodeListValueDialog.setCode("newly added value code");
+            editCodeListValueDialog.setMeaning("newly added value meaning");
+            editCodeListValueDialog.hitAddButton();
+            editCodeListPage.hitUpdateButton();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_17_1_TA_3")
+    public void test_TA_3() {
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
+        AppUserObject endUserB;
+        ReleaseObject branch;
+        {
+            AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            /**
+             * Create end-user Code List for a particular release branch in WIP state.
+             */
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserA, euNamespace, branch, "WIP");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, endUserA);
+            codeListForTesting.add(codeListWIP);
+            codeListValuesMap.put(codeListWIP, value);
+        }
+
+        HomePage homePage = loginPage().signIn(endUserB.getLoginId(), endUserB.getPassword());
+        for (CodeListObject cl : codeListForTesting) {
+            assertNotEquals(endUserB.getAppUserId(), cl.getOwnerUserId());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
+            assertFalse(owner.isDeveloper());
+            assertTrue(cl.getState().equals("WIP"));
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            assertDisabled(editCodeListPage.getCodeListNameField());
+            assertDisabled(editCodeListPage.getDefinitionField());
+            assertDisabled(editCodeListPage.getDefinitionSourceField());
+            assertDisabled(editCodeListPage.getVersionField());
+            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            CodeListValueObject value = codeListValuesMap.get(cl);
+            assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
+            AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
+            addCommentDialog.setComment("test comment");
+            escape(getDriver());
         }
     }
 
