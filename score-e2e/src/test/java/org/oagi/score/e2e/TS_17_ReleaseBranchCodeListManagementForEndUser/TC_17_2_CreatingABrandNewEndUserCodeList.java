@@ -17,9 +17,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -280,7 +278,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branchTwo.getReleaseNumber());
-        assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+        assertDoesNotThrow(() -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
     }
 
     @AfterEach
