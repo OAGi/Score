@@ -151,6 +151,31 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         editCodeListPage.removeCodeListValue();
         editCodeListPage.hitUpdateButton();
     }
+    @Test
+    @DisplayName("TC_17_2_TA_4")
+    public void test_TA_4() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        NamespaceObject namespaceEU;
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setBranch(branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(endUserA, branch.getReleaseNumber());
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUserA, branch.getReleaseNumber());
+        editCodeListPage.setVersion("test version");
+        editCodeListPage.setNamespace(namespaceEU);
+        editCodeListPage.hitUpdateButton();
+        assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
+        String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
+        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
+    }
 
     @AfterEach
     public void tearDown() {
