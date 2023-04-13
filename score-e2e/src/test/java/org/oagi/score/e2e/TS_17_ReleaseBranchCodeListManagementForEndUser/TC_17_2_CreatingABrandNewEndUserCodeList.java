@@ -250,6 +250,38 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
         }
     }
+    @Test
+    @DisplayName("TC_17_2_TA_7")
+    public void test_TA_7() {
+        AppUserObject endUserA;
+        AppUserObject developerA;
+        ReleaseObject branchTwo;
+        CodeListObject codeListPublished;
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            ReleaseObject branchOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            branchTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            ReleaseObject branchThree = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
+
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            /**
+             * Create Published developer Code List for a particular release branch.
+             */
+            codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, branchOne, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+            CodeListObject revisedCodeList = getAPIFactory().getCodeListAPI().createRevisionOfACodeListAndPublishInAnotherRelease(codeListPublished, branchTwo, developerA, 2);
+            getAPIFactory().getCodeListAPI().createRevisionOfACodeListAndPublishInAnotherRelease(revisedCodeList, branchThree, developerA, 3);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branchTwo.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+    }
 
     @AfterEach
     public void tearDown() {
