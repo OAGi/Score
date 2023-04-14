@@ -9,6 +9,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
+import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
+import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -16,6 +19,7 @@ import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
@@ -305,6 +309,58 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         editCodeListValueDialog.setDefinition("added definition");
         assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
         editCodeListValueDialog.hitSaveButton();
+        editCodeListPage.hitUpdateButton();
+    }
+
+    @Test
+    @DisplayName("TC_17_3_TA_8")
+    public void test_TA_8() {
+        AppUserObject endUser;
+        ReleaseObject branch;
+        CodeListObject codeList;
+        NamespaceObject namespaceEU;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+            /**
+             * Create derived WIP end-user Code List for a particular release branch.
+             */
+            codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUser, namespaceEU, branch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openNewAgencyIDList(endUser, branch.getReleaseNumber());
+        waitFor(ofMillis(1000L));
+        editAgencyIDListPage.setName("TestAgencyIDList");
+        editAgencyIDListPage.setNamespace(namespaceEU);
+        editAgencyIDListPage.setDefinition("some definition");
+        editAgencyIDListPage.setVersion("some version");
+
+        EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
+        editAgencyIDListValueDialog.setValue("value");
+        editAgencyIDListValueDialog.setMeaning("value meaning");
+        editAgencyIDListValueDialog.setDefinition("value definition");
+        editAgencyIDListValueDialog.setDefinitionSource("value definition source");
+        editAgencyIDListValueDialog.hitAddButton();
+        editAgencyIDListPage.hitUpdateButton();
+        editAgencyIDListPage.moveToQA();
+        editAgencyIDListPage.moveToProduction();
+
+        AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().getNewlyCreatedAgencyIDList(endUser, branch.getReleaseNumber());
+        ArrayList<AgencyIDListValueObject> agencyIDListValues = getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDList);
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(agencyIDList.getOwnerUserId());
+        assertTrue(agencyIDList.getState().equals("Production"));
+        assertFalse(owner.isDeveloper());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        editCodeListPage.setAgencyIDList(agencyIDList);
+        editCodeListPage.setAgencyIDListValue(agencyIDListValues.get(0));
         editCodeListPage.hitUpdateButton();
     }
 

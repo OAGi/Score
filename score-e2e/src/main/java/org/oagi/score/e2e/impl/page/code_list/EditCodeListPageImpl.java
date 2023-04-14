@@ -2,6 +2,8 @@ package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -443,5 +445,27 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getRestoreButton() {
         return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void setAgencyIDList(AgencyIDListObject agencyIDList) {
+        retry(() -> {
+            click(getAgencyIDListField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDList.getName() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue) {
+        retry(() -> {
+            click(getAgencyIDListValueField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDListValue.getValue() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
     }
 }

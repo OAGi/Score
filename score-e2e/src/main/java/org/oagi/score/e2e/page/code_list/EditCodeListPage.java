@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.page.code_list;
 
+import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
@@ -108,4 +110,8 @@ public interface EditCodeListPage extends Page {
     WebElement getRemarkField();
 
     WebElement getAgencyIDListValueField();
+
+    void setAgencyIDList(AgencyIDListObject agencyIDList);
+
+    void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue);
 }
