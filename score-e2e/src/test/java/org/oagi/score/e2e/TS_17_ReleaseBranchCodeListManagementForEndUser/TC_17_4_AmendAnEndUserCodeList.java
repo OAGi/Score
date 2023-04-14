@@ -286,6 +286,62 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+    @Test
+    @DisplayName("TC_17_4_TA_5")
+    public void test_TA_5() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListValueObject> values = new ArrayList<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
+                    getCodeListByCodeListNameAndReleaseNum("oacl_ResponseCode", branch.getReleaseNumber());
+            values = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(baseCodeList.getCodeListManifestId());
+
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createDerivedCodeList(baseCodeList, endUserB, namespaceEUB, branch, "Production");
+            codeListForTesting.add(codeList);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+
+            CodeListValueObject value = values.get(0);
+            editCodeListPage.selectCodeListValue(value.getValue());
+            assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
+            editCodeListValueDialog.setMeaning("new meaning for value");
+            editCodeListValueDialog.setDefinition("new definition for value");
+            editCodeListValueDialog.setDefinitionSource("new definition source for value");
+            boolean previousDeprecatedStatusForValue = value.isDeprecated();
+            if (previousDeprecatedStatusForValue == true){
+                assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
+            }else{
+                assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                editCodeListValueDialog.toggleDeprecated();
+            }
+            editCodeListValueDialog.hitSaveButton();
+            editCodeListPage.hitUpdateButton();
+        }
+    }
 
     @AfterEach
     public void tearDown() {
