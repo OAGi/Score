@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_17_ReleaseBranchCodeListManagementForEndUser;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,13 +9,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -486,6 +494,114 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             CodeListValueObject oldValue = codeListValueMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.valueExists(oldValue.getValue()));
             assertThrows(TimeoutException.class, () -> {editCodeListPage.valueExists(newValueCode);});
+        }
+    }
+
+    @Test
+    @DisplayName("TC_17_4_TA_9")
+    public void test_TA_9() {
+        AppUserObject endUserA;
+        AppUserObject developer;
+        ReleaseObject branch;
+        NamespaceObject namespace;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            developer = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, namespaceEUB, branch, "Production");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
+            codeListForTesting.add(codeList);
+
+            CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
+                    getCodeListByCodeListNameAndReleaseNum("oacl_ResponseCode", branch.getReleaseNumber());
+
+            codeList = getAPIFactory().getCodeListAPI().
+                    createDerivedCodeList(baseCodeList, endUserB, namespaceEUB, branch, "Production");
+            codeListForTesting.add(codeList);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting) {
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+            String newValueCode = "new value code";
+            editCodeListValueDialog.setCode(newValueCode);
+            editCodeListValueDialog.setMeaning("new value meaning");
+            editCodeListValueDialog.hitAddButton();
+            editCodeListPage.hitUpdateButton();
+
+            /**
+             * Prepare Core Components and Business Context
+             */
+            ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, branch, namespace, "Published");
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", branch.getReleaseNumber());
+            BCCPObject bccp = getAPIFactory().getCoreComponentAPI().createRandomBCCP(dataType, developer, namespace, "Published");
+            getAPIFactory().getCoreComponentAPI().appendBCC(acc, bccp, "Published");
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, developer, namespace, "Published");
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUserA);
+
+            ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+            CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+            CreateBIEForSelectTopLevelConceptPage selectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(List.of(context));
+            EditBIEPage editBIEPage = selectTopLevelConceptPage.createBIE(asccp.getDen(), branch.getReleaseNumber());
+            WebElement node = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+            assertTrue(node.isDisplayed());
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            waitFor(Duration.ofMillis(2000));
+            bbiePanel.toggleUsed();
+            bbiePanel.setValueDomainRestriction("Code");
+            bbiePanel.setValueDomain(cl.getName());
+            editBIEPage.hitUpdateButton();
+
+            ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
+
+            TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByDENAndReleaseNum(asccp.getDen(), branch.getReleaseNumber());
+            expressBIEPage.selectBIEForExpression(topLevelAsbiep);
+            expressBIEPage.selectJSONSchemaExpression();
+            File file = null;
+            try {
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(file);
+                JsonNode rootNode = root.path("definitions");
+                List<JsonNode> values = rootNode.findValues("enum");
+                JsonNode value = values.get(0);
+                ArrayList<String> jsonValues = new ArrayList<>();
+                for (int i=0; i<value.size(); i++){
+                    jsonValues.add(value.get(i).asText());
+                }
+                List<CodeListValueObject> codeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(cl.getCodeListManifestId());
+                for (CodeListValueObject codeListalue : codeListValues){
+                    assertTrue(jsonValues.contains(codeListalue.getValue()));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (file != null) {
+                    file.delete();
+                }
+            }
+
         }
     }
 
