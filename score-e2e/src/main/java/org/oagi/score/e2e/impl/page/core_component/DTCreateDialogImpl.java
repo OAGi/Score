@@ -104,7 +104,7 @@ public class DTCreateDialogImpl implements DTCreateDialog {
         return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
     }
     private String getDENFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override

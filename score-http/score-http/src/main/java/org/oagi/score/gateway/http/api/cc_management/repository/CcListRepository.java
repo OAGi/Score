@@ -2,15 +2,17 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 
 import org.jooq.Record;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
+import org.oagi.score.gateway.http.api.cc_management.data.CcChangesResponse;
 import org.oagi.score.gateway.http.api.cc_management.data.CcList;
 import org.oagi.score.gateway.http.api.cc_management.data.CcListRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
+import org.oagi.score.gateway.http.api.tag_management.data.ShortTag;
 import org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetReleaseRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.OagisComponentType;
@@ -931,5 +933,223 @@ public class CcListRepository {
                 .leftJoin(CDT_AWD_PRI.as("awd_pri_for_cdt")).on(and(DT.DT_ID.eq(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_ID), CDT_AWD_PRI.as("awd_pri_for_cdt").IS_DEFAULT.eq((byte) 1)))
                 .leftJoin(CDT_PRI.as("pri_for_cdt")).on(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_PRI_ID.eq(CDT_PRI.as("pri_for_cdt").CDT_PRI_ID))
                 .where(conditions);
+    }
+
+    public Collection<CcChangesResponse.CcChange> getCcChanges(ScoreUser requester, ULong releaseId) {
+        List<CcChangesResponse.CcChange> response = new ArrayList<>();
+
+        Map<ULong, CcChangesResponse.CcChange> accChangesMap = new HashMap<>();
+        dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(ACC_MANIFEST)
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .leftJoin(ACC_MANIFEST_TAG).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST_TAG.ACC_MANIFEST_ID))
+                .leftJoin(TAG).on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(releaseId),
+                        ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(ACC_MANIFEST.ACC_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (accChangesMap.containsKey(manifestId)) {
+                        ccChange = accChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("ACC", manifestId.toBigInteger(),
+                                record.get(ACC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        accChangesMap.put(manifestId, ccChange);
+                    }
+
+                    ULong tagId = record.get(TAG.TAG_ID);
+                    if (tagId != null) {
+                        ShortTag tag = new ShortTag();
+                        tag.setTagId(tagId.toBigInteger());
+                        tag.setName(record.get(TAG.NAME));
+                        tag.setTextColor(record.get(TAG.TEXT_COLOR));
+                        tag.setBackgroundColor(record.get(TAG.BACKGROUND_COLOR));
+                        ccChange.addTag(tag);
+                    }
+                });
+        response.addAll(accChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> asccpChangesMap = new HashMap<>();
+        dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(ASCCP_MANIFEST)
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .leftJoin(ASCCP_MANIFEST_TAG).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
+                .leftJoin(TAG).on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
+                .where(and(
+                        ASCCP_MANIFEST.RELEASE_ID.eq(releaseId),
+                        ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (asccpChangesMap.containsKey(manifestId)) {
+                        ccChange = asccpChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("ASCCP", manifestId.toBigInteger(),
+                                record.get(ASCCP.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        asccpChangesMap.put(manifestId, ccChange);
+                    }
+
+                    ULong tagId = record.get(TAG.TAG_ID);
+                    if (tagId != null) {
+                        ShortTag tag = new ShortTag();
+                        tag.setTagId(tagId.toBigInteger());
+                        tag.setName(record.get(TAG.NAME));
+                        tag.setTextColor(record.get(TAG.TEXT_COLOR));
+                        tag.setBackgroundColor(record.get(TAG.BACKGROUND_COLOR));
+                        ccChange.addTag(tag);
+                    }
+                });
+        response.addAll(asccpChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> bccpChangesMap = new HashMap<>();
+        dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(BCCP_MANIFEST)
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .leftJoin(BCCP_MANIFEST_TAG).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID))
+                .leftJoin(TAG).on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(releaseId),
+                        BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(BCCP_MANIFEST.BCCP_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (bccpChangesMap.containsKey(manifestId)) {
+                        ccChange = bccpChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("BCCP", manifestId.toBigInteger(),
+                                record.get(BCCP.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        bccpChangesMap.put(manifestId, ccChange);
+                    }
+
+                    ULong tagId = record.get(TAG.TAG_ID);
+                    if (tagId != null) {
+                        ShortTag tag = new ShortTag();
+                        tag.setTagId(tagId.toBigInteger());
+                        tag.setName(record.get(TAG.NAME));
+                        tag.setTextColor(record.get(TAG.TEXT_COLOR));
+                        tag.setBackgroundColor(record.get(TAG.BACKGROUND_COLOR));
+                        ccChange.addTag(tag);
+                    }
+                });
+        response.addAll(bccpChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> asccChangesMap = new HashMap<>();
+        dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC.DEN)
+                .from(ASCC_MANIFEST)
+                .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(releaseId),
+                        ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(ASCC_MANIFEST.ASCC_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (asccChangesMap.containsKey(manifestId)) {
+                        ccChange = asccChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("ASCC", manifestId.toBigInteger(),
+                                record.get(ASCC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        asccChangesMap.put(manifestId, ccChange);
+                    }
+                });
+        response.addAll(asccChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> bccChangesMap = new HashMap<>();
+        dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC.DEN)
+                .from(BCC_MANIFEST)
+                .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                .where(and(
+                        BCC_MANIFEST.RELEASE_ID.eq(releaseId),
+                        BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(BCC_MANIFEST.BCC_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (bccChangesMap.containsKey(manifestId)) {
+                        ccChange = bccChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("BCC", manifestId.toBigInteger(),
+                                record.get(BCC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        bccChangesMap.put(manifestId, ccChange);
+                    }
+                });
+        response.addAll(bccChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> dtChangesMap = new HashMap<>();
+        dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT.DEN,
+                        TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .leftJoin(DT_MANIFEST_TAG).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST_TAG.DT_MANIFEST_ID))
+                .leftJoin(TAG).on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(releaseId),
+                        DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(DT_MANIFEST.DT_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (dtChangesMap.containsKey(manifestId)) {
+                        ccChange = dtChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("DT", manifestId.toBigInteger(),
+                                record.get(DT.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        dtChangesMap.put(manifestId, ccChange);
+                    }
+
+                    ULong tagId = record.get(TAG.TAG_ID);
+                    if (tagId != null) {
+                        ShortTag tag = new ShortTag();
+                        tag.setTagId(tagId.toBigInteger());
+                        tag.setName(record.get(TAG.NAME));
+                        tag.setTextColor(record.get(TAG.TEXT_COLOR));
+                        tag.setBackgroundColor(record.get(TAG.BACKGROUND_COLOR));
+                        ccChange.addTag(tag);
+                    }
+                });
+        response.addAll(dtChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> codeListChangesMap = new HashMap<>();
+        dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID, CODE_LIST.NAME)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId),
+                        CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (codeListChangesMap.containsKey(manifestId)) {
+                        ccChange = codeListChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("CODE_LIST", manifestId.toBigInteger(),
+                                record.get(CODE_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        codeListChangesMap.put(manifestId, ccChange);
+                    }
+                });
+        response.addAll(codeListChangesMap.values());
+
+        Map<ULong, CcChangesResponse.CcChange> agencyIdListChangesMap = new HashMap<>();
+        dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST.NAME)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId),
+                        AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull()))
+                .fetchStream().forEach(record -> {
+                    ULong manifestId = record.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
+                    CcChangesResponse.CcChange ccChange;
+                    if (agencyIdListChangesMap.containsKey(manifestId)) {
+                        ccChange = agencyIdListChangesMap.get(manifestId);
+                    } else {
+                        ccChange = new CcChangesResponse.CcChange("AGENCY_ID_LIST", manifestId.toBigInteger(),
+                                record.get(AGENCY_ID_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                        agencyIdListChangesMap.put(manifestId, ccChange);
+                    }
+                });
+        response.addAll(agencyIdListChangesMap.values());
+
+        return response;
     }
 }

@@ -353,3 +353,15 @@ export class SummaryCcExtInfo {
   ccExtByUsersAndStates: Map<string, Map<string, number>>;
   myExtensionsUnusedInBIEs: SummaryCcExt[];
 }
+
+export class CcChangeResponse {
+  ccChangeList: CcChange[];
+}
+
+export class CcChange {
+  type: string;
+  manifestId; number;
+  den: string;
+  changeType: string;
+  tagList: ShortTag[];
+}
