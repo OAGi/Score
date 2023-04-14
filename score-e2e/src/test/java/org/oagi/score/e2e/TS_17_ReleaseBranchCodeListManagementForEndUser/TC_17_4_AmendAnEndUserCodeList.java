@@ -148,6 +148,82 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_17_4_TA_3")
+    public void test_TA_3() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEUA = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, namespaceEUB, branch, "Production");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+
+            codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserA, namespaceEUA, branch, "Production");
+            codeList.setDeprecated(true);
+            getAPIFactory().getCodeListAPI().updateCodeList(codeList);
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserA);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            /**
+             * Test Assertion #17.4.3.a
+             */
+            if (cl.isDeprecated()){
+                assertDisabled(editCodeListPage.getDeprecatedSelectField());
+            }else{
+                assertEnabled(editCodeListPage.getDeprecatedSelectField());
+                editCodeListPage.toggleDeprecated();
+            }
+            /**
+             * Test Assertion #17.4.3.b
+             */
+            assertDisabled(editCodeListPage.getNamespaceSelectField());
+            assertDisabled(editCodeListPage.getListIDField());
+            assertDisabled(editCodeListPage.getAgencyIDListField());
+            String versionAfterAmendment = cl.getVersionId()+"_New";
+            assertTrue(getText(editCodeListPage.getVersionField()).equals(versionAfterAmendment));
+            assertEnabled(editCodeListPage.getVersionField());
+            editCodeListPage.setVersion("something new");
+            /**
+             * Test Assertion #17.4.3.c
+             */
+            assertEnabled(editCodeListPage.getDefinitionField());
+            editCodeListPage.setDefinition("new definition");
+            assertEnabled(editCodeListPage.getDefinitionSourceField());
+            editCodeListPage.setDefinitionSource("new definition source");
+            assertEnabled(editCodeListPage.getRemarkField());
+            editCodeListPage.setRemark("new remark");
+            editCodeListPage.hitUpdateButton();
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

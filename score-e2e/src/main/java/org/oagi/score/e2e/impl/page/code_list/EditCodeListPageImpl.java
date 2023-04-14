@@ -485,4 +485,14 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getAmendButton() {
         return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
     }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedSelectField());
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        sendKeys(getRemarkField(), remark);
+    }
 }

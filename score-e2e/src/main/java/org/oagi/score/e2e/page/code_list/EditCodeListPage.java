@@ -118,4 +118,8 @@ public interface EditCodeListPage extends Page {
     void hitAmendButton();
 
     WebElement getAmendButton();
+
+    void toggleDeprecated();
+
+    void setRemark(String remark);
 }
