@@ -432,6 +432,63 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_17_4_TA_8")
+    public void test_TA_8() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, namespaceEUB, branch, "Production");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            editCodeListPage.setDefinition("new definition");
+            editCodeListPage.setDefinitionSource("new definition source");
+            editCodeListPage.setVersion("new version");
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+            String newValueCode = "new value code";
+            editCodeListValueDialog.setCode(newValueCode);
+            editCodeListValueDialog.setMeaning("new value meaning");
+            editCodeListValueDialog.hitAddButton();
+            editCodeListPage.hitUpdateButton();
+
+            editCodeListPage.hitCancelButton();
+            assertEquals(cl.getState(), getText(editCodeListPage.getStateField()));
+            assertEquals(previousRevisionNumber, Integer.valueOf(getText(editCodeListPage.getRevisionField())));
+            assertEquals(cl.getVersionId(), getText(editCodeListPage.getVersionField()));
+            assertEquals(cl.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+            assertEquals(cl.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+            CodeListValueObject oldValue = codeListValueMap.get(cl);
+            assertDoesNotThrow(() -> editCodeListPage.valueExists(oldValue.getValue()));
+            assertThrows(TimeoutException.class, () -> {editCodeListPage.valueExists(newValueCode);});
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
