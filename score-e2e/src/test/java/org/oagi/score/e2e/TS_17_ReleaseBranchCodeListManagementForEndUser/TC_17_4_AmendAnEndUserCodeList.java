@@ -12,6 +12,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,6 +107,44 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             }
             assertEquals(value.isDeprecated(), deprecated);
             escape(getDriver());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_17_4_TA_2")
+    public void test_TA_2() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            /**
+             * Create Published developer Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developer, namespace, branch, "Published");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developer);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
+            assertTrue(owner.isDeveloper());
+            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitAmendButton();});
+
         }
     }
 
