@@ -389,6 +389,48 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+    @Test
+    @DisplayName("TC_17_4_TA_7")
+    public void test_TA_7() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, namespaceEUB, branch, "Production");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
+            codeListForTesting.add(codeList);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
+            String newValueCode = "new value code";
+            editCodeListValueDialog.setCode(newValueCode);
+            editCodeListValueDialog.setMeaning("new value meaning");
+            editCodeListValueDialog.hitAddButton();
+            editCodeListPage.selectCodeListValue(newValueCode);
+            editCodeListPage.removeCodeListValue();
+        }
+    }
 
     @AfterEach
     public void tearDown() {
