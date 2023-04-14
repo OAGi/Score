@@ -119,4 +119,9 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     public WebElement getSaveButton() {
         return elementToBeClickable(getDriver(), SAVE_BUTTON_LOCATOR);
     }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedSelectField());
+    }
 }

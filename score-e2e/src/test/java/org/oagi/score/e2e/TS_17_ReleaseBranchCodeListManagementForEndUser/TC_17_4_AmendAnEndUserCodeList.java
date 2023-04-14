@@ -223,6 +223,69 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+    @Test
+    @DisplayName("TC_17_4_TA_4")
+    public void test_TA_4() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEUA = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+
+            /**
+             * Create Production end-user Code List for a particular release branch.
+             */
+            CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserB, namespaceEUB, branch, "Production");
+            CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+
+            codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUserA, namespaceEUA, branch, "Production");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserA);
+            value.setDeprecated(true);
+            getAPIFactory().getCodeListValueAPI().updateCodeListValue(value);
+            codeListForTesting.add(codeList);
+            codeListValueMap.put(codeList, value);
+        }
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+
+        for (CodeListObject cl : codeListForTesting){
+            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
+            editCodeListPage.hitAmendButton();
+            assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
+            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+
+            CodeListValueObject value = codeListValueMap.get(cl);
+            editCodeListPage.selectCodeListValue(value.getValue());
+            assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
+            EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
+            editCodeListValueDialog.setMeaning("new meaning for value");
+            editCodeListValueDialog.setDefinition("new definition for value");
+            editCodeListValueDialog.setDefinitionSource("new definition source for value");
+            boolean previousDeprecatedStatusForValue = value.isDeprecated();
+            if (previousDeprecatedStatusForValue == true){
+                assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
+            }else{
+                assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                editCodeListValueDialog.toggleDeprecated();
+            }
+            editCodeListValueDialog.hitSaveButton();
+            editCodeListPage.hitUpdateButton();
+        }
+    }
 
     @AfterEach
     public void tearDown() {
