@@ -963,7 +963,8 @@ public class XMLExportSchemaModuleVisitor {
                 BccRecord bcc = dataProvider.findBCC(bccManifest.getBccId());
                 BccpManifestRecord bccpManifest = dataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
                 BccpRecord bccp = dataProvider.findBCCP(bccpManifest.getBccpId());
-                DtRecord bdt = dataProvider.findDT(bccp.getBdtId());
+                DtManifestRecord dtManifestRecord = dataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
+                DtRecord bdt = dataProvider.findDT(dtManifestRecord.getDtId());
 
                 if (bcc.getEntityType() == 0) {
                     Element attributeElement = new Element("attribute", XSD_NS);
