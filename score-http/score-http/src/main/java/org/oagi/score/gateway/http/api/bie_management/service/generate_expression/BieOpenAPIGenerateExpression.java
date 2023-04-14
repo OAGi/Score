@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
-import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -273,7 +272,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (isFriendly()) {
                     schemaName = prefix + bieName;
                 } else {
-                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
                 }
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
@@ -322,7 +321,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = new LinkedHashMap();
                     // Issue #1148
-                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
                     properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
                     properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
                     properties.put("required", new ArrayList());
@@ -343,7 +342,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (isFriendly()) {
                     schemaName = prefix + bieName;
                 } else {
-                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
                 }
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
@@ -380,7 +379,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = new LinkedHashMap();
                     // Issue #1148
-                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
                     properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
                     properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
                     properties.put("required", new ArrayList());
