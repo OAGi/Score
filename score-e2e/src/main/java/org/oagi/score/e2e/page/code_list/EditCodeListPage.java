@@ -114,4 +114,8 @@ public interface EditCodeListPage extends Page {
     void setAgencyIDList(AgencyIDListObject agencyIDList);
 
     void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue);
+
+    void hitAmendButton();
+
+    WebElement getAmendButton();
 }
