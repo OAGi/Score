@@ -317,7 +317,7 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
         });
     }
     private String getDENFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override
