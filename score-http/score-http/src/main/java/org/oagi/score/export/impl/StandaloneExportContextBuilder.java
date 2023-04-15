@@ -206,11 +206,13 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             parentSchemaModule.addNamespace(schemaModule.getNamespace());
         }
 
-        NamespaceRecord baseNamespace = releaseDataProvider.findNamespace(baseDataType.getNamespaceId());
-        SchemaModule baseSchemaModule = getModuleByNamespace(baseNamespace);
-        if (baseSchemaModule != null && !baseSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
-            schemaModule.addImport(baseSchemaModule);
-            schemaModule.addNamespace(baseSchemaModule.getNamespace());
+        if (baseDataType.getBasedDtId() != null) { // if baseDataType is not CDT
+            NamespaceRecord baseNamespace = releaseDataProvider.findNamespace(baseDataType.getNamespaceId());
+            SchemaModule baseSchemaModule = getModuleByNamespace(baseNamespace);
+            if (baseSchemaModule != null && !baseSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                schemaModule.addImport(baseSchemaModule);
+                schemaModule.addNamespace(baseSchemaModule.getNamespace());
+            }
         }
 
         List<DtScManifestRecord> dtScManifestList =
