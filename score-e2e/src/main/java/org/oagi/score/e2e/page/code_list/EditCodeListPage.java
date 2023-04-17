@@ -122,4 +122,8 @@ public interface EditCodeListPage extends Page {
     void toggleDeprecated();
 
     void setRemark(String remark);
+
+    void moveToQA();
+
+    WebElement getMoveToQAButton();
 }

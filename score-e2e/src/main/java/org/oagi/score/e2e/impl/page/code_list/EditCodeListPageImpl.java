@@ -49,6 +49,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By BACK_TO_WIP_BUTTON_LOCATOR =
@@ -494,5 +496,20 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public void setRemark(String remark) {
         sendKeys(getRemarkField(), remark);
+    }
+
+    @Override
+    public void moveToQA() {
+        retry(() -> {
+            click(getMoveToQAButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getMoveToQAButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
     }
 }
