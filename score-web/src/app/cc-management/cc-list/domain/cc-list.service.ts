@@ -2,7 +2,7 @@ import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
+import {Acc, Ascc, Asccp, Bcc, Bccp, CcChangeResponse, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
 import {CcDtNodeDetail, OagisComponentType, XbtForList} from '../../domain/core-component-node';
@@ -53,6 +53,9 @@ export class CcListService {
     if (request.deprecated && request.deprecated.length === 1) {
       params = params.set('deprecated', '' + request.deprecated[0]);
     }
+    if (request.newComponent && request.newComponent.length === 1) {
+      params = params.set('newComponent', '' + request.newComponent[0]);
+    }
     if (request.commonlyUsed && request.commonlyUsed.length === 1) {
       params = params.set('commonlyUsed', '' + request.commonlyUsed[0]);
     }
@@ -100,6 +103,10 @@ export class CcListService {
     } else {
       return this.http.get<PageResponse<CcList>>('/api/core_component', {params});
     }
+  }
+
+  getCcChanges(releaseId: number): Observable<CcChangeResponse> {
+    return this.http.get<CcChangeResponse>('/api/core_component/changes_in_release/' + releaseId);
   }
 
   getAsccp(id): Observable<Asccp> {

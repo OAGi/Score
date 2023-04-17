@@ -72,20 +72,18 @@
       </button>
 
       <button (click)="validateSchemas()"
-              *ngIf="roles.includes('developer')"
               color="accent" mat-raised-button>
         Validate
       </button>
 
       <button (click)="exportSchemas()"
-              *ngIf="roles.includes('developer')"
               color="primary" mat-raised-button>
         Export
       </button>
 
       <button (click)="assignCCs()"
               color="primary" mat-raised-button>
-        Assign CCs
+        {{ roles.includes('developer') ? 'Assign CCs' : 'View Assigned CCs' }}
       </button>
     </div>
   </div>

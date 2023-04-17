@@ -303,14 +303,14 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         String name = "type_" + guid;
 
         Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getMinLength() != null) {
-            content.put("minLength", facetRestri.getMinLength().longValue());
+        if (facetRestri.getFacetMinLength() != null) {
+            content.put("minLength", facetRestri.getFacetMinLength().longValue());
         }
-        if (facetRestri.getMaxLength() != null) {
-            content.put("maxLength", facetRestri.getMaxLength().longValue());
+        if (facetRestri.getFacetMaxLength() != null) {
+            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
-        if (StringUtils.hasLength(facetRestri.getPattern())) {
-            content.put("pattern", facetRestri.getPattern());
+        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            content.put("pattern", facetRestri.getFacetPattern());
         }
 
         definitions.put(name, content);
@@ -642,7 +642,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = Helper.getXbt(generationContext, bdtPriRestri);
                 }
 
-                if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
                     ref = fillDefinitions(definitions, xbt, bbie);
                 } else {
                     ref = fillDefinitions(definitions, xbt);
@@ -720,7 +720,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 }
 
-                if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
+                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
                     ref = fillDefinitions(definitions, xbt, bbieSc);
                 } else {
                     ref = fillDefinitions(definitions, xbt);

@@ -850,7 +850,7 @@ public class AccWriteRepository {
                 .where(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!asccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ASCCPs used the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCPs first before purging the ACC '" + accRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
             } else {
@@ -862,7 +862,7 @@ public class AccWriteRepository {
                 .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!basedAccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted ACCs used the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the ACC '" + accRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
             } else {

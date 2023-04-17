@@ -16,9 +16,9 @@ public class BBIESC implements BIE, FacetRestrictionsAware {
     private BigInteger agencyIdListManifestId = BigInteger.ZERO;
     private int cardinalityMin;
     private int cardinalityMax;
-    private BigInteger minLength;
-    private BigInteger maxLength;
-    private String pattern;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private String defaultValue;
     private String fixedValue;
     private String definition;

@@ -52,31 +52,43 @@ public class AgencyIdController {
 
     @RequestMapping(value = "/agency_id_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetAgencyIdListListResponse getAgencyIdListList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                           @RequestParam(name = "states", required = false) String states,
-                                                           @RequestParam(name = "name", required = false) String name,
-                                                           @RequestParam(name = "definition", required = false) String definition,
-                                                           @RequestParam(name = "module", required = false) String module,
-                                                           @RequestParam(name = "deprecated", required = false) String deprecated,
-                                                           @RequestParam(name = "namespaces", required = false) String namespaces,
-                                                           @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
-                                                           @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
-                                                           @RequestParam(name = "updateStart", required = false) String updateStart,
-                                                           @RequestParam(name = "updateEnd", required = false) String updateEnd,
-                                                           @RequestParam(name = "releaseId", required = true) BigInteger releaseId,
-                                                           @RequestParam(name = "sortActive") String sortActive,
-                                                           @RequestParam(name = "sortDirection") String sortDirection,
-                                                           @RequestParam(name = "pageIndex") int pageIndex,
-                                                           @RequestParam(name = "pageSize") int pageSize) {
+    public GetAgencyIdListListResponse getAgencyIdListList(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "states", required = false) String states,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "definition", required = false) String definition,
+            @RequestParam(name = "module", required = false) String module,
+            @RequestParam(name = "deprecated", required = false) String deprecated,
+            @RequestParam(name = "newComponent", required = false) String newComponent,
+            @RequestParam(name = "namespaces", required = false) String namespaces,
+            @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
+            @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
+            @RequestParam(name = "updateStart", required = false) String updateStart,
+            @RequestParam(name = "updateEnd", required = false) String updateEnd,
+            @RequestParam(name = "releaseId", required = true) BigInteger releaseId,
+            @RequestParam(name = "sortActive") String sortActive,
+            @RequestParam(name = "sortDirection") String sortDirection,
+            @RequestParam(name = "pageIndex") int pageIndex,
+            @RequestParam(name = "pageSize") int pageSize) {
         GetAgencyIdListListRequest request = new GetAgencyIdListListRequest(sessionService.asScoreUser(user));
         request.setReleaseId(releaseId);
         request.setName(name);
         request.setDefinition(definition);
         request.setModule(module);
-        if (deprecated != null) {
-            request.setDeprecated(deprecated.equals("true"));
+        if (StringUtils.hasLength(deprecated)) {
+            if ("true".equalsIgnoreCase(deprecated.toLowerCase())) {
+                request.setDeprecated(true);
+            } else if ("false".equalsIgnoreCase(deprecated.toLowerCase())) {
+                request.setDeprecated(false);
+            }
         }
-
+        if (StringUtils.hasLength(newComponent)) {
+            if ("true".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(true);
+            } else if ("false".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(false);
+            }
+        }
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
                         .map(e -> CcState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());

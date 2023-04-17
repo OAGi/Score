@@ -15,6 +15,7 @@ export class AgencyIdListForListRequest {
   access: string;
   states: string[] = [];
   deprecated: boolean[] = [];
+  newComponent: boolean[] = [];
   extensible: boolean;
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
@@ -53,6 +54,8 @@ export class AgencyIdListForListRequest {
 
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
+    this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
     this.extensible = (params.get('extensible')) ? (('true' === params.get('extensible'))) : undefined;
     this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
@@ -84,6 +87,12 @@ export class AgencyIdListForListRequest {
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.deprecated !== undefined && this.deprecated.length > 0) {
+      params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
+    }
+    if (this.newComponent !== undefined && this.newComponent.length > 0) {
+      params = params.set('newComponent', this.newComponent.map(e => (e) ? 'true' : 'false').join(','));
     }
     if (this.extensible !== undefined) {
       params = params.set('extensible', (this.extensible) ? 'true' : 'false');
@@ -136,6 +145,7 @@ export class AgencyIdList {
   remark: string;
 
   deprecated: boolean;
+  newComponent: boolean;
   state: string;
   access: string;
 

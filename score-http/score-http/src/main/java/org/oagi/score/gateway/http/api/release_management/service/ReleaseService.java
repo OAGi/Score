@@ -522,11 +522,12 @@ public class ReleaseService implements InitializingBean {
                             new StandaloneExportContextBuilder(dataProvider, coreComponentService, pathCounter);
                     ExportContext exportContext = builder.build(asccpManifestId);
 
-                    SchemaModule schemaModule = exportContext.getSchemaModules().iterator().next();
-                    schemaModule.visit(visitor);
-                    File file = schemaModule.getModuleFile();
-                    if (file != null) {
-                        files.add(file);
+                    for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
+                        schemaModule.visit(visitor);
+                        File file = schemaModule.getModuleFile();
+                        if (file != null) {
+                            files.add(file);
+                        }
                     }
                 } catch (Exception e) {
                     logger.warn("Unexpected error occurs while it generates a stand-alone schema for 'asccp_manifest_id' [" + asccpManifestId + "]", e);

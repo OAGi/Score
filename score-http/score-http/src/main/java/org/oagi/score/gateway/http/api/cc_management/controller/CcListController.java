@@ -19,9 +19,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,24 +38,6 @@ public class CcListController {
     @Autowired
     private SessionService sessionService;
 
-    private Date getDateFromString(String timeString) {
-        DateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        try {
-            return dtFormat.parse(timeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-    String camelToSnake(String str) {
-        String regex = "([a-z])([A-Z]+)";
-        String replacement = "$1_$2";
-
-        str = str.replaceAll(regex, replacement).toLowerCase();
-        return str;
-    }
-
     @RequestMapping(value = "/core_component", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CcList> getCcList(
@@ -69,6 +48,7 @@ public class CcListController {
             @RequestParam(name = "types", required = false) String types,
             @RequestParam(name = "states", required = false) String states,
             @RequestParam(name = "deprecated", required = false) String deprecated,
+            @RequestParam(name = "newComponent", required = false) String newComponent,
             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
             @RequestParam(name = "updateStart", required = false) String updateStart,
@@ -100,6 +80,13 @@ public class CcListController {
                 request.setDeprecated(true);
             } else if ("false".equalsIgnoreCase(deprecated.toLowerCase())) {
                 request.setDeprecated(false);
+            }
+        }
+        if (StringUtils.hasLength(newComponent)) {
+            if ("true".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(true);
+            } else if ("false".equalsIgnoreCase(newComponent.toLowerCase())) {
+                request.setNewComponent(false);
             }
         }
         if (StringUtils.hasLength(isBIEUsable)) {
@@ -165,6 +152,15 @@ public class CcListController {
         request.setPageRequest(pageRequest);
 
         return service.getCcList(request);
+    }
+
+    @RequestMapping(value = "/core_component/changes_in_release/{releaseId:[\\d]+}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcChangesResponse getCcChanges(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("releaseId") BigInteger releaseId) {
+
+        return service.getCcChanges(sessionService.asScoreUser(user), releaseId);
     }
 
     @RequestMapping(value = "/core_component/{type}/{manifestId:[\\d]+}/transfer_ownership",

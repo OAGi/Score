@@ -22,11 +22,13 @@ import static org.oagi.score.export.model.Namespace.newNamespace;
 
 public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
-    private ReleaseDataProvider releaseDataProvider;
+    private final ReleaseDataProvider releaseDataProvider;
 
-    private CoreComponentService coreComponentService;
+    private final CoreComponentService coreComponentService;
 
-    private Map<String, Integer> pathCounter;
+    private final Map<String, Integer> pathCounter;
+
+    private Map<String, SchemaModule> schemaModuleMap = new HashMap<>();
 
     public StandaloneExportContextBuilder(ReleaseDataProvider releaseDataProvider,
                                           CoreComponentService coreComponentService,
@@ -36,22 +38,29 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         this.pathCounter = pathCounter;
     }
 
+    private SchemaModule getModuleByNamespace(NamespaceRecord namespace) {
+        if (this.schemaModuleMap.containsKey(namespace.getUri())) {
+            return this.schemaModuleMap.get(namespace.getUri());
+        }
+
+        ScoreModule scoreModule = new ScoreModule();
+        scoreModule.setReleaseNamespace(newNamespace(namespace));
+        SchemaModule schemaModule = new SchemaModule(scoreModule, this);
+        this.schemaModuleMap.put(namespace.getUri(), schemaModule);
+        return schemaModule;
+    }
+
     public ExportContext build(BigInteger asccpManifestId) {
         ULong asccpManifestIdULong = ULong.valueOf(asccpManifestId);
+        addASCCP(null, asccpManifestIdULong, true);
 
-        AsccpManifestRecord asccpManifestRecord = this.releaseDataProvider.findASCCPManifest(asccpManifestIdULong);
-        ReleaseRecord releaseRecord = releaseDataProvider.findRelease(asccpManifestRecord.getReleaseId());
-        NamespaceRecord namespaceRecord = releaseDataProvider.findNamespace(releaseRecord.getNamespaceId());
-
+        String path = getPath(asccpManifestIdULong);
         DefaultExportContext context = new DefaultExportContext();
-        ScoreModule scoreModule = new ScoreModule();
-        scoreModule.setReleaseNamespace(newNamespace(namespaceRecord));
-        scoreModule.setPath(getPath(asccpManifestIdULong));
-
-        SchemaModule schemaModule = new SchemaModule(scoreModule, this);
-        context.addSchemaModule(schemaModule);
-
-        addASCCP(schemaModule, asccpManifestIdULong, true);
+        this.schemaModuleMap.values().forEach(module -> {
+            String prefix = module.getNamespace().getNamespacePrefix();
+            module.setPath((StringUtils.hasLength(prefix)) ? path + "_" + prefix : path);
+            context.addSchemaModule(module);
+        });
 
         return context;
     }
@@ -79,7 +88,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         return path;
     }
 
-    private void addASCCP(SchemaModule schemaModule, ULong asccpManifestId, boolean ignoreReusableIndicator) {
+    private void addASCCP(SchemaModule parentSchemaModule, ULong asccpManifestId, boolean ignoreReusableIndicator) {
         AsccpManifestRecord asccpManifest =
                 releaseDataProvider.findASCCPManifest(asccpManifestId);
         AsccpRecord asccp = releaseDataProvider.findASCCP(asccpManifest.getAsccpId());
@@ -87,44 +96,53 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             return;
         }
 
+        SchemaModule schemaModule = null;
         if (ignoreReusableIndicator || asccp.getReusableIndicator() != (byte) 0) {
             NamespaceRecord namespace = releaseDataProvider.findNamespace(asccp.getNamespaceId());
-            schemaModule.addNamespace(newNamespace(namespace));
+            schemaModule = getModuleByNamespace(namespace);
+            if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                parentSchemaModule.addImport(schemaModule);
+                parentSchemaModule.addNamespace(schemaModule.getNamespace());
+            }
 
             if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, asccpManifest, releaseDataProvider))) {
                 return;
             }
         }
+
         addACC(schemaModule, asccpManifest.getRoleOfAccManifestId());
     }
 
-    private void addBCCP(SchemaModule schemaModule, BccManifestRecord bccManifest) {
+    private void addBCCP(SchemaModule parentSchemaModule, BccManifestRecord bccManifest) {
         BccRecord bcc = releaseDataProvider.findBCC(bccManifest.getBccId());
         BccpManifestRecord bccpManifest =
                 releaseDataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
 
+        SchemaModule bccpSchemaModule = null;
         if (EntityType.Element == EntityType.valueOf(bcc.getEntityType())) {
             BccpRecord bccp = releaseDataProvider.findBCCP(bccpManifest.getBccpId());
             NamespaceRecord namespace = releaseDataProvider.findNamespace(bccp.getNamespaceId());
-            schemaModule.addNamespace(newNamespace(namespace));
+            bccpSchemaModule = getModuleByNamespace(namespace);
+            if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(bccpSchemaModule.getNamespace())) {
+                parentSchemaModule.addImport(bccpSchemaModule);
+                parentSchemaModule.addNamespace(bccpSchemaModule.getNamespace());
+            }
 
             DtManifestRecord dtManifest = releaseDataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
             DtRecord bdt = releaseDataProvider.findDT(dtManifest.getDtId());
-            namespace = releaseDataProvider.findNamespace(bdt.getNamespaceId());
-            schemaModule.addNamespace(newNamespace(namespace));
-
-            if (!schemaModule.addBCCP(new BCCP(bccp, bdt))) {
+            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, bdt))) {
                 return;
             }
         }
 
-        addBDT(schemaModule, bccpManifest.getBdtManifestId());
+        addBDT(bccpSchemaModule, bccpManifest.getBdtManifestId());
     }
 
-    private void addACC(SchemaModule schemaModule, ULong accManifestId) {
+    private void addACC(SchemaModule parentSchemaModule, ULong accManifestId) {
         AccManifestRecord accManifest =
                 releaseDataProvider.findACCManifest(accManifestId);
 
+        SchemaModule schemaModule = null;
         try {
             AccRecord acc = releaseDataProvider.findACC(accManifest.getAccId());
             if (acc.getDen().equals("Any Structured Content. Details")) {
@@ -132,7 +150,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             }
 
             NamespaceRecord namespace = releaseDataProvider.findNamespace(acc.getNamespaceId());
-            schemaModule.addNamespace(newNamespace(namespace));
+            schemaModule = getModuleByNamespace(namespace);
+            if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                parentSchemaModule.addImport(schemaModule);
+                parentSchemaModule.addNamespace(schemaModule.getNamespace());
+            }
 
             if (!schemaModule.addACC(ACC.newInstance(acc, accManifest, releaseDataProvider))) {
                 return;
@@ -163,10 +185,10 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
     }
 
-    private void addBDT(SchemaModule schemaModule, ULong bdtManifestId) {
+    private void addBDT(SchemaModule parentSchemaModule, ULong bdtManifestId) {
         DtManifestRecord bdtManifest = releaseDataProvider.findDtManifestByDtManifestId(bdtManifestId);
         if (bdtManifest.getBasedDtManifestId() != null) {
-            addBDT(schemaModule, bdtManifest.getBasedDtManifestId());
+            addBDT(parentSchemaModule, bdtManifest.getBasedDtManifestId());
         }
         DtRecord bdt = releaseDataProvider.findDT(bdtManifest.getDtId());
         DtManifestRecord basedDtManifest =
@@ -178,11 +200,20 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
 
         NamespaceRecord namespace = releaseDataProvider.findNamespace(bdt.getNamespaceId());
-        schemaModule.addNamespace(newNamespace(namespace));
+        SchemaModule schemaModule = getModuleByNamespace(namespace);
+        if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+            parentSchemaModule.addImport(schemaModule);
+            parentSchemaModule.addNamespace(schemaModule.getNamespace());
+        }
 
-        List<DtScRecord> dtScList =
-                releaseDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
-                        .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
+        if (baseDataType.getBasedDtId() != null) { // if baseDataType is not CDT
+            NamespaceRecord baseNamespace = releaseDataProvider.findNamespace(baseDataType.getNamespaceId());
+            SchemaModule baseSchemaModule = getModuleByNamespace(baseNamespace);
+            if (baseSchemaModule != null && !baseSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                schemaModule.addImport(baseSchemaModule);
+                schemaModule.addNamespace(baseSchemaModule.getNamespace());
+            }
+        }
 
         List<DtScManifestRecord> dtScManifestList =
                 releaseDataProvider.findDtScManifestByOwnerDtManifestId(bdtManifest.getDtManifestId()).stream()
@@ -190,7 +221,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         boolean isDefaultBDT = baseDataType.getBasedDtId() == null || StringUtils.hasLength(bdt.getSixDigitId());
         BDTSimple bdtSimple;
-        if (dtScList.isEmpty()) {
+        if (dtScManifestList.isEmpty()) {
             List<BdtPriRestriRecord> bdtPriRestriList =
                     releaseDataProvider.findBdtPriRestriListByDtManifestId(bdtManifestId);
             List<CdtAwdPriXpsTypeMapRecord> cdtAwdPriXpsTypeMapList =
@@ -227,42 +258,38 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                     addXBTSimpleType(schemaModule, xbt);
                 }
 
-                List<BdtScPriRestriRecord> codeListBdtScPriRestri =
-                        bdtScPriRestriList.stream()
-                                .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
-                                .collect(Collectors.toList());
-                if (codeListBdtScPriRestri.size() > 1) {
-                    throw new IllegalStateException();
-                }
+                bdtScPriRestriList.stream()
+                        .filter(e -> e.getCodeListManifestId() != null)
+                        .forEach(bdtScPriRestri -> {
+                            CodeListManifestRecord codeListManifest = releaseDataProvider.findCodeListManifest(bdtScPriRestri.getCodeListManifestId());
+                            CodeListRecord codeList = releaseDataProvider.findCodeList(codeListManifest.getCodeListId());
+                            NamespaceRecord codeListNamespace = releaseDataProvider.findNamespace(codeList.getNamespaceId());
+                            SchemaModule codeListSchemaModule = getModuleByNamespace(codeListNamespace);
+                            if (codeListSchemaModule != null && !codeListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                                schemaModule.addImport(codeListSchemaModule);
+                                schemaModule.addNamespace(codeListSchemaModule.getNamespace());
+                            }
+                            addCodeList(codeListSchemaModule, codeListManifest);
+                        });
 
-                if (codeListBdtScPriRestri.isEmpty()) {
-                    List<BdtScPriRestriRecord> agencyIdBdtScPriRestri =
-                            bdtScPriRestriList.stream()
-                                    .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
-                                    .collect(Collectors.toList());
-                    if (agencyIdBdtScPriRestri.size() > 1) {
-                        throw new IllegalStateException();
-                    }
+                bdtScPriRestriList.stream()
+                        .filter(e -> e.getAgencyIdListManifestId() != null)
+                        .forEach(bdtScPriRestri -> {
+                            AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(
+                                    bdtScPriRestri.getAgencyIdListManifestId());
+                            AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
+                            NamespaceRecord agencyIdListNamespace = releaseDataProvider.findNamespace(agencyIdList.getNamespaceId());
+                            SchemaModule agencyIdListSchemaModule = getModuleByNamespace(agencyIdListNamespace);
+                            if (agencyIdListSchemaModule != null && !agencyIdListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                                schemaModule.addImport(agencyIdListSchemaModule);
+                                schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
+                            }
 
-                    if (agencyIdBdtScPriRestri.isEmpty()) {
-                        List<BdtScPriRestriRecord> defaultBdtScPriRestri =
-                                bdtScPriRestriList.stream()
-                                        .filter(e -> e.getIsDefault() == 1)
-                                        .collect(Collectors.toList());
-                        if (defaultBdtScPriRestri.isEmpty() || defaultBdtScPriRestri.size() > 1) {
-                            throw new IllegalStateException();
-                        }
-                    } else {
-                        AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(agencyIdBdtScPriRestri.get(0).getAgencyIdListManifestId());
-                        AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                        List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
-                        schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
-                    }
-                } else {
-                    CodeListManifestRecord codeListManifest = releaseDataProvider.findCodeListManifest(codeListBdtScPriRestri.get(0).getCodeListManifestId());
-                    CodeListRecord codeList = releaseDataProvider.findCodeList(codeListManifest.getCodeListId());
-                    addCodeList(schemaModule, codeList);
-                }
+                            List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(
+                                    agencyIdListManifest.getAgencyIdListManifestId()).stream()
+                                    .map(e -> releaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
+                            agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
+                        });
             });
         }
 
@@ -280,41 +307,38 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             addXBTSimpleType(schemaModule, xbt);
         }
 
-        List<BdtPriRestriRecord> codeListBdtPriRestri =
-                bdtPriRestriList.stream()
-                        .filter(e -> e.getCodeListManifestId() != null && e.getIsDefault() == (byte) 1)
-                        .collect(Collectors.toList());
-        if (codeListBdtPriRestri.size() > 1) {
-            throw new IllegalStateException();
-        }
-        if (codeListBdtPriRestri.isEmpty()) {
-            List<BdtPriRestriRecord> agencyIdBdtPriRestri =
-                    codeListBdtPriRestri.stream()
-                            .filter(e -> e.getAgencyIdListManifestId() != null && e.getIsDefault() == (byte) 1)
-                            .collect(Collectors.toList());
-            if (agencyIdBdtPriRestri.size() > 1) {
-                throw new IllegalStateException();
-            }
+        bdtPriRestriList.stream()
+                .filter(e -> e.getCodeListManifestId() != null)
+                .forEach(bdtPriRestri -> {
+                    CodeListManifestRecord codeListManifest = releaseDataProvider.findCodeListManifest(bdtPriRestri.getCodeListManifestId());
+                    CodeListRecord codeList = releaseDataProvider.findCodeList(codeListManifest.getCodeListId());
+                    NamespaceRecord codeListNamespace = releaseDataProvider.findNamespace(codeList.getNamespaceId());
+                    SchemaModule codeListSchemaModule = getModuleByNamespace(codeListNamespace);
+                    if (codeListSchemaModule != null && !codeListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                        schemaModule.addImport(codeListSchemaModule);
+                        schemaModule.addNamespace(codeListSchemaModule.getNamespace());
+                    }
+                    addCodeList(codeListSchemaModule, codeListManifest);
+                });
 
-            if (agencyIdBdtPriRestri.isEmpty()) {
-                List<BdtPriRestriRecord> defaultBdtPriRestri =
-                        bdtPriRestriList.stream()
-                                .filter(e -> e.getIsDefault() == 1)
-                                .collect(Collectors.toList());
-                if (defaultBdtPriRestri.isEmpty() || defaultBdtPriRestri.size() > 1) {
-                    throw new IllegalStateException();
-                }
-            } else {
-                AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(agencyIdBdtPriRestri.get(0).getAgencyIdListManifestId());
-                AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-                List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
-                schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
-            }
-        } else {
-            CodeListManifestRecord codeListManifest = releaseDataProvider.findCodeListManifest(codeListBdtPriRestri.get(0).getCodeListManifestId());
-            CodeListRecord codeList = releaseDataProvider.findCodeList(codeListManifest.getCodeListId());
-            addCodeList(schemaModule, codeList);
-        }
+        bdtPriRestriList.stream()
+                .filter(e -> e.getAgencyIdListManifestId() != null)
+                .forEach(bdtPriRestri -> {
+                    AgencyIdListManifestRecord agencyIdListManifest = releaseDataProvider.findAgencyIdListManifest(
+                            bdtPriRestri.getAgencyIdListManifestId());
+                    AgencyIdListRecord agencyIdList = releaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
+                    NamespaceRecord agencyIdListNamespace = releaseDataProvider.findNamespace(agencyIdList.getNamespaceId());
+                    SchemaModule agencyIdListSchemaModule = getModuleByNamespace(agencyIdListNamespace);
+                    if (agencyIdListSchemaModule != null && !agencyIdListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+                        schemaModule.addImport(agencyIdListSchemaModule);
+                        schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
+                    }
+
+                    List<AgencyIdListValueRecord> agencyIdListValues = releaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(
+                            agencyIdListManifest.getAgencyIdListManifestId())
+                            .stream().map(e -> releaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
+                    agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
+                });
     }
 
     private void addXBTSimpleType(SchemaModule schemaModule, XbtRecord xbt) {
@@ -328,19 +352,29 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         schemaModule.addXBTSimpleType(new XBTSimpleType(xbt, baseXbt));
     }
 
-    private void addCodeList(SchemaModule schemaModule, CodeListRecord codeList) {
-        CodeListRecord baseCodeList = releaseDataProvider.findCodeList(codeList.getBasedCodeListId());
-        if (baseCodeList != null) {
-            addCodeList(schemaModule, baseCodeList);
+    private void addCodeList(SchemaModule parentSchemaModule, CodeListManifestRecord codeListManifest) {
+        CodeListManifestRecord baseCodeListManifest = releaseDataProvider.findCodeListManifest(codeListManifest.getBasedCodeListManifestId());
+        if (baseCodeListManifest != null) {
+            addCodeList(parentSchemaModule, baseCodeListManifest);
         }
 
+        CodeListRecord codeList = releaseDataProvider.findCodeList(codeListManifest.getCodeListId());
         SchemaCodeList schemaCodeList = new SchemaCodeList(codeList.getNamespaceId());
         schemaCodeList.setGuid(codeList.getGuid());
         schemaCodeList.setName(codeList.getName());
         schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
 
-        for (CodeListValueRecord codeListValue : releaseDataProvider.findCodeListValueByCodeListId(codeList.getCodeListId())) {
+        for (CodeListValueManifestRecord codeListValueManifest : releaseDataProvider.findCodeListValueManifestByCodeListManifestId(
+                codeListManifest.getCodeListManifestId())) {
+            CodeListValueRecord codeListValue = releaseDataProvider.findCodeListValue(codeListValueManifest.getCodeListValueId());
             schemaCodeList.addValue(codeListValue.getValue());
+        }
+
+        NamespaceRecord namespace = releaseDataProvider.findNamespace(codeList.getNamespaceId());
+        SchemaModule schemaModule = getModuleByNamespace(namespace);
+        if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
+            parentSchemaModule.addImport(schemaModule);
+            parentSchemaModule.addNamespace(schemaModule.getNamespace());
         }
 
         schemaModule.addCodeList(schemaCodeList);

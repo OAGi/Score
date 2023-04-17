@@ -72,7 +72,7 @@ public abstract class ACC implements Component {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + acc.getGuid();
+        return acc.getGuid();
     }
 
     public String getTypeName() {
@@ -85,6 +85,10 @@ public abstract class ACC implements Component {
 
     public ULong getNamespaceId() {
         return acc.getNamespaceId();
+    }
+
+    public ULong getTypeNamespaceId() {
+        return this.getNamespaceId();
     }
 
     public boolean isGroup() {

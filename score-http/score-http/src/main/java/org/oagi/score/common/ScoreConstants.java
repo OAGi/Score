@@ -12,7 +12,6 @@ public class ScoreConstants {
     public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
 
     public static final String OAGI_NS = "http://www.openapplications.org/oagis/10";
-    public static final String OAGI_GUID_PREFIX = "oagis-id-";
 
     public static final String TAB_TOP_LEVEL_ABIE_SELECT_BC = "select_bc";
     public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";

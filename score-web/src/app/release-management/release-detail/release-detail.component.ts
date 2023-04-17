@@ -13,6 +13,8 @@ import {ReplaySubject} from 'rxjs';
 import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveAs} from 'file-saver';
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
+import {ReleaseWhatsNewDialogComponent} from "./release-whats-new-dialog/release-whats-new-dialog.component";
 
 @Component({
   selector: 'score-release-list',
@@ -38,6 +40,7 @@ export class ReleaseDetailComponent implements OnInit {
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
               private snackBar: MatSnackBar,
+              private dialog: MatDialog,
               private route: ActivatedRoute,
               private router: Router,
               private auth: AuthService,
@@ -158,6 +161,19 @@ export class ReleaseDetailComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  openWhatsNewDialog() {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.width = '80vw';
+    dialogConfig.height = '60%';
+    dialogConfig.data = {
+      releaseId: this.releaseDetail.releaseId
+    };
+    const dialogRef = this.dialog.open(ReleaseWhatsNewDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+    });
   }
 
   generateMigrationScript() {

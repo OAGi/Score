@@ -22,6 +22,7 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
     private BigInteger releaseId;
 
     private Boolean deprecated;
+    private Boolean newComponent;
     private List<BigInteger> namespaces;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
@@ -36,6 +37,14 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
 
     public void setDeprecated(Boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    public Boolean getNewComponent() {
+        return newComponent;
+    }
+
+    public void setNewComponent(Boolean newComponent) {
+        this.newComponent = newComponent;
     }
 
     public String getModule() {

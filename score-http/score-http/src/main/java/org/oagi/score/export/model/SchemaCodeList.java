@@ -8,9 +8,6 @@ import java.util.List;
 
 public class SchemaCodeList {
 
-
-    public String GUID_PREFIX = "oagis-id-";
-
     private String guid;
 
     private String name;
@@ -28,7 +25,7 @@ public class SchemaCodeList {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + guid;
+        return guid;
     }
 
     public void setGuid(String guid) {
@@ -36,7 +33,7 @@ public class SchemaCodeList {
     }
 
     public String getName() {
-        return name;
+        return name.replaceAll(" ", "").replace("Identifier", "ID");
     }
 
     public void setName(String name) {

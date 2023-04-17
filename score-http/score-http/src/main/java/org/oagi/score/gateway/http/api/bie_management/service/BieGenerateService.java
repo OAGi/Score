@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
@@ -196,8 +195,6 @@ public class BieGenerateService {
                 .on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(result.get(ASBIEP.BASED_ASCCP_MANIFEST_ID)))
                 .fetchOneInto(String.class);
-
-        String asbiepGuid = getGuidWithPrefix(result.get(ASBIEP.GUID));
 
         /*
          * Issue 1267

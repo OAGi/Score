@@ -341,8 +341,8 @@ export class AgencyIdListListComponent implements OnInit {
     return item.owner.username === this.currentUser && item.state === 'Deleted';
   }
 
-  openTransferDialog() {
-    if (!this.isEditable(this.contextMenuItem)) {
+  openTransferDialog(item: AgencyIdList, event?: MouseEvent) {
+    if (!this.isEditable(item)) {
       return;
     }
 
@@ -353,7 +353,7 @@ export class AgencyIdListListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(this.contextMenuItem.agencyIdListManifestId, result.loginId).subscribe(_ => {
+        this.service.transferOwnership(item.agencyIdListManifestId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
@@ -403,7 +403,7 @@ export class AgencyIdListListComponent implements OnInit {
     return;
   }
 
-  openDialogCcListRestore() {
+  openDialogCcListRestore(item: AgencyIdList) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore agency ID list';
@@ -415,7 +415,7 @@ export class AgencyIdListListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.restore(this.contextMenuItem.agencyIdListManifestId).subscribe(_ => {
+          this.service.restore(item.agencyIdListManifestId).subscribe(_ => {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });

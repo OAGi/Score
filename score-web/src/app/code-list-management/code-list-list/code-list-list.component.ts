@@ -341,7 +341,7 @@ export class CodeListListComponent implements OnInit {
     return item.access === 'CanEdit';
   }
 
-  openTransferDialog(item: CodeListForList) {
+  openTransferDialog(item: CodeListForList, event?: MouseEvent) {
     if (!this.isEditable(item)) {
       return;
     }

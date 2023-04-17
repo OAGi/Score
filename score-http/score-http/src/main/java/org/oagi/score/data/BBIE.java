@@ -18,9 +18,9 @@ public class BBIE implements BIE, FacetRestrictionsAware {
     private BigInteger agencyIdListManifestId = BigInteger.ZERO;
     private int cardinalityMin;
     private int cardinalityMax;
-    private BigInteger minLength;
-    private BigInteger maxLength;
-    private String pattern;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private String defaultValue;
     private boolean nillable;
     private String fixedValue;

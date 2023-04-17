@@ -710,9 +710,9 @@ public class CcNodeRepository {
 
         int cardinalityMaxOfDtScListSum = dslContext.select(DT_SC.CARDINALITY_MAX)
                 .from(BCCP_MANIFEST)
-                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
-                .join(DT).on(BCCP.BDT_ID.eq(DT.DT_ID))
-                .join(DT_SC).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .join(DT_SC_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchStreamInto(Integer.class).reduce(0, Integer::sum);
         bdt.setHasNoSc(cardinalityMaxOfDtScListSum == 0);

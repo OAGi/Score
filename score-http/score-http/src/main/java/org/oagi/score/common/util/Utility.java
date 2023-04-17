@@ -297,7 +297,7 @@ public class Utility {
         /*
          * [exception in Fields.xsd at line 4081]
          *
-         * <xsd:simpleType name="DurationMeasureType" id="oagis-id-10ef9f34e0504a71880c967c82ac039f">
+         * <xsd:simpleType name="DurationMeasureType" id="_10ef9f34e0504a71880c967c82ac039f">
          *     <xsd:restriction base="DurationType_JJ5401"/>
          * </xsd:simpleType>
          */

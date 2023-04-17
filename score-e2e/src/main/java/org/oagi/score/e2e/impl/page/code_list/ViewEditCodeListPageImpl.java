@@ -96,7 +96,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     }
 
     private String getNameFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override

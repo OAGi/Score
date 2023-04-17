@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
-import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -273,7 +272,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (isFriendly()) {
                     schemaName = prefix + bieName;
                 } else {
-                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
                 }
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
@@ -322,7 +321,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = new LinkedHashMap();
                     // Issue #1148
-                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
                     properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
                     properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
                     properties.put("required", new ArrayList());
@@ -343,7 +342,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (isFriendly()) {
                     schemaName = prefix + bieName;
                 } else {
-                    schemaName = prefix + bieName + "-" + getGuidWithPrefix(typeAbie.getGuid());
+                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
                 }
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
@@ -380,7 +379,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = new LinkedHashMap();
                     // Issue #1148
-                    properties.put("x-oagis-bie-guid", getGuidWithPrefix(typeAbie.getGuid()));
+                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
                     properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
                     properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
                     properties.put("required", new ArrayList());
@@ -618,14 +617,14 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         String name = "type_" + guid;
 
         Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getMinLength() != null) {
-            content.put("minLength", facetRestri.getMinLength().longValue());
+        if (facetRestri.getFacetMinLength() != null) {
+            content.put("minLength", facetRestri.getFacetMinLength().longValue());
         }
-        if (facetRestri.getMaxLength() != null) {
-            content.put("maxLength", facetRestri.getMaxLength().longValue());
+        if (facetRestri.getFacetMaxLength() != null) {
+            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
-        if (StringUtils.hasLength(facetRestri.getPattern())) {
-            content.put("pattern", facetRestri.getPattern());
+        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            content.put("pattern", facetRestri.getFacetPattern());
         }
 
         schemas.put(name, content);
@@ -980,7 +979,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
                     Xbt xbt = getXbt(bbie, bdt);
                     ref = fillSchemas(schemas, xbt, bbie);
                 } else if (!isFriendly()) {
@@ -1066,7 +1065,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
+                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
                     ref = fillSchemas(schemas, xbt, bbieSc);
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);

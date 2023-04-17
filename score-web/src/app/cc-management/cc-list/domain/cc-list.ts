@@ -4,14 +4,14 @@ import {SimpleRelease} from '../../../release-management/domain/release';
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
-import {ShortTag} from "../../../tag-management/domain/tag";
-import {toNumbers} from "@angular/compiler-cli/src/version_helpers";
+import {ShortTag} from '../../../tag-management/domain/tag';
 
 export class CcListRequest {
   release: SimpleRelease;
   types: string[] = [];
   states: string[] = [];
   deprecated: boolean[] = [false];
+  newComponent: boolean[] = [];
   commonlyUsed: boolean[] = [true];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
@@ -66,8 +66,9 @@ export class CcListRequest {
     }
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
-    this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')))] : undefined;
-    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')))] : undefined;
+    this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
+    this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
+    this.commonlyUsed = (params.get('commonlyUsed')) ? Array.from(params.get('commonlyUsed').split(',').map(e => e === 'true' ? true : false)) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.tags = (params.get('tags')) ? Array.from(params.get('tags').split(',')) : [];
@@ -106,12 +107,14 @@ export class CcListRequest {
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }
-    if (this.deprecated !== undefined) {
-      params = params.set('deprecated', (this.deprecated) ? 'true' : 'false');
+    if (this.deprecated !== undefined && this.deprecated.length > 0) {
+      params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
     }
-
-    if (this.commonlyUsed !== undefined && this.commonlyUsed !== []) {
-      params = params.set('commonlyUsed', (this.commonlyUsed) ? 'true' : 'false');
+    if (this.newComponent !== undefined && this.newComponent.length > 0) {
+      params = params.set('newComponent', this.newComponent.map(e => (e) ? 'true' : 'false').join(','));
+    }
+    if (this.commonlyUsed !== undefined && this.commonlyUsed.length > 0) {
+      params = params.set('commonlyUsed', this.commonlyUsed.map(e => (e) ? 'true' : 'false').join(','));
     }
     if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
@@ -181,6 +184,7 @@ export class CcList {
   sixDigitId: string;
   basedManifestId: number;
   defaultValueDomain: number;
+  newComponent: boolean;
   tagList: ShortTag[];
 }
 
@@ -348,4 +352,16 @@ export class SummaryCcExtInfo {
   numberOfMyCcExtByStates: Map<string, number>;
   ccExtByUsersAndStates: Map<string, Map<string, number>>;
   myExtensionsUnusedInBIEs: SummaryCcExt[];
+}
+
+export class CcChangeResponse {
+  ccChangeList: CcChange[];
+}
+
+export class CcChange {
+  type: string;
+  manifestId; number;
+  den: string;
+  changeType: string;
+  tagList: ShortTag[];
 }
