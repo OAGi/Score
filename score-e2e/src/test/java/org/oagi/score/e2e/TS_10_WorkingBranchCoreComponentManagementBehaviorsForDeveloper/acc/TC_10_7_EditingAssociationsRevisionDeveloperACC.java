@@ -377,7 +377,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc, acc_association;
-        ASCCObject ascc;
         ASCCPObject asccp;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
