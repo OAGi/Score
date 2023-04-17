@@ -60,8 +60,52 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
         editCodeListPage.setDefinition("new definition");
         editCodeListPage.setDefinitionSource("new definition source");
         assertThrows(TimeoutException.class, () -> {editCodeListPage.moveToQA();});
+    }
+
+    @Test
+    @DisplayName("TC_17_5_TA_2")
+    public void test_TA_2() {
+        AppUserObject endUser;
+        ReleaseObject branch;
+        CodeListObject codeList;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+            /**
+             * Create WIP end-user Code List for a particular release branch.
+             */
+            codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(endUser, namespaceEU, branch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        editCodeListPage.setDefinition("new definition");
+        editCodeListPage.setDefinitionSource("new definition source");
         editCodeListPage.hitUpdateButton();
+        /**
+         * Test Assertion #17.5.2.a
+         */
         assertDoesNotThrow(() -> {editCodeListPage.moveToQA();});
+        /**
+         * Test Assertion #17.5.2.b  and  Test Assertion #17.5.2.e
+         */
+        assertDoesNotThrow(() -> {editCodeListPage.backToWIP();});
+        assertThrows(TimeoutException.class, () -> {editCodeListPage.moveToProduction();});
+        /**
+         * Test Assertion #17.5.2.c
+         */
+        editCodeListPage.moveToQA();
+        assertDoesNotThrow(() -> {editCodeListPage.moveToProduction();});
+        /**
+         * Test Assertion #17.5.2.d
+         */
+        assertThrows(TimeoutException.class, () -> {editCodeListPage.backToWIP();});
     }
 
     @AfterEach

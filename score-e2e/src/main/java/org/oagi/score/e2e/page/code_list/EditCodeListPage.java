@@ -126,4 +126,8 @@ public interface EditCodeListPage extends Page {
     void moveToQA();
 
     WebElement getMoveToQAButton();
+
+    void moveToProduction();
+
+    WebElement getMoveToProductionButton();
 }
