@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -221,4 +222,6 @@ public interface DTViewEditPage extends Page {
     void setDefaultValueDomain(String name);
 
     WebElement getDefaultValueDomainField();
+
+    void setNamespace(NamespaceObject namespace);
 }

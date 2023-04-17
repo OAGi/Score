@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
 

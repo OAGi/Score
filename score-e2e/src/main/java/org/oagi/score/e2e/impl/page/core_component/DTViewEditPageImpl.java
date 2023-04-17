@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.DTObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.openqa.selenium.By;
@@ -325,5 +326,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public WebElement getDefaultValueDomainField() {
         return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+    }
+
+    @Override
+    public void setNamespace(NamespaceObject namespace) {
+        click(getNamespaceField());
+        waitFor(ofMillis(1000L));
+        WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
+        click(option);
     }
 }
