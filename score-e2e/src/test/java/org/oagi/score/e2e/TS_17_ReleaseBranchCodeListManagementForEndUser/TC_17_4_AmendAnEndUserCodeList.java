@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
@@ -27,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -271,6 +271,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         for (CodeListObject cl : codeListForTesting){
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            waitFor(ofSeconds(1L));
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -528,7 +529,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             codeListForTesting.add(codeList);
 
             CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
-                    getCodeListByCodeListNameAndReleaseNum("oacl_ResponseCode", branch.getReleaseNumber());
+                    getCodeListByCodeListNameAndReleaseNum("oacl_ReasonCode", branch.getReleaseNumber());
 
             codeList = getAPIFactory().getCodeListAPI().
                     createDerivedCodeList(baseCodeList, endUserB, namespaceEUB, branch, "Production");
@@ -549,7 +550,9 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListValueDialog.setMeaning("new value meaning");
             editCodeListValueDialog.hitAddButton();
             editCodeListPage.hitUpdateButton();
-
+            if (cl.getDefinition() == null){
+                editCodeListPage.hitUpdateAnywayButton();
+            }
             /**
              * Prepare Core Components and Business Context
              */
