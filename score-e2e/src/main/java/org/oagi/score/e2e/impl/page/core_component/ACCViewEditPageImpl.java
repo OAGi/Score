@@ -1048,6 +1048,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
         }
+
+        @Override
+        public void setDefinition(String newDefinition) {
+            sendKeys(getDefinitionField(), newDefinition);
+        }
     }
 
     private class ASCCPPanelImpl implements ASCCPPanel {

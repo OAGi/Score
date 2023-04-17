@@ -763,6 +763,12 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
+        /**
+         * Set the UI element of the 'Definition' field
+         * @param newDefinition
+         */
+        void setDefinition(String newDefinition);
+
     }
 
     /**
