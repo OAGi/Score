@@ -1231,7 +1231,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
@@ -1271,20 +1271,20 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
         bccPanel.getCardinalityMinField().clear();
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Min is required\")]")).isDisplayed());
+        assertEquals("true", bccPanel.getCardinalityMinField().getAttribute("aria-required"));
 
         assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
         bccPanel.getCardinalityMaxField().clear();
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Cardinality Max is required\")]")).isDisplayed());
+        assertEquals("true", bccPanel.getCardinalityMaxField().getAttribute("aria-required"));
 
         bccPanel.setCardinalityMinField("11");
         bccPanel.setCardinalityMaxField("111");
-        accViewEditPage.hitUpdateButton();
+        click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
 
