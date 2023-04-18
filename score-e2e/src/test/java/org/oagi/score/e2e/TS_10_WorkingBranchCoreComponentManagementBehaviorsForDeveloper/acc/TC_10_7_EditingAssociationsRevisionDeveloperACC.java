@@ -1704,6 +1704,8 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             coreComponentAPI.updateBCC(bcc);
             bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc2 = coreComponentAPI.appendBCC(acc, bccp_to_append, "Published");
+            coreComponentAPI.updateBCC(bcc2);
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -1712,23 +1714,18 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
         assertDisabled(bccPanel.getValueConstraintSelectField());
-        bccPanel.setEntityType("Attribute");
-        assertEnabled(bccPanel.getValueConstraintSelectField());
-        bccPanel.setValueConstraint("Default Value");
-        bccPanel.setDefaultValue("99");
-        bccPanel.setDefinition("test");
-        accViewEditPage.hitUpdateButton();
+        assertDisabled(bccPanel.getEntityTypeSelectField());
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
-        assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
-        assertEquals("Default Value", getText(bccPanel.getValueConstraintSelectField()));
-        assertEquals("99", getText(bccPanel.getDefaultValueField()));
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getEntityTypeSelectField());
     }
 
     @Test
@@ -1755,38 +1752,45 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
-        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        ACCObject acc, acc_association, acc_association_before, acc_association_after;
         ASCCPObject asccp, asccp_before, asccp_after;
-        asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "WIP");
-        asccp_after = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "WIP");
-        asccp_before = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, developer, namespace, "WIP");
+        ASCCObject ascc;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc_association_before = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            acc_association_after = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            asccp_after = coreComponentAPI.createRandomASCCP(acc_association_after, developer, namespace, "Published");
+            asccp_before = coreComponentAPI.createRandomASCCP(acc_association_before, developer, namespace, "Published");
+            ascc = getAPIFactory().getCoreComponentAPI().appendASCC(acc, asccp, "Published");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendASCCPDialog.selectAssociation(asccp.getDen());
-
-        appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        appendASCCPDialog.selectAssociation(asccp_before.getDen());
-
         accViewEditPage.hitReviseButton();
+
+        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        appendASCCPDialog.selectAssociation(asccp_before.getDen());
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_after.getPropertyTerm());
+        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_before.getPropertyTerm());
 
-        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        assertFalse(asccNode.isDisplayed());
-        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp_after.getPropertyTerm());
-        assertFalse(asccNode.isDisplayed());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp_before.getPropertyTerm() + "\")]";
+        assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
+
         viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitCancelButton();
 
-        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp_before.getPropertyTerm());
         assertTrue(asccNode.isDisplayed());
     }
 
