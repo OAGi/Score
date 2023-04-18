@@ -507,6 +507,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         waitFor(ofMillis(500L));
         assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
     }
+
     @Test
     public void test_TA_10_7_3_d() {
 
@@ -652,7 +653,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
-            ascc.setCardinalityMin(25);
+            ascc.setCardinalityMax(25);
             coreComponentAPI.updateASCC(ascc);
 
         }
@@ -691,8 +692,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
-            ascc.setCardinalityMin(25);
-            ascc.setCardinalityMax(75);
+            ascc.setCardinalityMin(75);
             coreComponentAPI.updateASCC(ascc);
 
         }
@@ -825,14 +825,15 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         //check max greater than min
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be less than or equal\")]")).size());
-        accViewEditPage.hitUpdateButton();
+        asccPanel.setDefinition(null);
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
 
-        assertEquals("11", getText(asccPanel.getCardinalityMinField()));
+        assertEquals("111", getText(asccPanel.getCardinalityMinField()));
     }
 
     @Test
