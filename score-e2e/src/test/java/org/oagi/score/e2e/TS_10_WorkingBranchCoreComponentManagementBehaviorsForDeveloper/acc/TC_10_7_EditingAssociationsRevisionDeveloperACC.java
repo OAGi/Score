@@ -1320,7 +1320,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertNotChecked(bccPanel.getDeprecatedCheckbox());
@@ -1357,7 +1357,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
@@ -1370,7 +1370,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setDefinition("test");
         accViewEditPage.hitUpdateButton();
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("Default Value", getText(bccPanel.getValueConstraintSelectField()));
@@ -1407,7 +1407,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + bccp_to_append.getPropertyTerm());
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
@@ -1418,7 +1418,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setDefinition("test");
         accViewEditPage.hitUpdateButton();
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
