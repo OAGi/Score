@@ -1806,10 +1806,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
-        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
-        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
 
@@ -1857,10 +1856,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
-        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         WebElement accBaseNode;
@@ -1888,22 +1886,21 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
                 By.xpath("//span[contains(text(), \"Apply\")]//ancestor::button[1]");
 
         ACCObject finalAccForBase = accForBase;
-        retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
-                td = tr.findElement(By.className("mat-column-" + "den"));
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
-            }
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
-            assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
-        });
+        assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
+
     }
 
     @Test
@@ -1918,10 +1915,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
-        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
-        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         WebElement accBaseNode;
