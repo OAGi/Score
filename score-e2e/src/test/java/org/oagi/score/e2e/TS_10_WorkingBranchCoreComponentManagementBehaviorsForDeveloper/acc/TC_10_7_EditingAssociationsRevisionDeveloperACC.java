@@ -2083,10 +2083,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
-        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
-        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         WebElement accBaseNode;
@@ -2100,8 +2099,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
         accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
 
-        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
-        assertFalse(accBaseNode.isDisplayed());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + accForBase.getDen() + "\")]";
+        assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
 
     }
 
@@ -2127,17 +2127,17 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
