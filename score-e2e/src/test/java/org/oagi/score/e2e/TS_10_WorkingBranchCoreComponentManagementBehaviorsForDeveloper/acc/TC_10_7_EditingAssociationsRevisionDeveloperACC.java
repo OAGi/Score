@@ -1944,8 +1944,8 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         accSetBaseACCDialog.hitCancelButton();
 
         accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
-        accSetBaseACCDialog.hitApplyButton("Any Structured Content. Details");
-        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Any Structured Content. Details");
+        accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
         accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
         assertEquals("Semantics", getText(accBasePanel.getComponentTypeSelectField()));
 
@@ -1963,10 +1963,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
-        acc.setBasedAccManifestId(accForBase.getBasedAccManifestId());
-        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         WebElement accBaseNode;
@@ -2016,22 +2015,22 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
-            asccForBase = coreComponentAPI.appendASCC(accForBase, asccp, "WIP");
+            asccForBase = coreComponentAPI.appendASCC(accForBase, asccp, "Published");
             asccForBase.setCardinalityMax(1);
             coreComponentAPI.updateASCC(asccForBase);
         }
@@ -2050,20 +2049,26 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ACCObject finalAccForBase = accForBase;
         String asccpPropertyTerm = asccp.getPropertyTerm();
-        String duplicateWarning = "There is a conflict in ASCCPs between the current ACC and the base ACC [" + asccpPropertyTerm + "]";
-        retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
-                td = tr.findElement(By.className("mat-column-" + "den"));
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
-            }
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-            assertTrue(duplicateWarning.equals(getSnackBarMessage(getDriver())));
-        });
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + finalAccForBase.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
+
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//snack-bar-container//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("There is a conflict in ASCCPs between the current ACC and the base ACC"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+
     }
 
     @Test

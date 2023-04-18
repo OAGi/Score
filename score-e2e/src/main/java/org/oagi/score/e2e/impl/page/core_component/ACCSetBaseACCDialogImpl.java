@@ -49,7 +49,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
     private static final By APPLY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//button//*[contains(text(),\"Apply\")]");
