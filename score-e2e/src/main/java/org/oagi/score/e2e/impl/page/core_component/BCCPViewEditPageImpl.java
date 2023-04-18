@@ -968,6 +968,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
         @Override
         public void toggleDeprecated() {
+            waitFor(ofMillis(3000L));
             click(getDeprecatedCheckbox());
         }
 
