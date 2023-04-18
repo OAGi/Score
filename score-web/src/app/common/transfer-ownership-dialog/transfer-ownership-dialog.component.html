@@ -5,6 +5,10 @@
 </mat-card>
 
 <mat-dialog-content class="mat-card-container" style="padding-bottom: 20px;">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
   <mat-card class="search-box">
     <mat-card-content class="mat-card-container">
       <div class="container-fluid" style="padding: 0;">

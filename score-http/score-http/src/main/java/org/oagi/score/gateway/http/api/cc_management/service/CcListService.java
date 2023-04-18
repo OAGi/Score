@@ -361,7 +361,7 @@ public class CcListService {
     }
 
     @Transactional
-    public void transferOwnershipList(AuthenticatedPrincipal user, CcTransferOwnerShipListRequest request) {
+    public void transferOwnershipList(AuthenticatedPrincipal user, CcTransferOwnershipListRequest request) {
         request.getAccManifestIds().forEach(e -> {
             transferOwnership(user, "ACC", e, request.getTargetLoginId());
         });

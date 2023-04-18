@@ -55,7 +55,8 @@ export class CodeListListComponent implements OnInit {
     'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(true, []);
+  selection = new SelectionModel<CodeListForList>(true, [],
+    true, (a, b) => a.codeListManifestId === b.codeListManifestId);
   expandedElement: CodeListForList | null;
   canSelect = ['WIP', 'Deleted'];
   loading = false;
@@ -206,7 +207,8 @@ export class CodeListListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => this.canSelect.indexOf(row.state) > -1).length;
+    const numRows = this.dataSource.data.filter(row =>
+      row.owner === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)).length;
     return numSelected === numRows;
   }
 
@@ -218,7 +220,7 @@ export class CodeListListComponent implements OnInit {
   }
 
   select(row: CodeListForList) {
-    if (this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
+    if (row.owner === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
       this.selection.select(row);
     }
   }
@@ -233,6 +235,11 @@ export class CodeListListComponent implements OnInit {
 
   isSelected(row: CodeListForList) {
     return this.selection.isSelected(row);
+  }
+
+  selectionClear() {
+    this.selection = new SelectionModel<CodeListForList>(true, [],
+      true, (a, b) => a.codeListManifestId === b.codeListManifestId);
   }
 
   get currentUser(): string {
@@ -297,7 +304,7 @@ export class CodeListListComponent implements OnInit {
             this.snackBar.open('Deleted', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadCodeList();
           });
         }
@@ -320,7 +327,7 @@ export class CodeListListComponent implements OnInit {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadCodeList();
           });
         }
@@ -415,7 +422,7 @@ export class CodeListListComponent implements OnInit {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadCodeList();
           });
         }
