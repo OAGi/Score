@@ -158,7 +158,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
-    public WebElement getComponentTypeSelectField(){
+    public WebElement getComponentTypeSelectField() {
         return elementToBeClickable(getDriver(), COMPONENT_TYPE_SELECT_FIELD_LOCATOR);
     }
 
