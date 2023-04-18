@@ -6,6 +6,7 @@ import {AsbieBbieList, BieList, BieListRequest, SummaryBieInfo} from './bie-list
 import {PageResponse} from '../../../basis/basis';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieToAssign} from '../../../business-term-management/domain/business-term';
+import {CcList} from "../../../cc-management/cc-list/domain/cc-list";
 
 @Injectable()
 export class BieListService {
@@ -106,6 +107,22 @@ export class BieListService {
       targetLoginId
     });
   }
+
+  updateStateOnList(actionType: string, toState: string, bieLists: BieList[]): Observable<any> {
+    return this.http.post<any>('/api/bie_list/state/multiple', {
+      action: actionType,
+      toState,
+      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
+    });
+  }
+
+  transferOwnershipOnList(bieLists: BieList[], targetLoginId: string): Observable<any> {
+    return this.http.post<any>('/api/bie_list/transfer_ownership/multiple', {
+      targetLoginId,
+      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
+    });
+  }
+
   getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieList>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)

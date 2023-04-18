@@ -1,10 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import org.oagi.score.data.BizCtx;
-import org.oagi.score.gateway.http.api.bie_management.data.BieEvent;
-import org.oagi.score.gateway.http.api.bie_management.data.BieList;
-import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.DeleteBieListRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
@@ -260,6 +257,35 @@ public class BieListController {
         event.addProperty("target", targetLoginId);
         event.addProperty("timestamp", LocalDateTime.now());
         bieService.fireBieEvent(event);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/bie_list/state/multiple",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateCcState(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                        @RequestBody BieUpdateStateListRequest request) {
+        bieService.updateStateBieList(user, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/bie_list/transfer_ownership/multiple",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @RequestBody BieTransferOwnershipListRequest request) {
+        bieService.transferOwnershipList(user, request);
+
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
+            BieEvent event = new BieEvent();
+            event.setAction("UpdateOwnership");
+            event.setTopLevelAsbiepId(topLevelAsbiepId);
+            event.addProperty("actor", user.getName());
+            event.addProperty("target", request.getTargetLoginId());
+            event.addProperty("timestamp", LocalDateTime.now());
+            bieService.fireBieEvent(event);
+        });
 
         return ResponseEntity.noContent().build();
     }

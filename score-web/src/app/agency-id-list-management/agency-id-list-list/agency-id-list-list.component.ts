@@ -28,6 +28,7 @@ import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SimpleNamespace} from "../../namespace-management/domain/namespace";
 import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {BieList} from "../../bie-management/bie-list/domain/bie-list";
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -52,7 +53,8 @@ export class AgencyIdListListComponent implements OnInit {
     'select', 'state', 'name', 'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<AgencyIdList>();
-  selection = new SelectionModel<AgencyIdList>(true, []);
+  selection = new SelectionModel<AgencyIdList>(true, [],
+    true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
   expandedElement: AgencyIdList | null;
   canSelect = ['WIP', 'Deleted'];
   loading = false;
@@ -233,6 +235,11 @@ export class AgencyIdListListComponent implements OnInit {
     return this.selection.isSelected(row);
   }
 
+  selectionClear() {
+    this.selection = new SelectionModel<AgencyIdList>(true, [],
+      true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
+  }
+
   get currentUser(): string {
     const userToken = this.auth.getUserToken();
     return (userToken) ? userToken.username : undefined;
@@ -290,7 +297,7 @@ export class AgencyIdListListComponent implements OnInit {
             this.snackBar.open('Deleted', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }
@@ -313,7 +320,7 @@ export class AgencyIdListListComponent implements OnInit {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }
@@ -419,7 +426,7 @@ export class AgencyIdListListComponent implements OnInit {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }
