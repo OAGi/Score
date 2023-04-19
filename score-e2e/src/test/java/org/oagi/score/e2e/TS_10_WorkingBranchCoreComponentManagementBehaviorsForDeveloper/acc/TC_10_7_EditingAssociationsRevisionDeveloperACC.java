@@ -2171,7 +2171,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
             assertEquals(anotherDeveloper.getLoginId(), getText(asccPanel.getOwnerField()));
 
-            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
             ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
             assertEquals(anotherDeveloper.getLoginId(), getText(bccPanel.getOwnerField()));
         }
@@ -2186,7 +2186,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);

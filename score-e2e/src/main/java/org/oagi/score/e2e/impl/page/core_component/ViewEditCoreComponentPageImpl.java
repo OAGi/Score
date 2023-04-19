@@ -365,6 +365,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void hitSearchButton() {
+        waitFor(ofMillis(3000L));
         retry(() -> {
             click(getSearchButton());
             waitFor(ofMillis(1000L));
