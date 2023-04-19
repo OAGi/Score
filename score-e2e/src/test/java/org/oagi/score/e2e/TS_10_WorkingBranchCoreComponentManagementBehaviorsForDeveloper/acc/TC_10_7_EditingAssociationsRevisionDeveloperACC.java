@@ -2153,8 +2153,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
-
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
             transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());

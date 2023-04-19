@@ -248,7 +248,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
-        click(td.findElement(By.tagName("button")));
+        click(td.findElement(By.className("mat-icon")));
 
         TransferCCOwnershipDialog transferCCOwnershipDialog =
                 new TransferCCOwnershipDialogImpl(this);
