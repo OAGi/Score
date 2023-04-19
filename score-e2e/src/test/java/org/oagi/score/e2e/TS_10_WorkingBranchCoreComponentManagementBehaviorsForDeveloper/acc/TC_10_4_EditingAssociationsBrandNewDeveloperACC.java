@@ -198,7 +198,12 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        assertTrue(getSnackBarMessage(getDriver()).contains("already has ASCCP [Account Identifiers. Named Identifiers]"));
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("already has ASCCP"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
@@ -282,7 +287,12 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
-        assertTrue("Target ASCCP is not reusable.".equals(getSnackBarMessage(getDriver())));
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Target ASCCP is not reusable."));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
         // Also test for when non-reusable ASCCP has been deleted while still having an association and
         // the developer still try to use the ASCCP in another association.
@@ -800,7 +810,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation("Accrued Amount");
 
-        assertTrue(getSnackBarMessage(getDriver()).contains("already has BCCP [Accrued Amount. Amount]"));
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("already has BCCP"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Accrued Amount");
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
@@ -1316,7 +1330,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        NamespaceObject enduserNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.enduser.test");
+        NamespaceObject enduserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         BCCPObject bccp_endUser;
 
         {
@@ -1704,8 +1718,12 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-        assertTrue(getSnackBarMessage(getDriver()).contains(duplicateWarning));
 
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains(duplicateWarning));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -1789,7 +1807,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1823,7 +1841,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -2597,7 +2615,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         String nodePath;
 
         {
-            nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
             SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
