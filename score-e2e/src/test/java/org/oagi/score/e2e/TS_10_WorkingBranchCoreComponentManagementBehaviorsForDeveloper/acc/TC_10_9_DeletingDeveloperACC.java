@@ -202,8 +202,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
             new_acc_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            acc.setBasedAccManifestId(new_acc_base.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, new_acc_base);
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
@@ -244,8 +243,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             acc_descendant_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
-            acc.setBasedAccManifestId(acc_descendant_base.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, acc_descendant_base);
         }
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
@@ -283,8 +281,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
             new_acc_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            acc.setBasedAccManifestId(new_acc_base.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, new_acc_base);
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
@@ -299,6 +296,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
         accViewEditPage.hitRestoreButton();
 
         switchToMainTab(getDriver());
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
 
