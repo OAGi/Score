@@ -2217,21 +2217,20 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            acc.setBasedAccManifestId(accForBase.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, accForBase);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
@@ -2239,7 +2238,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
-        viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
 
@@ -2265,7 +2263,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         {
             nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
             WebElement tr;
             tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
             assertTrue(tr.isDisplayed());
@@ -2276,7 +2274,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
         }
 
@@ -2295,7 +2293,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         {
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
             assertTrue(movedBCCPNode.isDisplayed());
         }
 
