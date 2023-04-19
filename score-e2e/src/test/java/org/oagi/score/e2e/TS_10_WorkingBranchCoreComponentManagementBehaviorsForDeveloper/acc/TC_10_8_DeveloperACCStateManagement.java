@@ -87,18 +87,18 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
         assertEquals("1", getText(accPanel.getRevisionField()));
         assertEquals("WIP", getText(accPanel.getStateField()));
         accViewEditPage.moveToDraft();
-        accViewEditPage.hitUpdateButton();
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Draft", getText(accPanel.getStateField()));
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("Draft", getText(asccpPanel.getStateField()));
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
-        ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
-        assertEquals("Draft", getText(bccpPanel.getStateField()));
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("Draft", getText(asccPanel.getStateField()));
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Draft", getText(bccPanel.getStateField()));
     }
 
     @Test
@@ -145,18 +145,18 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
         assertEquals("1", getText(accPanel.getRevisionField()));
         assertEquals("Draft", getText(accPanel.getStateField()));
         accViewEditPage.moveToCandidate();
-        accViewEditPage.hitUpdateButton();
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Candidate", getText(accPanel.getStateField()));
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("Candidate", getText(asccpPanel.getStateField()));
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
-        ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
-        assertEquals("Candidate", getText(bccpPanel.getStateField()));
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("Candidate", getText(asccPanel.getStateField()));
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Candidate", getText(bccPanel.getStateField()));
 
     }
 
@@ -204,18 +204,18 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
         assertEquals("1", getText(accPanel.getRevisionField()));
         assertEquals("Candidate", getText(accPanel.getStateField()));
         accViewEditPage.backToWIP();
-        accViewEditPage.hitUpdateButton();
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("WIP", getText(accPanel.getStateField()));
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("WIP", getText(asccpPanel.getStateField()));
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
-        ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
-        assertEquals("WIP", getText(bccpPanel.getStateField()));
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("WIP", getText(asccPanel.getStateField()));
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("WIP", getText(bccPanel.getStateField()));
     }
 
     @Test
@@ -262,18 +262,18 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
         assertEquals("1", getText(accPanel.getRevisionField()));
         assertEquals("Draft", getText(accPanel.getStateField()));
         accViewEditPage.backToWIP();
-        accViewEditPage.hitUpdateButton();
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("WIP", getText(accPanel.getStateField()));
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ACCViewEditPage.ASCCPPanel asccpPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("WIP", getText(asccpPanel.getStateField()));
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
-        ACCViewEditPage.BCCPPanel bccpPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
-        assertEquals("WIP", getText(bccpPanel.getStateField()));
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("WIP", getText(asccPanel.getStateField()));
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("WIP", getText(bccPanel.getStateField()));
     }
 
 }
