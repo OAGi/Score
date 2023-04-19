@@ -92,14 +92,14 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
         assert "ASCCP".equals(getText(getASCCPPanel().getCoreComponentField()));
-        assert getText(getTitle()).equals(asccp.getDen());
+        assert getText(getTitle()).startsWith(asccp.getPropertyTerm());
     }
 
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("div.mat-tab-list div.mat-tab-label"));
+                By.cssSelector("div.mat-tab-list div.mat-tab-label-content"));
     }
 
     @Override

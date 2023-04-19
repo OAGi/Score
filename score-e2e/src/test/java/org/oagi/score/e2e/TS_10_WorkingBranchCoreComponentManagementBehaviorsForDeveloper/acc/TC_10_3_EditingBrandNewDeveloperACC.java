@@ -67,7 +67,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertFalse(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
-        accPanel.setComponentType("Base");
+        accPanel.setComponentType("Base (Abstract)");
         assertDisabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }
@@ -434,7 +434,11 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         accViewEditPage.createOAGiExtensionComponent("/" + acc.getDen());
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]")));
-        assertTrue("Namespace is required.".equals(getSnackBarMessage(getDriver())));
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Namespace is required."));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
     }
 }
