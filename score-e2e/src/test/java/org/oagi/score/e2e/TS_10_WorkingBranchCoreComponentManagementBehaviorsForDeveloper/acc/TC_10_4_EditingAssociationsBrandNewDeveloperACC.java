@@ -2152,7 +2152,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
             if (hasBase) {
                 accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + oldBase);
+                hasBase = false;
             }
+            waitFor(ofMillis(1500L));
             ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
             accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
             oldBase = accForBase.getDen();
