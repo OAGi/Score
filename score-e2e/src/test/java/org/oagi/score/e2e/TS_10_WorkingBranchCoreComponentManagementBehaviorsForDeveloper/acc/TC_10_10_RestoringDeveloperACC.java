@@ -86,12 +86,9 @@ public class TC_10_10_RestoringDeveloperACC extends BaseTest {
         bccpViewEditPage.hitDeleteButton();
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        selectAssociationDialog.selectAssociation(asccp.getDen());
-        selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        selectAssociationDialog.selectAssociation(bccp_to_append.getDen());
-
         accViewEditPage.hitDeleteButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         String acc_prev_revision = getText(accPanel.getRevisionField());
