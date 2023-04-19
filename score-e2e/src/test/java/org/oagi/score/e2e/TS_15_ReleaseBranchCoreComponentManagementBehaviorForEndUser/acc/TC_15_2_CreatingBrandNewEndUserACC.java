@@ -7,6 +7,8 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,13 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_2_1() {
+        AppUserObject endUser= getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
     }
 
