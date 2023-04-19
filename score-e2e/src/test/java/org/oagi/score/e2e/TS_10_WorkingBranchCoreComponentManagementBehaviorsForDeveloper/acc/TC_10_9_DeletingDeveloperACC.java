@@ -64,7 +64,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
         accViewEditPage.hitDeleteButton();
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), branch);
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("1", getText(accPanel.getRevisionField()));
@@ -93,11 +93,9 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
 
             acc_descendant = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             acc_descendant_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
-            acc_descendant.setBasedAccManifestId(acc_descendant_base.getAccManifestId());
-            coreComponentAPI.updateACC(acc_descendant);
+            coreComponentAPI.updateBasedACC(acc_descendant, acc_descendant_base);
 
-            acc.setBasedAccManifestId(acc_descendant.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, acc_descendant);
         }
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + acc_descendant.getDen());
@@ -145,8 +143,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
             acc_base_for_delete = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             new_acc_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             acc_descendant_base = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
-            acc.setBasedAccManifestId(acc_descendant_base.getAccManifestId());
-            coreComponentAPI.updateACC(acc);
+            coreComponentAPI.updateBasedACC(acc, acc_descendant_base);
         }
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + acc_descendant_base.getDen());
