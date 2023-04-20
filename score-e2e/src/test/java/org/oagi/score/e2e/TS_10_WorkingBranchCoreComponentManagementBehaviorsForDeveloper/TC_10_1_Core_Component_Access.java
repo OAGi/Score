@@ -1362,6 +1362,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Query Base. Details", release.getReleaseNumber());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + "Query Base. Details" + "/" + "Response Code");
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
@@ -1374,7 +1375,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
 
         release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.test.com/enduser");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -1383,43 +1384,49 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
-        ACCObject ACCendUserWIP, ACCendUserQA;
+        ACCObject ACCendUserWIP, ACCendUserQA, ACCForBase;
         ASCCPObject ASCCPendUserQA;
         BCCPObject BCCPendUserQA;
         ACCendUserWIP = randomCoreComponentWithStateContainer.stateACCs.get("WIP");
         ACCendUserQA = randomCoreComponentWithStateContainer.stateACCs.get("QA");
         ASCCPendUserQA = randomCoreComponentWithStateContainer.stateASCCPs.get("QA");
         BCCPendUserQA = randomCoreComponentWithStateContainer.stateBCCPs.get("QA");
+        ACCForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "QA");
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
-        accViewEditPage.appendPropertyAtLast("/" + ASCCPendUserQA.getPropertyTerm());
-        accViewEditPage.appendPropertyAtLast("/" + BCCPendUserQA.getPropertyTerm());
-        accViewEditPage.setBaseACC("/" + ACCendUserQA.getDen());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + ACCendUserWIP.getDen());
+        appendAssociationDialog.selectAssociation(ASCCPendUserQA.getDen());
+        appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + ACCendUserWIP.getDen());
+        appendAssociationDialog.selectAssociation(BCCPendUserQA.getDen());
 
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + ACCendUserWIP.getDen());
+        accViewEditPage = accSetBaseACCDialog.hitApplyButton(ACCForBase.getDen());
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + ASCCPendUserQA.getPropertyTerm());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + BCCPendUserQA.getPropertyTerm());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
-        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserQA.getDen());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCForBase.getAccManifestId());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCForBase.getDen());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCForBase.getAccManifestId());
         accViewEditPage.backToWIP();
-        accViewEditPage.setBaseACC("/" + "Customer Credit Base. Details");
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + ACCForBase.getDen());
+        accSetBaseACCDialog.hitApplyButton("Customer Credit Base. Details");
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
-        accViewEditPage.findWhereUsed("/" + "Customer Credit Base");
-        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        accViewEditPage.findWhereUsed("/" + "Customer Credit Base. Details");
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCForBase.getDen()).isDisplayed());
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Customer Credit. Details").isDisplayed());
     }
 
