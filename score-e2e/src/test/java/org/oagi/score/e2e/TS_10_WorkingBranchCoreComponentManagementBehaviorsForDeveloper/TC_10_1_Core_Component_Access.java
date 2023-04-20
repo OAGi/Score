@@ -866,13 +866,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can filter Core Components based on their Type.
              */
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getStateSelectField().click();
+            waitFor(Duration.ofMillis(3000L));
+            click(viewEditCoreComponentPage.getStateSelectField());
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
 
             // search by state
             List<WebElement> stateOption = options.stream().filter(e -> state.equals(getText(e))).collect(Collectors.toList());
             stateOption.get(0).click();
-            pressEscape();
+            escape(getDriver());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
@@ -913,33 +914,47 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             /**
              * developer can filter Core Components based on their Updated Date.
              */
+            LocalDateTime startTime = LocalDateTime.of(
+                    2013,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+            LocalDateTime endTime = LocalDateTime.of(
+                    2015,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+
             LocalDateTime creationTime = LocalDateTime.of(
-                    2018,
+                    2014,
                     RandomUtils.nextInt(1, 13),
                     RandomUtils.nextInt(1, 29),
                     RandomUtils.nextInt(0, 24),
                     RandomUtils.nextInt(0, 60),
                     RandomUtils.nextInt(0, 60)
             );
-            LocalDateTime updateTime = LocalDateTime.of(
-                    2019,
-                    RandomUtils.nextInt(1, 13),
-                    RandomUtils.nextInt(1, 29),
-                    RandomUtils.nextInt(0, 24),
-                    RandomUtils.nextInt(0, 60),
-                    RandomUtils.nextInt(0, 60)
-            );
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc.setCreationTimestamp(creationTime);
-            acc.setLastUpdateTimestamp(updateTime);
+            acc.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateACC(acc);
             asccp.setCreationTimestamp(creationTime);
-            asccp.setLastUpdateTimestamp(updateTime);
+            asccp.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateASCCP(asccp);
             bccp.setCreationTimestamp(creationTime);
-            bccp.setLastUpdateTimestamp(updateTime);
+            bccp.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateBCCP(bccp);
 
             // search by Updated date
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setUpdatedStartDate(creationTime);
-            viewEditCoreComponentPage.setUpdatedEndDate(updateTime);
+            waitFor(Duration.ofMillis(3000L));
+            viewEditCoreComponentPage.setUpdatedStartDate(startTime);
+            viewEditCoreComponentPage.setUpdatedEndDate(endTime);
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
@@ -995,7 +1010,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setModule("Model\\Platform\\2_6\\Common\\Components\\Components");
         viewEditCoreComponentPage.hitSearchButton();
-        assertEquals(0, (getDriver().findElement(By.xpath("//*[contains(text(),\"Model\\OAGIS-Nouns\")]"))).getSize());
+        assertEquals(0, (getDriver().findElements(By.xpath("//*[contains(text(),\"Model\\OAGIS-Nouns\")]"))).size());
 
         viewEditCoreComponentPage.openPage();
         viewEditCoreComponentPage.setModule("Master");
@@ -1012,40 +1027,43 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         List<WebElement> baseOption = options.stream().filter(e -> "Base (Abstract)".equals(getText(e))).collect(Collectors.toList());
         baseOption.get(0).click();
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Financial Account Reference Identification. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         for (String componentState : Arrays.asList( "Base (Abstract)", "Semantics")){
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Identification. Details", "oagis").isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         for (String componentState : Arrays.asList( "Extension", "Semantics")){
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Extension. Details", "oagis").isDisplayed());
@@ -1053,33 +1071,36 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         for (String componentState : Arrays.asList( "Extension", "Semantics")){
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Transaction\"");
         viewEditCoreComponentPage.hitSearchButton();
-        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Inventory Transaction Group. Details", "oagis").isDisplayed());
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Inventory Transaction Group. Details\")]")).size());
+        assertTrue(1 <= getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         for (String componentState : Arrays.asList( "OAGIS10 Nouns", "Semantic Group")){
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Transaction\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         viewEditCoreComponentPage.getComponentTypeSelectField().click();
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -1087,7 +1108,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Transaction\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
