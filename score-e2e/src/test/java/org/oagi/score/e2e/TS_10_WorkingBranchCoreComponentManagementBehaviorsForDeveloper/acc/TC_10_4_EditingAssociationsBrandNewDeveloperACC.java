@@ -2438,6 +2438,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         }
 
         viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitCancelButton();
+        viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitCancelButton();
 
