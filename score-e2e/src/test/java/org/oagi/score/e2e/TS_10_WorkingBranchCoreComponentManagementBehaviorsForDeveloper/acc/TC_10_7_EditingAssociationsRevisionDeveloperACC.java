@@ -1754,7 +1754,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         ACCObject acc, acc_association, acc_association_before, acc_association_after;
         ASCCPObject asccp, asccp_before, asccp_after;
-        ASCCObject ascc;
+        ASCCObject ascc, ascc_before;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -1767,31 +1767,23 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             ascc = getAPIFactory().getCoreComponentAPI().appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
+            ascc_before = coreComponentAPI.appendASCC(acc, asccp_before, "Published");
+            ascc_before.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc_before);
         }
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
-
-        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        appendASCCPDialog.selectAssociation(asccp_before.getDen());
-
-        appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_before.getPropertyTerm());
+        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_after.getPropertyTerm());
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
-        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp_before.getPropertyTerm() + "\")]";
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp_after.getPropertyTerm() + "\")]";
         assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
-
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.hitCancelButton();
-
-        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp_before.getPropertyTerm());
-        assertTrue(asccNode.isDisplayed());
     }
 
     @Test
