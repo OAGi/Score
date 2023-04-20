@@ -2216,7 +2216,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.updateBasedACC(acc, accForBase);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
@@ -2238,6 +2238,8 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitReviseButton();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
 
