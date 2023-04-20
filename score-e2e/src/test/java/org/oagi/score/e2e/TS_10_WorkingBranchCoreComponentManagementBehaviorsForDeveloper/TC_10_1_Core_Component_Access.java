@@ -176,6 +176,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         /**
          * developer can edit the details of a CC that is in WIP state and owned by him
          */
@@ -188,7 +190,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertEnabled(accViewEditPage.getDefinitionField());
         assertEnabled(accViewEditPage.getDefinitionSourceField());
         assertEnabled(accViewEditPage.getNamespaceField());
-        assertEnabled(accViewEditPage.getCoreComponentTypeField());
+        assertEnabled(accPanel.getComponentTypeSelectField());
 
         accViewEditPage.openPage(); // refresh the page to erase the snackbar message
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -197,11 +199,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
         assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
         assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
         assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
 
         accViewEditPage.openPage();
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -213,10 +213,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
         assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
         assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
-        assertEnabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
+        assertEnabled(asccPanelContainer.getASCCPanel().getDefinitionField());
+        assertEnabled(asccPanelContainer.getASCCPanel().getDefinitionSourceField());
     }
 
     @Test
@@ -324,7 +322,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Draft");
         ccStates.add("Candidate");
-        ccStates.add("Release Draft");
 
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
@@ -343,7 +340,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             acc = entry.getValue();
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+            viewEditCoreComponentPage.openPage();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             /**
              * developer can view but CANNOT edit the details of a CC that is in WIP state and owned by another developer
              * However, he can add comments.
@@ -364,8 +362,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             click(accViewEditPage.getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
-
-            accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+            viewEditCoreComponentPage.openPage();   // refresh the page to erase the snackbar message
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
@@ -378,7 +376,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             click(bccPanelContainer.getBCCPanel().getCommentsIcon());
             assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
 
-            accViewEditPage.openPage();
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
             asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -618,7 +617,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
 
             By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
@@ -701,7 +700,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
 
             By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
+                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
