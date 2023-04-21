@@ -2313,27 +2313,27 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            accForBaseLv1 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv1 = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.updateBasedACC(acc, accForBaseLv1);
 
-            accForBaseLv2 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv2 = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.updateBasedACC(accForBaseLv1, accForBaseLv2);
 
-            accForBaseLv3 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBaseLv3 = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.updateBasedACC(accForBaseLv2, accForBaseLv3);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(accForBaseLv1, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBaseLv1, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
@@ -2341,7 +2341,16 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBaseLv1.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBaseLv2.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBaseLv3.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         viewEditCoreComponentPage.openPage();
         {

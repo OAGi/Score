@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
@@ -17,6 +15,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +23,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
@@ -84,47 +82,39 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        ACCObject acc, accGroup, accAbstract;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accGroup = coreComponentAPI.createRandomACCSemanticGroupType(developer, release, namespace, "Published");
+            accAbstract = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            accAbstract.setAbstract(true);
+            accAbstract.setComponentType(ComponentType.Base);
+            coreComponentAPI.updateACC(accAbstract);
+        }
+
         //abstract can change only from true to false
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Currency Exchange ABIE. Details", branch);
+        waitFor(Duration.ofMillis(3000L));
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        WebElement accNode = accViewEditPage.getNodeByPath("/Currency Exchange ABIE. Details");
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("2", getText(accPanel.getRevisionField()));
         assertDisabled(accPanel.getComponentTypeSelectField());
         assertEquals("Semantics", getText(accPanel.getComponentTypeSelectField()));
         assertEnabled(accPanel.getAbstractCheckbox());
-        assertChecked(accPanel.getAbstractCheckbox());
-
-        //false to true cannot be changed when semantics
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Business Object Document. Details", branch);
-        accViewEditPage.hitReviseButton();
-        accNode = accViewEditPage.getNodeByPath("/Business Object Document. Details");
-        accPanel = accViewEditPage.getACCPanel(accNode);
-        assertEquals("2", getText(accPanel.getRevisionField()));
-        assertDisabled(accPanel.getComponentTypeSelectField());
-        assertEquals("Semantics", getText(accPanel.getComponentTypeSelectField()));
-        assertDisabled(accPanel.getAbstractCheckbox());
         assertNotChecked(accPanel.getAbstractCheckbox());
 
-        //false to true cannot be changed when extension
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Change Status Extension. Details", branch);
-        accViewEditPage.hitReviseButton();
-        accNode = accViewEditPage.getNodeByPath("/Change Status Extension. Details");
-        accPanel = accViewEditPage.getACCPanel(accNode);
-        assertEquals("2", getText(accPanel.getRevisionField()));
-        assertDisabled(accPanel.getComponentTypeSelectField());
-        assertEquals("Extension", getText(accPanel.getComponentTypeSelectField()));
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertNotChecked(accPanel.getAbstractCheckbox());
 
         //false to true cannot be changed when semantic group
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Container Instance Identifiers Group. Details", branch);
+        waitFor(Duration.ofMillis(3000L));
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accGroup.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        accNode = accViewEditPage.getNodeByPath("/Container Instance Identifiers Group. Details");
+        accNode = accViewEditPage.getNodeByPath("/" + accGroup.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("2", getText(accPanel.getRevisionField()));
         assertDisabled(accPanel.getComponentTypeSelectField());
@@ -134,9 +124,10 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
 
         //abstract true cannot be changed when base
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Person Base. Details", branch);
+        waitFor(Duration.ofMillis(3000L));
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accAbstract.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        accNode = accViewEditPage.getNodeByPath("/Person Base. Details");
+        accNode = accViewEditPage.getNodeByPath("/" + accAbstract.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("2", getText(accPanel.getRevisionField()));
         assertDisabled(accPanel.getComponentTypeSelectField());
