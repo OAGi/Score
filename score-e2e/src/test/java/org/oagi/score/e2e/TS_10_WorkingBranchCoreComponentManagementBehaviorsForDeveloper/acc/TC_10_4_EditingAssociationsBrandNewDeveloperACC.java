@@ -15,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -2107,21 +2108,21 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
@@ -2129,7 +2130,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ACCViewEditPage accViewEditPage;
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
         SelectAssociationDialog appendAssociationDialog;
         boolean hasBase = false;
         String oldBase = null;
@@ -2920,68 +2922,44 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
-        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "Working";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-        ACCObject acc, acc_association, accForBase, accGroup;
-        ASCCObject ascc, asccGroup;
-        ASCCPObject asccp, asccpGroup;
-        BCCPObject bccp, bccp_to_append;
-
-        {
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
-            bcc.setCardinalityMax(1);
-            coreComponentAPI.updateBCC(bcc);
-
-            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
-            coreComponentAPI.appendBCC(acc, bccp_to_append, "WIP");
-
-            accGroup = coreComponentAPI.createRandomACCSemanticGroupType(developer, release, namespace, "WIP");
-            coreComponentAPI.appendBCC(accGroup, bccp, "Published");
-
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
-            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
-            ascc.setCardinalityMax(1);
-            coreComponentAPI.updateASCC(ascc);
-
-            asccpGroup = coreComponentAPI.createRandomASCCP(accGroup, developer, namespace, "WIP");
-            asccGroup = coreComponentAPI.appendASCC(accForBase, asccpGroup, "WIP");
-            coreComponentAPI.updateASCC(asccGroup);
-
-            coreComponentAPI.updateBasedACC(acc, accForBase);
-
-        }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        waitFor(Duration.ofMillis(3000L));
         ACCViewEditPage accViewEditPage;
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Classification Base. Details", branch);
+        accViewEditPage.hitReviseButton();
 
-        String nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
-        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp.getPropertyTerm());
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Semantic Classification. Details", branch);
+        accViewEditPage.hitReviseButton();
 
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/Semantic Classification. Details");
+        appendAssociationDialog.selectAssociation("Description. Text");
+        String nodePath = "/Semantic Classification. Details/Description. Text";
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Description");
         WebElement tr;
-        tr = selectBaseACCToRefactorDialog.getTableRecordByValue(accForBase.getDen());
+        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Classification Base. Details");
         assertTrue(tr.isDisplayed());
         click(tr.findElement(By.className("mat-column-" + "select")));
         selectBaseACCToRefactorDialog.hitAnalyzeButton();
         assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
-        String refactorIssue = "Ungrouping '" + asccpGroup.getPropertyTerm() + "' required.";
+        String refactorIssue = "Ungrouping 'Free Form Text Group' required.";
         String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + refactorIssue + "\")]";
         assertEquals(1, getDriver().findElements(By.xpath(xpathExpr)).size());
+        selectBaseACCToRefactorDialog.hitCancelButton();
+        accViewEditPage.hitCancelButton();
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Classification Base. Details", branch);
+        accViewEditPage.hitCancelButton();
     }
 
     @Test
