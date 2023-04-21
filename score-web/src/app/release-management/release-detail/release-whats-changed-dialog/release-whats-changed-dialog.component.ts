@@ -7,11 +7,11 @@ import {CcChange} from '../../../cc-management/cc-list/domain/cc-list';
 import {compare} from '../../../common/utility';
 
 @Component({
-  selector: 'score-release-whats-new-dialog',
-  templateUrl: './release-whats-new-dialog.component.html',
-  styleUrls: ['./release-whats-new-dialog.component.css']
+  selector: 'score-release-whats-changed-dialog',
+  templateUrl: './release-whats-changed-dialog.component.html',
+  styleUrls: ['./release-whats-changed-dialog.component.css']
 })
-export class ReleaseWhatsNewDialogComponent implements OnInit {
+export class ReleaseWhatsChangedDialogComponent implements OnInit {
 
   newACCs: CcChange[] = [];
   newASCCPs: CcChange[] = [];
@@ -22,8 +22,17 @@ export class ReleaseWhatsNewDialogComponent implements OnInit {
   newCodeLists: CcChange[] = [];
   newAgencyIdLists: CcChange[] = [];
 
+  revisedACCs: CcChange[] = [];
+  revisedASCCPs: CcChange[] = [];
+  revisedBCCPs: CcChange[] = [];
+  revisedASCCs: CcChange[] = [];
+  revisedBCCs: CcChange[] = [];
+  revisedDTs: CcChange[] = [];
+  revisedCodeLists: CcChange[] = [];
+  revisedAgencyIdLists: CcChange[] = [];
+
   constructor(
-    public dialogRef: MatDialogRef<ReleaseWhatsNewDialogComponent>,
+    public dialogRef: MatDialogRef<ReleaseWhatsChangedDialogComponent>,
     public ccListService: CcListService,
     public clipboard: Clipboard,
     public snackBar: MatSnackBar,
@@ -33,6 +42,7 @@ export class ReleaseWhatsNewDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.ccListService.getCcChanges(this.data.releaseId).subscribe(resp => {
+      // New components
       this.newACCs = resp.ccChangeList.filter(e => e.type === 'ACC' && e.changeType === 'NEW_COMPONENT')
         .sort((a, b) => compare(a.den, b.den));
       this.newACCs = this.newACCs.filter(e => !!e.tagList && e.tagList.length > 0).concat(
@@ -63,6 +73,39 @@ export class ReleaseWhatsNewDialogComponent implements OnInit {
         .sort((a, b) => compare(a.den, b.den));
 
       this.newAgencyIdLists = resp.ccChangeList.filter(e => e.type === 'AGENCY_ID_LIST' && e.changeType === 'NEW_COMPONENT')
+        .sort((a, b) => compare(a.den, b.den));
+
+      // Revised components
+      this.revisedACCs = resp.ccChangeList.filter(e => e.type === 'ACC' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+      this.revisedACCs = this.revisedACCs.filter(e => !!e.tagList && e.tagList.length > 0).concat(
+        this.revisedACCs.filter(e => !e.tagList || e.tagList.length === 0));
+
+      this.revisedASCCPs = resp.ccChangeList.filter(e => e.type === 'ASCCP' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+      this.revisedASCCPs = this.revisedASCCPs.filter(e => !!e.tagList && e.tagList.length > 0).concat(
+        this.revisedASCCPs.filter(e => !e.tagList || e.tagList.length === 0));
+
+      this.revisedBCCPs = resp.ccChangeList.filter(e => e.type === 'BCCP' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+      this.revisedBCCPs = this.revisedBCCPs.filter(e => !!e.tagList && e.tagList.length > 0).concat(
+        this.revisedBCCPs.filter(e => !e.tagList || e.tagList.length === 0));
+
+      this.revisedASCCs = resp.ccChangeList.filter(e => e.type === 'ASCC' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+
+      this.revisedBCCs = resp.ccChangeList.filter(e => e.type === 'BCC' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+
+      this.revisedDTs = resp.ccChangeList.filter(e => e.type === 'DT' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+      this.revisedDTs = this.revisedDTs.filter(e => !!e.tagList && e.tagList.length > 0).concat(
+        this.revisedDTs.filter(e => !e.tagList || e.tagList.length === 0));
+
+      this.revisedCodeLists = resp.ccChangeList.filter(e => e.type === 'CODE_LIST' && e.changeType === 'REVISED')
+        .sort((a, b) => compare(a.den, b.den));
+
+      this.revisedAgencyIdLists = resp.ccChangeList.filter(e => e.type === 'AGENCY_ID_LIST' && e.changeType === 'REVISED')
         .sort((a, b) => compare(a.den, b.den));
     });
   }

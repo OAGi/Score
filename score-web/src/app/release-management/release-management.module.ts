@@ -13,8 +13,8 @@ import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
-  ReleaseWhatsNewDialogComponent
-} from "./release-detail/release-whats-new-dialog/release-whats-new-dialog.component";
+  ReleaseWhatsChangedDialogComponent
+} from "./release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component";
 
 const routes: Routes = [
   {
@@ -60,7 +60,7 @@ const routes: Routes = [
     ReleaseCreateComponent,
     ReleaseDetailComponent,
     ReleaseAssignComponent,
-    ReleaseWhatsNewDialogComponent
+    ReleaseWhatsChangedDialogComponent
   ],
   providers: [
     ReleaseService

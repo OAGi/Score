@@ -14,7 +14,7 @@ import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {ReleaseWhatsNewDialogComponent} from "./release-whats-new-dialog/release-whats-new-dialog.component";
+import {ReleaseWhatsChangedDialogComponent} from "./release-whats-changed-dialog/release-whats-changed-dialog.component";
 
 @Component({
   selector: 'score-release-list',
@@ -163,7 +163,7 @@ export class ReleaseDetailComponent implements OnInit {
     return true;
   }
 
-  openWhatsNewDialog() {
+  openWhatsChangedDialog() {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.width = '80vw';
@@ -171,7 +171,7 @@ export class ReleaseDetailComponent implements OnInit {
     dialogConfig.data = {
       releaseId: this.releaseDetail.releaseId
     };
-    const dialogRef = this.dialog.open(ReleaseWhatsNewDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ReleaseWhatsChangedDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
     });
   }
