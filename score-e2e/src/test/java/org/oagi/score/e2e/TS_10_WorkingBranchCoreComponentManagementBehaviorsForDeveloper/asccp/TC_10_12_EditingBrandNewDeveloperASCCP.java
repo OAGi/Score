@@ -389,7 +389,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -413,7 +413,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -455,7 +455,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         waitFor(ofSeconds(1L));
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
