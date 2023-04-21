@@ -943,7 +943,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.DEFINITION_SOURCE, acc.getDefinitionSource())
                 .set(ACC.NAMESPACE_ID, ULong.valueOf(acc.getNamespaceId()))
                 .set(ACC.IS_DEPRECATED, (byte) (acc.isDeprecated() ? 1 : 0))
+                .set(ACC.IS_ABSTRACT, (byte)(acc.isAbstract() ? 1 : 0))
                 .set(ACC.STATE, acc.getState())
+                .set(ACC.OAGIS_COMPONENT_TYPE, acc.getComponentType().getValue())
                 .where(ACC.ACC_ID.eq(ULong.valueOf(acc.getAccId())))
                 .execute();
     }
