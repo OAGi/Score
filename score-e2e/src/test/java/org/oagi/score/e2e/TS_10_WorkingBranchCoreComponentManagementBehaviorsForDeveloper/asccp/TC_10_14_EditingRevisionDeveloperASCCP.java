@@ -11,7 +11,6 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ASCCPChangeACCDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
