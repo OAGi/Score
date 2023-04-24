@@ -1,7 +1,7 @@
-package org.oagi.score.e2e.impl.page.code_list;
+package org.oagi.score.e2e.impl.page.agency_id_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
+import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -10,11 +10,11 @@ import org.openqa.selenium.WebElement;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
+public class EditAgencyIDListValueDialogImpl implements EditAgencyIDListValueDialog {
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
-    private static final By CODE_FIELD_LOCATOR =
-            By.xpath("//mat-label[text() = \"Code\"]//ancestor::mat-form-field//input");
+    private static final By VALUE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Value\")]//ancestor::mat-form-field//input");
     private static final By MEANING_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Meaning\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -25,10 +25,9 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
             By.xpath("//span[contains(text(), \"Save\")]//ancestor::mat-dialog-actions/button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//span[contains(text(),\"Deprecated\")]//ancestor::mat-checkbox");
-
     private final BasePageImpl parent;
 
-    public EditCodeListValueDialogImpl(BasePageImpl parent) {
+    public EditAgencyIDListValueDialogImpl(BasePageImpl parent) {
         this.parent = parent;
     }
 
@@ -52,8 +51,8 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     }
 
     @Override
-    public void setCode(String code) {
-        sendKeys(getCodeField(), code);
+    public void setValue(String value) {
+        sendKeys(getValueField(), value);
     }
 
     @Override
@@ -71,8 +70,8 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     }
 
     @Override
-    public WebElement getCodeField() {
-        return visibilityOfElementLocated(getDriver(), CODE_FIELD_LOCATOR);
+    public WebElement getValueField() {
+        return visibilityOfElementLocated(getDriver(), VALUE_FIELD_LOCATOR);
     }
     @Override
     public WebElement getMeaningField() {
@@ -118,10 +117,5 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     @Override
     public WebElement getSaveButton() {
         return elementToBeClickable(getDriver(), SAVE_BUTTON_LOCATOR);
-    }
-
-    @Override
-    public void toggleDeprecated() {
-        click(getDeprecatedSelectField());
     }
 }
