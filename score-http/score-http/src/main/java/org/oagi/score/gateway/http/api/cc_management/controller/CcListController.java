@@ -179,7 +179,7 @@ public class CcListController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                            @RequestBody CcTransferOwnerShipListRequest request) {
+                                            @RequestBody CcTransferOwnershipListRequest request) {
         service.transferOwnershipList(user, request);
         return ResponseEntity.noContent().build();
     }

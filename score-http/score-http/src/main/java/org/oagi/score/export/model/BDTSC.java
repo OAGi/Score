@@ -44,7 +44,7 @@ public class BDTSC implements Component {
         }
         if (OAGIS_VERSION < 10.3D) {
             // exceptional case. 'preferredIndicator' must be 'preferred'.
-            if ("oagis-id-9bb9add40b5b415c8489b08bd4484907".equals(dtSc.getGuid())) {
+            if ("9bb9add40b5b415c8489b08bd4484907".equals(dtSc.getGuid())) {
                 representationTerm = "";
             }
         }

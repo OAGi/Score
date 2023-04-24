@@ -42,9 +42,8 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 @Scope(SCOPE_PROTOTYPE)
 public class XMLExportSchemaModuleVisitor {
 
+    private static final String ID_ATTIBUTE_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private String GUID_PREFIX = "oagis-id-";
 
     private SchemaModule schemaModule;
     private File baseDir;
@@ -156,7 +155,7 @@ public class XMLExportSchemaModuleVisitor {
         rootElement.addContent(simpleTypeElement);
 
         simpleTypeElement.setAttribute("name", agencyId.getTypeName());
-        simpleTypeElement.setAttribute("id", GUID_PREFIX + agencyId.getGuid());
+        simpleTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + agencyId.getGuid());
 
         String agencyIdName = agencyId.getName().replaceAll(" ", "").replace("Identifier", "ID");
         Element unionElement = new Element("union", XSD_NS);
@@ -169,7 +168,7 @@ public class XMLExportSchemaModuleVisitor {
         rootElement.addContent(enumerationTypeElement);
 
         enumerationTypeElement.setAttribute("name", agencyIdName + "ContentEnumerationType");
-        enumerationTypeElement.setAttribute("id", GUID_PREFIX + agencyId.getEnumGuid());
+        enumerationTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + agencyId.getEnumGuid());
 
         Element restrictionElement = new Element("restriction", XSD_NS);
         enumerationTypeElement.addContent(restrictionElement);
@@ -207,14 +206,14 @@ public class XMLExportSchemaModuleVisitor {
         if (schemaCodeList.getEnumTypeGuid() != null) {
             Element codeListElement = new Element("simpleType", XSD_NS);
             codeListElement.setAttribute("name", name + "EnumerationType");
-            codeListElement.setAttribute("id", GUID_PREFIX + schemaCodeList.getEnumTypeGuid());
+            codeListElement.setAttribute("id", ID_ATTIBUTE_PREFIX + schemaCodeList.getEnumTypeGuid());
 
             addRestriction(codeListElement, schemaCodeList.getValues());
             rootElement.addContent(codeListElement);
 
             codeListElement = new Element("simpleType", XSD_NS);
             codeListElement.setAttribute("name", name + "ContentType");
-            codeListElement.setAttribute("id", GUID_PREFIX + schemaCodeList.getGuid());
+            codeListElement.setAttribute("id", ID_ATTIBUTE_PREFIX + schemaCodeList.getGuid());
             Element unionElement = new Element("union", XSD_NS);
             SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
             if (baseCodeList == null) {
@@ -228,7 +227,7 @@ public class XMLExportSchemaModuleVisitor {
         } else {
             Element codeListElement = new Element("simpleType", XSD_NS);
             codeListElement.setAttribute("name", name + "ContentType");
-            codeListElement.setAttribute("id", GUID_PREFIX + schemaCodeList.getGuid());
+            codeListElement.setAttribute("id", ID_ATTIBUTE_PREFIX + schemaCodeList.getGuid());
             Collection<String> values = schemaCodeList.getValues();
             if (values.isEmpty()) {
                 Element restrictionElement = new Element("restriction", XSD_NS);
@@ -245,7 +244,7 @@ public class XMLExportSchemaModuleVisitor {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
         String name = xbtSimpleType.getName();
         simpleTypeElement.setAttribute("name", name);
-        simpleTypeElement.setAttribute("id", GUID_PREFIX + xbtSimpleType.getGuid());
+        simpleTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + xbtSimpleType.getGuid());
 
         String schemaDefinition = xbtSimpleType.getSchemaDefinition();
         schemaDefinition =
@@ -272,7 +271,7 @@ public class XMLExportSchemaModuleVisitor {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
         String name = bdtSimpleType.getName();
         simpleTypeElement.setAttribute("name", name);
-        simpleTypeElement.setAttribute("id", GUID_PREFIX + bdtSimpleType.getGuid());
+        simpleTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + bdtSimpleType.getGuid());
 
         if (bdtSimpleType.isDefaultBDT()) {
             setDocumentation(simpleTypeElement, bdtSimpleType);
@@ -472,7 +471,7 @@ public class XMLExportSchemaModuleVisitor {
     public void visitBDTSimpleContent(BDTSimpleContent bdtSimpleContent) throws Exception {
         Element complexTypeElement = new Element("complexType", XSD_NS);
         complexTypeElement.setAttribute("name", bdtSimpleContent.getName());
-        complexTypeElement.setAttribute("id", GUID_PREFIX + bdtSimpleContent.getGuid());
+        complexTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + bdtSimpleContent.getGuid());
 
         setDocumentation(complexTypeElement, bdtSimpleContent);
         setSimpleContent(complexTypeElement, bdtSimpleContent);
@@ -538,7 +537,7 @@ public class XMLExportSchemaModuleVisitor {
                 attributeElement.setAttribute("use", useVal);
             }
 
-            attributeElement.setAttribute("id", GUID_PREFIX + dtSc.getGuid());
+            attributeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + dtSc.getGuid());
 
             if (!schemaModule.getPath().contains("Meta")) {
                 setDocumentationForBdtSc(attributeElement, bdtSimpleContent, dtSc);
@@ -790,7 +789,7 @@ public class XMLExportSchemaModuleVisitor {
 
         element.setAttribute("name", component.getName());
         element.setAttribute("type", attachNamespacePrefixIfExists(component.getTypeName(), component.getTypeNamespaceId()));
-        element.setAttribute("id", GUID_PREFIX + component.getGuid());
+        element.setAttribute("id", ID_ATTIBUTE_PREFIX + component.getGuid());
 
         setDocumentation(element, component);
 
@@ -815,7 +814,7 @@ public class XMLExportSchemaModuleVisitor {
 
         String name = accComplexType.getName();
         complexTypeElement.setAttribute("name", name + "Type");
-        complexTypeElement.setAttribute("id", GUID_PREFIX + accComplexType.getGuid());
+        complexTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
         complexTypeElement.addContent(sequenceElement);
@@ -838,7 +837,7 @@ public class XMLExportSchemaModuleVisitor {
 
                 String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length());
                 element.setAttribute("ref", attachNamespacePrefixIfExists(bodName, dependedModule.getNamespace().getNamespaceId()));
-                element.setAttribute("id", GUID_PREFIX + Utility.generateGUID((name + path).getBytes()));
+                element.setAttribute("id", ID_ATTIBUTE_PREFIX + Utility.generateGUID((name + path).getBytes()));
                 element.setAttribute("minOccurs", "0");
 
                 sequenceElement.addContent(element);
@@ -861,7 +860,7 @@ public class XMLExportSchemaModuleVisitor {
         if (accComplexType.isAbstract()) {
             complexTypeElement.setAttribute("abstract", "true");
         }
-        complexTypeElement.setAttribute("id", GUID_PREFIX + accComplexType.getGuid());
+        complexTypeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
 
@@ -879,7 +878,7 @@ public class XMLExportSchemaModuleVisitor {
                     anyElement.setAttribute("namespace", "##any");
                     anyElement.setAttribute("processContents", "strict");
                     setCardinalities(anyElement, ascc.getCardinalityMin(), ascc.getCardinalityMax());
-                    anyElement.setAttribute("id", GUID_PREFIX + ascc.getGuid());
+                    anyElement.setAttribute("id", ID_ATTIBUTE_PREFIX + ascc.getGuid());
 
                     sequenceElement.addContent(anyElement);
 
@@ -895,7 +894,7 @@ public class XMLExportSchemaModuleVisitor {
 
                         String ref = Utility.toCamelCase(asccp.getPropertyTerm());
                         groupElement.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.getNamespaceId()));
-                        groupElement.setAttribute("id", GUID_PREFIX + ascc.getGuid());
+                        groupElement.setAttribute("id", ID_ATTIBUTE_PREFIX + ascc.getGuid());
                         setCardinalities(groupElement, ascc.getCardinalityMin(), ascc.getCardinalityMax());
 
                         sequenceElement.addContent(groupElement);
@@ -912,7 +911,7 @@ public class XMLExportSchemaModuleVisitor {
                             element.setAttribute("type", attachNamespacePrefixIfExists(typeName, asccp.getNamespaceId()));
                         }
 
-                        element.setAttribute("id", GUID_PREFIX + ascc.getGuid());
+                        element.setAttribute("id", ID_ATTIBUTE_PREFIX + ascc.getGuid());
                         setCardinalities(element, ascc.getCardinalityMin(), ascc.getCardinalityMax());
 
                         sequenceElement.addContent(element);
@@ -930,7 +929,7 @@ public class XMLExportSchemaModuleVisitor {
 
                     String ref = Utility.toCamelCase(bccp.getPropertyTerm());
                     element.setAttribute("ref", attachNamespacePrefixIfExists(ref, bccp.getNamespaceId()));
-                    element.setAttribute("id", GUID_PREFIX + bcc.getGuid());
+                    element.setAttribute("id", ID_ATTIBUTE_PREFIX + bcc.getGuid());
                     setCardinalities(element, bcc.getCardinalityMin(), bcc.getCardinalityMax());
 
                     sequenceElement.addContent(element);
@@ -963,7 +962,8 @@ public class XMLExportSchemaModuleVisitor {
                 BccRecord bcc = dataProvider.findBCC(bccManifest.getBccId());
                 BccpManifestRecord bccpManifest = dataProvider.findBCCPManifest(bccManifest.getToBccpManifestId());
                 BccpRecord bccp = dataProvider.findBCCP(bccpManifest.getBccpId());
-                DtRecord bdt = dataProvider.findDT(bccp.getBdtId());
+                DtManifestRecord dtManifestRecord = dataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
+                DtRecord bdt = dataProvider.findDT(dtManifestRecord.getDtId());
 
                 if (bcc.getEntityType() == 0) {
                     Element attributeElement = new Element("attribute", XSD_NS);
@@ -977,7 +977,7 @@ public class XMLExportSchemaModuleVisitor {
                         attributeElement.setAttribute("use", useVal);
                     }
 
-                    attributeElement.setAttribute("id", GUID_PREFIX + bcc.getGuid());
+                    attributeElement.setAttribute("id", ID_ATTIBUTE_PREFIX + bcc.getGuid());
                     // Attribute 'nillable' is not allowed in element <xsd:attribute>
 //                    if (bcc.getIsNillable() == 1) {
 //                        attributeElement.setAttribute("nillable", "true");

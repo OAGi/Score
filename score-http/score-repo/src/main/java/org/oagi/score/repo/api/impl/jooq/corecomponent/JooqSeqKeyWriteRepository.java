@@ -144,6 +144,14 @@ public class JooqSeqKeyWriteRepository
             throw new ScoreDataAccessException(new IllegalArgumentException());
         }
 
+        if (request.getItem().getPrevSeqKey() != null) {
+            BigInteger prevSeqKeyId = request.getItem().getPrevSeqKey().getSeqKeyId();
+            // if the request is already fulfilled
+            if (prevSeqKeyId.equals(request.getAfter().getSeqKeyId())) {
+                return new MoveAfterResponse();
+            }
+        }
+
         brokeLinks(request.getItem());
 
         // DO NOT change orders of executions.

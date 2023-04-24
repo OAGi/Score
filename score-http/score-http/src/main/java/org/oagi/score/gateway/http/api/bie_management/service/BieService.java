@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
+import org.oagi.score.gateway.http.api.cc_management.data.CcTransferOwnershipListRequest;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -36,10 +37,13 @@ import org.oagi.score.service.message.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -56,6 +60,9 @@ public class BieService {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private BieEditService bieEditService;
 
     @Autowired
     private ABIERepository abieRepository;
@@ -510,5 +517,18 @@ public class BieService {
         }
     }
 
+    @Transactional
+    public void updateStateBieList(AuthenticatedPrincipal user, BieUpdateStateListRequest request) {
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
+            bieEditService.updateState(user, topLevelAsbiepId, request.getToState());
+        });
+    }
+
+    @Transactional
+    public void transferOwnershipList(AuthenticatedPrincipal user, BieTransferOwnershipListRequest request) {
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
+            transferOwnership(user, topLevelAsbiepId, request.getTargetLoginId());
+        });
+    }
 
 }

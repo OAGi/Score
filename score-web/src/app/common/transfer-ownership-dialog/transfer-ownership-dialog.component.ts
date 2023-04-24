@@ -16,6 +16,7 @@ import {AuthService} from '../../authentication/auth.service';
 })
 export class TransferOwnershipDialogComponent implements OnInit {
 
+  loading = false;
   displayedColumns: string[] = [
     'select', 'loginId', 'name', 'organization', 'developer'
   ];
@@ -64,6 +65,7 @@ export class TransferOwnershipDialogComponent implements OnInit {
   }
 
   loadAccounts(isInit?: boolean) {
+    this.loading = true;
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
@@ -79,6 +81,9 @@ export class TransferOwnershipDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
       this.dataSource.data = resp.list;
+      this.loading = false;
+    }, error => {
+      this.loading = false;
     });
   }
 

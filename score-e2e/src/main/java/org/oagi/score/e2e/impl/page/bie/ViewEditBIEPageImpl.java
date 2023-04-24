@@ -55,7 +55,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By NEW_BIE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"New BIE\")]//ancestor::button[1]");
+            By.xpath("//button[contains(@mattooltip, \"New BIE\")]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");

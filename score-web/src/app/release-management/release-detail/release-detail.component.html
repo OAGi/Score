@@ -76,8 +76,8 @@
         </button>
         <button mat-raised-button color="info"
                 *ngIf="releaseDetail.state === 'Draft' || releaseDetail.state === 'Published'"
-                (click)="openWhatsNewDialog()">
-          What's new
+                (click)="openWhatsChangedDialog()">
+          What's changed
         </button>
         <button mat-raised-button color="accent"
                 *ngIf="releaseDetail.state === 'Published' && releaseDetail.latestRelease"

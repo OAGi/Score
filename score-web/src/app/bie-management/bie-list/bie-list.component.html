@@ -3,13 +3,40 @@
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button color="primary" routerLink="create" style="margin-right: 10px;">
-        New BIE
+      <button mat-icon-button class="ml-2" routerLink="create" matTooltip="New BIE">
+        <mat-icon>add</mat-icon>
       </button>
-      <button mat-raised-button color="warn"
-              (click)="discardAllSelected()"
-              [disabled]="selection.selected.length === 0">
-        Discard
+
+      <button mat-icon-button class="ml-2" matTooltip="Move to WIP"
+              [hidden]="!canToolbarAction('WIP')"
+              (click)="multipleUpdate('WIP')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to QA"
+              [hidden]="!canToolbarAction('QA')"
+              (click)="multipleUpdate('QA')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to Production"
+              [hidden]="!canToolbarAction('Production')"
+              (click)="multipleUpdate('Production')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Back to WIP"
+              [hidden]="!canToolbarAction('BackWIP')"
+              (click)="multipleUpdate('WIP')">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <button mat-icon-button class="ml-2" matTooltip="Discard"
+              [hidden]="selection.selected.length === 0"
+              (click)="discardAllSelected()">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Transfer Ownership"
+              [hidden]="!canToolbarAction('Transfer')"
+              (click)="openTransferDialogMultiple()">
+        <mat-icon>swap_horiz</mat-icon>
       </button>
     </mat-toolbar>
   </div>
@@ -173,9 +200,7 @@
               </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.access !== 'CanEdit'"
-                            matTooltip="This profile BIE cannot be modified."
-                            [matTooltipDisabled]="row.access === 'CanEdit'"
+              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.owner !== username"
                             (change)="$event ? toggle(row) : null"
                             [checked]="isSelected(row)">
               </mat-checkbox>

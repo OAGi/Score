@@ -96,6 +96,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
