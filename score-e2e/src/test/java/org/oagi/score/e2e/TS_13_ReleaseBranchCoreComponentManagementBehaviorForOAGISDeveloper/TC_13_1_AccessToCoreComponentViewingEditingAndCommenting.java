@@ -56,7 +56,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerB);
+            thisAccountWillBeDeletedAfterTests(endUser);
 
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
             ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");

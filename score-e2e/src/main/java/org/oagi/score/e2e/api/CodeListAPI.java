@@ -44,4 +44,6 @@ public interface CodeListAPI {
     List<String> getOAGISOwnedLists(BigInteger releaseId);
 
     boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList);
+
+    CodeListObject createRevisionOfACodeListAndPublishInAnotherRelease(CodeListObject codeListToBeRevised, ReleaseObject release, AppUserObject creator, int revisionNumber);
 }
