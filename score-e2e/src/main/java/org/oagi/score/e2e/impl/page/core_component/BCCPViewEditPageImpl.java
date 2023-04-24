@@ -307,6 +307,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

@@ -261,12 +261,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public void hitUpdateButton() {
         retry(() -> {
-            click(getUpdateButton());
+            click(getUpdateButton(true));
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
+
     @Override
     public void hitUpdateAnywayButton() {
         retry(() -> {
@@ -280,9 +282,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
     }
+
     @Override
-    public WebElement getUpdateButton() {
-        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
     }
 
     @Override

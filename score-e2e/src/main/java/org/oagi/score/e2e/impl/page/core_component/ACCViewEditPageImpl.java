@@ -1400,8 +1400,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public void hitUpdateButton() {
-        retry(() -> click(getUpdateButton(true)));
+        retry(() -> {
+            click(getUpdateButton(true));
+            waitFor(ofMillis(1000L));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
         assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
