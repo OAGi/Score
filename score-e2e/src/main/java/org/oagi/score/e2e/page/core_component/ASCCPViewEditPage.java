@@ -247,8 +247,6 @@ public interface ASCCPViewEditPage extends Page {
      */
     ASCCPanelContainer getASCCPanelContainer(WebElement asccNode);
 
-    WebElement getAddCommentButton();
-
     /**
      * Return the BCC panel container.
      *
@@ -257,7 +255,7 @@ public interface ASCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
-    AddCommentDialog hitAddCommentButton();
+    AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionField();
 

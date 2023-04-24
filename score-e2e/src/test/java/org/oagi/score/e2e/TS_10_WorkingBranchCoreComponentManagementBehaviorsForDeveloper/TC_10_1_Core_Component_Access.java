@@ -264,9 +264,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
          * However, he can add comments.
          */
 
-        By COMMENT_FIELD_LOCATOR =
-                By.xpath("//mat-sidenav//textarea");
-
         assertEquals("WIP", getText(accViewEditPage.getStateField()));
         assertDisabled(accViewEditPage.getStateField());
         assertDisabled(accViewEditPage.getGUIDField());
@@ -276,9 +273,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(accViewEditPage.getDefinitionSourceField());
         assertDisabled(accViewEditPage.getNamespaceField());
         assertDisabled(accViewEditPage.getCoreComponentTypeField());
-        click(accViewEditPage.getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+        accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
         accViewEditPage.openPage(); // refresh the page to erase the snackbar message
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -290,8 +285,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+        accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
         accViewEditPage.openPage();
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -307,8 +301,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
         assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
         assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-        click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+        accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
 
     }
 
@@ -349,9 +342,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * However, he can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -361,8 +351,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
@@ -375,8 +364,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -392,8 +380,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
@@ -434,9 +421,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * However, he can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -446,8 +430,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
@@ -460,8 +443,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -477,8 +459,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
@@ -535,9 +516,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * However, he can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -547,9 +525,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -561,8 +537,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -578,11 +553,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
-
-
     }
 
     @Test
@@ -617,9 +589,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer cannot edit details of a deleted CC owned by him. He can add comments
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -629,9 +598,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -643,8 +610,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -660,8 +626,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
     }
 
@@ -700,9 +665,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can cannot edit details of a deleted CC owned by another developer. He can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -712,9 +674,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -726,8 +686,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -743,8 +702,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
