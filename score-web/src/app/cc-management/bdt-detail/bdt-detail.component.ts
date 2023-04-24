@@ -936,6 +936,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.contextMenuItem = node;
         trigger.openMenu();
       });
+    } else if ($event.key === 'c' || $event.key === 'C') {
+      this.menuTriggerList.toArray().filter(e => !!e.menuData)
+        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
+        this.contextMenuItem = node;
+        this.openComments(node.type, node);
+      });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
