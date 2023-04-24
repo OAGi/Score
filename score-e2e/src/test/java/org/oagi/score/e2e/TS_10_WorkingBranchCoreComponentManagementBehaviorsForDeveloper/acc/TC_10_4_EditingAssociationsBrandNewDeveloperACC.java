@@ -2928,39 +2928,31 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
+        ACCObject acc,  accForBase;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        }
+
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        waitFor(Duration.ofMillis(3000L));
-        ACCViewEditPage accViewEditPage;
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Classification Base. Details", branch);
-        accViewEditPage.hitReviseButton();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + accForBase.getDen());
+        appendAssociationDialog.selectAssociation("Free Form Text Group. Free Form Text Group");
+        getAPIFactory().getCoreComponentAPI().updateBasedACC(acc, accForBase);
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Semantic Classification. Details", branch);
-        accViewEditPage.hitReviseButton();
-
-        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/Semantic Classification. Details");
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendAssociationDialog.selectAssociation("Description. Text");
-        String nodePath = "/Semantic Classification. Details/Description. Text";
-        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, "Description");
-        WebElement tr;
-        tr = selectBaseACCToRefactorDialog.getTableRecordByValue("Classification Base. Details");
-        assertTrue(tr.isDisplayed());
-        click(tr.findElement(By.className("mat-column-" + "select")));
-        selectBaseACCToRefactorDialog.hitAnalyzeButton();
-        assertDisabled(selectBaseACCToRefactorDialog.getRefactorButton(false));
-        String refactorIssue = "Ungrouping 'Free Form Text Group' required.";
-        String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + refactorIssue + "\")]";
-        assertEquals(1, getDriver().findElements(By.xpath(xpathExpr)).size());
-        selectBaseACCToRefactorDialog.hitCancelButton();
-        accViewEditPage.hitCancelButton();
-
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Classification Base. Details", branch);
-        accViewEditPage.hitCancelButton();
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Free Form Text Group. Details] already has BCCP [Description. Text]"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
