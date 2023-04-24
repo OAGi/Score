@@ -946,6 +946,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.IS_ABSTRACT, (byte)(acc.isAbstract() ? 1 : 0))
                 .set(ACC.STATE, acc.getState())
                 .set(ACC.OAGIS_COMPONENT_TYPE, acc.getComponentType().getValue())
+                .set(ACC.CREATION_TIMESTAMP, acc.getCreationTimestamp())
+                .set(ACC.LAST_UPDATE_TIMESTAMP, acc.getLastUpdateTimestamp())
                 .where(ACC.ACC_ID.eq(ULong.valueOf(acc.getAccId())))
                 .execute();
     }
@@ -1325,6 +1327,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ASCCP.IS_DEPRECATED, (byte) (asccp.isDeprecated() ? 1 : 0))
                 .set(ASCCP.IS_NILLABLE, (byte) (asccp.isNillable() ? 1 : 0))
                 .set(ASCCP.STATE, asccp.getState())
+                .set(ASCCP.CREATION_TIMESTAMP, asccp.getCreationTimestamp())
+                .set(ASCCP.LAST_UPDATE_TIMESTAMP, asccp.getLastUpdateTimestamp())
                 .where(ASCCP.ASCCP_ID.eq(ULong.valueOf(asccp.getAsccpId())))
                 .execute();
     }
@@ -1339,6 +1343,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(BCCP.IS_DEPRECATED, (byte) (bccp.isDeprecated() ? 1 : 0))
                 .set(BCCP.IS_NILLABLE, (byte) (bccp.isNillable() ? 1 : 0))
                 .set(BCCP.STATE, bccp.getState())
+                .set(BCCP.CREATION_TIMESTAMP, bccp.getCreationTimestamp())
+                .set(BCCP.LAST_UPDATE_TIMESTAMP, bccp.getLastUpdateTimestamp())
                 .where(BCCP.BCCP_ID.eq(ULong.valueOf(bccp.getBccpId())))
                 .execute();
     }
