@@ -519,8 +519,6 @@ public interface ACCViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
-    WebElement getCommentsIcon();
-
 
     /**
      * An interface of the ACC panel
