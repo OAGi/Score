@@ -879,13 +879,6 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
-        /**
-         * Return the UI element of the 'Comment' Icon.
-         *
-         * @return the UI element of the 'Comment' Icon
-         */
-        WebElement getCommentsIcon();
-
     }
 
     interface BCCPanelContainer {
@@ -1068,13 +1061,6 @@ public interface ACCViewEditPage extends Page {
          * @param definition
          */
         void setDefinition(String definition);
-
-        /**
-         * Return the UI element of the 'Comment' Icon.
-         *
-         * @return the UI element of the 'Comment' Icon
-         */
-        WebElement getCommentsIcon();
 
     }
 
