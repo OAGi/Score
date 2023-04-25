@@ -309,6 +309,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -968,6 +969,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         @Override
         public WebElement getDeprecatedCheckbox() {
             return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public void toggleDeprecated() {
+            waitFor(ofMillis(3000L));
+            click(getDeprecatedCheckbox());
         }
 
         @Override

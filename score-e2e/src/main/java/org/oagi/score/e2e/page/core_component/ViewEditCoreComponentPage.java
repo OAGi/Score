@@ -34,6 +34,12 @@ public interface ViewEditCoreComponentPage extends Page {
     WebElement getTypeSelectField();
 
     /**
+     * Set the UI element of the 'Type' select field with the given type.
+     * @param type
+     */
+    void setTypeSelect(String type);
+
+    /**
      * Return the UI element of the 'State' select field.
      *
      * @return the UI element of the 'State' select field

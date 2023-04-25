@@ -26,4 +26,5 @@ public interface ReleaseAPI {
     ReleaseObject getReleaseByReleaseNumber(String releaseNumber);
 
     ReleaseObject getTheLatestRelease();
+
 }

@@ -238,8 +238,8 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertFalse(accPanel.getGUIDField().isEnabled());
         assertFalse(accPanel.getDENField().isEnabled());
         assertFalse(accPanel.getObjectClassTermField().isEnabled());
-        assertFalse(accPanel.getComponentTypeSelectField().isEnabled());
-        assertFalse(accPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(accPanel.getComponentTypeSelectField());
+        assertDisabled(accPanel.getNamespaceSelectField());
         assertFalse(accPanel.getDefinitionSourceField().isEnabled());
         assertFalse(accPanel.getDefinitionField().isEnabled());
 
@@ -255,11 +255,11 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         assertFalse(bccpPanel.getOwnerField().isEnabled());
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
-        assertFalse(bccpPanel.getPropertyTermField().isEnabled());
-        assertFalse(bccpPanel.getNillableCheckbox().isEnabled());
-        assertFalse(bccpPanel.getDeprecatedCheckbox().isEnabled());
-        assertFalse(bccpPanel.getValueConstraintSelectField().isEnabled());
-        assertFalse(bccpPanel.getNamespaceSelectField().isEnabled());
+        assertDisabled(bccpPanel.getPropertyTermField());
+        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertDisabled(bccpPanel.getDeprecatedCheckbox());
+        assertDisabled(bccpPanel.getValueConstraintSelectField());
+        assertDisabled(bccpPanel.getNamespaceSelectField());
         assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
         assertFalse(bccpPanel.getDefinitionField().isEnabled());
     }
@@ -314,18 +314,15 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.selectAssociation(anotherACC.getDen());
-        selectAssociationDialog.hitUpdateButton();
+        ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.hitUpdateButton(anotherACC.getDen());
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
+        assertTrue(asccpDEN.endsWith(anotherACC.getObjectClassTerm()));
     }
 
     @Test
@@ -392,7 +389,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -416,7 +413,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -458,7 +455,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         waitFor(ofSeconds(1L));
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
@@ -487,10 +484,14 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
             randomACC1 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             randomACC2 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
             ASCCObject randomASCC1 = coreComponentAPI.appendASCC(randomACC1, asccp, "WIP");
             randomASCC1.setCardinalityMax(1);
             coreComponentAPI.updateASCC(randomASCC1);
@@ -503,7 +504,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
 
         String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
@@ -515,19 +516,19 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         {
             viewEditCoreComponentPage.openPage();
             waitFor(ofSeconds(1L));
-            asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
-            WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() +"/" + randomACC1.getDen());
-            ASCCPViewEditPage.ASCCPanel asccPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-            assertEquals(randomPropertyTerm, getText(asccPanel.getDENField()));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC1.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC1.getDen() + "/" + randomPropertyTerm);
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
         }
 
         {
             viewEditCoreComponentPage.openPage();
             waitFor(ofSeconds(1L));
-            asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
-            WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() +"/" + randomACC2.getDen());
-            ASCCPViewEditPage.ASCCPanel asccPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
-            assertEquals(randomPropertyTerm, getText(asccPanel.getDENField()));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC2.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC2.getDen() + "/" + randomPropertyTerm);
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
         }
     }
 
@@ -550,39 +551,47 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         //change ACC
         ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
-        SelectAssociationDialog selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.selectAssociation(anotherACC.getDen());
-        selectAssociationDialog.hitUpdateButton();
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.hitUpdateButton(anotherACC.getDen());
 
-        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         String asccpDEN = getText(asccpPanel.getDENField());
-        assertTrue(asccpDEN.endsWith(anotherACC.getDen()));
+        assertTrue(asccpDEN.endsWith(anotherACC.getObjectClassTerm()));
 
         //only semantics or semantic group ACC can be selected
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Issued Item Instance Base. Details");
-        selectAssociationDialog.hitSearchButton();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("Issued Item Instance Base. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Issued Item Instance Extension. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("Issued Item Instance Extension. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Issued Item Instance Base. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("Any Structured Content. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpCreateDialog.setDEN("Any Structured Content. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"Any Structured Content. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("OAGIS10 Nouns. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("OAGIS10 Nouns. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 Nouns. Details\")]")).size());
-        selectAssociationDialog = asccpViewEditPage.changeACC("/" + asccp.getPropertyTerm());
-        selectAssociationDialog.setDEN("OAGIS10 BODs. Details");
-        selectAssociationDialog.hitSearchButton();
+
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm());
+        asccpChangeACCDialog.setDEN("OAGIS10 BODs. Details");
+        asccpChangeACCDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"OAGIS10 BODs. Details\")]")).size());
     }
 }

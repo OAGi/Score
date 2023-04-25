@@ -66,13 +66,13 @@ public class TC_10_20_CreatingNewRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("2", getText(bccpPanel.getRevisionField()));

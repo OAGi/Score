@@ -91,6 +91,16 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public void setTypeSelect(String type) {
+
+        click(getTypeSelectField());
+        waitFor(ofMillis(2000L));
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[text() = \"" + type + "\"]"));
+        click(optionField);
+    }
+
+    @Override
     public WebElement getStateSelectField(){
         return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
@@ -248,7 +258,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
-        click(td.findElement(By.tagName("button")));
+        click(td.findElement(By.className("mat-icon")));
 
         TransferCCOwnershipDialog transferCCOwnershipDialog =
                 new TransferCCOwnershipDialogImpl(this);
@@ -365,6 +375,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void hitSearchButton() {
+        waitFor(ofMillis(3000L));
         retry(() -> {
             click(getSearchButton());
             waitFor(ofMillis(1000L));
