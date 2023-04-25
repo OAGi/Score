@@ -193,13 +193,6 @@ public interface ACCViewEditPage extends Page {
     String getDefinitionFieldValue();
 
     /**
-     * Return the UI element of the 'Comment' Icon
-     *
-     * @return the UI element of the 'Comment' Icon
-     */
-    WebElement getCommentsIcon();
-
-    /**
      * Return the UI element of the 'Context Menu' icon for the node.
      *
      * @param nodeName Node name
@@ -447,9 +440,7 @@ public interface ACCViewEditPage extends Page {
     WebElement getUpdateButton(boolean enabled);
 
 
-    AddCommentDialog hitAddCommentButton();
-
-    WebElement getAddCommentButton();
+    AddCommentDialog openCommentsDialog(String path);
 
     /**
      * Hit the 'Update' button.

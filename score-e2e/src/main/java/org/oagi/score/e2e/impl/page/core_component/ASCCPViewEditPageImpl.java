@@ -64,8 +64,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Open in new tab\")]");
     private static final By CHANGE_ACC_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Change ACC\")]");
-    private static final By ADD_COMMENT_ICON_LOCATOR =
-            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+    private static final By COMMENTS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Comments\")]");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -471,16 +471,18 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     @Override
-    public AddCommentDialog hitAddCommentButton() {
-        click(getAddCommentButton());
+    public AddCommentDialog openCommentsDialog(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("C").perform();
+        }
+
         AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
         return addCodeListCommentDialog;
-    }
-
-    @Override
-    public WebElement getAddCommentButton() {
-        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     @Override

@@ -112,8 +112,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
-    private static final By ADD_COMMENT_ICON_LOCATOR =
-            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+
+    private static final By COMMENTS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Comments\")]");
 
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
@@ -318,11 +319,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public String getDefinitionFieldValue() {
         return getText(getDefinitionField());
-    }
-
-    @Override
-    public WebElement getCommentsIcon() {
-        return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
     }
 
     @Override
@@ -831,16 +827,18 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
-    public AddCommentDialog hitAddCommentButton() {
-        click(getAddCommentButton());
+    public AddCommentDialog openCommentsDialog(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("C").perform();
+        }
+
         AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
         return addCodeListCommentDialog;
-    }
-
-    @Override
-    public WebElement getAddCommentButton() {
-        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
