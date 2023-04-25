@@ -4,7 +4,6 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.TC_10_1_Core_Component_Access;
-import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.acc.*;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.asccp.*;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.bccp.*;
@@ -18,7 +17,7 @@ import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFor
         TC_10_4_EditingAssociationsBrandNewDeveloperACC.class,
         TC_10_5_CreatingNewRevisionDeveloperACC.class,
         TC_10_6_EditingRevisionDeveloperACC.class,
-        TC_10_7_EditingAssociationsOfARevisionOfADeveloperACC.class,
+        TC_10_7_EditingAssociationsRevisionDeveloperACC.class,
         TC_10_8_DeveloperACCStateManagement.class,
         TC_10_9_DeletingDeveloperACC.class,
         TC_10_10_RestoringDeveloperACC.class,
