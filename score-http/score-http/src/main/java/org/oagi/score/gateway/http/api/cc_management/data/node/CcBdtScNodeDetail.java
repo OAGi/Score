@@ -45,5 +45,9 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private BigInteger basedDtScManifestId;
     private BigInteger basedDtScId;
 
+    private BigInteger sinceManifestId = BigInteger.ZERO;
+    private BigInteger sinceReleaseId = BigInteger.ZERO;
+    private String sinceReleaseNum;
+
     private List<CcBdtScPriRestri> bdtScPriRestriList;
 }

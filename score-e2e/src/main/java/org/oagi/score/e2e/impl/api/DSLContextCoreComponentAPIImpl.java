@@ -1,7 +1,8 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.*;
-import org.jooq.Record;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -17,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
 import static org.oagi.score.e2e.obj.ComponentType.*;
@@ -351,6 +350,29 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .fetchOne().getAccManifestId();
         acc.setAccManifestId(accManifestId.toBigInteger());
 
+        if ("Working".equals(release.getReleaseNumber()) && "Published".equals(state)) {
+            accManifestRecord = dslContext.selectFrom(ACC_MANIFEST)
+                    .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            AccManifestRecord prevAccManifestRecord = accManifestRecord.copy();
+            prevAccManifestRecord.setAccManifestId(null);
+            prevAccManifestRecord.setAccId(accId);
+            prevAccManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevAccManifestRecord.setNextAccManifestId(accManifestId);
+            prevAccManifestRecord.setAccManifestId(
+                    dslContext.insertInto(ACC_MANIFEST)
+                            .set(prevAccManifestRecord)
+                            .returning(ACC_MANIFEST.ACC_MANIFEST_ID)
+                            .fetchOne().getAccManifestId());
+
+            dslContext.update(ACC_MANIFEST)
+                    .set(ACC_MANIFEST.PREV_ACC_MANIFEST_ID, prevAccManifestRecord.getAccManifestId())
+                    .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
+                    .execute();
+        }
+
         return acc;
     }
 
@@ -474,6 +496,38 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .fetchOne().getAsccpManifestId();
         asccp.setAsccpManifestId(asccpManifestId.toBigInteger());
 
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(asccpManifestRecord.getReleaseId()))
+                .fetchOne();
+        if ("Working".equals(release.getReleaseNum()) && "Published".equals(state)) {
+            asccpManifestRecord = dslContext.selectFrom(ASCCP_MANIFEST)
+                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            AsccpManifestRecord prevAsccpManifestRecord = asccpManifestRecord.copy();
+            prevAsccpManifestRecord.setAsccpManifestId(null);
+            prevAsccpManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevAsccpManifestRecord.setRoleOfAccManifestId(dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                    .from(ACC_MANIFEST)
+                    .where(and(
+                            ACC_MANIFEST.ACC_ID.eq(ULong.valueOf(roleOfAcc.getAccId())),
+                            ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevAsccpManifestRecord.setNextAsccpManifestId(asccpManifestId);
+            prevAsccpManifestRecord.setAsccpManifestId(
+                    dslContext.insertInto(ASCCP_MANIFEST)
+                            .set(prevAsccpManifestRecord)
+                            .returning(ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
+                            .fetchOne().getAsccpManifestId());
+
+            dslContext.update(ASCCP_MANIFEST)
+                    .set(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID, prevAsccpManifestRecord.getAsccpManifestId())
+                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                    .execute();
+        }
+
         return asccp;
     }
 
@@ -534,6 +588,38 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .returning(BCCP_MANIFEST.BCCP_MANIFEST_ID)
                 .fetchOne().getBccpManifestId();
         bccp.setBccpManifestId(bccpManifestId.toBigInteger());
+
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(bccpManifestRecord.getReleaseId()))
+                .fetchOne();
+        if ("Working".equals(release.getReleaseNum()) && "Published".equals(state)) {
+            bccpManifestRecord = dslContext.selectFrom(BCCP_MANIFEST)
+                    .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            BccpManifestRecord prevBccpManifestRecord = bccpManifestRecord.copy();
+            prevBccpManifestRecord.setBccpManifestId(null);
+            prevBccpManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevBccpManifestRecord.setBdtManifestId(dslContext.select(DT_MANIFEST.DT_MANIFEST_ID)
+                    .from(DT_MANIFEST)
+                    .where(and(
+                            DT_MANIFEST.DT_ID.eq(ULong.valueOf(dataType.getDtId())),
+                            DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevBccpManifestRecord.setNextBccpManifestId(bccpManifestId);
+            prevBccpManifestRecord.setBccpManifestId(
+                    dslContext.insertInto(BCCP_MANIFEST)
+                            .set(prevBccpManifestRecord)
+                            .returning(BCCP_MANIFEST.BCCP_MANIFEST_ID)
+                            .fetchOne().getBccpManifestId());
+
+            dslContext.update(BCCP_MANIFEST)
+                    .set(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID, prevBccpManifestRecord.getBccpManifestId())
+                    .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestId))
+                    .execute();
+        }
 
         return bccp;
     }
@@ -857,7 +943,11 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.DEFINITION_SOURCE, acc.getDefinitionSource())
                 .set(ACC.NAMESPACE_ID, ULong.valueOf(acc.getNamespaceId()))
                 .set(ACC.IS_DEPRECATED, (byte) (acc.isDeprecated() ? 1 : 0))
+                .set(ACC.IS_ABSTRACT, (byte)(acc.isAbstract() ? 1 : 0))
                 .set(ACC.STATE, acc.getState())
+                .set(ACC.OAGIS_COMPONENT_TYPE, acc.getComponentType().getValue())
+                .set(ACC.CREATION_TIMESTAMP, acc.getCreationTimestamp())
+                .set(ACC.LAST_UPDATE_TIMESTAMP, acc.getLastUpdateTimestamp())
                 .where(ACC.ACC_ID.eq(ULong.valueOf(acc.getAccId())))
                 .execute();
     }
@@ -875,6 +965,25 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .execute();
 
         acc.setBasedAccManifestId(basedAcc.getAccManifestId());
+
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(acc.getReleaseId())))
+                .fetchOne();
+
+        if ("Working".equals(release.getReleaseNum()) && "Published".equals(acc.getState())) {
+            AccManifestRecord prevAccManifest = dslContext.selectFrom(ACC_MANIFEST)
+                    .where(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(ULong.valueOf(acc.getAccManifestId())))
+                    .fetchOne();
+
+            AccManifestRecord prevBaseAccManifest = dslContext.selectFrom(ACC_MANIFEST)
+                    .where(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(ULong.valueOf(basedAcc.getAccManifestId())))
+                    .fetchOne();
+
+            dslContext.update(ACC_MANIFEST)
+                    .set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, prevBaseAccManifest.getAccManifestId())
+                    .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(prevAccManifest.getAccManifestId()))
+                    .execute();
+        }
     }
 
     @Override
@@ -947,6 +1056,78 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ASCC_MANIFEST.SEQ_KEY_ID, seqKeyId)
                 .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asccManifestId))
                 .execute();
+
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(asccManifestRecord.getReleaseId()))
+                .fetchOne();
+        if ("Working".equals(release.getReleaseNum()) && "Published".equals(state)) {
+            asccManifestRecord = dslContext.selectFrom(ASCC_MANIFEST)
+                    .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asccManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            AsccManifestRecord prevAsccManifestRecord = asccManifestRecord.copy();
+            prevAsccManifestRecord.setAsccManifestId(null);
+            prevAsccManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevAsccManifestRecord.setFromAccManifestId(dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                    .from(ACC_MANIFEST)
+                    .where(and(
+                            ACC_MANIFEST.ACC_ID.eq(ULong.valueOf(fromAcc.getAccId())),
+                            ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevAsccManifestRecord.setToAsccpManifestId(dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
+                    .from(ASCCP_MANIFEST)
+                    .where(and(
+                            ASCCP_MANIFEST.ASCCP_ID.eq(ULong.valueOf(toAsccp.getAsccpId())),
+                            ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevAsccManifestRecord.setNextAsccManifestId(asccManifestId);
+            prevAsccManifestRecord.setAsccManifestId(
+                    dslContext.insertInto(ASCC_MANIFEST)
+                            .set(prevAsccManifestRecord)
+                            .returning(ASCC_MANIFEST.ASCC_MANIFEST_ID)
+                            .fetchOne().getAsccManifestId());
+
+            dslContext.update(ASCC_MANIFEST)
+                    .set(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID, prevAsccManifestRecord.getAsccManifestId())
+                    .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asccManifestId))
+                    .execute();
+
+            seqKeyRecord = dslContext.selectFrom(SEQ_KEY)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .fetchOne();
+            SeqKeyRecord prevSeqKeyRecord = seqKeyRecord.copy();
+            prevSeqKeyRecord.setSeqKeyId(null);
+            prevSeqKeyRecord.setFromAccManifestId(prevAsccManifestRecord.getFromAccManifestId());
+            prevSeqKeyRecord.setAsccManifestId(prevAsccManifestRecord.getToAsccpManifestId());
+
+            lastSeqKeyRecord = dslContext.selectFrom(SEQ_KEY)
+                    .where(and(
+                            SEQ_KEY.FROM_ACC_MANIFEST_ID.eq(prevAsccManifestRecord.getFromAccManifestId()),
+                            SEQ_KEY.NEXT_SEQ_KEY_ID.isNull()
+                    ))
+                    .fetchOne();
+            if (lastSeqKeyRecord != null) {
+                prevSeqKeyRecord.setPrevSeqKeyId(lastSeqKeyRecord.getSeqKeyId());
+            }
+            seqKeyId = dslContext.insertInto(SEQ_KEY)
+                    .set(prevSeqKeyRecord)
+                    .returning(SEQ_KEY.SEQ_KEY_ID)
+                    .fetchOne().getSeqKeyId();
+            if (lastSeqKeyRecord != null) {
+                dslContext.update(SEQ_KEY)
+                        .set(SEQ_KEY.NEXT_SEQ_KEY_ID, seqKeyId)
+                        .where(SEQ_KEY.SEQ_KEY_ID.eq(lastSeqKeyRecord.getSeqKeyId()))
+                        .execute();
+            }
+
+            dslContext.update(ASCC_MANIFEST)
+                    .set(ASCC_MANIFEST.SEQ_KEY_ID, seqKeyId)
+                    .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(prevAsccManifestRecord.getAsccManifestId()))
+                    .execute();
+        }
 
         return ascc;
     }
@@ -1050,6 +1231,78 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestId))
                 .execute();
 
+        ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(bccManifestRecord.getReleaseId()))
+                .fetchOne();
+        if ("Working".equals(release.getReleaseNum()) && "Published".equals(state)) {
+            bccManifestRecord = dslContext.selectFrom(BCC_MANIFEST)
+                    .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            BccManifestRecord prevBccManifestRecord = bccManifestRecord.copy();
+            prevBccManifestRecord.setBccManifestId(null);
+            prevBccManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevBccManifestRecord.setFromAccManifestId(dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                    .from(ACC_MANIFEST)
+                    .where(and(
+                            ACC_MANIFEST.ACC_ID.eq(ULong.valueOf(fromAcc.getAccId())),
+                            ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevBccManifestRecord.setToBccpManifestId(dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID)
+                    .from(BCCP_MANIFEST)
+                    .where(and(
+                            BCCP_MANIFEST.BCCP_ID.eq(ULong.valueOf(toBccp.getBccpId())),
+                            BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevBccManifestRecord.setNextBccManifestId(bccManifestId);
+            prevBccManifestRecord.setBccManifestId(
+                    dslContext.insertInto(BCC_MANIFEST)
+                            .set(prevBccManifestRecord)
+                            .returning(BCC_MANIFEST.BCC_MANIFEST_ID)
+                            .fetchOne().getBccManifestId());
+
+            dslContext.update(BCC_MANIFEST)
+                    .set(BCC_MANIFEST.PREV_BCC_MANIFEST_ID, prevBccManifestRecord.getBccManifestId())
+                    .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestId))
+                    .execute();
+
+            seqKeyRecord = dslContext.selectFrom(SEQ_KEY)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .fetchOne();
+            SeqKeyRecord prevSeqKeyRecord = seqKeyRecord.copy();
+            prevSeqKeyRecord.setSeqKeyId(null);
+            prevSeqKeyRecord.setFromAccManifestId(prevBccManifestRecord.getFromAccManifestId());
+            prevSeqKeyRecord.setBccManifestId(prevBccManifestRecord.getBccManifestId());
+
+            lastSeqKeyRecord = dslContext.selectFrom(SEQ_KEY)
+                    .where(and(
+                            SEQ_KEY.FROM_ACC_MANIFEST_ID.eq(prevBccManifestRecord.getFromAccManifestId()),
+                            SEQ_KEY.NEXT_SEQ_KEY_ID.isNull()
+                    ))
+                    .fetchOne();
+            if (lastSeqKeyRecord != null) {
+                prevSeqKeyRecord.setPrevSeqKeyId(lastSeqKeyRecord.getSeqKeyId());
+            }
+            seqKeyId = dslContext.insertInto(SEQ_KEY)
+                    .set(prevSeqKeyRecord)
+                    .returning(SEQ_KEY.SEQ_KEY_ID)
+                    .fetchOne().getSeqKeyId();
+            if (lastSeqKeyRecord != null) {
+                dslContext.update(SEQ_KEY)
+                        .set(SEQ_KEY.NEXT_SEQ_KEY_ID, seqKeyId)
+                        .where(SEQ_KEY.SEQ_KEY_ID.eq(lastSeqKeyRecord.getSeqKeyId()))
+                        .execute();
+            }
+
+            dslContext.update(BCC_MANIFEST)
+                    .set(BCC_MANIFEST.SEQ_KEY_ID, seqKeyId)
+                    .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(prevBccManifestRecord.getBccManifestId()))
+                    .execute();
+        }
+
         return bcc;
     }
 
@@ -1073,7 +1326,10 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ASCCP.DEFINITION_SOURCE, asccp.getDefinitionSource())
                 .set(ASCCP.IS_DEPRECATED, (byte) (asccp.isDeprecated() ? 1 : 0))
                 .set(ASCCP.IS_NILLABLE, (byte) (asccp.isNillable() ? 1 : 0))
+                .set(ASCCP.REUSABLE_INDICATOR, (byte) (asccp.isReusable() ? 1 : 0))
                 .set(ASCCP.STATE, asccp.getState())
+                .set(ASCCP.CREATION_TIMESTAMP, asccp.getCreationTimestamp())
+                .set(ASCCP.LAST_UPDATE_TIMESTAMP, asccp.getLastUpdateTimestamp())
                 .where(ASCCP.ASCCP_ID.eq(ULong.valueOf(asccp.getAsccpId())))
                 .execute();
     }
@@ -1088,6 +1344,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(BCCP.IS_DEPRECATED, (byte) (bccp.isDeprecated() ? 1 : 0))
                 .set(BCCP.IS_NILLABLE, (byte) (bccp.isNillable() ? 1 : 0))
                 .set(BCCP.STATE, bccp.getState())
+                .set(BCCP.CREATION_TIMESTAMP, bccp.getCreationTimestamp())
+                .set(BCCP.LAST_UPDATE_TIMESTAMP, bccp.getLastUpdateTimestamp())
                 .where(BCCP.BCCP_ID.eq(ULong.valueOf(bccp.getBccpId())))
                 .execute();
     }

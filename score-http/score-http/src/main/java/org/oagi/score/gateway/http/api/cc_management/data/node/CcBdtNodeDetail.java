@@ -42,5 +42,9 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private int revisionTrackingNum;
     private String spec;
 
+    private BigInteger sinceManifestId = BigInteger.ZERO;
+    private BigInteger sinceReleaseId = BigInteger.ZERO;
+    private String sinceReleaseNum;
+
     private List<CcBdtPriRestri> bdtPriRestriList;
 }

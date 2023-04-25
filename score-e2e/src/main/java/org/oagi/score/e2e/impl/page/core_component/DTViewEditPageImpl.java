@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.DTObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.openqa.selenium.By;
@@ -261,12 +262,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public void hitUpdateButton() {
         retry(() -> {
-            click(getUpdateButton());
+            click(getUpdateButton(true));
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
+
     @Override
     public void hitUpdateAnywayButton() {
         retry(() -> {
@@ -280,9 +283,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
     }
+
     @Override
-    public WebElement getUpdateButton() {
-        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
     }
 
     @Override
@@ -325,5 +333,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public WebElement getDefaultValueDomainField() {
         return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+    }
+
+    @Override
+    public void setNamespace(NamespaceObject namespace) {
+        click(getNamespaceField());
+        waitFor(ofMillis(1000L));
+        WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
+        click(option);
     }
 }

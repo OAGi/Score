@@ -1,4 +1,4 @@
-FROM mysql:5.7.41
+FROM --platform=linux/amd64 mysql:5.7.41
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 

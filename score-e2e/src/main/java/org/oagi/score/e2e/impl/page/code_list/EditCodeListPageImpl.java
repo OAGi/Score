@@ -2,6 +2,8 @@ package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -39,12 +41,18 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By REMARK_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By BACK_TO_WIP_BUTTON_LOCATOR =
@@ -55,6 +63,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    private static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
     private static final By REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR =
@@ -63,6 +73,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
@@ -75,6 +87,8 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
             By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select");
+    private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[text()= \"Agency ID List Value\"]//ancestor::div[1]/mat-select");
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
@@ -130,6 +144,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
+
+    @Override
+    public WebElement getRemarkField() {
+        return visibilityOfElementLocated(getDriver(), REMARK_FIELD_LOCATOR);
+    }
+
     @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
@@ -215,6 +235,11 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getAgencyIDListField() {
         return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getAgencyIDListValueField() {
+        return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
@@ -428,5 +453,80 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getRestoreButton() {
         return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void setAgencyIDList(AgencyIDListObject agencyIDList) {
+        retry(() -> {
+            click(getAgencyIDListField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDList.getName() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue) {
+        retry(() -> {
+            click(getAgencyIDListValueField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDListValue.getValue() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void hitAmendButton() {
+        click(getAmendButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getAmendButton() {
+        return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedSelectField());
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        sendKeys(getRemarkField(), remark);
+    }
+
+    @Override
+    public void moveToQA() {
+        retry(() -> {
+            click(getMoveToQAButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getMoveToQAButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void moveToProduction() {
+        retry(() -> {
+            click(getMoveToProductionButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getMoveToProductionButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
     }
 }

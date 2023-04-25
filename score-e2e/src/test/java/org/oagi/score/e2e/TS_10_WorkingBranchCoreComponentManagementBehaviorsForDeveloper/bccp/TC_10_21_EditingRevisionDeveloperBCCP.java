@@ -76,7 +76,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertDisabled(bccpPanel.getGUIDField());
@@ -112,7 +112,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("Fixed Value", getText(bccpPanel.getValueConstraintSelectField()));
@@ -146,7 +146,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertChecked(bccpPanel.getDeprecatedCheckbox());
@@ -179,7 +179,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertNotChecked(bccpPanel.getDeprecatedCheckbox());
@@ -206,13 +206,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertChecked(bccpPanel.getNillableCheckbox());
@@ -239,13 +239,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertNotChecked(bccpPanel.getNillableCheckbox());
@@ -272,13 +272,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("Default Value", getText(bccpPanel.getValueConstraintSelectField()));
@@ -306,13 +306,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals(randomBCCP.getDefinitionSource(), getText(bccpPanel.getDefinitionSourceField()));
@@ -327,7 +327,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals(newDefinitionSource, getText(bccpPanel.getDefinitionSourceField()));
@@ -356,13 +356,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         bccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
@@ -390,13 +390,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.DTPanel dtPanel = bccpViewEditPage.getBCCPPanelContainer().getDTPanel();
 
         assertFalse(dtPanel.getCoreComponentField().isEnabled());
@@ -445,19 +445,19 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitCancelButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("Published", getText(bccpPanel.getStateField()));
         assertEquals("1", getText(bccpPanel.getRevisionField()));

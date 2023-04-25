@@ -18,11 +18,11 @@
 .title {
 }
 
-.new-component {
+.new-component, .revised-component {
   font-size: 14px;
 }
 
-.new-component a {
+.new-component a, .revised-component a {
   text-decoration: none;
   color: rgba(0, 0, 0, .87);
 }

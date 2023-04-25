@@ -14,7 +14,7 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By CODE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Code\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[text() = \"Code\"]//ancestor::mat-form-field//input");
     private static final By MEANING_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Meaning\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -118,5 +118,10 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     @Override
     public WebElement getSaveButton() {
         return elementToBeClickable(getDriver(), SAVE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedSelectField());
     }
 }
