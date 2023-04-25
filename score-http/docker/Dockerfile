@@ -1,4 +1,4 @@
-FROM tomcat:10.1.7-jdk17-temurin
+FROM --platform=linux/amd64 tomcat:10.1.8-jdk17-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
