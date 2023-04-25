@@ -3,7 +3,6 @@ package org.oagi.score.e2e.api;
 import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -187,4 +186,5 @@ public interface CoreComponentAPI {
     DTObject getLatestDTCreated(String den, String branch);
 
     BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
+
 }

@@ -35,6 +35,8 @@ public class ASCCPObject {
 
     private boolean nillable;
 
+    private boolean reusable;
+
     private String state;
 
     private BigInteger ownerUserId;
@@ -60,6 +62,7 @@ public class ASCCPObject {
         asccp.setNamespaceId(namespace.getNamespaceId());
         asccp.setDeprecated(false);
         asccp.setNillable(false);
+        asccp.setReusable(true);
         asccp.setState(state);
         asccp.setOwnerUserId(creator.getAppUserId());
         asccp.setCreatedBy(creator.getAppUserId());

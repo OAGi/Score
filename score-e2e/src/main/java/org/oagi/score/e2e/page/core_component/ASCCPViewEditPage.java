@@ -172,6 +172,14 @@ public interface ASCCPViewEditPage extends Page {
     void hitUpdateButton();
 
     /**
+     * Open the ACC page through 'Open in new tab' context menu for the given ACC node.
+     *
+     * @param accNode ACC node
+     * @return the ACC page object
+     */
+    ACCViewEditPage openACCInNewTab(WebElement accNode);
+
+    /**
      * Return the UI element of the 'Deprecated' checkbox.
      *
      * @return the UI element of the 'Deprecated' checkbox
@@ -192,11 +200,12 @@ public interface ASCCPViewEditPage extends Page {
     WebElement getNodeByPath(String path);
 
     /**
-     * Open the association selection dialog by clicking 'Change ACC' context menu.
+     * Open the ASCCPChangeACC dialog by clicking 'Change ACC' context menu.
      *
-     * @param path node path
-     * @return the association selection dialog object
+     * @return the ASCCPChangeACCDialog  object
      */
+    ASCCPChangeACCDialog openChangeACCDialog(String path);
+
     SelectAssociationDialog changeACC(String path);
 
     /**
@@ -556,6 +565,11 @@ public interface ASCCPViewEditPage extends Page {
          * @return the UI element of the 'Reusable' checkbox
          */
         WebElement getReusableCheckbox();
+
+        /**
+         * Toggle the 'Reusable' checkbox.
+         */
+        void toggleReusable();
 
         /**
          * Return the UI element of the 'Nillable' checkbox.

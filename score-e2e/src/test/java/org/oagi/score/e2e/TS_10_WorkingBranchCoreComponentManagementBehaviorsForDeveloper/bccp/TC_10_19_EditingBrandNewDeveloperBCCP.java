@@ -300,7 +300,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -324,7 +324,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -363,7 +363,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
         {
             viewEditCoreComponentPage.openPage();
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(randomACC1.getDen(), branch);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC1.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + randomACC1.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(randomPropertyTerm, getText(bccPanelContainer.getBCCPPanel().getPropertyTermField()));
@@ -371,7 +371,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
         {
             viewEditCoreComponentPage.openPage();
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(randomACC2.getDen(), branch);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC2.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + randomACC2.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(randomPropertyTerm, getText(bccPanelContainer.getBCCPPanel().getPropertyTermField()));

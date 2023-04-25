@@ -209,7 +209,7 @@ public interface DTViewEditPage extends Page {
 
     WebElement getUpdateAnywayButton();
 
-    WebElement getUpdateButton();
+    WebElement getUpdateButton(boolean enabled);
 
     void setQualifier(String qualifier);
 
