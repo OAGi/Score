@@ -1326,6 +1326,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ASCCP.DEFINITION_SOURCE, asccp.getDefinitionSource())
                 .set(ASCCP.IS_DEPRECATED, (byte) (asccp.isDeprecated() ? 1 : 0))
                 .set(ASCCP.IS_NILLABLE, (byte) (asccp.isNillable() ? 1 : 0))
+                .set(ASCCP.REUSABLE_INDICATOR, (byte) (asccp.isReusable() ? 1 : 0))
                 .set(ASCCP.STATE, asccp.getState())
                 .set(ASCCP.CREATION_TIMESTAMP, asccp.getCreationTimestamp())
                 .set(ASCCP.LAST_UPDATE_TIMESTAMP, asccp.getLastUpdateTimestamp())

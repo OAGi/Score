@@ -180,6 +180,9 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
             asccp_not_reusable = coreComponentAPI.createRandomASCCP(acc_association_for_noreusable, developer, namespace, "Published");
+            asccp_not_reusable.setReusable(false);
+            coreComponentAPI.updateASCCP(asccp_not_reusable);
+
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
