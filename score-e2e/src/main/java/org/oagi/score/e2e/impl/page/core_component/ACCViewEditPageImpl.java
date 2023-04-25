@@ -827,6 +827,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public WebElement getCommentsIcon() {
+        return elementToBeClickable(getDriver(), COMMENTS_ICON_LOCATOR);
+    }
+
+    @Override
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
