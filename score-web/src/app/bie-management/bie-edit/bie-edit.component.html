@@ -73,6 +73,8 @@
                       </div>
                       <div class="ml-3">
                         <button mat-raised-button color="primary" (click)="updateDetails()"
+                                matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
+                                [matBadgeHidden]="sizeOfChanges === 0"
                                 *ngIf="state === 'WIP' && access === 'CanEdit'"
                                 [disabled]="isUpdating || !isChanged || !isValid">
                           Update
@@ -160,6 +162,7 @@
                                       *ngIf="node.level > 0"
                                       [checked]="used(node)"
                                       [disabled]="!isUsable(node)"
+                                      [color]="(node.used === undefined) ? 'warn' : undefined"
                                       (click)="toggleTreeUsed(node, $event)"
                                       [matTooltip]="getNodeTooltip(node)"
                                       [matTooltipDisabled]="getNodeTooltip(node) === ''">
@@ -329,7 +332,8 @@
                         <div class="col-md-12 col-sm-12">
                           <div class="checkbox">
                             <mat-slide-toggle color="accent"
-                                              [(ngModel)]="rootNode.inverseMode">
+                                              [(ngModel)]="rootNode.inverseMode"
+                                              (change)="updateInverseMode()">
                               Inverse Mode
                             </mat-slide-toggle>
                           </div>
