@@ -106,8 +106,8 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
+        ccStates.add("QA");
+        ccStates.add("Production");
         ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace_endUser, ccStates);
 
@@ -265,7 +265,71 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
-    public void test_TA_15_1_3() {
+    public void test_TA_15_1_3_and_TA_15_1_4() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("QA");
+        ccStates.add("Production");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            viewEditCoreComponentPage.openPage();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+
+            assertEquals(state, getText(accViewEditPage.getStateField()));
+            assertDisabled(accViewEditPage.getStateField());
+            assertDisabled(accViewEditPage.getGUIDField());
+            assertDisabled(accViewEditPage.getDENField());
+            assertDisabled(accViewEditPage.getObjectClassTermField());
+            assertDisabled(accViewEditPage.getDefinitionField());
+            assertDisabled(accViewEditPage.getDefinitionSourceField());
+            assertDisabled(accViewEditPage.getNamespaceField());
+            assertDisabled(accViewEditPage.getCoreComponentTypeField());
+
+            viewEditCoreComponentPage.openPage();   // refresh the page to erase the snackbar message
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
+            assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
+            assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+            asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+
+            assertEquals(state, getText(asccPanelContainer.getASCCPanel().getStateField()));
+            assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+            assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
+            assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
+            assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
+        }
 
     }
 
