@@ -496,6 +496,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.rootNode.isChanged || this.dataSource.getChanged().length > 0;
   }
 
+  get sizeOfChanges(): number {
+    return this.dataSource.getChanged().length;
+  }
+
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
       $event.preventDefault();
@@ -1593,6 +1597,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return false;
   }
 
+  updateInverseMode() {
+    const request = new BieDetailUpdateRequest();
+    this.isUpdating = true;
+    request.topLevelAsbiepDetail = this.rootNode;
+
+    this.service.updateDetails(this.topLevelAsbiepId, request).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe((resp: BieDetailUpdateResponse) => {
+      this.rootNode.reset();
+      this.snackBar.open(((this.rootNode.inverseMode) ? 'Inverse mode is turned on' : 'Inverse mode is turned off'), '', {
+        duration: 3000,
+      });
+    });
+  }
+
   updateDetails(include?: BieFlatNode[], callbackFn?) {
     const request = new BieDetailUpdateRequest();
 
@@ -1708,7 +1728,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     })).subscribe((resp: BieDetailUpdateResponse) => {
       this.rootNode.reset();
       this.dataSource.update(resp);
-      this.dataSource.getChanged().forEach(e => e.reset());
+      nodes.forEach(e => e.reset());
       this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(usedBieList => {
         this.dataSource.database.setUsedBieList(usedBieList);
       });
