@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import javax.naming.Name;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -479,6 +480,79 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
     @Test
     public void test_TA_15_1_8() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.7.1");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Published");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+
+        assertEquals("Published", getText(accViewEditPage.getStateField()));
+        assertDisabled(accViewEditPage.getStateField());
+        assertDisabled(accViewEditPage.getGUIDField());
+        assertDisabled(accViewEditPage.getDENField());
+        assertDisabled(accViewEditPage.getObjectClassTermField());
+        assertDisabled(accViewEditPage.getDefinitionField());
+        assertDisabled(accViewEditPage.getDefinitionSourceField());
+        assertDisabled(accViewEditPage.getNamespaceField());
+        assertDisabled(accViewEditPage.getCoreComponentTypeField());
+
+        accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+        assertEquals("Published", getText(bccPanelContainer.getBCCPanel().getStateField()));
+        assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
+
+        accViewEditPage.openPage();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+
+        assertEquals("Published", getText(asccPanelContainer.getASCCPanel().getStateField()));
+        assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+        assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
+        assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
+        assertDisabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
+        assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
+        assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
+        assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
 
     }
 
