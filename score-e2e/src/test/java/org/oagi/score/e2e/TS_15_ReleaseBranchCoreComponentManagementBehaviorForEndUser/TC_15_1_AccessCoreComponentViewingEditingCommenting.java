@@ -414,6 +414,67 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     @Test
     public void test_TA_15_1_7_amend_and_take_over_the_ownership() {
 
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.7.1");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("Production");
+
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(anotherUser, release, namespace, ccStates);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+
+        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+            ACCObject acc;
+            ASCCPObject asccp;
+            BCCPObject bccp;
+            String state = entry.getKey();
+            acc = entry.getValue();
+            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
+            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+            viewEditCoreComponentPage.openPage();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+            ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+            assertEquals(state, getText(accPanel.getStateField()));
+            assertDisabled(accPanel.getStateField());
+            assertDisabled(accPanel.getGUIDField());
+            assertDisabled(accPanel.getDENField());
+            assertDisabled(accPanel.getObjectClassTermField());
+            assertDisabled(accPanel.getDefinitionField());
+            assertDisabled(accPanel.getDefinitionSourceField());
+
+            accViewEditPage.hitAmendButton();
+            accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+            accPanel = accViewEditPage.getACCPanel(accNode);
+            assertEquals("WIP", getText(accPanel.getStateField()));
+            assertEquals(endUser.getLoginId(), getText(accPanel.getOwnerField()));
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            assertEquals("WIP", getText(bccPanelContainer.getBCCPanel().getStateField()));
+            assertEquals(endUser.getLoginId(), getText(bccPanelContainer.getBCCPanel().getOwnerField()));
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+            asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+
+            assertEquals("WIP", getText(asccPanelContainer.getASCCPanel().getStateField()));
+            assertEquals(endUser.getLoginId(), getText(asccPanelContainer.getASCCPanel().getOwnerField()));
+
+        }
     }
 
     @Test
