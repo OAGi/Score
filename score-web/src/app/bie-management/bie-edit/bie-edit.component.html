@@ -958,13 +958,13 @@
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Pattern Test"
-                                       [formControl]="biePatternTest">
-                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
-                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
-                                </mat-hint>
+                                       [formControl]="biePatternTest" [errorStateMatcher]="biePatternTestErrorStateMatcher">
                                 <mat-error *ngIf="biePatternTest.hasError('pattern')">
                                   The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
                                 </mat-error>
+                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
+                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
+                                </mat-hint>
                               </mat-form-field>
                             </div>
                           </div>
