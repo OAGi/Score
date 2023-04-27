@@ -295,7 +295,9 @@ public class CodeListUpliftingService {
         newCodeList.setDefinitionSource(codeList.getDefinitionSource());
         newCodeList.setNamespaceId(codeList.getNamespaceId());
         newCodeList.setExtensibleIndicator(codeList.getExtensibleIndicator());
-        newCodeList.setIsDeprecated(codeList.getIsDeprecated());
+        // Test Assertion #33.2.7
+        // After Uplifting, the "Deprecated" should be false.
+        newCodeList.setIsDeprecated((byte) 0);
         newCodeList.setOwnerUserId(ULong.valueOf(requester.getUserId()));
         newCodeList.setCreatedBy(ULong.valueOf(requester.getUserId()));
         newCodeList.setCreationTimestamp(timestamp);
