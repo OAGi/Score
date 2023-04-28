@@ -43,6 +43,9 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger sinceManifestId = BigInteger.ZERO;
         private BigInteger sinceReleaseId = BigInteger.ZERO;
         private String sinceReleaseNum;
+        private BigInteger lastChangedManifestId = BigInteger.ZERO;
+        private BigInteger lastChangedReleaseId = BigInteger.ZERO;
+        private String lastChangedReleaseNum;
     }
 
     @Data
@@ -73,6 +76,9 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger sinceManifestId = BigInteger.ZERO;
         private BigInteger sinceReleaseId = BigInteger.ZERO;
         private String sinceReleaseNum;
+        private BigInteger lastChangedManifestId = BigInteger.ZERO;
+        private BigInteger lastChangedReleaseId = BigInteger.ZERO;
+        private String lastChangedReleaseNum;
     }
 
     @Data
@@ -100,5 +106,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger sinceManifestId = BigInteger.ZERO;
         private BigInteger sinceReleaseId = BigInteger.ZERO;
         private String sinceReleaseNum;
+        private BigInteger lastChangedManifestId = BigInteger.ZERO;
+        private BigInteger lastChangedReleaseId = BigInteger.ZERO;
+        private String lastChangedReleaseNum;
     }
 }
