@@ -197,6 +197,16 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
+    public WebElement getAbstractCheckbox() {
+        return null;
+    }
+
+    @Override
+    public WebElement getDeprecatedCheckbox() {
+        return null;
+    }
+
+    @Override
     public WebElement getNamespaceField() {
         return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
     }

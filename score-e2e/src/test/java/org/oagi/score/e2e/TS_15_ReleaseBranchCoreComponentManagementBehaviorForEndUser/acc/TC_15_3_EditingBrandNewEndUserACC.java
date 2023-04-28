@@ -25,6 +25,8 @@ import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -125,11 +127,30 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
 
         assertDisabled(accExtensionViewEditPage.getObjectClassTermField());
         assertDisabled(accExtensionViewEditPage.getDENField());
+        assertDisabled(accExtensionViewEditPage.getAbstractCheckbox());
+        assertDisabled(accExtensionViewEditPage.getDeprecatedCheckbox());
     }
 
     @Test
     public void test_TA_15_3_3_a() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertFalse(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
+        accPanel.setComponentType("Base (Abstract)");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertChecked(accPanel.getAbstractCheckbox());
     }
 
     @Test

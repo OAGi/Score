@@ -128,6 +128,20 @@ public interface ACCExtensionViewEditPage extends Page {
     String getObjectClassTermFieldValue();
 
     /**
+     * Return the UI element of the 'Abstract' checkbox.
+     *
+     * @return the UI element of the 'Abstract' checkbox
+     */
+    WebElement getAbstractCheckbox();
+
+    /**
+     * Return the UI element of the 'Deprecated' checkbox.
+     *
+     * @return the UI element of the 'Deprecated' checkbox
+     */
+    WebElement getDeprecatedCheckbox();
+
+    /**
      * Return the UI element of the 'Namespace' field.
      *
      * @return the UI element of the 'Namespace' field
