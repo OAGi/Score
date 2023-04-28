@@ -655,5 +655,4 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
     }
 
-
 }

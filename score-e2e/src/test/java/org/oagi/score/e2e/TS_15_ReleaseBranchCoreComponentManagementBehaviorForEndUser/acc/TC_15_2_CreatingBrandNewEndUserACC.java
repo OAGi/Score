@@ -9,9 +9,12 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
@@ -47,10 +50,12 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        assertThrows(TimeoutException.class, ()-> viewEditCoreComponentPage.getCreateACCButton());
     }
 
     @Test
     public void test_TA_15_2_2() {
+
 
     }
 
