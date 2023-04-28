@@ -6,21 +6,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.menu.BIEMenu;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -80,6 +85,46 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     @Test
     public void test_TA_15_3_2() {
 
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ASCCPObject asccp;
+        BCCPObject bccpToAppend;
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, endUser, namespace, "Published");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Published");
+
+        }
+        TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, endUser, "WIP");
+
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        getDriver().manage().window().maximize();
+        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
+
+        accExtensionViewEditPage.setNamespace(namespace);
+        accExtensionViewEditPage.hitUpdateButton();
+
+        assertDisabled(accExtensionViewEditPage.getObjectClassTermField());
+        assertDisabled(accExtensionViewEditPage.getDENField());
     }
 
     @Test
