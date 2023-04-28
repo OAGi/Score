@@ -12,11 +12,9 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -24,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -178,22 +178,140 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_3_3_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertEquals("true", accPanel.getObjectClassTermField().getAttribute("aria-required"));
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
+        assertEquals("true", accPanel.getNamespaceSelectField().getAttribute("aria-required"));
+        assertNotChecked(accPanel.getAbstractCheckbox());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        accPanel = accViewEditPage.getACCPanel(accNode);
+        click(accPanel.getComponentTypeSelectField());
+        waitFor(ofMillis(1000L));
+        isHidden("//mat-option//span[.=\" Extension \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" User Extension Group \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" Embedded \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" OAGIS10 Nouns \"]//ancestor::mat-option");
+        isHidden("//mat-option//span[.=\" OAGIS10 BODs \"]//ancestor::mat-option");
+        escape(getDriver());
+    }
+    private void isHidden(String xpath) {
+        try {
+            getDriver().findElement(By.xpath(xpath + "[@hidden]"));
+        } catch (Exception notPresent) {
+            waitFor(ofMillis(2000L));
+            assertTrue(!isElementPresent(getDriver(), By.xpath(xpath)));
+        }
     }
 
     @Test
     public void test_TA_15_3_3_d() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertEquals("1", getText(accPanel.getRevisionField()));
+        assertNotChecked(accPanel.getDeprecatedCheckbox());
+        assertDisabled(accPanel.getDeprecatedCheckbox());
 
     }
 
     @Test
     public void test_TA_15_3_3_e() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        acc.setDefinition(null);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        accPanel.setObjectClassTerm(randomPropertyTerm);
+        String namespaceForUpdate = "http://www.openapplications.org/oagis/10";
+        accPanel.setNamespace(namespaceForUpdate);
+
+        assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
     }
-
 
     @Test
     public void test_TA_15_3_3_f() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ASCCPObject randomASCCP1, randomASCCP2;
+        randomASCCP1 = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, endUser, namespace, "WIP");
+        randomASCCP2 = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, endUser, namespace, "WIP");
+
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        randomPropertyTerm = "Test Object " + randomPropertyTerm;
+
+        acc.setObjectClassTerm(randomPropertyTerm);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP1.getAsccpManifestId());
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            String asccpDEN = getText(asccpPanel.getDENField());
+            assertTrue(asccpDEN.endsWith(randomPropertyTerm));
+            assertEquals("1", getText(asccpPanel.getRevisionField()));
+        }
+
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP2.getAsccpManifestId());
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            String asccpDEN = getText(asccpPanel.getDENField());
+            assertTrue(asccpDEN.endsWith(randomPropertyTerm));
+            assertEquals("1", getText(asccpPanel.getRevisionField()));
+        }
 
     }
 
