@@ -186,7 +186,7 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
       hashCode = 31 * hashCode + this.bieId;
     }
     if (this._used === undefined) {
-      hashCode = 31 * hashCode + 0;
+      hashCode = 31 * hashCode;
     } else {
       hashCode = 31 * hashCode + ((this._used) ? 1231 : 1237);
     }
@@ -329,7 +329,6 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
 
 export class AbieFlatNode extends BieFlatNodeImpl {
   asbiepId: number;
-  abieId: number;
   protected _asbiepPath: string;
   private _path: string;
   private _asbiepHashPath: string;
@@ -341,6 +340,14 @@ export class AbieFlatNode extends BieFlatNodeImpl {
   constructor() {
     super();
     this.bieType = 'ABIE';
+  }
+
+  get abieId(): number {
+    return this.bieId;
+  }
+
+  set abieId(abieId: number) {
+    this.bieId = abieId;
   }
 
   get asbiepPath(): string {
@@ -389,7 +396,6 @@ export class AbieFlatNode extends BieFlatNodeImpl {
 }
 
 export class AsbiepFlatNode extends AbieFlatNode {
-  asbieId: number;
   private _asbiePath: string;
   private _asbieHashPath: string;
 
@@ -402,6 +408,14 @@ export class AsbiepFlatNode extends AbieFlatNode {
   constructor() {
     super();
     this.bieType = 'ASBIEP';
+  }
+
+  get asbieId(): number {
+    return this.bieId;
+  }
+
+  set asbieId(asbieId: number) {
+    this.bieId = asbieId;
   }
 
   get type(): string {
@@ -490,7 +504,6 @@ export class AsbiepFlatNode extends AbieFlatNode {
 }
 
 export class BbiepFlatNode extends BieFlatNodeImpl {
-  bbieId: number;
   bbiepId: number;
   private _bbiePath: string;
   private _bbiepPath: string;
@@ -511,6 +524,14 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   constructor() {
     super();
     this.bieType = 'BBIEP';
+  }
+
+  get bbieId(): number {
+    return this.bieId;
+  }
+
+  set bbieId(bbieId: number) {
+    this.bieId = bbieId;
   }
 
   get type(): string {
@@ -612,7 +633,6 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
 
 export class BbieScFlatNode extends BieFlatNodeImpl {
   bbieId: number;
-  bbieScId: number;
   private _bbieScPath: string;
   private _bbieScHashPath: string;
 
@@ -626,6 +646,14 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
   constructor() {
     super();
     this.bieType = 'BBIE_SC';
+  }
+
+  get bbieScId(): number {
+    return this.bieId;
+  }
+
+  set bbieScId(bbieScId: number) {
+    this.bieId = bbieScId;
   }
 
   get bbieScPath(): string {
@@ -2163,7 +2191,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         }
       }
     });
-    return attributes.concat(nodes);
+    const children = attributes.concat(nodes);
+    return children;
   }
 
   loadChildren(node: T) {
@@ -2587,7 +2616,12 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         nodes = children.concat(nodes) as T[];
       }
     }
-    return changedNodes;
+    return changedNodes.filter(e => {
+      if (!e.inverseMode && !e.bieId && !e.used) {
+        return false;
+      }
+      return true;
+    });
   }
 
   onChange(entity: T, propertyName: string, val: any) {

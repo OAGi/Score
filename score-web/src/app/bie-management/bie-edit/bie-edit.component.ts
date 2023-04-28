@@ -33,8 +33,11 @@ import {
 } from '../domain/bie-flat-tree';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from '@angular/forms';
+import {
+  BusinessContext,
+  BusinessContextListRequest
+} from '../../context-management/business-context/domain/business-context';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
@@ -47,9 +50,10 @@ import {PageRequest} from '../../basis/basis';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {AssignedBtListRequest, AssignedBusinessTerm} from '../../business-term-management/domain/business-term';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
+import {ErrorStateMatcher, ShowOnDirtyErrorStateMatcher} from '@angular/material/core';
+
 
 @Component({
   selector: 'score-bie-edit',
@@ -99,6 +103,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   bieMaximumLength: FormControl;
   biePattern: FormControl;
   biePatternTest: FormControl;
+  biePatternTestErrorStateMatcher: ErrorStateMatcher;
 
   /* valueDomain */
   valueDomainFilterCtrl: FormControl = new FormControl();
@@ -195,7 +200,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this, ]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -496,6 +501,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.rootNode.isChanged || this.dataSource.getChanged().length > 0;
   }
 
+  get sizeOfChanges(): number {
+    return this.dataSource.getChanged().length;
+  }
+
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
       $event.preventDefault();
@@ -594,7 +603,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     ]).subscribe(([ccGraph, usedBieList, refBieList]) => {
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this, ]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
@@ -1101,7 +1110,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
     const isWhitespace = control.value.toString().trim().length === 0;
     const isValid = !isWhitespace;
-    return isValid ? null : {'whitespace': true};
+    return isValid ? null : {whitespace: true};
   }
 
   _setCardinalityMinFormControl(detailNode?: BieFlatNode) {
@@ -1441,11 +1450,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   _setPatternTestFormControl() {
     this.biePatternTest = new FormControl({
-      value: '',
+      value: (!!this.biePatternTest) ? this.biePatternTest.value : '',
       disabled: !this.biePattern || !this.biePattern.value || !this.biePattern.valid
     }, [
       (this.biePattern.valid) ? Validators.pattern(this.biePattern.value) : Validators.nullValidator
     ]);
+    this.biePatternTestErrorStateMatcher = new BiePatternTestShowOnDirtyErrorStateMatcher(this.biePattern);
   }
 
   onChangeFixedOrDefault(value: string) {
@@ -1593,6 +1603,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return false;
   }
 
+  updateInverseMode() {
+    const request = new BieDetailUpdateRequest();
+    this.isUpdating = true;
+    request.topLevelAsbiepDetail = this.rootNode;
+
+    this.service.updateDetails(this.topLevelAsbiepId, request).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe((resp: BieDetailUpdateResponse) => {
+      this.rootNode.reset();
+      this.snackBar.open(((this.rootNode.inverseMode) ? 'Inverse mode is turned on' : 'Inverse mode is turned off'), '', {
+        duration: 3000,
+      });
+    });
+  }
+
   updateDetails(include?: BieFlatNode[], callbackFn?) {
     const request = new BieDetailUpdateRequest();
 
@@ -1708,7 +1734,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     })).subscribe((resp: BieDetailUpdateResponse) => {
       this.rootNode.reset();
       this.dataSource.update(resp);
-      this.dataSource.getChanged().forEach(e => e.reset());
+      nodes.forEach(e => e.reset());
       this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(usedBieList => {
         this.dataSource.database.setUsedBieList(usedBieList);
       });
@@ -1943,5 +1969,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }, err => {
         this.businessContextUpdating = false;
       });
+  }
+}
+
+class BiePatternTestShowOnDirtyErrorStateMatcher implements ErrorStateMatcher {
+  constructor(private biePattern: FormControl) {
+  }
+  isErrorState(control: AbstractControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return (this.biePattern.dirty || control.dirty) && control.invalid;
   }
 }

@@ -73,6 +73,8 @@
                       </div>
                       <div class="ml-3">
                         <button mat-raised-button color="primary" (click)="updateDetails()"
+                                matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
+                                [matBadgeHidden]="sizeOfChanges === 0"
                                 *ngIf="state === 'WIP' && access === 'CanEdit'"
                                 [disabled]="isUpdating || !isChanged || !isValid">
                           Update
@@ -160,6 +162,7 @@
                                       *ngIf="node.level > 0"
                                       [checked]="used(node)"
                                       [disabled]="!isUsable(node)"
+                                      [color]="(node.used === undefined) ? 'warn' : undefined"
                                       (click)="toggleTreeUsed(node, $event)"
                                       [matTooltip]="getNodeTooltip(node)"
                                       [matTooltipDisabled]="getNodeTooltip(node) === ''">
@@ -329,7 +332,8 @@
                         <div class="col-md-12 col-sm-12">
                           <div class="checkbox">
                             <mat-slide-toggle color="accent"
-                                              [(ngModel)]="rootNode.inverseMode">
+                                              [(ngModel)]="rootNode.inverseMode"
+                                              (change)="updateInverseMode()">
                               Inverse Mode
                             </mat-slide-toggle>
                           </div>
@@ -954,13 +958,13 @@
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Pattern Test"
-                                       [formControl]="biePatternTest">
-                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
-                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
-                                </mat-hint>
+                                       [formControl]="biePatternTest" [errorStateMatcher]="biePatternTestErrorStateMatcher">
                                 <mat-error *ngIf="biePatternTest.hasError('pattern')">
                                   The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
                                 </mat-error>
+                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
+                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
+                                </mat-hint>
                               </mat-form-field>
                             </div>
                           </div>

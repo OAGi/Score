@@ -372,12 +372,21 @@
                             <input matInput [(ngModel)]="asBdtDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-2">
+                        <div class="{{ asBdtDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
                             <a [routerLink]="['/core_component/dt/' + asBdtDetail().sinceManifestId]"
                                target="_blank" rel="noopener noreferrer">
                               <input matInput [(ngModel)]="asBdtDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBdtDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/dt/' + asBdtDetail().lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBdtDetail().lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
                             </a>
                           </mat-form-field>
                         </div>
@@ -669,10 +678,16 @@
                             <input matInput [(ngModel)]="asBdtScDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-2">
+                        <div class="{{ asBdtScDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            <input matInput [(ngModel)]="asBdtScDetail().sinceReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBdtScDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().lastChangedReleaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
