@@ -314,14 +314,4 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         }
 
     }
-
-    @Test
-    public void test_TA_15_3_4_a() {
-
-    }
-
-    @Test
-    public void test_TA_15_3_4_b() {
-
-    }
 }
