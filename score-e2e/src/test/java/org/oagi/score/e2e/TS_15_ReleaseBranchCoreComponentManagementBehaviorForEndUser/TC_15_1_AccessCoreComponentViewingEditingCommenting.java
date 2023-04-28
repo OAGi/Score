@@ -600,17 +600,53 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
         click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
 
+        viewEditCoreComponentPage.hitMoveToQAButton();
 
+        viewEditCoreComponentPage.setState("QA");
+        viewEditCoreComponentPage.hitSearchButton();
 
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
 
+        viewEditCoreComponentPage.hitBackToWIPButton();
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.setState("WIP");
+        viewEditCoreComponentPage.hitSearchButton();
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
 
+        viewEditCoreComponentPage.hitMoveToQAButton();
 
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
+        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
 
-
-
-
+        viewEditCoreComponentPage.hitMoveToProductionButton();
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.setState("Production");
+        viewEditCoreComponentPage.hitSearchButton();
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
     }
 
