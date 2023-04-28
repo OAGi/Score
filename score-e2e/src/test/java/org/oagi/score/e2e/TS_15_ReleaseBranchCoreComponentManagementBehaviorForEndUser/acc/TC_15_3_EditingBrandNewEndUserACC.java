@@ -24,10 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.oagi.score.e2e.AssertionHelper.assertChecked;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -155,7 +153,27 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_3_3_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
+        assertNotChecked(accPanel.getAbstractCheckbox());
+        assertEnabled(accPanel.getAbstractCheckbox());
+
+        accPanel.setComponentType("Semantic Group");
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertNotChecked(accPanel.getAbstractCheckbox());
     }
 
     @Test
