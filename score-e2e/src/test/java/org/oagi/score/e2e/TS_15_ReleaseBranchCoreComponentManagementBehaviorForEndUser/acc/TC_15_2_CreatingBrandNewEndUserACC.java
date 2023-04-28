@@ -7,7 +7,6 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
@@ -50,7 +49,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_2_1() {
-        AppUserObject endUser= getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "Working";
@@ -58,12 +57,12 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        assertThrows(TimeoutException.class, ()-> viewEditCoreComponentPage.getCreateACCButton());
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateACCButton());
     }
 
     @Test
     public void test_TA_15_2_2() {
-        AppUserObject endUser= getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "10.8.7.1";
@@ -75,7 +74,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         int idx = url.lastIndexOf("/");
         BigInteger manifestId = new BigInteger(url.substring(idx + 1));
         ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(manifestId);
-        WebElement accNode =  accViewEditPage.getNodeByPath("/" + acc.getDen());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Object Class Term", getText(accPanel.getObjectClassTermField()));
         assertEquals("Object Class Term. Details", getText(accPanel.getDENField()));
