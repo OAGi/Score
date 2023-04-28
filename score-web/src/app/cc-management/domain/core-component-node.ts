@@ -154,6 +154,9 @@ export class CcAccNodeDetail extends CcNodeDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: AccFlatNode, obj: any) {
     super(node);
@@ -182,6 +185,9 @@ export class CcAccNodeDetail extends CcNodeDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
 
     this.reset();
   }
@@ -210,6 +216,9 @@ export class CcAccNodeDetail extends CcNodeDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
@@ -399,6 +408,9 @@ class AsccDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: CcFlatNode, obj: any) {
     this._node = node;
@@ -424,6 +436,9 @@ class AsccDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
   }
 
   get json(): any {
@@ -445,6 +460,9 @@ class AsccDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
@@ -542,6 +560,9 @@ class AsccpDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: CcFlatNode, obj: any) {
     this._node = node;
@@ -571,6 +592,9 @@ class AsccpDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
   }
 
   get json(): any {
@@ -596,6 +620,9 @@ class AsccpDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
@@ -763,6 +790,9 @@ class BccDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: BccpFlatNode, obj: any) {
     this._node = node;
@@ -793,6 +823,9 @@ class BccDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
   }
 
   get json(): any {
@@ -818,6 +851,9 @@ class BccDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
@@ -979,6 +1015,9 @@ class BccpDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: BccpFlatNode, obj: any) {
     this._node = node;
@@ -1009,6 +1048,9 @@ class BccpDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
   }
 
   get json(): any {
@@ -1035,6 +1077,9 @@ class BccpDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
@@ -1193,6 +1238,9 @@ class BdtDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   constructor(node: BccpFlatNode, obj: any) {
     this._node = node;
@@ -1220,6 +1268,9 @@ class BdtDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
   }
 }
 
@@ -1489,6 +1540,9 @@ export class CcDtNodeDetail extends CcNodeDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
   spec: string;
 
   bdtPriRestriList: CcBdtPriRestri[];
@@ -1526,6 +1580,9 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
     this.spec = obj.spec;
 
     this.bdtPriRestriList = obj.bdtPriRestriList;
@@ -1954,6 +2011,9 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   sinceManifestId: number;
   sinceReleaseId: number;
   sinceReleaseNum: string;
+  lastChangedManifestId: number;
+  lastChangedReleaseId: number;
+  lastChangedReleaseNum: string;
 
   private _propertyTerm: string;
   private _representationTerm: string;
@@ -2024,6 +2084,9 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this.sinceManifestId = obj.sinceManifestId;
     this.sinceReleaseId = obj.sinceReleaseId;
     this.sinceReleaseNum = obj.sinceReleaseNum;
+    this.lastChangedManifestId = obj.lastChangedManifestId;
+    this.lastChangedReleaseId = obj.lastChangedReleaseId;
+    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
     this._propertyTerm = obj.propertyTerm;
     this._representationTerm = obj.representationTerm;
     this.objectClassTerm = obj.objectClassTerm;
@@ -2333,6 +2396,9 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       sinceManifestId: this.sinceManifestId,
       sinceReleaseId: this.sinceReleaseId,
       sinceReleaseNum: this.sinceReleaseNum,
+      lastChangedManifestId: this.lastChangedManifestId,
+      lastChangedReleaseId: this.lastChangedReleaseId,
+      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
