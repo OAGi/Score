@@ -21,7 +21,7 @@ import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_5_EndUserACCStateManagement extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -173,7 +173,6 @@ public class TC_15_5_EndUserACCStateManagement extends BaseTest {
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("WIP", getText(bccPanel.getStateField()));
     }
-
 
     @Test
     public void test_TA_15_5_3() {
