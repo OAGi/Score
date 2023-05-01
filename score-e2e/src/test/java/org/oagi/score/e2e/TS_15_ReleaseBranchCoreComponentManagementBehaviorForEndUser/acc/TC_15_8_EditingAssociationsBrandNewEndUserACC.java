@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -406,13 +407,107 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_3_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
 
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setDefinition(null);
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
+        asccPanel.setCardinalityMaxField("-10");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"not allowed for Cardinality Max\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
+
+        //check max greater than min
+        asccPanel.setCardinalityMinField("111");
+        asccPanel.setCardinalityMaxField("11");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be greater than\")]")).size());
+        click(accViewEditPage.getUpdateButton(true));
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
+
+        assertEquals("111", getText(asccPanel.getCardinalityMinField()));
     }
 
     @Test
     public void test_TA_15_8_3_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
+        asccPanel.setCardinalityMaxField("-1");
+        waitFor(ofMillis(500L));
+        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
     }
 
     @Test
@@ -422,6 +517,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_3_e() {
+
 
     }
 
