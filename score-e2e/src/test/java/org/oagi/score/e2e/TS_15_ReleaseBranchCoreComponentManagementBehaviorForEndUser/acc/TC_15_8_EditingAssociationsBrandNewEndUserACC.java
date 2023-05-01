@@ -111,7 +111,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("QA");
         ccStates.add("Production");
         ccStates.add("Deleted");
-        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ASCCPObject asccp;
