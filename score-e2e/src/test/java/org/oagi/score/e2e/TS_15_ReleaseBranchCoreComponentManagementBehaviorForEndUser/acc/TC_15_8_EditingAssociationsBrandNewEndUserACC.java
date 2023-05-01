@@ -11,8 +11,12 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -21,7 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
@@ -134,13 +141,81 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_1_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "Production");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, endUser, namespace, "Production");
+        viewEditCoreComponentPage.openPage();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpViewEditPage.hitAmendButton();
+        asccpViewEditPage.toggleDeprecated();
+        asccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.setDEN(asccp.getDen());
+        appendASCCPDialog.hitSearchButton();
+        By APPEND_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + asccp.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
+
+        assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
 
     }
-
-
     @Test
     public void test_TA_15_8_1_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("already has ASCCP"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+
+        assertEquals("0", getText(asccPanel.getCardinalityMinField()));
+        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
+        assertNotChecked(asccPanel.getDeprecatedCheckbox());
+        assertDisabled(asccPanel.getDeprecatedCheckbox());
     }
 
     @Test
