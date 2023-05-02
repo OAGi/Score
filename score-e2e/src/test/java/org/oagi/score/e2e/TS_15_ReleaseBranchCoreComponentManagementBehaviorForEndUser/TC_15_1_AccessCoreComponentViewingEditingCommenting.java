@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTest {
@@ -548,56 +548,90 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        WebElement tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+        WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
 
         viewEditCoreComponentPage.hitMoveToQAButton();
 
         viewEditCoreComponentPage.setState("QA");
+        escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
 
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
 
         viewEditCoreComponentPage.hitBackToWIPButton();
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         viewEditCoreComponentPage.setState("WIP");
+        escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
 
         viewEditCoreComponentPage.hitMoveToQAButton();
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
+        viewEditCoreComponentPage.setState("QA");
+        escape(getDriver());
+        viewEditCoreComponentPage.hitSearchButton();
 
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
-        tr = viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId());
-        click(viewEditCoreComponentPage.getColumnByName(tr, "Select"));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
+        tr = viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
+        td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+        assertEnabled(td.findElement(By.tagName("mat-checkbox")));
+        click(td.findElement(By.tagName("mat-checkbox")));
 
         viewEditCoreComponentPage.hitMoveToProductionButton();
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         viewEditCoreComponentPage.setState("Production");
+        escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), endUser.getLoginId()).isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), endUser.getLoginId()).isDisplayed());
