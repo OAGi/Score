@@ -2053,7 +2053,105 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
     @Test
     public void test_TA_15_9_15() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
+        ACCObject acc, acc_association, accForBase;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            accForBase = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            coreComponentAPI.updateBasedACC(acc, accForBase);
+
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+
+        String nodePath;
+
+        {
+            nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
+            assertTrue(movedASCCPNode.isDisplayed());
+
+        }
+
+        {
+            nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
+            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
+            WebElement tr;
+            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
+            assertTrue(tr.isDisplayed());
+            click(tr.findElement(By.className("mat-column-" + "select")));
+            selectBaseACCToRefactorDialog.hitAnalyzeButton();
+            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
+            selectBaseACCToRefactorDialog.hitRefactorButton();
+
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+        }
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitCancelButton();
+
+        {
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            assertTrue(movedASCCPNode.isDisplayed());
+
+        }
+
+        {
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+            assertTrue(movedBCCPNode.isDisplayed());
+        }
     }
 }
