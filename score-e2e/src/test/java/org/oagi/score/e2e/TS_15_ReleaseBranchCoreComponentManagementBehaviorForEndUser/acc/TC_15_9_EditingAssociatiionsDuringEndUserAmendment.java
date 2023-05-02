@@ -1828,21 +1828,177 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     @Test
     public void test_TA_15_9_13() {
 
+
+
     }
 
     @Test
     public void test_TA_15_9_14_a() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(25);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        asccPanel.setCardinalityMinField("30");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Min must be less than or equals to\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
     }
 
     @Test
     public void test_TA_15_9_14_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMin(75);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        asccPanel.setCardinalityMaxField("50");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Max must be greater than\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
     }
 
     @Test
-    public void test_TA_15_9_14_c() {
+    public void test_TA_15_9_14_c_deprecated_in_previous_version() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setDeprecated(true);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        assertChecked(asccPanel.getDeprecatedCheckbox());
+        assertDisabled(asccPanel.getDeprecatedCheckbox());
+    }
+    @Test
+    public void test_TA_15_9_14_c_not_deprecated_in_previous_version() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setDeprecated(false);
+            coreComponentAPI.updateASCC(ascc);
+
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("2", getText(asccPanel.getRevisionField()));
+        assertNotChecked(asccPanel.getDeprecatedCheckbox());
+        assertEnabled(asccPanel.getDeprecatedCheckbox());
     }
 
     @Test
