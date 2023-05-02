@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -213,19 +216,120 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
     @Test
     public void test_TA_15_9_1_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//snack-bar-container//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("already has ASCCP"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Account Identifiers");
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+
+        assertEquals("0", getText(asccPanel.getCardinalityMinField()));
+        assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
+        assertNotChecked(asccPanel.getDeprecatedCheckbox());
+        assertDisabled(asccPanel.getDeprecatedCheckbox());
     }
-
 
     @Test
     public void test_TA_15_9_1_d() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation(asccp.getDen());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+        assertEquals("WIP", getText(asccPanel.getStateField()));
     }
 
     @Test
     public void test_TA_15_9_1_e() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+        ACCObject acc_WithNonReusableAsccp = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "WIP");
+        ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "WIP");
+        ASCCPObject asccp_NotReusable = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "WIP");
+        ASCCObject ascc = coreComponentAPI.appendASCC(acc_WithNonReusableAsccp, asccp_NotReusable, "WIP");
+        ascc.setCardinalityMax(1);
+        coreComponentAPI.updateASCC(ascc);
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_NotReusable.getAsccpManifestId());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+        asccpPanel.toggleReusable();
+        asccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitAmendButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.selectAssociation(asccp_NotReusable.getDen());
+
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//snack-bar-container//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable."));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
