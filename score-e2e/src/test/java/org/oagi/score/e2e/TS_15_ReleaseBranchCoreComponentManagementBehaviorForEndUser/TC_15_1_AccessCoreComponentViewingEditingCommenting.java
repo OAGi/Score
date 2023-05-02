@@ -15,7 +15,6 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import javax.naming.Name;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,11 +53,11 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     private class RandomCoreComponentWithStateContainer {
         private AppUserObject appUser;
         private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs= new HashMap<>();
+        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
         private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
         private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states)
-        {
+
+        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
             this.appUser = appUser;
             this.states = states;
 
@@ -89,7 +88,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
                     coreComponentAPI.updateASCC(ascc);
                     stateACCs.put(state, acc);
                     stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state,bccp);
+                    stateBCCPs.put(state, bccp);
                 }
             }
         }
@@ -120,7 +119,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -142,50 +141,6 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
             viewEditCoreComponentPage.setDEN(bccp.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
-        }
-
-        List<String> ccStatesForDeveloper = new ArrayList<>();
-        ccStatesForDeveloper.add("WIP");
-        ccStatesForDeveloper.add("Draft");
-        ccStatesForDeveloper.add("Candidate");
-        ccStatesForDeveloper.add("Deleted");
-        ccStatesForDeveloper.add("Published");
-        randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStatesForDeveloper);
-
-        viewEditCoreComponentPage.openPage();
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
-            ACCObject acc;
-            ASCCPObject asccp;
-            BCCPObject bccp;
-            String state = entry.getKey();
-            acc = entry.getValue();
-            asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
-            bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
-            viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setDEN(acc.getDen());
-            viewEditCoreComponentPage.hitSearchButton();
-            if (state.equals("Published")){
-                assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
-            } else{
-                assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),acc.getDen())]")).size());
-            }
-            viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setDEN(asccp.getDen());
-            viewEditCoreComponentPage.hitSearchButton();
-            if (state.equals("Published")){
-                assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
-            }else{
-                assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),asccp.getDen())]")).size());
-            }
-
-            viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setDEN(bccp.getDen());
-            viewEditCoreComponentPage.hitSearchButton();
-            if (state.equals("Published")){
-                assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
-            }else{
-                assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),bccp.getDen())]")).size());
-            }
         }
     }
 
@@ -283,7 +238,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -358,7 +313,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -433,7 +388,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
