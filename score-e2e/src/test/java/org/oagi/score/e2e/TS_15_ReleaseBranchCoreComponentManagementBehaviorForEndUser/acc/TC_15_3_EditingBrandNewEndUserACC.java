@@ -263,8 +263,6 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         accPanel.setObjectClassTerm(randomPropertyTerm);
-        String namespaceForUpdate = "http://www.openapplications.org/oagis/10";
-        accPanel.setNamespace(namespaceForUpdate);
 
         assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
