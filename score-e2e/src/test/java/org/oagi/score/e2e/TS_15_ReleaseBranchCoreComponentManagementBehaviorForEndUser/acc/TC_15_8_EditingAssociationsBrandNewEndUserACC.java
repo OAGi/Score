@@ -24,8 +24,7 @@ import java.util.Map;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
+import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -885,42 +884,343 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_6_a() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("0", getText(bccPanel.getCardinalityMinField()));
+
+        bccPanel.setCardinalityMinField("-1");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Min\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
+
+        bccPanel.setCardinalityMinField("10");
+        bccPanel.setDefinition("test cardinality min >=0");
+        accViewEditPage.hitUpdateButton();
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("10", getText(bccPanel.getCardinalityMinField()));
     }
 
     @Test
     public void test_TA_15_8_6_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Published");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("0", getText(bccPanel.getCardinalityMinField()));
+
+        bccPanel.setCardinalityMaxField("-9");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"is not allowed for Cardinality Max\")]")).size());
+        assertDisabled(accViewEditPage.getUpdateButton(false));
+
+        bccPanel.setCardinalityMaxField("11");
+        bccPanel.setCardinalityMinField("111");
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"must be less than or equal\")]")).size());
+        bccPanel.setDefinition("Test Max >= Min");
+        accViewEditPage.hitUpdateButton();
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
     }
 
     @Test
     public void test_TA_15_8_6_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
+        bccPanel.setCardinalityMaxField("-1");
+        waitFor(ofMillis(500L));
+        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
     }
 
     @Test
     public void test_TA_15_8_6_d() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("0", getText(bccPanel.getCardinalityMinField()));
+        bccPanel.getCardinalityMinField().clear();
+        assertEquals("true", bccPanel.getCardinalityMinField().getAttribute("aria-required"));
+
+        assertEquals("unbounded", getText(bccPanel.getCardinalityMaxField()));
+        bccPanel.getCardinalityMaxField().clear();
+        assertEquals("true", bccPanel.getCardinalityMaxField().getAttribute("aria-required"));
+
+        bccPanel.setCardinalityMinField("11");
+        bccPanel.setCardinalityMaxField("111");
+        click(accViewEditPage.getUpdateButton(true));
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
     }
 
     @Test
     public void test_TA_15_8_6_e() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertNotChecked(bccPanel.getDeprecatedCheckbox());
+        assertDisabled(bccPanel.getDeprecatedCheckbox());
     }
 
     @Test
     public void test_TA_15_8_6_f() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation("Record Set Total");
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setEntityType("Attribute");
+        assertEnabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setValueConstraint("Default Value");
+        bccPanel.setDefaultValue("99");
+        bccPanel.setDefinition("test");
+        accViewEditPage.hitUpdateButton();
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("Default Value", getText(bccPanel.getValueConstraintSelectField()));
+        assertEquals("99", getText(bccPanel.getDefaultValueField()));
     }
 
     @Test
-    public void test_TA_15_8_6_g() {
+    public void test_TA_15_8_6_g_h() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
-    }
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        BCCPObject bccp, bccp_to_append;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        }
 
-    @Test
-    public void test_TA_15_8_6_h() {
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
+
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation("Open Invoice Count. Number");
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setEntityType("Attribute");
+        assertEnabled(bccPanel.getValueConstraintSelectField());
+        bccPanel.setDefinition("test");
+        accViewEditPage.hitUpdateButton();
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("0", getText(bccPanel.getCardinalityMinField()));
+        assertEquals("1", getText(bccPanel.getCardinalityMaxField()));
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation("Confirmation Code. Code");
+
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Confirmation Code");
+        bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+        assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
+        assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
+        assertDisabled(bccPanel.getEntityTypeSelectField());
     }
 
     @Test
