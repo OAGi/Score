@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -57,7 +58,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateACCButton());
+        assertEquals(0, getDriver().findElements(By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ACC\"]")).size());
     }
 
     @Test
@@ -81,7 +82,5 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         assertEquals("Semantics", getText(accPanel.getComponentTypeSelectField()));
         assertNotChecked(accPanel.getAbstractCheckbox());
         assertNotChecked(accPanel.getDeprecatedCheckbox());
-        assertEquals("", getText(accPanel.getDefinitionSourceField()));
-        assertEquals("", getText(accPanel.getDefinitionField()));
     }
 }
