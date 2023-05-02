@@ -10,8 +10,12 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest {
@@ -162,11 +166,54 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
     @Test
     public void test_TA_15_9_1_b() {
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+        viewEditCoreComponentPage.openPage();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpViewEditPage.hitAmendButton();
+        asccpViewEditPage.toggleDeprecated();
+        asccpViewEditPage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendASCCPDialog.setDEN(asccp.getDen());
+        appendASCCPDialog.hitSearchButton();
+        By APPEND_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + 1 + "]"));
+            td = tr.findElement(By.className("mat-column-" + "den"));
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate an association using " + asccp.getDen(), e);
+        }
+        click(tr.findElement(By.className("mat-column-" + "select")));
+        click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
+
+        assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
     }
 
     @Test
     public void test_TA_15_9_1_c() {
+
 
     }
 
