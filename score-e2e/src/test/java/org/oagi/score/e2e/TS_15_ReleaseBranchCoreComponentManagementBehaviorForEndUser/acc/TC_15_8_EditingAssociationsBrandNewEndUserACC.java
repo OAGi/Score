@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.time.Duration.ofMillis;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -1546,16 +1545,124 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_11() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.hitApplyButton(accForBase.getDen());
+
+        WebElement accBaseNode;
+        ACCViewEditPage.ACCPanel accBasePanel;
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
+        accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
+        assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
+        accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
+
+        accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + accForBase.getDen() + "\")]";
+        assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
 
     @Test
     public void test_TA_15_8_12() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc, acc_association;
+        ASCCObject ascc;
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "WIP");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "WIP");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage;
+        viewEditCoreComponentPage.openPage();
+        {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            transferCCOwnershipDialog.transfer(anotherUser.getLoginId());
+
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
+            assertEquals(anotherUser.getLoginId(), getText(td));
+
+            //verify the ownership of all associations (ASCC and BCC) are  transferred as well
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals(anotherUser.getLoginId(), getText(asccPanel.getOwnerField()));
+
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+            assertEquals(anotherUser.getLoginId(), getText(bccPanel.getOwnerField()));
+        }
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
+        viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        {
+            viewEditCoreComponentPage.setDEN(acc.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(endUser.getLoginId()));
+        }
 
     }
-
-
 
 }
