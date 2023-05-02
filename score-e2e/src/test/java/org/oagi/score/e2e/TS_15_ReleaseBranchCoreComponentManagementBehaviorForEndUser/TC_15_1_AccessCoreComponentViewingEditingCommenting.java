@@ -638,10 +638,4 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), endUser.getLoginId()).isDisplayed());
 
     }
-
-    @Test
-    public void test_TA_15_1_10_a() {
-
-    }
-
 }
