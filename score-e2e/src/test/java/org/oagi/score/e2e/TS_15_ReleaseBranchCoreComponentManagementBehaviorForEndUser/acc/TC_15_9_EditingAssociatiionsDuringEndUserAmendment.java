@@ -1367,11 +1367,56 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
     @Test
     public void test_TA_15_9_9() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc, acc_association, acc_association_before, acc_association_after;
+        ASCCPObject asccp, asccp_before, asccp_after;
+        ASCCObject ascc, ascc_before;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            acc_association_before = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            acc_association_after = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            asccp_after = coreComponentAPI.createRandomASCCP(acc_association_after, anotherUser, namespace, "Production");
+            asccp_before = coreComponentAPI.createRandomASCCP(acc_association_before, anotherUser, namespace, "Production");
+            ascc = getAPIFactory().getCoreComponentAPI().appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+            ascc_before = coreComponentAPI.appendASCC(acc, asccp_before, "Production");
+            ascc_before.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc_before);
+        }
+
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.hitReviseButton();
+        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        appendASCCPDialog.selectAssociation(asccp_after.getDen());
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.removeAssociation("/" + acc.getDen() + "/" + asccp_after.getPropertyTerm());
+
+        WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp_after.getPropertyTerm() + "\")]";
+        assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
     @Test
     public void test_TA_15_9_10_a() {
+
 
     }
 
