@@ -178,11 +178,12 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         accExtensionViewEditPage.openPage();
         click(accExtensionViewEditPage.getAmendButton(true));
-
+        WebElement extensionNode = accExtensionViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage.ACCPanel accPanel = accExtensionViewEditPage.getACCPanel(extensionNode);
         assertDisabled(accExtensionViewEditPage.getObjectClassTermField());
         assertDisabled(accExtensionViewEditPage.getDENField());
-        assertDisabled(accExtensionViewEditPage.getAbstractCheckbox());
-        assertDisabled(accExtensionViewEditPage.getDeprecatedCheckbox());
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertDisabled(accPanel.getDeprecatedCheckbox());
     }
 
     @Test

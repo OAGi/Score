@@ -122,11 +122,12 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
 
         accExtensionViewEditPage.setNamespace(namespace);
         accExtensionViewEditPage.hitUpdateButton();
-
+        WebElement extensionNode = accExtensionViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Extension");
+        ACCExtensionViewEditPage.ACCPanel accPanel = accExtensionViewEditPage.getACCPanel(extensionNode);
         assertDisabled(accExtensionViewEditPage.getObjectClassTermField());
         assertDisabled(accExtensionViewEditPage.getDENField());
-        assertDisabled(accExtensionViewEditPage.getAbstractCheckbox());
-        assertDisabled(accExtensionViewEditPage.getDeprecatedCheckbox());
+        assertDisabled(accPanel.getAbstractCheckbox());
+        assertDisabled(accPanel.getDeprecatedCheckbox());
     }
 
     @Test
