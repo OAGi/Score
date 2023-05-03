@@ -24,12 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.jooq.tools.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static sun.util.locale.LocaleUtils.isEmpty;
+
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
