@@ -15,6 +15,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.math.BigInteger;
 import java.time.Duration;
 
+import static java.time.Duration.of;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -659,9 +660,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public void hitAmendButton() {
-        click(getAmendButton());
-        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        retry(()->{
+            click(getAmendButton());
+            click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(Duration.ofMillis(1000L));
         assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 

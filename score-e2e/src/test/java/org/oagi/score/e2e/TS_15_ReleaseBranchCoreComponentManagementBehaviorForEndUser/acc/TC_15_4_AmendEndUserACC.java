@@ -101,7 +101,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
-        assertEquals("2", accPanel.getRevisionField());
+        assertEquals("2", getText(accPanel.getRevisionField()));
         assertEquals(acc.getObjectClassTerm(), getText(accPanel.getObjectClassTermField()));
         assertEquals(acc.getDen(), getText(accPanel.getDENField()));
         assertEquals(acc.getDefinition(), getText(accPanel.getDefinitionField()));
