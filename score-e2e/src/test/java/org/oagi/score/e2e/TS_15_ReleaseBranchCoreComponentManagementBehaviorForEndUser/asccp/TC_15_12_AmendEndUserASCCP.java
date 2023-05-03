@@ -25,8 +25,7 @@ import java.util.List;
 
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -670,23 +669,194 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
     @Test
     public void test_TA_15_12_4_g() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ASCCPObject asccp;
+        BCCPObject bccp, bccp_to_append;
+        ACCObject acc, acc_association;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            coreComponentAPI.updateASCCP(asccp);
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpViewEditPage.hitAmendButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        //ACC node cannot be changed
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertFalse(accPanel.getCoreComponentField().isEnabled());
+        assertEquals("ACC", getText(accPanel.getCoreComponentField()));
+        assertFalse(accPanel.getReleaseField().isEnabled());
+        assertFalse(accPanel.getRevisionField().isEnabled());
+        assertFalse(accPanel.getStateField().isEnabled());
+        assertFalse(accPanel.getOwnerField().isEnabled());
+        assertFalse(accPanel.getGUIDField().isEnabled());
+        assertFalse(accPanel.getDENField().isEnabled());
+        assertFalse(accPanel.getObjectClassTermField().isEnabled());
+        assertDisabled(accPanel.getComponentTypeSelectField());
+        assertDisabled(accPanel.getNamespaceSelectField());
+        assertFalse(accPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(accPanel.getDefinitionField().isEnabled());
+
+        //BCCP node cannot be changed
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen() + "/" + bccp_to_append.getPropertyTerm());
+        ASCCPViewEditPage.BCCPPanel bccpPanel = asccpViewEditPage.getBCCPanelContainer(bccpNode).getBCCPPanel();
+        assertFalse(bccpPanel.getCoreComponentField().isEnabled());
+        assertEquals("BCCP", getText(bccpPanel.getCoreComponentField()));
+        assertFalse(bccpPanel.getReleaseField().isEnabled());
+        assertFalse(bccpPanel.getRevisionField().isEnabled());
+        assertFalse(bccpPanel.getStateField().isEnabled());
+        assertFalse(bccpPanel.getOwnerField().isEnabled());
+        assertFalse(bccpPanel.getGUIDField().isEnabled());
+        assertFalse(bccpPanel.getDENField().isEnabled());
+        assertFalse(bccpPanel.getPropertyTermField().isEnabled());
+        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertDisabled(bccpPanel.getDeprecatedCheckbox());
+        assertDisabled(bccpPanel.getValueConstraintSelectField());
+        assertDisabled(bccpPanel.getNamespaceSelectField());
+        assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(bccpPanel.getDefinitionField().isEnabled());
     }
 
     @Test
     public void test_TA_15_12_4_h() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpViewEditPage.hitAmendButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+
+        assertEquals("true", asccpPanel.getPropertyTermField().getAttribute("aria-required"));
+        assertEquals("true", asccpPanel.getReusableCheckbox().getAttribute("aria-required"));
+        assertEquals("true", asccpPanel.getNamespaceSelectField().getAttribute("aria-required"));
+        assertEquals("true", asccpPanel.getNillableCheckbox().getAttribute("aria-required"));
     }
 
     @Test
     public void test_TA_15_12_5() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            coreComponentAPI.updateASCCP(asccp);
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpViewEditPage.hitAmendButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+
+        //change ACC
+        ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
+        assertThrows(TimeoutException.class, ()-> finalAsccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm()));
     }
 
 
     @Test
     public void test_TA_15_12_6() {
+
 
     }
 }
