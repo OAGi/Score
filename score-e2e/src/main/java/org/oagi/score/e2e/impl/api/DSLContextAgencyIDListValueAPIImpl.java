@@ -13,6 +13,11 @@ import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_VALUE;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_VALUE_MANIFEST;
@@ -76,20 +81,20 @@ public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI 
     }
 
     @Override
-    public ArrayList<AgencyIDListValueObject> getAgencyIDListValueByAgencyListID(AgencyIDListObject agencyIdList) {
-        ArrayList<AgencyIDListValueObject> values = new ArrayList<>();
+    public List<AgencyIDListValueObject> getAgencyIDListValueByAgencyListID(AgencyIDListObject agencyIdList) {
+        List<AgencyIDListValueObject> values = new ArrayList<>();
 
-        Result agencyIdListValueResult = dslContext.selectFrom(AGENCY_ID_LIST_VALUE)
-                .where(AGENCY_ID_LIST_VALUE.OWNER_LIST_ID.eq(ULong.valueOf(agencyIdList.getAgencyIDListId())))
+        Result<AgencyIdListValueManifestRecord> agencyIdListValueManifestResult = dslContext.selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(ULong.valueOf(agencyIdList.getAgencyIDListManifestId())))
                 .fetch();
-        for (int i=0; i<agencyIdListValueResult.size(); i++){
-            AgencyIDListValueObject value = new AgencyIDListValueObject();
-            Record agencyIDValueRecord = (Record) agencyIdListValueResult.get(i);
-            ULong agencyIDListValueId = agencyIDValueRecord.get(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID);
-            AgencyIdListValueManifestRecord agencyIdListValueManifestRecord = dslContext.selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
-                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(agencyIDListValueId))
-                    .fetchOne();
-            value = mapper(agencyIdListValueManifestRecord, (AgencyIdListValueRecord) agencyIDValueRecord);
+        Map<ULong, AgencyIdListValueRecord> agencyIdListValueRecordMap = (agencyIdListValueManifestResult.isNotEmpty()) ? dslContext.selectFrom(AGENCY_ID_LIST_VALUE)
+                .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.in(agencyIdListValueManifestResult.stream().map(e -> e.getAgencyIdListValueId()).collect(Collectors.toList())))
+                .fetchStream().collect(Collectors.toMap(AgencyIdListValueRecord::getAgencyIdListValueId, Function.identity())) : Collections.emptyMap();
+
+        for (int i = 0; i < agencyIdListValueManifestResult.size(); i++) {
+            AgencyIdListValueManifestRecord agencyIDValueManifestRecord = agencyIdListValueManifestResult.get(i);
+            AgencyIdListValueRecord agencyIDValueRecord = agencyIdListValueRecordMap.get(agencyIDValueManifestRecord.getAgencyIdListValueId());
+            AgencyIDListValueObject value = mapper(agencyIDValueManifestRecord, agencyIDValueRecord);
             values.add(value);
         }
         return values;

@@ -123,6 +123,23 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getReviseButton();
 
+    /**
+     * Revise the current Agency ID List.
+     */
+    void revise();
+
+    /**
+     * Return the UI element of the 'Cancel' button.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Cancel revising of the current Agency ID List.
+     */
+    void cancel();
+
     void moveToQA();
 
     WebElement getMoveToQAButton();

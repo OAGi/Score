@@ -8,10 +8,7 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.agency_id_list.AddCommentDialog;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.time.Duration;
 
@@ -51,6 +48,12 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    private static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -197,6 +200,27 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public void revise() {
+        click(getReviseButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void cancel() {
+        click(getCancelButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Canceled".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
     public WebElement getUpdateButton() {
         return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
     }
@@ -294,7 +318,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public void hitSearchButton() {
-        click(getSearchButton());
+        try {
+            click(getSearchButton());
+        } catch (ElementClickInterceptedException e) {
+            getSearchField().sendKeys(Keys.ENTER);
+        }
         waitFor(ofMillis(500L));
     }
 

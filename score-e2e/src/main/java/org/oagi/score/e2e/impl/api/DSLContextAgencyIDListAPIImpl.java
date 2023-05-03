@@ -106,6 +106,24 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
     }
 
     @Override
+    public AgencyIDListObject getAgencyIDListByNameAndBranch(String name, String branch) {
+        List<Field<?>> fields = new ArrayList();
+        fields.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(AGENCY_ID_LIST.fields()));
+        return dslContext.select(fields)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .where(and(
+                        AGENCY_ID_LIST.NAME.eq(name),
+                        RELEASE.RELEASE_NUM.eq(branch)
+                ))
+                .fetchOne(record -> agencyIDListListMapper(record));
+    }
+
+    @Override
     public AgencyIDListObject getNewlyCreatedAgencyIDList(AppUserObject user, String release) {
         ULong latestAgencyIDListIDByUserInRelease = dslContext.select(DSL.max(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                 .from(AGENCY_ID_LIST_MANIFEST)
