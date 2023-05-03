@@ -9,6 +9,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueM
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueRecord;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AgencyIDListValueObject;
+import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -22,6 +23,44 @@ public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI 
 
     public DSLContextAgencyIDListValueAPIImpl(DSLContext dslContext) {
         this.dslContext = dslContext;
+    }
+
+    @Override
+    public AgencyIDListValueObject createRandomAgencyIDListValue(AppUserObject creator, AgencyIDListObject agencyIDList) {
+        AgencyIDListValueObject agencyIDListValue = AgencyIDListValueObject.createRandomAgencyIDListValue(creator);
+
+        AgencyIdListValueRecord agencyIdListValueRecord = new AgencyIdListValueRecord();
+        agencyIdListValueRecord.setGuid(agencyIDListValue.getGuid());
+        agencyIdListValueRecord.setValue(agencyIDListValue.getValue());
+        agencyIdListValueRecord.setName(agencyIDListValue.getName());
+        agencyIdListValueRecord.setDefinition(agencyIDListValue.getDefinition());
+        agencyIdListValueRecord.setDefinitionSource(agencyIDListValue.getDefinitionSource());
+        agencyIdListValueRecord.setOwnerListId(ULong.valueOf(agencyIDList.getAgencyIDListId()));
+        agencyIdListValueRecord.setIsDeprecated((byte) 0);
+        agencyIdListValueRecord.setOwnerUserId(ULong.valueOf(agencyIDList.getOwnerUserId()));
+        agencyIdListValueRecord.setCreatedBy(ULong.valueOf(agencyIDList.getCreatedBy()));
+        agencyIdListValueRecord.setLastUpdatedBy(ULong.valueOf(agencyIDList.getLastUpdatedBy()));
+        agencyIdListValueRecord.setCreationTimestamp(agencyIDList.getCreationTimestamp());
+        agencyIdListValueRecord.setLastUpdateTimestamp(agencyIDList.getLastUpdateTimestamp());
+        ULong agencyIdListValueId = dslContext.insertInto(AGENCY_ID_LIST_VALUE)
+                .set(agencyIdListValueRecord)
+                .returning(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID)
+                .fetchOne().getAgencyIdListValueId();
+
+        AgencyIdListValueManifestRecord agencyIdListValueManifestRecord = new AgencyIdListValueManifestRecord();
+        agencyIdListValueManifestRecord.setReleaseId(ULong.valueOf(agencyIDList.getReleaseId()));
+        agencyIdListValueManifestRecord.setAgencyIdListValueId(agencyIdListValueId);
+        agencyIdListValueManifestRecord.setAgencyIdListManifestId(ULong.valueOf(agencyIDList.getAgencyIDListManifestId()));
+
+        ULong agencyIdListValueManifestId = dslContext.insertInto(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .set(agencyIdListValueManifestRecord)
+                .returning(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .fetchOne().getAgencyIdListValueManifestId();
+
+        agencyIDListValue.setReleaseId(agencyIDList.getReleaseId());
+        agencyIDListValue.setAgencyIDListValueId(agencyIdListValueId.toBigInteger());
+        agencyIDListValue.setAgencyIDListValueManifestId(agencyIdListValueManifestId.toBigInteger());
+        return agencyIDListValue;
     }
 
     @Override
