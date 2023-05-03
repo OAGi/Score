@@ -22,10 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.time.Duration.ofSeconds;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_12_AmendEndUserASCCP extends BaseTest {
@@ -269,17 +270,148 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
     @Test
     public void test_TA_15_12_4_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace_endUser, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace_endUser, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace_endUser, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace_endUser, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace_endUser, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+
+        asccpViewEditPage.hitAmendButton();
+
+        //reload the page to verify
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        String newDefinitionSource = randomPrint(50, 100).trim();
+        asccpPanel.setDefinitionSource(newDefinitionSource);
+        String newDefinition = randomPrint(50, 100).trim();
+        asccpPanel.setDefinition(newDefinition);
+        asccpViewEditPage.hitUpdateButton();
+
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
+        assertEquals(newDefinitionSource, getText(asccpPanel.getDefinitionSourceField()));
+        assertEquals(newDefinition, getText(asccpPanel.getDefinitionField()));
     }
 
     @Test
     public void test_TA_15_12_4_c() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        ASCCPObject asccp, asccp_not_reusable;
+        BCCPObject bccp;
+        ACCObject acc;
+
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            ACCObject acc_association_for_noreusable = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
+            asccp_not_reusable = coreComponentAPI.createRandomASCCP(acc_association_for_noreusable, anotherUser, namespace, "Production");
+            asccp_not_reusable.setReusable(false);
+            coreComponentAPI.updateASCCP(asccp_not_reusable);
+
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+        }
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        //reload the page to verify
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        assertChecked(asccpPanel.getReusableCheckbox());
+        asccpViewEditPage.hitAmendButton();
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
+        assertChecked(asccpPanel.getReusableCheckbox());
+        assertDisabled(asccpPanel.getReusableCheckbox());
+
+        //Test when "Reusable" checkbox is unchecked in the original developer ASCCP
+        //reload the page
+        viewEditCoreComponentPage.openPage();
+        waitFor(ofSeconds(1L));
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_not_reusable.getAsccpManifestId());
+        WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
+        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
+        asccpPanel.toggleReusable();
+        assertNotChecked(asccpPanel.getReusableCheckbox());
+        assertDisabled(asccpPanel.getReusableCheckbox());
+        asccpViewEditPage.hitReviseButton();
+
+        asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
+        assertEquals("2", getText(asccpPanel.getRevisionField()));
+        assertNotChecked(asccpPanel.getReusableCheckbox());
+        assertEnabled(asccpPanel.getReusableCheckbox());
     }
 
     @Test
     public void test_TA_15_12_4_d() {
+
 
     }
 
