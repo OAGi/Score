@@ -11,6 +11,7 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPCreateDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 import static sun.util.locale.LocaleUtils.isEmpty;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -179,8 +180,6 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         ccStates.add("Candidate");
         ccStates.add("Published");
         randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
-
-
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
@@ -218,13 +217,50 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
     }
     @Test
     public void test_TA_15_10_3() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+
+        acc.setDefinition("definition changed");
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("definition changed", getText(accPanel.getDefinitionField()));
     }
 
     @Test
     public void test_TA_15_10_4() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        accViewEditPage.createASCCPfromThis("/" + acc.getDen());
+        WebElement confirmCreateButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]"));
+        click(confirmCreateButton);
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+        assertTrue(acc.getDen().startsWith(asccp.getPropertyTerm()));
     }
-
-
 }
