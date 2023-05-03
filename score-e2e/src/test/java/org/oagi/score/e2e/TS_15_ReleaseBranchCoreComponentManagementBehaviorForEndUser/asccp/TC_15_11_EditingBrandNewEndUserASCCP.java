@@ -426,17 +426,110 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
 
     @Test
     public void test_TA_15_11_3() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        randomPropertyTerm = "Test Object " + randomPropertyTerm;
+
+        acc.setObjectClassTerm(randomPropertyTerm);
+        getAPIFactory().getCoreComponentAPI().updateACC(acc);
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
+        assertEquals("1", getText(accPanel.getRevisionField()));
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(ofSeconds(1L));
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        asccpPanel = asccpViewEditPage.getASCCPPanel();
+        String asccpDEN = getText(asccpPanel.getDENField());
+        assertTrue(asccpDEN.endsWith(randomPropertyTerm));
+        assertEquals("1", getText(asccpPanel.getRevisionField()));
     }
-
-
     @Test
     public void test_TA_15_11_4() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        ACCObject acc, randomACC1, randomACC2;
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+
+            ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
+
+            randomACC1 = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+            randomACC2 = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "WIP");
+            ASCCObject randomASCC1 = coreComponentAPI.appendASCC(randomACC1, asccp, "WIP");
+            randomASCC1.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(randomASCC1);
+            ASCCObject randomASCC2 = coreComponentAPI.appendASCC(randomACC2, asccp, "WIP");
+            randomASCC2.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(randomASCC2);
+        }
+
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+
+        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
+        randomPropertyTerm = "Test Object " + randomPropertyTerm;
+        asccpPanel.setPropertyTerm(randomPropertyTerm);
+        asccpViewEditPage.hitUpdateButton();
+
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC1.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC1.getDen() + "/" + randomPropertyTerm);
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
+        }
+
+        {
+            viewEditCoreComponentPage.openPage();
+            waitFor(ofSeconds(1L));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC2.getAccManifestId());
+            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC2.getDen() + "/" + randomPropertyTerm);
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
+        }
 
     }
-
-
-
-
 }
