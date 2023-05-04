@@ -53,7 +53,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);;
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -154,7 +154,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);;
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         ASCCPObject asccp;
         BCCPObject bccp;
