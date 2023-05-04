@@ -23,19 +23,17 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_4_AmendEndUserACC extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -155,7 +153,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         }
         TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, endUser, "WIP");
+                .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, endUser, "WIP");
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -244,7 +242,6 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
         assertNotChecked(accPanel.getAbstractCheckbox());
         assertEnabled(accPanel.getAbstractCheckbox());
-
     }
 
     @Test
@@ -262,7 +259,8 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
-        acc.setComponentType(ComponentType.valueOf("Base (Abstract)"));
+        acc.setComponentType(ComponentType.Base);
+        acc.setAbstract(true);
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitAmendButton();
@@ -304,7 +302,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         accViewEditPage.hitUpdateButton();
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        accNode = accViewEditPage.getNodeByPath("/" + randomPropertyTerm + ". Details");
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals(randomPropertyTerm, getText(accPanel.getObjectClassTermField()));
     }
@@ -380,7 +378,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Published");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
         acc.setDefinition(null);
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -396,12 +394,4 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
 
     }
-
-    @Test
-    public void test_TA_15_4_5() {
-
-
-
-    }
-
 }
