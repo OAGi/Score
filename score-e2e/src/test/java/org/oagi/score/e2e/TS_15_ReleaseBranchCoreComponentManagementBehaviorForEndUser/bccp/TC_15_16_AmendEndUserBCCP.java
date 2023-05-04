@@ -19,6 +19,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
@@ -212,8 +213,41 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
 
     @Test
     public void test_TA_15_16_3_b() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        randomBCCP.setNillable(false);
+        randomBCCP.setFixedValue(randomAlphabetic(5, 10));
+        coreComponentAPI.updateBCCP(randomBCCP);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitAmendButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        assertEquals("Fixed Value", getText(bccpPanel.getValueConstraintSelectField()));
+        assertEquals(randomBCCP.getFixedValue(), getText(bccpPanel.getFixedValueField()));
+        assertDisabled(bccpPanel.getFixedValueField());
     }
 
 
