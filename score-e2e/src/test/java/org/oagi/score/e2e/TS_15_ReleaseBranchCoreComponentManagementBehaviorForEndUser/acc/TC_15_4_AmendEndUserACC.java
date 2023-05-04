@@ -142,20 +142,20 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         ASCCPObject asccp;
         BCCPObject bccpToAppend;
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            ACCObject acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Published");
-            coreComponentAPI.appendExtension(acc, anotherUser, namespace, "Published");
+            ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            coreComponentAPI.appendExtension(acc, endUser, namespace, "Production");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc, anotherUser, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
 
         }
         TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, anotherUser, "WIP");
+                .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, endUser, "WIP");
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();

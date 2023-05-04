@@ -665,7 +665,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
         });
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(Duration.ofMillis(1000L));
         assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 
