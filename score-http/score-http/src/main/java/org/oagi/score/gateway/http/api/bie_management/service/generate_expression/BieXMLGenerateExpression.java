@@ -889,7 +889,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         Element restrictionNode = newElement("restriction");
-        restrictionNode.setAttribute("base", xbt.getBuiltinType());
+        String builtinType = xbt.getBuiltinType();
+        if (!builtinType.startsWith(XSD_NAMESPACE.getPrefix())) {
+            builtinType = XSD_NAMESPACE.getPrefix() + ":" + "token";
+        }
+        restrictionNode.setAttribute("base", builtinType);
         xbtNode.addContent(restrictionNode);
 
         if (facetRestri.getFacetMinLength() != null) {
