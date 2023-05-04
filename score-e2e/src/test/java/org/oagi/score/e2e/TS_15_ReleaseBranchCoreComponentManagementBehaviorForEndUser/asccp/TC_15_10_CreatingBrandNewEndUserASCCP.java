@@ -170,51 +170,35 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
 
             String definitionSourceText = getText(asccpPanel.getDefinitionSourceField());
             assertTrue(isEmpty(definitionSourceText));
-
-
         }
 
-        release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ccStates = new ArrayList<>();
-        ccStates.add("WIP");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
-        ccStates.add("Published");
-        randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
-        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
-            ACCObject acc;
-            ASCCPObject asccp;
-            String state = entry.getKey();
-            acc = entry.getValue();
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "Published");
+        viewEditCoreComponentPage.openPage();
+        ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+        ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
+        String url = getDriver().getCurrentUrl();
+        BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        assertEquals(branch, getText(asccpPanel.getReleaseField()));
+        assertEquals("1", getText(asccpPanel.getRevisionField()));
+        assertEquals("WIP", getText(asccpPanel.getStateField()));
 
-            viewEditCoreComponentPage.openPage();
-            ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-            ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
-            String url = getDriver().getCurrentUrl();
-            BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-            asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-            WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-            assertEquals(branch, getText(asccpPanel.getReleaseField()));
-            assertEquals("1", getText(asccpPanel.getRevisionField()));
-            assertEquals("WIP", getText(asccpPanel.getStateField()));
+        String propertyTermText = getText(asccpPanel.getPropertyTermField());
+        assertEquals(asccp.getPropertyTerm(), propertyTermText);
 
-            String propertyTermText = getText(asccpPanel.getPropertyTermField());
-            assertEquals(asccp.getPropertyTerm(), propertyTermText);
+        assertNotChecked(asccpPanel.getNillableCheckbox());
+        assertDisabled(asccpPanel.getDeprecatedCheckbox());
 
-            assertNotChecked(asccpPanel.getNillableCheckbox());
-            assertDisabled(asccpPanel.getDeprecatedCheckbox());
+        String namespaceText = getText(asccpPanel.getNamespaceSelectField());
+        assertEquals("Namespace", namespaceText);
 
-            String namespaceText = getText(asccpPanel.getNamespaceSelectField());
-            assertEquals("Namespace", namespaceText);
+        String definitionText = getText(asccpPanel.getDefinitionField());
+        assertTrue(isEmpty(definitionText));
 
-            String definitionText = getText(asccpPanel.getDefinitionField());
-            assertTrue(isEmpty(definitionText));
-
-            String definitionSourceText = getText(asccpPanel.getDefinitionSourceField());
-            assertTrue(isEmpty(definitionSourceText));
-
-        }
+        String definitionSourceText = getText(asccpPanel.getDefinitionSourceField());
+        assertTrue(isEmpty(definitionSourceText));
     }
     @Test
     public void test_TA_15_10_3() {
