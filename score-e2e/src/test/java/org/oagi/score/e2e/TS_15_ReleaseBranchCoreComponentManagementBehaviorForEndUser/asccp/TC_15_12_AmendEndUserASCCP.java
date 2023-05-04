@@ -183,12 +183,12 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            ACCObject acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Published");
-            coreComponentAPI.appendExtension(acc, anotherUser, namespace, "Published");
+            ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            coreComponentAPI.appendExtension(acc, endUser, namespace, "Production");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc, anotherUser, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
 
         }
         TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
