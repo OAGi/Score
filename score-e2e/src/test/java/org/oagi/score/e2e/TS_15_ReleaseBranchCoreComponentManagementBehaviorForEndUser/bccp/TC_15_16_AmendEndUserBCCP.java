@@ -14,16 +14,20 @@ import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -489,28 +493,189 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
 
     @Test
     public void test_TA_15_16_3_f() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        randomBCCP.setDefinitionSource(randomPrint(50, 100).trim());
+        randomBCCP.setDefinition(randomPrint(50, 100).trim());
+        coreComponentAPI.updateBCCP(randomBCCP);
+
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitAmendButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        assertEquals(randomBCCP.getDefinitionSource(), getText(bccpPanel.getDefinitionSourceField()));
+        assertEquals(randomBCCP.getDefinition(), getText(bccpPanel.getDefinitionField()));
+
+        String newDefinitionSource = randomPrint(50, 100).trim();
+        bccpPanel.setDefinitionSource(newDefinitionSource);
+        String newDefinition = randomPrint(50, 100).trim();
+        bccpPanel.setDefinition(newDefinition);
+        bccpViewEditPage.hitUpdateButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+
+        bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        assertEquals(newDefinitionSource, getText(bccpPanel.getDefinitionSourceField()));
+        assertEquals(newDefinition, getText(bccpPanel.getDefinitionField()));
     }
 
     @Test
     public void test_TA_15_16_3_g() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        randomBCCP.setDefinitionSource(randomPrint(50, 100).trim());
+        // No definition
+        randomBCCP.setDefinition(null);
+        coreComponentAPI.updateBCCP(randomBCCP);
+
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitAmendButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        bccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
+        BCCPViewEditPage finalBccpViewEditPage = bccpViewEditPage;
+        assertThrows(TimeoutException.class, () -> finalBccpViewEditPage.hitUpdateButton());
+        assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
 
     }
 
     @Test
     public void test_TA_15_16_3_h() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitReviseButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        BCCPViewEditPage.DTPanel dtPanel = bccpViewEditPage.getBCCPPanelContainer().getDTPanel();
+
+        assertFalse(dtPanel.getCoreComponentField().isEnabled());
+        assertEquals("DT", getText(dtPanel.getCoreComponentField()));
+        assertFalse(dtPanel.getReleaseField().isEnabled());
+        assertEquals(getText(bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel().getReleaseField()),
+                getText(dtPanel.getReleaseField()));
+        assertFalse(dtPanel.getRevisionField().isEnabled());
+        assertFalse(dtPanel.getStateField().isEnabled());
+        assertEquals(dataType.getState(), getText(dtPanel.getStateField()));
+        assertFalse(dtPanel.getOwnerField().isEnabled());
+        assertFalse(dtPanel.getGUIDField().isEnabled());
+        assertFalse(dtPanel.getDENField().isEnabled());
+        assertEquals(dataType.getDen(), getText(dtPanel.getDENField()));
+        assertFalse(dtPanel.getDataTypeTermField().isEnabled());
+        assertEquals(dataType.getDataTypeTerm(), getText(dtPanel.getDataTypeTermField()));
+        assertFalse(dtPanel.getQualifierField().isEnabled());
+        assertEquals(dataType.getQualifier(), getText(dtPanel.getQualifierField()));
+        assertFalse(dtPanel.getDefinitionSourceField().isEnabled());
+        assertFalse(dtPanel.getDefinitionField().isEnabled());
+
+        BCCPViewEditPage finalBccpViewEditPage = bccpViewEditPage;
+        assertThrows(WebDriverException.class, () -> finalBccpViewEditPage.openChangeBDTDialog());
     }
 
     @Test
     public void test_TA_15_16_4() {
 
+
     }
 
     @Test
     public void test_TA_15_16_5() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        String branch = "10.8.7.1";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitAmendButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitCancelButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+        assertEquals("Published", getText(bccpPanel.getStateField()));
+        assertEquals("1", getText(bccpPanel.getRevisionField()));
 
     }
-
 }
