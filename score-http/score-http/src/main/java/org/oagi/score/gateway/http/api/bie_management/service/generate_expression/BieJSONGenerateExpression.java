@@ -310,6 +310,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
         if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            // Override 'pattern' and 'format' properties
+            content.remove("pattern");
+            content.remove("format");
             content.put("pattern", facetRestri.getFacetPattern());
         }
 
