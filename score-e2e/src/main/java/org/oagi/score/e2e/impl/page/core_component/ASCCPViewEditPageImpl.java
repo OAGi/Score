@@ -174,10 +174,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public void hitAmendButton() {
-        retry(()->{
-            click(getAmendButton());
-            click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
-        });
+        click(getAmendButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Amended".equals(getSnackBarMessage(getDriver()));
     }

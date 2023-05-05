@@ -405,8 +405,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpPanel.toggleReusable();
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
-        asccpViewEditPage.hitReviseButton();
+        asccpViewEditPage.hitAmendButton();
 
+        asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertEquals("2", getText(asccpPanel.getRevisionField()));
         assertNotChecked(asccpPanel.getReusableCheckbox());
