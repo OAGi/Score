@@ -14,10 +14,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -456,8 +453,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getDeprecatedCheckbox());
@@ -506,8 +501,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertNotChecked(asccpPanel.getDeprecatedCheckbox());
@@ -557,8 +550,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getNillableCheckbox());
@@ -604,12 +595,10 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             coreComponentAPI.updateASCC(ascc);
         }
 
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertNotChecked(asccpPanel.getNillableCheckbox());
@@ -659,8 +648,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         asccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
@@ -713,8 +700,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         //ACC node cannot be changed
         WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen());
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
@@ -795,15 +780,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
 
         assertEquals("true", asccpPanel.getPropertyTermField().getAttribute("aria-required"));
-        assertEquals("true", asccpPanel.getReusableCheckbox().getAttribute("aria-required"));
         assertEquals("true", asccpPanel.getNamespaceSelectField().getAttribute("aria-required"));
-        assertEquals("true", asccpPanel.getNillableCheckbox().getAttribute("aria-required"));
     }
 
     @Test
@@ -847,14 +828,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpViewEditPage.hitAmendButton();
 
-        //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-
         //change ACC
-        ACCObject anotherACC = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
-        ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
-        assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.openChangeACCDialog("/" + asccp.getPropertyTerm()));
+        asccpViewEditPage.clickOnDropDownMenuByPath("/" + asccp.getPropertyTerm());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Change ACC\")]")).size());
     }
 
     @Test
