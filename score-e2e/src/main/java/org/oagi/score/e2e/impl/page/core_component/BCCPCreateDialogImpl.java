@@ -286,7 +286,7 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
         });
 
         click(getCreateButton());
-        waitFor(ofMillis(1000L));
+        waitFor(ofMillis(2000L));
 
         String url = getDriver().getCurrentUrl();
         BigInteger bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));

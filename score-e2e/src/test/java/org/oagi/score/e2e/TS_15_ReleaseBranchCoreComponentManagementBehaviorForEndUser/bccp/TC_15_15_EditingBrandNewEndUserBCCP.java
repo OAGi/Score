@@ -72,8 +72,6 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
         bccpPanel.toggleNillable();
-        String namespace = "http://www.openapplications.org/oagis/10";
-        bccpPanel.setNamespace(namespace);
         String definition = randomPrint(50, 100).trim();
         bccpPanel.setDefinition(definition);
 
@@ -110,6 +108,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
@@ -118,7 +117,6 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
         bccpPanel.toggleNillable();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         bccpPanel.setNamespace(namespace.getUri());
 
         assertThrows(TimeoutException.class, () -> bccpViewEditPage.hitUpdateButton());
@@ -257,8 +255,6 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
         bccpPanel.toggleNillable();
-        String namespace = "http://www.openapplications.org/oagis/10";
-        bccpPanel.setNamespace(namespace);
         String definition = randomPrint(50, 100).trim();
         bccpPanel.setDefinition(definition);
 
