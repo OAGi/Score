@@ -100,15 +100,14 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         //reload the page to verify
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp.getBccpManifestId());
-        WebElement asccNode = bccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("2", getText(bccpPanel.getRevisionField()));
         assertEquals("WIP", getText(bccpPanel.getStateField()));
         assertEquals(bccp.getPropertyTerm(), getText(bccpPanel.getPropertyTermField()));
         assertEquals(bccp.getDen(), getText(bccpPanel.getDENField()));
 
-        assertNotChecked(bccpPanel.getNillableCheckbox());
-        assertEnabled(bccpPanel.getNillableCheckbox());
+        assertChecked(bccpPanel.getNillableCheckbox());
+        assertDisabled(bccpPanel.getNillableCheckbox());
 
         assertNotChecked(bccpPanel.getDeprecatedCheckbox());
         assertEnabled(bccpPanel.getDeprecatedCheckbox());
@@ -479,7 +478,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
-        bccpViewEditPage.hitReviseButton();
+        bccpViewEditPage.hitAmendButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
