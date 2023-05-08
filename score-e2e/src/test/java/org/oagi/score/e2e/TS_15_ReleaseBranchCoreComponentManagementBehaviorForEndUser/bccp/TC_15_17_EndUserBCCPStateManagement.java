@@ -63,7 +63,7 @@ public class TC_15_17_EndUserBCCPStateManagement extends BaseTest {
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("WIP", getText(bccpPanel.getStateField()));
-        bccpViewEditPage.moveToDraft();
+        bccpViewEditPage.moveToQA();
 
         // reload the page
         bccpViewEditPage =
