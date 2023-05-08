@@ -67,7 +67,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitDeleteButton();
-        assertTrue(viewEditCoreComponentPage.isOpened());
+        viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
@@ -172,7 +172,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
-        bccpViewEditPage.hitReviseButton();
+        bccpViewEditPage.hitAmendButton();
 
         // reload the page
         bccpViewEditPage =
