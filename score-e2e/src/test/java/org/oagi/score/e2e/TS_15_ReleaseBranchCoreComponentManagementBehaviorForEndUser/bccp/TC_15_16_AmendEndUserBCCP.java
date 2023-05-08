@@ -603,7 +603,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
-        bccpViewEditPage.hitReviseButton();
+        bccpViewEditPage.hitAmendButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
@@ -673,7 +673,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
-        assertEquals("Published", getText(bccpPanel.getStateField()));
+        assertEquals("Production", getText(bccpPanel.getStateField()));
         assertEquals("1", getText(bccpPanel.getRevisionField()));
 
     }
