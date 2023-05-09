@@ -14,9 +14,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
-import javax.security.auth.login.AccountNotFoundException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +98,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     public void test_TA_15_9_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        AppUserObject anotherUser= getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -112,6 +111,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        waitFor(Duration.ofMillis(3000L));
         accViewEditPage.hitAmendButton();
 
         List<String> ccStates = new ArrayList<>();
@@ -274,7 +274,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         viewEditCoreComponentPage.openPage();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.hitReviseButton();
+        accViewEditPage.hitAmendButton();
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation(asccp.getDen());
 
@@ -584,7 +584,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "WIP");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association,anotherUser, namespace, "WIP");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "WIP");
 
         }
 
@@ -666,7 +666,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.hitReviseButton();
+        accViewEditPage.hitAmendButton();
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -751,7 +751,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp_to_append.getBccpManifestId());
-        bccpViewEditPage.hitReviseButton();
+        bccpViewEditPage.hitAmendButton();
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         bccpPanel.toggleDeprecated();
         bccpViewEditPage.hitUpdateButton();
@@ -1032,7 +1032,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp_endUser = coreComponentAPI.createRandomBCCP(dataType, anotherUser, enduserNamespace, "Production");
         }
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser,  release, enduserNamespace, "Production");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, enduserNamespace, "Production");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitAmendButton();
         BCCPObject bccp, bccp_before, bccp_after;
@@ -1401,8 +1401,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         }
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        accViewEditPage.hitReviseButton();
-        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        accViewEditPage.hitAmendButton();
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
 
         viewEditCoreComponentPage.openPage();
@@ -1746,6 +1746,9 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
         String branch = "10.8.7.1";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
@@ -1822,7 +1825,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
-            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(endUser.getLoginId()));
+            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(developer.getLoginId()));
         }
     }
 
@@ -1902,7 +1905,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
-            ascc.setCardinalityMax(25);
+            ascc.setCardinalityMin(25);
             coreComponentAPI.updateASCC(ascc);
 
         }
@@ -2005,6 +2008,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         assertChecked(asccPanel.getDeprecatedCheckbox());
         assertDisabled(asccPanel.getDeprecatedCheckbox());
     }
+
     @Test
     public void test_TA_15_9_14_c_not_deprecated_in_previous_version() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
