@@ -2128,6 +2128,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Production");
             bcc.setCardinalityMax(1);
+            bcc.setDefinition(null);
+            bcc.setDefinitionSource("aDefSource");
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
@@ -2137,6 +2139,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
+            ascc.setDefinition(null);
+            ascc.setDefinitionSource("aDefSource");
             coreComponentAPI.updateASCC(ascc);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -2152,37 +2156,32 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         {
             nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
-            WebElement tr;
-            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
-            assertTrue(tr.isDisplayed());
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
-            selectBaseACCToRefactorDialog.hitRefactorButton();
-
+            accViewEditPage.openPage();
+            WebElement asccNode = accViewEditPage.getNodeByPath(nodePath);
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            asccPanel.setCardinalityMaxField("50");
+            asccPanel.setDefinition("changeDefinition");
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
-            assertTrue(movedASCCPNode.isDisplayed());
-
+            asccNode = accViewEditPage.getNodeByPath(nodePath);
+            asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals("50", getText(asccPanel.getCardinalityMaxField()));
+            assertEquals("changeDefinition", getText(asccPanel.getDefinitionField()));
         }
 
         {
-            nodePath = "/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm();
-            SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, bccp_to_append.getPropertyTerm());
-            WebElement tr;
-            tr = selectBaseACCToRefactorDialog.getTableRecordAtIndex(1);
-            assertTrue(tr.isDisplayed());
-            click(tr.findElement(By.className("mat-column-" + "select")));
-            selectBaseACCToRefactorDialog.hitAnalyzeButton();
-            assertEnabled(selectBaseACCToRefactorDialog.getRefactorButton(true));
-            selectBaseACCToRefactorDialog.hitRefactorButton();
-
+            nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
+            accViewEditPage.openPage();
+            WebElement bccNode = accViewEditPage.getNodeByPath(nodePath);
+            ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+            bccPanel.setCardinalityMaxField("70");
+            bccPanel.setDefinition("changeDefinition");
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + bccp_to_append.getPropertyTerm());
-            assertTrue(movedBCCPNode.isDisplayed());
+            bccNode = accViewEditPage.getNodeByPath(nodePath);
+            bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+            assertEquals("70", getText(bccPanel.getCardinalityMaxField()));
+            assertEquals("changeDefinition", getText(bccPanel.getDefinitionField()));
         }
 
         viewEditCoreComponentPage.openPage();
@@ -2192,16 +2191,19 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         {
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-            assertTrue(movedASCCPNode.isDisplayed());
-
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
+            assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
+            assertEquals("", getText(asccPanel.getDefinitionField()));
         }
 
         {
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedBCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
-            assertTrue(movedBCCPNode.isDisplayed());
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
+            assertEquals("1", getText(bccPanel.getCardinalityMaxField()));
+            assertEquals("", getText(bccPanel.getDefinitionField()));
         }
     }
 }
