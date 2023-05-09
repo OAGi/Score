@@ -2115,7 +2115,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCObject acc, acc_association, accForBase;
         ASCCObject ascc;
         ASCCPObject asccp;
-        BCCPObject bccp, bccp_to_append;
+        BCCPObject bccp;
 
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
@@ -2126,30 +2126,24 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
-            BCCObject bcc = coreComponentAPI.appendBCC(accForBase, bccp, "Production");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
-            bcc.setDefinition(null);
+            bcc.setDefinition("oldDef");
             bcc.setDefinitionSource("aDefSource");
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
-            coreComponentAPI.appendBCC(acc, bccp_to_append, "Production");
-
             asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
             ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
-            ascc.setDefinition(null);
+            ascc.setDefinition("oldDef");
             ascc.setDefinitionSource("aDefSource");
             coreComponentAPI.updateASCC(ascc);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage;
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
-        accViewEditPage.hitAmendButton();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitAmendButton();
 
         String nodePath;
@@ -2161,6 +2155,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
             asccPanel.setCardinalityMaxField("50");
             asccPanel.setDefinition("changeDefinition");
+            accViewEditPage.hitUpdateButton();
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             asccNode = accViewEditPage.getNodeByPath(nodePath);
@@ -2171,11 +2166,13 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         {
             nodePath = "/" + acc.getDen() + "/" + bccp.getPropertyTerm();
-            accViewEditPage.openPage();
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath(nodePath);
             ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
             bccPanel.setCardinalityMaxField("70");
             bccPanel.setDefinition("changeDefinition");
+            accViewEditPage.hitUpdateButton();
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             bccNode = accViewEditPage.getNodeByPath(nodePath);
@@ -2194,7 +2191,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
             assertEquals("1", getText(asccPanel.getCardinalityMaxField()));
-            assertEquals("", getText(asccPanel.getDefinitionField()));
+            assertEquals("oldDef", getText(asccPanel.getDefinitionField()));
         }
 
         {
@@ -2203,7 +2200,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
             ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
             assertEquals("1", getText(bccPanel.getCardinalityMaxField()));
-            assertEquals("", getText(bccPanel.getDefinitionField()));
+            assertEquals("oldDef", getText(bccPanel.getDefinitionField()));
         }
     }
 }
