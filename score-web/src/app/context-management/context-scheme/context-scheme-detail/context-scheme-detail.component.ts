@@ -135,7 +135,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
         for (const value of this.dataSource.data) {
-          if (value.value === result.value) {
+          if (value.guid !== result.guid && value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 3000,
             });
