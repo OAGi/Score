@@ -239,13 +239,14 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.createASCCPfromThis("/" + acc.getDen());
         WebElement confirmCreateButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]"));
         click(confirmCreateButton);
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-        assertTrue(acc.getDen().startsWith(asccp.getPropertyTerm()));
+        viewEditCoreComponentPage.openPage();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccpManifestId);
+        assertTrue(acc.getDen().startsWith(getText(asccpViewEditPage.getASCCPPanel().getPropertyTermField())));
     }
 }

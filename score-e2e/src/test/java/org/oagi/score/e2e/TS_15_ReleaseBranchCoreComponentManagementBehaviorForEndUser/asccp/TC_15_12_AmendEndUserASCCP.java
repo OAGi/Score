@@ -546,7 +546,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             coreComponentAPI.updateASCC(ascc);
         }
 
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpViewEditPage.hitAmendButton();
 
         //reload the page
