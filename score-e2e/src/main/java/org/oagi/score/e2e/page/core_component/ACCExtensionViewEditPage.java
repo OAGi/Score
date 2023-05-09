@@ -272,6 +272,11 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement getAmendButton(boolean enabled);
 
+    /**
+     * Hit the 'Amend' button.
+     */
+    void hitAmendButton();
+
     void setDefinition(String asccpDefinition);
 
     void hitDeleteButton();

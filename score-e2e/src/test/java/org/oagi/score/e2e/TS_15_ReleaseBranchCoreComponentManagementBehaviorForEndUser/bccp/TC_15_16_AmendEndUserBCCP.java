@@ -10,13 +10,12 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,8 @@ import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.click;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -636,8 +635,26 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
 
     @Test
     public void test_TA_15_16_4() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        String branch = "10.8.7.1";
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
+        BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
+        BCCPChangeBDTDialog bccpChangeBDTDialog = bccpViewEditPage.openChangeBDTDialog();
+        String nextBDTDen = "Telephone_ Value. Type";
+        bccpChangeBDTDialog.update(nextBDTDen);
+
+        BCCPViewEditPage.DTPanel dtPanel = bccpViewEditPage.getBCCPPanelContainer().getDTPanel();
+        assertEquals(nextBDTDen, getText(dtPanel.getDENField()));
+        assertEquals("Value", getText(dtPanel.getDataTypeTermField()));
+        assertEquals("Telephone", getText(dtPanel.getQualifierField()));
     }
 
     @Test

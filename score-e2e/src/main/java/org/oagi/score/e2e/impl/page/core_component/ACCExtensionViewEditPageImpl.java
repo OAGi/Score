@@ -75,6 +75,9 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
     public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
 
@@ -409,6 +412,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         } else {
             return visibilityOfElementLocated(getDriver(), AMEND_BUTTON_LOCATOR);
         }
+    }
+
+    @Override
+    public void hitAmendButton() {
+        click(getAmendButton(true));
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(Duration.ofMillis(500L));
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 
     private WebElement getInputFieldByName(String name) {

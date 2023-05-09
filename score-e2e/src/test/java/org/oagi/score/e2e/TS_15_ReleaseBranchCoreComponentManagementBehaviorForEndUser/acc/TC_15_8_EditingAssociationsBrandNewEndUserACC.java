@@ -706,7 +706,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1579,6 +1579,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_8_12() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -1660,7 +1662,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
-            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(endUser.getLoginId()));
+            assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(developer.getLoginId()));
         }
 
     }

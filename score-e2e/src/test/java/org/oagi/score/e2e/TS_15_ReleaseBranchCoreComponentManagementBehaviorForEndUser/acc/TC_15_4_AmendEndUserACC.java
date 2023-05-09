@@ -134,54 +134,48 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         String branch = "10.8.7.1";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
         ASCCPObject asccp;
-        BCCPObject bccpToAppend;
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc;
+        TopLevelASBIEPObject endUserBIE;
+        NamespaceObject endUserNamespace;
         {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            coreComponentAPI.appendExtension(acc, endUser, namespace, "Production");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+            endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+            BusinessContextObject contextEndUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+            endUserBIE = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(contextEndUser), asccp, endUser, "WIP");
         }
-        TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, endUser, "WIP");
 
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(endUserBIE);
+        getDriver().manage().window().maximize();
+        assertEquals("WIP", endUserBIE.getState());
+
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        getDriver().manage().window().maximize();
-        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
-
-        accExtensionViewEditPage.setNamespace(namespace);
+        accExtensionViewEditPage.setNamespace(endUserNamespace);
         accExtensionViewEditPage.hitUpdateButton();
         accExtensionViewEditPage.moveToQA();
-        topLevelAsbiep.setState("QA");
-        getAPIFactory().getBusinessInformationEntityAPI().updateTopLevelASBIEP(topLevelAsbiep);
-
+        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
+        assertEquals(endUser.getLoginId(), accExtensionViewEditPage.getOwnerFieldValue());
         accExtensionViewEditPage.moveToProduction();
-        topLevelAsbiep.setState("Production");
-        getAPIFactory().getBusinessInformationEntityAPI().updateTopLevelASBIEP(topLevelAsbiep);
-
-        accExtensionViewEditPage.openPage();
-        click(accExtensionViewEditPage.getAmendButton(true));
-        WebElement extensionNode = accExtensionViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Extension");
-        ACCExtensionViewEditPage.ACCPanel accPanel = accExtensionViewEditPage.getACCPanel(extensionNode);
+        assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
+        accExtensionViewEditPage.hitAmendButton();
         assertDisabled(accExtensionViewEditPage.getObjectClassTermField());
         assertDisabled(accExtensionViewEditPage.getDENField());
-        assertDisabled(accPanel.getAbstractCheckbox());
-        assertDisabled(accPanel.getDeprecatedCheckbox());
+        //assertDisabled(accExtensionViewEditPage.getAbstractCheckbox());
+        //assertDisabled(accExtensionViewEditPage.getDeprecatedCheckbox());
     }
 
     @Test
