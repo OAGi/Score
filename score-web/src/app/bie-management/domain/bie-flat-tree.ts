@@ -2782,7 +2782,21 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     if (this.hideUnused) {
       children = children.filter(e => e.used);
     }
-    const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
+    let index;
+    // Issue #1486
+    // It shouldn't use 'hashPath' to handle with the case of two BIEs referred to the same reused BIE.
+    if (node.derived) {
+      const asbiepNode = node as unknown as AsbiepFlatNode;
+      index = this.data.map(e => {
+        if (e.bieType !== 'ASBIEP') {
+          return '';
+        }
+        return (e as unknown as AsbiepFlatNode).asbiePath;
+      }).indexOf(asbiepNode.asbiePath);
+    } else {
+      index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
+    }
+
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
       return;
