@@ -401,19 +401,19 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   get isValid(): boolean {
     if (this.selectedNode && this.selectedNode.bieType !== 'ABIE' && this.selectedNode.used) {
-      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.valid) {
+      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.disabled && !this.bieCardinalityMin.valid) {
         return false;
       }
-      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.valid) {
+      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.disabled && !this.bieCardinalityMax.valid) {
         return false;
       }
-      if (!!this.bieMinimumLength && !this.bieMinimumLength.valid) {
+      if (!!this.bieMinimumLength && !this.bieMinimumLength.disabled && !this.bieMinimumLength.valid) {
         return false;
       }
-      if (!!this.bieMaximumLength && !this.bieMaximumLength.valid) {
+      if (!!this.bieMaximumLength && !this.bieMaximumLength.disabled && !this.bieMaximumLength.valid) {
         return false;
       }
-      if (!!this.biePattern && !this.biePattern.valid) {
+      if (!!this.biePattern && !this.biePattern.disabled && !this.biePattern.valid) {
         return false;
       }
     }
