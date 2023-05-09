@@ -949,7 +949,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   isStringTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['String', 'NormalizedString', 'Token', 'TimeDuration', 'TimePoint']) {
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
       if (cdtPrimitives.includes(typeName)) {
         return true;
       }

@@ -910,11 +910,11 @@
                         </div>
                       </div>
 
-                      <mat-card *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
+                      <mat-card>
                         <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
                         <mat-card-content>
                           <div class="row">
-                            <div class="col-3">
+                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
                               <mat-form-field>
                                 <input matInput placeholder="Minimum Length"
                                        [formControl]="bieMinimumLength">
@@ -930,7 +930,7 @@
                                 </mat-error>
                               </mat-form-field>
                             </div>
-                            <div class="col-3">
+                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
                               <mat-form-field>
                                 <input matInput placeholder="Maximum Length"
                                        [formControl]="bieMaximumLength">
