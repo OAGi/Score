@@ -123,7 +123,7 @@ export class ReleaseDetailComponent implements OnInit {
   }
 
   updateState(state: string) {
-    if (!this.auth.isAdmin()) {
+    if (state === 'Published' && !this.auth.isAdmin()) {
       this.snackBar.open('Only administrators can publish the release.', '', {
         duration: 3000,
       });
