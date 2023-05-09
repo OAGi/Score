@@ -1390,7 +1390,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(500L));
         assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
