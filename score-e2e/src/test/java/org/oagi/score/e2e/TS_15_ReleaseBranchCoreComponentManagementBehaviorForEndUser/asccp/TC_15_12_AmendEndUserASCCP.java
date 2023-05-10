@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.asccp;
 
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,13 +7,14 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.core_component.*;
+import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -170,49 +170,44 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
         String branch = "10.8.7.1";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage =
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-
         ASCCPObject asccp;
-        BCCPObject bccpToAppend;
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        ACCObject acc;
+        TopLevelASBIEPObject endUserBIE;
+        NamespaceObject endUserNamespace;
         {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            coreComponentAPI.appendExtension(acc, endUser, namespace, "Production");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+            endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+
+            BusinessContextObject contextEndUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+            endUserBIE = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(contextEndUser), asccp, endUser, "WIP");
         }
-        TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, anotherUser, "WIP");
 
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(endUserBIE);
+        getDriver().manage().window().maximize();
+        assertEquals("WIP", endUserBIE.getState());
+
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        getDriver().manage().window().maximize();
-        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
-
-        accExtensionViewEditPage.setNamespace(namespace);
+        accExtensionViewEditPage.setNamespace(endUserNamespace);
         accExtensionViewEditPage.hitUpdateButton();
         accExtensionViewEditPage.moveToQA();
-        topLevelAsbiep.setState("QA");
-        getAPIFactory().getBusinessInformationEntityAPI().updateTopLevelASBIEP(topLevelAsbiep);
-
+        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
+        assertEquals(endUser.getLoginId(), accExtensionViewEditPage.getOwnerFieldValue());
         accExtensionViewEditPage.moveToProduction();
-        topLevelAsbiep.setState("Production");
-        getAPIFactory().getBusinessInformationEntityAPI().updateTopLevelASBIEP(topLevelAsbiep);
-
-        accExtensionViewEditPage.openPage();
+        assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]")).size());
-
     }
 
     @Test

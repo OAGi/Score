@@ -450,6 +450,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be greater than\")]")).size());
+
+        asccPanel.setCardinalityMaxField("222");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));

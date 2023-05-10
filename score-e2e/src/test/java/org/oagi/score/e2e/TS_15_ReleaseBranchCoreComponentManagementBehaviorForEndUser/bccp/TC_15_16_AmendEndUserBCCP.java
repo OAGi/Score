@@ -218,9 +218,6 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherUser);
-
         String branch = "10.8.7.1";
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
@@ -229,7 +226,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
         randomBCCP.setNillable(false);
         randomBCCP.setFixedValue(randomAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -458,12 +455,9 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
     public void test_TA_15_16_3_e() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherUser);
-
         String branch = "10.8.7.1";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -471,7 +465,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
         randomBCCP.setDefaultValue(randomAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
 
