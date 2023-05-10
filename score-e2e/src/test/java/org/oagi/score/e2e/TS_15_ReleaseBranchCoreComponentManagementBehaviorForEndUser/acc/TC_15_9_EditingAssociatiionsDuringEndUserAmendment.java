@@ -1446,10 +1446,10 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
         accViewEditPage.deleteBaseACC("/" + acc.getDen() + "/" + accForBase.getDen());
 
-        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
 
-        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherDeveloper, release, namespace, "WIP");
+        accForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "WIP");
         accForBase.setDeprecated(true);
         getAPIFactory().getCoreComponentAPI().updateACC(accForBase);
 
