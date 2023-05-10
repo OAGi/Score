@@ -7,7 +7,6 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -15,7 +14,6 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -23,7 +21,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -59,10 +56,6 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-
-        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherUser);
-
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.7.1");
         NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
@@ -73,18 +66,18 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace_endUser, "Production");
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace_endUser, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            ACCObject acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace_endUser, "Production");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace_endUser, "Production");
+            ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace_endUser, "Production");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace_endUser, "Production");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
@@ -93,7 +86,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
 
         accViewEditPage.hitAmendButton();
 
@@ -303,8 +296,6 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
     @Test
     public void test_TA_15_4_4_d_deprecated_true_in_previous_version() {
-        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherUser);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -314,8 +305,8 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(anotherUser, release, namespace, "Production");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "Production");
         acc.setDeprecated(true);
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -326,7 +317,6 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
         assertChecked(accPanel.getDeprecatedCheckbox());
         assertDisabled(accPanel.getDeprecatedCheckbox());
-
     }
 
     @Test
