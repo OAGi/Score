@@ -219,9 +219,14 @@
                             [disabled]="isTenantEnabled">
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
+                    <mat-divider *ngIf="canRemoveReusedBIE(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
                             *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
                       <span class="context-menu-item">Remove Reused BIE</span>
+                    </button>
+                    <button mat-menu-item (click)="retainReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Retain Reused BIE</span>
                     </button>
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
@@ -238,7 +243,7 @@
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
                     </button>
-                    <mat-divider *ngIf="canEdit && (isUsableChildren(contextMenuItem) || isCardinalityEditable(contextMenuItem))"></mat-divider>
+                    <mat-divider *ngIf="canEdit"></mat-divider>
                     <button mat-menu-item (click)="enableChildren(contextMenuItem)"
                             *ngIf="canEdit"
                             [disabled]="!isUsableChildren(contextMenuItem)">
