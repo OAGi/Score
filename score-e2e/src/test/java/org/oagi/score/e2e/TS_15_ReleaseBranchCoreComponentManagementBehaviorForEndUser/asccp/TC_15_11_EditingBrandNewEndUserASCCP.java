@@ -451,7 +451,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
 
         acc.setObjectClassTerm(randomPropertyTerm);
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc.getDen());
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
         assertEquals("1", getText(accPanel.getRevisionField()));
 
@@ -463,6 +463,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
         assertTrue(asccpDEN.endsWith(randomPropertyTerm));
         assertEquals("1", getText(asccpPanel.getRevisionField()));
     }
+
     @Test
     public void test_TA_15_11_4() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -517,7 +518,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
             viewEditCoreComponentPage.openPage();
             waitFor(ofSeconds(1L));
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC1.getAccManifestId());
-            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC1.getDen() + "/" + randomPropertyTerm);
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + randomACC1.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
             assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
         }
@@ -526,7 +527,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
             viewEditCoreComponentPage.openPage();
             waitFor(ofSeconds(1L));
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC2.getAccManifestId());
-            WebElement asccNode = accViewEditPage.getNodeByPath("/"  + randomACC2.getDen() + "/" + randomPropertyTerm);
+            WebElement asccNode = accViewEditPage.getNodeByPath("/" + randomACC2.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
             assertTrue(getText(asccPanel.getDENField()).contains(randomPropertyTerm));
         }
