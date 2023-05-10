@@ -99,9 +99,9 @@ export class AgencyIdListDetailComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = (data: AgencyIdListValue, filter: string) => {
-      return (data.value && data.value.indexOf(filter) > -1)
-        || (data.name && data.name.indexOf(filter) > -1)
-        || (data.definition && data.definition.indexOf(filter) > -1);
+      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
+        || (data.name && data.name.toLowerCase().indexOf(filter) > -1)
+        || (data.definition && data.definition.toLowerCase().indexOf(filter) > -1);
     };
 
     this.subscribeEvent();
