@@ -1326,29 +1326,25 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     public void test_TA_15_9_9() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-
-        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(anotherUser);
-
         String branch = "10.8.7.1";
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         ACCObject acc, acc_association, acc_association_before, acc_association_after;
         ASCCPObject asccp, asccp_before, asccp_after;
         ASCCObject ascc, ascc_before;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            acc_association_before = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            acc_association_after = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
-            asccp_after = coreComponentAPI.createRandomASCCP(acc_association_after, anotherUser, namespace, "Production");
-            asccp_before = coreComponentAPI.createRandomASCCP(acc_association_before, anotherUser, namespace, "Production");
+            acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            acc_association_before = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            acc_association_after = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+            asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "Production");
+            asccp_after = coreComponentAPI.createRandomASCCP(acc_association_after, endUser, namespace, "Production");
+            asccp_before = coreComponentAPI.createRandomASCCP(acc_association_before, endUser, namespace, "Production");
             ascc = getAPIFactory().getCoreComponentAPI().appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
