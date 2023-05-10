@@ -638,6 +638,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const asbiepNode = (node as AsbiepFlatNode);
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
+        action: 'Reuse',
         asccpManifestId: asbiepNode.asccpNode.manifestId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
@@ -651,6 +652,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
       if (!selectedTopLevelAsbiepId) {
         return;
+      }
+
+      if (!asbiepNode.used) {
+        this.toggleTreeUsed(asbiepNode);
       }
       this.updateDetails(asbiepNode.parents, () => {
         this.isUpdating = true;
@@ -669,7 +674,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove reused BIE?';
-    dialogConfig.data.content = ['Are you sure you want to remove reused BIE?'];
+    dialogConfig.data.content = ['Are you sure you want to remove the reused BIE?'];
     dialogConfig.data.action = 'Remove';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -686,6 +691,38 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       this.isUpdating = true;
       this.service.removeReusedBIE(this.topLevelAsbiepId, asbiepNode.asbieHashPath)
+        .pipe(finalize(() => {
+          this.isUpdating = false;
+        })).subscribe(_ => {
+        this.reloadTree(node);
+      });
+    });
+  }
+
+  retainReusedBIE(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Retain reused BIE?';
+    dialogConfig.data.content = ['Are you sure you want to retain the reused BIE?'];
+    dialogConfig.data.action = 'Retain';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .pipe(
+        finalize(() => {
+          this.isUpdating = false;
+        })
+      ).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      const asbiepNode = (node as AsbiepFlatNode);
+
+      this.isUpdating = true;
+      this.service.retainReusedBIE(this.topLevelAsbiepId, asbiepNode.asbieHashPath)
         .pipe(finalize(() => {
           this.isUpdating = false;
         })).subscribe(_ => {
