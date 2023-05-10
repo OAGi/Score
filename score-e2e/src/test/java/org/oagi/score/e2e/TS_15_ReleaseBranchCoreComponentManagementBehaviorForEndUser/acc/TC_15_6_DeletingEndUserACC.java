@@ -75,7 +75,6 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     public void test_TA_15_6_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-
         String branch = "10.8.7.1";
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
