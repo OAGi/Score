@@ -93,7 +93,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
 
         //reload the page to verify
-        viewEditCoreComponentPage.openPage();
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
@@ -293,13 +292,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
 
         asccpViewEditPage.hitAmendButton();
-
-        //reload the page to verify
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         String newDefinitionSource = randomPrint(50, 100).trim();
@@ -363,8 +358,6 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertChecked(asccpPanel.getReusableCheckbox());
         asccpViewEditPage.hitAmendButton();
         //reload the page
-        viewEditCoreComponentPage.openPage();
-        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
