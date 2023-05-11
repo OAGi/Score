@@ -55,7 +55,7 @@ export class NavbarComponent implements OnInit {
     } else if (userToken.roles.includes(this.auth.ROLE_DEVELOPER)) {
       return '#FAFAD2'; // Light yellow
     } else {
-      return '#D1F2CE'; // Light green
+      return '';
     }
   }
 
