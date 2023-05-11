@@ -272,7 +272,153 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement getAmendButton(boolean enabled);
 
+    /**
+     * Hit the 'Amend' button.
+     */
+    void hitAmendButton();
+
     void setDefinition(String asccpDefinition);
 
     void hitDeleteButton();
+
+    /**
+     * Return the UI element of the tree node by the node path.
+     *
+     * @param path the node path
+     * @return the UI element of the tree node
+     */
+    WebElement getNodeByPath(String path);
+
+    /**
+     * An interface of the ACC panel
+     */
+    interface ACCPanel {
+
+        /**
+         * Return the UI element of the 'Core Component' field.
+         *
+         * @return the UI element of the 'Core Component' field
+         */
+        WebElement getCoreComponentField();
+
+        /**
+         * Return the UI element of the 'Release' field.
+         *
+         * @return the UI element of the 'Release' field
+         */
+        WebElement getReleaseField();
+
+        /**
+         * Return the UI element of the 'Revision' field.
+         *
+         * @return the UI element of the 'Revision' field
+         */
+        WebElement getRevisionField();
+
+        /**
+         * Return the UI element of the 'State' field.
+         *
+         * @return the UI element of the 'State' field
+         */
+        WebElement getStateField();
+
+        /**
+         * Return the UI element of the 'Owner' field.
+         *
+         * @return the UI element of the 'Owner' field
+         */
+        WebElement getOwnerField();
+
+        /**
+         * Return the UI element of the 'GUID' field.
+         *
+         * @return the UI element of the 'GUID' field
+         */
+        WebElement getGUIDField();
+
+        /**
+         * Return the UI element of the 'DEN' field.
+         *
+         * @return the UI element of the 'DEN' field
+         */
+        WebElement getDENField();
+
+        /**
+         * Return the UI element of the 'Object Class Term' field.
+         *
+         * @return the UI element of the 'Object Class Term' field
+         */
+        WebElement getObjectClassTermField();
+
+        /**
+         * Set the "Object Class Term" field with given text.
+         * @param objectClassTerm
+         */
+        void setObjectClassTerm(String objectClassTerm);
+
+        /**
+         * Return the UI element of the 'Component Type' select field.
+         *
+         * @return the UI element of the 'Component Type' select field
+         */
+        WebElement getComponentTypeSelectField();
+
+        /**
+         * Set the 'Component' field with the given text.
+         *
+         * @param componentType "Base" "Semantic" or "Semantic Group"
+         */
+        void setComponentType(String componentType);
+
+        /**
+         * Return the UI element of the 'Abstract' checkbox.
+         *
+         * @return the UI element of the 'Abstract' checkbox
+         */
+        WebElement getAbstractCheckbox();
+
+        /**
+         * Return the UI element of the 'Deprecated' checkbox.
+         *
+         * @return the UI element of the 'Deprecated' checkbox
+         */
+        WebElement getDeprecatedCheckbox();
+
+        /**
+         * Return the UI element of the 'Namespace' select field.
+         *
+         * @return the UI element of the 'Namespace' select field
+         */
+        WebElement getNamespaceSelectField();
+
+        /**
+         * Set the 'Namespace' field with the given text.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(String namespace);
+
+        /**
+         * Return the UI element of the 'Definition Source' field.
+         *
+         * @return the UI element of the 'Definition Source' field
+         */
+        WebElement getDefinitionSourceField();
+
+        /**
+         * Return the UI element of the 'Definition' field.
+         *
+         * @return the UI element of the 'Definition' field
+         */
+        WebElement getDefinitionField();
+
+    }
+
+    /**
+     * Return the ACC panel.
+     *
+     * @param accNode ACC node
+     * @return the ACC panel
+     */
+    ACCPanel getACCPanel(WebElement accNode);
 }
