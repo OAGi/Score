@@ -970,6 +970,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         bccPanel.setCardinalityMinField("111");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"must be less than or equal\")]")).size());
         bccPanel.setDefinition("Test Max >= Min");
+        bccPanel.setCardinalityMinField("5");
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
@@ -1343,9 +1344,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         WebElement accBaseNode;
         ACCViewEditPage.ACCPanel accBasePanel;
-
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
         accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
         assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));

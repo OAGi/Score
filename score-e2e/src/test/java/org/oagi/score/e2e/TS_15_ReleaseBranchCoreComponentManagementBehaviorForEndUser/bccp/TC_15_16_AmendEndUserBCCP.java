@@ -28,7 +28,7 @@ import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_16_AmendEndUserBCCP extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -369,7 +369,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType,endUser, namespace, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "Production");
