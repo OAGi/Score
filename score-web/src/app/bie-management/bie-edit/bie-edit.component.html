@@ -76,7 +76,7 @@
                                 matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
                                 [matBadgeHidden]="sizeOfChanges === 0"
                                 *ngIf="state === 'WIP' && access === 'CanEdit'"
-                                [disabled]="isUpdating || !isChanged || !isValid">
+                                [disabled]="updateDisabled">
                           Update
                         </button>
                         <button mat-raised-button color="accent" (click)="updateState('QA')"

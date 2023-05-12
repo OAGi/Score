@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {of} from 'rxjs';
@@ -58,7 +58,29 @@ export class AccountDetailComponent implements OnInit {
     }
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return this.isDisabled();
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     this.service.updatePasswordAccount(this.account, this.newPassword).subscribe(_ => {
       this.snackBar.open('Updated', '', {
         duration: 3000,

@@ -22,7 +22,7 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="update()"
-                [disabled]="!isChanged() || isDisabled(contextCategory)">
+                [disabled]="updateDisabled">
           Update
         </button>
         <button mat-raised-button color="warn" (click)="discard()">
