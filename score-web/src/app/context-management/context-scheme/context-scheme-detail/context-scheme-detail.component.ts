@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
@@ -228,7 +228,29 @@ export class ContextSchemeDetailComponent implements OnInit {
     this.location.back();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return !this.isChanged() || this.isDisabled(this.contextScheme);
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     this.checkUniqueness(this.contextScheme, (_) => {
       this.checkSchemeAgencyName(this.contextScheme, (dummy) => {
         this.doUpdate();

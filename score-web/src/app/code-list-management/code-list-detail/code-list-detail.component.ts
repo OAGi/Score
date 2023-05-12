@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -431,7 +431,29 @@ export class CodeListDetailComponent implements OnInit {
     });
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return (this.state !== 'WIP' || this.access !== 'CanEdit') || this.isUpdating || !this.isChanged;
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     if (!this.codeList.codeListName) {
       this.snackBar.open('Name is required', '', {
         duration: 3000,

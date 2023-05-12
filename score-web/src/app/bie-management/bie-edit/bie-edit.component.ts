@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -52,7 +52,7 @@ import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-di
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {ErrorStateMatcher, ShowOnDirtyErrorStateMatcher} from '@angular/material/core';
+import {ErrorStateMatcher} from '@angular/material/core';
 
 
 @Component({
@@ -322,6 +322,20 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.cursorNode = node;
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
   keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
@@ -329,6 +343,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
       this.dataSource.toggle(this.cursorNode);
+    } else if ($event.code === 'Space') {
+      this.toggleTreeUsed(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
         .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
@@ -1656,7 +1672,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
+  get updateDisabled(): boolean {
+    return this.isUpdating || !this.isChanged || !this.isValid;
+  }
+
   updateDetails(include?: BieFlatNode[], callbackFn?) {
+    if (this.updateDisabled) {
+      return;
+    }
+
     const request = new BieDetailUpdateRequest();
 
     let nodes = this.dataSource.getChanged();

@@ -38,7 +38,7 @@
       <div class="actions">
         <button mat-raised-button (click)="back()">Back</button>
         <button mat-raised-button color="primary" *ngIf="namespace.canEdit"
-                [disabled]="!isChanged() || isDisabled() || !namespace.canEdit"
+                [disabled]="updateDisabled"
                 (click)="update()">
           Update
         </button>
