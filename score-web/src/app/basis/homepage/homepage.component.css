@@ -127,11 +127,13 @@ a {
   margin-bottom: 10px;
 }
 
-.mat-column-state, .mat-column-bieState {
+.mat-column-state, .mat-column-ccType, .mat-column-ccState, .mat-column-bieState {
   width: 108px;
 }
 
-.mat-column-Editing, .mat-column-Candidate, .mat-column-Published, .mat-column-Total {
+.mat-column-Editing, .mat-column-WIP,
+.mat-column-Draft, .mat-column-QA, .mat-column-Candidate,
+.mat-column-Published, .mat-column-Production, .mat-column-Deleted, .mat-column-Total {
   width: 15%;
 }
 
