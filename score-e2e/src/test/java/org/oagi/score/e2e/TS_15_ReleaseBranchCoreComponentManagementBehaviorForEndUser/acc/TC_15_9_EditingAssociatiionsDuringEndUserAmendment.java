@@ -264,7 +264,6 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCObject acc_association = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "Production");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc_association, endUser, namespace, "Production");
 
-        viewEditCoreComponentPage.openPage();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitAmendButton();
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
@@ -1417,9 +1416,6 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         WebElement accBaseNode;
         ACCViewEditPage.ACCPanel accBasePanel;
         ACCSetBaseACCDialog accSetBaseACCDialog;
-
-        viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accBaseNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen());
         accBasePanel = accViewEditPage.getACCPanel(accBaseNode);
         assertEquals(accForBase.getDen(), getText(accBasePanel.getDENField()));
