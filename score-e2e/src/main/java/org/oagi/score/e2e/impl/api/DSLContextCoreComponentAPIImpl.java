@@ -8,6 +8,9 @@ import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
 import org.oagi.score.e2e.obj.*;
 
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -634,6 +638,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dtRecord.setRepresentationTerm(bdt.getRepresentationTerm());
         dtRecord.setBasedDtId(ULong.valueOf(bdt.getBasedDtId()));
         dtRecord.setDen(bdt.getDen());
+        dtRecord.setQualifier_(bdt.getQualifier());
         dtRecord.setDefinition(bdt.getDefinition());
         dtRecord.setDefinitionSource(bdt.getDefinitionSource());
         dtRecord.setNamespaceId(ULong.valueOf(bdt.getNamespaceId()));
@@ -678,6 +683,101 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .returning(DT_MANIFEST.DT_MANIFEST_ID)
                 .fetchOne().getDtManifestId();
         bdt.setDtManifestId(dtManifestId.toBigInteger());
+
+        boolean isCdt = baseDataType.getBasedDtManifestId() == null;
+        if (isCdt) {
+            List<CdtAwdPriRecord> cdtAwdPriList = dslContext.selectFrom(CDT_AWD_PRI)
+                    .where(CDT_AWD_PRI.CDT_ID.eq(ULong.valueOf(baseDataType.getDtId())))
+                    .fetch();
+            for (CdtAwdPriRecord cdtAwdPri : cdtAwdPriList) {
+                List<CdtAwdPriXpsTypeMapRecord> cdtAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_AWD_PRI_XPS_TYPE_MAP)
+                        .where(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(cdtAwdPri.getCdtAwdPriId()))
+                        .fetch();
+
+                for (CdtAwdPriXpsTypeMapRecord cdtAwdPriXpsTypeMap : cdtAwdPriXpsTypeMapList) {
+                    BdtPriRestriRecord bdtPriRestri = new BdtPriRestriRecord();
+                    bdtPriRestri.setBdtManifestId(dtManifestId);
+                    bdtPriRestri.setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId());
+                    bdtPriRestri.setIsDefault(cdtAwdPriXpsTypeMap.getIsDefault());
+                    dslContext.insertInto(BDT_PRI_RESTRI)
+                            .set(bdtPriRestri).execute();
+                }
+            }
+        } else {
+            List<BdtPriRestriRecord> bdtPriRestriList = dslContext.selectFrom(BDT_PRI_RESTRI)
+                    .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(ULong.valueOf(baseDataType.getDtManifestId())))
+                    .fetch();
+            bdtPriRestriList.stream().forEach(bdtPriRestri -> {
+                bdtPriRestri.setBdtPriRestriId(null);
+                bdtPriRestri.setBdtManifestId(dtManifestId);
+                dslContext.insertInto(BDT_PRI_RESTRI)
+                        .set(bdtPriRestri).execute();
+            });
+        }
+
+        dslContext.selectFrom(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(ULong.valueOf(baseDataType.getDtManifestId())))
+                .fetch().forEach(dtScManifest -> {
+                    DtScRecord dtSc = dslContext.selectFrom(DT_SC)
+                            .where(DT_SC.DT_SC_ID.eq(dtScManifest.getDtScId()))
+                            .fetchOne();
+
+                    dtSc.setDtScId(null);
+                    dtSc.setOwnerDtId(bdtId);
+                    dtSc.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
+                    dtSc.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
+                    dtSc.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
+                    dtSc.setCreationTimestamp(bdt.getCreationTimestamp());
+                    dtSc.setLastUpdateTimestamp(bdt.getLastUpdateTimestamp());
+                    dtSc.setDtScId(
+                            dslContext.insertInto(DT_SC)
+                                    .set(dtSc)
+                                    .returning(DT_SC.DT_SC_ID).fetchOne().getDtScId()
+                    );
+
+                    ULong oldDtScManifestId = dtScManifest.getDtScManifestId();
+
+                    dtScManifest.setDtScManifestId(null);
+                    dtScManifest.setDtScId(dtSc.getDtScId());
+                    dtScManifest.setOwnerDtManifestId(dtManifestId);
+                    dtScManifest.setDtScManifestId(
+                            dslContext.insertInto(DT_SC_MANIFEST)
+                                    .set(dtScManifest)
+                                    .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID).fetchOne().getDtScManifestId()
+                    );
+
+                    if (isCdt) {
+                        List<CdtScAwdPriRecord> cdtScAwdPriList = dslContext.selectFrom(CDT_SC_AWD_PRI)
+                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(dtSc.getDtScId()))
+                                .fetch();
+                        for (CdtScAwdPriRecord cdtScAwdPri : cdtScAwdPriList) {
+                            List<CdtScAwdPriXpsTypeMapRecord> cdtScAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
+                                    .where(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(cdtScAwdPri.getCdtScAwdPriId()))
+                                    .fetch();
+                            for (CdtScAwdPriXpsTypeMapRecord cdtScAwdPriXpsTypeMap : cdtScAwdPriXpsTypeMapList) {
+                                BdtScPriRestriRecord bdtScPriRestri = new BdtScPriRestriRecord();
+                                bdtScPriRestri.setBdtScManifestId(dtScManifest.getDtScManifestId());
+                                bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId());
+                                bdtScPriRestri.setIsDefault(cdtScAwdPriXpsTypeMap.getIsDefault());
+                                dslContext.insertInto(BDT_SC_PRI_RESTRI)
+                                        .set(bdtScPriRestri)
+                                        .execute();
+                            }
+                        }
+
+                    } else {
+                        List<BdtScPriRestriRecord> bdtScPriRestriList = dslContext.selectFrom(BDT_SC_PRI_RESTRI)
+                                .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(oldDtScManifestId))
+                                .fetch();
+                        bdtScPriRestriList.stream().forEach(bdtScPriRestri -> {
+                            bdtScPriRestri.setBdtScPriRestriId(null);
+                            bdtScPriRestri.setBdtScManifestId(dtScManifest.getDtScManifestId());
+                            dslContext.insertInto(BDT_SC_PRI_RESTRI)
+                                    .set(bdtScPriRestri)
+                                    .execute();
+                        });
+                    }
+                });
 
         return bdt;
     }
