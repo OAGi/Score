@@ -62,6 +62,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
@@ -411,4 +413,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement node = getNodeByName(nodeName);
         return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
+
+    @Override
+    public WebElement getReviseButton() {
+        return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
 }

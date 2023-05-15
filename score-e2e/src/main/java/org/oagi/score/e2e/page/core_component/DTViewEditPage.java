@@ -233,4 +233,6 @@ public interface DTViewEditPage extends Page {
     WebElement getSearchField();
 
     WebElement getContextMenuIconByNodeName(String nodeName);
+
+    WebElement getReviseButton();
 }
