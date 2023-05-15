@@ -76,7 +76,7 @@
                                 matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
                                 [matBadgeHidden]="sizeOfChanges === 0"
                                 *ngIf="state === 'WIP' && access === 'CanEdit'"
-                                [disabled]="isUpdating || !isChanged || !isValid">
+                                [disabled]="updateDisabled">
                           Update
                         </button>
                         <button mat-raised-button color="accent" (click)="updateState('QA')"
@@ -219,9 +219,14 @@
                             [disabled]="isTenantEnabled">
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
+                    <mat-divider *ngIf="canRemoveReusedBIE(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
                             *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
                       <span class="context-menu-item">Remove Reused BIE</span>
+                    </button>
+                    <button mat-menu-item (click)="retainReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Retain Reused BIE</span>
                     </button>
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
@@ -238,7 +243,7 @@
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
                     </button>
-                    <mat-divider *ngIf="canEdit && (isUsableChildren(contextMenuItem) || isCardinalityEditable(contextMenuItem))"></mat-divider>
+                    <mat-divider *ngIf="canEdit"></mat-divider>
                     <button mat-menu-item (click)="enableChildren(contextMenuItem)"
                             *ngIf="canEdit"
                             [disabled]="!isUsableChildren(contextMenuItem)">
@@ -910,11 +915,11 @@
                         </div>
                       </div>
 
-                      <mat-card *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
+                      <mat-card>
                         <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
                         <mat-card-content>
                           <div class="row">
-                            <div class="col-3">
+                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
                               <mat-form-field>
                                 <input matInput placeholder="Minimum Length"
                                        [formControl]="bieMinimumLength">
@@ -930,7 +935,7 @@
                                 </mat-error>
                               </mat-form-field>
                             </div>
-                            <div class="col-3">
+                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
                               <mat-form-field>
                                 <input matInput placeholder="Maximum Length"
                                        [formControl]="bieMaximumLength">

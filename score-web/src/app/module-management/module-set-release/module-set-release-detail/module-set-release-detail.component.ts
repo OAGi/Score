@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -160,8 +160,26 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateModuleSetRelease();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return !this.roles.includes('developer') || !this.isChanged;
+  }
+
   updateModuleSetRelease() {
-    if (!this.isChanged) {
+    if (this.updateDisabled) {
       return;
     }
 

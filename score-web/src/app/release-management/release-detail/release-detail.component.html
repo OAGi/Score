@@ -55,7 +55,7 @@
       <div class="actions">
         <button mat-raised-button color="primary"
                 *ngIf="releaseDetail.state === 'Initialized' || releaseDetail.state === 'Draft'"
-                [disabled]="!isChanged || !canUpdate()"
+                [disabled]="updateDisabled"
                 (click)="update()">
           Update
         </button>

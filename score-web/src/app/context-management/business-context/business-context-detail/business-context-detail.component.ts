@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
@@ -187,7 +187,29 @@ export class BusinessContextDetailComponent implements OnInit {
     this.location.back();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return !this.isChanged() || this.isDisabled(this.businessContext);
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     this.service.update(this.businessContext).subscribe(_ => {
       this.hashCode = hashCode(this.businessContext);
       this.snackBar.open('Updated', '', {

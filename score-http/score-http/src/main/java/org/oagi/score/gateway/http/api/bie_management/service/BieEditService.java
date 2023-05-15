@@ -79,15 +79,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.utils.ScoreDigestUtils.sha256;
 
 @Service
 @Transactional(readOnly = true)
@@ -810,6 +809,152 @@ public class BieEditService implements InitializingBean {
         }
 
         dslContext.deleteFrom(ASBIE).where(ASBIE.ASBIE_ID.eq(asbieRecord.getAsbieId())).execute();
+    }
+
+    @Transactional
+    public void retainReuseBIE(AuthenticatedPrincipal user, RemoveReusedBIERequest request) {
+        AppUser requester = sessionService.getAppUserByUsername(user);
+
+        TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getTopLevelAsbiepId())))
+                .fetchOne();
+
+        AppUserRecord bieOwnerRecord = dslContext.selectFrom(APP_USER)
+                .where(APP_USER.APP_USER_ID.eq(topLevelAsbiepRecord.getOwnerUserId()))
+                .fetchOne();
+
+        if (requester.isDeveloper() && bieOwnerRecord.getIsDeveloper() == 0) {
+            throw new IllegalArgumentException("Developer does not allow to paste end user's BIE.");
+        }
+
+        if (!topLevelAsbiepRecord.getOwnerUserId().toBigInteger().equals(requester.getAppUserId())) {
+            throw new IllegalArgumentException("Requester is not an owner of the target BIE.");
+        }
+        if (BieState.valueOf(topLevelAsbiepRecord.getState()) != BieState.WIP) {
+            throw new IllegalArgumentException("Target BIE cannot edit.");
+        }
+
+        AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
+                .where(and(
+                        ASBIE.HASH_PATH.eq(request.getAsbieHashPath()),
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId())
+                ))
+                .fetchOne();
+
+        AsbiepRecord toAsbiepRecord =
+                dslContext.selectFrom(ASBIEP)
+                        .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
+                        .fetchOne();
+
+        ULong ownerTopLevelAsbiepOfToAsbiep = toAsbiepRecord.getOwnerTopLevelAsbiepId();
+        boolean isReused = !asbieRecord.getOwnerTopLevelAsbiepId().equals(ownerTopLevelAsbiepOfToAsbiep);
+        if (!isReused) {
+            throw new IllegalArgumentException("There is no reuse BIE for retention.");
+        }
+
+        ULong reuseTopLevelAsbiepId = toAsbiepRecord.getOwnerTopLevelAsbiepId();
+        Map<ULong, ULong> abieIdChangeMap = new HashMap<>();
+        dslContext.selectFrom(ABIE)
+                .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                .fetchStream().forEach(abie -> {
+                    ULong oldAbieId = abie.getAbieId();
+                    abie.setAbieId(null);
+                    abie.setPath(asbieRecord.getPath() + ">" + abie.getPath());
+                    abie.setHashPath(sha256(abie.getPath()));
+                    abie.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                    abie.setLastUpdateTimestamp(LocalDateTime.now());
+                    abie.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                    ULong newAbieId = dslContext.insertInto(ABIE).set(abie)
+                            .returning(ABIE.ABIE_ID).fetchOne().getAbieId();
+                    abieIdChangeMap.put(oldAbieId, newAbieId);
+                });
+        Map<ULong, ULong> asbiepIdChangeMap = new HashMap<>();
+        AtomicReference<ULong> newToAsbiepIdRef = new AtomicReference<>();
+        dslContext.selectFrom(ASBIEP)
+                .where(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                .fetchStream().forEach(asbiep -> {
+                    ULong oldAsbiepId = asbiep.getAsbiepId();
+                    boolean isTopLevelAsbiepId = asbiep.getAsbiepId().equals(toAsbiepRecord.getAsbiepId());
+                    asbiep.setAsbiepId(null);
+                    asbiep.setRoleOfAbieId(abieIdChangeMap.get(asbiep.getRoleOfAbieId()));
+                    asbiep.setPath(asbieRecord.getPath() + ">" + asbiep.getPath());
+                    asbiep.setHashPath(sha256(asbiep.getPath()));
+                    asbiep.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                    asbiep.setLastUpdateTimestamp(LocalDateTime.now());
+                    asbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                    ULong newAsbiepId = dslContext.insertInto(ASBIEP).set(asbiep)
+                            .returning(ASBIEP.ASBIEP_ID).fetchOne().getAsbiepId();
+                    asbiepIdChangeMap.put(oldAsbiepId, newAsbiepId);
+                    if (isTopLevelAsbiepId) {
+                        newToAsbiepIdRef.set(newAsbiepId);
+                    }
+                });
+        Map<ULong, ULong> bbiepIdChangeMap = new HashMap<>();
+        dslContext.selectFrom(BBIEP)
+                .where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                .fetchStream().forEach(bbiep -> {
+                    ULong oldBbiepId = bbiep.getBbiepId();
+                    bbiep.setBbiepId(null);
+                    bbiep.setPath(asbieRecord.getPath() + ">" + bbiep.getPath());
+                    bbiep.setHashPath(sha256(bbiep.getPath()));
+                    bbiep.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                    bbiep.setLastUpdateTimestamp(LocalDateTime.now());
+                    bbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                    ULong newBbiepId = dslContext.insertInto(BBIEP).set(bbiep)
+                            .returning(BBIEP.BBIEP_ID).fetchOne().getBbiepId();
+                    bbiepIdChangeMap.put(oldBbiepId, newBbiepId);
+                });
+        dslContext.batch(
+                dslContext.selectFrom(ASBIE)
+                        .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                        .fetchStream().map(asbie -> {
+                            asbie.setAsbieId(null);
+                            asbie.setPath(asbieRecord.getPath() + ">" + asbie.getPath());
+                            asbie.setHashPath(sha256(asbie.getPath()));
+                            asbie.setFromAbieId(abieIdChangeMap.get(asbie.getFromAbieId()));
+                            asbie.setToAsbiepId(asbiepIdChangeMap.get(asbie.getToAsbiepId()));
+                            asbie.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                            asbie.setLastUpdateTimestamp(LocalDateTime.now());
+                            asbie.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                            return dslContext.insertInto(ASBIE).set(asbie);
+                        }).collect(Collectors.toList())
+        ).execute();
+        Map<ULong, ULong> bbieIdChangeMap = new HashMap<>();
+        dslContext.selectFrom(BBIE)
+                .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                .fetchStream().forEach(bbie -> {
+                    ULong oldBbieId = bbie.getBbieId();
+                    bbie.setBbieId(null);
+                    bbie.setPath(asbieRecord.getPath() + ">" + bbie.getPath());
+                    bbie.setHashPath(sha256(bbie.getPath()));
+                    bbie.setFromAbieId(abieIdChangeMap.get(bbie.getFromAbieId()));
+                    bbie.setToBbiepId(bbiepIdChangeMap.get(bbie.getToBbiepId()));
+                    bbie.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                    bbie.setLastUpdateTimestamp(LocalDateTime.now());
+                    bbie.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                    ULong newBbieId = dslContext.insertInto(BBIE).set(bbie)
+                            .returning(BBIE.BBIE_ID).fetchOne().getBbieId();
+                    bbieIdChangeMap.put(oldBbieId, newBbieId);
+                });
+        dslContext.batch(
+                dslContext.selectFrom(BBIE_SC)
+                        .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
+                        .fetchStream().map(bbieSc -> {
+                            bbieSc.setBbieScId(null);
+                            bbieSc.setPath(asbieRecord.getPath() + ">" + bbieSc.getPath());
+                            bbieSc.setHashPath(sha256(bbieSc.getPath()));
+                            bbieSc.setBbieId(bbieIdChangeMap.get(bbieSc.getBbieId()));
+                            bbieSc.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+                            bbieSc.setLastUpdateTimestamp(LocalDateTime.now());
+                            bbieSc.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
+                            return dslContext.insertInto(BBIE_SC).set(bbieSc);
+                        }).collect(Collectors.toList())
+        ).execute();
+
+        dslContext.update(ASBIE)
+                .set(ASBIE.TO_ASBIEP_ID, newToAsbiepIdRef.get())
+                .where(ASBIE.ASBIE_ID.eq(asbieRecord.getAsbieId()))
+                .execute();
     }
 
     @Transactional

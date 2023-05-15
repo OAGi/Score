@@ -24,6 +24,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class ReuseBieDialogComponent implements OnInit {
 
+  action: string;
   displayedColumns: string[] = [
     'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
@@ -50,15 +51,16 @@ export class ReuseBieDialogComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
-    @Inject(MAT_DIALOG_DATA) public asbiepNode: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
+    this.action = this.data.action;
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.asccpManifestId = this.asbiepNode.asccpManifestId;
-    this.request.release.releaseId = this.asbiepNode.releaseId;
-    this.request.excludeTopLevelAsbiepIds = [this.asbiepNode.topLevelAsbiepId,];
+    this.request.filters.asccpManifestId = this.data.asccpManifestId;
+    this.request.release.releaseId = this.data.releaseId;
+    this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;
     }

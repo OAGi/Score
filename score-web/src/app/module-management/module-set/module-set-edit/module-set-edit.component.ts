@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -91,8 +91,26 @@ export class ModuleSetEditComponent implements OnInit {
     this.$hashCode = hashCode(this.moduleSet);
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateModuleSet();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return !this.roles.includes('developer') || !this.canUpdate;
+  }
+
   updateModuleSet() {
-    if (!this.canUpdate) {
+    if (this.updateDisabled) {
       return;
     }
 
