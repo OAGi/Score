@@ -10,6 +10,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 
+import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 
 import java.util.ArrayList;
@@ -68,6 +69,36 @@ public class TC_38_1_DTAccess extends BaseTest {
             viewEditCoreComponentPage.setDEN(dt.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+
+    }
+
+    @Test
+    @DisplayName("TC_38_1_TA_2")
+    public void test_TA_2() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Value. Type", "Working");
+            DTObject dtWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerA, namespace, "WIP");
+            dtForTesting.add(dtWIP);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("WIP"));
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.setQualifier("qualifier");
+            dtViewEditPage.hitUpdateButton();
         }
 
     }
