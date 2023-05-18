@@ -654,7 +654,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const asbiepNode = (node as AsbiepFlatNode);
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
-        action: 'Reuse',
         asccpManifestId: asbiepNode.asccpNode.manifestId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
