@@ -23,7 +23,7 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
-        <jOOQ.version>3.18.3</jOOQ.version>
+        <jOOQ.version>3.18.4</jOOQ.version>
         <gson.version>2.10.1</gson.version>
         <snakeyaml.version>2.0</snakeyaml.version>
 
