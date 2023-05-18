@@ -912,7 +912,11 @@ public class BieEditService implements InitializingBean {
                             asbie.setPath(asbieRecord.getPath() + ">" + asbie.getPath());
                             asbie.setHashPath(sha256(asbie.getPath()));
                             asbie.setFromAbieId(abieIdChangeMap.get(asbie.getFromAbieId()));
-                            asbie.setToAsbiepId(asbiepIdChangeMap.get(asbie.getToAsbiepId()));
+                            ULong asbieId = asbiepIdChangeMap.get(asbie.getToAsbiepId());
+                            // There's no change if the ASBIE is reusing the BIE.
+                            if (asbieId != null) {
+                                asbie.setToAsbiepId(asbieId);
+                            }
                             asbie.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                             asbie.setLastUpdateTimestamp(LocalDateTime.now());
                             asbie.setOwnerTopLevelAsbiepId(topLevelAsbiepRecord.getTopLevelAsbiepId());
