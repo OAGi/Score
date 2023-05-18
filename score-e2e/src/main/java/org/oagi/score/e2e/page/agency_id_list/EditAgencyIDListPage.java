@@ -152,13 +152,65 @@ public interface EditAgencyIDListPage extends Page {
      */
     void cancel();
 
-    void moveToQA();
+    /**
+     * Return the UI element of the 'Move to Draft' button.
+     *
+     * @return the UI element of the 'Move to Draft' button
+     */
+    WebElement getMoveToDraftButton();
 
+    /**     *
+     * Move the state of the agency ID list to 'Draft'.
+     */
+    void moveToDraft();
+
+    /**
+     * Return the UI element of the 'Move to Candidate' button.
+     *
+     * @return the UI element of the 'Move to Candidate' button
+     */
+    WebElement getMoveToCandidateButton();
+
+    /**     *
+     * Move the state of the agency ID list to 'Candidate'.
+     */
+    void moveToCandidate();
+
+    /**
+     * Return the UI element of the 'Move to QA' button.
+     *
+     * @return the UI element of the 'Move to QA' button
+     */
     WebElement getMoveToQAButton();
 
+    /**     *
+     * Move the state of the agency ID list to 'QA'.
+     */
+    void moveToQA();
+
+    /**
+     * Return the UI element of the 'Move to Production' button.
+     *
+     * @return the UI element of the 'Move to Production' button
+     */
+    WebElement getMoveToProductionButton();
+
+    /**
+     * Move the state of the agency ID list to 'Production'.
+     */
     void moveToProduction();
 
-    WebElement getMoveToProductionButton();
+    /**
+     * Return the UI element of the 'Back to WIP' button.
+     *
+     * @return the UI element of the 'Back to WIP' button
+     */
+    WebElement getBackToWIPButton();
+
+    /**
+     * Move the state of the agency ID list back to 'WIP'.
+     */
+    void backToWIP();
 
     /**
      * Return the UI element of the 'Add' button for the new agency ID list value.

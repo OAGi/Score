@@ -57,10 +57,16 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+    private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
     private static final By ADD_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
     private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
@@ -252,6 +258,44 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     public WebElement getUpdateButton() {
         return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
     }
+
+    @Override
+    public WebElement getMoveToDraftButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void moveToDraft() {
+        retry(() -> {
+            click(getMoveToDraftButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getMoveToCandidateButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void moveToCandidate() {
+        retry(() -> {
+            click(getMoveToCandidateButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getMoveToQAButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+    }
+
     @Override
     public void moveToQA() {
         retry(() -> {
@@ -264,8 +308,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
-    public WebElement getMoveToQAButton() {
-        return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+    public WebElement getMoveToProductionButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
     }
 
     @Override
@@ -280,8 +324,19 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
-    public WebElement getMoveToProductionButton() {
-        return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+    public WebElement getBackToWIPButton() {
+        return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void backToWIP() {
+        retry(() -> {
+            click(getBackToWIPButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
     }
 
     @Override
