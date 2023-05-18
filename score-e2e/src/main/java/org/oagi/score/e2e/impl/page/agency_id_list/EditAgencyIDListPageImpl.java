@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.agency_id_list;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.agency_id_list.AddCommentDialog;
@@ -36,6 +37,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-form-field//input");
     private static final By VERSION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+    private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//mat-select");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -142,13 +145,26 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     public WebElement getAgencyIDListNameField() {
         return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_NAME_FIELD_LOCATOR);
     }
+
+    @Override
+    public WebElement getAgencyIDListValueSelectField() {
+        return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue) {
+        retry(() -> {
+            click(getAgencyIDListValueSelectField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDListValue.getName() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
     @Override
     public WebElement getNamespaceSelectField() {
         return visibilityOfElementLocated(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
-    }
-    @Override
-    public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
@@ -163,6 +179,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public WebElement getDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
     public void setDefinition(String definition) {
         sendKeys(getDefinitionField(), definition);
     }
@@ -170,6 +191,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setDefinitionSource(String definitionSource) {
+        sendKeys(getDefinitionSourceField(), definitionSource);
     }
 
     @Override

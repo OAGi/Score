@@ -5,11 +5,9 @@ import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.AgencyIDListAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListRecord;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CodeListManifestRecord;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.LogRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
@@ -28,8 +26,11 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
 
     private final DSLContext dslContext;
 
-    public DSLContextAgencyIDListAPIImpl(DSLContext dslContext) {
+    private final APIFactory apiFactory;
+
+    public DSLContextAgencyIDListAPIImpl(DSLContext dslContext, APIFactory apiFactory) {
         this.dslContext = dslContext;
+        this.apiFactory = apiFactory;
     }
 
     @Override
@@ -87,6 +88,29 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
         agencyIDList.setReleaseId(release.getReleaseId());
         agencyIDList.setAgencyIDListId(agencyIdListId.toBigInteger());
         agencyIDList.setAgencyIDListManifestId(agencyIdListManifestId.toBigInteger());
+
+        if ("Working".equals(release.getReleaseNumber()) && "Published".equals(state)) {
+            agencyIdListManifestRecord = dslContext.selectFrom(AGENCY_ID_LIST_MANIFEST)
+                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            AgencyIdListManifestRecord prevAgencyIdListManifestRecord = agencyIdListManifestRecord.copy();
+            prevAgencyIdListManifestRecord.setAgencyIdListManifestId(null);
+            prevAgencyIdListManifestRecord.setAgencyIdListId(agencyIdListId);
+            prevAgencyIdListManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevAgencyIdListManifestRecord.setNextAgencyIdListManifestId(agencyIdListManifestId);
+            prevAgencyIdListManifestRecord.setAgencyIdListManifestId(
+                    dslContext.insertInto(AGENCY_ID_LIST_MANIFEST)
+                            .set(prevAgencyIdListManifestRecord)
+                            .returning(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                            .fetchOne().getAgencyIdListManifestId());
+
+            dslContext.update(AGENCY_ID_LIST_MANIFEST)
+                    .set(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID, prevAgencyIdListManifestRecord.getAgencyIdListManifestId())
+                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
+                    .execute();
+        }
 
         return agencyIDList;
     }

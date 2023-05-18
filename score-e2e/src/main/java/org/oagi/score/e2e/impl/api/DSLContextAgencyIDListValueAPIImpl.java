@@ -4,12 +4,15 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.AgencyIDListValueAPI;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueRecord;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -19,15 +22,19 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_VALUE;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_VALUE_MANIFEST;
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_MANIFEST;
 
 public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI {
 
     private final DSLContext dslContext;
 
-    public DSLContextAgencyIDListValueAPIImpl(DSLContext dslContext) {
+    private final APIFactory apiFactory;
+
+    public DSLContextAgencyIDListValueAPIImpl(DSLContext dslContext, APIFactory apiFactory) {
         this.dslContext = dslContext;
+        this.apiFactory = apiFactory;
     }
 
     @Override
@@ -65,6 +72,39 @@ public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI 
         agencyIDListValue.setReleaseId(agencyIDList.getReleaseId());
         agencyIDListValue.setAgencyIDListValueId(agencyIdListValueId.toBigInteger());
         agencyIDListValue.setAgencyIDListValueManifestId(agencyIdListValueManifestId.toBigInteger());
+
+        ReleaseObject release = apiFactory.getReleaseAPI().getReleaseById(agencyIDList.getReleaseId());
+
+        if ("Working".equals(release.getReleaseNumber()) && "Published".equals(agencyIDList.getState())) {
+            agencyIdListValueManifestRecord = dslContext.selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(agencyIdListValueManifestId))
+                    .fetchOne();
+
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            AgencyIdListValueManifestRecord prevAgencyIdListValueManifestRecord = agencyIdListValueManifestRecord.copy();
+            prevAgencyIdListValueManifestRecord.setAgencyIdListValueManifestId(null);
+            prevAgencyIdListValueManifestRecord.setAgencyIdListManifestId(dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                    .from(AGENCY_ID_LIST_MANIFEST)
+                    .where(and(
+                            AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(latestRelease.getReleaseId())),
+                            AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(ULong.valueOf(agencyIDList.getAgencyIDListId()))
+                    ))
+                    .fetchOneInto(ULong.class));
+            prevAgencyIdListValueManifestRecord.setAgencyIdListValueId(agencyIdListValueId);
+            prevAgencyIdListValueManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
+            prevAgencyIdListValueManifestRecord.setNextAgencyIdListValueManifestId(agencyIdListValueManifestId);
+            prevAgencyIdListValueManifestRecord.setAgencyIdListValueManifestId(
+                    dslContext.insertInto(AGENCY_ID_LIST_VALUE_MANIFEST)
+                            .set(prevAgencyIdListValueManifestRecord)
+                            .returning(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                            .fetchOne().getAgencyIdListValueManifestId());
+
+            dslContext.update(AGENCY_ID_LIST_VALUE_MANIFEST)
+                    .set(AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID, prevAgencyIdListValueManifestRecord.getAgencyIdListValueManifestId())
+                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(agencyIdListValueManifestId))
+                    .execute();
+        }
+
         return agencyIDListValue;
     }
 

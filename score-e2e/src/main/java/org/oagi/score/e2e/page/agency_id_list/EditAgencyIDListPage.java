@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.agency_id_list;
 
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
@@ -74,6 +75,15 @@ public interface EditAgencyIDListPage extends Page {
     void setVersion(String version);
 
     /**
+     * Return the UI element of the 'Agency ID List Value' select field.
+     *
+     * @return the UI element of the 'Agency ID List Value' select field
+     */
+    WebElement getAgencyIDListValueSelectField();
+
+    void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue);
+
+    /**
      * Return the UI element of the 'Namespace' select field.
      *
      * @return the UI element of the 'Namespace' select field
@@ -97,6 +107,8 @@ public interface EditAgencyIDListPage extends Page {
      * @return the UI element of the 'Definition Source' field
      */
     WebElement getDefinitionSourceField();
+
+    void setDefinitionSource(String definitionSource);
 
     WebElement getUpdateButton();
 

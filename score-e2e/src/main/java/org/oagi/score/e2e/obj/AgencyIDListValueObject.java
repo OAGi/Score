@@ -46,7 +46,7 @@ public class AgencyIDListValueObject {
     public static AgencyIDListValueObject createRandomAgencyIDListValue(AppUserObject creator) {
         AgencyIDListValueObject agencyIDListValue = new AgencyIDListValueObject();
         agencyIDListValue.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
-        agencyIDListValue.setValue(randomNumeric(5, 10).trim());
+        agencyIDListValue.setValue(randomAlphanumeric(5, 10).trim());
         agencyIDListValue.setName(randomAlphanumeric(5, 10).trim());
         agencyIDListValue.setDefinition(randomPrint(50, 100).trim());
         agencyIDListValue.setDefinitionSource(randomAlphanumeric(5, 10));
