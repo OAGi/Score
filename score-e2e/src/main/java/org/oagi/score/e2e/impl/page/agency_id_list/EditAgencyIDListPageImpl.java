@@ -63,6 +63,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
     private static final By ADD_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
+    private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -293,6 +295,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public WebElement getAddAgencyIDListValueButton() {
+        return elementToBeClickable(getDriver(), ADD_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR);
+    }
+
+    @Override
     public EditAgencyIDListValueDialog addAgencyIDListValue() {
         click(getAddAgencyIDListValueButton());
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = new EditAgencyIDListValueDialogImpl(this);
@@ -301,8 +308,18 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
-    public WebElement getAddAgencyIDListValueButton() {
-        return elementToBeClickable(getDriver(), ADD_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR);
+    public WebElement getRemoveAgencyIDListValueButton() {
+        return elementToBeClickable(getDriver(), REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitRemoveAgencyIDListValueButton() {
+        retry(() -> {
+            click(getRemoveAgencyIDListValueButton());
+            click(getDialogButtonByName(getDriver(), "Remove"));
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

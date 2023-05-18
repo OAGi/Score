@@ -160,9 +160,31 @@ public interface EditAgencyIDListPage extends Page {
 
     WebElement getMoveToProductionButton();
 
+    /**
+     * Return the UI element of the 'Add' button for the new agency ID list value.
+     *
+     * @return the UI element of the 'Add' button for the new agency ID list value
+     */
+    WebElement getAddAgencyIDListValueButton();
+
+    /**
+     * Open the Agency ID List Value dialog to add a new one.
+     *
+     * @return the Agency ID List Value dialog
+     */
     EditAgencyIDListValueDialog addAgencyIDListValue();
 
-    WebElement getAddAgencyIDListValueButton();
+    /**
+     * Return the UI element of the 'Remove' button for the agency ID list value(s).
+     *
+     * @return the UI element of the 'Remove' button for the agency ID list value(s)
+     */
+    WebElement getRemoveAgencyIDListValueButton();
+
+    /**
+     * Hit the 'Remove' button for the agency ID list value(s).
+     */
+    void hitRemoveAgencyIDListValueButton();
 
     EditAgencyIDListValueDialog openAgencyIDListValueDialogByValue(String value);
 

@@ -9,6 +9,8 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -241,13 +244,104 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
     @Test
     @DisplayName("TC_34_4_5")
     public void TA_5() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        AgencyIDListObject agencyIDList =
+                getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
+        List<AgencyIDListValueObject> agencyIDListValues = Arrays.asList(
+                getAPIFactory().getAgencyIDListValueAPI().createRandomAgencyIDListValue(developer, agencyIDList));
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        EditAgencyIDListPage editAgencyIDListPage =
+                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIDList.getName(), release.getReleaseNumber());
+        editAgencyIDListPage.revise();
+
+        EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
+        assertDisabled(editAgencyIDListValueDialog.getDeprecatedSelectField());
+
+        String newValue = randomAlphanumeric(5, 10).trim();
+        editAgencyIDListValueDialog.setValue(newValue);
+        String newMeaning = randomAlphanumeric(5, 10).trim();
+        editAgencyIDListValueDialog.setMeaning(newMeaning);
+        String newDefinition = randomPrint(50, 100).trim();
+        editAgencyIDListValueDialog.setDefinition(newDefinition);
+        String newDefinitionSource = randomAlphanumeric(5, 10);
+        editAgencyIDListValueDialog.setDefinitionSource(newDefinitionSource);
+        editAgencyIDListValueDialog.hitAddButton();
+
+        editAgencyIDListPage.hitUpdateButton();
+        editAgencyIDListPage.openPage();
+
+        WebElement tr = editAgencyIDListPage.getTableRecordByValue(newValue);
+        WebElement td = editAgencyIDListPage.getColumnByName(tr, "select");
+        click(td);
+
+        editAgencyIDListPage.hitRemoveAgencyIDListValueButton();
+        editAgencyIDListPage.hitUpdateButton();
+        editAgencyIDListPage.openPage();
+
+        assertThrows(TimeoutException.class, () -> editAgencyIDListPage.getTableRecordByValue(newValue));
     }
 
     @Test
     @DisplayName("TC_34_4_6")
     public void TA_6() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        AgencyIDListObject agencyIDList =
+                getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
+        List<AgencyIDListValueObject> agencyIDListValues = Arrays.asList(
+                getAPIFactory().getAgencyIDListValueAPI().createRandomAgencyIDListValue(developer, agencyIDList));
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        EditAgencyIDListPage editAgencyIDListPage =
+                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIDList.getName(), release.getReleaseNumber());
+        editAgencyIDListPage.revise();
+
+        String newVersion = randomAlphanumeric(5, 10);
+        editAgencyIDListPage.setVersion(newVersion);
+        String newDefinition = randomPrint(50, 100).trim();
+        editAgencyIDListPage.setDefinition(newDefinition);
+        String newDefinitionSource = randomAlphanumeric(5, 10);
+        editAgencyIDListPage.setDefinitionSource(newDefinitionSource);
+
+        EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
+        assertDisabled(editAgencyIDListValueDialog.getDeprecatedSelectField());
+
+        String newValue = randomAlphanumeric(5, 10).trim();
+        editAgencyIDListValueDialog.setValue(newValue);
+        editAgencyIDListValueDialog.setMeaning(randomAlphanumeric(5, 10).trim());
+        editAgencyIDListValueDialog.setDefinition(randomPrint(50, 100).trim());
+        editAgencyIDListValueDialog.setDefinitionSource(randomAlphanumeric(5, 10));
+        editAgencyIDListValueDialog.hitAddButton();
+
+        editAgencyIDListPage.hitUpdateButton();
+        editAgencyIDListPage.openPage();
+
+        editAgencyIDListPage.cancel();
+        editAgencyIDListPage.openPage();
+
+        assertEquals("Agency ID List", getText(editAgencyIDListPage.getCoreComponentField()));
+        assertEquals(release.getReleaseNumber(), getText(editAgencyIDListPage.getReleaseField()));
+        assertEquals("Published", getText(editAgencyIDListPage.getStateField()));
+        assertEquals("1", getText(editAgencyIDListPage.getRevisionField()));
+        assertEquals(agencyIDList.getName(), getText(editAgencyIDListPage.getAgencyIDListNameField()));
+        assertEquals(agencyIDList.getListId(), getText(editAgencyIDListPage.getListIDField()));
+        assertEquals(agencyIDList.getVersionId(), getText(editAgencyIDListPage.getVersionField()));
+        assertEquals(agencyIDList.getDefinition(), getText(editAgencyIDListPage.getDefinitionField()));
+        assertEquals(agencyIDList.getDefinitionSource(), getText(editAgencyIDListPage.getDefinitionSourceField()));
+
+        assertThrows(TimeoutException.class, () -> editAgencyIDListPage.getTableRecordByValue(newValue));
     }
 
 }
