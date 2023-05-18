@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -52,7 +52,7 @@ import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-di
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {ErrorStateMatcher, ShowOnDirtyErrorStateMatcher} from '@angular/material/core';
+import {ErrorStateMatcher} from '@angular/material/core';
 
 
 @Component({
@@ -322,6 +322,20 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.cursorNode = node;
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
   keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
@@ -329,6 +343,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
       this.dataSource.toggle(this.cursorNode);
+    } else if ($event.code === 'Space') {
+      this.toggleTreeUsed(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
         .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
@@ -401,19 +417,19 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   get isValid(): boolean {
     if (this.selectedNode && this.selectedNode.bieType !== 'ABIE' && this.selectedNode.used) {
-      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.valid) {
+      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.disabled && !this.bieCardinalityMin.valid) {
         return false;
       }
-      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.valid) {
+      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.disabled && !this.bieCardinalityMax.valid) {
         return false;
       }
-      if (!!this.bieMinimumLength && !this.bieMinimumLength.valid) {
+      if (!!this.bieMinimumLength && !this.bieMinimumLength.disabled && !this.bieMinimumLength.valid) {
         return false;
       }
-      if (!!this.bieMaximumLength && !this.bieMaximumLength.valid) {
+      if (!!this.bieMaximumLength && !this.bieMaximumLength.disabled && !this.bieMaximumLength.valid) {
         return false;
       }
-      if (!!this.biePattern && !this.biePattern.valid) {
+      if (!!this.biePattern && !this.biePattern.disabled && !this.biePattern.valid) {
         return false;
       }
     }
@@ -638,6 +654,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const asbiepNode = (node as AsbiepFlatNode);
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
+        action: 'Reuse',
         asccpManifestId: asbiepNode.asccpNode.manifestId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
@@ -651,6 +668,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
       if (!selectedTopLevelAsbiepId) {
         return;
+      }
+
+      if (!asbiepNode.used) {
+        this.toggleTreeUsed(asbiepNode);
       }
       this.updateDetails(asbiepNode.parents, () => {
         this.isUpdating = true;
@@ -669,7 +690,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove reused BIE?';
-    dialogConfig.data.content = ['Are you sure you want to remove reused BIE?'];
+    dialogConfig.data.content = ['Are you sure you want to remove the reused BIE?'];
     dialogConfig.data.action = 'Remove';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -686,6 +707,38 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       this.isUpdating = true;
       this.service.removeReusedBIE(this.topLevelAsbiepId, asbiepNode.asbieHashPath)
+        .pipe(finalize(() => {
+          this.isUpdating = false;
+        })).subscribe(_ => {
+        this.reloadTree(node);
+      });
+    });
+  }
+
+  retainReusedBIE(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Retain reused BIE?';
+    dialogConfig.data.content = ['Are you sure you want to retain the reused BIE?'];
+    dialogConfig.data.action = 'Retain';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .pipe(
+        finalize(() => {
+          this.isUpdating = false;
+        })
+      ).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      const asbiepNode = (node as AsbiepFlatNode);
+
+      this.isUpdating = true;
+      this.service.retainReusedBIE(this.topLevelAsbiepId, asbiepNode.asbieHashPath)
         .pipe(finalize(() => {
           this.isUpdating = false;
         })).subscribe(_ => {
@@ -949,7 +1002,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   isStringTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['String', 'NormalizedString', 'Token']) {
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
       if (cdtPrimitives.includes(typeName)) {
         return true;
       }
@@ -1619,7 +1672,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
+  get updateDisabled(): boolean {
+    return this.isUpdating || !this.isChanged || !this.isValid;
+  }
+
   updateDetails(include?: BieFlatNode[], callbackFn?) {
+    if (this.updateDisabled) {
+      return;
+    }
+
     const request = new BieDetailUpdateRequest();
 
     let nodes = this.dataSource.getChanged();

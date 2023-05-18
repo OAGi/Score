@@ -1,6 +1,6 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -494,6 +494,16 @@ export class ExtensionDetailComponent implements OnInit {
     return this.dataSource.getChanged().length > 0;
   }
 
+  get isValid(): boolean {
+    if (!!this.ccCardinalityMin && !this.ccCardinalityMin.disabled && !this.ccCardinalityMin.valid) {
+      return false;
+    }
+    if (!!this.ccCardinalityMax && !this.ccCardinalityMax.disabled && !this.ccCardinalityMax.valid) {
+      return false;
+    }
+    return true;
+  }
+
   _updateDetails(details: CcFlatNode[]) {
     this.isUpdating = true;
     this.service.updateDetails(this.manifestId, details)
@@ -517,8 +527,26 @@ export class ExtensionDetailComponent implements OnInit {
       });
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChanged || this.isUpdating || !this.isValid;
+  }
+
   updateDetails() {
-    if (!this.isChanged || this.isUpdating) {
+    if (this.updateDisabled) {
       return;
     }
 
@@ -910,26 +938,20 @@ export class ExtensionDetailComponent implements OnInit {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
-        if (obj.cardinalityMax === -1) {
-          return null;
-        }
         if (Number(control.value) < 0) {
           return {min: 'Cardinality Min must be bigger than or equals to ' + 0};
         }
         if (Number(control.value) > prevRevision.cardinalityMin) {
           return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinalityMin};
         }
-        if (Number(control.value) > obj.cardinalityMax) {
+        if (obj.cardinalityMax >= 0 && Number(control.value) > obj.cardinalityMax) {
           return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
         }
         return null;
       });
     } else {
       validators.push((control: AbstractControl): ValidationErrors | null => {
-        if (obj.cardinalityMax === -1) {
-          return null;
-        }
-        if (Number(control.value) > obj.cardinalityMax) {
+        if (obj.cardinalityMax >= 0 && Number(control.value) > obj.cardinalityMax) {
           return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
         }
         return null;
@@ -1009,7 +1031,7 @@ export class ExtensionDetailComponent implements OnInit {
           return null;
         }
         if (prevRevision.cardinalityMax === -1) {
-          return {max: 'Cardinality Max can not be changed'};
+          return {max: 'Cardinality Max cannot be changed'};
         }
         if (controlValue < prevRevision.cardinalityMax) {
           return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinalityMax};

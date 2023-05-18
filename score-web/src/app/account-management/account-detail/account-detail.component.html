@@ -77,7 +77,7 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="update()"
-                [disabled]="isDisabled()">
+                [disabled]="updateDisabled">
           Update
         </button>
         <button mat-raised-button color="warn" *ngIf="!!account && account.enabled" (click)="setEnable(false)">

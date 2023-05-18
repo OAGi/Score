@@ -70,7 +70,7 @@
             <div class="col-12 actions-wrap" *ngIf="isWorkingRelease()">
               <button mat-raised-button color="primary" (click)="update()"
                       *ngIf="state === 'WIP' && access === 'CanEdit'"
-                      [disabled]="isUpdating || !isChanged">
+                      [disabled]="updateDisabled">
                 Update
               </button>
               <button mat-raised-button color="accent" (click)="updateState('Draft')"

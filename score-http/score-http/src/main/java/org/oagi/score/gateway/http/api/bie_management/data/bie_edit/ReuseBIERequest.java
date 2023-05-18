@@ -11,4 +11,5 @@ public class ReuseBIERequest {
     private BigInteger asccpManifestId;
     private String asbieHashPath;
     private BigInteger reuseTopLevelAsbiepId;
+
 }

@@ -277,6 +277,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
                 }
+                boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
                 path.put("get", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -304,7 +305,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                         .put("content", ImmutableMap.<String, Object>builder()
                                                 .put("application/json", ImmutableMap.<String, Object>builder()
                                                         .put("schema", ImmutableMap.<String, Object>builder()
-                                                                .put("$ref", "#/components/schemas/" + schemaName)
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
                                                                 .build())
                                                         .build())
                                                 .build())
@@ -319,16 +320,18 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 }
 
                 if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = new LinkedHashMap();
-                    // Issue #1148
-                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
-                    properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
-                    properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
-                    properties.put("required", new ArrayList());
-                    properties.put("additionalProperties", false);
-
+                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                     schemas.put(schemaName, properties);
+                }
+                // Issue #1483
+                if (isArray && !schemas.containsKey(schemaName + "List")) {
+                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                            .put("type", "array")
+                            .put("items", ImmutableMap.<String, Object>builder()
+                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .build())
+                            .build());
                 }
             }
 
@@ -347,6 +350,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
                 }
+                boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
                 path.put("post", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -360,7 +364,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
                                                 .put("schema", ImmutableMap.<String, Object>builder()
-                                                        .put("$ref", "#/components/schemas/" + schemaName)
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
                                                         .build())
                                                 .build())
                                         .build())
@@ -377,21 +381,35 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                         .build());
 
                 if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = new LinkedHashMap();
-                    // Issue #1148
-                    properties.put("x-oagis-bie-guid", typeAbie.getGuid());
-                    properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
-                    properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
-                    properties.put("required", new ArrayList());
-                    properties.put("additionalProperties", false);
-
+                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                     schemas.put(schemaName, properties);
+                }
+                // Issue #1483
+                if (isArray && !schemas.containsKey(schemaName + "List")) {
+                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                            .put("type", "array")
+                            .put("items", ImmutableMap.<String, Object>builder()
+                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .build())
+                            .build());
                 }
             }
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
+    }
+
+    private Map<String, Object> makeProperties(ABIE typeAbie, TopLevelAsbiep topLevelAsbiep) {
+        Map<String, Object> properties = new LinkedHashMap();
+        // Issue #1148
+        properties.put("x-oagis-bie-guid", typeAbie.getGuid());
+        properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
+        properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
+        properties.put("required", new ArrayList());
+        properties.put("additionalProperties", false);
+
+        return properties;
     }
 
     private String getOperationId(String operation, TopLevelAsbiep topLevelAsbiep) {
@@ -418,12 +436,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, paginationResponseTopLevelAsbiep, generationContext);
         }
 
-        fillProperties(parent, schemas, asbiep, abie,
-                option.isArrayForJsonExpressionForOpenAPI30GetTemplate(), generationContext);
+        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
+        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30GetTemplate()) {
-            suppressRootProperty(parent, option.isArrayForJsonExpressionForOpenAPI30GetTemplate());
+            suppressRootProperty(parent, isArray);
         }
     }
 
@@ -440,12 +458,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
 
-        fillProperties(parent, schemas, asbiep, abie,
-                option.isArrayForJsonExpressionForOpenAPI30PostTemplate(), generationContext);
+        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
+        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30PostTemplate()) {
-            suppressRootProperty(parent, option.isArrayForJsonExpressionForOpenAPI30PostTemplate());
+            suppressRootProperty(parent, isArray);
         }
     }
 
@@ -481,10 +499,15 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 Map<String, Object> schemas,
                                 ASBIE asbie,
                                 GenerationContext generationContext) {
-        ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
-        ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        ASCC ascc = generationContext.queryBasedASCC(asbie);
+        Map<String, Object> properties = new LinkedHashMap();
+        if (!parent.containsKey("properties")) {
+            parent.put("properties", new LinkedHashMap<String, Object>());
+        }
+
+        ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
+        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
 
         int minVal = asbie.getCardinalityMin();
         int maxVal = asbie.getCardinalityMax();
@@ -492,40 +515,42 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         boolean isArray = (maxVal < 0 || maxVal > 1);
         boolean isNillable = asbie.isNillable();
 
-        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
-        if (minVal > 0) {
-            List<String> parentRequired = (List<String>) parent.get("required");
-            if (parentRequired == null) {
-                throw new IllegalStateException();
+        boolean reused = !asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId());
+        if (reused) {
+            String ref = getReference(schemas, asbiep, generationContext);
+            properties.put("$ref", ref);
+        } else {
+            ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+            ASCC ascc = generationContext.queryBasedASCC(asbie);
+
+            if (minVal > 0) {
+                List<String> parentRequired = (List<String>) parent.get("required");
+                if (parentRequired == null) {
+                    throw new IllegalStateException();
+                }
+                parentRequired.add(name);
             }
-            parentRequired.add(name);
-        }
 
-        Map<String, Object> properties = new LinkedHashMap();
-        if (!parent.containsKey("properties")) {
-            parent.put("properties", new LinkedHashMap<String, Object>());
-        }
-
-        if (option.isBieDefinition()) {
-            String definition = asbie.getDefinition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
+            if (option.isBieDefinition()) {
+                String definition = asbie.getDefinition();
+                if (StringUtils.hasLength(definition)) {
+                    properties.put("description", definition);
+                }
             }
+
+            properties.put("type", "object");
+            properties.put("required", new ArrayList());
+            properties.put("additionalProperties", false);
+            properties.put("properties", new LinkedHashMap<String, Object>());
+
+            fillProperties(properties, schemas, typeAbie, generationContext);
+
+            if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
+                properties.remove("required");
+            }
+
+            properties = oneOf(allOf(properties), isNillable);
         }
-
-        properties.put("type", "object");
-        properties.put("required", new ArrayList());
-        properties.put("additionalProperties", false);
-        properties.put("properties", new LinkedHashMap<String, Object>());
-
-        fillProperties(properties, schemas, typeAbie, generationContext);
-
-        if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
-            properties.remove("required");
-        }
-
-        properties = oneOf(allOf(properties), isNillable);
 
         if (isArray) {
             Map<String, Object> items = new LinkedHashMap();
@@ -545,9 +570,37 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 properties.put("maxItems", maxVal);
             }
             properties.put("items", items);
+
+            // Issue #1483
+            // make a global property for an array
+            if (reused) {
+                properties = makeGlobalPropertyIfArray(schemas, name, properties);
+            }
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private Map<String, Object> makeGlobalPropertyIfArray(Map<String, Object> schemas, String name,
+                                                          Map<String, Object> properties) {
+        if (properties == null || !"array".equals(properties.get("type"))) {
+            return properties;
+        }
+
+        Set<String> keySet = properties.keySet();
+        boolean customized = keySet.contains("minItems") || keySet.contains("maxItems");
+        if (customized) {
+            return properties;
+        }
+
+        String nameForList = name + "List";
+        if (!schemas.containsKey(nameForList)) {
+            schemas.put(nameForList, properties);
+        }
+
+        Map<String, Object> refProperties = new HashMap<>();
+        refProperties.put("$ref", "#/components/schemas/" + nameForList);
+        return refProperties;
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -624,6 +677,9 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
         if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            // Override 'pattern' and 'format' properties
+            content.remove("pattern");
+            content.remove("format");
             content.put("pattern", facetRestri.getFacetPattern());
         }
 
@@ -966,6 +1022,22 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                     generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
             return Helper.getXbt(generationContext, bdtPriRestri);
         }
+    }
+
+    private String getReference(Map<String, Object> schemas, ASBIEP asbiep,
+                                GenerationContext generationContext) {
+        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
+        if (!schemas.containsKey(name)) {
+            TopLevelAsbiep refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.getOwnerTopLevelAsbiepId());
+            ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+            Map<String, Object> properties = makeProperties(typeAbie, refTopLevelAsbiep);
+            fillProperties(properties, schemas, asbiep, typeAbie, false, generationContext);
+            suppressRootProperty(properties, false);
+            schemas.put(name, properties);
+        }
+
+        return "#/components/schemas/" + name;
     }
 
     private String getReference(Map<String, Object> schemas, BBIE bbie, DT bdt,

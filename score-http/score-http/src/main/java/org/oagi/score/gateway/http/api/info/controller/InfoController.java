@@ -1,9 +1,6 @@
 package org.oagi.score.gateway.http.api.info.controller;
 
-import org.oagi.score.gateway.http.api.info.data.OAuth2AppInfo;
-import org.oagi.score.gateway.http.api.info.data.ProductInfo;
-import org.oagi.score.gateway.http.api.info.data.SummaryBieInfo;
-import org.oagi.score.gateway.http.api.info.data.SummaryCcExtInfo;
+import org.oagi.score.gateway.http.api.info.data.*;
 import org.oagi.score.gateway.http.api.info.service.BieInfoService;
 import org.oagi.score.gateway.http.api.info.service.CcInfoService;
 import org.oagi.score.gateway.http.api.info.service.OAuth2AppInfoService;
@@ -50,11 +47,18 @@ public class InfoController {
         return productInfos;
     }
 
+    @RequestMapping(value = "/info/cc_summary",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public SummaryCcInfo getSummaryCcInfo(@AuthenticationPrincipal AuthenticatedPrincipal user) {
+        return ccInfoService.getSummaryCcInfo(user);
+    }
+
     @RequestMapping(value = "/info/bie_summary",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryBieInfo getSummaryBieInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                            @RequestParam(name="releaseId", required=false, defaultValue="-1") BigInteger releaseId) {
+                                            @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
         return bieInfoService.getSummaryBieInfo(user, releaseId);
     }
 
@@ -62,7 +66,7 @@ public class InfoController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryCcExtInfo getSummaryCcExtInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                @RequestParam(name = "releaseId", required=false, defaultValue="-1") BigInteger releaseId) {
+                                                @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
         return ccInfoService.getSummaryCcExtInfo(user, releaseId);
     }
 

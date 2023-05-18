@@ -89,6 +89,11 @@ export class BieEditService {
     });
   }
 
+  retainReusedBIE(topLevelAsbiepId: number, asbieHashPath: string): Observable<any> {
+    const url = '/api/profile_bie/' + topLevelAsbiepId + '/retain_reuse';
+    return this.http.post<any>(url, {asbieHashPath});
+  }
+
   removeReusedBIE(topLevelAsbiepId: number, asbieHashPath: string): Observable<any> {
     const url = '/api/profile_bie/' + topLevelAsbiepId + '/remove_reuse';
     return this.http.post<any>(url, {asbieHashPath});

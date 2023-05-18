@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -130,10 +130,10 @@ export class CodeListDetailComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = (data: CodeListValue, filter: string) => {
-      return (data.value && data.value.indexOf(filter) > -1)
-        || (data.meaning && data.meaning.indexOf(filter) > -1)
-        || (data.definition && data.definition.indexOf(filter) > -1)
-        || (data.definitionSource && data.definitionSource.indexOf(filter) > -1);
+      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
+        || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1)
+        || (data.definition && data.definition.toLowerCase().indexOf(filter) > -1)
+        || (data.definitionSource && data.definitionSource.toLowerCase().indexOf(filter) > -1);
     };
 
     this.subscribeEvent();
@@ -431,7 +431,29 @@ export class CodeListDetailComponent implements OnInit {
     });
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return (this.state !== 'WIP' || this.access !== 'CanEdit') || this.isUpdating || !this.isChanged;
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     if (!this.codeList.codeListName) {
       this.snackBar.open('Name is required', '', {
         duration: 3000,

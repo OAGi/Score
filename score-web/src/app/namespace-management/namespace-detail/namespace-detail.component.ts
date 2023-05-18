@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -64,7 +64,29 @@ export class NamespaceDetailComponent implements OnInit {
     this.location.back();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return !this.isChanged() || this.isDisabled() || !this.namespace.canEdit;
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     this.namespace.uri = this.uriForm.value;
     this.service.update(this.namespace).subscribe(_ => {
       this.hashCode = hashCode(this.namespace);

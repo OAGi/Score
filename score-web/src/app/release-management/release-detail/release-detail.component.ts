@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
@@ -103,7 +103,29 @@ export class ReleaseDetailComponent implements OnInit {
     return this.$hashCode !== hashCode(this.releaseDetail);
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.update();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return (this.releaseDetail.state !== 'Initialized' && this.releaseDetail.state !== 'Draft') || !this.isChanged || !this.canUpdate();
+  }
+
   update() {
+    if (this.updateDisabled) {
+      return;
+    }
+
     this.isLoading = true;
     this.service.updateRelease(this.releaseDetail)
       .pipe(finalize(() => {
@@ -123,7 +145,7 @@ export class ReleaseDetailComponent implements OnInit {
   }
 
   updateState(state: string) {
-    if (!this.auth.isAdmin()) {
+    if (state === 'Published' && !this.auth.isAdmin()) {
       this.snackBar.open('Only administrators can publish the release.', '', {
         duration: 3000,
       });

@@ -123,7 +123,7 @@
                       </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP' && access === 'CanEdit'"
-                              [disabled]="!isChanged">
+                              [disabled]="updateDisabled">
                         Update
                       </button>
                       <button mat-raised-button color="accent" (click)="updateState('QA')"
