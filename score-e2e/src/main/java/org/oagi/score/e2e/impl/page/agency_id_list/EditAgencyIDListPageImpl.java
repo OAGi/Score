@@ -47,6 +47,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By REVISE_BUTTON_LOCATOR =
@@ -207,12 +209,30 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
     public void hitUpdateButton() {
         retry(() -> {
-            click(getUpdateButton());
+            click(getUpdateButton(true));
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getDeleteButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), DELETE_BUTTON_LOCATOR);
+        }
     }
 
     @Override
@@ -252,11 +272,6 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
         click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
-    }
-
-    @Override
-    public WebElement getUpdateButton() {
-        return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
     }
 
     @Override

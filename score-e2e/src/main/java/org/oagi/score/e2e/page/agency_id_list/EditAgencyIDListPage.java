@@ -110,9 +110,23 @@ public interface EditAgencyIDListPage extends Page {
 
     void setDefinitionSource(String definitionSource);
 
-    WebElement getUpdateButton();
+    /**
+     * Return the UI element of the 'Update' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Update' button
+     */
+    WebElement getUpdateButton(boolean enabled);
 
     void hitUpdateButton();
+
+    /**
+     * Return the UI element of the 'Delete' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton(boolean enabled);
 
     /**
      * Return the UI element of the 'Comment' button.
