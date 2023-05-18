@@ -620,6 +620,7 @@ export class BieUpliftComponent implements OnInit {
     if (node.source && node.source.derived) {
       const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
         data: {
+          action: 'Reuse',
           asccpManifestId: (node._node as unknown as AsbiepFlatNode).asccpNode.manifestId,
           releaseId: this.targetReleaseId,
           topLevelAsbiepId: this.topLevelAsbiepId
