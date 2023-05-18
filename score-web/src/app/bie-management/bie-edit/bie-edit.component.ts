@@ -763,31 +763,18 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         } else {
           const asbiepNode = node as AsbiepFlatNode;
-          if (!this.updateDisabled) {
-            this.updateDetails(node.parents, () => {
-              this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
-                .pipe(finalize(() => {
-                  this.isUpdating = false;
-                })).subscribe(_ => {
-                  this.snackBar.open('Making BIE reusable request queued', '', {
-                    duration: 3000,
-                  });
-                  this.router.navigateByUrl('/profile_bie');
-                });
-            });
-          } else {
+          this.isUpdating = true;
+          this.updateDetails(node.parents, () => {
             this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
               .pipe(finalize(() => {
                 this.isUpdating = false;
               })).subscribe(_ => {
-                this.snackBar.open('Making BIE reusable request queued', '', {
-                  duration: 3000,
-                });
-                this.router.navigateByUrl('/profile_bie');
+              this.snackBar.open('Making BIE reusable request queued', '', {
+                duration: 3000,
               });
-          }
-
-          this.isUpdating = true;
+              this.router.navigateByUrl('/profile_bie');
+            });
+          });
         }
       });
   }
@@ -1674,7 +1661,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   updateDetails(include?: BieFlatNode[], callbackFn?) {
     if (this.updateDisabled) {
-      return;
+      if (callbackFn === undefined) {
+        return;
+      } else {
+        return callbackFn && callbackFn();
+      }
     }
 
     const request = new BieDetailUpdateRequest();
