@@ -239,6 +239,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        assertFalse(endUser.isDeveloper());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateDTButton());
@@ -368,6 +369,38 @@ public class TC_38_1_DTAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("Deleted"));
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            assertDoesNotThrow(() -> dtViewEditPage.hitRestoreButton());
+        }
+
+    }
+    @Test
+    @DisplayName("TC_38_1_TA_11")
+    public void test_TA_11() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Deleted");
+            dtForTesting.add(randomBDTDeleted);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        for (DTObject dt : dtForTesting) {
+            assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
