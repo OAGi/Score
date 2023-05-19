@@ -71,13 +71,13 @@ The end user can see the details of a reused BIE node that he does not own, and 
 The end user can express a reusing BIE that reuses a BIE in WIP state and owned by a different user.
 
 #### Test Assertion #24.1.14
-The end user won't remove a higher level reference to a reused BIE when removing a different reused BIE at lower level. 
+The end user can remove reused BIE references at any level even if there's another same reused BIE at a different level.
 
 #### Test Assertion #24.1.15
-Enable reusable global schema when a BIE references a reusable BIE within a nested reused BIE. The reused BIE can be expressed as its own global property and referenced within the nested BIE.
+Enable the global schema for reused BIE references no matter it has nested reused BIE or not.
 
 #### Test Assertion #24.1.16
-Retain enabled properties, including their primitives, cardinality, and context defintions of a reused BIE when user disables its reuse. 
+Retain all enabled properties under the reused BIE hierarchy when the user clicks the 'Retain Reused BIE' context menu.
 
 ### Test Step Pre-condition:
 
