@@ -2,17 +2,42 @@ import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Acc, Ascc, Asccp, Bcc, Bccp, CcChangeResponse, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
+import {
+  Acc,
+  Ascc,
+  Asccp,
+  Bcc,
+  Bccp,
+  CcChangeResponse,
+  CcList,
+  CcListRequest,
+  SummaryCcExtInfo,
+  SummaryCcInfo
+} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
 import {CcDtNodeDetail, OagisComponentType, XbtForList} from '../../domain/core-component-node';
 import {base64Encode} from '../../../common/utility';
 import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
+import {SummaryBieInfo} from "../../../bie-management/bie-list/domain/bie-list";
 
 @Injectable()
 export class CcListService {
 
   constructor(private http: HttpClient) {
+  }
+
+  getSummaryCcList(): Observable<SummaryCcInfo> {
+    return this.http.get<SummaryCcInfo>('/api/info/cc_summary').pipe(map(
+      e => {
+        if (e.myRecentCCs) {
+          e.myRecentCCs = e.myRecentCCs.map(elm => {
+            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+            return elm;
+          });
+        }
+        return e;
+      }));
   }
 
   getSummaryCcExtList(releaseId: number): Observable<SummaryCcExtInfo> {

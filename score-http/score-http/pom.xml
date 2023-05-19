@@ -26,16 +26,16 @@
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.8</aspectj.version>
         <lettuce.version>6.2.4.RELEASE</lettuce.version>
-        <redisson.version>3.20.1</redisson.version>
-        <netty.version>4.1.91.Final</netty.version>
+        <redisson.version>3.21.1</redisson.version>
+        <netty.version>4.1.92.Final</netty.version>
         <lombok.version>1.18.26</lombok.version>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
         <log4j.version>2.20.0</log4j.version>
-        <jOOQ.version>3.18.3</jOOQ.version>
+        <jOOQ.version>3.18.4</jOOQ.version>
         <guava.version>31.1-jre</guava.version>
         <gson.version>2.10.1</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.12.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.2.3</poi.version>

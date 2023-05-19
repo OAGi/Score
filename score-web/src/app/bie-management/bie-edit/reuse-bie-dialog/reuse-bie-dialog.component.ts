@@ -24,7 +24,6 @@ import {finalize} from 'rxjs/operators';
 })
 export class ReuseBieDialogComponent implements OnInit {
 
-  action: string;
   displayedColumns: string[] = [
     'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
@@ -55,7 +54,6 @@ export class ReuseBieDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.action = this.data.action;
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.asccpManifestId = this.data.asccpManifestId;

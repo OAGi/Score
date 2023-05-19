@@ -4,7 +4,8 @@
       <div class="state-progress-bar">
         <div class="state-progress ellipsis {{ item.name }}" *ngFor="let item of data"
              [style.width.%]="getWidth(item)"
-             [style.background-color]="item.style.bg_color">
+             [style.background-color]="item.style.bg_color"
+             [matTooltip]="item.name + ' (' + item.value + ')'">
           <a [routerLink]="item.href[0]"
              [class.disabled]="item.disabled" [queryParams]="{ q: getParams(item) }">
             <div class="state-progress-text"

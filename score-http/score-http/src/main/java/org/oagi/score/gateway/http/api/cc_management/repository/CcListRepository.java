@@ -224,7 +224,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull() : ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ACC.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }
@@ -387,7 +387,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull() : ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ASCC.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }
@@ -489,7 +489,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull() : BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(BCC.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }
@@ -591,7 +591,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull() : ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ASCCP.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }
@@ -706,7 +706,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull() : BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(BCCP.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }
@@ -827,7 +827,7 @@ public class CcListRepository {
         if (request.getNewComponent() != null) {
             conditions.add(request.getNewComponent() ? DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull() : DT_MANIFEST.PREV_DT_MANIFEST_ID.isNotNull());
         }
-        if (request.getStates() != null) {
+        if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(DT.STATE.in(
                     request.getStates().stream().map(CcState::name).collect(Collectors.toList())));
         }

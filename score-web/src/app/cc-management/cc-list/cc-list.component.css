@@ -68,15 +68,11 @@ mat-toolbar > .mat-icon-button {
   outline: none;
 }
 
-.mat-column-type {
-  width: 110px;
-}
-
 .mat-column-revision {
   width: 70px;
 }
 
-.mat-column-state {
+.mat-column-type, .mat-column-state {
   width: 100px;
 }
 

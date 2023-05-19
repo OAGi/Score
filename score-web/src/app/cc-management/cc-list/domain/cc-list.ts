@@ -5,6 +5,7 @@ import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ShortTag} from '../../../tag-management/domain/tag';
+import {BieList} from "../../../bie-management/bie-list/domain/bie-list";
 
 export class CcListRequest {
   release: SimpleRelease;
@@ -325,6 +326,13 @@ export class Ascc {
   revisionTrackingNum: string;
   revisionAction: string;
   releaseId: number;
+}
+
+export class SummaryCcInfo {
+  numberOfTotalCcByStates: Map<string, number>;
+  numberOfMyCcByStates: Map<string, number>;
+  ccByUsersAndStates: Map<string, Map<string, number>>;
+  myRecentCCs: CcList[] = [];
 }
 
 export class SummaryCcExt {

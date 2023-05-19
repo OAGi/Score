@@ -277,6 +277,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
                 }
+                boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
                 path.put("get", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -304,7 +305,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                         .put("content", ImmutableMap.<String, Object>builder()
                                                 .put("application/json", ImmutableMap.<String, Object>builder()
                                                         .put("schema", ImmutableMap.<String, Object>builder()
-                                                                .put("$ref", "#/components/schemas/" + schemaName)
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
                                                                 .build())
                                                         .build())
                                                 .build())
@@ -323,6 +324,15 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                     fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                     schemas.put(schemaName, properties);
                 }
+                // Issue #1483
+                if (isArray && !schemas.containsKey(schemaName + "List")) {
+                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                            .put("type", "array")
+                            .put("items", ImmutableMap.<String, Object>builder()
+                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .build())
+                            .build());
+                }
             }
 
             if (option.isOpenAPI30PostTemplate()) {
@@ -340,6 +350,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
                 }
+                boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
                 path.put("post", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -353,7 +364,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
                                                 .put("schema", ImmutableMap.<String, Object>builder()
-                                                        .put("$ref", "#/components/schemas/" + schemaName)
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
                                                         .build())
                                                 .build())
                                         .build())
@@ -373,6 +384,15 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                     Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                     schemas.put(schemaName, properties);
+                }
+                // Issue #1483
+                if (isArray && !schemas.containsKey(schemaName + "List")) {
+                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                            .put("type", "array")
+                            .put("items", ImmutableMap.<String, Object>builder()
+                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .build())
+                            .build());
                 }
             }
         } finally {
@@ -416,12 +436,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, paginationResponseTopLevelAsbiep, generationContext);
         }
 
-        fillProperties(parent, schemas, asbiep, abie,
-                option.isArrayForJsonExpressionForOpenAPI30GetTemplate(), generationContext);
+        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
+        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30GetTemplate()) {
-            suppressRootProperty(parent, option.isArrayForJsonExpressionForOpenAPI30GetTemplate());
+            suppressRootProperty(parent, isArray);
         }
     }
 
@@ -438,12 +458,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
 
-        fillProperties(parent, schemas, asbiep, abie,
-                option.isArrayForJsonExpressionForOpenAPI30PostTemplate(), generationContext);
+        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
+        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30PostTemplate()) {
-            suppressRootProperty(parent, option.isArrayForJsonExpressionForOpenAPI30PostTemplate());
+            suppressRootProperty(parent, isArray);
         }
     }
 
@@ -550,9 +570,37 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 properties.put("maxItems", maxVal);
             }
             properties.put("items", items);
+
+            // Issue #1483
+            // make a global property for an array
+            if (reused) {
+                properties = makeGlobalPropertyIfArray(schemas, name, properties);
+            }
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private Map<String, Object> makeGlobalPropertyIfArray(Map<String, Object> schemas, String name,
+                                                          Map<String, Object> properties) {
+        if (properties == null || !"array".equals(properties.get("type"))) {
+            return properties;
+        }
+
+        Set<String> keySet = properties.keySet();
+        boolean customized = keySet.contains("minItems") || keySet.contains("maxItems");
+        if (customized) {
+            return properties;
+        }
+
+        String nameForList = name + "List";
+        if (!schemas.containsKey(nameForList)) {
+            schemas.put(nameForList, properties);
+        }
+
+        Map<String, Object> refProperties = new HashMap<>();
+        refProperties.put("$ref", "#/components/schemas/" + nameForList);
+        return refProperties;
     }
 
     private void fillProperties(Map<String, Object> parent,
