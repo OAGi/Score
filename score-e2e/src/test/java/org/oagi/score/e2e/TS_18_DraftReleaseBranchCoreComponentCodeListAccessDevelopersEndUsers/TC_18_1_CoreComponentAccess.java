@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,16 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_18_1_CoreComponentAccess extends BaseTest {
@@ -122,22 +128,16 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn("oagis", "oagis");
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        EditReleasePage editReleasePage = viewEditReleasePage.createRelease();
+        editReleasePage.setReleaseNum(newReleaseNum);
+        editReleasePage.setReleaseNamespace(namespace);
+        editReleasePage.hitUpdateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage =  viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        editReleasePage.hitCreateDraftButton();
+        waitFor(Duration.ofMillis(6000L));
 
     }
 

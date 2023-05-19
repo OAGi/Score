@@ -254,7 +254,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         assert editReleasePage.isOpened();
         return editReleasePage;
     }
-
     @Override
     public WebElement getNewReleaseButton() {
         return elementToBeClickable(getDriver(), NEW_RELEASE_BUTTON_LOCATOR);
