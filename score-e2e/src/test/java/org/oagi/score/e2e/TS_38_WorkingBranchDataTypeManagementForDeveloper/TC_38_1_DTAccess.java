@@ -20,8 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_38_1_DTAccess extends BaseTest {
@@ -408,6 +407,185 @@ public class TC_38_1_DTAccess extends BaseTest {
         }
 
     }
+
+    @Test
+    @DisplayName("TC_38_1_TA_12_a")
+    public void test_TA_12_a() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPOne);
+
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPTwo);
+
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("WIP"));
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        viewEditCoreComponentPage.hitMoveToDraftButton();
+
+    }
+    @Test
+    @DisplayName("TC_38_1_TA_12_b")
+    public void test_TA_12_b() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftOne);
+
+            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftTwo);
+
+            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("Draft"));
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        viewEditCoreComponentPage.hitBackToWIPButton();
+
+    }
+    @Test
+    @DisplayName("TC_38_1_TA_12_c")
+    public void test_TA_12_c() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftOne);
+
+            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftTwo);
+
+            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            dtForTesting.add(randomBDTDraftThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("Draft"));
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        viewEditCoreComponentPage.hitMoveToCandidateButton();
+
+    }
+    @Test
+    @DisplayName("TC_38_1_TA_12_d")
+    public void test_TA_12_d() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPOne);
+
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPTwo);
+
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        viewEditCoreComponentPage.hitTransferOwnershipButton();
+    }
+
+    @Test
+    @DisplayName("TC_38_1_TA_12_e")
+    public void test_TA_12_e() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPOne);
+
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPTwo);
+
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        viewEditCoreComponentPage.hitDeleteButton();
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
