@@ -177,15 +177,7 @@ public interface ViewEditReleasePage extends Page {
      *
      * @return the Release page object
      */
-    ViewEditReleasePage createRelease();
-
-    /**
-     * Return the UI element of the table record at the given index, which starts from 1.
-     *
-     * @param idx The index of the table record.
-     * @return the UI element of the table record at the given index
-     */
-    WebElement getTableRecordAtIndex(int idx);
+    EditReleasePage createRelease();
 
     /**
      * Return the UI element of the table record containing the given value.

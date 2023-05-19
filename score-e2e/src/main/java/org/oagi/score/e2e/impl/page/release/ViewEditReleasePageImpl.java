@@ -47,6 +47,9 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
+    private static final By NEW_RELEASE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"New Release\")]//ancestor::button[1]");
+
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);
     }
@@ -254,26 +257,31 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getNewReleaseButton() {
-        return null;
+        return elementToBeClickable(getDriver(), NEW_RELEASE_BUTTON_LOCATOR);
     }
 
     @Override
-    public ViewEditReleasePage createRelease() {
-        return null;
-    }
+    public EditReleasePage createRelease() {
+        click(getNewReleaseButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
 
-    @Override
-    public WebElement getTableRecordAtIndex(int idx) {
-        return null;
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger releaseId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ReleaseObject releaseObject = getAPIFactory().getReleaseAPI().getReleaseById(releaseId);
+        EditReleasePage editReleasePage = new EditReleasePageImpl(this, releaseObject);
+        assert editReleasePage.isOpened();
+        return editReleasePage;
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return null;
+        defaultWait(getDriver());
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
-        return null;
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
     }
 }
