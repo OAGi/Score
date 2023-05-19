@@ -346,6 +346,35 @@ public class TC_38_1_DTAccess extends BaseTest {
         }
 
     }
+    @Test
+    @DisplayName("TC_38_1_TA_10")
+    public void test_TA_10() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Deleted");
+            dtForTesting.add(randomBDTDeleted);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        for (DTObject dt : dtForTesting) {
+            assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("Deleted"));
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            assertDoesNotThrow(() -> dtViewEditPage.hitRestoreButton());
+        }
+
+    }
     @AfterEach
     public void tearDown() {
         super.tearDown();
