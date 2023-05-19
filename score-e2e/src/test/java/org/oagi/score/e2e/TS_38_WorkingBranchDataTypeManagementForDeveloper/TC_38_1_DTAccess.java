@@ -586,6 +586,45 @@ public class TC_38_1_DTAccess extends BaseTest {
         viewEditCoreComponentPage.hitDeleteButton();
     }
 
+    @Test
+    @DisplayName("TC_38_1_TA_13")
+    public void test_TA_13() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPOne);
+
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPTwo);
+
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "WIP");
+            dtForTesting.add(randomBDTWIPThree);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        for (DTObject dt : dtForTesting) {
+            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTransferOwnershipButton());
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getDeleteButton());
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getMoveToDraftButton());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
