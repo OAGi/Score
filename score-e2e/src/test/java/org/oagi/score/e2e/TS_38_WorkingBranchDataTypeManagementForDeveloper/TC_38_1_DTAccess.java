@@ -222,7 +222,28 @@ public class TC_38_1_DTAccess extends BaseTest {
         }
 
     }
+    @Test
+    @DisplayName("TC_38_1_TA_6")
+    public void test_TA_6() {
+        AppUserObject developerA;
+        AppUserObject endUser;
+        ReleaseObject branch;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
 
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateDTButton());
+    }
+    
     @AfterEach
     public void tearDown() {
         super.tearDown();
