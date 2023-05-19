@@ -1496,6 +1496,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dt.setLastUpdatedBy(record.get(DT.LAST_UPDATED_BY).toBigInteger());
         dt.setCreationTimestamp(record.get(DT.CREATION_TIMESTAMP));
         dt.setLastUpdateTimestamp(record.get(DT.LAST_UPDATE_TIMESTAMP));
+        dt.setContentComponentDefinition(record.get(DT.CONTENT_COMPONENT_DEFINITION));
         return dt;
     }
 

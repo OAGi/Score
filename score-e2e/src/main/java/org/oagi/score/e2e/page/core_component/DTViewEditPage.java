@@ -239,4 +239,22 @@ public interface DTViewEditPage extends Page {
     void hitRestoreButton();
 
     WebElement getRestoreButton();
+
+    String getBasedDataTypeFieldValue();
+
+    WebElement getBasedDataTypeField();
+
+    String getQualifierFieldValue();
+
+    WebElement getSixHexadecimalIdentifierField();
+
+    String getContentComponentDefinitionFieldValue();
+
+    WebElement getContentComponentDefinitionField();
+
+    void setDefinition(String definition);
+
+    void setDefinitionSource(String definitionSource);
+
+    void setContentComponentDefinition(String contentComponentDefinition);
 }

@@ -76,6 +76,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Comments\")]");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-form-field//input");
+    private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
+    private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -437,5 +443,50 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public String getBasedDataTypeFieldValue() {
+        return getText(getBasedDataTypeField());
+    }
+
+    @Override
+    public WebElement getBasedDataTypeField() {
+        return visibilityOfElementLocated(getDriver(), BASED_DATA_TYPE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public String getQualifierFieldValue() {
+        return getText(getQualifierField());
+    }
+
+    @Override
+    public WebElement getSixHexadecimalIdentifierField() {
+        return visibilityOfElementLocated(getDriver(), SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR);
+    }
+
+    @Override
+    public String getContentComponentDefinitionFieldValue() {
+        return getText(getContentComponentDefinitionField());
+    }
+
+    @Override
+    public WebElement getContentComponentDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setDefinition(String definition) {
+        sendKeys(getDefinitionField(), definition);
+    }
+
+    @Override
+    public void setDefinitionSource(String definitionSource) {
+        sendKeys(getDefinitionSourceField(), definitionSource);
+    }
+
+    @Override
+    public void setContentComponentDefinition(String contentComponentDefinition) {
+        sendKeys(getContentComponentDefinitionField(), contentComponentDefinition);
     }
 }
