@@ -37,6 +37,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @Test
     public void test_TA_18_1_1() {
 
+
+
     }
 
     @Test
