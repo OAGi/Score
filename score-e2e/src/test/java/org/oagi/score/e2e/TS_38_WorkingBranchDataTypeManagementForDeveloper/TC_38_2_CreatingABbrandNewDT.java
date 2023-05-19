@@ -102,7 +102,7 @@ public class TC_38_2_CreatingABbrandNewDT extends BaseTest {
         viewEditCoreComponentPage.setBranch(publishedRelease.getReleaseNumber());
         viewEditCoreComponentPage.setDEN(newQualifier + "_" + baseDT.getDen());
         viewEditCoreComponentPage.hitSearchButton();
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTableRecordByValue(newQualifier + "_" + baseDT.getDen()));
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTableRecordByValue(newQualifier + "_ " + baseDT.getDen()));
     }
 
     @AfterEach
