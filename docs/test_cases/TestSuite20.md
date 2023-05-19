@@ -19,7 +19,7 @@ The developer can create a new namespace. He becomes the owner of the namespace.
 ##### Test Assertion #20.1.1.a
 URI is required and unique. The system should not validate the URI syntax to be a valid URI, i.e., this is actually a text field.
 ##### Test Assertion #20.1.1.b
-Prefix is optional.
+Prefix is required and unique.
 ##### Test Assertion #20.1.1.c
 Description is optional.
 ##### Test Assertion #20.1.1.d
