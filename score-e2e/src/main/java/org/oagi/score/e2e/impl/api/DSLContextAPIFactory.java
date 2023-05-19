@@ -82,12 +82,12 @@ public class DSLContextAPIFactory implements APIFactory {
 
     @Override
     public AgencyIDListAPI getAgencyIDListAPI() {
-        return new DSLContextAgencyIDListAPIImpl(dslContext);
+        return new DSLContextAgencyIDListAPIImpl(dslContext, this);
     }
 
     @Override
     public AgencyIDListValueAPI getAgencyIDListValueAPI() {
-        return new DSLContextAgencyIDListValueAPIImpl(dslContext);
+        return new DSLContextAgencyIDListValueAPIImpl(dslContext, this);
     }
 
     @Override

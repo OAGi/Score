@@ -77,6 +77,9 @@ It should be transferred to the target BBIE or BBIE_SC node in case of manual ma
 #### Test Assertion #29.1.12
 Paths of unmapped source nodes including the code list and agency ID list nodes shall be expressed in an uplift output/log file. If the unmapped node is a reused node, the path shall be indicated as Reused. There is no need to include paths of the descendant nodes of the reused BIE node.
 
+#### Test Assertion #29.1.13
+Tree expansion should reflect the nested reused BIE path in BIE uplift page if the source BIE has the nested reuse BIE. 
+
 ### Test Step Pre-condition:
 
 

@@ -8,6 +8,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.RELEASE;
 
@@ -33,6 +34,12 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
                 .where(RELEASE.RELEASE_NUM.eq(releaseNumber))
                 .fetchOptional().orElse(null);
         return mapper(release);
+    }
+
+    @Override
+    public List<ReleaseObject> getReleases() {
+        return dslContext.selectFrom(RELEASE)
+                .fetch(record -> mapper(record));
     }
 
     @Override

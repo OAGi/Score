@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.RandomStringUtils.*;
 
 @Data
 public class AgencyIDListObject {
@@ -47,5 +50,26 @@ public class AgencyIDListObject {
     private LocalDateTime creationTimestamp;
 
     private LocalDateTime lastUpdateTimestamp;
+
+    public static AgencyIDListObject createRandomAgencyIDList(AppUserObject creator, NamespaceObject namespace, String state) {
+        AgencyIDListObject agencyIDList = new AgencyIDListObject();
+        agencyIDList.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
+        agencyIDList.setEnumTypeGuid("oagis-id-" + UUID.randomUUID().toString().replaceAll("-", ""));
+        agencyIDList.setListId(randomNumeric(5, 10));
+        agencyIDList.setVersionId(randomAlphanumeric(5, 10));
+        agencyIDList.setName("clm" + agencyIDList.getListId() + agencyIDList.getVersionId() + "_AgencyIdentification");
+        agencyIDList.setDefinition(randomPrint(50, 100).trim());
+        agencyIDList.setDefinitionSource(randomAlphanumeric(5, 10));
+        agencyIDList.setRemark(randomPrint(50, 100).trim());
+        agencyIDList.setNamespaceId(namespace.getNamespaceId());
+        agencyIDList.setDeprecated(false);
+        agencyIDList.setState(state);
+        agencyIDList.setOwnerUserId(creator.getAppUserId());
+        agencyIDList.setCreatedBy(creator.getAppUserId());
+        agencyIDList.setLastUpdatedBy(creator.getAppUserId());
+        agencyIDList.setCreationTimestamp(LocalDateTime.now());
+        agencyIDList.setLastUpdateTimestamp(LocalDateTime.now());
+        return agencyIDList;
+    }
 
 }
