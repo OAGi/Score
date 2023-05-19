@@ -168,7 +168,20 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_2() {
+        HomePage homePage = loginPage().signIn("oagis", "oagis");
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("QA");
+        ccStates.add("Production");
+        ccStates.add("Deleted");
+        viewEditCoreComponentPage.setBranch(newReleaseNum);
 
+        for (String state : ccStates){
+            viewEditCoreComponentPage.setState(state);
+            viewEditCoreComponentPage.hitSearchButton();
+            assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
+        }
     }
 
     @Test
