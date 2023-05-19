@@ -104,6 +104,22 @@ public class TC_38_2_CreatingABbrandNewDT extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTableRecordByValue(newQualifier + "_ " + baseDT.getDen()));
     }
+    @Test
+    @DisplayName("TC_38_2_TA_2")
+    public void test_TA_2() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateDTButton());
+    }
 
     @AfterEach
     public void tearDown() {
