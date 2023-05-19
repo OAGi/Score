@@ -18,7 +18,7 @@
 
         <lombok.version>1.18.26</lombok.version>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
-        <jOOQ.version>3.18.3</jOOQ.version>
+        <jOOQ.version>3.18.4</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <junit.version>4.13.2</junit.version>

@@ -244,9 +244,37 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 properties.put("maxItems", maxVal);
             }
             properties.put("items", items);
+
+            // Issue #1483
+            // make a global property for an array
+            if (reused) {
+                properties = makeGlobalPropertyIfArray(definitions, name, properties);
+            }
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private Map<String, Object> makeGlobalPropertyIfArray(Map<String, Object> definitions, String name,
+                                                          Map<String, Object> properties) {
+        if (properties == null || !"array".equals(properties.get("type"))) {
+            return properties;
+        }
+
+        Set<String> keySet = properties.keySet();
+        boolean customized = keySet.contains("minItems") || keySet.contains("maxItems");
+        if (customized) {
+            return properties;
+        }
+
+        String nameForList = name + "List";
+        if (!definitions.containsKey(nameForList)) {
+            definitions.put(nameForList, properties);
+        }
+
+        Map<String, Object> refProperties = new HashMap<>();
+        refProperties.put("$ref", "#/definitions/" + nameForList);
+        return refProperties;
     }
 
     private void fillProperties(Map<String, Object> parent,
