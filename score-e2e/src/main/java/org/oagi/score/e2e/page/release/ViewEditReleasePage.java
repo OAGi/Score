@@ -1,9 +1,6 @@
 package org.oagi.score.e2e.page.release;
 
 import org.oagi.score.e2e.page.Page;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -23,7 +20,7 @@ public interface ViewEditReleasePage extends Page {
     /**
      * Set the 'Creator' select field.
      *
-     * @param creator  userId
+     * @param creator userId
      */
     void setCreator(String creator);
 
@@ -56,6 +53,20 @@ public interface ViewEditReleasePage extends Page {
     void setCreatedEndDate(LocalDateTime createdEndDate);
 
     /**
+     * Return the UI element of the 'Updater' select field.
+     *
+     * @return the UI element of the 'Updater' select field
+     */
+    WebElement getUpdaterSelectField();
+
+    /**
+     * Set the 'Updater' select field.
+     *
+     * @param updater userId
+     */
+    void setUpdater(String updater);
+
+    /**
      * Return the UI element of the 'Updated Start Date' field.
      *
      * @return the UI element of the 'Updated Start Date' field
@@ -84,6 +95,20 @@ public interface ViewEditReleasePage extends Page {
     void setUpdatedEndDate(LocalDateTime updatedEndDate);
 
     /**
+     * Return the UI element of the 'Namespace' select field.
+     *
+     * @return the UI element of the 'Namespace' select field
+     */
+    WebElement getNamespaceSelectField();
+
+    /**
+     * Set the 'Namespace' select field.
+     *
+     * @param namespace Namespace
+     */
+    void setNamespace(String namespace);
+
+    /**
      * Return the UI element of the 'State' select field.
      *
      * @return the UI element of the 'State' select field
@@ -92,74 +117,24 @@ public interface ViewEditReleasePage extends Page {
 
     /**
      * Set the UI element of the 'State' select field with the given type.
+     *
      * @param state
      */
     void setState(String state);
 
-
+    /**
+     * Return the UI element of the 'Release Num' field.
+     *
+     * @return the UI element of the 'Release Num' field
+     */
+    WebElement getReleaseNumField();
 
     /**
-     * Return the UI element of the 'DEN' field.
+     * Set the 'Release Num' field with given text.
      *
-     * @return the UI element of the 'DEN' field
+     * @param releaseNum release num text
      */
-    WebElement getDENField();
-
-    /**
-     * Return the 'DEN' field label text.
-     *
-     * @return the 'DEN' field label text
-     */
-    String getDENFieldLabel();
-
-    /**
-     * Set the 'DEN' field with given text.
-     *
-     * @param den DEN text
-     */
-    void setDEN(String den);
-
-    /**
-     * Return the UI element of the 'Definition' field.
-     *
-     * @return the UI element of the 'Definition' field
-     */
-    WebElement getDefinitionField();
-
-    /**
-     * Set the 'Definition' field with given text.
-     *
-     * @param definition Definition text
-     */
-    void setDefinition(String definition);
-
-    /**
-     * Return the UI element of the 'Module' field.
-     *
-     * @return the UI element of the 'Module' field
-     */
-    WebElement getModuleField();
-
-    /**
-     * Return the 'Module' field label text.
-     *
-     * @return the 'Module' field label text
-     */
-    String getModuleFieldLabel();
-
-    /**
-     * Set the 'Module' field with given text.
-     *
-     * @param module Module text
-     */
-    void setModule(String module);
-
-    /**
-     * Return the UI element of the 'Component Type' select field.
-     *
-     * @return the UI element of the 'Component Type' select field
-     */
-    WebElement getComponentTypeSelectField();
+    void setReleaseNum(String releaseNum);
 
     /**
      * Return the UI element of the 'Search' button.
@@ -174,45 +149,58 @@ public interface ViewEditReleasePage extends Page {
     void hitSearchButton();
 
     /**
-     * Open the page of the ACC filtered by `den` and `branch`.
+     * Open the page of the Release filtered by `Release Num` and `state`.
      *
-     * @param den DEN text
-     * @param branch Branch text
-     * @return the ACC page object
+     * @param releaseNum Release Num text
+     * @param State      "Initialized", "Draft" and "Published"
+     * @return the Release page object
      */
-    ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch);
+    EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State);
 
     /**
-     * Open the page of the ACC by its manifest ID.
+     * Open the page of the Release by its ID.
      *
-     * @param accManifestID manifest ID
-     * @return the ACC page object
+     * @param releaseId release ID
+     * @return the Release page object
      */
-    ACCViewEditPage openACCViewEditPageByManifestID(BigInteger accManifestID);
+    EditReleasePage openReleaseViewEditPageByID(BigInteger releaseId);
 
     /**
-     * Open the page of the ASCCP filtered by `den` and `branch`.
+     * Return the UI element of the 'New Release' button.
      *
-     * @param den DEN text
-     * @param branch Branch text
-     * @return the ASCCP page object
+     * @return the UI element of the 'New Release' button
      */
-    ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch);
+    WebElement getNewReleaseButton();
 
     /**
-     * Open the page of the ASCCP by its manifest ID.
+     * Create a new Release.
      *
-     * @param asccpManifestID manifest ID
-     * @return the ASCCP page object
+     * @return the Release page object
      */
-    ASCCPViewEditPage openASCCPViewEditPageByManifestID(BigInteger asccpManifestID);
+    ViewEditReleasePage createRelease();
 
     /**
-     * Open the page of the BCCP filtered by `den` and `branch`.
+     * Return the UI element of the table record at the given index, which starts from 1.
      *
-     * @param den DEN text
-     * @param branch Branch text
-     * @return the BCCP page object
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
      */
-    BCCPViewEditPage openBCCPViewEditPageByDenAndBranch(String den, String branch);
+    WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Return the UI element of the table record containing the given value.
+     *
+     * @param value value
+     * @return the UI element of the table record
+     */
+    WebElement getTableRecordByValue(String value);
+
+    /**
+     * Return the UI element of the column of the given table record with the column name.
+     *
+     * @param tableRecord the table record
+     * @param columnName  the column name
+     * @return the UI element of the column
+     */
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
 }
