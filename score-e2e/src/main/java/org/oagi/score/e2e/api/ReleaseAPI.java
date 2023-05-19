@@ -3,6 +3,7 @@ package org.oagi.score.e2e.api;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * APIs for the release management.
@@ -24,6 +25,13 @@ public interface ReleaseAPI {
      * @return release object
      */
     ReleaseObject getReleaseByReleaseNumber(String releaseNumber);
+
+    /**
+     * Return the releases.
+     *
+     * @return release objects.
+     */
+    List<ReleaseObject> getReleases();
 
     ReleaseObject getTheLatestRelease();
 

@@ -353,7 +353,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         editAgencyIDListPage.moveToProduction();
 
         AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().getNewlyCreatedAgencyIDList(endUser, branch.getReleaseNumber());
-        ArrayList<AgencyIDListValueObject> agencyIDListValues = getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDList);
+        List<AgencyIDListValueObject> agencyIDListValues = getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDList);
         AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(agencyIDList.getOwnerUserId());
         assertTrue(agencyIDList.getState().equals("Production"));
         assertFalse(owner.isDeveloper());

@@ -7,6 +7,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +20,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class Configuration {
+
+    private static final Logger logger = Logger.getLogger(Configuration.class.getName());
 
     private static final String SCORE_E2E_PROPERTY_FILENAME = "score-e2e.properties";
 
@@ -71,6 +76,8 @@ public class Configuration {
                 return new ChromeDriver((ChromeOptions) newCapabilities());
             case "edge":
                 return new EdgeDriver((EdgeOptions) newCapabilities());
+            case "safari":
+                return new SafariDriver((SafariOptions) newCapabilities());
         }
         throw new IllegalArgumentException("Unsupported browser: " + browser);
     }
@@ -82,12 +89,26 @@ public class Configuration {
                 return newChromeCapabilities();
             case "edge":
                 return newEdgeCapabilities();
+            case "safari":
+                return newSafariCapabilities();
         }
         throw new IllegalArgumentException("Unsupported browser: " + browser);
     }
 
     private Capabilities newChromeCapabilities() {
+        String driverPath = getProperty("org.oagi.score.e2e.chrome.driver");
+        if (driverPath != null) {
+            logger.info("Register 'webdriver.chrome.driver' property with '" + driverPath + "'");
+            System.setProperty("webdriver.chrome.driver", driverPath);
+        }
+
         ChromeOptions chromeOptions = new ChromeOptions();
+        String binaryPath = getProperty("org.oagi.score.e2e.chrome.binary");
+        if (binaryPath != null) {
+            logger.info("Register the binary path of the Chrome with '" + binaryPath + "'");
+            chromeOptions.setBinary(binaryPath);
+        }
+
         if (getBooleanProperty("org.oagi.score.e2e.chrome.headless")) {
             chromeOptions.addArguments("--headless");
         }
@@ -124,6 +145,11 @@ public class Configuration {
         edgePrefs.put("safebrowsing.enabled", "true");
         edgeOptions.setExperimentalOption("prefs", edgePrefs);
         return edgeOptions;
+    }
+
+    private SafariOptions newSafariCapabilities() {
+        SafariOptions safariOptions = new SafariOptions();
+        return safariOptions;
     }
 
     public String getProperty(String key) {
