@@ -6,9 +6,11 @@ import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
+import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
@@ -122,11 +124,18 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     }
 
     @Override
-    public void hitCreateDraftButton() {
+    public ReleaseAssignmentPage hitCreateDraftButton() {
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger releaseId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ReleaseObject releaseObject = getAPIFactory().getReleaseAPI().getReleaseById(releaseId);
         retry(() -> {
             click(getCreateDraftButton());
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
+
+        ReleaseAssignmentPage releaseAssignmentPage = new ReleaseAssignmentPageImpl(this, releaseObject);
+        assert releaseAssignmentPage.isOpened();
+        return releaseAssignmentPage;
     }
 }

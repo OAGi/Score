@@ -14,6 +14,7 @@ import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
+import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 
 import java.time.Duration;
@@ -31,6 +32,51 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+        ccStates.add("Published");
+        ccStates.add("Deleted");
+        RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
+        CodeListObject codeListCandidate = getAPIFactory().getCodeListAPI().
+                createRandomCodeList(developer, namespace, workingBranch, "Candidate");
+        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
+        codeListCandidate.setVersionId("99");
+        codeListCandidate.setDefinition("random code list in candidate state");
+        getAPIFactory().getCodeListAPI().updateCodeList(codeListCandidate);
+
+        List<String> euCCStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("QA");
+        ccStates.add("Production");
+
+        RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, euBranch, euNamespace, euCCStates);
+
+        HomePage homePage = loginPage().signIn("oagis", "oagis");
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        EditReleasePage editReleasePage = viewEditReleasePage.createRelease();
+        editReleasePage.setReleaseNum(newReleaseNum);
+        editReleasePage.setReleaseNamespace(namespace);
+        editReleasePage.hitUpdateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage =  viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage =  editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
+        waitFor(Duration.ofMillis(6000L));
     }
 
     @AfterEach
@@ -42,9 +88,6 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
         });
     }
-
-
-
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
@@ -136,9 +179,10 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         viewEditReleasePage.openPage();
         editReleasePage =  viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
-        editReleasePage.hitCreateDraftButton();
+        ReleaseAssignmentPage releaseAssignmentPage =  editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
         waitFor(Duration.ofMillis(6000L));
-
     }
 
     @Test

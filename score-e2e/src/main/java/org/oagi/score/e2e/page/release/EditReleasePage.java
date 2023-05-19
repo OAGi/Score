@@ -29,5 +29,5 @@ public interface EditReleasePage extends Page {
 
     WebElement getCreateDraftButton();
 
-    void hitCreateDraftButton();
+    ReleaseAssignmentPage hitCreateDraftButton();
 }
