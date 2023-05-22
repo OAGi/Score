@@ -436,12 +436,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, paginationResponseTopLevelAsbiep, generationContext);
         }
 
-        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
-        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
+        fillProperties(parent, schemas, asbiep, abie, false, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30GetTemplate()) {
-            suppressRootProperty(parent, isArray);
+            suppressRootProperty(parent, false);
         }
     }
 
@@ -458,12 +457,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
 
-        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
-        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
+        fillProperties(parent, schemas, asbiep, abie, false, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30PostTemplate()) {
-            suppressRootProperty(parent, isArray);
+            suppressRootProperty(parent, false);
         }
     }
 
