@@ -1,8 +1,11 @@
 package org.oagi.score.e2e.impl.page.release;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.business_term.CreateBusinessTermPageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
+import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
@@ -11,6 +14,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -260,17 +264,13 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     @Override
-    public EditReleasePage createRelease() {
+    public CreateReleasePage createRelease() {
         click(getNewReleaseButton());
-        invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
+        waitFor(Duration.ofMillis(500L));
 
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger releaseId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-        ReleaseObject releaseObject = getAPIFactory().getReleaseAPI().getReleaseById(releaseId);
-        EditReleasePage editReleasePage = new EditReleasePageImpl(this, releaseObject);
-        assert editReleasePage.isOpened();
-        return editReleasePage;
+        CreateReleasePage createReleasePage = new CreateReleasePageImpl(this);
+        assert createReleasePage.isOpened();
+        return createReleasePage;
     }
 
     @Override

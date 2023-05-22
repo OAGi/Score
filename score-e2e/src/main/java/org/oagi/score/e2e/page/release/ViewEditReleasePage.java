@@ -177,7 +177,7 @@ public interface ViewEditReleasePage extends Page {
      *
      * @return the Release page object
      */
-    EditReleasePage createRelease();
+    CreateReleasePage createRelease();
 
     /**
      * Return the UI element of the table record containing the given value.

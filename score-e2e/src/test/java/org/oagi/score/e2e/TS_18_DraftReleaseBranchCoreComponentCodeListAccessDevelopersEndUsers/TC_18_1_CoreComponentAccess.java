@@ -16,6 +16,7 @@ import org.oagi.score.e2e.page.core_component.ACCSetBaseACCDialog;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
@@ -46,8 +47,9 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-        thisAccountWillBeDeletedAfterTests(developer);
-        thisAccountWillBeDeletedAfterTests(endUser);
+        draft_creation();
+    }
+    private void draft_creation(){
         ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
@@ -55,19 +57,18 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
-        ccStates.add("Candidate");
-        ccStates.add("Published");
+        ccStates.add("Candidate");;
         ccStates.add("Deleted");
         developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
         ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACC.getAccManifestId());
-        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + candidateACC.getDen());
-        accSetBaseACCDialog.hitApplyButton("Contract Line Base. Details");
-        accViewEditPage.openPage();
+        accViewEditPage.backToWIP();
         SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACC.getDen());
         appendAssociationDialog.selectAssociation("Adjusted Total Tax Amount");
+        accViewEditPage.moveToDraft();
+        accViewEditPage.moveToCandidate();
 
         codeListCandidate = getAPIFactory().getCodeListAPI().
                 createRandomCodeList(developer, namespace, workingBranch, "Published");
@@ -90,12 +91,12 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
 
-        EditReleasePage editReleasePage = viewEditReleasePage.createRelease();
-        editReleasePage.setReleaseNum(newReleaseNum);
-        editReleasePage.setReleaseNamespace(namespace);
-        editReleasePage.hitUpdateButton();
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.hitUpdateButton();
         viewEditReleasePage.openPage();
-        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
@@ -165,6 +166,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_1() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         for (Map.Entry<String, ACCObject> entry : developerCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -189,6 +192,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_2() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         List<String> ccStates = new ArrayList<>();
@@ -207,7 +212,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_3() {
-
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         for (Map.Entry<String, ACCObject> entry : developerCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -232,6 +238,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_4() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         List<String> ccStates = new ArrayList<>();
@@ -251,6 +259,8 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
     @Test
     public void test_TA_18_1_5_a_b_c() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(newReleaseNum);
