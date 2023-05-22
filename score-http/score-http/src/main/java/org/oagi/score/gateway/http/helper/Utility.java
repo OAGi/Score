@@ -4,6 +4,9 @@ import lombok.SneakyThrows;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.util.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -222,5 +225,16 @@ public class Utility {
 
     public static String emptyToNull(String str) {
         return str.equals("") ? null : str;
+    }
+    public static boolean isValidUrl(String url) throws URISyntaxException, MalformedURLException {
+        try{
+            URL urlForTest = new URL(url);
+            urlForTest.toURI();
+            return true;
+        }catch(URISyntaxException e){
+            return false;
+        }catch(MalformedURLException e){
+            return false;
+        }
     }
 }
