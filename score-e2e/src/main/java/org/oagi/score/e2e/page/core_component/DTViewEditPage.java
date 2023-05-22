@@ -257,4 +257,9 @@ public interface DTViewEditPage extends Page {
     void setDefinitionSource(String definitionSource);
 
     void setContentComponentDefinition(String contentComponentDefinition);
+
+    WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression);
+
+
+    WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName);
 }

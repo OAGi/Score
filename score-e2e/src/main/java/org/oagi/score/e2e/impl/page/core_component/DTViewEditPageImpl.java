@@ -57,6 +57,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
+
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
 
@@ -488,5 +489,17 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public void setContentComponentDefinition(String contentComponentDefinition) {
         sendKeys(getContentComponentDefinitionField(), contentComponentDefinition);
+    }
+
+    @Override
+    public WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]" +
+                "/ancestor::tr[1]//*[contains(text(),\""+valueDomainName+"\")]//ancestor::tr//*[contains(text(),\""+XSDExpression+"\")]"));
+    }
+
+    @Override
+    public WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]/ancestor::tr[1]//*[contains(text()" +
+                ",\""+valueDomainName+"\")]//ancestor::tr/td[1]//label/span[1]//input"));
     }
 }
