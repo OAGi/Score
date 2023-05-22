@@ -94,7 +94,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
-        createReleasePage.hitUpdateButton();
+        createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
