@@ -226,9 +226,9 @@ public class Utility {
     public static String emptyToNull(String str) {
         return str.equals("") ? null : str;
     }
-    public static boolean isValidUrl(String url) throws URISyntaxException, MalformedURLException {
+    public static boolean isValidURI(String uri) throws URISyntaxException, MalformedURLException {
         try{
-            URL urlForTest = new URL(url);
+            URL urlForTest = new URL(uri);
             urlForTest.toURI();
             return true;
         }catch(URISyntaxException e){
