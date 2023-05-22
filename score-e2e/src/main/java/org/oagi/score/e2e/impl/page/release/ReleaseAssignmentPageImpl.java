@@ -47,14 +47,12 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
-        assert getText(getTitle()).endsWith("Releases Assignment");
+        assert getText(getTitle()).endsWith("Release Assignment");
     }
 
     @Override
     public WebElement getTitle() {
-        invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
