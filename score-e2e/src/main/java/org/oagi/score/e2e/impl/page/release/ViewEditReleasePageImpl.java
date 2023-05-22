@@ -231,7 +231,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
             WebElement tr;
             try {
                 tr = getTableRecordByValue(releaseNum);
-                td = getColumnByName(tr, "Release");
+                td = getColumnByName(tr, "releaseNum");
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a core component using " + releaseNum, e);
             }
@@ -247,7 +247,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     private String getReleaseNumFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.release > a > span")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a")));
     }
 
     @Override

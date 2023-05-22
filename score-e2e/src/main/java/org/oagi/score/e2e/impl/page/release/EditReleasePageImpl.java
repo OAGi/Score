@@ -53,9 +53,7 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
 
     @Override
     public WebElement getTitle() {
-        invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
