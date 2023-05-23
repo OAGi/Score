@@ -7,14 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.code_list.EditCodeListPage;
-import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
@@ -87,7 +84,6 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     @AfterEach
     public void tearDown() {
         super.tearDown();
-
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
@@ -102,6 +98,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         private AppUserObject appUser;
         private List<String> states = new ArrayList<>();
         private HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
+
         public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
             this.appUser = appUser;
             this.states = states;
@@ -118,9 +115,9 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         }
 
     }
-
     @Test
     public void test_TA_18_2_1() {
+
 
 
     }

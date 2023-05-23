@@ -106,13 +106,16 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
-        waitFor(Duration.ofMillis(6000L));
+        waitFor(Duration.ofSeconds(300L));
         homePage.logout();
     }
 
     @AfterEach
     public void tearDown() {
         super.tearDown();
+
+        //move the draft release back to initialized state
+
 
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
