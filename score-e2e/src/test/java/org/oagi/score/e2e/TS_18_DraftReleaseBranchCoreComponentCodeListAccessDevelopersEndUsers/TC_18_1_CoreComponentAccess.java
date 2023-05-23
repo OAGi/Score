@@ -12,7 +12,6 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.core_component.ACCSetBaseACCDialog;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
@@ -37,6 +36,8 @@ import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_18_1_CoreComponentAccess extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
+
+    String existingReleaseNum = null;
     String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
     RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
     RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
@@ -47,9 +48,13 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-        draft_creation();
+        if (existingReleaseNum == null) {
+            draft_creation();
+            existingReleaseNum = newReleaseNum;
+        }
     }
-    private void draft_creation(){
+
+    private void draft_creation() {
         ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
@@ -57,7 +62,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
-        ccStates.add("Candidate");;
+        ccStates.add("Candidate");
         ccStates.add("Deleted");
         developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
         ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
@@ -83,9 +88,9 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         editCodeListPage.moveToCandidate();
 
         List<String> euCCStates = new ArrayList<>();
-        ccStates.add("WIP");
-        ccStates.add("QA");
-        ccStates.add("Production");
+        euCCStates.add("WIP");
+        euCCStates.add("QA");
+        euCCStates.add("Production");
 
         euCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, euBranch, euNamespace, euCCStates);
 
@@ -163,6 +168,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         }
 
     }
+
     @Test
     public void test_TA_18_1_1() {
         thisAccountWillBeDeletedAfterTests(developer);
@@ -173,7 +179,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             String state = entry.getKey();
             ACCObject acc = developerCoreComponentWithStateContainer.stateACCs.get(state);
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setBranch(newReleaseNum);
+            viewEditCoreComponentPage.setBranch(existingReleaseNum);
             if (!state.equalsIgnoreCase("Candidate")) {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
@@ -185,7 +191,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             }
         }
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.setBranch(newReleaseNum);
+        viewEditCoreComponentPage.setBranch(existingReleaseNum);
         assertEquals(0, getDriver().findElements(By.xpath("//button[@mattooltip=\"Create Component\"]")).size());
     }
 
@@ -200,7 +206,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ccStates.add("QA");
         ccStates.add("Production");
         ccStates.add("Deleted");
-        viewEditCoreComponentPage.setBranch(newReleaseNum);
+        viewEditCoreComponentPage.setBranch(existingReleaseNum);
 
         for (String state : ccStates) {
             viewEditCoreComponentPage.setState(state);
@@ -219,7 +225,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             String state = entry.getKey();
             ACCObject acc = developerCoreComponentWithStateContainer.stateACCs.get(state);
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setBranch(newReleaseNum);
+            viewEditCoreComponentPage.setBranch(existingReleaseNum);
             if (!state.equalsIgnoreCase("Candidate")) {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
@@ -231,7 +237,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             }
         }
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.setBranch(newReleaseNum);
+        viewEditCoreComponentPage.setBranch(existingReleaseNum);
         assertEquals(0, getDriver().findElements(By.xpath("//button[@mattooltip=\"Create Component\"]")).size());
     }
 
@@ -246,7 +252,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ccStates.add("QA");
         ccStates.add("Production");
         ccStates.add("Deleted");
-        viewEditCoreComponentPage.setBranch(newReleaseNum);
+        viewEditCoreComponentPage.setBranch(existingReleaseNum);
 
         for (String state : ccStates) {
             viewEditCoreComponentPage.setState(state);
@@ -264,15 +270,15 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(newReleaseNum);
         ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(candidateACC.getDen(), newReleaseNum);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(candidateACC.getDen(), existingReleaseNum);
         WebElement asccpNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/Adjusted Total Tax Amount");
         assertTrue(asccpNode.isDisplayed());
         WebElement baseNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/Contract Line Base. Details");
         assertTrue(baseNode.isDisplayed());
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        viewEditCodeListPage.setBranch(newReleaseNum);
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), newReleaseNum);
+        viewEditCodeListPage.setBranch(existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
         assertEquals("99", getText(editCodeListPage.getVersionField()));
         assertEquals("random code list in candidate state", getText(editCodeListPage.getDefinitionField()));
     }
