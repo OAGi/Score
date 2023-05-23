@@ -45,6 +45,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     public static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button/span");
 
     public ViewEditCoreComponentPageImpl(BasePage parent) {
         super(parent);
@@ -525,5 +527,59 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public void hitMoveToDraftButton() {
+        click(getMoveToDraftButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getMoveToDraftButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to Draft\")]"));
+    }
+
+    @Override
+    public void hitMoveToCandidateButton() {
+        click(getMoveToCandidateButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getMoveToCandidateButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to Candidate\")]"));
+    }
+
+    @Override
+    public TransferCCOwnershipDialog hitTransferOwnershipButton() {
+        click(getTransferOwnershipButton());
+        TransferCCOwnershipDialog transferCCOwnershipDialog =
+                new TransferCCOwnershipDialogImpl(this);
+        assert transferCCOwnershipDialog.isOpened();
+        return transferCCOwnershipDialog;
+    }
+    @Override
+    public WebElement getTransferOwnershipButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Transfer Ownership\")]"));
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Delete\")]"));
     }
 }

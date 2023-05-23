@@ -9,6 +9,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,5 +109,13 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
             namespaceObjectsList.add(namespace);
         }
         return namespaceObjectsList;
+    }
+
+    @Override
+    public NamespaceObject getNamespaceById(BigInteger namespaceId) {
+        NamespaceRecord namespaceRecord = dslContext.selectFrom(NAMESPACE)
+                .where(NAMESPACE.NAMESPACE_ID.eq(ULong.valueOf(namespaceId)))
+                .fetchOne();
+        return mapper(namespaceRecord);
     }
 }
