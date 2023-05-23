@@ -195,4 +195,27 @@ public interface ViewEditReleasePage extends Page {
      * @return the UI element of the column
      */
     WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    /**
+     * Return the UI element of the 'Context Menu' icon for the release node.
+     *
+     * @param releaseNum release Number
+     * @return the UI element of the 'Context Menu' icon
+     */
+    WebElement getContextMenuIconByReleaseNum(String releaseNum);
+
+    /**
+     * Return the UI element of the 'Back To Initialized' button.
+     *
+     * @param releaseNum release Number
+     * @return the UI element of the 'Back To Initialized' button
+     */
+    WebElement getMoveBackToInitializedButton(String releaseNum);
+
+    /**
+     * Hit the 'BackToInitialized' button.
+     *
+     * @param releaseNum release Number
+     */
+    void MoveBackToInitialized(String releaseNum);
 }

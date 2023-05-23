@@ -113,10 +113,11 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @AfterEach
     public void tearDown() {
         super.tearDown();
-
         //move the draft release back to initialized state
-
-
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.MoveBackToInitialized(existingReleaseNum);
+        waitFor(Duration.ofSeconds(300L));
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());

@@ -1,10 +1,8 @@
 package org.oagi.score.e2e.impl.page.release;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.business_term.CreateBusinessTermPageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
@@ -53,6 +51,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By NEW_RELEASE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Release\")]//ancestor::button[1]");
+    private static final By MOVE_BACK_TO_INITIALIZED =
+            By.xpath("//span[contains(text(), \"Move back to Initialized\")]//ancestor::button[1]");
+
+    private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
 
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);
@@ -258,6 +261,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         assert editReleasePage.isOpened();
         return editReleasePage;
     }
+
     @Override
     public WebElement getNewReleaseButton() {
         return elementToBeClickable(getDriver(), NEW_RELEASE_BUTTON_LOCATOR);
@@ -282,5 +286,28 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public WebElement getContextMenuIconByReleaseNum(String releaseNum) {
+        WebElement tr = getTableRecordByValue(releaseNum);
+        return tr.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement getMoveBackToInitializedButton(String releaseNum) {
+        getContextMenuIconByReleaseNum(releaseNum);
+        return elementToBeClickable(getDriver(), MOVE_BACK_TO_INITIALIZED);
+    }
+
+    @Override
+    public void MoveBackToInitialized(String releaseNum) {
+        waitFor(ofMillis(3000L));
+        retry(() -> {
+            click(getMoveBackToInitializedButton(releaseNum));
+            click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofSeconds(120));
     }
 }
