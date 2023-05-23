@@ -117,7 +117,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         viewEditReleasePage.MoveBackToInitialized(existingReleaseNum);
-        waitFor(Duration.ofSeconds(300L));
+        waitFor(Duration.ofSeconds(60L));
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());

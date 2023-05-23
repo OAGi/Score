@@ -12,16 +12,22 @@ import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
+import org.openqa.selenium.By;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -84,6 +90,11 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     @AfterEach
     public void tearDown() {
         super.tearDown();
+        //move the draft release back to initialized state
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.MoveBackToInitialized(existingReleaseNum);
+        waitFor(Duration.ofSeconds(60L));
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
@@ -115,10 +126,28 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         }
 
     }
+
     @Test
     public void test_TA_18_2_1() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setBranch(existingReleaseNum);
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
+        CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        assertDisabled(editCodeListPage.getNamespaceSelectField());
+        assertDisabled(editCodeListPage.getListIDField());
+        assertDisabled(editCodeListPage.getAgencyIDListField());
+        assertDisabled(editCodeListPage.getNamespaceSelectField());
+        assertDisabled(editCodeListPage.getDefinitionField());
+        assertDisabled(editCodeListPage.getDefinitionSourceField());
+        assertDisabled(editCodeListPage.getDeprecatedSelectField());
 
+        //openFirstCodeListValue
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"\")]/ancestor::tr[1]//td[3]")));
 
     }
 
