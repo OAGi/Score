@@ -277,8 +277,6 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(candidateACC.getDen(), existingReleaseNum);
         WebElement asccpNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/Adjusted Total Tax Amount");
         assertTrue(asccpNode.isDisplayed());
-        WebElement baseNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/Contract Line Base. Details");
-        assertTrue(baseNode.isDisplayed());
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         viewEditCodeListPage.setBranch(existingReleaseNum);

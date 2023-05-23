@@ -7,12 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
@@ -27,7 +25,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -124,8 +121,15 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
 
         //openFirstCodeListValue
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"\")]/ancestor::tr[1]//td[3]")));
+        String codeListValue = developerCodeListWithStateContainer.stateCodeListValues.get("Candidate").getValue();
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValue);
+        assertDisabled(editCodeListValueDialog.getCodeField());
+        assertDisabled(editCodeListValueDialog.getMeaningField());
+        assertDisabled(editCodeListValueDialog.getDefinitionField());
+        assertDisabled(editCodeListValueDialog.getDefinitionSourceField());
+        assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
 
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Revise\")]//ancestor::button[1]")).size());
     }
 
     @Test
@@ -168,17 +172,22 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
 
         //openFirstCodeListValue
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"\")]/ancestor::tr[1]//td[3]")));
+        String codeListValue = euCodeListWithStateContainer.stateCodeListValues.get("Candidate").getValue();
+        EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValue);
+        assertDisabled(editCodeListValueDialog.getCodeField());
+        assertDisabled(editCodeListValueDialog.getMeaningField());
+        assertDisabled(editCodeListValueDialog.getDefinitionField());
+        assertDisabled(editCodeListValueDialog.getDefinitionSourceField());
+        assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
 
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Derive Code List based on this\")]//ancestor::button[1]")).size());
-
-
     }
 
     private class RandomCodeListWithStateContainer {
         private AppUserObject appUser;
         private List<String> states = new ArrayList<>();
         private HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
+        private HashMap<String, CodeListValueObject> stateCodeListValues = new HashMap<>();
 
         public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
             this.appUser = appUser;
@@ -186,11 +195,13 @@ public class TC_18_2_CodeListAccess extends BaseTest {
 
             for (int i = 0; i < this.states.size(); ++i) {
                 CodeListObject codeList;
+                CodeListValueObject codeListValue;
                 String state = this.states.get(i);
                 {
                     codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(this.appUser, namespace, release, state);
-                    getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, this.appUser);
+                    codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, this.appUser);
                     stateCodeLists.put(state, codeList);
+                    stateCodeListValues.put(state, codeListValue);
                 }
             }
         }
