@@ -51,6 +51,7 @@ public class DTObject {
     private LocalDateTime creationTimestamp;
 
     private LocalDateTime lastUpdateTimestamp;
+    private String contentComponentDefinition;
 
     public static DTObject createRandomDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
         DTObject bdt = new DTObject();

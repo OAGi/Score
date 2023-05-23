@@ -381,4 +381,19 @@ public interface ViewEditCoreComponentPage extends Page {
      */
     void hitBackToWIPButton();
 
+    void hitMoveToDraftButton();
+
+    WebElement getMoveToDraftButton();
+
+    void hitMoveToCandidateButton();
+
+    WebElement getMoveToCandidateButton();
+
+    TransferCCOwnershipDialog hitTransferOwnershipButton();
+
+    WebElement getTransferOwnershipButton();
+
+    void hitDeleteButton();
+
+    WebElement getDeleteButton();
 }

@@ -25,8 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.oagi.score.gateway.http.helper.Utility.isValidURI;
 
 @Service
 @Transactional(readOnly = true)
@@ -59,11 +62,10 @@ public class BusinessTermService {
 
     public GetBusinessTermListResponse getBusinessTermList(GetBusinessTermListRequest request) {
         GetBusinessTermListResponse response;
-        if(request.getAssignedBies() != null && !request.getAssignedBies().isEmpty()) {
+        if (request.getAssignedBies() != null && !request.getAssignedBies().isEmpty()) {
             response = scoreRepositoryFactory.createBusinessTermReadRepository()
                     .getBusinessTermListByAssignedBie(request);
-        }
-        else {
+        } else {
             response = scoreRepositoryFactory.createBusinessTermReadRepository()
                     .getBusinessTermList(request);
         }
@@ -80,29 +82,39 @@ public class BusinessTermService {
     @Transactional
     public CreateBulkBusinessTermResponse createBusinessTermsFromFile(CreateBulkBusinessTermRequest request)
             throws ScoreDataAccessException {
+        List<String> formatCheckExceptions = new ArrayList<>();
         try (CSVReader reader = new CSVReader(
                 new BufferedReader(
                         new InputStreamReader(request.getInputStream(), "UTF-8"), ','))) {
             List<BusinessTerm> businessTerms = new ArrayList<BusinessTerm>();
-
             List<String[]> list = reader.readAll();
             list.remove(0); // remove header with column names
             for (String[] recordStr : list) {
                 BusinessTerm term = new BusinessTerm();
+                if (recordStr[0].length() > 255) {
+                    formatCheckExceptions.add(recordStr[0] + " is longer than 255 characters limit.");
+                }
                 term.setBusinessTerm(recordStr[0]);
                 term.setExternalReferenceUri(recordStr[1]);
+                if (!isValidURI(recordStr[1])) {
+                    formatCheckExceptions.add(recordStr[1] + " is not a valid URI.");
+                }
                 term.setExternalReferenceId(recordStr[2]);
                 term.setDefinition(recordStr[3]);
                 term.setComment(recordStr[4]);
-                if(term.getExternalReferenceUri() != null && !term.getExternalReferenceUri().equals("")
+                if (term.getExternalReferenceUri() != null && !term.getExternalReferenceUri().equals("")
                         && checkBusinessTermUniqueness(term)) {
                     businessTerms.add(term);
                 }
             }
             request.setBusinessTermList(businessTerms);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ScoreDataAccessException("Fail to parse CSV file: " + e.getMessage());
+        } catch (URISyntaxException e) {
+            throw new ScoreDataAccessException("Fail to parse CSV file: " + e.getMessage());
+        }
+        if (!formatCheckExceptions.isEmpty()) {
+            throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", formatCheckExceptions));
         }
 
         CreateBulkBusinessTermResponse response =
@@ -132,6 +144,7 @@ public class BusinessTermService {
         AssignedBusinessTerm response = businessTermRepository.getBusinessTermAssignment(request);
         return response;
     }
+
     public PageResponse<AssignedBusinessTermListRecord> getBusinessTermAssignmentList(AuthenticatedPrincipal user, AssignedBusinessTermListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);

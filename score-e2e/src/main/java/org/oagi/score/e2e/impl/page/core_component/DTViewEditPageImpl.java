@@ -2,12 +2,14 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 
@@ -55,15 +57,32 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
+
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    private static final By RESTORE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
             By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+    private static final By SEARCH_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By COMMENTS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Comments\")]");
+    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-form-field//input");
+    private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
+    private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -342,5 +361,145 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
         click(option);
+    }
+
+    @Override
+    public AddCommentDialog hitAddCommentButton(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+        }
+        AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
+        assert addCodeListCommentDialog.isOpened();
+        return addCodeListCommentDialog;
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByName(nodeName);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return node;
+    }
+
+    private WebElement goToNode(String path) {
+        click(getSearchField());
+        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
+        node.sendKeys(Keys.ENTER);
+        click(node);
+        clear(getSearchField());
+        return node;
+    }
+    @Override
+    public WebElement getSearchField() {
+        return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+    }
+
+    public WebElement getNodeByName(String name) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//cdk-virtual-scroll-viewport//*[contains(text(), \"" + name + "\")]" +
+                        "//ancestor::div[contains(@class, \"mat-tree-node\")]"));
+    }
+
+    @Override
+    public WebElement getContextMenuIconByNodeName(String nodeName) {
+        WebElement node = getNodeByName(nodeName);
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
+
+    @Override
+    public WebElement getReviseButton() {
+        return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getRestoreButton() {
+        return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitRestoreButton() {
+        retry(() -> {
+            click(getRestoreButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public String getBasedDataTypeFieldValue() {
+        return getText(getBasedDataTypeField());
+    }
+
+    @Override
+    public WebElement getBasedDataTypeField() {
+        return visibilityOfElementLocated(getDriver(), BASED_DATA_TYPE_FIELD_LOCATOR);
+    }
+
+    @Override
+    public String getQualifierFieldValue() {
+        return getText(getQualifierField());
+    }
+
+    @Override
+    public WebElement getSixHexadecimalIdentifierField() {
+        return visibilityOfElementLocated(getDriver(), SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR);
+    }
+
+    @Override
+    public String getContentComponentDefinitionFieldValue() {
+        return getText(getContentComponentDefinitionField());
+    }
+
+    @Override
+    public WebElement getContentComponentDefinitionField() {
+        return visibilityOfElementLocated(getDriver(), CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setDefinition(String definition) {
+        sendKeys(getDefinitionField(), definition);
+    }
+
+    @Override
+    public void setDefinitionSource(String definitionSource) {
+        sendKeys(getDefinitionSourceField(), definitionSource);
+    }
+
+    @Override
+    public void setContentComponentDefinition(String contentComponentDefinition) {
+        sendKeys(getContentComponentDefinitionField(), contentComponentDefinition);
+    }
+
+    @Override
+    public WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]" +
+                "/ancestor::tr[1]//*[contains(text(),\""+valueDomainName+"\")]//ancestor::tr//*[contains(text(),\""+XSDExpression+"\")]"));
+    }
+
+    @Override
+    public WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]/ancestor::tr[1]//*[contains(text()" +
+                ",\""+valueDomainName+"\")]//ancestor::tr/td[1]//label/span[1]//input"));
     }
 }
