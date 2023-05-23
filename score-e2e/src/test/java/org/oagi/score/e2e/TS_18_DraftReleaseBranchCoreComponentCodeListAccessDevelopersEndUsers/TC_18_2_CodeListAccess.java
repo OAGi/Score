@@ -32,8 +32,6 @@ import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_18_2_CodeListAccess extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
-
     String existingReleaseNum = null;
     String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
     CodeListObject codeListCandidate;
@@ -41,6 +39,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     RandomCodeListWithStateContainer euCodeListWithStateContainer;
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+    private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -105,28 +104,6 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         this.randomAccounts.add(appUser);
     }
 
-    private class RandomCodeListWithStateContainer {
-        private AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
-
-        public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
-            this.appUser = appUser;
-            this.states = states;
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                CodeListObject codeList;
-                String state = this.states.get(i);
-                {
-                    codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(this.appUser, namespace, release, state);
-                    getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, this.appUser);
-                    stateCodeLists.put(state, codeList);
-                }
-            }
-        }
-
-    }
-
     @Test
     public void test_TA_18_2_1() {
         thisAccountWillBeDeletedAfterTests(developer);
@@ -153,11 +130,70 @@ public class TC_18_2_CodeListAccess extends BaseTest {
 
     @Test
     public void test_TA_18_2_2() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        List<String> clStates = new ArrayList<>();
+        clStates.add("WIP");
+        clStates.add("QA");
+        clStates.add("Production");
+        clStates.add("Deleted");
+        viewEditCodeListPage.setBranch(existingReleaseNum);
 
+        for (String state : clStates) {
+            viewEditCodeListPage.toggleState(state);
+            viewEditCodeListPage.hitSearchButton();
+            assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
+        }
     }
 
     @Test
     public void test_TA_18_2_3() {
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setBranch(existingReleaseNum);
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
+
+        CodeListObject codeListCandidate = euCodeListWithStateContainer.stateCodeLists.get("Candidate");
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        assertDisabled(editCodeListPage.getNamespaceSelectField());
+        assertDisabled(editCodeListPage.getListIDField());
+        assertDisabled(editCodeListPage.getAgencyIDListField());
+        assertDisabled(editCodeListPage.getNamespaceSelectField());
+        assertDisabled(editCodeListPage.getDefinitionField());
+        assertDisabled(editCodeListPage.getDefinitionSourceField());
+        assertDisabled(editCodeListPage.getDeprecatedSelectField());
+
+        //openFirstCodeListValue
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"\")]/ancestor::tr[1]//td[3]")));
+
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Derive Code List based on this\")]//ancestor::button[1]")).size());
+
+
+    }
+
+    private class RandomCodeListWithStateContainer {
+        private AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
+
+        public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                CodeListObject codeList;
+                String state = this.states.get(i);
+                {
+                    codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(this.appUser, namespace, release, state);
+                    getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, this.appUser);
+                    stateCodeLists.put(state, codeList);
+                }
+            }
+        }
 
     }
 
