@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDe
 
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -36,27 +37,18 @@ import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_18_1_CoreComponentAccess extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-
-    String existingReleaseNum = null;
-    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
-    RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
-    RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
-    CodeListObject codeListCandidate;
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
-    @BeforeEach
-    public void init() {
-        super.init();
-        if (existingReleaseNum == null) {
-            draft_creation();
-            existingReleaseNum = newReleaseNum;
-        }
-    }
+    String existingReleaseNum = null;
+    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+    CodeListObject codeListCandidate;
+    RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
+    RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
 
-    private void draft_creation() {
+    public void draft_creation(){
         ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getTheLatestRelease();
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         List<String> ccStates = new ArrayList<>();
@@ -110,6 +102,14 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         homePage.logout();
     }
 
+    @BeforeEach
+    public void init() {
+        super.init();
+        if (existingReleaseNum == null) {
+            draft_creation();
+            existingReleaseNum = newReleaseNum;
+        }
+    }
     @AfterEach
     public void tearDown() {
         super.tearDown();
