@@ -8,7 +8,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.EditNamespacePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
@@ -180,6 +182,35 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
 
     @Test
     public void test_TA_20_1_6() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(anotherDeveloper);
+        HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+
+        {
+            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.hitSearchButton();
+
+            WebElement tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+
+            TransferCCOwnershipDialog transferCCOwnershipDialog =
+                    viewEditNamespacePage.openTransferCCOwnershipDialog(tr);
+            transferCCOwnershipDialog.transfer(developer.getLoginId());
+
+            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.hitSearchButton();
+
+            tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            td = viewEditNamespacePage.getColumnByName(tr, "owner");
+            assertEquals(developer.getLoginId(), getText(td));
+        }
     }
 }

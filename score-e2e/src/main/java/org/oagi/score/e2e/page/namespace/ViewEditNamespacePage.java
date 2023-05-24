@@ -87,4 +87,12 @@ public interface ViewEditNamespacePage extends Page {
     CreateNamespacePage hitNewNamespaceButton();
 
     EditNamespacePage openNamespaceByURIAndOwner(String uri, String owner);
+
+    /**
+     * Open the 'Transfer Namespace Ownership' dialog.
+     *
+     * @param tr the table record
+     * @return the 'Transfer Namespace Ownership' dialog object
+     */
+    TransferNamespaceOwnershipDialog openTransferNamespaceOwnershipDialog(WebElement tr);
 }
