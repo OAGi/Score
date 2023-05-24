@@ -1,11 +1,15 @@
 package org.oagi.score.e2e.impl.page.namespace;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.business_term.UploadBusinessTermsPageImpl;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
+import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -161,6 +165,11 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
     }
 
     @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
     public void hitSearchButton() {
         retry(() -> {
             click(getSearchButton());
@@ -177,5 +186,14 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
     @Override
     public WebElement getNewNamespaceButton() {
         return elementToBeClickable(getDriver(), NEW_NAMESPACE_BUTTON_LOCATOR);
+    }
+    @Override
+    public CreateNamespacePage hitNewNamespaceButton() {
+        click(getNewNamespaceButton());
+        waitFor(Duration.ofMillis(500L));
+
+        CreateNamespacePage createNamespacePage = new CreateNamespacePageImpl(this);
+        assert createNamespacePage.isOpened();
+        return createNamespacePage;
     }
 }

@@ -71,9 +71,18 @@ public interface ViewEditNamespacePage extends Page {
 
     WebElement getTableRecordByValue(String value);
 
+    /**
+     * Return the UI element of the table record at the given index, which starts from 1.
+     *
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
+     */
+    WebElement getTableRecordAtIndex(int idx);
+
     void hitSearchButton();
 
     WebElement getSearchButton();
 
     WebElement getNewNamespaceButton();
+    CreateNamespacePage hitNewNamespaceButton();
 }
