@@ -85,4 +85,6 @@ public interface ViewEditNamespacePage extends Page {
 
     WebElement getNewNamespaceButton();
     CreateNamespacePage hitNewNamespaceButton();
+
+    EditNamespacePage openNamespaceByURIAndOwner(String uri, String owner);
 }

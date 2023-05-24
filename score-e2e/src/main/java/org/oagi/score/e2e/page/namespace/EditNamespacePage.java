@@ -12,6 +12,10 @@ public interface EditNamespacePage extends Page {
 
     void setPrefix(String prefix);
 
+    WebElement getDescriptionField();
+
+    void setDescription(String description);
+
     WebElement getStandardCheckboxField();
 
     void hitUpdateButton();

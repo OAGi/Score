@@ -1,12 +1,14 @@
 package org.oagi.score.e2e.impl.page.namespace;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.business_term.UploadBusinessTermsPageImpl;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
+import org.oagi.score.e2e.page.namespace.EditNamespacePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
@@ -187,6 +189,7 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
     public WebElement getNewNamespaceButton() {
         return elementToBeClickable(getDriver(), NEW_NAMESPACE_BUTTON_LOCATOR);
     }
+
     @Override
     public CreateNamespacePage hitNewNamespaceButton() {
         click(getNewNamespaceButton());
@@ -196,4 +199,45 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
         assert createNamespacePage.isOpened();
         return createNamespacePage;
     }
+
+    @Override
+    public EditNamespacePage openNamespaceByURIAndOwner(String uri, String owner) {
+        setOwner(owner);
+        openNamespaceByURI(uri);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(uri);
+        waitFor(ofMillis(500L));
+        EditNamespacePage editNamespacePage = new EditNamespacePageImpl(this, namespace);
+        assert editNamespacePage.isOpened();
+        return editNamespacePage;
+    }
+
+    private void openNamespaceByURI(String uri) {
+        setURI(uri);
+
+        retry(() -> {
+            hitSearchButton();
+
+            WebElement td;
+            WebElement tr;
+            try {
+                tr = getTableRecordByValue(uri);
+                td = getColumnByName(tr, "URI");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a namespace using " + uri, e);
+            }
+            String nameField = getNameFieldFromTheTable(td);
+            if (!uri.equals(nameField)) {
+                throw new NoSuchElementException("Cannot locate a namespace using " + uri);
+            }
+            WebElement tdLoginID = td.findElement(By.cssSelector("a"));
+            // TODO:
+            // 'click' does not work when the browser hides the link.
+            getDriver().get(tdLoginID.getAttribute("href"));
+        });
+    }
+
+    private String getNameFieldFromTheTable(WebElement tableData) {
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
+    }
+
 }

@@ -15,6 +15,8 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
             By.xpath("//span[contains(text(), \"URI\")]//ancestor::div[1]/input");
     private static final By PREFIX_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Prefix\")]//ancestor::div[1]/input");
+    private static final By DESCRIPTION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Description\")]//ancestor::div[1]/input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By STANDARD_CHECKBOX_FIELD_LOCATOR =
@@ -72,6 +74,16 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
     @Override
     public void setPrefix(String prefix) {
         sendKeys(getPrefixField(), prefix);
+    }
+
+    @Override
+    public WebElement getDescriptionField() {
+        return visibilityOfElementLocated(getDriver(), DESCRIPTION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setDescription(String description) {
+        sendKeys(getDescriptionField(), description);
     }
 
     @Override
