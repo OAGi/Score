@@ -7,18 +7,19 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.EditNamespacePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -118,18 +119,63 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_3() {
+    public void test_TA_20_1_3_and_5() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId());
+        assertDisabled(editNamespacePage.getURIField());
+        assertDisabled(editNamespacePage.getPrefixField());
+        assertDisabled(editNamespacePage.getDescriptionField());
+        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+
+        viewEditNamespacePage.openPage();
+        editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner("http://www.openapplications.org/oagis/10", "oagis");
+        assertDisabled(editNamespacePage.getURIField());
+        assertDisabled(editNamespacePage.getPrefixField());
+        assertDisabled(editNamespacePage.getDescriptionField());
+        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+        homePage.logout();
+
+        homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(developerNamespace.getUri(), developer.getLoginId());
+        assertDisabled(editNamespacePage.getURIField());
+        assertDisabled(editNamespacePage.getPrefixField());
+        assertDisabled(editNamespacePage.getDescriptionField());
+        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+        homePage.logout();
     }
 
     @Test
     public void test_TA_20_1_4() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
-    }
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
-    @Test
-    public void test_TA_20_1_5() {
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(developerNamespace.getUri(), developer.getLoginId());
+        editNamespacePage.hitDiscardButton();
 
+        viewEditNamespacePage.openPage();
+        assertThrows(TimeoutException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(developerNamespace.getUri(), developer.getLoginId()));
     }
 
     @Test
