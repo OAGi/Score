@@ -26,7 +26,7 @@ import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
-public class TC_38_2_CreatingABbrandNewDT extends BaseTest {
+public class TC_38_2_CreatingBrandNewDT extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 

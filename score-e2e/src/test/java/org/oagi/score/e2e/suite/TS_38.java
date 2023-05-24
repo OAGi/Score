@@ -9,8 +9,8 @@ import org.oagi.score.e2e.TS_38_WorkingBranchDataTypeManagementForDeveloper.*;
 @SuiteDisplayName("Test Suite 38")
 @SelectClasses({
         TC_38_1_DTAccess.class,
-        TC_38_2_CreatingABbrandNewDT.class,
-        TC_38_3_EditingABrandNewDeveloperDT.class
+        TC_38_2_CreatingBrandNewDT.class,
+        TC_38_3_EditingBrandNewDeveloperDT.class
 })
 public class TS_38 {
 }
