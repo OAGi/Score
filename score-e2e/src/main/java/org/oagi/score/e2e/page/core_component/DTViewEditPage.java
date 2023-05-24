@@ -230,6 +230,8 @@ public interface DTViewEditPage extends Page {
 
     WebElement clickOnDropDownMenuByPath(String path);
 
+    WebElement goToNode(String path);
+
     WebElement getSearchField();
 
     WebElement getContextMenuIconByNodeName(String nodeName);
@@ -262,4 +264,16 @@ public interface DTViewEditPage extends Page {
 
 
     WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName);
+
+    void discardValueDomain();
+
+    WebElement getDiscardValueDomainButton();
+
+    String getDefinitionWarningDialogMessage();
+
+    WebElement getTableRecordByValue(String value);
+
+    void selectValueDomain(String name);
+
+    void addSupplementaryComponent(String path);
 }

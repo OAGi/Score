@@ -1,16 +1,12 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.JSON;
+import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
 import org.oagi.score.e2e.obj.*;
 
@@ -20,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -1505,6 +1500,44 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .from(RELEASE)
                 .where(RELEASE.RELEASE_NUM.eq(releaseNum))
                 .fetchOneInto(ULong.class);
+    }
+
+    @Override
+    public List<DTSCObject> getSupplementaryComponentsForDT(BigInteger dtID, String release) {
+        List<DTSCObject> dtList = new ArrayList<>();
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        List<Result<Record>> result = dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT_SC_MANIFEST).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)))
+                .fetchMany();
+        for (Result<Record> r: result){
+            for (int i=0; i<r.size(); i++){
+                DTSCObject dtSC = dtSCMapper(r.get(i));
+                dtList.add(dtSC);
+            }
+        }
+        return dtList;
+    }
+
+    private DTSCObject dtSCMapper(org.jooq.Record record) {
+        DTSCObject dtSC = new DTSCObject();
+        dtSC.setDtSCId(record.get(DT_SC.DT_SC_ID).toBigInteger());
+        dtSC.setOwnerDTId(record.get(DT_SC.OWNER_DT_ID).toBigInteger());
+        dtSC.setGuid(record.get(DT_SC.GUID));
+        dtSC.setObjectClassTerm(record.get(DT_SC.OBJECT_CLASS_TERM));
+        dtSC.setPropertyTerm(record.get(DT_SC.PROPERTY_TERM));
+        dtSC.setRepresentationTerm(record.get(DT_SC.REPRESENTATION_TERM));
+        dtSC.setDefinition(record.get(DT_SC.DEFINITION));
+        dtSC.setDefinitionSource(record.get(DT_SC.DEFINITION_SOURCE));
+        dtSC.setOwnerUserId(record.get(DT_SC.OWNER_USER_ID).toBigInteger());
+        dtSC.setCreatedBy(record.get(DT_SC.CREATED_BY).toBigInteger());
+        dtSC.setLastUpdatedBy(record.get(DT_SC.LAST_UPDATED_BY).toBigInteger());
+        return dtSC;
     }
 
 }

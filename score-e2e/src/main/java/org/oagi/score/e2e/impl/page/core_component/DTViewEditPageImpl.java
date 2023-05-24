@@ -60,6 +60,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
+    private static final By DISCARD_VALUE_DOMAIN_LOCATOR =
+            By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
@@ -75,6 +77,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
+    private static final By SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Add Supplementary Component\")]");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
@@ -83,6 +87,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
     private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -400,7 +406,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         return node;
     }
 
-    private WebElement goToNode(String path) {
+    @Override
+    public WebElement goToNode(String path) {
         click(getSearchField());
         WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
         node.sendKeys(Keys.ENTER);
@@ -501,5 +508,48 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]/ancestor::tr[1]//*[contains(text()" +
                 ",\""+valueDomainName+"\")]//ancestor::tr/td[1]//label/span[1]//input"));
+    }
+
+    @Override
+    public void discardValueDomain() {
+        click(getDiscardValueDomainButton());
+    }
+
+    @Override
+    public WebElement getDiscardValueDomainButton(){
+        return elementToBeClickable(getDriver(), DISCARD_VALUE_DOMAIN_LOCATOR);
+    }
+
+    @Override
+    public String getDefinitionWarningDialogMessage() {
+        return visibilityOfElementLocated(getDriver(), DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR).getText();
+    }
+
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \""+value+"\")]/ancestor::tr"));
+    }
+
+    @Override
+    public void selectValueDomain(String name) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(name);
+            WebElement td = getColumnByName(tr, "select");
+            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        });
+
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public void addSupplementaryComponent(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+        }
     }
 }

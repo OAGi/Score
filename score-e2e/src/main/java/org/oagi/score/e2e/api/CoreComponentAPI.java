@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.api;
 
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScRecord;
 import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
@@ -187,4 +188,5 @@ public interface CoreComponentAPI {
 
     BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 
+    List<DTSCObject> getSupplementaryComponentsForDT(BigInteger dtID, String release);
 }
