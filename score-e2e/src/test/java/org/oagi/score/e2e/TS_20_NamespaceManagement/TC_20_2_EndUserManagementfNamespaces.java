@@ -7,9 +7,21 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
+import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
@@ -36,7 +48,33 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
 
     @Test
     public void test_TA_20_2_1_a_b_c_d() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        assertNotChecked(createNamespacePage.getStandardCheckboxField());
+        assertDisabled(createNamespacePage.getStandardCheckboxField());
+
+        String testURI = "http://www.testenduseranamespace1.org/user/10";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.hitCreateButton();
+        viewEditNamespacePage.openPage();
+        viewEditNamespacePage.setURI(testURI);
+        viewEditNamespacePage.hitSearchButton();
+        WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//td[contains(text(),\"" + endUser.getLoginId() + "\")]")).size());
+
+        createNamespacePage.openPage();
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.hitCreateButton();
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
