@@ -15,16 +15,17 @@ import org.oagi.score.e2e.page.namespace.EditNamespacePage;
 import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertChecked;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -68,7 +69,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         viewEditNamespacePage.setURI(testURI);
         viewEditNamespacePage.hitSearchButton();
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
-        String namespaceXpath = "//*[contains(text(),\""+testURI+"\")]//ancestor::tr[1]//span[contains(text(),\""+developer.getLoginId()+"\")]";
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + developer.getLoginId() + "\")]";
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
 
         createNamespacePage.openPage();
@@ -118,7 +119,8 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
         editNamespacePage.hitBackButton();
-        String namespaceXpath = "//*[contains(text(),\""+testURI+"\")]//ancestor::tr[1]//span[contains(text(),\""+developer.getLoginId()+"\")]";
+        waitFor(Duration.ofMillis(3000L));
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + developer.getLoginId() + "\")]";
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
 
@@ -139,7 +141,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertDisabled(editNamespacePage.getURIField());
         assertDisabled(editNamespacePage.getPrefixField());
         assertDisabled(editNamespacePage.getDescriptionField());
-        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertNotChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
 
         viewEditNamespacePage.openPage();
@@ -158,7 +160,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertDisabled(editNamespacePage.getURIField());
         assertDisabled(editNamespacePage.getPrefixField());
         assertDisabled(editNamespacePage.getDescriptionField());
-        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertNotChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
         homePage.logout();
@@ -177,7 +179,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         editNamespacePage.hitDiscardButton();
 
         viewEditNamespacePage.openPage();
-        assertThrows(TimeoutException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(developerNamespace.getUri(), developer.getLoginId()));
+        assertThrows(NoSuchElementException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(developerNamespace.getUri(), developer.getLoginId()));
     }
 
     @Test

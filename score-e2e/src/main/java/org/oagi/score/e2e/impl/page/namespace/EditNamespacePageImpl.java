@@ -111,6 +111,10 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
             click(getDiscardButton());
             waitFor(ofMillis(1000L));
         });
+        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardButton);
         invisibilityOfLoadingContainerElement(getDriver());
     }
 
