@@ -79,7 +79,6 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
-
     }
 
     @Test

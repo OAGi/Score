@@ -222,7 +222,7 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
             WebElement tr;
             try {
                 tr = getTableRecordByValue(uri);
-                td = getColumnByName(tr, "URI");
+                td = getColumnByName(tr, "uri");
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a namespace using " + uri, e);
             }
