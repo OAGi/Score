@@ -109,13 +109,15 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
         editNamespacePage.getURIField().clear();
-        editNamespacePage.setURI("http://www.openapplications.org/oagis/10");
+        String existingURI = "http://www.openapplications.org/oagis/10";
+        editNamespacePage.setURI(existingURI);
         editNamespacePage.hitUpdateButton();
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        editNamespacePage.hitBackButton();
         String namespaceXpath = "//*[contains(text(),\""+testURI+"\")]//ancestor::tr[1]//span[contains(text(),\""+developer.getLoginId()+"\")]";
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
@@ -130,7 +132,6 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
-        String branch = "Working";
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
@@ -169,7 +170,6 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
-        String branch = "Working";
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
