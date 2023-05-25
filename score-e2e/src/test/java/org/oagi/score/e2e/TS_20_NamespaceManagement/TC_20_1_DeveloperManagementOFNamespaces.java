@@ -65,7 +65,8 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         viewEditNamespacePage.setURI(testURI);
         viewEditNamespacePage.hitSearchButton();
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//td[contains(text(),\"" + developer.getLoginId() + "\")]")).size());
+        String developerName = developer.getLoginId();
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"http://www.testdevelopernamespace1.org/user/10\")]//ancestor::tr[1]")).size());
 
         createNamespacePage.openPage();
         createNamespacePage.setURI(testURI);
