@@ -79,8 +79,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -91,7 +90,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
         CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
-        assertChecked(createNamespacePage.getStandardCheckboxField());
+        assertNotChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
         String randomDomain = randomAlphabetic(5, 10);
@@ -108,7 +107,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(testURI, endUser.getLoginId());
         assertEquals(randomDomain, getText(editNamespacePage.getPrefixField()));
         assertEquals("a description", getText(editNamespacePage.getDescriptionField()));
-        assertChecked(editNamespacePage.getStandardCheckboxField());
+        assertNotChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
         editNamespacePage.getURIField().clear();
         String existingURI = "http://www.openapplications.org/oagis/10";
@@ -117,8 +116,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' exists."));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
         editNamespacePage.hitBackButton();
         waitFor(Duration.ofMillis(3000L));
         String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
@@ -136,8 +134,6 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
-
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
@@ -201,8 +197,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
             WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
-            TransferNamespaceOwershipDialog transferNamespaceOwershipDialog =
-                    viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
+            TransferNamespaceOwershipDialog transferNamespaceOwershipDialog = viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
             transferNamespaceOwershipDialog.transfer(endUser.getLoginId());
 
             viewEditNamespacePage.setURI(testURI);
