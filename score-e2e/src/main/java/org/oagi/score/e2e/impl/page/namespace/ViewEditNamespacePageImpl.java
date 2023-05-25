@@ -238,7 +238,7 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
     }
 
     private String getNameFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
+        return getText(tableData.findElement(By.cssSelector("td.mat-column-uri > a")));
     }
 
     @Override

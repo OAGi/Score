@@ -16,7 +16,7 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
     private static final By PREFIX_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Prefix\")]//ancestor::div[1]/input");
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::div[1]/textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By STANDARD_CHECKBOX_FIELD_LOCATOR =
