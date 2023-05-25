@@ -8,18 +8,20 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.EditNamespacePage;
+import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -154,17 +156,51 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
 
     @Test
     public void test_TA_20_2_4() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
-    }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId());
+        editNamespacePage.hitDiscardButton();
 
-    @Test
-    public void test_TA_20_2_5() {
-
+        viewEditNamespacePage.openPage();
+        assertThrows(TimeoutException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId()));
     }
 
     @Test
     public void test_TA_20_2_6() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(anotherUser);
+        HomePage homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+
+        {
+            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.hitSearchButton();
+
+            WebElement tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+
+            TransferNamespaceOwershipDialog transferNamespaceOwershipDialog =
+                    viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
+            transferNamespaceOwershipDialog.transfer(endUser.getLoginId());
+
+            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.hitSearchButton();
+
+            tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            td = viewEditNamespacePage.getColumnByName(tr, "owner");
+            assertEquals(endUser.getLoginId(), getText(td));
+        }
 
     }
 
