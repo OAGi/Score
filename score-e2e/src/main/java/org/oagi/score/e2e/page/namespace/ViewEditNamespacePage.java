@@ -94,5 +94,5 @@ public interface ViewEditNamespacePage extends Page {
      * @param tr the table record
      * @return the 'Transfer Namespace Ownership' dialog object
      */
-    TransferNamespaceOwnershipDialog openTransferNamespaceOwnershipDialog(WebElement tr);
+     TransferNamespaceOwershipDialog openTransferNamespaceOwnershipDialog(WebElement tr);
 }

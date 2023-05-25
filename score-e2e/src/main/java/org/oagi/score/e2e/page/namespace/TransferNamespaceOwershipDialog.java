@@ -107,9 +107,9 @@ public interface TransferNamespaceOwershipDialog extends Dialog {
     /**
      * Transfer the ownership to the user who has the given login ID.
      *
-     * @param loginId Login ID
+     * @param loginID Login ID
      */
-    void transfer(String loginId);
+    void transfer(String loginID);
 
     /**
      * Return the UI element of the 'Cancel' button.

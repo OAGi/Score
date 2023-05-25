@@ -10,9 +10,9 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.EditNamespacePage;
+import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -201,9 +201,9 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
             WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
-            TransferCCOwnershipDialog transferCCOwnershipDialog =
-                    viewEditNamespacePage.openTransferCCOwnershipDialog(tr);
-            transferCCOwnershipDialog.transfer(developer.getLoginId());
+            TransferNamespaceOwershipDialog transferNamespaceOwershipDialog =
+                    viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
+            transferNamespaceOwershipDialog.transfer(developer.getLoginId());
 
             viewEditNamespacePage.setURI(namespace.getUri());
             viewEditNamespacePage.hitSearchButton();
