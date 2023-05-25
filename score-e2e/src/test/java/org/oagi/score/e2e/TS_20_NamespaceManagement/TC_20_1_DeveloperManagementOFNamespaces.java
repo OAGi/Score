@@ -21,6 +21,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -48,6 +49,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
+
     @Test
     public void test_TA_20_1_1_a_b_c_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -58,15 +60,16 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String testURI = "http://www.testdevelopernamespace1.org/user/10";
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
         createNamespacePage.hitCreateButton();
         viewEditNamespacePage.openPage();
         viewEditNamespacePage.setURI(testURI);
         viewEditNamespacePage.hitSearchButton();
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
-        String developerName = developer.getLoginId();
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"http://www.testdevelopernamespace1.org/user/10\")]//ancestor::tr[1]")).size());
+        String namespaceXpath = "//*[contains(text(),\""+testURI+"\")]//ancestor::tr[1]//span[contains(text(),\""+developer.getLoginId()+"\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
 
         createNamespacePage.openPage();
         createNamespacePage.setURI(testURI);
@@ -84,16 +87,16 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        String branch = "Working";
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
         CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
         assertChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String testURI = "http://www.testdevelopernamespace1.org/user/10";
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
-        createNamespacePage.setPrefix("a prefix");
+        createNamespacePage.setPrefix(randomDomain);
         createNamespacePage.setDescription("a description");
         createNamespacePage.hitCreateButton();
         viewEditNamespacePage.openPage();
@@ -102,7 +105,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
 
         EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(testURI, developer.getLoginId());
-        assertEquals("a prefix", getText(editNamespacePage.getPrefixField()));
+        assertEquals(randomDomain, getText(editNamespacePage.getPrefixField()));
         assertEquals("a description", getText(editNamespacePage.getDescriptionField()));
         assertChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
@@ -115,7 +118,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//td[contains(text(),\"" + developer.getLoginId() + "\")]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + developer.getLoginId() + "\")]")).size());
     }
 
     @Test

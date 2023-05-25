@@ -14,7 +14,7 @@ public class CreateNamespacePageImpl extends BasePageImpl implements CreateNames
     private static final By PREFIX_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Prefix\")]//ancestor::div[1]/input");
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::div[1]/textarea");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
     private static final By STANDARD_CHECKBOX_FIELD_LOCATOR =
