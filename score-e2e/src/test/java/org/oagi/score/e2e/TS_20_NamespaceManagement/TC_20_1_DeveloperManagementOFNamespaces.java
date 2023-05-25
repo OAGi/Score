@@ -171,7 +171,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
-
+        developerNamespace.setStandardNamespace(true);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
 
@@ -191,15 +191,18 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
 
         String branch = "Working";
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(anotherDeveloper);
         HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
-
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.hitCreateButton();
         {
-            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.setURI(testURI);
             viewEditNamespacePage.hitSearchButton();
 
-            WebElement tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            WebElement tr = viewEditNamespacePage.getTableRecordByValue(testURI);
             WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
@@ -207,10 +210,10 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
                     viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
             transferNamespaceOwershipDialog.transfer(developer.getLoginId());
 
-            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.setURI(testURI);
             viewEditNamespacePage.hitSearchButton();
 
-            tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            tr = viewEditNamespacePage.getTableRecordByValue(testURI);
             td = viewEditNamespacePage.getColumnByName(tr, "owner");
             assertEquals(developer.getLoginId(), getText(td));
         }

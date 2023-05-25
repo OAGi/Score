@@ -15,16 +15,17 @@ import org.oagi.score.e2e.page.namespace.EditNamespacePage;
 import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
@@ -61,14 +62,16 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         assertNotChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String testURI = "http://www.testenduseranamespace1.org/user/10";
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
         createNamespacePage.hitCreateButton();
         viewEditNamespacePage.openPage();
         viewEditNamespacePage.setURI(testURI);
         viewEditNamespacePage.hitSearchButton();
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//td[contains(text(),\"" + endUser.getLoginId() + "\")]")).size());
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
 
         createNamespacePage.openPage();
         createNamespacePage.setURI(testURI);
@@ -91,9 +94,10 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         assertChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String testURI = "http://www.testenduseranamespace1.org/user/10";
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
-        createNamespacePage.setPrefix("a prefix");
+        createNamespacePage.setPrefix(randomDomain);
         createNamespacePage.setDescription("a description");
         createNamespacePage.hitCreateButton();
         viewEditNamespacePage.openPage();
@@ -102,20 +106,23 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
 
         EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(testURI, endUser.getLoginId());
-        assertEquals("a prefix", getText(editNamespacePage.getPrefixField()));
+        assertEquals(randomDomain, getText(editNamespacePage.getPrefixField()));
         assertEquals("a description", getText(editNamespacePage.getDescriptionField()));
-        assertNotChecked(editNamespacePage.getStandardCheckboxField());
+        assertChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
         editNamespacePage.getURIField().clear();
-        editNamespacePage.setURI("http://www.openapplications.org/oagis/10");
+        String existingURI = "http://www.openapplications.org/oagis/10";
+        editNamespacePage.setURI(existingURI);
         editNamespacePage.hitUpdateButton();
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
-
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//td[contains(text(),\"" + endUser.getLoginId() + "\")]")).size());
+        editNamespacePage.hitBackButton();
+        waitFor(Duration.ofMillis(3000L));
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
 
 
@@ -167,7 +174,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         editNamespacePage.hitDiscardButton();
 
         viewEditNamespacePage.openPage();
-        assertThrows(TimeoutException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId()));
+        assertThrows(NoSuchElementException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId()));
     }
 
     @Test
@@ -178,15 +185,19 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(anotherUser);
         HomePage homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        String randomDomain = randomAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.hitCreateButton();
 
         {
-            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.setURI(testURI);
             viewEditNamespacePage.hitSearchButton();
 
-            WebElement tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            WebElement tr = viewEditNamespacePage.getTableRecordByValue(testURI);
             WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
@@ -194,10 +205,10 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
                     viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
             transferNamespaceOwershipDialog.transfer(endUser.getLoginId());
 
-            viewEditNamespacePage.setURI(namespace.getUri());
+            viewEditNamespacePage.setURI(testURI);
             viewEditNamespacePage.hitSearchButton();
 
-            tr = viewEditNamespacePage.getTableRecordByValue(namespace.getUri());
+            tr = viewEditNamespacePage.getTableRecordByValue(testURI);
             td = viewEditNamespacePage.getColumnByName(tr, "owner");
             assertEquals(endUser.getLoginId(), getText(td));
         }
