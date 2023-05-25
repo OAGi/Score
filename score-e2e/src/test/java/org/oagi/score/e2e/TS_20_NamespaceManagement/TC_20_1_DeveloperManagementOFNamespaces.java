@@ -117,8 +117,8 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
-
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + developer.getLoginId() + "\")]")).size());
+        String namespaceXpath = "//*[contains(text(),\""+testURI+"\")]//ancestor::tr[1]//span[contains(text(),\""+developer.getLoginId()+"\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
 
     @Test
