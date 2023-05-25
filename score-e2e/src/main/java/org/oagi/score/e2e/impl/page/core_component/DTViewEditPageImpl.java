@@ -49,6 +49,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By CARDINALITY_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
+    private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
 
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
@@ -550,6 +554,82 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
             click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+        }
+    }
+    @Override
+    public WebElement getNodeByPath(String path) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        return getNodeByName(nodes[nodes.length - 1]);
+    }
+
+    @Override
+    public SupplementaryComponentPanel getSCPanel(WebElement scNode) {
+        return retry(() -> {
+            click(scNode);
+            waitFor(ofMillis(1000L));
+            String nodeText = getText(scNode);
+            String panelTitle = getText(getTitle());
+            assert nodeText.contains(panelTitle);
+            return new SupplementaryComponentPanelImpl();
+        });
+    }
+
+    private class SupplementaryComponentPanelImpl implements DTViewEditPage.SupplementaryComponentPanel {
+        @Override
+        public void setCardinality(String cardinality) {
+            click(getCardinalityField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
+            click(option);
+        }
+        @Override
+        public WebElement getCardinalityField() {
+            return visibilityOfElementLocated(getDriver(), CARDINALITY_FIELD_LOCATOR);
+        }
+
+        @Override
+        public void setValueConstraintType(String valueConstraintType) {
+            click(getValueConstraintTypeField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
+            click(option);
+        }
+        @Override
+        public WebElement getValueConstraintTypeField() {
+            return visibilityOfElementLocated(getDriver(), VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
+        }
+
+        @Override
+        public void setValueConstraint(String constraintValue) {
+            sendKeys(getValueConstraintField(), constraintValue);
+        }
+        @Override
+        public WebElement getValueConstraintField() {
+            String selectedValueConstraintType = getValueConstraintTypeFieldValue();
+            if (selectedValueConstraintType.equals("None")){
+                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"No value constraints\")]/ancestor::mat-form-field//input"));
+            } else{
+                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + selectedValueConstraintType +
+                        "\")]/ancestor::mat-form-field//input"));
+            }
+        }
+
+        @Override
+        public String getCardinalityFieldValue() {
+            return getText(getCardinalityField());
+        }
+
+        @Override
+        public String getValueConstraintTypeFieldValue() {
+            return getText(getValueConstraintTypeField());
+        }
+
+        @Override
+        public String getValueConstraintFieldValue() {
+            return getText(getValueConstraintField());
         }
     }
 }
