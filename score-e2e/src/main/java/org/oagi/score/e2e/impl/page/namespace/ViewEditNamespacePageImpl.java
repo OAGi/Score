@@ -5,6 +5,7 @@ import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
 import org.oagi.score.e2e.page.namespace.EditNamespacePage;
+import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -240,4 +241,14 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
         return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
+    @Override
+    public TransferNamespaceOwershipDialog openTransferNamespaceOwnershipDialog(WebElement tr) {
+        WebElement td = getColumnByName(tr, "transferOwnership");
+        click(td.findElement(By.className("mat-icon")));
+
+        TransferNamespaceOwershipDialog transferNamespaceOwershipDialog =
+                new TransferNamespaceOwnershipDialogImpl(this);
+        assert transferNamespaceOwershipDialog.isOpened();
+        return transferNamespaceOwershipDialog;
+    }
 }

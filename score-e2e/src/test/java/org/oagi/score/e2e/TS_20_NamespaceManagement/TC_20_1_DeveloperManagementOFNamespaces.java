@@ -48,13 +48,10 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
-
     @Test
     public void test_TA_20_1_1_a_b_c_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-
-        String branch = "Working";
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
         CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
