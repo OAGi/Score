@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
