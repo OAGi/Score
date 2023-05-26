@@ -508,47 +508,7 @@ public class DtWriteRepository {
         bdtManifestRecord.setLogId(logRecord.getLogId());
         bdtManifestRecord.update(DT_MANIFEST.LOG_ID);
 
-        for (DtManifestRecord derivedDtManifestRecord : dslContext.selectFrom(DT_MANIFEST)
-                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
-                .fetch()) {
-            propagateUpdateDtRecord(derivedDtManifestRecord, request, user);
-        }
-
         return new UpdateDtPropertiesRepositoryResponse(bdtManifestRecord.getDtManifestId().toBigInteger());
-    }
-
-    private void propagateUpdateDtRecord(DtManifestRecord dtManifestRecord,
-                                         UpdateDtPropertiesRepositoryRequest request,
-                                         AppUser user) {
-        DtRecord dtRecord = dslContext.selectFrom(DT)
-                .where(DT.DT_ID.eq(dtManifestRecord.getDtId()))
-                .fetchOne();
-
-        UpdateSetFirstStep<DtRecord> firstStep = dslContext.update(DT);
-        UpdateSetMoreStep<DtRecord> moreStep = null;
-        if (compare(dtRecord.getContentComponentDefinition(), request.getContentComponentDefinition()) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT.CONTENT_COMPONENT_DEFINITION, request.getContentComponentDefinition());
-        }
-        if (compare(dtRecord.getDefinition(), request.getDefinition()) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT.DEFINITION, request.getDefinition());
-        }
-        if (compare(dtRecord.getDefinitionSource(), request.getDefinitionSource()) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT.DEFINITION_SOURCE, request.getDefinitionSource());
-        }
-
-        if (moreStep != null) {
-            moreStep.where(DT.DT_ID.eq(dtRecord.getDtId()))
-                    .execute();
-        }
-
-        for (DtManifestRecord derivedDtManifestRecord : dslContext.selectFrom(DT_MANIFEST)
-                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
-                .fetch()) {
-            propagateUpdateDtRecord(derivedDtManifestRecord, request, user);
-        }
     }
 
     private void deleteDerivedValueDomain(ULong basedDtManifestId, List<BdtPriRestriRecord> deleteList) {
