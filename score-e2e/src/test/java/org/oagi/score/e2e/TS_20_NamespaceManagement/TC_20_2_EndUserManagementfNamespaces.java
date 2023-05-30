@@ -123,8 +123,6 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
-
-
     @Test
     public void test_TA_20_2_3() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
