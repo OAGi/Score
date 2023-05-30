@@ -300,5 +300,4 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     public void test_TA_18_1_5_e() {
 
     }
-
 }
