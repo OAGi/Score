@@ -141,9 +141,9 @@ public interface CoreComponentAPI {
                                 NamespaceObject namespace, String state);
 
     /**
-     * Create a random BDT.
+     * Create a random BDT with the CCTS DT v3.1 specification rule.
      *
-     * @param baseDataType The base data type
+     * @param baseDataType the base data type
      * @param creator      account who creates this BDT
      * @param namespace    namespace
      * @param state        BDT state
@@ -151,6 +151,19 @@ public interface CoreComponentAPI {
      */
     DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
                              NamespaceObject namespace, String state);
+
+    /**
+     * Create a random BDT.
+     *
+     * @param baseDataType the base data type
+     * @param creator      account who creates this BDT
+     * @param namespace    namespace
+     * @param state        BDT state
+     * @param refSpec      reference specification. Used only if the base data type is CDT.
+     * @return created BDT object
+     */
+    DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
+                             NamespaceObject namespace, String state, ReferenceSpec refSpec);
 
     ACCObject createRevisedACC(ACCObject prevAcc, AppUserObject creator, ReleaseObject release, String state);
 

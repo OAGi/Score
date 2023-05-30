@@ -625,6 +625,12 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
     @Override
     public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+        return createRandomBDT(baseDataType, creator, namespace, state, ReferenceSpec.CCTS_DT_v3_1);
+    }
+
+    @Override
+    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state,
+                                    ReferenceSpec referenceSpec) {
         DTObject bdt = DTObject.createRandomDT(baseDataType, creator, namespace, state);
         bdt.setReleaseId(baseDataType.getReleaseId());
         DtRecord dtRecord = new DtRecord();
@@ -713,12 +719,40 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dslContext.selectFrom(DT_SC_MANIFEST)
                 .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(ULong.valueOf(baseDataType.getDtManifestId())))
                 .fetch().forEach(dtScManifest -> {
+                    ULong oldDtScId = dtScManifest.getDtScId();
                     DtScRecord dtSc = dslContext.selectFrom(DT_SC)
-                            .where(DT_SC.DT_SC_ID.eq(dtScManifest.getDtScId()))
+                            .where(DT_SC.DT_SC_ID.eq(oldDtScId))
                             .fetchOne();
 
                     dtSc.setDtScId(null);
                     dtSc.setOwnerDtId(bdtId);
+                    if (isCdt) {
+                        RefSpecRecord refSpec = null;
+                        switch (referenceSpec) {
+                            case CCTS_DT_v3_1:
+                                refSpec = dslContext.selectFrom(REF_SPEC)
+                                        .where(REF_SPEC.SPEC.eq("CCTS DT v3.1"))
+                                        .fetchOne();
+                                break;
+                            case ISO_15000_5:
+                                refSpec = dslContext.selectFrom(REF_SPEC)
+                                        .where(REF_SPEC.SPEC.eq("ISO 15000:5 (2014) CCT"))
+                                        .fetchOne();
+                                break;
+                        }
+                        if (refSpec != null) {
+                            CdtScRefSpecRecord cdtScRefSpec = dslContext.selectFrom(CDT_SC_REF_SPEC)
+                                    .where(and(
+                                            CDT_SC_REF_SPEC.REF_SPEC_ID.eq(refSpec.getRefSpecId()),
+                                            CDT_SC_REF_SPEC.CDT_SC_ID.eq(oldDtScId)
+                                    ))
+                                    .fetchOptional().orElse(null);
+                            if (cdtScRefSpec == null) {
+                                dtSc.setCardinalityMax(0);
+                            }
+                        }
+                    }
+
                     dtSc.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
                     dtSc.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
                     dtSc.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
@@ -743,7 +777,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
                     if (isCdt) {
                         List<CdtScAwdPriRecord> cdtScAwdPriList = dslContext.selectFrom(CDT_SC_AWD_PRI)
-                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(dtSc.getDtScId()))
+                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(oldDtScId))
                                 .fetch();
                         for (CdtScAwdPriRecord cdtScAwdPri : cdtScAwdPriList) {
                             List<CdtScAwdPriXpsTypeMapRecord> cdtScAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
@@ -759,7 +793,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                                         .execute();
                             }
                         }
-
                     } else {
                         List<BdtScPriRestriRecord> bdtScPriRestriList = dslContext.selectFrom(BDT_SC_PRI_RESTRI)
                                 .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(oldDtScManifestId))

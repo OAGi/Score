@@ -178,9 +178,12 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
         for (DTObject dt : dtForTesting) {
             DTObject derivedDT = derivedBDTs.get(dt);
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
-            dtViewEditPage.setDefinition("Derived BDT definition");
-            dtViewEditPage.setDefinitionSource("Derived BDT definition source");
-            dtViewEditPage.setContentComponentDefinition("Derived BDT Content Component definition");
+            String derivedBDTDefinition = "Derived BDT definition";
+            String derivedBDTDefinitionSource = "Derived BDT definition source";
+            String derivedBDTContentComponentDefinition = "Derived BDT Content Component definition";
+            dtViewEditPage.setDefinition(derivedBDTDefinition);
+            dtViewEditPage.setDefinitionSource(derivedBDTDefinitionSource);
+            dtViewEditPage.setContentComponentDefinition(derivedBDTContentComponentDefinition);
             dtViewEditPage.hitUpdateButton();
 
             homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -221,9 +224,9 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             DTObject derivedDTLevelTwo = derivedBDTs.get(derivedDT);
             homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDTLevelTwo.getDen(), branch.getReleaseNumber());
-            assertTrue(dtViewEditPage.getDefinitionFieldValue().equals(baseBDTDefinition));
-            assertTrue(dtViewEditPage.getDefinitionSourceFieldValue().equals(baseBDTDefinitionSource));
-            assertTrue(dtViewEditPage.getContentComponentDefinitionFieldValue().equals(baseBDTContentComponentDefinition));
+            assertTrue(dtViewEditPage.getDefinitionFieldValue().equals(derivedBDTDefinition));
+            assertTrue(dtViewEditPage.getDefinitionSourceFieldValue().equals(derivedBDTDefinitionSource));
+            assertTrue(dtViewEditPage.getContentComponentDefinitionFieldValue().equals(derivedBDTContentComponentDefinition));
             dtViewEditPage.showValueDomain();
             assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDTLevelTwo.getDen() + "/" + dtSCName);
