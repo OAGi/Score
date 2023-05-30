@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_24_1_ReuseBIE extends BaseTest {
@@ -48,7 +49,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_24_1_1_a() {
+    public void test_TA_24_1_1_a_and_b() {
         ASCCPObject asccp, asccp_owner_usera;
         BCCPObject bccp;
         ACCObject acc;
@@ -105,24 +106,24 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp.getPropertyTerm()+"\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
 
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        asbiePanel.setCardinalityMax(199);
+        asbiePanel.setCardinalityMin(77);
+        asbiePanel.setContextDefinition("aContextDefinition");
+        editBIEPage.hitUpdateButton();
 
+        editBIEPage.openPage();
+        asccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
+        assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
+        assertEquals("aContextDefinition", getText(asbiePanel.getContextDefinitionField()));
     }
-
     @Test
-    public void test_TA_24_1_1_b() {
+    public void test_TA_24_1_1_c_and_d() {
+
 
     }
-
-    @Test
-    public void test_TA_24_1_1_c() {
-
-    }
-
-    @Test
-    public void test_TA_24_1_1_d() {
-
-    }
-
     @Test
     public void test_TA_24_1_1_e() {
 
