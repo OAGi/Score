@@ -56,7 +56,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         BCCPObject bccp;
         ACCObject acc;
         AppUserObject usera;
-        AppUserObject userb;
         NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
@@ -65,9 +64,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
-            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(userb);
-
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
 
