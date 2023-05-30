@@ -12,7 +12,9 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_24_1_ReuseBIE extends BaseTest {
@@ -52,6 +55,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         AppUserObject usera;
         AppUserObject userb;
         BusinessContextObject context;
+        TopLevelASBIEPObject useraBIE;
         String prev_release = "10.8.5";
         ReleaseObject prevReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
         {
@@ -76,10 +80,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
-
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
-            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -92,8 +96,14 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        WebElement bccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        editBIEPage.clickOnDropDownMenuByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
 
-
+        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
+        WebElement asccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp.getPropertyTerm()+"\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
 
 
     }
