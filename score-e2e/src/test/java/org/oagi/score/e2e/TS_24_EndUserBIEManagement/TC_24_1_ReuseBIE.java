@@ -14,6 +14,8 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -50,11 +52,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_1_a_and_b() {
-        ASCCPObject asccp, asccp_owner_usera;
+        ASCCPObject asccp, asccp_owner_usera, asccp_to_append;
         BCCPObject bccp;
         ACCObject acc;
         AppUserObject usera;
         AppUserObject userb;
+        NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
         String prev_release = "10.8.5";
@@ -66,7 +69,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
 
             /**
              * The owner of the ASCCP is usera
@@ -77,10 +80,11 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
+            ACCObject acc_association2 = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
+            asccp_to_append = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
-            ascc.setCardinalityMax(1);
-            coreComponentAPI.updateASCC(ascc);
+            coreComponentAPI.appendExtension(acc, usera, namespace, "Production");
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -97,15 +101,23 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        WebElement bccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
-        editBIEPage.clickOnDropDownMenuByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension");
+        SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp_owner_usera.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(asccp_to_append.getDen());
+        ACCExtensionViewEditPage.setNamespace(namespace);
+        ACCExtensionViewEditPage.hitUpdateButton();
+        ACCExtensionViewEditPage.moveToQA();
+        ACCExtensionViewEditPage.moveToProduction();
+        bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
+        editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + bccp.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
 
-        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
-        WebElement asccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp.getPropertyTerm()+"\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
 
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp.getPropertyTerm()+"\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
+        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         asbiePanel.setCardinalityMax(199);
         asbiePanel.setCardinalityMin(77);
@@ -113,7 +125,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         editBIEPage.openPage();
-        asccpNode = editBIEPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm()+ "/" + asccp.getPropertyTerm());
         asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
         assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
