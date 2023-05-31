@@ -52,8 +52,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_1_a_and_b() {
-        ASCCPObject asccp, asccp_owner_usera, asccp_to_append;
-        BCCPObject bccp;
+        ASCCPObject asccp, asccp_owner_usera, asccp_to_append,asccp_child, asccp_reuse;
+        BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
         NamespaceObject namespace;
@@ -73,13 +73,27 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             acc = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", prevReleaseObject.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
+
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("7dbd5b2f116f41d88622bba1237abf8f", prevReleaseObject.getReleaseNumber());
+            bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
             ACCObject acc_association2 = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
+
+            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
+
+            asccp_child = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc_association2, asccp_child, "Production");
+            ascc.setCardinalityMax(1);
+            coreComponentAPI.updateASCC(ascc);
+
             asccp = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
             asccp_to_append = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
-            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
+            asccp_reuse = coreComponentAPI.createRandomASCCP(acc_association2, usera, namespace, "Production");
+            ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
             coreComponentAPI.appendExtension(acc, usera, namespace, "Published");
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
@@ -100,16 +114,19 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension");
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp_owner_usera.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.selectAssociation(asccp_to_append.getDen());
+        selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp_owner_usera.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(bccp_not_reuse.getDen());
+        selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp_owner_usera.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation(asccp_reuse.getDen());
         ACCExtensionViewEditPage.setNamespace(namespace);
         ACCExtensionViewEditPage.hitUpdateButton();
         ACCExtensionViewEditPage.moveToQA();
         ACCExtensionViewEditPage.moveToProduction();
-        bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
-        editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        editBIEPage.openPage();
+        editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + bccp_not_reuse.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
 
-        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
 
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp.getPropertyTerm()+"\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
