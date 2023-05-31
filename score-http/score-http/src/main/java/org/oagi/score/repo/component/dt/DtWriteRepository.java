@@ -695,7 +695,7 @@ public class DtWriteRepository {
                 }
             }
 
-            insertDerivedValueDomain(dtManifest.getDtId(), insertList);
+            insertDerivedValueDomain(dtManifest.getDtManifestId(), insertList);
         }
     }
 
