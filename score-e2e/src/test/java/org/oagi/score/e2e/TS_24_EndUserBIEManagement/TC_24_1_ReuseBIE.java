@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -76,7 +77,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
-            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", prevReleaseObject.getReleaseNumber());
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("3292eaa5630b48ecb7c4249b0ddc760e", prevReleaseObject.getReleaseNumber());
             bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
@@ -126,6 +127,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + bccp_not_reuse.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
 
+        escape(getDriver());
+        editBIEPage.openPage();
         SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
 
