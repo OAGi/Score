@@ -76,7 +76,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
-            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("7dbd5b2f116f41d88622bba1237abf8f", prevReleaseObject.getReleaseNumber());
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", prevReleaseObject.getReleaseNumber());
             bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
