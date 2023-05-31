@@ -99,7 +99,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp_reuse, usera, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
