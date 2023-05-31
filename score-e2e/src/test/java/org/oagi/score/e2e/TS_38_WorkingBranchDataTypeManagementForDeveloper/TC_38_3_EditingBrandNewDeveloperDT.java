@@ -138,7 +138,7 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(baseCDT.getDtId(), branch.getReleaseNumber());
             for (DTSCObject dtSC: supplementaryComponentsFromTheBaseDT){
                 String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +dtSC.getRepresentationTerm();
-                assertDoesNotThrow(() -> dtViewEditPage.goToNode("/" + dt.getDen() + "/" + dtSCName));
+                assertDoesNotThrow(() -> dtViewEditPage.getNodeByPath("/" + dt.getDen() + "/" + dtSCName));
             }
         }
     }

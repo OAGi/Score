@@ -1546,7 +1546,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
-                .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)))
+                .join(CDT_SC_REF_SPEC).on(DT_SC.DT_SC_ID.eq(CDT_SC_REF_SPEC.CDT_SC_ID))
+                .join(REF_SPEC).on(CDT_SC_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
+                .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)).and(REF_SPEC.SPEC.eq("CCTS DT v3.1")))
                 .fetchMany();
         for (Result<Record> r: result){
             for (int i=0; i<r.size(); i++){
