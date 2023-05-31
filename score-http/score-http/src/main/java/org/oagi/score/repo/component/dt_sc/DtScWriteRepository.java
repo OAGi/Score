@@ -143,8 +143,8 @@ public class DtScWriteRepository {
         int cnt = dslContext.selectCount()
                 .from(DT_SC)
                 .where(and(
-                        DT_SC.OWNER_DT_ID.eq(dtId),
                         DT_SC.PROPERTY_TERM.eq(propertyTerm),
+                        DT_SC.OWNER_DT_ID.eq(dtId),
                         DT_SC.DT_SC_ID.notEqual(dtScRecord.getDtScId())
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0);
@@ -157,39 +157,26 @@ public class DtScWriteRepository {
                                        String objectClassTerm,
                                        String propertyTerm,
                                        String representationTerm) {
-        while (dtScRecord.getBasedDtScId() != null) {
-            dtScRecord = dslContext.selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getBasedDtScId()))
-                    .fetchOne();
-        }
-
-        Queue<DtScRecord> dtScHierarchy = new LinkedList();
-        dtScHierarchy.add(dtScRecord);
-
-        Set<ULong> dtScIdSet = new HashSet();
-        while (!dtScHierarchy.isEmpty()) {
-            dtScRecord = dtScHierarchy.poll();
-            dtScIdSet.add(dtScRecord.getDtScId());
-
-            dtScHierarchy.addAll(
-                    dslContext.selectFrom(DT_SC)
-                            .where(DT_SC.BASED_DT_SC_ID.eq(dtScRecord.getDtScId()))
-                            .fetch()
-            );
-        }
-
         int cnt = dslContext.selectCount()
                 .from(DT_SC)
                 .where(and(
                         DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm),
                         DT_SC.PROPERTY_TERM.eq(propertyTerm),
                         DT_SC.REPRESENTATION_TERM.eq(representationTerm),
-                        DT_SC.DT_SC_ID.notIn(dtScIdSet)
+                        DT_SC.OWNER_DT_ID.eq(dtScRecord.getOwnerDtId()),
+                        DT_SC.DT_SC_ID.notEqual(dtScRecord.getDtScId())
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0);
         if (cnt > 0) {
             String den = getDen(objectClassTerm, propertyTerm, representationTerm);
             throw new IllegalArgumentException("There is an another supplementary component whose DEN is same with the request: " + den);
+        }
+
+        if (dtScRecord.getBasedDtScId() != null) {
+            dtScRecord = dslContext.selectFrom(DT_SC)
+                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getBasedDtScId()))
+                    .fetchOne();
+            ensureUniquenessOfDen(dtScRecord, objectClassTerm, propertyTerm, representationTerm);
         }
     }
 
