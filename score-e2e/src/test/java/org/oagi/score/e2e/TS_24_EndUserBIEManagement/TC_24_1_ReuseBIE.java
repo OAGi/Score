@@ -80,7 +80,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
             asccp_to_append = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
-            coreComponentAPI.appendExtension(acc, usera, namespace, "Production");
+            coreComponentAPI.appendExtension(acc, usera, namespace, "Published");
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
