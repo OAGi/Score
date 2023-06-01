@@ -282,6 +282,8 @@ public interface DTViewEditPage extends Page {
 
     DTViewEditPage.SupplementaryComponentPanel getSCPanel(WebElement scNode);
 
+    void removeSupplementaryComponent(String path);
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 

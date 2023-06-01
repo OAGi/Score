@@ -89,6 +89,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Comments\")]");
     private static final By SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Add Supplementary Component\")]");
+    private static final By REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Remove\")]");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
@@ -567,6 +569,20 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         goToNode(path);
         String[] nodes = path.split("/");
         return getNodeByName(nodes[nodes.length - 1]);
+    }
+
+    @Override
+    public void removeSupplementaryComponent(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+        }
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Remove anyway\")]//ancestor::button[1]")));
     }
 
     @Override

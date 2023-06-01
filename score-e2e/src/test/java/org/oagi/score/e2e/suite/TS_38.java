@@ -10,7 +10,9 @@ import org.oagi.score.e2e.TS_38_WorkingBranchDataTypeManagementForDeveloper.*;
 @SelectClasses({
         TC_38_1_DTAccess.class,
         TC_38_2_CreatingBrandNewDT.class,
-        TC_38_3_EditingBrandNewDeveloperDT.class
+        TC_38_3_EditingBrandNewDeveloperDT.class,
+        TC_38_4_AddBrandNewSC.class,
+        TC_38_5_RemoveBrandNewSC.class
 })
 public class TS_38 {
 }
