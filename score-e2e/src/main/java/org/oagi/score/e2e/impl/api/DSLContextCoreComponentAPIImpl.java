@@ -1581,7 +1581,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     public List<String> getRepresentationTermsForCDTs(String release) {
         List<String> representationTerms = new ArrayList<>();
 
-        representationTerms = dslContext.select()
+        representationTerms = dslContext.select(DT.REPRESENTATION_TERM)
                 .from(DT)
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
