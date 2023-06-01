@@ -149,6 +149,59 @@ public class TC_24_1_ReuseBIE extends BaseTest {
     }
     @Test
     public void test_TA_24_1_1_c_and_d() {
+        AppUserObject usera;
+        NamespaceObject namespace;
+        BusinessContextObject context;
+        String useraASCCP = "Cancel Acknowledge Employee Work Time. Cancel Acknowledge Employee Work Time";
+        String BIEDocumentReference = "Document Reference. Document Reference";
+        String BIEWorkTimePeriod = "Work Time Period. Time Period";
+        String BIEWorkLocation = "Work Location. Location";
+        String BIEStateChange = "State Change. State Change";
+        String BIEPersonName = "Person Name. Person Name";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        {
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(useraASCCP, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEDocumentReference, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEWorkTimePeriod, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEWorkLocation, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEStateChange, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEPersonName, currentReleaseObject.getReleaseNumber());
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(useraASCCP);
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+
+        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Document Reference");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(BIEDocumentReference);
+
+        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Document Reference");
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Document Reference\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
+
+        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Work Time Period");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(BIEWorkTimePeriod);
+
+        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Work Time Period");
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Work Time Period\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
+
+
 
 
     }
