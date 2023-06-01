@@ -1616,6 +1616,20 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
+    public DTObject getRevisedDT(DTObject previousDT) {
+        List<Field<?>> fields = new ArrayList();
+        fields.add(DT_MANIFEST.DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(DT.fields()));
+        return dslContext.select(fields)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .where(DT.PREV_DT_ID.eq(ULong.valueOf(previousDT.getDtId())))
+                .fetchOne(record -> dtMapper(record));
+    }
+
+    @Override
     public DTSCObject getNewlyCreatedSCForDT(BigInteger dtId, String releaseNumber) {
         ULong latestSCId = dslContext.select(DSL.max(DT_SC.DT_SC_ID))
                 .from(DT_SC)

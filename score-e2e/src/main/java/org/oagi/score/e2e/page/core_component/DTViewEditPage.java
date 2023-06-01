@@ -284,6 +284,8 @@ public interface DTViewEditPage extends Page {
 
     void removeSupplementaryComponent(String path);
 
+    void hitReviseButton();
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 
@@ -330,5 +332,13 @@ public interface DTViewEditPage extends Page {
         String getDefaultValueDomainFieldValue();
 
         void showValueDomain();
+
+        void setPropertyTerm(String propertyTerm);
+
+        void setDefaultValueDomain(String valueDomain);
+
+        WebElement getDefaultValueDomainField();
+
+        void setDefinitionSource(String definitionSource);
     }
 }

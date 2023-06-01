@@ -101,6 +101,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -586,6 +588,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
+    public void hitReviseButton() {
+        click(getReviseButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
     public SupplementaryComponentPanel getSCPanel(WebElement scNode) {
         return retry(() -> {
             click(scNode);
@@ -724,6 +734,28 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         @Override
         public void showValueDomain() {
             click(getShowValueDomain());
+        }
+
+        @Override
+        public void setPropertyTerm(String propertyTerm) {
+            sendKeys(getPropertyTermField(), propertyTerm);
+        }
+
+        @Override
+        public void setDefaultValueDomain(String valueDomain) {
+            click(getDefaultValueDomainField());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(),\"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+        }
+
+        @Override
+        public WebElement getDefaultValueDomainField() {
+            return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+        }
+
+        @Override
+        public void setDefinitionSource(String definitionSource) {
+            sendKeys(getDefinitionSourceField(), definitionSource);
         }
     }
 }

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)

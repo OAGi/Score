@@ -213,4 +213,6 @@ public interface CoreComponentAPI {
     List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm);
 
     String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm);
+
+    DTObject getRevisedDT(DTObject previousDT);
 }
