@@ -97,7 +97,7 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
             List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
             String representationTerm = representationTermsForCDTs.get(representationTermsForCDTs.size()-1);
             SCPanel.selectRepresentationTerm(representationTerm);
-            //assertEquals(null, SCPanel.getValueConstraintFieldValue());
+            assertEquals(null, SCPanel.getValueConstraintFieldValue());
             /**
              * Test Assertion #38.6.1.c
              */
@@ -152,6 +152,92 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
                 assertEquals("Are you sure you want to update this without definitions?",
                         dtViewEditPage.getDefinitionWarningDialogMessage());
                 dtViewEditPage.hitUpdateAnywayButton();
+            }
+
+        }
+    }
+    @Test
+    @DisplayName("TC_38_6_TA_2")
+    public void test_TA_2() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        DTObject baseCDT;
+        ArrayList<DTObject> derivedBDTs = new ArrayList<>();
+        CodeListObject codeList;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDT);
+
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, developerA, namespace, "WIP");
+            derivedBDTs.add(derivedBDTLevelOne);
+
+            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(derivedBDTLevelOne, developerA, namespace, "WIP");
+            derivedBDTs.add(derivedBDTLevelTwo);
+
+            codeList = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, branch, "WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.addSupplementaryComponent("/" + dt.getDen());
+            DTSCObject dtSC = getAPIFactory().getCoreComponentAPI().getNewlyCreatedSCForDT(dt.getDtId(), branch.getReleaseNumber());
+            String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + dtSC.getRepresentationTerm();
+
+            WebElement supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dt.getDen() + "/" + dtSCName);
+            assertTrue(supplementaryComponentNode.isDisplayed());
+            DTViewEditPage.SupplementaryComponentPanel SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
+            dtViewEditPage.showValueDomain();
+            List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
+            String representationTerm = SCPanel.getRepresentationSelectFieldValue();
+            List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
+            if (valueDomains.contains("Token")){
+                dtViewEditPage.addCodeListValueDomain(codeList.getName());
+            } else{
+                for (String representationTermNew: representationTermsForCDTs){
+                    valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTermNew);
+                    if (valueDomains.contains("Token")){
+                        SCPanel.selectRepresentationTerm(representationTermNew);
+                        String propertyTerm = SCPanel.getPropertyTermFieldValue();
+                        representationTerm = SCPanel.getRepresentationSelectFieldValue();
+                        dtSCName = dtSC.getObjectClassTerm() + ". " + propertyTerm + ". " + representationTerm;
+                        break;
+                    }
+                }
+               dtViewEditPage.addCodeListValueDomain(codeList.getName());
+            }
+            String definition = "SC new definition";
+            String definitionSource = "SC new definition source";
+            SCPanel.setDefinition(definition);
+            SCPanel.setDefinitionSource(definitionSource);
+            SCPanel.setCardinality("Required");
+            SCPanel.setValueConstraintType("Fixed Value");
+            SCPanel.setValueConstraint("fixed value");
+            dtViewEditPage.hitUpdateButton();
+
+            for (DTObject derivedDT : derivedBDTs) {
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+                supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen() + "/" + dtSCName);
+                assertTrue(supplementaryComponentNode.isDisplayed());
+                SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
+                assertTrue(SCPanel.getDefinitionFieldValue().equals(definition));
+                assertTrue(SCPanel.getDefinitionSourceFieldValue().equals(definitionSource));
+                assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
+                assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
+                assertEquals(null, SCPanel.getValueConstraintFieldValue());
+                dtViewEditPage.showValueDomain();
+                assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
             }
 
         }

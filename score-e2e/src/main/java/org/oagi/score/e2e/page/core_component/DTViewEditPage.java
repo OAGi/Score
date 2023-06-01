@@ -340,5 +340,7 @@ public interface DTViewEditPage extends Page {
         WebElement getDefaultValueDomainField();
 
         void setDefinitionSource(String definitionSource);
+
+        String getRepresentationSelectFieldValue();
     }
 }

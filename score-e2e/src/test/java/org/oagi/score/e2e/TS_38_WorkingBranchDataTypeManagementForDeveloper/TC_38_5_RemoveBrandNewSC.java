@@ -116,7 +116,6 @@ public class TC_38_5_RemoveBrandNewSC extends BaseTest {
             DTViewEditPage.SupplementaryComponentPanel SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
             SCPanel.setDefinition("some definition");
             dtViewEditPage.hitUpdateButton();
-
             dtViewEditPage.removeSupplementaryComponent("/" + dt.getDen() + "/" + dtSCName);
             for(DTObject derivedDT: derivedBDTs){
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();

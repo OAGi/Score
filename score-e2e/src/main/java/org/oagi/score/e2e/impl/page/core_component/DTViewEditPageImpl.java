@@ -757,5 +757,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         public void setDefinitionSource(String definitionSource) {
             sendKeys(getDefinitionSourceField(), definitionSource);
         }
+
+        @Override
+        public String getRepresentationSelectFieldValue() {
+            return getText(getRepresentationSelectField());
+        }
     }
 }
