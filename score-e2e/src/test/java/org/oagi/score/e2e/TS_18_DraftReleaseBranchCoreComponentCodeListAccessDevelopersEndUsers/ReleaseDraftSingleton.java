@@ -129,6 +129,7 @@ public class ReleaseDraftSingleton {
             releaseAssignmentPage.hitAssignAllButton();
             releaseAssignmentPage.hitCreateButton();
             waitFor(Duration.ofSeconds(300L));
+            existingReleaseNum = newReleaseNum;
             homePage.logout();
         } finally {
             driver.quit();
