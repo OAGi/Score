@@ -300,5 +300,33 @@ public interface DTViewEditPage extends Page {
         String getValueConstraintTypeFieldValue();
 
         String getValueConstraintFieldValue();
+
+        String getObjectClassTermFieldValue();
+
+        WebElement getObjectClassTermField();
+
+        String getDefinitionFieldValue();
+
+        String getDefinitionSourceFieldValue();
+
+        void setDefinition(String definition);
+
+        String getPropertyTermFieldValue();
+
+        WebElement getPropertyTermField();
+
+        WebElement getRepresentationSelectField();
+
+        WebElement getDefinitionField();
+
+        WebElement getDefinitionSourceField();
+
+        void selectRepresentationTerm(String representationTerm);
+
+        WebElement getTableRecordByValue(String value);
+
+        String getDefaultValueDomainFieldValue();
+
+        void showValueDomain();
     }
 }

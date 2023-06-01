@@ -1559,6 +1559,85 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         return dtList;
     }
 
+    @Override
+    public boolean SCPropertyTermIsUnique(DTObject dataType, String release, String objectClassTerm, String representationTerm, String propertyTerm) {
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        List<Result<Record>> result = dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT.DT_ID.eq(ULong.valueOf(dataType.getDtId())),
+                        RELEASE.RELEASE_NUM.eq(release), DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm), DT_SC.REPRESENTATION_TERM.eq(representationTerm),
+                        DT_SC.PROPERTY_TERM.eq(propertyTerm)))
+                .fetchMany();
+        if (result.size()>1){
+            return false;
+        } else return true;
+    }
+
+    @Override
+    public List<String> getRepresentationTermsForCDTs(String release) {
+        List<String> representationTerms = new ArrayList<>();
+
+        representationTerms = dslContext.select()
+                .from(DT)
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(CDT_REF_SPEC).on(DT.DT_ID.eq(CDT_REF_SPEC.CDT_ID))
+                .join(REF_SPEC).on(CDT_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
+                .where(and(RELEASE.RELEASE_NUM.eq(release), REF_SPEC.SPEC.eq("CCTS DT v3.1")))
+                .fetch(DT.REPRESENTATION_TERM);
+        return representationTerms;
+    }
+
+    @Override
+    public List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm) {
+        List<String> valueDomains = new ArrayList<>();
+
+        valueDomains = dslContext.select()
+                .from(DT)
+                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
+                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .where(DT.REPRESENTATION_TERM.eq(representationTerm))
+                .fetch(CDT_PRI.NAME);
+        return valueDomains;
+    }
+
+    @Override
+    public String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm) {
+        return dslContext.select(CDT_PRI.NAME)
+                .from(DT)
+                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
+                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .where(DT.REPRESENTATION_TERM.eq(representationTerm).and(CDT_AWD_PRI.IS_DEFAULT.eq((byte) 1)))
+                .fetchOneInto(String.class);
+    }
+
+    @Override
+    public DTSCObject getNewlyCreatedSCForDT(BigInteger dtId, String releaseNumber) {
+        ULong latestSCId = dslContext.select(DSL.max(DT_SC.DT_SC_ID))
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT.DT_ID.eq(ULong.valueOf(dtId)),
+                        RELEASE.RELEASE_NUM.eq(releaseNumber)))
+                .fetchOneInto(ULong.class);
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        return dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT_SC.DT_SC_ID.eq(latestSCId)))
+                .fetchOne(record -> dtSCMapper(record));
+    }
+
+
+
     private DTSCObject dtSCMapper(org.jooq.Record record) {
         DTSCObject dtSC = new DTSCObject();
         dtSC.setDtSCId(record.get(DT_SC.DT_SC_ID).toBigInteger());

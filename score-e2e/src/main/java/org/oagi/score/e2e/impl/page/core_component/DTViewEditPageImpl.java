@@ -40,12 +40,18 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+    private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+    private static final By PROPERTY_TERM_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+    private static final By REPRESENTATION_TERM_SELECTOR_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
 
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
 
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
 
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
@@ -630,6 +636,78 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         @Override
         public String getValueConstraintFieldValue() {
             return getText(getValueConstraintField());
+        }
+
+        @Override
+        public String getObjectClassTermFieldValue() {
+            return getText(getObjectClassTermField());
+        }
+
+        @Override
+        public WebElement getObjectClassTermField() {
+            return visibilityOfElementLocated(getDriver(), OBJECT_CLASS_TERM_FIELD_LOCATOR);
+        }
+
+        @Override
+        public String getDefinitionFieldValue() {
+            return getText(getDefinitionField());
+        }
+
+        @Override
+        public String getDefinitionSourceFieldValue() {
+            return getText(getDefinitionSourceField());
+        }
+
+        @Override
+        public void setDefinition(String definition) {
+            sendKeys(getDefinitionField(), definition);
+        }
+
+        @Override
+        public String getPropertyTermFieldValue() {
+            return getText(getPropertyTermField());
+        }
+
+        @Override
+        public WebElement getPropertyTermField() {
+            return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+        }
+
+        @Override
+        public WebElement getRepresentationSelectField() {
+            return visibilityOfElementLocated(getDriver(), REPRESENTATION_TERM_SELECTOR_LOCATOR);
+        }
+
+        @Override
+        public WebElement getDefinitionField() {
+            return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+        }
+
+        @Override
+        public WebElement getDefinitionSourceField() {
+            return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+        }
+
+        @Override
+        public void selectRepresentationTerm(String representationTerm) {
+            click(getRepresentationSelectField());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//span[text()=\""+ representationTerm +"\"]//ancestor::mat-option[1]")));
+        }
+
+        @Override
+        public WebElement getTableRecordByValue(String value) {
+            return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \""+value+"\")]/ancestor::tr"));
+        }
+
+        @Override
+        public String getDefaultValueDomainFieldValue() {
+            return getText(getDefaultValueDomainField());
+        }
+
+        @Override
+        public void showValueDomain() {
+            click(getShowValueDomain());
         }
     }
 }

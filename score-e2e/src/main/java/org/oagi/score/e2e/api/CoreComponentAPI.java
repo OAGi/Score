@@ -4,6 +4,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScRecord;
 import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -202,4 +203,14 @@ public interface CoreComponentAPI {
     BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 
     List<DTSCObject> getSupplementaryComponentsForDT(BigInteger dtID, String release);
+
+    DTSCObject getNewlyCreatedSCForDT(BigInteger dtId, String releaseNumber);
+
+    boolean SCPropertyTermIsUnique(DTObject dataType, String release, String objectClassTerm, String representationTerm, String propertyTerm);
+
+    List<String> getRepresentationTermsForCDTs(String release);
+
+    List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm);
+
+    String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm);
 }
