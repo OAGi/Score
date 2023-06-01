@@ -385,6 +385,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                     fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                     schemas.put(schemaName, properties);
                 }
+
                 // Issue #1483
                 if (isArray && !schemas.containsKey(schemaName + "List")) {
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
@@ -436,12 +437,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, paginationResponseTopLevelAsbiep, generationContext);
         }
 
-        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
-        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
+        fillProperties(parent, schemas, asbiep, abie, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30GetTemplate()) {
-            suppressRootProperty(parent, isArray);
+            suppressRootProperty(parent);
         }
     }
 
@@ -458,16 +458,15 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
 
-        boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
-        fillProperties(parent, schemas, asbiep, abie, isArray, generationContext);
+        fillProperties(parent, schemas, asbiep, abie, generationContext);
 
         // Issue #1317
         if (option.isSuppressRootPropertyForOpenAPI30PostTemplate()) {
-            suppressRootProperty(parent, isArray);
+            suppressRootProperty(parent);
         }
     }
 
-    private void suppressRootProperty(Map<String, Object> parent, boolean isArray) {
+    private void suppressRootProperty(Map<String, Object> parent) {
         Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
         // Get the first element from 'properties' property and move all children of the element to the parent.
         Set<String> keys = properties.keySet();
@@ -475,9 +474,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             return;
         }
         Map<String, Object> rootProperties = (Map<String, Object>) properties.get(keys.iterator().next());
-        if (!isArray) {
-            parent.put("type", "object");
-        }
+        parent.put("type", "object");
         Arrays.asList("required", "additionalProperties", "properties").stream().forEach(e -> parent.remove(e));
 
         for (Map.Entry<String, Object> entry : rootProperties.entrySet()) {
@@ -492,7 +489,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        fillProperties(parent, schemas, asbiep, typeAbie, false, generationContext);
+        fillProperties(parent, schemas, asbiep, typeAbie, generationContext);
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -606,7 +603,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> schemas,
                                 ASBIEP asbiep, ABIE abie,
-                                boolean isArray,
                                 GenerationContext generationContext) {
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
@@ -635,21 +631,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
         if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
             properties.remove("required");
-        }
-
-        /*
-         * Issue #575
-         */
-        if (isArray) {
-            Map<String, Object> items = new LinkedHashMap(properties);
-            properties = new LinkedHashMap();
-
-            String description = (String) items.remove("description");
-            if (StringUtils.hasLength(description)) {
-                properties.put("description", description);
-            }
-            properties.put("type", "array");
-            properties.put("items", items);
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
@@ -1032,8 +1013,8 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             TopLevelAsbiep refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.getOwnerTopLevelAsbiepId());
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
             Map<String, Object> properties = makeProperties(typeAbie, refTopLevelAsbiep);
-            fillProperties(properties, schemas, asbiep, typeAbie, false, generationContext);
-            suppressRootProperty(properties, false);
+            fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
+            suppressRootProperty(properties);
             schemas.put(name, properties);
         }
 

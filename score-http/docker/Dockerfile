@@ -20,6 +20,6 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
     chmod -R g=u /usr/local/tomcat/
 
 USER 1001
-COPY score-http-3.0.3.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http-3.0.4.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

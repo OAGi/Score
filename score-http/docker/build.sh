@@ -10,14 +10,14 @@ cd ..
 ./mvnw clean package -DskipTests=true
 
 echo "Preparing files..."
-cp score-http/target/score-http-3.0.3.war docker
+cp score-http/target/score-http-3.0.4.war docker
 cp ~/.m2/repository/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar docker
 
 echo "Building docker image..."
 cd docker
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.0.3 .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.0.4 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-http-gateway:3.0.3
+docker scout cves oagi1docker/srt-http-gateway:3.0.4
 
 echo "Done."
