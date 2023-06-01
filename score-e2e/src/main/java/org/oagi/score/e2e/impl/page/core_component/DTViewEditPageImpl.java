@@ -423,7 +423,13 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public WebElement goToNode(String path) {
         click(getSearchField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(getSearchField(), path);
+            if (!path.equals(getText(getSearchField()))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(getSearchField());
@@ -435,9 +441,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     public WebElement getNodeByName(String name) {
-        return elementToBeClickable(getDriver(), By.xpath(
-                "//cdk-virtual-scroll-viewport//*[contains(text(), \"" + name + "\")]" +
-                        "//ancestor::div[contains(@class, \"mat-tree-node\")]"));
+        By nodeLocator = By.xpath(
+                "//*[text() = \"" + name + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+        return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
     @Override
