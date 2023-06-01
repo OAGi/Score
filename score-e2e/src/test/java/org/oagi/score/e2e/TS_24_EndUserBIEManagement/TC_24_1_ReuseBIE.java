@@ -158,6 +158,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         String BIEWorkLocation = "Work Location. Location";
         String BIEStateChange = "State Change. State Change";
         String BIEPersonName = "Person Name. Person Name";
+        String BIELineIdentifierSet = "Line Identifier Set. Identifier Set";
+        String BIECommonTimeReporting = "Common Time Reporting. Common Time Reporting";
+        String BIEEmployeeWorkTime = "Employee Work Time. Employee Work Time";
+        String BIEResponseCriteria = "Response Criteria. Response Action Criteria";
         ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getTheLatestRelease();
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -182,6 +186,15 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         createBIEForSelectTopLevelConceptPage.createBIE(BIEStateChange, currentReleaseObject.getReleaseNumber());
         createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(BIEPersonName, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIELineIdentifierSet, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIECommonTimeReporting, currentReleaseObject.getReleaseNumber());
+
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEEmployeeWorkTime, currentReleaseObject.getReleaseNumber());
+        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(BIEResponseCriteria, currentReleaseObject.getReleaseNumber());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(useraASCCP);
@@ -201,9 +214,27 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Work Time Period");
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Work Time Period\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
 
+        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Cancel Acknowledge/Response Criteria");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(BIEResponseCriteria);
 
+        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Cancel Acknowledge/Response Criteria");
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Response Criteria\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
 
+        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(BIECommonTimeReporting);
 
+        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting");
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Common Time Reporting\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
+
+        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Contract Reference/Line Identifier Set");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(BIELineIdentifierSet);
+
+        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Contract Reference/Line Identifier Set");
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Line Identifier Set\"]//ancestor::div/mat-icon[@role=\"img\"][@data-mat-icon-name=\"fa-recycle\"]")).size());
+
+        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Work Location/Enterprise Unit");
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Enterprise Unit\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1][1]")));
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Line Identifier Set\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1][1]")));
     }
     @Test
     public void test_TA_24_1_1_e() {
