@@ -51,7 +51,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
 
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
 
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
