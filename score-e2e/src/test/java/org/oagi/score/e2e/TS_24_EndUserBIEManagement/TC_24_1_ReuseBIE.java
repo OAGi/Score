@@ -60,7 +60,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
-        String prev_release = "10.8.5";
+        String prev_release = "10.8.6";
         ReleaseObject prevReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -121,8 +121,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         selectCCPropertyPage.selectAssociation(asccp_reuse.getDen());
         ACCExtensionViewEditPage.setNamespace(namespace);
         ACCExtensionViewEditPage.hitUpdateButton();
-        ACCExtensionViewEditPage.moveToQA();
-        ACCExtensionViewEditPage.moveToProduction();
         editBIEPage.openPage();
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + bccp_not_reuse.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
