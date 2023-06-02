@@ -11,7 +11,6 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class TC_38_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             String definitionSource = "SC new definition source";
             SCPanel.setDefinition(definition);
             SCPanel.setDefinitionSource(definitionSource);
-            SCPanel.setCardinality("Required");
+            SCPanel.setCardinality("Optional");
             SCPanel.setValueConstraintType("Fixed Value");
             SCPanel.setValueConstraint("fixed value");
             dtViewEditPage.hitUpdateButton();
@@ -134,6 +133,7 @@ public class TC_38_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
                 assertDoesNotThrow(() -> dtViewEditPage.addCodeListValueDomain(codeList.getName()));
                 dtViewEditPage.selectValueDomain(codeList.getName());
                 dtViewEditPage.discardValueDomain();
+                dtViewEditPage.addCodeListValueDomain(codeList.getName());
             }
 
             /**
@@ -151,19 +151,35 @@ public class TC_38_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             if (SCPanel.getCardinalityFieldValue().equals("Optional")){
                 SCPanel.setCardinality("Required");
                 SCPanel.setCardinality("Optional");
+                SCPanel.setCardinality("Required");
             }
             /**
              * Test Assertion #38.7.7
              */
-            SCPanel.setValueConstraintType("Fixed Value");
-            SCPanel.setValueConstraint("fixed value updated");
-            SCPanel.setDefinition("Derived DT level SC One definition");
-            SCPanel.setDefinitionSource("Derived DT level SC One definition source");
+            SCPanel.setValueConstraintType("Default Value");
+            SCPanel.setValueConstraint("Default value");
+            String derivedDTLevelOneDefinition = "Derived DT SC level One definition";
+            String derivedDTLevelOneDefinitionSource = "Derived DT level SC One definition source";
+            SCPanel.setDefinition(derivedDTLevelOneDefinition);
+            SCPanel.setDefinitionSource(derivedDTLevelOneDefinitionSource);
             dtViewEditPage.hitUpdateButton();
             /**
              * Test Assertion #38.7.8
              */
 
+            DTObject derivedDTLevelTwo = derivedBDTs.get(derivedDTLevelOne);
+            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDTLevelTwo.getDen(), branch.getReleaseNumber());
+            supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDTLevelTwo.getDen() + "/" + dtSCName);
+            assertTrue(supplementaryComponentNode.isDisplayed());
+            SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
+            assertTrue(SCPanel.getDefinitionFieldValue().equals(derivedDTLevelOneDefinition));
+            assertTrue(SCPanel.getDefinitionSourceFieldValue().equals(derivedDTLevelOneDefinitionSource));
+            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
+            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Default Value"));
+            assertEquals(null, SCPanel.getValueConstraintFieldValue());
+            dtViewEditPage.showValueDomain();
+            assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
         }
     }
 
