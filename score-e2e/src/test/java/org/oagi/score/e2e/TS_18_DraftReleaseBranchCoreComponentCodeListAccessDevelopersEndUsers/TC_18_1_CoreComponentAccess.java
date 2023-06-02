@@ -86,11 +86,11 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             if (!state.equalsIgnoreCase("Candidate")) {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
+                assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr")).size());
             } else {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                assertEquals(1, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
+                assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr")).size());
             }
         }
         viewEditCoreComponentPage.openPage();
