@@ -264,36 +264,34 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
         setBranch(branch);
         hitSearchButton();
 
-        return retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "den");
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN, e);
-            }
-            if (!asccpDEN.equals(getText(td.findElement(By.tagName("a"))))) {
-                throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN);
-            }
-            WebElement select = getColumnByName(tr, "select");
-            click(select);
-            click(getCreateButton());
-            assert "Created".equals(getSnackBarMessage(getDriver()));
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = getTableRecordAtIndex(1);
+            td = getColumnByName(tr, "den");
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN, e);
+        }
+        if (!asccpDEN.equals(getText(td.findElement(By.tagName("a"))))) {
+            throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN);
+        }
+        WebElement select = getColumnByName(tr, "select");
+        click(select);
+        click(getCreateButton());
+        assert "Created".equals(getSnackBarMessage(getDriver()));
 
-            // Wait for BIE creation
-            waitFor(Duration.ofMillis(1000));
-            invisibilityOfLoadingContainerElement(getDriver());
+        // Wait for BIE creation
+        waitFor(Duration.ofMillis(1000));
+        invisibilityOfLoadingContainerElement(getDriver());
 
-            String currentUrl = getDriver().getCurrentUrl();
-            BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
 
-            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-            EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
-            return editBIEPage;
-        });
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+        EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
+        assert editBIEPage.isOpened();
+        return editBIEPage;
     }
 
 }
