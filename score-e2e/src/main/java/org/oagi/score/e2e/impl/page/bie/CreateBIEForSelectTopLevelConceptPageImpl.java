@@ -278,10 +278,10 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
         WebElement select = getColumnByName(tr, "select");
         click(select);
         click(getCreateButton());
+        waitFor(Duration.ofMillis(1000));
         assert "Created".equals(getSnackBarMessage(getDriver()));
 
         // Wait for BIE creation
-        waitFor(Duration.ofMillis(1000));
         invisibilityOfLoadingContainerElement(getDriver());
 
         String currentUrl = getDriver().getCurrentUrl();

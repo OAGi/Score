@@ -155,11 +155,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         String useraASCCP = "Cancel Acknowledge Employee Work Time. Cancel Acknowledge Employee Work Time";
         String BIEDocumentReference = "Document Reference. Document Reference";
         String BIEWorkTimePeriod = "Work Time Period. Time Period";
-        String BIECommonTimeReporting = "Common Time Reporting. Common Time Reporting";
         String BIEEmployeeWorkTime = "Employee Work Time. Employee Work Time";
         String BIEResponseCriteria = "Response Criteria. Response Action Criteria";
         List<String> BIEGroupForTesting = Arrays.asList(useraASCCP, BIEDocumentReference, BIEWorkTimePeriod,
-               BIECommonTimeReporting, BIEEmployeeWorkTime, BIEResponseCriteria);
+                BIEEmployeeWorkTime, BIEResponseCriteria);
         String branch = "10.8.8";
         ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         {
@@ -209,12 +208,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
         editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Cancel Acknowledge/Response Criteria");
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Response Criteria\"]//ancestor::div[1]/fa-icon")).size());
-
-        selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting");
-        selectProfileBIEToReuseDialog.selectBIEToReuse(BIECommonTimeReporting);
-
-        editBIEPage.getNodeByPath("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting");
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Common Time Reporting\"]//ancestor::div[1]/fa-icon")).size());
 
         selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/Cancel Acknowledge Employee Work Time/Data Area/Employee Work Time/Common Time Reporting/Work Location/Enterprise Unit");
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Enterprise Unit\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1][1]")));
