@@ -162,6 +162,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         String BIECommonTimeReporting = "Common Time Reporting. Common Time Reporting";
         String BIEEmployeeWorkTime = "Employee Work Time. Employee Work Time";
         String BIEResponseCriteria = "Response Criteria. Response Action Criteria";
+        List<String> BIEGroupForTesting = Arrays.asList(useraASCCP, BIEDocumentReference, BIEWorkTimePeriod, BIEWorkLocation,
+                BIEStateChange, BIEPersonName, BIELineIdentifierSet, BIECommonTimeReporting, BIEEmployeeWorkTime, BIEResponseCriteria);
         ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getTheLatestRelease();
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -174,37 +176,19 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(useraASCCP, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEDocumentReference, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEWorkTimePeriod, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEWorkLocation, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEStateChange, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEPersonName, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIELineIdentifierSet, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIECommonTimeReporting, currentReleaseObject.getReleaseNumber());
-
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEEmployeeWorkTime, currentReleaseObject.getReleaseNumber());
-        viewEditBIEPage.openPage();
-        createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(BIEResponseCriteria, currentReleaseObject.getReleaseNumber());
-
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage;
+        Boolean BIEexisting = true;
+        for (String testingBIE : BIEGroupForTesting){
+            viewEditBIEPage.openPage();
+            viewEditBIEPage.setDEN(testingBIE);
+            viewEditBIEPage.hitSearchButton();
+            BIEexisting = (0 < getDriver().findElements(By.xpath("//score-bie-list//table//tbody//tr")).size());
+            if(BIEexisting == false){
+                createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+                createBIEForSelectTopLevelConceptPage.createBIE(testingBIE, currentReleaseObject.getReleaseNumber());
+            }
+            BIEexisting = true;
+        }
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(useraASCCP);
         viewEditBIEPage.hitSearchButton();
