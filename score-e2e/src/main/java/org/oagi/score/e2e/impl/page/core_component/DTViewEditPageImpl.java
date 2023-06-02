@@ -602,6 +602,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
+    public String getDefaultValueDomainFieldValue() {
+        return getText(getDefaultValueDomainField());
+    }
+
+    @Override
     public SupplementaryComponentPanel getSCPanel(WebElement scNode) {
         return retry(() -> {
             click(scNode);

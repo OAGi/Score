@@ -286,6 +286,8 @@ public interface DTViewEditPage extends Page {
 
     void hitReviseButton();
 
+    String getDefaultValueDomainFieldValue();
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 
