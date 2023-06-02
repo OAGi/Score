@@ -121,6 +121,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         selectCCPropertyPage.selectAssociation(asccp_reuse.getDen());
         ACCExtensionViewEditPage.setNamespace(namespace);
         ACCExtensionViewEditPage.hitUpdateButton();
+        ACCExtensionViewEditPage.moveToQA();
+        ACCExtensionViewEditPage.moveToProduction();
         editBIEPage.openPage();
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + bccp_not_reuse.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Reuse BIE\")]")).size());
@@ -133,6 +135,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp_reuse.getPropertyTerm()+"\"]//ancestor::div[1]/fa-icon")).size());
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMax(199);
         asbiePanel.setCardinalityMin(77);
         asbiePanel.setContextDefinition("aContextDefinition");
