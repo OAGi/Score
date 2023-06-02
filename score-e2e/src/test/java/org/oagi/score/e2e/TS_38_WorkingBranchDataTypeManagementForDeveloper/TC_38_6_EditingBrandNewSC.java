@@ -14,11 +14,13 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -66,6 +68,7 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
             dtViewEditPage.hitReviseButton();
             DTObject revisedDT = getAPIFactory().getCoreComponentAPI().getRevisedDT(dt);
             dtViewEditPage.addSupplementaryComponent("/" + revisedDT.getDen());
+            waitFor(Duration.ofMillis(3000L));
             DTSCObject dtSC = getAPIFactory().getCoreComponentAPI().getNewlyCreatedSCForDT(revisedDT.getDtId(), branch.getReleaseNumber());
             String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +dtSC.getRepresentationTerm();
             WebElement supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + revisedDT.getDen() + "/" + dtSCName);
@@ -190,6 +193,7 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
         for (DTObject dt : dtForTesting) {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             dtViewEditPage.addSupplementaryComponent("/" + dt.getDen());
+            waitFor(Duration.ofMillis(3000L));
             DTSCObject dtSC = getAPIFactory().getCoreComponentAPI().getNewlyCreatedSCForDT(dt.getDtId(), branch.getReleaseNumber());
             String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + dtSC.getRepresentationTerm();
 
