@@ -1,9 +1,6 @@
 package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -45,13 +42,14 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
+
         this.releaseDraft = ReleaseDraftSingleton.getInstance();
+
     }
 
     @AfterEach
     public void tearDown() {
         super.tearDown();
-
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
@@ -141,11 +139,11 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             if (!state.equalsIgnoreCase("Candidate")) {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
+                assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr")).size());
             } else {
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                assertEquals(1, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
+                assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"" + acc.getDen() + "\")]//ancestor::tr")).size());
             }
         }
         viewEditCoreComponentPage.openPage();
