@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_24_1_ReuseBIE extends BaseTest {
@@ -52,7 +52,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_1_a_and_b() {
-        ASCCPObject asccp, asccp_owner_usera, asccp_to_append,asccp_child, asccp_reuse;
+        ASCCPObject asccp, asccp_owner_usera, asccp_to_append, asccp_child, asccp_reuse;
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
@@ -128,10 +128,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
         escape(getDriver());
         editBIEPage.openPage();
-        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + asccp_reuse.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
 
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp_reuse.getPropertyTerm()+"\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         asbiePanel.toggleUsed();
@@ -141,15 +141,16 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         editBIEPage.openPage();
-        asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm()+ "/" + asccp.getPropertyTerm());
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
         assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
         assertEquals("aContextDefinition", getText(asbiePanel.getContextDefinitionField()));
     }
+
     @Test
     public void test_TA_24_1_1_c_and_d() {
-        ASCCPObject asccp, asccp_owner_usera, asccp_to_append,asccp_child, asccp_reuse;
+        ASCCPObject asccp, asccp_owner_usera, asccp_to_append, asccp_child, asccp_reuse;
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
@@ -208,14 +209,15 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp_reuse.getPropertyTerm()+"\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
     }
+
     @Test
     public void test_TA_24_1_1_e() {
-        ASCCPObject asccp_owner_usera, asccp_to_append,asccp_child, asccp_reuse;
+        ASCCPObject asccp_owner_usera, asccp_to_append, asccp_child, asccp_reuse;
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
@@ -272,10 +274,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog  selectProfileBIEToReuseDialog =editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\""+asccp_reuse.getPropertyTerm()+"\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
         WebElement reusedASCCPNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
@@ -285,7 +287,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         editBIEPage.openPage();
-        reusedASCCPNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm()+ "/" + asccp_reuse.getPropertyTerm());
+        reusedASCCPNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
         assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
         assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
@@ -294,7 +296,60 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_2() {
+        ASCCPObject asccp_owner_usera, developer_asccp, asccp_child, asccp_reuse;
+        BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
+        ACCObject acc, developer_acc;
+        AppUserObject usera, developer;
+        NamespaceObject namespace, developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject developerBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
+            /**
+             * The owner of the ASCCP is developer
+             */
+            developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
+
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
+        }
+
+        {
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            /**
+             * The owner of the ASCCP is usera
+             */
+            acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
+            asccp_reuse = coreComponentAPI.createRandomASCCP(developer_acc, usera, namespace, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp_reuse, "Production");
+            asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), current_release);
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(asccp_owner_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
+        editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
     }
 
     @Test
@@ -373,8 +428,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
     public void test_TA_24_1_16() {
 
     }
-
-
 
 
 }
