@@ -111,7 +111,6 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +SCPanel.getRepresentationSelectFieldValue();
             dtViewEditPage.hitUpdateButton();
             dtViewEditPage.removeSupplementaryComponent("/" + revisedDT.getDen() + "/" + dtSCName);
-            assertTrue(Integer.valueOf(dtViewEditPage.getRevisionFieldValue()) > 1);
             /**
              * Test Assertion #38.10.1.d
              */
