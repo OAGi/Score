@@ -29,8 +29,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_18_1_CoreComponentAccess extends BaseTest {
@@ -38,13 +37,10 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     private ReleaseDraftSingleton releaseDraft;
-
     @BeforeEach
     public void init() {
         super.init();
-
         this.releaseDraft = ReleaseDraftSingleton.getInstance();
-
     }
 
     @AfterEach
@@ -94,6 +90,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         viewEditCoreComponentPage.openPage();
         viewEditCoreComponentPage.setBranch(existingReleaseNum);
         assertEquals(0, getDriver().findElements(By.xpath("//button[@mattooltip=\"Create Component\"]")).size());
+
     }
 
     @Test
@@ -170,6 +167,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         for (String state : ccStates) {
             viewEditCoreComponentPage.setState(state);
+            escape(getDriver());
             viewEditCoreComponentPage.hitSearchButton();
             assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
         }
