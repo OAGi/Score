@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_18_2_CodeListAccess extends BaseTest {
     String existingReleaseNum = null;
     String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
@@ -86,11 +86,6 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     @AfterEach
     public void tearDown() {
         super.tearDown();
-        //move the draft release back to initialized state
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-        viewEditReleasePage.MoveBackToInitialized(existingReleaseNum);
-        waitFor(Duration.ofSeconds(60L));
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
