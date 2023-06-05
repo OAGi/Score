@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
@@ -133,6 +132,11 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             assertFalse(dt.getState().equals("Published"));
             assertThrows(TimeoutException.class, () -> dtViewEditPage.hitReviseButton());
+            dtViewEditPage.setDefinition("new definition");
+            dtViewEditPage.setDefinition("");
+            dtViewEditPage.setDefinitionSource("new definition source");
+            dtViewEditPage.setContentComponentDefinition("new content component definition");
+
         }
     }
 
