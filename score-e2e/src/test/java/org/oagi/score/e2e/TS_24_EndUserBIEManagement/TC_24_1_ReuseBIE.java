@@ -319,12 +319,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              */
             developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
             developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
-
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
         }
 
         {
-
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
             /**
@@ -339,6 +337,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
