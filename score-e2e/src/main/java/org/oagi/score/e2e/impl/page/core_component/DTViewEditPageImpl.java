@@ -81,6 +81,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
             By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By SEARCH_FIELD_LOCATOR =
@@ -101,6 +103,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
+    private static final By DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
@@ -109,6 +113,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -662,6 +668,40 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
+    }
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton());
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Deleted".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public String getDeleteWarningDialogMessage() {
+        return visibilityOfElementLocated(getDriver(), DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR).getText();
+    }
+
+    @Override
+    public void hitDeleteAnywayButton() {
+        retry(() -> {
+            click(getDeleteAnywayButton());
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getDeleteAnywayButton() {
+        return elementToBeClickable(getDriver(), CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR);
     }
 
     @Override

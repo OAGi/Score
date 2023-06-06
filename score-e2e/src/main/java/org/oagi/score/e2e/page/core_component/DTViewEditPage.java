@@ -288,6 +288,12 @@ public interface DTViewEditPage extends Page {
 
     void backToWIP();
 
+    WebElement getDeleteButton();
+
+    void hitDeleteButton();
+
+    WebElement getDeleteAnywayButton();
+
     DTViewEditPage.SupplementaryComponentPanel getSCPanel(WebElement scNode);
 
     void removeSupplementaryComponent(String path);
@@ -299,6 +305,10 @@ public interface DTViewEditPage extends Page {
     WebElement getMoveToDraft(boolean enabled);
 
     void moveToDraft();
+
+    String getDeleteWarningDialogMessage();
+
+    void hitDeleteAnywayButton();
 
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);

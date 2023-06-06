@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.impl.PageHelper;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.DTObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
@@ -15,12 +19,13 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 
 @Execution(ExecutionMode.CONCURRENT)
-public class TC_38_12_DeveloperDTStateManagement extends BaseTest {
+public class TC_38_13_DeletingDeveloperDT extends BaseTest {
+
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
@@ -34,8 +39,8 @@ public class TC_38_12_DeveloperDTStateManagement extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_38_12_from_TA_1_to_TA_4")
-    public void test_from_TA_1_to_TA_4() {
+    @DisplayName("TC_38_13_TA_1")
+    public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -57,24 +62,16 @@ public class TC_38_12_DeveloperDTStateManagement extends BaseTest {
         for (DTObject dt : dtForTesting) {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(Integer.valueOf(dtViewEditPage.getRevisionFieldValue()) == 1);
             assertTrue(dt.getState().equals("WIP"));
-            /**
-             * Test Assertion #38.12.1
-             */
-            assertDoesNotThrow(() -> dtViewEditPage.moveToDraft());
-            /**
-             * Test Assertion #38.12.2
-             */
-            assertDoesNotThrow(() -> dtViewEditPage.moveToCandidate());
-            /**
-             * Test Assertion #38.12.3
-             */
-            assertDoesNotThrow(() -> dtViewEditPage.backToWIP());
-            /**
-             * Test Assertion #38.12.4
-             */
-            dtViewEditPage.moveToDraft();
-            assertDoesNotThrow(() -> dtViewEditPage.backToWIP());
+            assertDoesNotThrow(() -> click(dtViewEditPage.getDeleteButton()));
+            assertEquals("Are you sure you want to delete this core component?",
+                    dtViewEditPage.getDeleteWarningDialogMessage());
+            dtViewEditPage.hitDeleteAnywayButton();
+            viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+            viewEditCoreComponentPage.setDEN(dt.getDen());
+            viewEditCoreComponentPage.hitSearchButton();
+            assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
         }
     }
 
@@ -86,6 +83,4 @@ public class TC_38_12_DeveloperDTStateManagement extends BaseTest {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
     }
-
-
 }
