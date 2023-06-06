@@ -555,9 +555,16 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        Boolean bieExisting = true;
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + asccp_for_usera.getDen() + "\")]//ancestor::tr")).size();
+        if (bieExisting == false){
+            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+            createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
+            bieExisting = true;
 
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
+        }
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
         viewEditBIEPage.hitSearchButton();

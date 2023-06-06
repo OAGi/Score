@@ -60,7 +60,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
+            By.xpath("//button[contains(@mattooltip, \"Move to QA\")]");
 
     public ViewEditBIEPageImpl(BasePage parent) {
         super(parent);
