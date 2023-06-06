@@ -157,7 +157,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         viewEditCodeListPage.setBranch(existingReleaseNum);
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
-        CodeListObject codeListCandidate = euCodeListWithStateContainer.stateCodeLists.get("Candidate");
+        CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
         assertDisabled(editCodeListPage.getNamespaceSelectField());
         assertDisabled(editCodeListPage.getListIDField());
@@ -168,14 +168,14 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
 
         //openFirstCodeListValue
-        String codeListValue = euCodeListWithStateContainer.stateCodeListValues.get("Candidate").getValue();
+        String codeListValue = developerCodeListWithStateContainer.stateCodeListValues.get("Candidate").getValue();
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValue);
         assertDisabled(editCodeListValueDialog.getCodeField());
         assertDisabled(editCodeListValueDialog.getMeaningField());
         assertDisabled(editCodeListValueDialog.getDefinitionField());
         assertDisabled(editCodeListValueDialog.getDefinitionSourceField());
         assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-
+        escape(getDriver());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Derive Code List based on this\")]//ancestor::button[1]")).size());
     }
 
