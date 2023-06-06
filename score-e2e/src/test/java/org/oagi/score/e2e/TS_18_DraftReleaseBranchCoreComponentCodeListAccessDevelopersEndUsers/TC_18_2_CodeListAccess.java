@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -123,7 +124,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertDisabled(editCodeListValueDialog.getDefinitionField());
         assertDisabled(editCodeListValueDialog.getDefinitionSourceField());
         assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-
+        escape(getDriver());
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Revise\")]//ancestor::button[1]")).size());
     }
 
