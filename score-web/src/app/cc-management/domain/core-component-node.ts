@@ -1115,7 +1115,7 @@ class BccpDetail {
   }
 
   get den(): string {
-    return this.propertyTerm + '. ' + this._node.bdtNode.dataTypeTerm;
+    return (this.propertyTerm + '. ' + this._node.bdtNode.den).replace('. Type', '');
   }
 
   set den(val: string) { // do nothing

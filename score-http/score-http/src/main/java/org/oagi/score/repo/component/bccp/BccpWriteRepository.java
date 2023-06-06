@@ -67,7 +67,8 @@ public class BccpWriteRepository {
         bccp.setGuid(ScoreGuid.randomGuid());
         bccp.setPropertyTerm(request.getInitialPropertyTerm());
         bccp.setRepresentationTerm(bdt.getDataTypeTerm());
-        bccp.setDen(bccp.getPropertyTerm() + ". " + bccp.getRepresentationTerm());
+        String den = bccp.getPropertyTerm() + ". " + bdt.getDen().replaceAll(". Type", "");
+        bccp.setDen(den);
         bccp.setBdtId(bdt.getDtId());
         bccp.setState(CcState.WIP.name());
         bccp.setIsDeprecated((byte) 0);
