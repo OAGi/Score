@@ -47,6 +47,12 @@ public class Zip {
     }
 
     public static File compressionHierarchy(File baseDirectory, Collection<File> targetFiles) throws IOException {
+        // If it's running on Mac OS X, target files are generated under '/private/var/folders'.
+        // But, the base directory is '/var/folders'. Since '/var' is a symlink of '/private/var' on Mac OS X,
+        // renaming the base directory impacts on nothing.
+        if (baseDirectory.getAbsolutePath().startsWith("/var/folders")) {
+            baseDirectory = new File("/private/" + baseDirectory.getAbsolutePath());
+        }
         File file = File.createTempFile("oagis-", null);
         URI currentPath = baseDirectory.toURI();
         FileOutputStream dest = new FileOutputStream(file);
