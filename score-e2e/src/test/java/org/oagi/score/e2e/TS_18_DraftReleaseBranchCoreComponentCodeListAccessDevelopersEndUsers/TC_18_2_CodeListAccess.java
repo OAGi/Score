@@ -147,7 +147,6 @@ public class TC_18_2_CodeListAccess extends BaseTest {
             assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
         }
     }
-
     @Test
     public void test_TA_18_2_3() {
         thisAccountWillBeDeletedAfterTests(developer);
