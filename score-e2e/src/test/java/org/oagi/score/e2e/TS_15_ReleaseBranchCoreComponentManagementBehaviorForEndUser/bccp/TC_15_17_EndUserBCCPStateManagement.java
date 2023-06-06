@@ -58,7 +58,7 @@ public class TC_15_17_EndUserBCCPStateManagement extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType,endUser, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();

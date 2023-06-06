@@ -46,76 +46,11 @@ public interface ExpressBIEPage extends Page {
 
     JSONSchemaExpressionOptions selectJSONSchemaExpression();
 
-    interface JSONSchemaExpressionOptions {
-
-        WebElement getMakeAsAnArrayCheckbox();
-
-        void toggleMakeAsAnArray();
-
-        WebElement getIncludeMetaHeaderCheckbox();
-
-        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
-
-        WebElement getIncludePaginationResponseCheckbox();
-
-        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
-
-    }
-
     WebElement getOpenAPIExpressionRadioButton();
 
     OpenAPIExpressionOptions selectOpenAPIExpression();
 
-    interface OpenAPIExpressionOptions {
-
-        void selectYAMLOpenAPIFormat();
-
-        WebElement getGETOperationTemplateCheckbox();
-
-        OpenAPIExpressionGETOperationOptions toggleGETOperationTemplate();
-
-        WebElement getPOSTOperationTemplateCheckbox();
-
-        OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate();
-
-        void selectJSONOpenAPIFormat();
-    }
-
-    interface OpenAPIExpressionGETOperationOptions {
-
-        WebElement getMakeAsAnArrayCheckbox();
-
-        void toggleMakeAsAnArray();
-
-        WebElement getIncludeMetaHeaderCheckbox();
-
-        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
-
-        WebElement getIncludePaginationResponseCheckbox();
-
-        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
-
-    }
-
-    interface OpenAPIExpressionPOSTOperationOptions {
-
-        WebElement getMakeAsAnArrayCheckbox();
-
-        void toggleMakeAsAnArray();
-
-        WebElement getIncludeMetaHeaderCheckbox();
-
-        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
-
-    }
-
     void selectJSONOpenAPIFormat();
-
-    enum ExpressionFormat {
-        XML,
-        JSON,
-        YML
-    }
 
     /**
      * Hit the 'Generate' button for a single BIE selection.
@@ -128,7 +63,7 @@ public interface ExpressBIEPage extends Page {
     /**
      * Hit the 'Generate' button.
      *
-     * @param format BIE Expression format
+     * @param format     BIE Expression format
      * @param compressed {@code true} if it checks multiple BIEs, otherwise {@code false}
      * @return generate file
      */
@@ -177,5 +112,70 @@ public interface ExpressBIEPage extends Page {
     void selectPutEachSchemaInAnIndividualFile();
 
     WebElement getPutEachSchemaInAnIndividualFileRadioButton();
+
+    enum ExpressionFormat {
+        XML,
+        JSON,
+        YML
+    }
+
+    interface JSONSchemaExpressionOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
+
+    interface OpenAPIExpressionOptions {
+
+        void selectYAMLOpenAPIFormat();
+
+        WebElement getGETOperationTemplateCheckbox();
+
+        OpenAPIExpressionGETOperationOptions toggleGETOperationTemplate();
+
+        WebElement getPOSTOperationTemplateCheckbox();
+
+        OpenAPIExpressionPOSTOperationOptions togglePOSTOperationTemplate();
+
+        void selectJSONOpenAPIFormat();
+    }
+
+    interface OpenAPIExpressionGETOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+        WebElement getIncludePaginationResponseCheckbox();
+
+        void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context);
+
+    }
+
+    interface OpenAPIExpressionPOSTOperationOptions {
+
+        WebElement getMakeAsAnArrayCheckbox();
+
+        void toggleMakeAsAnArray();
+
+        WebElement getIncludeMetaHeaderCheckbox();
+
+        void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context);
+
+    }
 
 }

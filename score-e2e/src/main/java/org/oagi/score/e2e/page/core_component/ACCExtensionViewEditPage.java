@@ -290,6 +290,14 @@ public interface ACCExtensionViewEditPage extends Page {
     WebElement getNodeByPath(String path);
 
     /**
+     * Return the ACC panel.
+     *
+     * @param accNode ACC node
+     * @return the ACC panel
+     */
+    ACCPanel getACCPanel(WebElement accNode);
+
+    /**
      * An interface of the ACC panel
      */
     interface ACCPanel {
@@ -352,6 +360,7 @@ public interface ACCExtensionViewEditPage extends Page {
 
         /**
          * Set the "Object Class Term" field with given text.
+         *
          * @param objectClassTerm
          */
         void setObjectClassTerm(String objectClassTerm);
@@ -413,12 +422,4 @@ public interface ACCExtensionViewEditPage extends Page {
         WebElement getDefinitionField();
 
     }
-
-    /**
-     * Return the ACC panel.
-     *
-     * @param accNode ACC node
-     * @return the ACC panel
-     */
-    ACCPanel getACCPanel(WebElement accNode);
 }

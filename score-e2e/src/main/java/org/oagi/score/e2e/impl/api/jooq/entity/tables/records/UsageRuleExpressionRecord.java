@@ -18,18 +18,28 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
  * particular syntax indicated by the CONSTRAINT_TYPE column. One of the
  * syntaxes can be unstructured, which works a description of the usage rule.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpressionRecord> implements Record4<ULong, Integer, String, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.usage_rule_expression.usage_rule_expression_id</code>. Primary
-     * key of the usage rule expression
+     * Create a detached UsageRuleExpressionRecord
      */
-    public void setUsageRuleExpressionId(ULong value) {
-        set(0, value);
+    public UsageRuleExpressionRecord() {
+        super(UsageRuleExpression.USAGE_RULE_EXPRESSION);
+    }
+
+    /**
+     * Create a detached, initialised UsageRuleExpressionRecord
+     */
+    public UsageRuleExpressionRecord(ULong usageRuleExpressionId, Integer constraintType, String constraintText, ULong representedUsageRuleId) {
+        super(UsageRuleExpression.USAGE_RULE_EXPRESSION);
+
+        setUsageRuleExpressionId(usageRuleExpressionId);
+        setConstraintType(constraintType);
+        setConstraintText(constraintText);
+        setRepresentedUsageRuleId(representedUsageRuleId);
     }
 
     /**
@@ -42,14 +52,12 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     /**
-     * Setter for <code>oagi.usage_rule_expression.constraint_type</code>.
-     * Constraint type according to the CC spec. It represents the expression
-     * language (syntax) used in the CONSTRAINT column. It is a value list
-     * column. 0 = 'Unstructured' which is basically a description of the rule,
-     * 1 = 'Schematron'.
+     * Setter for
+     * <code>oagi.usage_rule_expression.usage_rule_expression_id</code>. Primary
+     * key of the usage rule expression
      */
-    public void setConstraintType(Integer value) {
-        set(1, value);
+    public void setUsageRuleExpressionId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -64,12 +72,14 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     /**
-     * Setter for <code>oagi.usage_rule_expression.constraint_text</code>. This
-     * column capture the constraint expressing the usage rule. In other words,
-     * this is the expression.
+     * Setter for <code>oagi.usage_rule_expression.constraint_type</code>.
+     * Constraint type according to the CC spec. It represents the expression
+     * language (syntax) used in the CONSTRAINT column. It is a value list
+     * column. 0 = 'Unstructured' which is basically a description of the rule,
+     * 1 = 'Schematron'.
      */
-    public void setConstraintText(String value) {
-        set(2, value);
+    public void setConstraintType(Integer value) {
+        set(1, value);
     }
 
     /**
@@ -82,13 +92,17 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     /**
-     * Setter for
-     * <code>oagi.usage_rule_expression.represented_usage_rule_id</code>. The
-     * usage rule which the expression represents
+     * Setter for <code>oagi.usage_rule_expression.constraint_text</code>. This
+     * column capture the constraint expressing the usage rule. In other words,
+     * this is the expression.
      */
-    public void setRepresentedUsageRuleId(ULong value) {
-        set(3, value);
+    public void setConstraintText(String value) {
+        set(2, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for
@@ -100,17 +114,22 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record4 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for
+     * <code>oagi.usage_rule_expression.represented_usage_rule_id</code>. The
+     * usage rule which the expression represents
+     */
+    public void setRepresentedUsageRuleId(ULong value) {
+        set(3, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row4<ULong, Integer, String, ULong> fieldsRow() {
@@ -200,6 +219,10 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public UsageRuleExpressionRecord value4(ULong value) {
         setRepresentedUsageRuleId(value);
@@ -213,28 +236,5 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
         value3(value3);
         value4(value4);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached UsageRuleExpressionRecord
-     */
-    public UsageRuleExpressionRecord() {
-        super(UsageRuleExpression.USAGE_RULE_EXPRESSION);
-    }
-
-    /**
-     * Create a detached, initialised UsageRuleExpressionRecord
-     */
-    public UsageRuleExpressionRecord(ULong usageRuleExpressionId, Integer constraintType, String constraintText, ULong representedUsageRuleId) {
-        super(UsageRuleExpression.USAGE_RULE_EXPRESSION);
-
-        setUsageRuleExpressionId(usageRuleExpressionId);
-        setConstraintType(constraintType);
-        setConstraintText(constraintText);
-        setRepresentedUsageRuleId(representedUsageRuleId);
     }
 }

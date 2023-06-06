@@ -25,65 +25,12 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
-    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
-        this.randomAccounts.add(appUser);
+    private static int extractNumberFromText(String text) {
+        return Integer.valueOf(text.replaceAll("\\D", ""));
     }
 
-    private class UserTopLevelASBIEPContainer {
-        static List<String> SAMPLED_ASCCP_DEN_LIST = Arrays.asList(
-                "Coordinate Reference. Sequenced Identifiers",
-                "Account Identifiers. Named Identifiers",
-                "Customer Item Identification. Item Identification",
-                "Change Product Availability. Change Product Availability",
-                "Collaboration Message. Collaboration Message",
-                "Production Data. Production Data");
-        private AppUserObject appUser;
-        private int yieldPointer = 0;
-        int numberOfWIPBIEs;
-        int numberOfQABIEs;
-        int numberOfProductionBIEs;
-
-        private List<String> recentBIEs = new ArrayList<>();
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
-            this(appUser, release, nextInt(2, 5), nextInt(2, 5), nextInt(2, 5));
-        }
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,
-                                           int numberOfWIPBIEs, int numberOfQABIEs, int numberOfProductionBIEs) {
-            this.appUser = appUser;
-            this.numberOfWIPBIEs = numberOfWIPBIEs;
-            this.numberOfQABIEs = numberOfQABIEs;
-            this.numberOfProductionBIEs = numberOfProductionBIEs;
-
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
-
-            for (int i = 0; i < numberOfWIPBIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "WIP");
-            }
-            for (int i = 0; i < numberOfQABIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "QA");
-            }
-            for (int i = 0; i < numberOfProductionBIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "Production");
-            }
-        }
-
-        String nextRandomASCCP() {
-            if (this.yieldPointer == SAMPLED_ASCCP_DEN_LIST.size()) {
-                this.yieldPointer = 0;
-            }
-            return SAMPLED_ASCCP_DEN_LIST.get(this.yieldPointer++);
-        }
+    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
+        this.randomAccounts.add(appUser);
     }
 
     @Test
@@ -118,10 +65,6 @@ public class TC_28_1_BIEsTab extends BaseTest {
                 .getASCCPByDENAndReleaseNum(den, release.getReleaseNumber());
         return getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext), asccp, creator, state);
-    }
-
-    private static int extractNumberFromText(String text) {
-        return Integer.valueOf(text.replaceAll("\\D", ""));
     }
 
     @Test
@@ -523,6 +466,62 @@ public class TC_28_1_BIEsTab extends BaseTest {
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
         });
+    }
+
+    private class UserTopLevelASBIEPContainer {
+        static List<String> SAMPLED_ASCCP_DEN_LIST = Arrays.asList(
+                "Coordinate Reference. Sequenced Identifiers",
+                "Account Identifiers. Named Identifiers",
+                "Customer Item Identification. Item Identification",
+                "Change Product Availability. Change Product Availability",
+                "Collaboration Message. Collaboration Message",
+                "Production Data. Production Data");
+        int numberOfWIPBIEs;
+        int numberOfQABIEs;
+        int numberOfProductionBIEs;
+        private AppUserObject appUser;
+        private int yieldPointer = 0;
+        private List<String> recentBIEs = new ArrayList<>();
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
+            this(appUser, release, nextInt(2, 5), nextInt(2, 5), nextInt(2, 5));
+        }
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,
+                                           int numberOfWIPBIEs, int numberOfQABIEs, int numberOfProductionBIEs) {
+            this.appUser = appUser;
+            this.numberOfWIPBIEs = numberOfWIPBIEs;
+            this.numberOfQABIEs = numberOfQABIEs;
+            this.numberOfProductionBIEs = numberOfProductionBIEs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+
+            for (int i = 0; i < numberOfWIPBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "WIP");
+            }
+            for (int i = 0; i < numberOfQABIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "QA");
+            }
+            for (int i = 0; i < numberOfProductionBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "Production");
+            }
+        }
+
+        String nextRandomASCCP() {
+            if (this.yieldPointer == SAMPLED_ASCCP_DEN_LIST.size()) {
+                this.yieldPointer = 0;
+            }
+            return SAMPLED_ASCCP_DEN_LIST.get(this.yieldPointer++);
+        }
     }
 
 }

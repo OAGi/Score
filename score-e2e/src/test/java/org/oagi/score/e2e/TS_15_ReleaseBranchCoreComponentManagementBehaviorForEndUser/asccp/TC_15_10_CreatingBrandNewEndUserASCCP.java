@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.TC_15_1_AccessCoreComponentViewingEditingCommenting;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
@@ -53,51 +52,6 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private class RandomCoreComponentWithStateContainer {
-        private AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
-        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
-            this.appUser = appUser;
-            this.states = states;
-
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccp;
-                ACCObject acc;
-                String state = this.states.get(i);
-
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
-                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
-                    bcc.setCardinalityMax(1);
-                    coreComponentAPI.updateBCC(bcc);
-
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
-                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
-                    ascc.setCardinalityMax(1);
-                    coreComponentAPI.updateASCC(ascc);
-                    stateACCs.put(state, acc);
-                    stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state, bccp);
-                }
-            }
-        }
-
     }
 
     @Test
@@ -200,6 +154,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         String definitionSourceText = getText(asccpPanel.getDefinitionSourceField());
         assertTrue(isEmpty(definitionSourceText));
     }
+
     @Test
     public void test_TA_15_10_3() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -248,5 +203,50 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         viewEditCoreComponentPage.openPage();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccpManifestId);
         assertTrue(acc.getDen().startsWith(getText(asccpViewEditPage.getASCCPPanel().getPropertyTermField())));
+    }
+
+    private class RandomCoreComponentWithStateContainer {
+        private AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
+        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
+        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
+
+        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                ASCCPObject asccp;
+                BCCPObject bccp;
+                ACCObject acc;
+                String state = this.states.get(i);
+
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
+                    bcc.setCardinalityMax(1);
+                    coreComponentAPI.updateBCC(bcc);
+
+                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
+                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
+                    ascc.setCardinalityMax(1);
+                    coreComponentAPI.updateASCC(ascc);
+                    stateACCs.put(state, acc);
+                    stateASCCPs.put(state, asccp);
+                    stateBCCPs.put(state, bccp);
+                }
+            }
+        }
+
     }
 }

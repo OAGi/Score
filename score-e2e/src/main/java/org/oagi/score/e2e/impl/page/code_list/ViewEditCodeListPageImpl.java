@@ -14,7 +14,6 @@ import org.openqa.selenium.WebElement;
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.click;
 
 public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
@@ -244,7 +243,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
                     By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
             click(optionField);
             escape(getDriver());
-                });
+        });
     }
 
     @Override
@@ -273,6 +272,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             }
         });
     }
+
     @Override
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Definition\")]"));
@@ -300,6 +300,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             }
         });
     }
+
     @Override
     public WebElement getModuleField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Module\")]"));
@@ -326,6 +327,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             }
         });
     }
+
     @Override
     public WebElement getUpdatedDateField() {
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]"));

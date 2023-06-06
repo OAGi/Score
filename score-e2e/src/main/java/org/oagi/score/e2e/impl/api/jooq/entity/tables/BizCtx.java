@@ -4,25 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function7;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -31,71 +14,62 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxRecord;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This table represents a business context. A business context is a combination
  * of one or more business context values.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BizCtx extends TableImpl<BizCtxRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.biz_ctx</code>
      */
     public static final BizCtx BIZ_CTX = new BizCtx();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<BizCtxRecord> getRecordType() {
-        return BizCtxRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal
      * database key.
      */
     public final TableField<BizCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
-
     /**
      * The column <code>oagi.biz_ctx.guid</code>. A globally unique identifier
      * (GUID).
      */
     public final TableField<BizCtxRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
-
     /**
      * The column <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
      * business context.
      */
     public final TableField<BizCtxRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Short, descriptive name of the business context.");
-
     /**
      * The column <code>oagi.biz_ctx.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * APP_USER table referring to the user who creates the entity.
      */
     public final TableField<BizCtxRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the entity. ");
-
     /**
      * The column <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the
      * APP_USER table  referring to the last user who has updated the business
      * context.
      */
     public final TableField<BizCtxRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table  referring to the last user who has updated the business context.");
-
     /**
      * The column <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when
-     * the business context record was first created. 
+     * the business context record was first created.
      */
     public final TableField<BizCtxRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the business context record was first created. ");
-
     /**
      * The column <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp
      * when the business context was last updated.
      */
     public final TableField<BizCtxRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the business context was last updated.");
+    private transient AppUser _bizCtxCreatedByFk;
+    private transient AppUser _bizCtxLastUpdatedByFk;
 
     private BizCtx(Name alias, Table<BizCtxRecord> aliased) {
         this(alias, aliased, null);
@@ -130,6 +104,14 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         super(child, key, BIZ_CTX);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<BizCtxRecord> getRecordType() {
+        return BizCtxRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -154,9 +136,6 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     public List<ForeignKey<BizCtxRecord, ?>> getReferences() {
         return Arrays.asList(Keys.BIZ_CTX_CREATED_BY_FK, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
     }
-
-    private transient AppUser _bizCtxCreatedByFk;
-    private transient AppUser _bizCtxLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via

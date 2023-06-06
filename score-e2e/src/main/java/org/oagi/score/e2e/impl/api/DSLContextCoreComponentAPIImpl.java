@@ -8,9 +8,6 @@ import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
 import org.oagi.score.e2e.obj.*;
 
@@ -20,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -85,7 +81,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
         String den = record.get(ACC.DEN);
-        if (den.contains("User Extension Group")){
+        if (den.contains("User Extension Group")) {
             acc.setLocalExtension(true);
         }
         acc.setOwnerUserId(record.get(ACC.OWNER_USER_ID).toBigInteger());
@@ -1043,7 +1039,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.DEFINITION_SOURCE, acc.getDefinitionSource())
                 .set(ACC.NAMESPACE_ID, ULong.valueOf(acc.getNamespaceId()))
                 .set(ACC.IS_DEPRECATED, (byte) (acc.isDeprecated() ? 1 : 0))
-                .set(ACC.IS_ABSTRACT, (byte)(acc.isAbstract() ? 1 : 0))
+                .set(ACC.IS_ABSTRACT, (byte) (acc.isAbstract() ? 1 : 0))
                 .set(ACC.STATE, acc.getState())
                 .set(ACC.OAGIS_COMPONENT_TYPE, acc.getComponentType().getValue())
                 .set(ACC.CREATION_TIMESTAMP, acc.getCreationTimestamp())

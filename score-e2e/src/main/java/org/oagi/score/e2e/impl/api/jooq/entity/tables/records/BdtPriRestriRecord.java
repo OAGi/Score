@@ -22,17 +22,30 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
  * specifies the primitive which is an agency identification list. Only one
  * column among the three can have a value in a particular record.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> implements Record6<ULong, ULong, ULong, ULong, ULong, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary,
-     * internal database key.
+     * Create a detached BdtPriRestriRecord
      */
-    public void setBdtPriRestriId(ULong value) {
-        set(0, value);
+    public BdtPriRestriRecord() {
+        super(BdtPriRestri.BDT_PRI_RESTRI);
+    }
+
+    /**
+     * Create a detached, initialised BdtPriRestriRecord
+     */
+    public BdtPriRestriRecord(ULong bdtPriRestriId, ULong bdtManifestId, ULong cdtAwdPriXpsTypeMapId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
+        super(BdtPriRestri.BDT_PRI_RESTRI);
+
+        setBdtPriRestriId(bdtPriRestriId);
+        setBdtManifestId(bdtManifestId);
+        setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
+        setCodeListManifestId(codeListManifestId);
+        setAgencyIdListManifestId(agencyIdListManifestId);
+        setIsDefault(isDefault);
     }
 
     /**
@@ -44,12 +57,11 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.bdt_manifest_id</code>. Foreign key
-     * to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a
-     * CDT).
+     * Setter for <code>oagi.bdt_pri_restri.bdt_pri_restri_id</code>. Primary,
+     * internal database key.
      */
-    public void setBdtManifestId(ULong value) {
-        set(1, value);
+    public void setBdtPriRestriId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -62,13 +74,12 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
-     * This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows
-     * for a primitive restriction based on a built-in type of schema
-     * expressions.
+     * Setter for <code>oagi.bdt_pri_restri.bdt_manifest_id</code>. Foreign key
+     * to the DT_MANIFEST table. It shall point to only DT that is a BDT (not a
+     * CDT).
      */
-    public void setCdtAwdPriXpsTypeMapId(ULong value) {
-        set(2, value);
+    public void setBdtManifestId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -82,11 +93,13 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.code_list_manifest_id</code>.
-     * Foreign key to the CODE_LIST_MANIFEST table.
+     * Setter for <code>oagi.bdt_pri_restri.cdt_awd_pri_xps_type_map_id</code>.
+     * This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows
+     * for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
-    public void setCodeListManifestId(ULong value) {
-        set(3, value);
+    public void setCdtAwdPriXpsTypeMapId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -98,13 +111,11 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_manifest_id</code>.
-     * This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in
-     * the case that the BDT content can be restricted to an agency
-     * identification.
+     * Setter for <code>oagi.bdt_pri_restri.code_list_manifest_id</code>.
+     * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public void setAgencyIdListManifestId(ULong value) {
-        set(4, value);
+    public void setCodeListManifestId(ULong value) {
+        set(3, value);
     }
 
     /**
@@ -118,14 +129,18 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bdt_pri_restri.is_default</code>. This allows
-     * overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP
-     * table. It typically indicates the most generic primtive for the data
-     * type.
+     * Setter for <code>oagi.bdt_pri_restri.agency_id_list_manifest_id</code>.
+     * This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in
+     * the case that the BDT content can be restricted to an agency
+     * identification.
      */
-    public void setIsDefault(Byte value) {
-        set(5, value);
+    public void setAgencyIdListManifestId(ULong value) {
+        set(4, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.bdt_pri_restri.is_default</code>. This allows
@@ -138,17 +153,23 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record6 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.bdt_pri_restri.is_default</code>. This allows
+     * overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP
+     * table. It typically indicates the most generic primtive for the data
+     * type.
+     */
+    public void setIsDefault(Byte value) {
+        set(5, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row6<ULong, ULong, ULong, ULong, ULong, Byte> fieldsRow() {
@@ -280,6 +301,10 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BdtPriRestriRecord value6(Byte value) {
         setIsDefault(value);
@@ -295,30 +320,5 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
         value5(value5);
         value6(value6);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BdtPriRestriRecord
-     */
-    public BdtPriRestriRecord() {
-        super(BdtPriRestri.BDT_PRI_RESTRI);
-    }
-
-    /**
-     * Create a detached, initialised BdtPriRestriRecord
-     */
-    public BdtPriRestriRecord(ULong bdtPriRestriId, ULong bdtManifestId, ULong cdtAwdPriXpsTypeMapId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
-        super(BdtPriRestri.BDT_PRI_RESTRI);
-
-        setBdtPriRestriId(bdtPriRestriId);
-        setBdtManifestId(bdtManifestId);
-        setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
-        setCodeListManifestId(codeListManifestId);
-        setAgencyIdListManifestId(agencyIdListManifestId);
-        setIsDefault(isDefault);
     }
 }

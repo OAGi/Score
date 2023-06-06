@@ -17,16 +17,32 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
  * This table captures the user information for authentication and authorization
  * purposes.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements Record8<ULong, String, String, String, String, Byte, Byte, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.app_user.app_user_id</code>. Primary key column.
+     * Create a detached AppUserRecord
      */
-    public void setAppUserId(ULong value) {
-        set(0, value);
+    public AppUserRecord() {
+        super(AppUser.APP_USER);
+    }
+
+    /**
+     * Create a detached, initialised AppUserRecord
+     */
+    public AppUserRecord(ULong appUserId, String loginId, String password, String name, String organization, Byte isDeveloper, Byte isAdmin, Byte isEnabled) {
+        super(AppUser.APP_USER);
+
+        setAppUserId(appUserId);
+        setLoginId(loginId);
+        setPassword(password);
+        setName(name);
+        setOrganization(organization);
+        setIsDeveloper(isDeveloper);
+        setIsAdmin(isAdmin);
+        setIsEnabled(isEnabled);
     }
 
     /**
@@ -37,10 +53,10 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.login_id</code>. User Id of the user.
+     * Setter for <code>oagi.app_user.app_user_id</code>. Primary key column.
      */
-    public void setLoginId(String value) {
-        set(1, value);
+    public void setAppUserId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -51,11 +67,10 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.password</code>. Password to authenticate
-     * the user.
+     * Setter for <code>oagi.app_user.login_id</code>. User Id of the user.
      */
-    public void setPassword(String value) {
-        set(2, value);
+    public void setLoginId(String value) {
+        set(1, value);
     }
 
     /**
@@ -67,10 +82,11 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.name</code>. Full name of the user.
+     * Setter for <code>oagi.app_user.password</code>. Password to authenticate
+     * the user.
      */
-    public void setName(String value) {
-        set(3, value);
+    public void setPassword(String value) {
+        set(2, value);
     }
 
     /**
@@ -81,11 +97,10 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.organization</code>. The company the user
-     * represents.
+     * Setter for <code>oagi.app_user.name</code>. Full name of the user.
      */
-    public void setOrganization(String value) {
-        set(4, value);
+    public void setName(String value) {
+        set(3, value);
     }
 
     /**
@@ -97,10 +112,11 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_developer</code>.
+     * Setter for <code>oagi.app_user.organization</code>. The company the user
+     * represents.
      */
-    public void setIsDeveloper(Byte value) {
-        set(5, value);
+    public void setOrganization(String value) {
+        set(4, value);
     }
 
     /**
@@ -111,11 +127,10 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_admin</code>. Indicator whether the
-     * user has an admin role or not.
+     * Setter for <code>oagi.app_user.is_developer</code>.
      */
-    public void setIsAdmin(Byte value) {
-        set(6, value);
+    public void setIsDeveloper(Byte value) {
+        set(5, value);
     }
 
     /**
@@ -127,11 +142,16 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_enabled</code>.
+     * Setter for <code>oagi.app_user.is_admin</code>. Indicator whether the
+     * user has an admin role or not.
      */
-    public void setIsEnabled(Byte value) {
-        set(7, value);
+    public void setIsAdmin(Byte value) {
+        set(6, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.app_user.is_enabled</code>.
@@ -141,17 +161,20 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record8 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.app_user.is_enabled</code>.
+     */
+    public void setIsEnabled(Byte value) {
+        set(7, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record8 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row8<ULong, String, String, String, String, Byte, Byte, Byte> fieldsRow() {
@@ -325,6 +348,10 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public AppUserRecord value8(Byte value) {
         setIsEnabled(value);
@@ -342,32 +369,5 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
         value7(value7);
         value8(value8);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached AppUserRecord
-     */
-    public AppUserRecord() {
-        super(AppUser.APP_USER);
-    }
-
-    /**
-     * Create a detached, initialised AppUserRecord
-     */
-    public AppUserRecord(ULong appUserId, String loginId, String password, String name, String organization, Byte isDeveloper, Byte isAdmin, Byte isEnabled) {
-        super(AppUser.APP_USER);
-
-        setAppUserId(appUserId);
-        setLoginId(loginId);
-        setPassword(password);
-        setName(name);
-        setOrganization(organization);
-        setIsDeveloper(isDeveloper);
-        setIsAdmin(isAdmin);
-        setIsEnabled(isEnabled);
     }
 }

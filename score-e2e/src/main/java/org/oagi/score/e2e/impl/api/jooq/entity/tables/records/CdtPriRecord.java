@@ -16,17 +16,26 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
 /**
  * This table stores the CDT primitives.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements Record2<ULong, String> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
-     * database key.
+     * Create a detached CdtPriRecord
      */
-    public void setCdtPriId(ULong value) {
-        set(0, value);
+    public CdtPriRecord() {
+        super(CdtPri.CDT_PRI);
+    }
+
+    /**
+     * Create a detached, initialised CdtPriRecord
+     */
+    public CdtPriRecord(ULong cdtPriId, String name) {
+        super(CdtPri.CDT_PRI);
+
+        setCdtPriId(cdtPriId);
+        setName(name);
     }
 
     /**
@@ -38,12 +47,16 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
-     * the CCTS datatype catalog, e.g., Decimal.
+     * Setter for <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
+     * database key.
      */
-    public void setName(String value) {
-        set(1, value);
+    public void setCdtPriId(ULong value) {
+        set(0, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
@@ -54,17 +67,21 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record2 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
+     * the CCTS datatype catalog, e.g., Decimal.
+     */
+    public void setName(String value) {
+        set(1, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record2 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row2<ULong, String> fieldsRow() {
@@ -112,6 +129,10 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public CdtPriRecord value2(String value) {
         setName(value);
@@ -123,26 +144,5 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
         value1(value1);
         value2(value2);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached CdtPriRecord
-     */
-    public CdtPriRecord() {
-        super(CdtPri.CDT_PRI);
-    }
-
-    /**
-     * Create a detached, initialised CdtPriRecord
-     */
-    public CdtPriRecord(ULong cdtPriId, String name) {
-        super(CdtPri.CDT_PRI);
-
-        setCdtPriId(cdtPriId);
-        setName(name);
     }
 }

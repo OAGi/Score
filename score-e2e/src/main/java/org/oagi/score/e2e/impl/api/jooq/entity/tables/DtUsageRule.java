@@ -4,24 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function4;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -29,6 +13,10 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtUsageRuleRecord;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 
 /**
@@ -38,49 +26,39 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtUsageRuleRecord;
  * record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not
  * both.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.dt_usage_rule</code>
      */
     public static final DtUsageRule DT_USAGE_RULE = new DtUsageRule();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<DtUsageRuleRecord> getRecordType() {
-        return DtUsageRuleRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
      * of the table.
      */
     public final TableField<DtUsageRuleRecord, ULong> DT_USAGE_RULE_ID = createField(DSL.name("dt_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the table.");
-
     /**
      * The column <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>.
      * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
      * the DT content component or DT_SC.
      */
     public final TableField<DtUsageRuleRecord, ULong> ASSIGNED_USAGE_RULE_ID = createField(DSL.name("assigned_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.");
-
     /**
      * The column <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to
      * the DT_ID for assigning a usage rule to the corresponding DT content
      * component.
      */
     public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_ID = createField(DSL.name("target_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.");
-
     /**
      * The column <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
      * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
      */
     public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_SC_ID = createField(DSL.name("target_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.");
+    private transient UsageRule _usageRule;
+    private transient Dt _dt;
+    private transient DtSc _dtSc;
 
     private DtUsageRule(Name alias, Table<DtUsageRuleRecord> aliased) {
         this(alias, aliased, null);
@@ -115,6 +93,14 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
         super(child, key, DT_USAGE_RULE);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<DtUsageRuleRecord> getRecordType() {
+        return DtUsageRuleRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -134,10 +120,6 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
     public List<ForeignKey<DtUsageRuleRecord, ?>> getReferences() {
         return Arrays.asList(Keys.DT_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, Keys.DT_USAGE_RULE_TARGET_DT_ID_FK, Keys.DT_USAGE_RULE_TARGET_DT_SC_ID_FK);
     }
-
-    private transient UsageRule _usageRule;
-    private transient Dt _dt;
-    private transient DtSc _dtSc;
 
     /**
      * Get the implicit join path to the <code>oagi.usage_rule</code> table.

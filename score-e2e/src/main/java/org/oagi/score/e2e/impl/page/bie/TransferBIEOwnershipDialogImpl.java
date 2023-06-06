@@ -1,8 +1,5 @@
 package org.oagi.score.e2e.impl.page.bie;
 
-import org.oagi.score.e2e.impl.page.admin.EditAccountPageImpl;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.page.admin.EditAccountPage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.openqa.selenium.*;
 

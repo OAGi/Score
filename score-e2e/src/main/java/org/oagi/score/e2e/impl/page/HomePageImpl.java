@@ -165,6 +165,36 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         return new BIEsByUsersAndStatesPanelImpl(this);
     }
 
+    @Override
+    public MyRecentBIEsPanelImpl openMyRecentBIEsPanel() {
+        click(getBIEsTab());
+        return new MyRecentBIEsPanelImpl(this);
+    }
+
+    @Override
+    public TotalUEsByStatesPanel openTotalUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new TotalUEsByStatesPanelImpl(this);
+    }
+
+    @Override
+    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new MyUEsByStatesPanelImpl(this);
+    }
+
+    @Override
+    public UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel() {
+        click(getUserExtensionsTab());
+        return new UEsByUsersAndStatesPanelImpl(this);
+    }
+
+    @Override
+    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
+        click(getUserExtensionsTab());
+        return new MyUnusedUEsInBIEsPanelImpl(this);
+    }
+
     private class TotalBIEsByStatesPanelImpl implements TotalBIEsByStatesPanel {
 
         private BasePage parent;
@@ -266,12 +296,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public MyRecentBIEsPanelImpl openMyRecentBIEsPanel() {
-        click(getBIEsTab());
-        return new MyRecentBIEsPanelImpl(this);
-    }
-
     private class BIEsByUsersAndStatesPanelImpl implements BIEsByUsersAndStatesPanel {
 
         private BasePage parent;
@@ -359,12 +383,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public TotalUEsByStatesPanel openTotalUEsByStatesPanel() {
-        click(getUserExtensionsTab());
-        return new TotalUEsByStatesPanelImpl(this);
-    }
-
     private class MyUEsByStatesPanelImpl implements MyUEsByStatesPanel {
 
         private BasePage parent;
@@ -391,13 +409,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             });
         }
     }
-
-    @Override
-    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
-        click(getUserExtensionsTab());
-        return new MyUEsByStatesPanelImpl(this);
-    }
-
 
     private class UEsByUsersAndStatesPanelImpl implements UEsByUsersAndStatesPanel {
 
@@ -458,12 +469,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel() {
-        click(getUserExtensionsTab());
-        return new UEsByUsersAndStatesPanelImpl(this);
-    }
-
     private class MyUnusedUEsInBIEsPanelImpl implements MyUnusedUEsInBIEsPanel {
 
         private BasePage parent;
@@ -487,12 +492,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             assert viewEditCoreComponentPage.isOpened();
             return viewEditCoreComponentPage;
         }
-    }
-
-    @Override
-    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
-        click(getUserExtensionsTab());
-        return new MyUnusedUEsInBIEsPanelImpl(this);
     }
 
 }

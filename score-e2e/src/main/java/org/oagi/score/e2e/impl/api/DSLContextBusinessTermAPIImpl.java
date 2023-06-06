@@ -5,13 +5,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.BusinessTermAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BusinessTermRecord;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxCategoryRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 
 import java.math.BigInteger;
 
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.BUSINESS_TERM;
 
 public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
     private final DSLContext dslContext;
@@ -81,7 +80,7 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
 
     @Override
     public BusinessTermObject createRandomBusinessTerm(BusinessTermObject businessTerm,
-                                                AppUserObject creator){
+                                                       AppUserObject creator) {
         BusinessTermRecord bizTermRecord = new BusinessTermRecord();
         bizTermRecord.setGuid(businessTerm.getGuid());
         bizTermRecord.setExternalRefUri(businessTerm.getExternalReferenceUri());

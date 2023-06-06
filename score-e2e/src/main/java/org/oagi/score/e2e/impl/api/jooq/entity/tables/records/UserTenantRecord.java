@@ -16,17 +16,27 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant;
 /**
  * This table captures the tenant roles of the user
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> implements Record3<ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.user_tenant.user_tenant_id</code>. Primary key
-     * column.
+     * Create a detached UserTenantRecord
      */
-    public void setUserTenantId(ULong value) {
-        set(0, value);
+    public UserTenantRecord() {
+        super(UserTenant.USER_TENANT);
+    }
+
+    /**
+     * Create a detached, initialised UserTenantRecord
+     */
+    public UserTenantRecord(ULong userTenantId, ULong tenantId, ULong appUserId) {
+        super(UserTenant.USER_TENANT);
+
+        setUserTenantId(userTenantId);
+        setTenantId(tenantId);
+        setAppUserId(appUserId);
     }
 
     /**
@@ -38,11 +48,11 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
-     * the user.
+     * Setter for <code>oagi.user_tenant.user_tenant_id</code>. Primary key
+     * column.
      */
-    public void setTenantId(ULong value) {
-        set(1, value);
+    public void setUserTenantId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -54,11 +64,16 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.user_tenant.app_user_id</code>. Application user.
+     * Setter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
+     * the user.
      */
-    public void setAppUserId(ULong value) {
-        set(2, value);
+    public void setTenantId(ULong value) {
+        set(1, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.user_tenant.app_user_id</code>. Application user.
@@ -68,17 +83,20 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record3 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.user_tenant.app_user_id</code>. Application user.
+     */
+    public void setAppUserId(ULong value) {
+        set(2, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row3<ULong, ULong, ULong> fieldsRow() {
@@ -147,6 +165,10 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public UserTenantRecord value3(ULong value) {
         setAppUserId(value);
@@ -159,27 +181,5 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> impl
         value2(value2);
         value3(value3);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached UserTenantRecord
-     */
-    public UserTenantRecord() {
-        super(UserTenant.USER_TENANT);
-    }
-
-    /**
-     * Create a detached, initialised UserTenantRecord
-     */
-    public UserTenantRecord(ULong userTenantId, ULong tenantId, ULong appUserId) {
-        super(UserTenant.USER_TENANT);
-
-        setUserTenantId(userTenantId);
-        setTenantId(tenantId);
-        setAppUserId(appUserId);
     }
 }

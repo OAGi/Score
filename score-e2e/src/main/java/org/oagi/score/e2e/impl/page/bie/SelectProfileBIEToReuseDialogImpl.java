@@ -77,6 +77,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         click(searchedSelectField);
         escape(getDriver());
     }
+
     @Override
     public WebElement getUpdaterSelectField() {
         return visibilityOfElementLocated(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
@@ -113,6 +114,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);

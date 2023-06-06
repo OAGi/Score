@@ -24,18 +24,30 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
  * created only when there is a user extension to the the OAGIS extension
  * component/ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevisionRecord> implements Record6<ULong, ULong, ULong, ULong, Byte, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.bie_user_ext_revision.bie_user_ext_revision_id</code>.
-     * Primary, internal database key.
+     * Create a detached BieUserExtRevisionRecord
      */
-    public void setBieUserExtRevisionId(ULong value) {
-        set(0, value);
+    public BieUserExtRevisionRecord() {
+        super(BieUserExtRevision.BIE_USER_EXT_REVISION);
+    }
+
+    /**
+     * Create a detached, initialised BieUserExtRevisionRecord
+     */
+    public BieUserExtRevisionRecord(ULong bieUserExtRevisionId, ULong extAbieId, ULong extAccId, ULong userExtAccId, Byte revisedIndicator, ULong topLevelAsbiepId) {
+        super(BieUserExtRevision.BIE_USER_EXT_REVISION);
+
+        setBieUserExtRevisionId(bieUserExtRevisionId);
+        setExtAbieId(extAbieId);
+        setExtAccId(extAccId);
+        setUserExtAccId(userExtAccId);
+        setRevisedIndicator(revisedIndicator);
+        setTopLevelAsbiepId(topLevelAsbiepId);
     }
 
     /**
@@ -48,16 +60,12 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.ext_abie_id</code>. This
-     * points to an ABIE record corresponding to the EXTENSION_ACC_ID record.
-     * For example, this column can point to the ApplicationAreaExtension ABIE
-     * which is based on the ApplicationAreaExtension ACC (referred to by the
-     * EXT_ACC_ID column). This column can be NULL only when the extension is
-     * the AllExtension because there is no corresponding ABIE for the
-     * AllExtension ACC.
+     * Setter for
+     * <code>oagi.bie_user_ext_revision.bie_user_ext_revision_id</code>.
+     * Primary, internal database key.
      */
-    public void setExtAbieId(ULong value) {
-        set(1, value);
+    public void setBieUserExtRevisionId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -74,15 +82,16 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
-     * points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID
-     * column is based. E.g. It may point to an ApplicationAreaExtension ACC,
-     * AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that
-     * an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2
-     * (Extension).
+     * Setter for <code>oagi.bie_user_ext_revision.ext_abie_id</code>. This
+     * points to an ABIE record corresponding to the EXTENSION_ACC_ID record.
+     * For example, this column can point to the ApplicationAreaExtension ABIE
+     * which is based on the ApplicationAreaExtension ACC (referred to by the
+     * EXT_ACC_ID column). This column can be NULL only when the extension is
+     * the AllExtension because there is no corresponding ABIE for the
+     * AllExtension ACC.
      */
-    public void setExtAccId(ULong value) {
-        set(2, value);
+    public void setExtAbieId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -98,14 +107,15 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.user_ext_acc_id</code>. This
-     * column points to the specific revision of a User Extension ACC (this is
-     * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
-     * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
-     * the AllExtension). 
+     * Setter for <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
+     * points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID
+     * column is based. E.g. It may point to an ApplicationAreaExtension ACC,
+     * AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that
+     * an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2
+     * (Extension).
      */
-    public void setUserExtAccId(ULong value) {
-        set(3, value);
+    public void setExtAccId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -113,22 +123,21 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
      * column points to the specific revision of a User Extension ACC (this is
      * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
      * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
-     * the AllExtension). 
+     * the AllExtension).
      */
     public ULong getUserExtAccId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.revised_indicator</code>.
-     * This column is a flag indicating to whether the User Extension ACC (as
-     * identified in the USER_EXT_ACC_ID column) has been revised, i.e., there
-     * is a newer version of the user extension ACC than the one currently used
-     * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
-     * not current.
+     * Setter for <code>oagi.bie_user_ext_revision.user_ext_acc_id</code>. This
+     * column points to the specific revision of a User Extension ACC (this is
+     * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
+     * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
+     * the AllExtension).
      */
-    public void setRevisedIndicator(Byte value) {
-        set(4, value);
+    public void setUserExtAccId(ULong value) {
+        set(3, value);
     }
 
     /**
@@ -144,12 +153,20 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
-     * This is a foreign key to the top-level ASBIEP.
+     * Setter for <code>oagi.bie_user_ext_revision.revised_indicator</code>.
+     * This column is a flag indicating to whether the User Extension ACC (as
+     * identified in the USER_EXT_ACC_ID column) has been revised, i.e., there
+     * is a newer version of the user extension ACC than the one currently used
+     * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
+     * not current.
      */
-    public void setTopLevelAsbiepId(ULong value) {
-        set(5, value);
+    public void setRevisedIndicator(Byte value) {
+        set(4, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
@@ -160,17 +177,21 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record6 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
+     * This is a foreign key to the top-level ASBIEP.
+     */
+    public void setTopLevelAsbiepId(ULong value) {
+        set(5, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row6<ULong, ULong, ULong, ULong, Byte, ULong> fieldsRow() {
@@ -302,6 +323,10 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BieUserExtRevisionRecord value6(ULong value) {
         setTopLevelAsbiepId(value);
@@ -317,30 +342,5 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
         value5(value5);
         value6(value6);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BieUserExtRevisionRecord
-     */
-    public BieUserExtRevisionRecord() {
-        super(BieUserExtRevision.BIE_USER_EXT_REVISION);
-    }
-
-    /**
-     * Create a detached, initialised BieUserExtRevisionRecord
-     */
-    public BieUserExtRevisionRecord(ULong bieUserExtRevisionId, ULong extAbieId, ULong extAccId, ULong userExtAccId, Byte revisedIndicator, ULong topLevelAsbiepId) {
-        super(BieUserExtRevision.BIE_USER_EXT_REVISION);
-
-        setBieUserExtRevisionId(bieUserExtRevisionId);
-        setExtAbieId(extAbieId);
-        setExtAccId(extAccId);
-        setUserExtAccId(userExtAccId);
-        setRevisedIndicator(revisedIndicator);
-        setTopLevelAsbiepId(topLevelAsbiepId);
     }
 }

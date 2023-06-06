@@ -105,6 +105,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
         ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
         assertEquals("Deleted", getText(bccPanelContainer.getBCCPPanel().getStateField()));
     }
+
     @Test
     public void test_TA_15_18_3() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -152,6 +153,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
         assertEquals("WIP", getText(bccpPanel.getStateField()));
         assertEquals(endUser.getLoginId(), getText(bccpPanel.getOwnerField()));
     }
+
     @Test
     public void test_TA_15_18_4() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

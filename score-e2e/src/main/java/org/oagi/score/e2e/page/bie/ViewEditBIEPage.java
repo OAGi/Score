@@ -246,6 +246,7 @@ public interface ViewEditBIEPage extends Page {
 
     /**
      * Return the number of only BIEs by state
+     *
      * @param state the BIE state: WIP, QA or Production
      * @return the quantity of Only BIEs by state
      */

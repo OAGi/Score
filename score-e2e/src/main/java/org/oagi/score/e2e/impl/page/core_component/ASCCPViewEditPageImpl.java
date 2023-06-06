@@ -22,12 +22,6 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEditPage {
 
-    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
@@ -48,6 +42,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -76,6 +76,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
     private final ASCCPObject asccp;
+
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
         this.asccp = asccp;
@@ -450,6 +451,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             };
         });
     }
+
     @Override
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);

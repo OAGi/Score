@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record22;
@@ -14,24 +12,55 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
 
+import java.time.LocalDateTime;
+
 
 /**
  * This table represents the supplementary component (SC) of a DT. Revision is
  * not tracked at the supplementary component. It is considered intrinsic part
  * of the DT. In other words, when a new revision of a DT is created a new set
- * of supplementary components is created along with it. 
+ * of supplementary components is created along with it.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Record22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.dt_sc.dt_sc_id</code>. Internal, primary database
-     * key.
+     * Create a detached DtScRecord
      */
-    public void setDtScId(ULong value) {
-        set(0, value);
+    public DtScRecord() {
+        super(DtSc.DT_SC);
+    }
+
+    /**
+     * Create a detached, initialised DtScRecord
+     */
+    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
+        super(DtSc.DT_SC);
+
+        setDtScId(dtScId);
+        setGuid(guid);
+        setObjectClassTerm(objectClassTerm);
+        setPropertyTerm(propertyTerm);
+        setRepresentationTerm(representationTerm);
+        setDefinition(definition);
+        setDefinitionSource(definitionSource);
+        setOwnerDtId(ownerDtId);
+        setCardinalityMin(cardinalityMin);
+        setCardinalityMax(cardinalityMax);
+        setBasedDtScId(basedDtScId);
+        setDefaultValue(defaultValue);
+        setFixedValue(fixedValue);
+        setIsDeprecated(isDeprecated);
+        setReplacementDtScId(replacementDtScId);
+        setCreatedBy(createdBy);
+        setOwnerUserId(ownerUserId);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setPrevDtScId(prevDtScId);
+        setNextDtScId(nextDtScId);
     }
 
     /**
@@ -43,11 +72,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>oagi.dt_sc.dt_sc_id</code>. Internal, primary database
+     * key.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setDtScId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -59,11 +88,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.object_class_term</code>. Object class term
-     * of the SC.
+     * Setter for <code>oagi.dt_sc.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public void setObjectClassTerm(String value) {
-        set(2, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -75,11 +104,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.property_term</code>. Property term of the
-     * SC.
+     * Setter for <code>oagi.dt_sc.object_class_term</code>. Object class term
+     * of the SC.
      */
-    public void setPropertyTerm(String value) {
-        set(3, value);
+    public void setObjectClassTerm(String value) {
+        set(2, value);
     }
 
     /**
@@ -91,11 +120,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.representation_term</code>. Representation of
-     * the supplementary component.
+     * Setter for <code>oagi.dt_sc.property_term</code>. Property term of the
+     * SC.
      */
-    public void setRepresentationTerm(String value) {
-        set(4, value);
+    public void setPropertyTerm(String value) {
+        set(3, value);
     }
 
     /**
@@ -107,11 +136,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.definition</code>. Description of the
-     * supplementary component.
+     * Setter for <code>oagi.dt_sc.representation_term</code>. Representation of
+     * the supplementary component.
      */
-    public void setDefinition(String value) {
-        set(5, value);
+    public void setRepresentationTerm(String value) {
+        set(4, value);
     }
 
     /**
@@ -123,11 +152,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>oagi.dt_sc.definition</code>. Description of the
+     * supplementary component.
      */
-    public void setDefinitionSource(String value) {
-        set(6, value);
+    public void setDefinition(String value) {
+        set(5, value);
     }
 
     /**
@@ -139,12 +168,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.owner_dt_id</code>. Foreigned key to the DT
-     * table indicating the data type, to which this supplementary component
-     * belongs.
+     * Setter for <code>oagi.dt_sc.definition_source</code>. This is typically a
+     * URL identifying the source of the DEFINITION column.
      */
-    public void setOwnerDtId(ULong value) {
-        set(7, value);
+    public void setDefinitionSource(String value) {
+        set(6, value);
     }
 
     /**
@@ -157,12 +185,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.cardinality_min</code>. The minimum
-     * occurrence constraint associated with the supplementary component. The
-     * valid values zero or one.
+     * Setter for <code>oagi.dt_sc.owner_dt_id</code>. Foreigned key to the DT
+     * table indicating the data type, to which this supplementary component
+     * belongs.
      */
-    public void setCardinalityMin(Integer value) {
-        set(8, value);
+    public void setOwnerDtId(ULong value) {
+        set(7, value);
     }
 
     /**
@@ -175,13 +203,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.cardinality_max</code>. The maximum
+     * Setter for <code>oagi.dt_sc.cardinality_min</code>. The minimum
      * occurrence constraint associated with the supplementary component. The
-     * valid values are zero or one. Zero is used when the SC is restricted from
-     * an instantiation in the data type.
+     * valid values zero or one.
      */
-    public void setCardinalityMax(Integer value) {
-        set(9, value);
+    public void setCardinalityMin(Integer value) {
+        set(8, value);
     }
 
     /**
@@ -195,12 +222,13 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.based_dt_sc_id</code>. Foreign key to the
-     * DT_SC table itself. This column is used when the SC is derived from the
-     * based DT.
+     * Setter for <code>oagi.dt_sc.cardinality_max</code>. The maximum
+     * occurrence constraint associated with the supplementary component. The
+     * valid values are zero or one. Zero is used when the SC is restricted from
+     * an instantiation in the data type.
      */
-    public void setBasedDtScId(ULong value) {
-        set(10, value);
+    public void setCardinalityMax(Integer value) {
+        set(9, value);
     }
 
     /**
@@ -213,12 +241,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.default_value</code>. This column specifies
-     * the default value constraint. Default and fixed value constraints cannot
-     * be used at the same time.
+     * Setter for <code>oagi.dt_sc.based_dt_sc_id</code>. Foreign key to the
+     * DT_SC table itself. This column is used when the SC is derived from the
+     * based DT.
      */
-    public void setDefaultValue(String value) {
-        set(11, value);
+    public void setBasedDtScId(ULong value) {
+        set(10, value);
     }
 
     /**
@@ -231,12 +259,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.fixed_value</code>. This column captures the
-     * fixed value constraint. Default and fixed value constraints cannot be
-     * used at the same time.
+     * Setter for <code>oagi.dt_sc.default_value</code>. This column specifies
+     * the default value constraint. Default and fixed value constraints cannot
+     * be used at the same time.
      */
-    public void setFixedValue(String value) {
-        set(12, value);
+    public void setDefaultValue(String value) {
+        set(11, value);
     }
 
     /**
@@ -249,12 +277,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
-     * is deprecated and should not be reused (i.e., no new reference to this
-     * record should be created).
+     * Setter for <code>oagi.dt_sc.fixed_value</code>. This column captures the
+     * fixed value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
-    public void setIsDeprecated(Byte value) {
-        set(13, value);
+    public void setFixedValue(String value) {
+        set(12, value);
     }
 
     /**
@@ -267,11 +295,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.replacement_dt_sc_id</code>. This refers to a
-     * replacement if the record is deprecated.
+     * Setter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
+     * is deprecated and should not be reused (i.e., no new reference to this
+     * record should be created).
      */
-    public void setReplacementDtScId(ULong value) {
-        set(14, value);
+    public void setIsDeprecated(Byte value) {
+        set(13, value);
     }
 
     /**
@@ -283,11 +312,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the code list.
+     * Setter for <code>oagi.dt_sc.replacement_dt_sc_id</code>. This refers to a
+     * replacement if the record is deprecated.
      */
-    public void setCreatedBy(ULong value) {
-        set(15, value);
+    public void setReplacementDtScId(ULong value) {
+        set(14, value);
     }
 
     /**
@@ -299,22 +328,18 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
-     * 
-     * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership.
+     * Setter for <code>oagi.dt_sc.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created the code list.
      */
-    public void setOwnerUserId(ULong value) {
-        set(16, value);
+    public void setCreatedBy(ULong value) {
+        set(15, value);
     }
 
     /**
      * Getter for <code>oagi.dt_sc.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     * <p>
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -323,11 +348,15 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.last_updated_by</code>. Foreign key to the
-     * APP_USER table. It identifies the user who last updated the code list.
+     * Setter for <code>oagi.dt_sc.owner_user_id</code>. Foreign key to the
+     * APP_USER table. This is the user who owns the entity, is allowed to edit
+     * the entity, and who can transfer the ownership to another user.
+     * <p>
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(17, value);
+    public void setOwnerUserId(ULong value) {
+        set(16, value);
     }
 
     /**
@@ -339,11 +368,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
-     * code list was created.
+     * Setter for <code>oagi.dt_sc.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the code list.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(18, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(17, value);
     }
 
     /**
@@ -355,11 +384,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
-     * the code list was last updated.
+     * Setter for <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
+     * code list was created.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(19, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(18, value);
     }
 
     /**
@@ -371,11 +400,11 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Setter for <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
+     * the code list was last updated.
      */
-    public void setPrevDtScId(ULong value) {
-        set(20, value);
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(19, value);
     }
 
     /**
@@ -387,12 +416,16 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Setter for <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to
+     * indicate the previous history record.
      */
-    public void setNextDtScId(ULong value) {
-        set(21, value);
+    public void setPrevDtScId(ULong value) {
+        set(20, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
@@ -403,17 +436,21 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record22 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
+     * indicate the next history record.
+     */
+    public void setNextDtScId(ULong value) {
+        set(21, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record22 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
@@ -881,6 +918,10 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public DtScRecord value22(ULong value) {
         setNextDtScId(value);
@@ -912,46 +953,5 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Recor
         value21(value21);
         value22(value22);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached DtScRecord
-     */
-    public DtScRecord() {
-        super(DtSc.DT_SC);
-    }
-
-    /**
-     * Create a detached, initialised DtScRecord
-     */
-    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
-        super(DtSc.DT_SC);
-
-        setDtScId(dtScId);
-        setGuid(guid);
-        setObjectClassTerm(objectClassTerm);
-        setPropertyTerm(propertyTerm);
-        setRepresentationTerm(representationTerm);
-        setDefinition(definition);
-        setDefinitionSource(definitionSource);
-        setOwnerDtId(ownerDtId);
-        setCardinalityMin(cardinalityMin);
-        setCardinalityMax(cardinalityMax);
-        setBasedDtScId(basedDtScId);
-        setDefaultValue(defaultValue);
-        setFixedValue(fixedValue);
-        setIsDeprecated(isDeprecated);
-        setReplacementDtScId(replacementDtScId);
-        setCreatedBy(createdBy);
-        setOwnerUserId(ownerUserId);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setPrevDtScId(prevDtScId);
-        setNextDtScId(nextDtScId);
     }
 }

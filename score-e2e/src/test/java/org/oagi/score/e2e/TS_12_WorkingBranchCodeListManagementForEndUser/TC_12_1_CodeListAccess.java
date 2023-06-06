@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
 
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -34,6 +34,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
         super.init();
 
     }
+
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
@@ -78,6 +79,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
             viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
         }
     }
+
     @Test
     @DisplayName("TC_12_1_TA_2")
     public void test_TA_2() {
@@ -125,7 +127,9 @@ public class TC_12_1_CodeListAccess extends BaseTest {
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             assertDisabled(editCodeListPage.getVersionField());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.getAddCodeListValueButton();
+            });
             CodeListValueObject value = codeListValuesMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -133,6 +137,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
             escape(getDriver());
         }
     }
+
     @Test
     @DisplayName("TC_12_1_TA_3")
     public void test_TA_3() {
@@ -173,7 +178,9 @@ public class TC_12_1_CodeListAccess extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(endUserA.getAppUserId(), cl.getOwnerUserId());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            assertThrows(NoSuchElementException.class, () -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());});
+            assertThrows(NoSuchElementException.class, () -> {
+                viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            });
         }
     }
 

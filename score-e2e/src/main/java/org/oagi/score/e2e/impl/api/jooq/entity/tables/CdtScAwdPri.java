@@ -4,24 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function4;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -30,55 +14,48 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CdtScAwdPriRecord;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This table capture the CDT primitives allowed for a particular SC of a CDT.
  * It also stores the CDT primitives allowed for a SC of a BDT that extends its
  * base (such SC is not defined in the CCTS data type catalog specification).
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.cdt_sc_awd_pri</code>
      */
     public static final CdtScAwdPri CDT_SC_AWD_PRI = new CdtScAwdPri();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<CdtScAwdPriRecord> getRecordType() {
-        return CdtScAwdPriRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.cdt_sc_awd_pri.cdt_sc_awd_pri_id</code>. Internal,
      * primary database key.
      */
     public final TableField<CdtScAwdPriRecord, ULong> CDT_SC_AWD_PRI_ID = createField(DSL.name("cdt_sc_awd_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
-
     /**
      * The column <code>oagi.cdt_sc_awd_pri.cdt_sc_id</code>. Foreign key
      * pointing to the supplementary component (SC).
      */
     public final TableField<CdtScAwdPriRecord, ULong> CDT_SC_ID = createField(DSL.name("cdt_sc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key pointing to the supplementary component (SC).");
-
     /**
      * The column <code>oagi.cdt_sc_awd_pri.cdt_pri_id</code>. A foreign key
      * pointing to the CDT_Pri table. It represents a CDT primitive allowed for
      * the suppliement component identified in the CDT_SC_ID column.
      */
     public final TableField<CdtScAwdPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to the CDT_Pri table. It represents a CDT primitive allowed for the suppliement component identified in the CDT_SC_ID column.");
-
     /**
      * The column <code>oagi.cdt_sc_awd_pri.is_default</code>. Indicating
      * whether the primitive is the default primitive of the supplementary
      * component.
      */
     public final TableField<CdtScAwdPriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false), this, "Indicating whether the primitive is the default primitive of the supplementary component.");
+    private transient DtSc _dtSc;
+    private transient CdtPri _cdtPri;
 
     private CdtScAwdPri(Name alias, Table<CdtScAwdPriRecord> aliased) {
         this(alias, aliased, null);
@@ -113,6 +90,14 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
         super(child, key, CDT_SC_AWD_PRI);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<CdtScAwdPriRecord> getRecordType() {
+        return CdtScAwdPriRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -132,9 +117,6 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
     public List<ForeignKey<CdtScAwdPriRecord, ?>> getReferences() {
         return Arrays.asList(Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK);
     }
-
-    private transient DtSc _dtSc;
-    private transient CdtPri _cdtPri;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc</code> table.

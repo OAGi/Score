@@ -5,7 +5,6 @@ import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

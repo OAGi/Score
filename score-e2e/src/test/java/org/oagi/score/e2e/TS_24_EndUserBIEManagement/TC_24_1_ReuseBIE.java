@@ -296,9 +296,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_2() {
-        ASCCPObject asccp_owner_usera, developer_asccp, asccp_child, asccp_reuse;
-        BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
-        ACCObject acc, developer_acc;
+        ASCCPObject developer_asccp, developer_asccp_for_usera;
+        ACCObject acc, developer_acc, developer_acc_association;
         AppUserObject usera, developer;
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
@@ -318,41 +317,33 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              * The owner of the ASCCP is developer
              */
             developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_acc_association = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
             developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
+            ASCCObject ascc = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
+            developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
         }
-
-        {
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-            /**
-             * The owner of the ASCCP is usera
-             */
-            acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
-            asccp_reuse = coreComponentAPI.createRandomASCCP(developer_acc, usera, namespace, "Production");
-            ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp_reuse, "Production");
-            asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
-        }
-
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), current_release);
+        createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
-        viewEditBIEPage.setDEN(asccp_owner_usera.getDen());
+        viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
-        editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
     }
 
     @Test
     public void test_TA_24_1_3() {
+
 
     }
 

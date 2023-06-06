@@ -173,7 +173,7 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getMoveToDraftButton();
 
-    /**     *
+    /**
      * Move the state of the agency ID list to 'Draft'.
      */
     void moveToDraft();
@@ -185,7 +185,7 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getMoveToCandidateButton();
 
-    /**     *
+    /**
      * Move the state of the agency ID list to 'Candidate'.
      */
     void moveToCandidate();
@@ -197,7 +197,7 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getMoveToQAButton();
 
-    /**     *
+    /**
      * Move the state of the agency ID list to 'QA'.
      */
     void moveToQA();

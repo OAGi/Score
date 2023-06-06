@@ -43,7 +43,7 @@ public class TC_26_1_UserGuideIsAccessible extends BaseTest {
 
     @Test
     @DisplayName("TC_26_1_1")
-    public void link_to_user_guide_is_available_to_oagis_developer_and_is_resolved(){
+    public void link_to_user_guide_is_available_to_oagis_developer_and_is_resolved() {
         HomePage homePage = loginPage().signIn(appDevUser.getLoginId(), appDevUser.getPassword());
         UserGuidePage userGuidePage = homePage.getHelpMenu().openUserGuideSubMenu();
         assertTrue(userGuidePage.getTitle().isDisplayed());
@@ -51,7 +51,7 @@ public class TC_26_1_UserGuideIsAccessible extends BaseTest {
 
     @Test
     @DisplayName("TC_26_1_2")
-    public void link_to_user_guide_is_available_to_end_user_and_is_resolved(){
+    public void link_to_user_guide_is_available_to_end_user_and_is_resolved() {
         HomePage homePage = loginPage().signIn(appEndUser.getLoginId(), appEndUser.getPassword());
         UserGuidePage userGuidePage = homePage.getHelpMenu().openUserGuideSubMenu();
         assertTrue(userGuidePage.getTitle().isDisplayed());

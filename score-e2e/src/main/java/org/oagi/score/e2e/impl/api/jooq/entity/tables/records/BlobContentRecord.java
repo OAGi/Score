@@ -17,17 +17,26 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContent;
  * This table stores schemas whose content is only imported as a whole and is
  * represented in Blob.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> implements Record2<ULong, byte[]> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.blob_content.blob_content_id</code>. Primary,
-     * internal database key.
+     * Create a detached BlobContentRecord
      */
-    public void setBlobContentId(ULong value) {
-        set(0, value);
+    public BlobContentRecord() {
+        super(BlobContent.BLOB_CONTENT);
+    }
+
+    /**
+     * Create a detached, initialised BlobContentRecord
+     */
+    public BlobContentRecord(ULong blobContentId, byte[] content) {
+        super(BlobContent.BLOB_CONTENT);
+
+        setBlobContentId(blobContentId);
+        setContent(content);
     }
 
     /**
@@ -39,12 +48,16 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
     }
 
     /**
-     * Setter for <code>oagi.blob_content.content</code>. The Blob content of
-     * the schema file.
+     * Setter for <code>oagi.blob_content.blob_content_id</code>. Primary,
+     * internal database key.
      */
-    public void setContent(byte[] value) {
-        set(1, value);
+    public void setBlobContentId(ULong value) {
+        set(0, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.blob_content.content</code>. The Blob content of
@@ -55,17 +68,21 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record2 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.blob_content.content</code>. The Blob content of
+     * the schema file.
+     */
+    public void setContent(byte[] value) {
+        set(1, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record2 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row2<ULong, byte[]> fieldsRow() {
@@ -113,6 +130,10 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BlobContentRecord value2(byte[] value) {
         setContent(value);
@@ -124,26 +145,5 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> im
         value1(value1);
         value2(value2);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BlobContentRecord
-     */
-    public BlobContentRecord() {
-        super(BlobContent.BLOB_CONTENT);
-    }
-
-    /**
-     * Create a detached, initialised BlobContentRecord
-     */
-    public BlobContentRecord(ULong blobContentId, byte[] content) {
-        super(BlobContent.BLOB_CONTENT);
-
-        setBlobContentId(blobContentId);
-        setContent(content);
     }
 }

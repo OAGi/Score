@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;

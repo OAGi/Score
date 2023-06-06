@@ -8,7 +8,6 @@ import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

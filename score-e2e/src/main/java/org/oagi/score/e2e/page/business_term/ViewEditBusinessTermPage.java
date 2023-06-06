@@ -126,6 +126,7 @@ public interface ViewEditBusinessTermPage extends Page {
 
     /**
      * Return the UI checkbox for select at given index
+     *
      * @param idx index
      * @return the UI checkbox element
      */

@@ -87,7 +87,6 @@ public interface CoreComponentAPI {
     DTObject getBDTByManifestId(BigInteger dtManifestId);
 
     /**
-     *
      * @param guid
      * @param releaseNum
      * @return

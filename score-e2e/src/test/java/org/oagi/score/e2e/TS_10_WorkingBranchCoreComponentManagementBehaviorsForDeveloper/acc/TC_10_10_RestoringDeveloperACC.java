@@ -9,7 +9,10 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.*;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;

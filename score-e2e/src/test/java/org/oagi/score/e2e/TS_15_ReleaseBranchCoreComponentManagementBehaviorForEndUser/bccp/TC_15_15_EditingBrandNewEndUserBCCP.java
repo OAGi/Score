@@ -175,6 +175,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         assertFalse(dtPanel.getDefinitionSourceField().isEnabled());
         assertFalse(dtPanel.getDefinitionField().isEnabled());
     }
+
     @Test
     public void test_TA_15_15_1_f() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -268,6 +269,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         assertThrows(TimeoutException.class, () -> bccpPanel.setNamespace(developerNamespace.getUri()));
 
     }
+
     @Test
     public void test_TA_15_15_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

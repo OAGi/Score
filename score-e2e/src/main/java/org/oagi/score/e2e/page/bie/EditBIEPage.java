@@ -7,7 +7,6 @@ import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.WebElement;
 
-
 import java.util.List;
 
 /**
@@ -198,8 +197,8 @@ public interface EditBIEPage extends Page {
     /**
      * Continue to extend the 'Extension' BIE after it gets the attention message.
      *
-     * @see #getAttentionDialogMessage()
      * @return the local/global user extension page
+     * @see #getAttentionDialogMessage()
      */
     ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
@@ -208,6 +207,14 @@ public interface EditBIEPage extends Page {
     String getTypeDefinitionValue();
 
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path);
+
+    WebElement getTypeDefinitionField();
+
+    ASBIEPanel getASBIEPanel(WebElement asccpNode);
+
+    BBIEPanel getBBIEPanel(WebElement bccpNode);
+
+    BBIESCPanel getBBIESCPanel(WebElement bdtScNode);
 
     /**
      * An interface of the panel for 'Top-Level ASBIEP' node.
@@ -363,10 +370,6 @@ public interface EditBIEPage extends Page {
 
     }
 
-    WebElement getTypeDefinitionField();
-
-    ASBIEPanel getASBIEPanel(WebElement asccpNode);
-
     interface ASBIEPanel {
 
         BusinessTermAssignmentPage clickShowBusinessTermsButton();
@@ -458,8 +461,6 @@ public interface EditBIEPage extends Page {
         WebElement getAssignBusinessTermButton(boolean enabled);
     }
 
-    BBIEPanel getBBIEPanel(WebElement bccpNode);
-
     interface BBIEPanel {
 
         BusinessTermAssignmentPage clickShowBusinessTermsButton();
@@ -532,7 +533,6 @@ public interface EditBIEPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param value "None", "Fixed Value", "Default Value"
          * @return
          */
@@ -600,8 +600,6 @@ public interface EditBIEPage extends Page {
         String getValueDomainWarningMessage(String valueDomain);
     }
 
-    BBIESCPanel getBBIESCPanel(WebElement bdtScNode);
-
     interface BBIESCPanel {
 
         /**
@@ -661,7 +659,6 @@ public interface EditBIEPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param value "None", "Fixed Value", "Default Value"
          * @return
          */

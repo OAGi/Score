@@ -1,6 +1,9 @@
 package org.oagi.score.e2e.api;
 
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 
@@ -17,7 +20,7 @@ public interface AgencyIDListAPI {
     /**
      * Return the agency ID list object by given name and branch
      *
-     * @param name the name of the agency ID list.
+     * @param name   the name of the agency ID list.
      * @param branch the branch
      * @return the agency ID list object
      */

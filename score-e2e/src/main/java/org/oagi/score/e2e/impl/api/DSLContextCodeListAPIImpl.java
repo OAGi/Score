@@ -290,6 +290,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                         (RELEASE.RELEASE_NUM.eq(releaseNumber)))
                 .fetchOneInto(String.class);
     }
+
     @Override
     public ArrayList<CodeListObject> getDefaultCodeListsForDT(String guid, BigInteger releaseId) {
         List<Field<?>> fields = new ArrayList();
@@ -330,9 +331,9 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                 .from(CODE_LIST)
                 .where(CODE_LIST.LIST_ID.eq(listId))
                 .fetchMany();
-        if (records.size()>1){
+        if (records.size() > 1) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -362,9 +363,9 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                         (CODE_LIST.VERSION_ID.eq(codeList.getVersionId())),
                         (AGENCY_ID_LIST.NAME).eq(agencyIDList)))
                 .fetchMany();
-        if (records.size()>1){
+        if (records.size() > 1) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -447,7 +448,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         fields.add(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID);
         fields.add(CODE_LIST_MANIFEST.RELEASE_ID);
         fields.addAll(Arrays.asList(CODE_LIST.fields()));
-        CodeListObject revisedCodeList =  dslContext.select(fields)
+        CodeListObject revisedCodeList = dslContext.select(fields)
                 .from(CODE_LIST_MANIFEST)
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .where(CODE_LIST.CODE_LIST_ID.eq(codeListId))
@@ -498,7 +499,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         codeList.setDefinition(record.get(CODE_LIST.DEFINITION));
         codeList.setRemark(record.get(CODE_LIST.REMARK));
         codeList.setDefinitionSource(record.get(CODE_LIST.DEFINITION_SOURCE));
-        codeList.setNamespaceId(record.get(CODE_LIST.NAMESPACE_ID) ==null ? null : record.get(CODE_LIST.NAMESPACE_ID).toBigInteger());
+        codeList.setNamespaceId(record.get(CODE_LIST.NAMESPACE_ID) == null ? null : record.get(CODE_LIST.NAMESPACE_ID).toBigInteger());
         codeList.setCreatedBy(record.get(CODE_LIST.CREATED_BY).toBigInteger());
         codeList.setOwnerUserId(record.get(CODE_LIST.OWNER_USER_ID).toBigInteger());
         codeList.setLastUpdatedBy(record.get(CODE_LIST.LAST_UPDATED_BY).toBigInteger());
@@ -531,7 +532,6 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         }
         return codeLists;
     }
-
 
 
     @Override

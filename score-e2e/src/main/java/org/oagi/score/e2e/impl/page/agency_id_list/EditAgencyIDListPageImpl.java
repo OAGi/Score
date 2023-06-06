@@ -19,6 +19,12 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgencyIDListPage {
 
+    public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
@@ -49,16 +55,10 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
-    public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
-    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
-    public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
@@ -89,9 +89,9 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     protected String getPageUrl() {
-        if (this.agencyIDList.getAgencyIDListManifestId()!=null){
+        if (this.agencyIDList.getAgencyIDListManifestId() != null) {
             return getConfig().getBaseUrl().resolve("/agency_id_list/" + this.agencyIDList.getAgencyIDListManifestId()).toString();
-        }else{
+        } else {
             return getConfig().getBaseUrl().resolve("/agency_id_list/" + this.agencyIDList.getAgencyIDListId()).toString();
         }
     }

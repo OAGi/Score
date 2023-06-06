@@ -18,65 +18,52 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+    public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
+            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
-
     private static final By RELEASE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
-
     private static final By REVISION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
-
     private static final By STATE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
-
     private static final By OWNER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
             By.xpath("//label/span[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
-
     private static final By GUID_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
-
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
-
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
-
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
-
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
-
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
-
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
-
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
-
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
-    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
-    public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
-    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-form-field//input");
     private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
@@ -246,10 +233,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void showValueDomain() {
         click(getShowValueDomain());
     }
+
     @Override
     public WebElement getShowValueDomain() {
         return elementToBeClickable(getDriver(), VALUE_DOMAIN_LOCATOR);
     }
+
     @Override
     public WebElement getAddValueDomainButton() {
         return elementToBeClickable(getDriver(), ADD_VALUE_DOMAIN_LOCATOR);
@@ -266,13 +255,15 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ valueDomainName +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
     }
+
     @Override
     public WebElement getTheLastTableRecord() {
         defaultWait(getDriver());
         return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//tr[last()]"));
     }
+
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
@@ -298,6 +289,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
@@ -316,6 +308,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void setQualifier(String qualifier) {
         sendKeys(getQualifierField(), qualifier);
     }
+
     @Override
     public WebElement getQualifierField() {
         return visibilityOfElementLocated(getDriver(), QUALIFIER_FIELD_LOCATOR);
@@ -326,7 +319,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tr = getTheLastTableRecord();
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
-        WebElement codeList = findElement(getDriver(), By.xpath("//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]"));
+        WebElement codeList = findElement(getDriver(), By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]"));
         codeList.findElement(By.xpath("//span[@class=\"text-line-through\"]"));
     }
 
@@ -340,15 +333,16 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ codeListName +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]")));
     }
 
     @Override
     public void setDefaultValueDomain(String name) {
         click(getDefaultValueDomainField());
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
     }
+
     @Override
     public WebElement getDefaultValueDomainField() {
         return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
@@ -408,6 +402,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         clear(getSearchField());
         return node;
     }
+
     @Override
     public WebElement getSearchField() {
         return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
@@ -493,13 +488,13 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]" +
-                "/ancestor::tr[1]//*[contains(text(),\""+valueDomainName+"\")]//ancestor::tr//*[contains(text(),\""+XSDExpression+"\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\"" + valueDomainType + "\")]" +
+                "/ancestor::tr[1]//*[contains(text(),\"" + valueDomainName + "\")]//ancestor::tr//*[contains(text(),\"" + XSDExpression + "\")]"));
     }
 
     @Override
     public WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]/ancestor::tr[1]//*[contains(text()" +
-                ",\""+valueDomainName+"\")]//ancestor::tr/td[1]//label/span[1]//input"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\"" + valueDomainType + "\")]/ancestor::tr[1]//*[contains(text()" +
+                ",\"" + valueDomainName + "\")]//ancestor::tr/td[1]//label/span[1]//input"));
     }
 }

@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record13;
@@ -14,22 +12,44 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Module;
 
+import java.time.LocalDateTime;
+
 
 /**
  * The module table stores information about a physical file, into which CC
  * components will be generated during the expression generation.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements Record13<ULong, ULong, ULong, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.module.module_id</code>. Primary, internal database
-     * key.
+     * Create a detached ModuleRecord
      */
-    public void setModuleId(ULong value) {
-        set(0, value);
+    public ModuleRecord() {
+        super(Module.MODULE);
+    }
+
+    /**
+     * Create a detached, initialised ModuleRecord
+     */
+    public ModuleRecord(ULong moduleId, ULong moduleSetId, ULong parentModuleId, String type, String path, String name, ULong namespaceId, String versionNum, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(Module.MODULE);
+
+        setModuleId(moduleId);
+        setModuleSetId(moduleSetId);
+        setParentModuleId(parentModuleId);
+        setType(type);
+        setPath(path);
+        setName(name);
+        setNamespaceId(namespaceId);
+        setVersionNum(versionNum);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setOwnerUserId(ownerUserId);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 
     /**
@@ -41,11 +61,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.module_set_id</code>. This indicates a
-     * module set.
+     * Setter for <code>oagi.module.module_id</code>. Primary, internal database
+     * key.
      */
-    public void setModuleSetId(ULong value) {
-        set(1, value);
+    public void setModuleId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -57,11 +77,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.parent_module_id</code>. This indicates a
-     * parent module id. root module will be NULL.
+     * Setter for <code>oagi.module.module_set_id</code>. This indicates a
+     * module set.
      */
-    public void setParentModuleId(ULong value) {
-        set(2, value);
+    public void setModuleSetId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -73,11 +93,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.type</code>. This is a type column for
-     * indicates module is FILE or DIRECTORY.
+     * Setter for <code>oagi.module.parent_module_id</code>. This indicates a
+     * parent module id. root module will be NULL.
      */
-    public void setType(String value) {
-        set(3, value);
+    public void setParentModuleId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -89,10 +109,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.path</code>. Absolute path to the module.
+     * Setter for <code>oagi.module.type</code>. This is a type column for
+     * indicates module is FILE or DIRECTORY.
      */
-    public void setPath(String value) {
-        set(4, value);
+    public void setType(String value) {
+        set(3, value);
     }
 
     /**
@@ -103,13 +124,10 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.name</code>. The is the filename of the
-     * module. The reason to not including the extension is that the extension
-     * maybe dependent on the expression. For XML schema, '.xsd' maybe added; or
-     * for JSON, '.json' maybe added as the file extension.
+     * Setter for <code>oagi.module.path</code>. Absolute path to the module.
      */
-    public void setName(String value) {
-        set(5, value);
+    public void setPath(String value) {
+        set(4, value);
     }
 
     /**
@@ -123,13 +141,13 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.namespace_id</code>. Note that a release
-     * record has a namespace associated. The NAMESPACE_ID, if specified here,
-     * overrides the release's namespace. However, the NAMESPACE_ID associated
-     * with the component takes the highest precedence.
+     * Setter for <code>oagi.module.name</code>. The is the filename of the
+     * module. The reason to not including the extension is that the extension
+     * maybe dependent on the expression. For XML schema, '.xsd' maybe added; or
+     * for JSON, '.json' maybe added as the file extension.
      */
-    public void setNamespaceId(ULong value) {
-        set(6, value);
+    public void setName(String value) {
+        set(5, value);
     }
 
     /**
@@ -143,11 +161,13 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.version_num</code>. This is the version
-     * number to be assigned to the schema module.
+     * Setter for <code>oagi.module.namespace_id</code>. Note that a release
+     * record has a namespace associated. The NAMESPACE_ID, if specified here,
+     * overrides the release's namespace. However, the NAMESPACE_ID associated
+     * with the component takes the highest precedence.
      */
-    public void setVersionNum(String value) {
-        set(7, value);
+    public void setNamespaceId(ULong value) {
+        set(6, value);
     }
 
     /**
@@ -159,11 +179,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created this MODULE.
+     * Setter for <code>oagi.module.version_num</code>. This is the version
+     * number to be assigned to the schema module.
      */
-    public void setCreatedBy(ULong value) {
-        set(8, value);
+    public void setVersionNum(String value) {
+        set(7, value);
     }
 
     /**
@@ -175,20 +195,17 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
-     * 
-     * In the history record, this should always be the user who is editing the
-     * entity (perhaps except when the ownership has just been changed).
+     * Setter for <code>oagi.module.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this MODULE.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(9, value);
+    public void setCreatedBy(ULong value) {
+        set(8, value);
     }
 
     /**
      * Getter for <code>oagi.module.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
-     * 
+     * APP_USER table referring to the last user who updated the record.
+     * <p>
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -197,11 +214,14 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.owner_user_id</code>. Foreign key to the
-     * APP_USER table identifying the user who can update or delete the record.
+     * Setter for <code>oagi.module.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record.
+     * <p>
+     * In the history record, this should always be the user who is editing the
+     * entity (perhaps except when the ownership has just been changed).
      */
-    public void setOwnerUserId(ULong value) {
-        set(10, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(9, value);
     }
 
     /**
@@ -213,11 +233,11 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Setter for <code>oagi.module.owner_user_id</code>. Foreign key to the
+     * APP_USER table identifying the user who can update or delete the record.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(11, value);
+    public void setOwnerUserId(ULong value) {
+        set(10, value);
     }
 
     /**
@@ -229,12 +249,16 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.module.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Setter for <code>oagi.module.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(12, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(11, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.module.last_update_timestamp</code>. The timestamp
@@ -245,17 +269,21 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record13 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.module.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(12, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record13 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row13<ULong, ULong, ULong, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
@@ -534,6 +562,10 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public ModuleRecord value13(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -556,37 +588,5 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
         value12(value12);
         value13(value13);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached ModuleRecord
-     */
-    public ModuleRecord() {
-        super(Module.MODULE);
-    }
-
-    /**
-     * Create a detached, initialised ModuleRecord
-     */
-    public ModuleRecord(ULong moduleId, ULong moduleSetId, ULong parentModuleId, String type, String path, String name, ULong namespaceId, String versionNum, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(Module.MODULE);
-
-        setModuleId(moduleId);
-        setModuleSetId(moduleSetId);
-        setParentModuleId(parentModuleId);
-        setType(type);
-        setPath(path);
-        setName(name);
-        setNamespaceId(namespaceId);
-        setVersionNum(versionNum);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setOwnerUserId(ownerUserId);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 }

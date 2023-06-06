@@ -1,13 +1,17 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.AgencyIDListAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.LogRecord;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
