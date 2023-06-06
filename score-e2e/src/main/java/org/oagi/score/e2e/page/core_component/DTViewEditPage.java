@@ -310,6 +310,8 @@ public interface DTViewEditPage extends Page {
 
     void hitDeleteAnywayButton();
 
+    WebElement getAmendButton();
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 
