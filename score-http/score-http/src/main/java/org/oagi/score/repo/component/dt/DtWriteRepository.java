@@ -1153,8 +1153,7 @@ public class DtWriteRepository {
         DtRecord prevDtRecord = dslContext.selectFrom(DT)
                 .where(DT.DT_ID.eq(bdtRecord.getPrevDtId())).fetchOne();
 
-        dslContext.deleteFrom(BDT_PRI_RESTRI)
-                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId())).execute();
+        // TODO: Revert BDT_PRI_RESTRI in the previous settings
 
         // unlink prev DT
         prevDtRecord.setNextDtId(null);
@@ -1162,8 +1161,7 @@ public class DtWriteRepository {
 
         // remove revised DT_SCs
         for(DtScManifestRecord dtScManifestRecord : dtScManifestRecords) {
-            dslContext.deleteFrom(BDT_SC_PRI_RESTRI)
-                    .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifestRecord.getDtScManifestId())).execute();
+            // TODO: Revert BDT_SC_PRI_RESTRI in the previous settings
 
             DtScRecord currentDtSc = dslContext.selectFrom(DT_SC)
                     .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId())).fetchOne();
