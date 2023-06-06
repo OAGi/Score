@@ -37,7 +37,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     RandomCodeListWithStateContainer euCodeListWithStateContainer;
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -180,10 +180,10 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     private class RandomCodeListWithStateContainer {
-        private AppUserObject appUser;
+        private final AppUserObject appUser;
         private List<String> states = new ArrayList<>();
-        private HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
-        private HashMap<String, CodeListValueObject> stateCodeListValues = new HashMap<>();
+        private final HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
+        private final HashMap<String, CodeListValueObject> stateCodeListValues = new HashMap<>();
 
         public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
             this.appUser = appUser;
