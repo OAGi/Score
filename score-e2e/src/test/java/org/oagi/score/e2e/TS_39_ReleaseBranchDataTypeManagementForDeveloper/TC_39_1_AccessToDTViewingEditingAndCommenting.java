@@ -123,6 +123,43 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     }
 
+    @Test
+    @DisplayName("TC_39_1_TA_3")
+    public void test_TA_3() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+
+            DTObject dtEUQA = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, endUserA, namespaceEU, "QA");
+            dtForTesting.add(dtEUQA);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
+            assertTrue(dt.getState().equals("QA"));
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            assertDisabled(dtViewEditPage.getDefinitionField());
+            assertDisabled(dtViewEditPage.getQualifierField());
+            AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
+            addCommentDialog.setComment("test comment");
+            escape(getDriver());
+        }
+
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
