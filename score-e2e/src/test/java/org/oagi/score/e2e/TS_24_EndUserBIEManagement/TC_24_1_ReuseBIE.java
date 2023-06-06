@@ -500,7 +500,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(useraBIE.getPropertyTerm());
         viewEditBIEPage.hitSearchButton();
         invisibilityOfLoadingContainerElement(getDriver());
@@ -508,6 +508,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordByValue(useraBIE.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]")));
         click(viewEditBIEPage.getDiscardButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
