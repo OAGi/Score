@@ -734,19 +734,19 @@ public class LogRepository {
      * Begins DT
      */
     public LogRecord insertBdtLog(DtManifestRecord bdtManifestRecord,
-                                   DtRecord bdtRecord,
-                                   LogAction logAction,
-                                   ULong requesterId,
-                                   LocalDateTime timestamp) {
+                                  DtRecord bdtRecord,
+                                  LogAction logAction,
+                                  ULong requesterId,
+                                  LocalDateTime timestamp) {
         return insertBdtLog(bdtManifestRecord, bdtRecord, null, logAction, requesterId, timestamp);
     }
 
     public LogRecord insertBdtLog(DtManifestRecord bdtManifestRecord,
-                                   DtRecord bdtRecord,
-                                   ULong prevLogId,
-                                   LogAction logAction,
-                                   ULong requesterId,
-                                   LocalDateTime timestamp) {
+                                  DtRecord bdtRecord,
+                                  ULong prevLogId,
+                                  LogAction logAction,
+                                  ULong requesterId,
+                                  LocalDateTime timestamp) {
 
         LogRecord prevLogRecord = null;
         if (prevLogId != null) {

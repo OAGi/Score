@@ -769,6 +769,7 @@ public class DtScWriteRepository {
                 logRepository.insertBdtLog(
                         dtManifestRecord,
                         dtRecord,
+                        dtManifestRecord.getLogId(),
                         LogAction.Modified,
                         userId, timestamp);
         dtManifestRecord.setLogId(logRecord.getLogId());
