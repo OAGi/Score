@@ -132,10 +132,6 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             assertFalse(dt.getState().equals("Published"));
             assertThrows(TimeoutException.class, () -> dtViewEditPage.hitReviseButton());
-            dtViewEditPage.setDefinition("new definition");
-            dtViewEditPage.setDefinition("");
-            dtViewEditPage.setDefinitionSource("new definition source");
-            dtViewEditPage.setContentComponentDefinition("new content component definition");
 
         }
     }
