@@ -15,6 +15,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,42 @@ public class TC_38_13_DeletingDeveloperDT extends BaseTest {
             viewEditCoreComponentPage.setDEN(dt.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+    }
+
+    @Test
+    @DisplayName("TC_38_13_TA_3")
+    public void test_TA_3() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        DTObject baseCDT;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Published");
+            dtForTesting.add(randomBDT);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.hitReviseButton();
+            assertTrue(dtViewEditPage.getStateFieldValue().equals("WIP"));
+            assertTrue(Integer.valueOf(dtViewEditPage.getRevisionFieldValue()) > 1);
+            assertThrows(TimeoutException.class, () -> dtViewEditPage.hitDeleteButton());
+            dtViewEditPage.moveToDraft();
+            assertTrue(dtViewEditPage.getStateFieldValue().equals("Draft"));
+            assertThrows(TimeoutException.class, () -> dtViewEditPage.hitDeleteButton());
+            dtViewEditPage.moveToCandidate();
+            assertTrue(dtViewEditPage.getStateFieldValue().equals("Candidate"));
+            assertThrows(TimeoutException.class, () -> dtViewEditPage.hitDeleteButton());
         }
     }
 
