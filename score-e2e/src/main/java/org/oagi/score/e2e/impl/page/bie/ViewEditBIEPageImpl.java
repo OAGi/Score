@@ -59,6 +59,9 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     private static final By DISCARD_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
+
     public ViewEditBIEPageImpl(BasePage parent) {
         super(parent);
     }
@@ -357,5 +360,23 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public int getNumberOfOnlyBIEsPerStateAreListed(String state) {
         return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][@class=\"" + state + " bie-state\"]")).size();
+    }
+
+    @Override
+    public WebElement getMoveToQA(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToQA() {
+        click(getMoveToQA(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 }

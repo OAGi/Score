@@ -252,4 +252,19 @@ public interface ViewEditBIEPage extends Page {
      */
     int getNumberOfOnlyBIEsPerStateAreListed(String state);
 
+    /**
+     * Return the UI element of the 'Move to QA' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to QA' button
+     */
+    WebElement getMoveToQA(boolean enabled);
+
+    /**
+     * Make the BIE to the QA state. It works only if the BIE is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the WIP state or the 'Update' button is enabled.
+     */
+    void moveToQA();
+
 }
