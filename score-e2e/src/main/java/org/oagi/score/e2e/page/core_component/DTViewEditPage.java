@@ -280,6 +280,14 @@ public interface DTViewEditPage extends Page {
 
     WebElement getNodeByPath(String path);
 
+    WebElement getMoveToCandidate(boolean enabled);
+
+    void moveToCandidate();
+
+    WebElement getBackToWIPButton(boolean enabled);
+
+    void backToWIP();
+
     DTViewEditPage.SupplementaryComponentPanel getSCPanel(WebElement scNode);
 
     void removeSupplementaryComponent(String path);
@@ -287,6 +295,10 @@ public interface DTViewEditPage extends Page {
     void hitReviseButton();
 
     String getDefaultValueDomainFieldValue();
+
+    WebElement getMoveToDraft(boolean enabled);
+
+    void moveToDraft();
 
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
