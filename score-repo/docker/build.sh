@@ -6,9 +6,9 @@ if ! [[ -x "$(command -v docker)" ]]; then
 fi
 
 echo "Building docker image..."
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-repo:3.0.0 .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-repo:3.0.2 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-repo:3.0.0
+docker scout cves oagi1docker/srt-repo:3.0.2
 
 echo "Done."
