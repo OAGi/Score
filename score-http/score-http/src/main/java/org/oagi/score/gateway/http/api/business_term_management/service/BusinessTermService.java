@@ -89,6 +89,9 @@ public class BusinessTermService {
             List<BusinessTerm> businessTerms = new ArrayList<BusinessTerm>();
             List<String[]> list = reader.readAll();
             list.remove(0); // remove header with column names
+            if (list.isEmpty()) {
+                throw new ScoreDataAccessException("No business term is provided in the CSV file");
+            }
             for (String[] recordStr : list) {
                 BusinessTerm term = new BusinessTerm();
                 if (recordStr[0].length() > 255) {
