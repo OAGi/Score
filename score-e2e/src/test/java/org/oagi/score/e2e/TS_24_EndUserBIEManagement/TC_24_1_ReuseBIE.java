@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
@@ -30,7 +30,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_24_1_ReuseBIE extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -99,13 +99,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp_reuse, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_reuse, usera, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), prev_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_owner_usera.getDen());
@@ -197,13 +197,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp_reuse, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_reuse, usera, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_owner_usera.getDen());
@@ -262,13 +262,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
 
             context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp_reuse, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_reuse, usera, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(asccp_owner_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_owner_usera.getDen());
@@ -322,13 +322,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
             ASCCObject ascc = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
             developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
-            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
@@ -372,14 +372,14 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             ASCCObject ascc_lv1 = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
 
             developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
-            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
-            developerBIE_lv2 = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp_lv2, developer, "WIP");
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
+            developerBIE_lv2 = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
@@ -424,13 +424,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
             ASCCObject ascc = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
             developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
-            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), developer_asccp, developer, "WIP");
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
@@ -478,13 +478,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, euNamespace, "Production");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp, "Production");
             asccp_for_usera = coreComponentAPI.createRandomASCCP(acc_association, usera, euNamespace, "Production");
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
         }
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -550,7 +550,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, euNamespace, "Production");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp, "Production");
             asccp_for_usera = coreComponentAPI.createRandomASCCP(acc_association, usera, euNamespace, "Production");
-            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
         }
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -559,8 +559,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
         viewEditBIEPage.hitSearchButton();
         bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + asccp_for_usera.getDen() + "\")]//ancestor::tr")).size();
-        if (bieExisting == false){
-            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Arrays.asList(context));
+        if (!bieExisting) {
+            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
             createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
             bieExisting = true;
 
@@ -575,16 +575,10 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        homePage.logout();
-        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        bieMenu = homePage.getBIEMenu();
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.setBranch(current_release);
-        viewEditBIEPage.setDEN(useraBIE.getPropertyTerm());
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
         viewEditBIEPage.hitSearchButton();
-        invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(500L));
-        tr = viewEditBIEPage.getTableRecordByValue(useraBIE.getPropertyTerm());
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
 
