@@ -88,9 +88,10 @@ public class BusinessTermService {
                         new InputStreamReader(request.getInputStream(), "UTF-8"), ','))) {
             List<BusinessTerm> businessTerms = new ArrayList<BusinessTerm>();
             List<String[]> list = reader.readAll();
-            list.remove(0); // remove header with column names
-            if (list.isEmpty()) {
-                throw new ScoreDataAccessException("No business term is provided in the CSV file");
+            if (list == null || list.isEmpty()) {
+                throw new ScoreDataAccessException("Cannot find the header.");
+            }else{
+                list.remove(0); // remove header with column names
             }
             for (String[] recordStr : list) {
                 BusinessTerm term = new BusinessTerm();
