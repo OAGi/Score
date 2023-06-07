@@ -95,14 +95,14 @@ public class BusinessTermService {
                     formatCheckExceptions.add(recordStr[0] + " is longer than 255 characters limit.");
                 }
                 term.setBusinessTerm(recordStr[0]);
-                term.setExternalReferenceUri(recordStr[1]);
                 if (!isValidURI(recordStr[1])) {
                     formatCheckExceptions.add(recordStr[1] + " is not a valid URI.");
                 }
+                term.setExternalReferenceUri(recordStr[1]);
                 term.setExternalReferenceId(recordStr[2]);
                 term.setDefinition(recordStr[3]);
                 term.setComment(recordStr[4]);
-                if (term.getExternalReferenceUri() != null && !term.getExternalReferenceUri().equals("")
+                if (formatCheckExceptions.isEmpty() && term.getExternalReferenceUri() != null && !term.getExternalReferenceUri().equals("")
                         && checkBusinessTermUniqueness(term)) {
                     businessTerms.add(term);
                 }
