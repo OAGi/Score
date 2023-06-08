@@ -65,6 +65,9 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//button[contains(@mattooltip, \"Move to Production\")]");
 
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//button[contains(@mattooltip, \"Back to WIP\")]");
+
     public ViewEditBIEPageImpl(BasePage parent) {
         super(parent);
     }
@@ -395,6 +398,24 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public void moveToProduction() {
         click(getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public WebElement getBackToWIP(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void BackToWP() {
+        click(getBackToWIP(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());

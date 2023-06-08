@@ -282,4 +282,19 @@ public interface ViewEditBIEPage extends Page {
      */
     void moveToProduction();
 
+    /**
+     * Return the UI element of the 'Back to WIP' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Back to WIP' button
+     */
+    WebElement getBackToWIP(boolean enabled);
+
+    /**
+     * Make the BIE to the WIP state. It works only if the BIE is in the QA state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state or the 'Update' button is enabled.
+     */
+    void BackToWP();
+
 }
