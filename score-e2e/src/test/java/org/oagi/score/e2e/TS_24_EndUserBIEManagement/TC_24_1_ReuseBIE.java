@@ -656,8 +656,11 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
-
-        click(viewEditBIEPage.getMoveToQA(true));
+        viewEditBIEPage.moveToQA();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        td = viewEditBIEPage.getColumnByName(tr, "select");
+        click(td);
+        click(viewEditBIEPage.getMoveToProduction(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());

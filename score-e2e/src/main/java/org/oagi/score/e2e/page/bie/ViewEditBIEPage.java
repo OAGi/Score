@@ -267,4 +267,19 @@ public interface ViewEditBIEPage extends Page {
      */
     void moveToQA();
 
+    /**
+     * Return the UI element of the 'Move to Production' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to Production' button
+     */
+    WebElement getMoveToProduction(boolean enabled);
+
+    /**
+     * Make the BIE to the Production state. It works only if the BIE is in the QA state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state or the 'Update' button is enabled.
+     */
+    void moveToProduction();
+
 }
