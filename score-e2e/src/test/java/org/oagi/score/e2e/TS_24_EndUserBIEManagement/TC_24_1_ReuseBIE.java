@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -1010,8 +1009,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             asccp_for_usera = coreComponentAPI.createRandomASCCP(acc_association, usera, euNamespace, "Production");
             useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
         }
-
-
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1028,7 +1025,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         homePage.logout();
-
         homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1040,7 +1036,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
             createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
             bieExisting = true;
-
         }
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());

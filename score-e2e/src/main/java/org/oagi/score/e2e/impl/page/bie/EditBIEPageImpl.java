@@ -6,7 +6,6 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
-import org.oagi.score.e2e.impl.page.core_component.ACCViewEditPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -15,7 +14,6 @@ import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -663,8 +661,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
-        public WebElement getContextDefinitionField()
-        {return getTextAreaFieldByName("Context Definition");
+        public WebElement getContextDefinitionField() {
+            return getInputFieldByName("Context Definition");
         }
     }
 
