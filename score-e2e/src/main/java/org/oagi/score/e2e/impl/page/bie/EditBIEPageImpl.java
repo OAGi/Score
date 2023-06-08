@@ -161,6 +161,28 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel) {
+        goToNode(path);
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
+        click(node);
+        new Actions(getDriver()).sendKeys("O").perform();
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
+            }
+        } catch (WebDriverException ignore) {
+        }
+        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        click(contextMenuIcon);
+        assert visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        return node;
+    }
+
+    @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
@@ -262,6 +284,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private WebElement getNodeByName(String nodeName) {
         By nodeLocator = By.xpath(
                 "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+        return visibilityOfElementLocated(getDriver(), nodeLocator);
+    }
+
+    private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
+        By nodeLocator = By.xpath(
+                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")][@data-level=\""+dataLevel +"\"]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
@@ -409,6 +437,24 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         });*/
 
         WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
+        assert selectProfileBIEToReuse.isOpened();
+        return selectProfileBIEToReuse;
+
+    }
+
+    @Override
+    public SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel) {
+        WebElement node = clickOnDropDownMenuByPathAndLevel(path, dataLevel);
         try {
             click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {

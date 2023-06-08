@@ -50,6 +50,15 @@ public interface EditBIEPage extends Page {
     WebElement clickOnDropDownMenuByPath(String path);
 
     /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @param dataLevel the level of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel);
+
+    /**
      * Return the panel for 'Top-Level ASBIEP' node.
      *
      * @return 'Top-Level ASBIEP' node panel
@@ -208,6 +217,8 @@ public interface EditBIEPage extends Page {
     String getTypeDefinitionValue();
 
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path);
+
+    SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel);
 
     WebElement getTypeDefinitionField();
 

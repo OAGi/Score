@@ -1206,13 +1206,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 2);
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
         editBIEPage.openPage();
-        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm()  + "/" + asccp.getPropertyTerm());
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_usera.getPropertyTerm()  + "/" + asccp.getPropertyTerm(), 1);
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
