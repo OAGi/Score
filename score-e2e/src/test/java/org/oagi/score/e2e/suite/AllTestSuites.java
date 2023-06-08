@@ -26,7 +26,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
         TS_34.class,
         TS_38.class,
         TS_39.class,
-        TS_40.class
+        TS_40.class,
+        TS_41.class
 })
 public class AllTestSuites {
 }
