@@ -1222,7 +1222,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
         click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
 
-
+        editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
     }
 
 
