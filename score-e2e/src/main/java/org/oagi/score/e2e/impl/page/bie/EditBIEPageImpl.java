@@ -662,7 +662,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getContextDefinitionField() {
-            return getInputFieldByName("Context Definition");
+            return getTextAreaFieldByName("Context Definition");
         }
     }
 

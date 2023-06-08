@@ -1053,12 +1053,25 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         assertEquals("useraBIE remark", getText(reusedASBIEPanel.getRemarkField()));
         assertEquals("useraBIE business term", getText(reusedASBIEPanel.getLegacyBusinessTermField()));
         assertEquals("useraBIE status", getText(reusedASBIEPanel.getStatusField()));
-        assertEquals("useraBIE definition", getText(reusedASBIEPanel.getContextDefinitionField()));
-    }
 
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        asbiePanel.setCardinalityMax(199);
+        asbiePanel.setCardinalityMin(77);
+        asbiePanel.setContextDefinition("association of the Reused BIE");
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
+        assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
+        assertEquals("association of the Reused BIE", getText(asbiePanel.getContextDefinitionField()));
+    }
 
     @Test
     public void test_TA_24_1_13() {
+
 
     }
 
