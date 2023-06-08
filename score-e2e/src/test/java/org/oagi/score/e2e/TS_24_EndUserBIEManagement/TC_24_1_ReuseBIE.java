@@ -676,7 +676,73 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_24_1_8() {
+        ASCCPObject asccp, asccp_for_usera;
+        ACCObject acc, acc_association;
+        AppUserObject usera, userb, developer;
+        NamespaceObject namespace, developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject useraBIE, userbBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
 
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        {
+            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(userb);
+
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            /**
+             * The owner of the ASCCP is usera
+             */
+            acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, euNamespace, "Production");
+            acc_association = coreComponentAPI.createRandomACC(usera, currentReleaseObject, euNamespace, "Production");
+            asccp = coreComponentAPI.createRandomASCCP(acc, usera, euNamespace, "Production");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp, "Production");
+            asccp_for_usera = coreComponentAPI.createRandomASCCP(acc_association, usera, euNamespace, "Production");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "QA");
+        }
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        Boolean bieExisting = true;
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + asccp_for_usera.getDen() + "\")]//ancestor::tr")).size();
+        if (!bieExisting) {
+            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
+            createBIEForSelectTopLevelConceptPage.createBIE(asccp_for_usera.getDen(), current_release);
+            bieExisting = true;
+
+        }
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
+        editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
+        click(td);
+        viewEditBIEPage.moveToQA();
+        viewEditBIEPage.setDEN(asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        assertEquals("QA", getText(topLevelASBIEPPanel.getStateField()));
     }
 
     @Test
