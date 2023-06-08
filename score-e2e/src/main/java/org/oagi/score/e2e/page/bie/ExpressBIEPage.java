@@ -16,6 +16,8 @@ public interface ExpressBIEPage extends Page {
 
     void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP);
 
+    void selectBIEForExpression(String releaseNum, String topLevelASBIPDEN);
+
     void setBranch(String branch);
 
     WebElement getBranchSelectField();

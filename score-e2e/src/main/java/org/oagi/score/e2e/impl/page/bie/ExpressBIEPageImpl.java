@@ -100,6 +100,20 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
+    public void selectBIEForExpression(String releaseNum, String topLevelASBIEPDEN) {
+        setBranch(releaseNum);
+        setDEN(topLevelASBIEPDEN);
+        hitSearchButton();
+
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(topLevelASBIEPDEN);
+            WebElement td = getColumnByName(tr, "select");
+            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        });
+
+    }
+
+    @Override
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
