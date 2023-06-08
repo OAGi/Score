@@ -66,7 +66,7 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
 
             /**
-             * Test Assertion #38.3.1.a
+             * Test Assertion #41.3.1.a
              */
             assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
             ArrayList<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs();
@@ -87,17 +87,17 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
             dtViewEditPage.discardValueDomain();
 
             /**
-             * Test Assertion #38.3.1.b
+             * Test Assertion #41.3.1.b
              */
             dtViewEditPage.setQualifier("newQualifier, " + dt.getQualifier());
 
             /**
-             * Test Assertion #38.3.1.c
+             * Test Assertion #41.3.1.c
              */
             assertEquals("false", dtViewEditPage.getSixHexadecimalIdentifierField().getAttribute("aria-required"));
 
             /**
-             * Test Assertion #38.3.1.d
+             * Test Assertion #41.3.1.d
              */
             assertEquals("false", dtViewEditPage.getContentComponentDefinitionField().getAttribute("aria-required"));
             assertEquals("false", dtViewEditPage.getDefinitionField().getAttribute("aria-required"));
