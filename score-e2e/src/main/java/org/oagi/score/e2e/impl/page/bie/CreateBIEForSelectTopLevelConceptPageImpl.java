@@ -278,12 +278,11 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
         WebElement select = getColumnByName(tr, "select");
         click(select);
         click(getCreateButton());
-        waitFor(Duration.ofMillis(1000));
+        waitFor(Duration.ofMillis(500));
         assert "Created".equals(getSnackBarMessage(getDriver()));
 
         // Wait for BIE creation
         invisibilityOfLoadingContainerElement(getDriver());
-
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
 
