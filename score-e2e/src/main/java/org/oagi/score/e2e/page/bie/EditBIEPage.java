@@ -5,6 +5,7 @@ import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -370,6 +371,14 @@ public interface EditBIEPage extends Page {
 
     }
 
+    /**
+     * Return the Reused ASBIE Panel
+     *
+     * @param asccpNode ASCCP node
+     * @return the Reused ASBIE Panel
+     */
+    ReusedASBIEPanel getReusedASBIEPanel(WebElement asccpNode);
+
     interface ASBIEPanel {
 
         BusinessTermAssignmentPage clickShowBusinessTermsButton();
@@ -459,6 +468,72 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
+    }
+
+    interface ReusedASBIEPanel {
+
+        /**
+         * Return the UI element of the 'Release' field.
+         *
+         * @return the UI element of the 'Release' field
+         */
+        WebElement getReleaseField();
+
+        /**
+         * Return the UI element of the 'State' field.
+         *
+         * @return the UI element of the 'State field
+         */
+        WebElement getStateField();
+
+        /**
+         * Return the UI element of the 'Owner' field.
+         *
+         * @return the UI element of the 'Owner' field
+         */
+        WebElement getOwnerField();
+
+        /**
+         * Return the UI element of the 'Business Context' field.
+         *
+         * @return the UI element of the 'Business Context' field
+         */
+        WebElement getBusinessContextField();
+
+        /**
+         * Return the UI element of the 'Legacy Business Term' field.
+         *
+         * @return the UI element of the 'Legacy Business Term' field
+         */
+        WebElement getLegacyBusinessTermField();
+
+        /**
+         * Return the UI element of the 'Remark' field.
+         *
+         * @return the UI element of the 'Remark' field
+         */
+        WebElement getRemarkField();
+
+        /**
+         * Return the UI element of the 'Version' field.
+         *
+         * @return the UI element of the 'Version' field
+         */
+        WebElement getVersionField();
+
+        /**
+         * Return the UI element of the 'Status' field.
+         *
+         * @return the UI element of the 'Status' field
+         */
+        WebElement getStatusField();
+
+        /**
+         * Return the UI element of the 'Context Definition' field.
+         *
+         * @return the UI element of the 'Context Definition' field
+         */
+        WebElement getContextDefinitionField();
     }
 
     interface BBIEPanel {
