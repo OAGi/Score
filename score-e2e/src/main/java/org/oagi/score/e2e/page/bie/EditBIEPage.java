@@ -196,6 +196,14 @@ public interface EditBIEPage extends Page {
     ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
 
     /**
+     * Retain Reused BIE information on the node
+     *
+     * @param path the path of the Reused BIE node.
+     * @return the EditBIEPage
+     */
+    void RetainReusedBIEOnNode(String path);
+
+    /**
      * Return the attention message in the warning dialog.
      * This happens when the user attempts to make the user extension,
      * but another user is working on that extension.

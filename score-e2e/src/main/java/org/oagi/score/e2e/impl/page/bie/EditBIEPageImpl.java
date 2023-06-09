@@ -39,6 +39,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Globally\")]");
 
+    private static final By RETAINED_REUSED_BIE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Retain Reused BIE\")]");
+
     private static final By SETTINGS_ICON_LOCATOR =
             By.xpath("//mat-icon[text() = \"settings\"]");
 
@@ -183,6 +186,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public void RetainReusedBIEOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Retain\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
+        });
+    }
+
+    @Override
     public ACCExtensionViewEditPage extendBIEGloballyOnNode(String path) {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
@@ -289,7 +311,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")][@data-level=\""+dataLevel +"\"]");
+                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")][@data-level=\"" + dataLevel + "\"]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
