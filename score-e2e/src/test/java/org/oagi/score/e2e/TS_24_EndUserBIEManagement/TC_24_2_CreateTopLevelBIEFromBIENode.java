@@ -10,7 +10,6 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
@@ -102,17 +101,18 @@ public class TC_24_2_CreateTopLevelBIEFromBIENode extends BaseTest {
         homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(userbBIE.getDen());
         viewEditBIEPage.hitSearchButton();
 
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() +"/"  + asccp.getPropertyTerm());
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
-        editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() +"/"+ asccp.getPropertyTerm());
+        editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() +"/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
 
         asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
@@ -133,5 +133,11 @@ public class TC_24_2_CreateTopLevelBIEFromBIENode extends BaseTest {
 
         asccpNode = editBIEPage.getNodeByPath("/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertEquals("13", getText(asbiePanel.getCardinalityMaxField()));
+        assertEquals("7", getText(asbiePanel.getCardinalityMinField()));
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        assertEquals(userb.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
     }
 }
