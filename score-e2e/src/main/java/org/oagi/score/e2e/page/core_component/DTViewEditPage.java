@@ -314,6 +314,14 @@ public interface DTViewEditPage extends Page {
 
     void hitAmendButton();
 
+    WebElement getMoveToQAButton(boolean enabled);
+
+    void moveToQA();
+
+    WebElement getMoveToProductionButton(boolean enabled);
+
+    void moveToProduction();
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 
