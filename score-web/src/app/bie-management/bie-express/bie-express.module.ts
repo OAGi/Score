@@ -11,6 +11,7 @@ import {BieExpressService} from './domain/bie-express.service';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import { BieExpressOpenapi30Component } from './bie-express.openapi30/bie-express.openapi30.component';
 
 
 const routes: Routes = [
@@ -35,6 +36,7 @@ const routes: Routes = [
     BieExpressComponent,
     MetaHeaderDialogComponent,
     PaginationResponseDialogComponent,
+    BieExpressOpenapi30Component,
   ],
   entryComponents: [
     MetaHeaderDialogComponent,

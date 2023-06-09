@@ -1,0 +1,471 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ "BIE_EXPRESS_OPENAPI30.TITLE" | translate }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-3">
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Branch</mat-label>
+                <mat-select [(ngModel)]="request.release"
+                            (ngModelChange)="onChange('branch', request.release);
+                                            this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
+                  <mat-select-trigger class="d-flex">
+                    <span>{{ request.release.releaseNum }}</span>
+                    <span class="f12 ml-auto {{ request.release.state }}">
+                      {{ request.release.state | separate }}
+                    </span>
+                  </mat-select-trigger>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+                    <div class="d-flex">
+                      <span class="release-num">{{ release.releaseNum }}</span>
+                      <span class="f12 ml-auto {{ release.state }}">
+                        {{ release.state | separate }}
+                      </span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>State</mat-label>
+                <mat-select [(ngModel)]="request.states" multiple>
+                  <mat-option *ngFor="let state of states" [value]="state">
+                    {{state}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Owner</mat-label>
+                <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Updater</mat-label>
+                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.den"
+                         (ngModelChange)="onChange('filters.den', request.filters.den)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();"
+                         placeholder="DEN">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.businessContext"
+                         (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();"
+                         placeholder="Business Context">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <div class="mat-elevation-z1">
+        <table mat-table multiTemplateDataRows
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+               [dataSource]="dataSource">
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="den">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <div class="den word-break-all">
+                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                   matTooltip="{{ element.den }}">
+                  <span>{{ element.den }}</span>
+                </a>
+              </div>
+              <div class="description">{{ element.guid }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="owner">
+            <th mat-header-cell *matHeaderCellDef> Owner</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.owner">{{ element.owner }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="businessContexts">
+            <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-select [(ngModel)]="businessContextSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+                <mat-option *ngFor="let businessContext of element.businessContexts" [value]="businessContext">
+                  <span>
+                    {{ businessContext.name }}
+                  </span>
+                </mat-option>
+              </mat-select>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef> Version</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.version">{{ element.version }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.status">{{ element.status }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="bizTerm">
+            <th mat-header-cell *matHeaderCellDef> Business Term</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.remark }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdateTimestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"
+              (click)="toggle(row)"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="pt-2 pb-0 filter-container">
+    <mat-card-content>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Select annotation to generate for BIEs</span>
+            <div class="option-body">
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieDefinition">BIE Definition</mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE CCTS Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieGuid"
+                              [disabled]="option.expressionOption !== 'XML'">BIE GUID
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.businessContext"
+                              [disabled]="option.expressionOption !== 'XML'">Business Context
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE OAGi/Score Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                              [disabled]="option.expressionOption !== 'XML'">Based CC Meta Data
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Select an expression</span>
+            <div class="option-body">
+              <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
+                               (change)="expressionOptionChange()">
+                <mat-radio-button class="option-radio-button" value="XML">
+                  XML Schema
+                </mat-radio-button>
+                <mat-radio-button class="option-radio-button" value="JSON">
+                  JSON Schema
+                </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
+                  <span
+                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
+                                (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
+                                             'includeMetaHeaderForJson',
+                                             'metaHeaderTopLevelAsbiepId')">
+                  <span
+                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
+                                (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
+                                             'includePaginationResponseForJson',
+                                             'paginationResponseTopLevelAsbiepId')">
+                    <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                  </mat-checkbox>
+                </div>
+                <mat-radio-button class="option-radio-button" value="OpenAPI30">
+                  Open API 3.0 (Template)
+                </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
+                  <mat-form-field>
+                    <mat-label>Format</mat-label>
+                    <mat-select [(ngModel)]="option.openAPIExpressionFormat"
+                                required="true">
+                      <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
+                        {{ openApiFormat }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate">
+                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
+                  </mat-checkbox>
+
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true"
+                                class="get-operation-template generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30GetTemplate || option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
+                                class="get-operation-template generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
+                                class="get-operation-template generate-second-option"
+                                (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
+                                             'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
+                                             'metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate')">
+                  <span
+                    class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
+                                [disabled]="option.openAPI30GetTemplate != true || option.suppressRootPropertyForOpenAPI30GetTemplate"
+                                class="get-operation-template generate-second-option"
+                                (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
+                                             'includePaginationResponseForJsonForOpenAPI30GetTemplate',
+                                             'paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate')">
+                    <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                  </mat-checkbox>
+
+                  <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
+                                [disabled]="option.expressionOption !== 'OpenAPI30'">
+                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
+                  </mat-checkbox>
+
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true"
+                                class="post-operation-template generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.suppressRootPropertyForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true || option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
+                                class="post-operation-template generate-second-option">
+                  <span
+                    class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Suppress a root property</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
+                                [disabled]="option.openAPI30PostTemplate != true || option.suppressRootPropertyForOpenAPI30PostTemplate"
+                                class="post-operation-template generate-second-option"
+                                (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
+                                             'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
+                                             'metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate')">
+                    <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                  </mat-checkbox>
+                </div>
+                <mat-radio-button class="option-radio-button" value="ODF">
+                  Open Document Spreadsheet (supports CSV)
+                </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'ODF'">
+                  <mat-form-field>
+                    <mat-label>Format</mat-label>
+                    <mat-select [(ngModel)]="option.odfExpressionFormat"
+                                required="true">
+                      <mat-option *ngFor="let odfFormat of odfFormats" [value]="odfFormat">
+                        {{ odfFormat }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Schema File Option</span>
+            <div class="option-body">
+              <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
+                <mat-radio-button class="option-radio-button" value="ALL"
+                                  [disabled]="(option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)) ||
+                                              (option.expressionOption === 'ODF')">
+                  Put all schemas in the same file
+                </mat-radio-button>
+                <mat-radio-button class="option-radio-button" value="EACH">
+                  Put each schema in an individual file
+                </mat-radio-button>
+              </mat-radio-group>
+
+              <div class="filename-option">
+                <div class="generate-option">
+                  <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">Include a business context in the filename</mat-checkbox>
+                </div>
+                <div class="generate-option">
+                  <mat-checkbox [(ngModel)]="option.includeVersionInFilename">Include a version in the filename</mat-checkbox>
+                </div>
+              </div>
+
+              <div class="actions mt-4">
+                <button mat-raised-button color="primary" (click)="generate()"
+                        [disabled]="selection.selected.length === 0">
+                  Generate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
