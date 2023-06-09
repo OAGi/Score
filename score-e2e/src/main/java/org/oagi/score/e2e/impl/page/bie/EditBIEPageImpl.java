@@ -42,6 +42,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By RETAINED_REUSED_BIE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Retain Reused BIE\")]");
 
+    private static final By MAKE_BIE_REUSABLE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Make BIE reusable\")]");
+
     private static final By SETTINGS_ICON_LOCATOR =
             By.xpath("//mat-icon[text() = \"settings\"]");
 
@@ -201,6 +204,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                     "//mat-dialog-container//span[contains(text(), \"Retain\")]//ancestor::button[1]")));
             invisibilityOfLoadingContainerElement(getDriver());
             waitFor(ofMillis(1000L));
+        });
+    }
+
+    @Override
+    public void MakeBIEReusableOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Make\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(2000L));
         });
     }
 

@@ -204,6 +204,14 @@ public interface EditBIEPage extends Page {
     void RetainReusedBIEOnNode(String path);
 
     /**
+     * Create a top level BIE for the selected ASBIE node
+     *
+     * @param path the path of the ASBIE node
+     * @return the ViewEditBIEPage
+     */
+    void MakeBIEReusableOnNode(String path);
+
+    /**
      * Return the attention message in the warning dialog.
      * This happens when the user attempts to make the user extension,
      * but another user is working on that extension.
