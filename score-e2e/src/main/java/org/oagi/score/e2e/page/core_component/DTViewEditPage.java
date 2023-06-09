@@ -312,6 +312,8 @@ public interface DTViewEditPage extends Page {
 
     WebElement getAmendButton();
 
+    void hitAmendButton();
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 
