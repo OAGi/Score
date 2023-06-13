@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {BieExpressOpenapi30Component} from './bie-express.openapi30.component';
-import {Routes} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../../../authentication/auth.service';
 
 const routes: Routes = [
@@ -18,10 +18,12 @@ const routes: Routes = [
     BieExpressOpenapi30Component
   ],
   imports: [
+    RouterModule.forChild(routes),
     CommonModule
   ],
   exports: [
-    BieExpressOpenapi30Component
+    BieExpressOpenapi30Component,
+    RouterModule,
   ]
 })
 export class BieExpressOpenapi30Module { }
