@@ -1211,6 +1211,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       return;
     }
 
+    // Test Assertion #38.6.1.b
+    // When the Representation Term is changed the Value Constraint should be reset.
+    detail.fixedOrDefault = 'none';
+    detail.fixedValue = undefined;
+    detail.defaultValue = undefined;
+
     this.service.getPrimitiveListByRepresentationTerm(detail.representationTerm, detail.manifestId)
       .subscribe(resp => {
         detail.bdtScPriRestriList = [];
