@@ -9,6 +9,8 @@ import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
+import {MatButtonModule} from '@angular/material/button';
+import {MatMenuModule} from '@angular/material/menu';
 
 @Component({
   selector: 'score-navbar',
