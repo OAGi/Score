@@ -28,6 +28,10 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 export class BieExpressOpenapi30Component implements OnInit {
   title = 'Express BIE in Open API 3.0 Expression';
 
+  displayedColumns: string[] = [
+    'select', 'state', 'den', 'owner', 'verb', 'array', 'suppressRoot', 'messageBody', 'resourceName', 'operationId',
+    'tag'
+  ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
