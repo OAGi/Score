@@ -193,19 +193,6 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="businessContexts">
-            <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="businessContextSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
-                <mat-option *ngFor="let businessContext of element.businessContexts" [value]="businessContext">
-                  <span>
-                    {{ businessContext.name }}
-                  </span>
-                </mat-option>
-              </mat-select>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
             <td mat-cell *matCellDef="let element">
@@ -220,17 +207,53 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="bizTerm">
-            <th mat-header-cell *matHeaderCellDef> Business Term</th>
+          <ng-container matColumnDef="verb">
+            <th mat-header-cell *matHeaderCellDef> Verb</th>
             <td mat-cell *matCellDef="let element">
-              <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
+              <div [matTooltip]="element.verb">{{ element.verb}}</div>
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="remark">
-            <th mat-header-cell *matHeaderCellDef> Remark</th>
+          <ng-container matColumnDef="arrayIndicator">
+            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
             <td mat-cell *matCellDef="let element">
-              <div>{{ element.remark }}</div>
+              <div>{{ element.arrayIndicator }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="suppressRoot">
+            <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.suppressRoot }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="messageBody">
+            <th mat-header-cell *matHeaderCellDef> Message Body</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.messageBody }}</div>
+            </td>
+          </ng-container>
+
+
+          <ng-container matColumnDef="resourceName">
+            <th mat-header-cell *matHeaderCellDef> Resource Name</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.resourceName }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="operationId">
+            <th mat-header-cell *matHeaderCellDef> Operation Id</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.operationId }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tag">
+            <th mat-header-cell *matHeaderCellDef> tag</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.tag }}</div>
             </td>
           </ng-container>
 
