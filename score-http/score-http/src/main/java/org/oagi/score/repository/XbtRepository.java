@@ -2,6 +2,7 @@ package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
 import org.jooq.Record16;
+import org.jooq.Record17;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Xbt;
@@ -21,12 +22,12 @@ public class XbtRepository implements ScoreRepository<Xbt> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectOnConditionStep<Record16<ULong, ULong, ULong, String, ULong, ULong, ULong, String, LocalDateTime,
-            Byte, String, String, LocalDateTime, String, String, Integer>> getSelectJoinStep() {
+    private SelectOnConditionStep<Record17<ULong, ULong, ULong, String, ULong, ULong, ULong, String, LocalDateTime,
+                Byte, String, String, String, LocalDateTime, String, String, Integer>> getSelectJoinStep() {
         return dslContext.select(XBT.XBT_ID, XBT.CREATED_BY,
                 XBT.LAST_UPDATED_BY, XBT.NAME, XBT.OWNER_USER_ID,
                 XBT_MANIFEST.RELEASE_ID, XBT.SUBTYPE_OF_XBT_ID, XBT.BUILTIN_TYPE,
-                XBT.CREATION_TIMESTAMP, XBT.IS_DEPRECATED, XBT.JBT_DRAFT05_MAP, XBT.OPENAPI30_MAP,
+                XBT.CREATION_TIMESTAMP, XBT.IS_DEPRECATED, XBT.JBT_DRAFT05_MAP, XBT.OPENAPI30_MAP, XBT.AVRO_MAP,
                 XBT.LAST_UPDATE_TIMESTAMP, XBT.REVISION_DOC, XBT.SCHEMA_DEFINITION, XBT.STATE)
                 .from(XBT)
                 .join(XBT_MANIFEST).on(XBT.XBT_ID.eq(XBT_MANIFEST.XBT_ID));
