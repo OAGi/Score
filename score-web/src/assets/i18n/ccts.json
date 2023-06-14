@@ -57,6 +57,9 @@
   "BIE_EXPRESS": {
     "TITLE": "Express BIE"
   },
+  "BIE_EXPRESS_OPENAPI30": {
+    "TITLE": "Express BIE in OpenAPI 3.0"
+  },
   "BIE_COPY": {
     "TITLE": "Copy BIE"
   },

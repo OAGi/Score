@@ -1,7 +1,7 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white">
-      <span class="title">{{ "BIE_EXPRESS.TITLE" | translate }}</span>
+      <span class="title">{{ "BIE_EXPRESS_OPENAPI30.TITLE" | translate }}</span>
       <span class="flex-11-auto"></span>
     </mat-toolbar>
   </div>
@@ -277,3 +277,57 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+  <mat-card class="pt-2 pb-0 filter-container">
+    <mat-card-content>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <span class="option-header">Select annotation to generate for BIEs</span>
+            <div class="option-body">
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieDefinition">BIE Definition</mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE CCTS Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieGuid"
+                              [disabled]="option.expressionOption !== 'XML'">BIE GUID
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.businessContext"
+                              [disabled]="option.expressionOption !== 'XML'">Business Context
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                              [disabled]="option.expressionOption !== 'XML'"
+                              (change)="bieAnnotationChange()">BIE OAGi/Score Meta Data
+                </mat-checkbox>
+              </div>
+              <div class="generate-option dependent-option">
+                <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                              [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                              [disabled]="option.expressionOption !== 'XML'">Based CC Meta Data
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>

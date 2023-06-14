@@ -19,6 +19,7 @@ import {finalize} from 'rxjs/operators';
 import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {BieExpressOption} from '../domain/generate-expression';
 
 @Component({
   selector: 'score-bie-express.openapi30',
@@ -47,6 +48,7 @@ export class BieExpressOpenapi30Component implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  option: BieExpressOption;
 
   // Memorizer
   previousPackageOption: string;
@@ -67,6 +69,11 @@ export class BieExpressOpenapi30Component implements OnInit {
   }
 
   ngOnInit(): void {
+    this.option = new BieExpressOption();
+    this.option.bieDefinition = true;
+    this.option.packageOption = 'ALL';
+    // Default Open API expression format is 'YAML'.
+    this.option.openAPIExpressionFormat = 'YAML';
     // Init BIE table
     this.request = new BieListRequest(this.route.snapshot.queryParamMap, new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
@@ -174,6 +181,16 @@ export class BieExpressOpenapi30Component implements OnInit {
 
   isSelected(row: BieList) {
     return this.selection.isSelected(row.topLevelAsbiepId);
+  }
+
+  bieAnnotationChange() {
+    if (!this.option.bieCctsMetaData) {
+      this.option.includeCctsDefinitionTag = false;
+    }
+
+    if (!this.option.bieOagiScoreMetaData) {
+      this.option.includeWhoColumns = false;
+    }
   }
 
 
