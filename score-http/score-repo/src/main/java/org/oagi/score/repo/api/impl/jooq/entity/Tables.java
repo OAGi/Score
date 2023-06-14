@@ -80,6 +80,29 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSet;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDoc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocBizCtx;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocMessageBody;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocTag;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasExample;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasExternalDoc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasExternalDocDoc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasHttpHeader;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMediaType;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMessageBody;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasOperation;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasOperationTag;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasParameter;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasParameterLink;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasRequest;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasRequestParameter;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResource;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResourceTag;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResponse;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResponseHeaders;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasServer;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasServerVariable;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2App;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.RefSpec;
@@ -601,6 +624,121 @@ public class Tables {
      * namespace as in the XML schema specification.
      */
     public static final Namespace NAMESPACE = Namespace.NAMESPACE;
+
+    /**
+     * The table <code>oagi.oas_doc</code>.
+     */
+    public static final OasDoc OAS_DOC = OasDoc.OAS_DOC;
+
+    /**
+     * The table <code>oagi.oas_doc_biz_ctx</code>.
+     */
+    public static final OasDocBizCtx OAS_DOC_BIZ_CTX = OasDocBizCtx.OAS_DOC_BIZ_CTX;
+
+    /**
+     * The table <code>oagi.oas_doc_message_body</code>.
+     */
+    public static final OasDocMessageBody OAS_DOC_MESSAGE_BODY = OasDocMessageBody.OAS_DOC_MESSAGE_BODY;
+
+    /**
+     * The table <code>oagi.oas_doc_tag</code>.
+     */
+    public static final OasDocTag OAS_DOC_TAG = OasDocTag.OAS_DOC_TAG;
+
+    /**
+     * The table <code>oagi.oas_example</code>.
+     */
+    public static final OasExample OAS_EXAMPLE = OasExample.OAS_EXAMPLE;
+
+    /**
+     * Allows referencing an external resource for extended documentation.
+     */
+    public static final OasExternalDoc OAS_EXTERNAL_DOC = OasExternalDoc.OAS_EXTERNAL_DOC;
+
+    /**
+     * The table <code>oagi.oas_external_doc_doc</code>.
+     */
+    public static final OasExternalDocDoc OAS_EXTERNAL_DOC_DOC = OasExternalDocDoc.OAS_EXTERNAL_DOC_DOC;
+
+    /**
+     * The table <code>oagi.oas_http_header</code>.
+     */
+    public static final OasHttpHeader OAS_HTTP_HEADER = OasHttpHeader.OAS_HTTP_HEADER;
+
+    /**
+     * The table <code>oagi.oas_media_type</code>.
+     */
+    public static final OasMediaType OAS_MEDIA_TYPE = OasMediaType.OAS_MEDIA_TYPE;
+
+    /**
+     * The table <code>oagi.oas_message_body</code>.
+     */
+    public static final OasMessageBody OAS_MESSAGE_BODY = OasMessageBody.OAS_MESSAGE_BODY;
+
+    /**
+     * The table <code>oagi.oas_operation</code>.
+     */
+    public static final OasOperation OAS_OPERATION = OasOperation.OAS_OPERATION;
+
+    /**
+     * The table <code>oagi.oas_operation_tag</code>.
+     */
+    public static final OasOperationTag OAS_OPERATION_TAG = OasOperationTag.OAS_OPERATION_TAG;
+
+    /**
+     * The table <code>oagi.oas_parameter</code>.
+     */
+    public static final OasParameter OAS_PARAMETER = OasParameter.OAS_PARAMETER;
+
+    /**
+     * The table <code>oagi.oas_parameter_link</code>.
+     */
+    public static final OasParameterLink OAS_PARAMETER_LINK = OasParameterLink.OAS_PARAMETER_LINK;
+
+    /**
+     * The table <code>oagi.oas_request</code>.
+     */
+    public static final OasRequest OAS_REQUEST = OasRequest.OAS_REQUEST;
+
+    /**
+     * The table <code>oagi.oas_request_parameter</code>.
+     */
+    public static final OasRequestParameter OAS_REQUEST_PARAMETER = OasRequestParameter.OAS_REQUEST_PARAMETER;
+
+    /**
+     * The table <code>oagi.oas_resource</code>.
+     */
+    public static final OasResource OAS_RESOURCE = OasResource.OAS_RESOURCE;
+
+    /**
+     * The table <code>oagi.oas_resource_tag</code>.
+     */
+    public static final OasResourceTag OAS_RESOURCE_TAG = OasResourceTag.OAS_RESOURCE_TAG;
+
+    /**
+     * The table <code>oagi.oas_response</code>.
+     */
+    public static final OasResponse OAS_RESPONSE = OasResponse.OAS_RESPONSE;
+
+    /**
+     * The table <code>oagi.oas_response_headers</code>.
+     */
+    public static final OasResponseHeaders OAS_RESPONSE_HEADERS = OasResponseHeaders.OAS_RESPONSE_HEADERS;
+
+    /**
+     * The table <code>oagi.oas_server</code>.
+     */
+    public static final OasServer OAS_SERVER = OasServer.OAS_SERVER;
+
+    /**
+     * The table <code>oagi.oas_server_variable</code>.
+     */
+    public static final OasServerVariable OAS_SERVER_VARIABLE = OasServerVariable.OAS_SERVER_VARIABLE;
+
+    /**
+     * The table <code>oagi.oas_tag</code>.
+     */
+    public static final OasTag OAS_TAG = OasTag.OAS_TAG;
 
     /**
      * The table <code>oagi.oauth2_app</code>.
