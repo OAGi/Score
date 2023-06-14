@@ -7,6 +7,9 @@ import {MaterialModule} from '../../../material.module';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ScoreCommonModule} from '../../../common/score-common.module';
+import { OasDocCreateComponent } from './oas-doc-create/oas-doc-create.component';
+import { OasDocListComponent } from './oas-doc-list/oas-doc-list.component';
+import { OasDocDetailComponent } from './oas-doc-detail/oas-doc-detail.component';
 
 const routes: Routes = [
   {
@@ -19,7 +22,10 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    BieExpressOpenapi30Component
+    BieExpressOpenapi30Component,
+    OasDocCreateComponent,
+    OasDocListComponent,
+    OasDocDetailComponent
   ],
   imports: [
     RouterModule.forChild(routes),
