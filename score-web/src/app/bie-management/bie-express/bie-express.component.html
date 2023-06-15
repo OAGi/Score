@@ -428,7 +428,7 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-                <mat-radio-button class="option-radio-button" value="Avro">
+                <mat-radio-button class="option-radio-button" value="AVRO">
                   Avro™ Schema
                 </mat-radio-button>
               </mat-radio-group>
@@ -441,7 +441,7 @@
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
                 <mat-radio-button class="option-radio-button" value="ALL"
                                   [disabled]="(option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)) ||
-                                              (option.expressionOption === 'ODF')">
+                                              (option.expressionOption === 'ODF') || (option.expressionOption === 'AVRO')">
                   Put all schemas in the same file
                 </mat-radio-button>
                 <mat-radio-button class="option-radio-button" value="EACH">
