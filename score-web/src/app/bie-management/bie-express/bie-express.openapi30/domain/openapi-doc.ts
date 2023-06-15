@@ -11,6 +11,7 @@ export class OasDocListRequest {
     openAPIVersion: string;
     version: string;
     licenseName: string;
+    description: string;
   };
 
   updaterUsernameList: string[] = [];
@@ -53,7 +54,8 @@ export class OasDocListRequest {
       title: params.get('title') || '',
       openAPIVersion: params.get('openAPIVersion') || '',
       version: params.get('version') || '',
-      licenseName: params.get('licenseName') || ''
+      licenseName: params.get('licenseName') || '',
+      description: params.get('description') || '',
     };
   }
 
@@ -84,6 +86,9 @@ export class OasDocListRequest {
     }
     if (this.filters.licenseName) {
       params = params.set('licenseName', '' + this.filters.licenseName);
+    }
+    if (this.filters.description){
+      params = params.set('description', '' + this.filters.description);
     }
     return params;
   }
@@ -178,7 +183,7 @@ export class OasDocBIEListRequest {
   }
 }
 
-export class OasDocBIEList{
+export class OasDocBieList{
   topLevelAsbiepId: number;
   den: string;
   propertyTerm: string;

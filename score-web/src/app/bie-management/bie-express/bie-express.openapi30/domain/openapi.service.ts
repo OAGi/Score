@@ -26,6 +26,9 @@ export class OpenAPIService{
     if (request.filters.licenseName) {
       params = params.set('licenseName', request.filters.licenseName);
     }
+    if (request.filters.description) {
+      params = params.set('description', request.filters.description);
+    }
 
     if (request.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
@@ -51,8 +54,5 @@ export class OpenAPIService{
       });
     }
   }
-
-
-
 
 }

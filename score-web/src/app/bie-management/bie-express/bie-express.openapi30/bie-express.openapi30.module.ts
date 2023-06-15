@@ -13,7 +13,7 @@ import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 
 const routes: Routes = [
   {
-    path: 'profile_bie/express/openapi30',
+    path: 'profile_bie/express',
     children: [
       {
         path: 'oas_doc',
