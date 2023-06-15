@@ -111,6 +111,7 @@ export class OasDoc{
   creationTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
+  used: boolean;
 }
 
 export class OasDocBIEListRequest {
