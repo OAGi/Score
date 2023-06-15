@@ -334,7 +334,7 @@ export class BieExpressComponent implements OnInit {
   }
 
   expressionOptionChange() {
-    if (this.option.expressionOption === 'ODF') {
+    if (this.option.expressionOption === 'ODF' || this.option.expressionOption === 'AVRO') {
       this.option.packageOption = 'EACH';
     }
 
