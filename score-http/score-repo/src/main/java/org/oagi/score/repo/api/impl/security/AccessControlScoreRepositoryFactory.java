@@ -20,6 +20,8 @@ import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyWriteRepository;
 import org.oagi.score.repo.api.message.MessageReadRepository;
 import org.oagi.score.repo.api.message.MessageWriteRepository;
 import org.oagi.score.repo.api.module.*;
+import org.oagi.score.repo.api.openapidoc.OasDocReadRepository;
+import org.oagi.score.repo.api.openapidoc.OasDocWriteRepository;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.security.AccessControlException;
@@ -222,5 +224,15 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     @Override
     public BusinessTermAssignmentWriteRepository createBusinessTermAssignmentWriteRepository() throws ScoreDataAccessException {
         return wrapForAccessControl(delegate.createBusinessTermAssignmentWriteRepository(), BusinessTermAssignmentWriteRepository.class);
+    }
+
+    @Override
+    public OasDocReadRepository createOasDocReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createOasDocReadRepository(), OasDocReadRepository.class);
+    }
+
+    @Override
+    public OasDocWriteRepository createOasDocWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createOasDocWriteRepository(), OasDocWriteRepository.class);
     }
 }

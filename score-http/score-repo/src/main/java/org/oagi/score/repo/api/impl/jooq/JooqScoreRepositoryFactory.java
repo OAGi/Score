@@ -30,11 +30,15 @@ import org.oagi.score.repo.api.impl.jooq.corecomponent.*;
 import org.oagi.score.repo.api.impl.jooq.message.JooqMessageReadRepository;
 import org.oagi.score.repo.api.impl.jooq.message.JooqMessageWriteRepository;
 import org.oagi.score.repo.api.impl.jooq.module.*;
+import org.oagi.score.repo.api.impl.jooq.openapidoc.JooqOasDocReadRepository;
+import org.oagi.score.repo.api.impl.jooq.openapidoc.JooqOasDocWriteRepository;
 import org.oagi.score.repo.api.impl.jooq.release.JooqReleaseReadRepository;
 import org.oagi.score.repo.api.impl.jooq.user.JooqScoreUserReadRepository;
 import org.oagi.score.repo.api.message.MessageReadRepository;
 import org.oagi.score.repo.api.message.MessageWriteRepository;
 import org.oagi.score.repo.api.module.*;
+import org.oagi.score.repo.api.openapidoc.OasDocReadRepository;
+import org.oagi.score.repo.api.openapidoc.OasDocWriteRepository;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 
@@ -188,6 +192,16 @@ public class JooqScoreRepositoryFactory implements ScoreRepositoryFactory {
     @Override
     public BusinessTermAssignmentWriteRepository createBusinessTermAssignmentWriteRepository() throws ScoreDataAccessException {
         return new JooqBusinessTermAssignmentWriteRepository(this.dslContext);
+    }
+
+    @Override
+    public OasDocReadRepository createOasDocReadRepository() throws ScoreDataAccessException {
+        return new JooqOasDocReadRepository(this.dslContext);
+    }
+
+    @Override
+    public OasDocWriteRepository createOasDocWriteRepository() throws ScoreDataAccessException {
+        return new JooqOasDocWriteRepository(this.dslContext);
     }
 
 }
