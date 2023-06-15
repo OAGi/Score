@@ -10,6 +10,7 @@ import {ScoreCommonModule} from '../../../common/score-common.module';
 import {OasDocCreateComponent} from './oas-doc-create/oas-doc-create.component';
 import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
+import {OpenAPIService} from './domain/openapi.service';
 
 const routes: Routes = [
   {
@@ -55,6 +56,9 @@ const routes: Routes = [
     OasDocListComponent,
     OasDocDetailComponent,
     RouterModule,
+  ],
+  providers: [
+    OpenAPIService
   ]
 })
 export class BieExpressOpenapi30Module { }

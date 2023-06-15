@@ -119,7 +119,7 @@ export class OasDoc{
   used: boolean;
 }
 
-export class OasDocBIEListRequest {
+export class BieListRequestForOasDoc {
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
@@ -183,7 +183,7 @@ export class OasDocBIEListRequest {
   }
 }
 
-export class OasDocBieList{
+export class BieListForOasDoc{
   topLevelAsbiepId: number;
   den: string;
   propertyTerm: string;
