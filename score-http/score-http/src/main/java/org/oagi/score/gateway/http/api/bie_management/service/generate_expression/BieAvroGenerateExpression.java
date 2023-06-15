@@ -220,12 +220,15 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         }
 
         DTSC dtSc = generationContext.findDtSc(bbieSc.getBasedDtScManifestId());
-        String name = convertIdentifierToId(toName(dtSc.getPropertyTerm(), dtSc.getRepresentationTerm(), rt -> {
+        String name = toName(dtSc.getPropertyTerm(), dtSc.getRepresentationTerm(), rt -> {
             if ("Text".equals(rt)) {
                 return "";
             }
+            if ("Identifier".equals(rt)) {
+                return "ID";
+            }
             return rt;
-        }, true));
+        }, false);
 
         String type = getType(bbieSc, generationContext);
 
