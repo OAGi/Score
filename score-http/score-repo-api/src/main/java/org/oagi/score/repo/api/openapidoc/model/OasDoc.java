@@ -24,6 +24,9 @@ public class OasDoc extends Auditable {
     private ScoreUser createdBy;
     private ScoreUser lastUpdatedBy;
 
+    public OasDoc() {
+    }
+
     public BigInteger getOasDocId() {
         return oasDocId;
     }
