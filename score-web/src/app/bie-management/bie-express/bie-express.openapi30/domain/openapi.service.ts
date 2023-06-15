@@ -36,8 +36,23 @@ export class OpenAPIService{
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    return this.http.get<PageResponse<OasDoc>>('/api/oas_doc', {params});
+    return this.http.get<PageResponse<OasDoc>>('/api/oas_docs', {params});
   }
+  getOasDoc(id): Observable<OasDoc>{
+    return this.http.get<OasDoc>('/api/oas_doc/' + id);
+  }
+
+  delete(...oasDocIds): Observable<any> {
+    if (oasDocIds.length === 1) {
+      return this.http.delete('/api/oas_doc/' + oasDocIds[0]);
+    } else {
+      return this.http.post<any>('/api/oas_doc/delete', {
+        oasDocIdList: oasDocIds
+      });
+    }
+  }
+
+
 
 
 }
