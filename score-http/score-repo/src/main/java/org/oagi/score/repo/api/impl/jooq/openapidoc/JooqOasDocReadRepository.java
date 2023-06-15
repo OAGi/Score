@@ -1,4 +1,4 @@
-package org.oagi.score.repo.api.impl.jooq.openapi;
+package org.oagi.score.repo.api.impl.jooq.openapidoc;
 
 import org.jooq.Record;
 import org.jooq.*;
