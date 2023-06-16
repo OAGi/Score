@@ -14,6 +14,7 @@ public class CreateOasDocRequest extends Request {
     private String contactEmail;
     private String licenseName;
     private String licenseUrl;
+    private String ownerUserId;
 
     public CreateOasDocRequest(ScoreUser requester) {
         super(requester);
@@ -101,5 +102,13 @@ public class CreateOasDocRequest extends Request {
 
     public void setLicenseUrl(String licenseUrl) {
         this.licenseUrl = licenseUrl;
+    }
+
+    public String getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 }

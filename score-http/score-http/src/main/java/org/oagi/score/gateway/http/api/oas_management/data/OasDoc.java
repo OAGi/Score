@@ -20,7 +20,7 @@ public class OasDoc {
     private String licenseName;
     private String licenseUrl;
     private String owner;
-    private BigInteger ownerUserId;
+    private String ownerUserId;
     private Date lastUpdateTimestamp;
     private String lastUpdateUser;
 }

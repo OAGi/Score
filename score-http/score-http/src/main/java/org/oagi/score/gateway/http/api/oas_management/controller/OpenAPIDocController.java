@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -106,6 +107,7 @@ public class OpenAPIDocController {
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody OasDoc oasDoc) {
         CreateOasDocRequest request = new CreateOasDocRequest(authenticationService.asScoreUser(requester));
+        request.setOwnerUserId(requester.getName());
         request.setOpenAPIVersion(oasDoc.getOpenAPIVersion());
         request.setTitle(oasDoc.getTitle());
         request.setDescription(oasDoc.getDescription());
