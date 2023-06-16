@@ -11,21 +11,19 @@ import {OasDocCreateComponent} from './oas-doc-create/oas-doc-create.component';
 import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
-import { OasDocBieListComponent } from './oas-doc-create/oas-doc-bie-list.component';
-import {BieCreateBizCtxComponent} from '../../bie-create/bie-create-biz-ctx.component';
-import {BieCreateAsccpComponent} from '../../bie-create/bie-create-asccp.component';
+import {OasDocBieListComponent} from './oas-doc-create/oas-doc-bie-list.component';
 
 const routes: Routes = [
   {
-    path: 'profile_bie/express',
+    path: 'profile_bie/express/oas_doc',
     children: [
       {
-        path: 'oas_doc',
+        path: '',
         component: OasDocListComponent,
         canActivate: [AuthService]
       },
       {
-        path: 'oas_doc/create',
+        path: 'create',
         children: [
           {
             path: '',
@@ -40,7 +38,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'oas_doc/:id',
+        path: ':id',
         component: OasDocDetailComponent,
         canActivate: [AuthService]
       },
@@ -75,4 +73,5 @@ const routes: Routes = [
     OpenAPIService
   ]
 })
-export class BieExpressOpenapi30Module { }
+export class BieExpressOpenapi30Module {
+}
