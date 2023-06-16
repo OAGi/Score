@@ -38,6 +38,7 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
 
         ScoreUser requester = request.getRequester();
         BigInteger requesterUserId = requester.getUserId();
+        ULong userId = ULong.valueOf(requesterUserId);
         LocalDateTime timestamp = LocalDateTime.now();
 
         OasDocRecord record = new OasDocRecord();
@@ -52,6 +53,7 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
         record.setContactEmail(request.getContactEmail());
         record.setLicenseName(request.getLicenseName());
         record.setLicenseUrl(request.getLicenseUrl());
+        record.setOwnerUserId(userId);
         record.setCreatedBy(ULong.valueOf(requesterUserId));
         record.setLastUpdatedBy(ULong.valueOf(requesterUserId));
         record.setCreationTimestamp(timestamp);

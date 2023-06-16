@@ -19,6 +19,7 @@ public class OasDoc extends Auditable {
     private String contactEmail;
     private String licenseName;
     private String licenseUrl;
+    private String ownerUserId;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private ScoreUser createdBy;
@@ -141,6 +142,14 @@ public class OasDoc extends Auditable {
     @Override
     public void setCreationTimestamp(Date creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
+    }
+
+    public String getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     @Override
