@@ -113,6 +113,7 @@ export class OasDoc{
   contactEmail: string;
   licenseName: string;
   licenseUrl: string;
+  ownerUserId: string;
   lastUpdateTimestamp: Date;
   creationTimestamp: Date;
   createdBy: ScoreUser;

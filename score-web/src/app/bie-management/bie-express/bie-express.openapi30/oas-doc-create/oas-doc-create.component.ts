@@ -7,7 +7,6 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {BusinessTerm} from '../../../../business-term-management/domain/business-term';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
@@ -48,7 +47,8 @@ export class OasDocCreateComponent implements OnInit {
   back() {
     this.location.back();
   }
-  openDialogOasDocCreate(){
+
+  openDialogOasDocCreate() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
     dialogConfig.data.content = ['Another Open API Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'];
@@ -62,6 +62,7 @@ export class OasDocCreateComponent implements OnInit {
       this.router.navigateByUrl('/profile_bie/express/oas_doc');
     });
   }
+
   create() {
     this.checkUniqueness(this.oasDoc, (_) => {
       this.checkOasDocTitle(this.oasDoc, (dummy) => {
@@ -70,7 +71,11 @@ export class OasDocCreateComponent implements OnInit {
     });
   }
 
-  checkOasDocTitle(oasDoc:OasDoc, callbackFn?) {
+  createWithoutCheck() {
+    this.doCreate();
+  }
+
+  checkOasDocTitle(oasDoc: OasDoc, callbackFn?) {
     this.openAPIService.checkUniqueness(oasDoc).subscribe(resp => {
       if (!resp) {
         this.openDialogOasDocCreate();
