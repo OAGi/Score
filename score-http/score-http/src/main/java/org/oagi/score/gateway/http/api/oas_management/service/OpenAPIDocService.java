@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.service;
 
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.OasDocRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
@@ -18,6 +19,8 @@ public class OpenAPIDocService {
     private SessionService sessionService;
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
+    @Autowired
+    private OasDocRepository oasDocRepository;
     @Autowired
     private DSLContext dslContext;
 
@@ -47,6 +50,14 @@ public class OpenAPIDocService {
     public DeleteOasDocResponse DeleteOasDoc(DeleteOasDocRequest request) {
         DeleteOasDocResponse response = scoreRepositoryFactory.createOasDocWriteRepository().deleteOasDoc(request);
         return response;
+    }
+
+    public boolean checkOasDocUniqueness(OasDoc oasDoc) {
+        return oasDocRepository.checkOasDocUniqueness(oasDoc);
+    }
+
+    public boolean checkOasDocTitleUniqueness(OasDoc oasDoc) {
+        return oasDocRepository.checkOasDocTitleUniqueness(oasDoc);
     }
 
 

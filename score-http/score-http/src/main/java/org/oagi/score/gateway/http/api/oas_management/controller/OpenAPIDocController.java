@@ -84,6 +84,23 @@ public class OpenAPIDocController {
         return pageResponse;
     }
 
+    @RequestMapping(value = "/oas_docs/check_uniqueness", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean checkUniqueness(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody OasDoc oasDoc) {
+        return oasDocService.checkOasDocUniqueness(oasDoc);
+    }
+
+
+    @RequestMapping(value = "/oas_docs/check_title_uniqueness", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean checkTitleUniqueness(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody OasDoc oasDoc) {
+        return oasDocService.checkOasDocTitleUniqueness(oasDoc);
+    }
+
     @RequestMapping(value = "/oas_doc", method = RequestMethod.PUT)
     public ResponseEntity create(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
