@@ -75,6 +75,22 @@ export class OpenAPIService{
     });
   }
 
+  updateOasDoc(oasDoc: OasDoc): Observable<any> {
+    return this.http.post('/api/oas_doc/' + oasDoc.oasDocId, {
+      oasDocId: oasDoc.oasDocId,
+      title: oasDoc.title,
+      openAPIVersion: oasDoc.openAPIVersion,
+      version: oasDoc.version,
+      licenseName: oasDoc.licenseName,
+      description: oasDoc.description,
+      termsOfService: oasDoc.termsOfService,
+      contactName: oasDoc.contactName,
+      contactUrl: oasDoc.contactUrl,
+      contactEmail: oasDoc.contactEmail,
+      licenseUrl: oasDoc.licenseUrl
+    });
+  }
+
   checkUniqueness(oasDoc: OasDoc): Observable<any> {
     return this.http.post('/api/oas_docs/check_uniqueness', {
       oasDocId: oasDoc.oasDocId,

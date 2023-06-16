@@ -121,6 +121,17 @@ export class OasDoc{
   used: boolean;
 }
 
+export interface simpleOasDoc {
+  oasDocId: number;
+  guid: string;
+  openAPIVersion: string;
+  title: string;
+  description: string;
+  version: string;
+  licenseName: string;
+  ownerUserId: string;
+}
+
 export class BieListForOasDocRequest {
   release: SimpleRelease;
   filters: {

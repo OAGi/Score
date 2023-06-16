@@ -1,1 +1,67 @@
-<p>oas-doc-detail works!</p>
+<div class="context-section">
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+    </mat-card-header>
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>Title</mat-label>
+          <input matInput required [(ngModel)]="oasDoc.title" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Open API Version</mat-label>
+          <input matInput required [(ngModel)]="oasDoc.openAPIVersion" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Doc Version</mat-label>
+          <input matInput required [(ngModel)]="oasDoc.version" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Terms Of Service</mat-label>
+          <input matInput [(ngModel)]="oasDoc.termsOfService" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contact Name</mat-label>
+          <input matInput [(ngModel)]="oasDoc.contactName" maxlength="255"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Contact Url</mat-label>
+          <input matInput [(ngModel)]="oasDoc.contactUrl" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contact Email</mat-label>
+          <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>License Name</mat-label>
+          <input matInput required [(ngModel)]="oasDoc.licenseName" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>License Url</mat-label>
+          <input matInput [(ngModel)]="oasDoc.licenseUrl" maxlength="255"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="oasDoc.description"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="update()"
+                [disabled]="!isChanged() || isDisabled(oasDoc)">
+          Update
+        </button>
+        <button mat-raised-button color="warn" (click)="discard()"
+                *ngIf="!this.oasDoc.used">
+          Discard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
