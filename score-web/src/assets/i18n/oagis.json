@@ -56,6 +56,9 @@
   "BIE_EXPRESS_OPENAPI3.0": {
     "TITLE": "OpenAPI Doc (Profiled Component, Noun, BOD)"
   },
+  "OAS_DOC_CREATE":{
+    "TITLE": "Create OpenAPI Doc (Profiled Component, Noun, BOD)"
+  },
   "BIE_COPY": {
     "TITLE": "Copy BIE (Profiled Component, Noun, BOD)"
   },

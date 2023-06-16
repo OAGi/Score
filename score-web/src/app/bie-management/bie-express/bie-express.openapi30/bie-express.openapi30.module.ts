@@ -11,6 +11,9 @@ import {OasDocCreateComponent} from './oas-doc-create/oas-doc-create.component';
 import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
+import { OasDocBieListComponent } from './oas-doc-create/oas-doc-bie-list.component';
+import {BieCreateBizCtxComponent} from '../../bie-create/bie-create-biz-ctx.component';
+import {BieCreateAsccpComponent} from '../../bie-create/bie-create-asccp.component';
 
 const routes: Routes = [
   {
@@ -23,8 +26,18 @@ const routes: Routes = [
       },
       {
         path: 'oas_doc/create',
-        component: OasDocCreateComponent,
-        canActivate: [AuthService]
+        children: [
+          {
+            path: '',
+            component: OasDocCreateComponent,
+            canActivate: [AuthService]
+          },
+          {
+            path: 'bie_list',
+            component: OasDocBieListComponent,
+            canActivate: [AuthService]
+          }
+        ]
       },
       {
         path: 'oas_doc/:id',
@@ -40,7 +53,8 @@ const routes: Routes = [
     BieExpressOpenapi30Component,
     OasDocCreateComponent,
     OasDocListComponent,
-    OasDocDetailComponent
+    OasDocDetailComponent,
+    OasDocBieListComponent
   ],
   imports: [
     RouterModule.forChild(routes),

@@ -1,3 +1,4 @@
+
 <div class="context-section">
   <mat-card class="pt-4 pb-2">
     <mat-card-header>
@@ -154,12 +155,12 @@
         </button>
       </mat-card-actions>
     </mat-card>
-   <mat-card>
-    <mat-card-content class="mat-card-container">
-      <!-- ASCCP Table -->
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+    <mat-card>
+      <mat-card-content class="mat-card-container">
+        <!-- ASCCP Table -->
+        <div class="loading-container" *ngIf="loading">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
         <div class="mat-elevation-z1">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
@@ -273,29 +274,29 @@
                 (click)="toggle(row)"></tr>
           </table>
 
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
-      </div>
-    </mat-card-content>
-  </mat-card>
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="warn" (click)="back()"
-                [disabled]="loading">
-          Back
-        </button>
-        <button mat-raised-button color="primary" (click)="create()"
-                [hidden]="dataSource.data.length == 0"
-                [disabled]="this.selection.selected.length == 0">
-          Create
-        </button>
+    <div class="row action-group m-0">
+      <div class="col-12 actions-wrap">
+        <div class="actions">
+          <button mat-raised-button color="warn" (click)="back()"
+                  [disabled]="loading">
+            Back
+          </button>
+          <button mat-raised-button color="primary" (click)="create()"
+                  [hidden]="dataSource.data.length == 0"
+                  [disabled]="this.selection.selected.length == 0">
+            Create
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
 
 

@@ -60,6 +60,9 @@
   "BIE_EXPRESS_OPENAPI30": {
     "TITLE": "OpenAPI Doc"
   },
+  "OAS_DOC_CREATE":{
+    "TITLE": "Create OpenAPI Doc"
+  },
   "BIE_COPY": {
     "TITLE": "Copy BIE"
   },

@@ -4,6 +4,7 @@ import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
+import { SimpleRelease } from 'src/app/release-management/domain/release';
 
 export class OasDocListRequest {
   filters: {
@@ -120,6 +121,7 @@ export class OasDoc{
 }
 
 export class BieListForOasDocRequest {
+  release: SimpleRelease;
   filters: {
     propertyTerm: string;
     bizCtxName: string;
@@ -132,6 +134,8 @@ export class BieListForOasDocRequest {
     start: Date,
     end: Date,
   };
+  ownerLoginIds: string[] = [];
+  updaterLoginIds: string[] = [];
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {

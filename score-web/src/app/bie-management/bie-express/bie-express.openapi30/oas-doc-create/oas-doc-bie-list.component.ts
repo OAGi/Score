@@ -1,15 +1,16 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {BieListForOasDoc, BieListForOasDocRequest, OasDoc} from '../domain/openapi-doc';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {Release} from '../../../bie-create/domain/bie-create-list';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {BieListForOasDoc, BieListForOasDocRequest, OasDoc} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {WorkingRelease} from '../../../../release-management/domain/release';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
+import {OpenAPIService} from '../domain/openapi.service';
 import {ReleaseService} from '../../../../release-management/domain/release.service';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../../authentication/auth.service';
@@ -21,14 +22,14 @@ import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../../comm
 import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {OpenAPIService} from '../domain/openapi.service';
 
 @Component({
-  selector: 'score-oas-doc-create',
-  templateUrl: './oas-doc-create.component.html',
-  styleUrls: ['./oas-doc-create.component.css']
+  selector: 'score-oas-doc-bie-list',
+  templateUrl: './oas-doc-bie-list.component.html',
+  styleUrls: ['./oas-doc-bie-list.component.css']
 })
-export class OasDocCreateComponent implements OnInit {
+export class OasDocBieListComponent implements OnInit {
+
   title = 'Create Open API Doc';
   subtitle = 'Open API Doc Metadata';
   oasDoc: OasDoc;
@@ -228,6 +229,5 @@ export class OasDocCreateComponent implements OnInit {
     const userToken = this.auth.getUserToken();
     return userToken.roles.includes('developer');
   }
-
 
 }
