@@ -201,18 +201,12 @@
         </button>
       </mat-card-actions>
     </mat-card>
-
+   <mat-card>
     <mat-card-content class="mat-card-container">
       <!-- ASCCP Table -->
       <div class="loading-container" *ngIf="loading">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
-
-      <mat-card-content class="mat-card-container">
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
-
         <div class="mat-elevation-z1">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
@@ -349,7 +343,7 @@
       </div>
     </div>
   </div>
-</div>
+
 
 
 

@@ -119,7 +119,14 @@ export class OasDoc{
   used: boolean;
 }
 
-export class BieListRequestForOasDoc {
+export class BieListForOasDocRequest {
+  filters: {
+    propertyTerm: string;
+    bizCtxName: string;
+    topLevelAsbiepId: number;
+    den: string;
+  };
+
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
@@ -155,6 +162,12 @@ export class BieListRequestForOasDoc {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
+    this.filters = {
+      propertyTerm: params.get('propertyTerm') || '',
+      bizCtxName: params.get('bizCtxname') || '',
+      topLevelAsbiepId: Number(params.get('topLevelAsbiepId')) || 0,
+      den: params.get('den') || '',
+    };
   }
 
   toParams(): HttpParams {
@@ -172,6 +185,18 @@ export class BieListRequestForOasDoc {
     }
     if (this.updatedDate.end) {
       params = params.set('updateEnd', '' + this.updatedDate.end.getTime());
+    }
+    if (this.filters.propertyTerm && this.filters.propertyTerm.length > 0) {
+      params = params.set('propertyTerm', '' + this.filters.propertyTerm);
+    }
+    if (this.filters.bizCtxName && this.filters.bizCtxName.length > 0) {
+      params = params.set('businessContext', '' + this.filters.bizCtxName);
+    }
+    if (this.filters.topLevelAsbiepId) {
+      params = params.set('topLevelAsbiepId', this.filters.topLevelAsbiepId.toString());
+    }
+    if (this.filters.den && this.filters.den.length > 0) {
+      params = params.set('den', '' + this.filters.den);
     }
     return params;
   }
