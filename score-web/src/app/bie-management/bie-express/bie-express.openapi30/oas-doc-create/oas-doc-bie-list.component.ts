@@ -30,9 +30,8 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 })
 export class OasDocBieListComponent implements OnInit {
 
-  title = 'Create Open API Doc';
-  subtitle = 'Open API Doc Metadata';
-  oasDoc: OasDoc;
+  title = 'Add BIE to Open API Doc';
+  subtitle = 'Select BIEs';
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
   releaseId: number;

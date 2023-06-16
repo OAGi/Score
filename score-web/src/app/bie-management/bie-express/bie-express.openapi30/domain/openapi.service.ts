@@ -4,6 +4,7 @@ import {BieListForOasDoc, BieListForOasDocRequest, OasDoc, OasDocListRequest} fr
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
 import {BieList} from '../../../bie-list/domain/bie-list';
+import {BusinessTerm} from '../../../../business-term-management/domain/business-term';
 
 @Injectable()
 export class OpenAPIService{
@@ -55,8 +56,41 @@ export class OpenAPIService{
       });
     }
   }
+  createOasDoc(oasDoc: OasDoc): Observable<any>{
+    if ('' + oasDoc.oasDocId === 'undefined' || !oasDoc.oasDocId) {
+      oasDoc.oasDocId = null;
+    }
+    return this.http.put('/api/oas_doc', {
+      oasDocId: oasDoc.oasDocId,
+      title: oasDoc.title,
+      openAPIVersion: oasDoc.openAPIVersion,
+      version: oasDoc.version,
+      licenseName: oasDoc.licenseName,
+      description: oasDoc.description,
+      termsOfService: oasDoc.termsOfService,
+      contactName: oasDoc.contactName,
+      contactUrl: oasDoc.contactUrl,
+      contactEmail: oasDoc.contactEmail,
+      licenseUrl: oasDoc.licenseUrl
+    });
+  }
 
+  checkUniqueness(oasDoc: OasDoc): Observable<any> {
+    return this.http.post('/api/oas_docs/check_uniqueness', {
+      oasDocId: oasDoc.oasDocId,
+      title: oasDoc.title,
+      openAPIVersion: oasDoc.openAPIVersion,
+      version: oasDoc.version,
+      licenseName: oasDoc.licenseName
+    });
+  }
 
+  checkTitleUniqueness(oasDoc: OasDoc): Observable<any> {
+    return this.http.post('/api/oas_docs/check_name_uniqueness', {
+      oasDocId: oasDoc.oasDocId,
+      title: oasDoc.title
+    });
+  }
 
   getBieListForOasDoc(request: BieListForOasDocRequest): Observable<PageResponse<BieListForOasDoc>>{
     let params = new HttpParams()
