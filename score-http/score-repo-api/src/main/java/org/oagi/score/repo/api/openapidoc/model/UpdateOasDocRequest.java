@@ -15,6 +15,7 @@ public class UpdateOasDocRequest extends Request {
     private String contactEmail;
     private String licenseName;
     private String licenseUrl;
+    private String ownerUserId;
 
     public UpdateOasDocRequest(ScoreUser requester) {
         super(requester);
@@ -113,6 +114,14 @@ public class UpdateOasDocRequest extends Request {
         this.licenseUrl = licenseUrl;
     }
 
+    public String getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
+    }
+
     @Override
     public String toString() {
         return "UpdateOasDocRequest{" +
@@ -127,6 +136,7 @@ public class UpdateOasDocRequest extends Request {
                 ", contactEmail='" + contactEmail + '\'' +
                 ", licenseName='" + licenseName + '\'' +
                 ", licenseUrl='" + licenseUrl + '\'' +
+                ", ownerUserId='" + ownerUserId + '\'' +
                 '}';
     }
 }
