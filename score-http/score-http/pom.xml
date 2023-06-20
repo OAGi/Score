@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0-alpha</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-service</artifactId>
-            <version>3.0.4</version>
+            <version>3.1.0-alpha</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
