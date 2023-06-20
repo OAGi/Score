@@ -59,6 +59,9 @@
   "OAS_DOC_CREATE":{
     "TITLE": "Create OpenAPI Doc (Profiled Component, Noun, BOD)"
   },
+  "OAS_DOC_BIE_LIST":{
+    "TITLE": "Bie List for Open API Doc (Profiled Component, Noun, BOD)"
+  },
   "BIE_COPY": {
     "TITLE": "Copy BIE (Profiled Component, Noun, BOD)"
   },

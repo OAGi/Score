@@ -158,6 +158,10 @@ export class OasDocDetailComponent implements OnInit {
       });
   }
 
+  listBIE() {
+    this.router.navigateByUrl('/profile_bie/express/oas_doc/' + this.oasDoc.oasDocId + '/bie_list');
+  }
+
   isDirty(): boolean {
     return !!this.oasDoc.oasDocId
       || this.oasDoc.title && this.oasDoc.title.length > 0

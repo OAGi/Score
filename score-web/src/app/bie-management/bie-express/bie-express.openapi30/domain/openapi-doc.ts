@@ -225,6 +225,7 @@ export class BieListForOasDocRequest {
 }
 
 export class BieListForOasDoc{
+  oasDocId: number;
   topLevelAsbiepId: number;
   den: string;
   propertyTerm: string;

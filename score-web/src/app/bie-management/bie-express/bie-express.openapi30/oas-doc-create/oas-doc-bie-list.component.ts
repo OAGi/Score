@@ -29,9 +29,8 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
   styleUrls: ['./oas-doc-bie-list.component.css']
 })
 export class OasDocBieListComponent implements OnInit {
-
-  title = 'Add BIE to Open API Doc';
   subtitle = 'Select BIEs';
+  oasDoc: OasDoc;
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
   releaseId: number;
@@ -71,6 +70,16 @@ export class OasDocBieListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.oasDoc = new OasDoc();
+    this.oasDoc.used = true;
+    const oasDocId = this.route.snapshot.params.id;
+
+    forkJoin(
+      this.openAPIService.getOasDoc(oasDocId)
+    )
+      .subscribe(([simpleOasDoc]) => {
+        this.oasDoc = simpleOasDoc;
+      });
     // Init BIE List table
     this.request = new BieListForOasDocRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));

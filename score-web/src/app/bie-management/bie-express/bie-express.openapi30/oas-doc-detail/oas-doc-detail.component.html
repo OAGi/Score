@@ -57,9 +57,9 @@
                 [disabled]="!isChanged() || isDisabled(oasDoc)">
           Update
         </button>
-        <button mat-raised-button color="warn" (click)="discard()"
-                *ngIf="!this.oasDoc.used">
-          Discard
+        <button mat-raised-button color="warn"
+                (click)="listBIE()">
+          BIE List
         </button>
       </div>
     </div>

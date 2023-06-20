@@ -12,6 +12,10 @@ import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
 import {OasDocBieListComponent} from './oas-doc-create/oas-doc-bie-list.component';
+import {OasDocAssignComponent} from './oas-doc-assign/oas-doc-assign.component';
+import {ReleaseDetailComponent} from '../../../release-management/release-detail/release-detail.component';
+import {ReleaseAssignComponent} from '../../../release-management/release-assign/release-assign.component';
+
 
 const routes: Routes = [
   {
@@ -39,8 +43,20 @@ const routes: Routes = [
       },
       {
         path: ':id',
-        component: OasDocDetailComponent,
-        canActivate: [AuthService]
+        children: [{
+          path: '',
+          component: OasDocDetailComponent,
+          canActivate: [AuthService],
+        }, {
+          path: 'assign',
+          component: OasDocAssignComponent,
+          canActivate: [AuthService],
+        },
+          {
+            path: 'bie_list',
+            component: OasDocBieListComponent,
+            canActivate: [AuthService],
+          }]
       },
     ]
   }
@@ -52,7 +68,8 @@ const routes: Routes = [
     OasDocCreateComponent,
     OasDocListComponent,
     OasDocDetailComponent,
-    OasDocBieListComponent
+    OasDocBieListComponent,
+    OasDocAssignComponent
   ],
   imports: [
     RouterModule.forChild(routes),
