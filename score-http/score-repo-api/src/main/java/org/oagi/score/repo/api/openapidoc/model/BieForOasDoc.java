@@ -8,14 +8,10 @@ import java.util.Date;
 
 public class BieForOasDoc extends Auditable {
     private BigInteger topLevelAsbiepId;
+    private BigInteger releaseId;
     private BigInteger oasDocId;
-    private String den;
     private String propertyTerm;
     private String guid;
-    private String releaseNum;
-    private BigInteger bizCtxId;
-    private String bizCtxName;
-    private String access;
     private String owner;
     private String version;
     private String status;
@@ -43,6 +39,14 @@ public class BieForOasDoc extends Auditable {
         this.topLevelAsbiepId = topLevelAsbiepId;
     }
 
+    public BigInteger getReleaseId() {
+        return releaseId;
+    }
+
+    public void setReleaseId(BigInteger releaseId) {
+        this.releaseId = releaseId;
+    }
+
     public BigInteger getOasDocId() {
         return oasDocId;
     }
@@ -50,15 +54,6 @@ public class BieForOasDoc extends Auditable {
     public void setOasDocId(BigInteger oasDocId) {
         this.oasDocId = oasDocId;
     }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
-    }
-
     public String getPropertyTerm() {
         return propertyTerm;
     }
@@ -73,38 +68,6 @@ public class BieForOasDoc extends Auditable {
 
     public void setGuid(String guid) {
         this.guid = guid;
-    }
-
-    public String getReleaseNum() {
-        return releaseNum;
-    }
-
-    public void setReleaseNum(String releaseNum) {
-        this.releaseNum = releaseNum;
-    }
-
-    public BigInteger getBizCtxId() {
-        return bizCtxId;
-    }
-
-    public void setBizCtxId(BigInteger bizCtxId) {
-        this.bizCtxId = bizCtxId;
-    }
-
-    public String getBizCtxName() {
-        return bizCtxName;
-    }
-
-    public void setBizCtxName(String bizCtxName) {
-        this.bizCtxName = bizCtxName;
-    }
-
-    public String getAccess() {
-        return access;
-    }
-
-    public void setAccess(String access) {
-        this.access = access;
     }
 
     public String getOwner() {
@@ -235,16 +198,11 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId, String den, String propertyTerm, String guid, String releaseNum, BigInteger bizCtxId, String bizCtxName, String access, String owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId, String propertyTerm, String guid, String owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.oasDocId = oasDocId;
-        this.den = den;
         this.propertyTerm = propertyTerm;
         this.guid = guid;
-        this.releaseNum = releaseNum;
-        this.bizCtxId = bizCtxId;
-        this.bizCtxName = bizCtxName;
-        this.access = access;
         this.owner = owner;
         this.version = version;
         this.status = status;
@@ -267,13 +225,8 @@ public class BieForOasDoc extends Auditable {
         return "BieListForOasDoc{" +
                 "topLevelAsbiepId=" + topLevelAsbiepId +
                 ", oasDocId=" + oasDocId +
-                ", den='" + den + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", guid='" + guid + '\'' +
-                ", releaseNum='" + releaseNum + '\'' +
-                ", bizCtxId=" + bizCtxId +
-                ", bizCtxName='" + bizCtxName + '\'' +
-                ", access='" + access + '\'' +
                 ", owner='" + owner + '\'' +
                 ", version='" + version + '\'' +
                 ", status='" + status + '\'' +

@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function16;
+import org.jooq.Function17;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -103,6 +103,11 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * The column <code>oagi.oas_response.make_array_indicator</code>.
      */
     public final TableField<OasResponseRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+
+    /**
+     * The column <code>oagi.oas_response.suppress_root_indicator</code>.
+     */
+    public final TableField<OasResponseRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_response.include_meta_header_indicator</code>.
@@ -295,18 +300,18 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<ULong, ULong, Integer, String, ULong, String, String, ULong, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<ULong, ULong, Integer, String, ULong, String, String, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function16<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function17<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -314,7 +319,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function16<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

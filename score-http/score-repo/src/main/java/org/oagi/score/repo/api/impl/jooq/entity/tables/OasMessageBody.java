@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
+import org.jooq.Function7;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -60,16 +60,10 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     public final TableField<OasMessageBodyRecord, ULong> OAS_MESSAGE_BODY_ID = createField(DSL.name("oas_message_body_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_message_body.asbiep_id</code>. A reference of
-     * the ASBIEP record.
+     * The column <code>oagi.oas_message_body.top_level_asbiep_id</code>. A
+     * reference of the ASBIEP record.
      */
-    public final TableField<OasMessageBodyRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the ASBIEP record.");
-
-    /**
-     * The column <code>oagi.oas_message_body.asccp_id</code>. A reference of
-     * the ASCCP record.
-     */
-    public final TableField<OasMessageBodyRecord, ULong> ASCCP_ID = createField(DSL.name("asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the ASCCP record.");
+    public final TableField<OasMessageBodyRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the ASBIEP record.");
 
     /**
      * The column <code>oagi.oas_message_body.oas_example_id</code>. A reference
@@ -151,33 +145,23 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
     @Override
     public List<ForeignKey<OasMessageBodyRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_OAS_ASCCP_ID_FK, Keys.OAS_MESSAGE_BODY_OAS_EXAMPLE_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_OAS_EXAMPLE_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
     }
 
-    private transient Asbiep _asbiep;
-    private transient Asccp _asccp;
+    private transient TopLevelAsbiep _topLevelAsbiep;
     private transient OasExample _oasExample;
     private transient AppUser _oasMessageBodyCreatedByFk;
     private transient AppUser _oasMessageBodyLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbiep</code> table.
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table.
      */
-    public Asbiep asbiep() {
-        if (_asbiep == null)
-            _asbiep = new Asbiep(this, Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK);
+    public TopLevelAsbiep topLevelAsbiep() {
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK);
 
-        return _asbiep;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table.
-     */
-    public Asccp asccp() {
-        if (_asccp == null)
-            _asccp = new Asccp(this, Keys.OAS_MESSAGE_BODY_OAS_ASCCP_ID_FK);
-
-        return _asccp;
+        return _topLevelAsbiep;
     }
 
     /**
@@ -252,18 +236,18 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -271,7 +255,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

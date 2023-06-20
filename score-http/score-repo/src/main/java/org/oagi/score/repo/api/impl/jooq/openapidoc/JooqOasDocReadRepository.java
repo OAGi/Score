@@ -83,9 +83,9 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             oasDoc.setCreationTimestamp(
-                    Date.from(record.get(BUSINESS_TERM.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             oasDoc.setLastUpdateTimestamp(
-                    Date.from(record.get(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             return oasDoc;
         };
     }
