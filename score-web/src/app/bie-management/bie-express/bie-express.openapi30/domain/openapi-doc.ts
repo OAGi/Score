@@ -227,13 +227,9 @@ export class BieForOasDocListRequest {
 export class BieForOasDoc{
   oasDocId: number;
   topLevelAsbiepId: number;
-  den: string;
   propertyTerm: string;
   guid: string;
   releaseNum: string;
-  bizCtxId: number;
-  bizCtxName: string;
-  access: string;
   owner: string;
   version: string;
   status: string;
