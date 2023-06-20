@@ -6,7 +6,7 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class BieListForOasDoc extends Auditable {
+public class BieForOasDoc extends Auditable {
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
     private String den;
@@ -32,7 +32,7 @@ public class BieListForOasDoc extends Auditable {
     private ScoreUser createdBy;
     private ScoreUser lastUpdatedBy;
 
-    public BieListForOasDoc() {
+    public BieForOasDoc() {
     }
 
     public BigInteger getTopLevelAsbiepId() {
@@ -235,7 +235,7 @@ public class BieListForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieListForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId, String den, String propertyTerm, String guid, String releaseNum, BigInteger bizCtxId, String bizCtxName, String access, String owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId, String den, String propertyTerm, String guid, String releaseNum, BigInteger bizCtxId, String bizCtxName, String access, String owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.oasDocId = oasDocId;
         this.den = den;

@@ -132,7 +132,7 @@ export interface simpleOasDoc {
   ownerUserId: string;
 }
 
-export class BieListForOasDocRequest {
+export class BieForOasDocListRequest {
   release: SimpleRelease;
   filters: {
     propertyTerm: string;
@@ -224,7 +224,7 @@ export class BieListForOasDocRequest {
   }
 }
 
-export class BieListForOasDoc{
+export class BieForOasDoc{
   oasDocId: number;
   topLevelAsbiepId: number;
   den: string;
