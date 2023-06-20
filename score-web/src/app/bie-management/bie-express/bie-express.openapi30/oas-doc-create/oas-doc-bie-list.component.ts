@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BieListForOasDoc, BieListForOasDocRequest, OasDoc} from '../domain/openapi-doc';
+import {BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {Release} from '../../../bie-create/domain/bie-create-list';
 import {MatTableDataSource} from '@angular/material/table';
@@ -39,8 +39,8 @@ export class OasDocBieListComponent implements OnInit {
     'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
-  dataSource = new MatTableDataSource<BieListForOasDoc>();
-  selection = new SelectionModel<BieListForOasDoc>(false, []);
+  dataSource = new MatTableDataSource<BieForOasDoc>();
+  selection = new SelectionModel<BieForOasDoc>(false, []);
 
   loading = false;
 
@@ -51,7 +51,7 @@ export class OasDocBieListComponent implements OnInit {
   filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: BieListForOasDocRequest;
+  request: BieForOasDocListRequest;
 
   workingRelease = WorkingRelease;
 
@@ -81,7 +81,7 @@ export class OasDocBieListComponent implements OnInit {
         this.oasDoc = simpleOasDoc;
       });
     // Init BIE List table
-    this.request = new BieListForOasDocRequest(this.route.snapshot.queryParamMap,
+    this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -196,7 +196,7 @@ export class OasDocBieListComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      const list = resp.list.map((elm: BieListForOasDoc) => {
+      const list = resp.list.map((elm: BieForOasDoc) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
@@ -214,11 +214,11 @@ export class OasDocBieListComponent implements OnInit {
     this.router.navigateByUrl('/profile_bie/express/oas_doc');
   }
 
-  select(row: BieListForOasDoc) {
+  select(row: BieForOasDoc) {
     this.selection.select(row);
   }
 
-  toggle(row: BieListForOasDoc) {
+  toggle(row: BieForOasDoc) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -226,7 +226,7 @@ export class OasDocBieListComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieListForOasDoc) {
+  isSelected(row: BieForOasDoc) {
     return this.selection.isSelected(row);
   }
 

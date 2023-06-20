@@ -1,16 +1,15 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {BieListForOasDoc, BieListForOasDocRequest, OasDoc, OasDocListRequest} from './openapi-doc';
+import {BieForOasDoc, BieForOasDocListRequest, OasDoc, OasDocListRequest} from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
-import {BieList} from '../../../bie-list/domain/bie-list';
-import {BusinessTerm} from '../../../../business-term-management/domain/business-term';
 
 @Injectable()
-export class OpenAPIService{
+export class OpenAPIService {
   constructor(private http: HttpClient) {
   }
-  getOasDocList(request: OasDocListRequest): Observable<PageResponse<OasDoc>>{
+
+  getOasDocList(request: OasDocListRequest): Observable<PageResponse<OasDoc>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -43,7 +42,8 @@ export class OpenAPIService{
     }
     return this.http.get<PageResponse<OasDoc>>('/api/oas_docs', {params});
   }
-  getOasDoc(id): Observable<OasDoc>{
+
+  getOasDoc(id): Observable<OasDoc> {
     return this.http.get<OasDoc>('/api/oas_doc/' + id);
   }
 
@@ -56,7 +56,8 @@ export class OpenAPIService{
       });
     }
   }
-  createOasDoc(oasDoc: OasDoc): Observable<any>{
+
+  createOasDoc(oasDoc: OasDoc): Observable<any> {
     if ('' + oasDoc.oasDocId === 'undefined' || !oasDoc.oasDocId) {
       oasDoc.oasDocId = null;
     }
@@ -108,7 +109,7 @@ export class OpenAPIService{
     });
   }
 
-  getBieListForOasDoc(request: BieListForOasDocRequest): Observable<PageResponse<BieListForOasDoc>>{
+  getBieListForOasDoc(request: BieForOasDocListRequest): Observable<PageResponse<BieForOasDoc>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -144,7 +145,7 @@ export class OpenAPIService{
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    return this.http.get<PageResponse<BieListForOasDoc>>('/api/oas_doc/bie_list', {params});
+    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/bie_list', {params});
   }
 
 }
