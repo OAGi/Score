@@ -5,22 +5,22 @@ import org.oagi.score.repo.api.base.Request;
 import java.math.BigInteger;
 
 public class GetBieForOasDocRequest extends Request {
-    private BigInteger bieForOasDocId;
+    private BigInteger topLevelAsbiepId;
 
-    public GetBieForOasDocRequest(BigInteger bieForOasDocId) {
-        this.bieForOasDocId = bieForOasDocId;
+    public GetBieForOasDocRequest(BigInteger topLevelAsbiepId) {
+        this.topLevelAsbiepId = topLevelAsbiepId;
     }
 
-    public BigInteger getBieForOasDocId() {
-        return bieForOasDocId;
+    public BigInteger getTopLevelAsbiepId() {
+        return topLevelAsbiepId;
     }
 
-    public void setBieForOasDocId(BigInteger bieForOasDocId) {
-        this.bieForOasDocId = bieForOasDocId;
+    public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        this.topLevelAsbiepId = topLevelAsbiepId;
     }
 
-    public GetBieForOasDocRequest withBieForOasDocId(BigInteger bieForOasDocId) {
-        this.setBieForOasDocId(bieForOasDocId);
+    public GetBieForOasDocRequest withTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        this.setTopLevelAsbiepId(topLevelAsbiepId);
         return this;
     }
 }

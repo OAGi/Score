@@ -7,10 +7,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class BieForOasDocRequest extends Request {
-    private BigInteger bieForOasDocId;
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
-    private BigInteger bizCtxId;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -18,22 +16,12 @@ public class BieForOasDocRequest extends Request {
     public BieForOasDocRequest() {
     }
 
-    public BieForOasDocRequest(BigInteger bieForOasDocId, BigInteger topLevelAsbiepId, BigInteger oasDocId, BigInteger bizCtxId, Collection<String> updaterUsernameList, LocalDateTime updateStartDate, LocalDateTime updateEndDate) {
-        this.bieForOasDocId = bieForOasDocId;
+    public BieForOasDocRequest(BigInteger topLevelAsbiepId, BigInteger oasDocId,  Collection<String> updaterUsernameList, LocalDateTime updateStartDate, LocalDateTime updateEndDate) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.oasDocId = oasDocId;
-        this.bizCtxId = bizCtxId;
         this.updaterUsernameList = updaterUsernameList;
         this.updateStartDate = updateStartDate;
         this.updateEndDate = updateEndDate;
-    }
-
-    public BigInteger getBieForOasDocId() {
-        return bieForOasDocId;
-    }
-
-    public void setBieForOasDocId(BigInteger bieForOasDocId) {
-        this.bieForOasDocId = bieForOasDocId;
     }
 
     public BigInteger getTopLevelAsbiepId() {
@@ -51,15 +39,6 @@ public class BieForOasDocRequest extends Request {
     public void setOasDocId(BigInteger oasDocId) {
         this.oasDocId = oasDocId;
     }
-
-    public BigInteger getBizCtxId() {
-        return bizCtxId;
-    }
-
-    public void setBizCtxId(BigInteger bizCtxId) {
-        this.bizCtxId = bizCtxId;
-    }
-
     public Collection<String> getUpdaterUsernameList() {
         return updaterUsernameList;
     }
@@ -87,10 +66,8 @@ public class BieForOasDocRequest extends Request {
     @Override
     public String toString() {
         return "BieForOasDocRequest{" +
-                "bieForOasDocId=" + bieForOasDocId +
                 ", topLevelAsbiepId=" + topLevelAsbiepId +
                 ", oasDocId=" + oasDocId +
-                ", bizCtxId=" + bizCtxId +
                 ", updaterUsernameList=" + updaterUsernameList +
                 ", updateStartDate=" + updateStartDate +
                 ", updateEndDate=" + updateEndDate +

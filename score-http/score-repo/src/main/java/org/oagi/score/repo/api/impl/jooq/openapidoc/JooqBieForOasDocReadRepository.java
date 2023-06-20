@@ -1,19 +1,24 @@
 package org.oagi.score.repo.api.impl.jooq.openapidoc;
 
-import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.SelectOnConditionStep;
+import org.jooq.*;
+import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
+import java.math.BigInteger;
 import java.time.ZoneId;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
@@ -110,13 +115,110 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         };
     }
 
-    @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        return null;
+        BieForOasDoc bieForOasDoc = null;
+
+        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
+        if (topLevelAsbiepId != null) {
+            bieForOasDoc = (BieForOasDoc) select()
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                    .fetchOne(mapper());
+        }
+
+        return new GetBieForOasDocResponse(bieForOasDoc);
+    }
+
+    private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
+        List<Condition> conditions = new ArrayList();
+
+        if (request.getTopLevelAsbiepIdList() != null && !request.getTopLevelAsbiepIdList().isEmpty()) {
+            if (request.getTopLevelAsbiepIdList().size() == 1) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(
+                        ULong.valueOf(request.getTopLevelAsbiepIdList().iterator().next())
+                ));
+            } else {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
+                        request.getTopLevelAsbiepIdList().stream()
+                                .map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+        }
+
+        if (request.getOasDocId() != null) {
+            conditions.add(OAS_DOC.OAS_DOC_ID.eq(
+                    ULong.valueOf(request.getOasDocId())
+            ));
+        }
+
+
+        if (!request.getUpdaterUsernameList().isEmpty()) {
+            conditions.add(APP_USER.as("updater").LOGIN_ID.in(
+                    new HashSet<>(request.getUpdaterUsernameList()).stream()
+                            .filter(e -> StringUtils.hasLength(e)).map(e -> trim(e)).collect(Collectors.toList())
+            ));
+        }
+        if (request.getUpdateStartDate() != null) {
+            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.greaterOrEqual(request.getUpdateStartDate()));
+        }
+        if (request.getUpdateEndDate() != null) {
+            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
+        }
+
+        return conditions;
+    }
+
+    private SortField getSortField(GetBieForOasDocListRequest request) {
+        if (!StringUtils.hasLength(request.getSortActive())) {
+            return null;
+        }
+
+        Field field;
+        switch (trim(request.getSortActive()).toLowerCase()) {
+            case "den":
+                field = ASCCP.PROPERTY_TERM;
+                break;
+            case "lastupdatetimestamp":
+                field = OAS_DOC.LAST_UPDATE_TIMESTAMP;
+                break;
+
+            default:
+                return null;
+        }
+
+        return (request.getSortDirection() == ASC) ? field.asc() : field.desc();
     }
 
     @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocListResponse getBieForOasDocList(GetBieForOasDocListRequest request) throws ScoreDataAccessException {
-        return null;
+        Collection<Condition> conditions = getConditions(request);
+        SelectConditionStep conditionStep = select().where(conditions);
+
+        SortField sortField = getSortField(request);
+        int length = dslContext().fetchCount(conditionStep);
+        SelectFinalStep finalStep;
+        if (sortField == null) {
+            if (request.isPagination()) {
+                finalStep = conditionStep.limit(request.getPageOffset(), request.getPageSize());
+            } else {
+                finalStep = conditionStep;
+            }
+        } else {
+            if (request.isPagination()) {
+                finalStep = conditionStep.orderBy(sortField)
+                        .limit(request.getPageOffset(), request.getPageSize());
+            } else {
+                finalStep = conditionStep.orderBy(sortField);
+            }
+        }
+
+        return new GetBieForOasDocListResponse(
+                finalStep.fetch(mapper()),
+                request.getPageIndex(),
+                request.getPageSize(),
+                length
+        );
     }
+
 }

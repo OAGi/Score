@@ -139,10 +139,10 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             ));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP.greaterOrEqual(request.getUpdateStartDate()));
+            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.greaterOrEqual(request.getUpdateStartDate()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
+            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
         }
 
         return conditions;

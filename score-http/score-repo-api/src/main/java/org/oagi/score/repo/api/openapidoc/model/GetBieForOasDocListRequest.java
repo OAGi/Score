@@ -1,7 +1,6 @@
 package org.oagi.score.repo.api.openapidoc.model;
 
 import org.oagi.score.repo.api.base.PaginationRequest;
-import org.oagi.score.repo.api.businessterm.model.BusinessTerm;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
@@ -9,10 +8,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class GetBieForOasDocListRequest extends PaginationRequest<BieForOasDoc> {
-    private Collection<BigInteger> bieForOasDocIdList;
-    private String bizCtxName;
-    private String propertyTerm;
-    private String release;
+    private Collection<BigInteger> topLevelAsbiepIdList;
+    private BigInteger oasDocId;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -24,36 +21,21 @@ public class GetBieForOasDocListRequest extends PaginationRequest<BieForOasDoc> 
     public GetBieForOasDocListRequest(ScoreUser requester, Class<BieForOasDoc> type) {
         super(requester, type);
     }
-    public Collection<BigInteger> getBieForOasDocIdList() {
-        return bieForOasDocIdList;
+
+    public Collection<BigInteger> getTopLevelAsbiepIdList() {
+        return topLevelAsbiepIdList;
     }
 
-    public void setBieForOasDocIdList(Collection<BigInteger> bieForOasDocIdList) {
-        this.bieForOasDocIdList = bieForOasDocIdList;
+    public void setTopLevelAsbiepIdList(Collection<BigInteger> topLevelAsbiepIdList) {
+        this.topLevelAsbiepIdList = topLevelAsbiepIdList;
     }
 
-    public String getBizCtxName() {
-        return bizCtxName;
+    public BigInteger getOasDocId() {
+        return oasDocId;
     }
 
-    public void setBizCtxName(String bizCtxName) {
-        this.bizCtxName = bizCtxName;
-    }
-
-    public String getPropertyTerm() {
-        return propertyTerm;
-    }
-
-    public void setPropertyTerm(String propertyTerm) {
-        this.propertyTerm = propertyTerm;
-    }
-
-    public String getRelease() {
-        return release;
-    }
-
-    public void setRelease(String release) {
-        this.release = release;
+    public void setOasDocId(BigInteger oasDocId) {
+        this.oasDocId = oasDocId;
     }
 
     public Collection<String> getUpdaterUsernameList() {
