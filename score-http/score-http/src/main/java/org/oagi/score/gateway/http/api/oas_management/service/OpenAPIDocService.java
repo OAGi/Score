@@ -52,6 +52,11 @@ public class OpenAPIDocService {
         return response;
     }
 
+    public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) {
+        GetBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDoc(request);
+        return response;
+    }
+
     public boolean checkOasDocUniqueness(OasDoc oasDoc) {
         return oasDocRepository.checkOasDocUniqueness(oasDoc);
     }
