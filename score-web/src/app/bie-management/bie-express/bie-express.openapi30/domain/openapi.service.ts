@@ -37,6 +37,9 @@ export class OpenAPIService {
   getOasDoc(id): Observable<OasDoc> {
     return this.http.get<OasDoc>('/api/oas_doc/' + id);
   }
+  getBieForOasDoc(id): Observable<BieForOasDoc> {
+    return this.http.get<BieForOasDoc>('/api/oas_doc/' + id + '/bie_list');
+  }
 
   delete(...oasDocIds): Observable<any> {
     if (oasDocIds.length === 1) {

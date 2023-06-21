@@ -1,8 +1,19 @@
 <div class="context-section">
   <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
+    <mat-card-header class="display-flow-root">
+      <mat-card-title class="float-left">{{ title }}</mat-card-title>
+        <div class="action-group float-right mt-n2">
+          <div class="col-12 actions-wrap">
+            <button mat-raised-button color="primary" (click)="update()"
+                    [disabled]="!isChanged() || isDisabled(oasDoc)">
+              Update
+            </button>
+            <button mat-raised-button color="warn" (click)="discard()">
+              Discard
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <div class="row">
@@ -15,7 +26,19 @@
           <div class="col-2">
             <mat-form-field>
               <mat-label>Description</mat-label>
-              <textarea rows="6" cols="30" matInput [(ngModel)]="oasDoc.description"></textarea>
+              <textarea rows="1" cols="200" matInput [(ngModel)]="oasDoc.description"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2 col-sm-12">
+            <mat-form-field>
+              <mat-label>Selected Business Contexts</mat-label>
+              <mat-select [(ngModel)]="businessContextIdList" multiple required>
+                <mat-option *ngFor="let bizCtx of businessContextList" [value]="bizCtx.businessContextId" [disabled]="true">
+                  {{ bizCtx.name }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
           </div>
         </div>
@@ -23,18 +46,102 @@
     </mat-card>
   </mat-card>
 
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="update()"
-                [disabled]="!isChanged() || isDisabled(oasDoc)">
-          Update
+  <mat-card>
+    <mat-card-header class="align-items-baseline">
+      <mat-card-title>Bie List</mat-card-title>
+      <div style="padding: 8px 0 8px 12px;" *ngIf="access === 'CanEdit'">
+        <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary"
+                [disabled]="access !== 'CanEdit' || isDisabled(oasDoc)">
+          <mat-icon>add</mat-icon>
+          Add
         </button>
-        <button mat-raised-button color="warn"
-                (click)="listBIE()">
-          BIE List
+        <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
+                [hidden]="dataSource.data.length == 0"
+                [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
+                color="warn">
+          <mat-icon>delete</mat-icon>
+          Remove
         </button>
       </div>
-    </div>
+    </mat-card-header>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-subtitle>
+          <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="bizCtxSearch" (keyup.enter)="applyFilter(bizCtxSearch)" maxlength="100"/>
+            <button mat-icon-button matSuffix (click)="applyFilter(bizCtxSearch)">
+              <mat-icon>search</mat-icon>
+            </button>
+            <button mat-icon-button matSuffix *ngIf="bizCtxSearch && bizCtxSearch.length > 0" (click)="clearFilter()">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-form-field>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="mat-card-container">
+        <div class="mat-elevation-z1">
+          <table mat-table matSort [dataSource]="dataSource">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                              *ngIf="access === 'CanEdit'"
+                              [checked]="selection.hasValue() && isAllSelected()"
+                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                              *ngIf="access === 'CanEdit'"
+                              [disabled]="!isAvailable(row) || isRevisionValue(row)"
+                              (change)="$event ? toggle(row) : null"
+                              [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Code</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="{{ color(element) }}">{{ element.value }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="meaning">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Meaning</th>
+              <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="deprecated">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Deprecated</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-icon *ngIf="element.deprecated">done</mat-icon>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="definition">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
+              <td mat-cell *matCellDef="let element"> {{ element.definition }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="definitionSource">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition Source</th>
+              <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="openDialog(row)"></tr>
+          </table>
+
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
   </div>
-</div>

@@ -11,7 +11,7 @@ export class OasDocListRequest {
     title: string;
     description: string;
   };
-
+  access: string;
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
@@ -42,6 +42,7 @@ export class OasDocListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
+    this.access = params.get('access') || '';
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
@@ -61,6 +62,9 @@ export class OasDocListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
+    if (this.access && this.access.length > 0) {
+      params = params.set('access', '' + this.access);
+    }
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
     }
@@ -89,6 +93,7 @@ export class OasDocListRequest {
 export class OasDoc {
   oasDocId: number;
   guid: string;
+  releaseId: number;
   openAPIVersion: string;
   title: string;
   description: string;
@@ -99,6 +104,7 @@ export class OasDoc {
   contactEmail: string;
   licenseName: string;
   licenseUrl: string;
+  access: string;
   ownerUserId: string;
   lastUpdateTimestamp: Date;
   creationTimestamp: Date;
@@ -125,7 +131,7 @@ export class BieForOasDocListRequest {
     bizCtxName: string;
     den: string;
   };
-
+  access: string;
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
@@ -157,7 +163,7 @@ export class BieForOasDocListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
-
+    this.access = params.get('access') || '';
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
@@ -176,6 +182,9 @@ export class BieForOasDocListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
+    if (this.access && this.access.length > 0) {
+      params = params.set('access', '' + this.access);
+    }
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
     }
