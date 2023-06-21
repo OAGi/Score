@@ -22,6 +22,7 @@ import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../../comm
 import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {B} from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'score-oas-doc-bie-list',
@@ -30,7 +31,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 })
 export class OasDocBieListComponent implements OnInit {
   subtitle = 'Select BIEs';
-  oasDoc: OasDoc;
+  bieForOasDoc: BieForOasDoc;
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
   releaseId: number;
@@ -65,13 +66,11 @@ export class OasDocBieListComponent implements OnInit {
               private auth: AuthService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    this.oasDoc = new OasDoc();
-    this.oasDoc.used = true;
+    this.bieForOasDoc = new BieForOasDoc();
     const oasDocId = this.route.snapshot.params.id;
 
     forkJoin(

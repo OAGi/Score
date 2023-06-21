@@ -4,14 +4,11 @@ import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
-import { SimpleRelease } from 'src/app/release-management/domain/release';
+import {SimpleRelease} from 'src/app/release-management/domain/release';
 
 export class OasDocListRequest {
   filters: {
     title: string;
-    openAPIVersion: string;
-    version: string;
-    licenseName: string;
     description: string;
   };
 
@@ -53,9 +50,6 @@ export class OasDocListRequest {
 
     this.filters = {
       title: params.get('title') || '',
-      openAPIVersion: params.get('openAPIVersion') || '',
-      version: params.get('version') || '',
-      licenseName: params.get('licenseName') || '',
       description: params.get('description') || '',
     };
   }
@@ -79,16 +73,7 @@ export class OasDocListRequest {
     if (this.filters.title && this.filters.title.length > 0) {
       params = params.set('title', '' + this.filters.title);
     }
-    if (this.filters.openAPIVersion) {
-      params = params.set('openAPIVersion', '' + this.filters.openAPIVersion);
-    }
-    if (this.filters.version) {
-      params = params.set('version', '' + this.filters.version);
-    }
-    if (this.filters.licenseName) {
-      params = params.set('licenseName', '' + this.filters.licenseName);
-    }
-    if (this.filters.description){
+    if (this.filters.description) {
       params = params.set('description', '' + this.filters.description);
     }
     return params;
@@ -100,7 +85,8 @@ export class OasDocListRequest {
     return (str) ? 'q=' + str : undefined;
   }
 }
-export class OasDoc{
+
+export class OasDoc {
   oasDocId: number;
   guid: string;
   openAPIVersion: string;
@@ -119,6 +105,7 @@ export class OasDoc{
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
   used: boolean;
+  bieList: BieForOasDoc[];
 }
 
 export interface simpleOasDoc {
@@ -135,9 +122,7 @@ export interface simpleOasDoc {
 export class BieForOasDocListRequest {
   release: SimpleRelease;
   filters: {
-    propertyTerm: string;
     bizCtxName: string;
-    topLevelAsbiepId: number;
     den: string;
   };
 
@@ -179,9 +164,7 @@ export class BieForOasDocListRequest {
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
-      propertyTerm: params.get('propertyTerm') || '',
       bizCtxName: params.get('bizCtxname') || '',
-      topLevelAsbiepId: Number(params.get('topLevelAsbiepId')) || 0,
       den: params.get('den') || '',
     };
   }
@@ -202,14 +185,8 @@ export class BieForOasDocListRequest {
     if (this.updatedDate.end) {
       params = params.set('updateEnd', '' + this.updatedDate.end.getTime());
     }
-    if (this.filters.propertyTerm && this.filters.propertyTerm.length > 0) {
-      params = params.set('propertyTerm', '' + this.filters.propertyTerm);
-    }
     if (this.filters.bizCtxName && this.filters.bizCtxName.length > 0) {
       params = params.set('businessContext', '' + this.filters.bizCtxName);
-    }
-    if (this.filters.topLevelAsbiepId) {
-      params = params.set('topLevelAsbiepId', this.filters.topLevelAsbiepId.toString());
     }
     if (this.filters.den && this.filters.den.length > 0) {
       params = params.set('den', '' + this.filters.den);
@@ -224,11 +201,13 @@ export class BieForOasDocListRequest {
   }
 }
 
-export class BieForOasDoc{
+export class BieForOasDoc {
   oasDocId: number;
   topLevelAsbiepId: number;
   propertyTerm: string;
   guid: string;
+  releaseId: number;
+  access: string;
   releaseNum: string;
   owner: string;
   version: string;
