@@ -44,6 +44,7 @@ export class OasDocDetailComponent implements OnInit {
   businessContextSelection = {};
   request: BieForOasDocListRequest;
   loading = false;
+  isUpdating: boolean;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -85,9 +86,16 @@ export class OasDocDetailComponent implements OnInit {
       .subscribe(([simpleOasDoc, bieForOasDoc]) => {
         this.oasDoc = simpleOasDoc;
         this.hashCode = hashCode(this.oasDoc);
-
+        this.init(this.oasDoc);
         this.loadBieListForOasDoc(true);
+      }, _ => {
+        this.isUpdating = false;
       });
+  }
+  init(oasDoc: OasDoc){
+    this.hashCode = hashCode(oasDoc);
+    this.oasDoc = oasDoc;
+    this.isUpdating = false;
   }
 
   loadBieListForOasDoc(isInit?: boolean) {
@@ -152,6 +160,12 @@ export class OasDocDetailComponent implements OnInit {
   clearFilter() {
     this.bizCtxSearch = '';
     this.applyFilter(this.bizCtxSearch);
+  }
+  get access(): string{
+    if (this.oasDoc){
+      return this.oasDoc.access;
+    }
+    return '';
   }
 
   checkUniqueness(oasDoc: OasDoc, callbackFn?) {

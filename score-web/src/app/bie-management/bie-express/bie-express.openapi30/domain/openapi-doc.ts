@@ -233,5 +233,3 @@ export class BieForOasDoc {
   operationId: string;
   tagName: string;
 }
-
-

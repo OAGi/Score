@@ -15,13 +15,6 @@ export class OpenAPIService {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
-    if (request.filters.title) {
-      params = params.set('title', request.filters.title);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
-
     if (request.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
     }

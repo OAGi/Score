@@ -103,33 +103,95 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="value">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Code</th>
+            <ng-container matColumnDef="state">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
               <td mat-cell *matCellDef="let element">
-                <span class="{{ color(element) }}">{{ element.value }}</span>
+                <span class="bie-state {{ element.state }}">{{ element.state }}</span>
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="meaning">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Meaning</th>
-              <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="deprecated">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Deprecated</th>
-              <td mat-cell *matCellDef="let element">
-                <mat-icon *ngIf="element.deprecated">done</mat-icon>
+            <ng-container matColumnDef="den">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+              <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+                <div class="den word-break-all">
+                  <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                     matTooltip="{{ element.den }}">
+                    <span>{{ element.den }}</span>
+                  </a>
+                </div>
+                <div class="description">{{ element.guid }}</div>
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="definition">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
-              <td mat-cell *matCellDef="let element"> {{ element.definition }}</td>
+            <ng-container matColumnDef="owner">
+              <th mat-header-cell *matHeaderCellDef> Owner</th>
+              <td mat-cell *matCellDef="let element">
+                <span [matTooltip]="element.owner">{{ element.owner }}</span>
+              </td>
             </ng-container>
 
-            <ng-container matColumnDef="definitionSource">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition Source</th>
-              <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
+            <ng-container matColumnDef="version">
+              <th mat-header-cell *matHeaderCellDef> Version</th>
+              <td mat-cell *matCellDef="let element">
+                <div [matTooltip]="element.version">{{ element.version }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="verb">
+              <th mat-header-cell *matHeaderCellDef> Verb</th>
+              <td mat-cell *matCellDef="let element">
+                <div [matTooltip]="element.verb">{{ element.verb }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="arrayIndicator">
+              <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
+              <td mat-cell *matCellDef="let element">
+                <div [matTooltip]="element.arrayIndicator">{{ element.arrayIndicator }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="suppressRoot">
+              <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
+              <td mat-cell *matCellDef="let element">
+                <div>{{ element.suprressRoot }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="messageBody">
+              <th mat-header-cell *matHeaderCellDef> Message Body</th>
+              <td mat-cell *matCellDef="let element">
+                <div>{{ element.messageBody }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="resourceName">
+              <th mat-header-cell *matHeaderCellDef> Resource Name</th>
+              <td mat-cell *matCellDef="let element">
+                <div>{{ element.resourceName }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="operationId">
+              <th mat-header-cell *matHeaderCellDef> Operation Id</th>
+              <td mat-cell *matCellDef="let element">
+                <div>{{ element.operationId }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tagName">
+              <th mat-header-cell *matHeaderCellDef> Tag Name</th>
+              <td mat-cell *matCellDef="let element">
+                <div>{{ element.tagName }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastUpdateTimestamp">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+              </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
