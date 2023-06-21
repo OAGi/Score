@@ -23,6 +23,11 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     }
 
     @Override
+    public List<AppUserObject> getAppUsers() {
+        return dslContext.selectFrom(APP_USER).fetch(record -> mapper(record));
+    }
+
+    @Override
     public AppUserObject getAppUserByLoginID(String loginID) {
         AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.LOGIN_ID.eq(loginID))
