@@ -3,11 +3,19 @@ package org.oagi.score.e2e.api;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * APIs for the account management.
  */
 public interface AppUserAPI {
+
+    /**
+     * Return all account objects.
+     *
+     * @return all account objects
+     */
+    List<AppUserObject> getAppUsers();
 
     /**
      * Return the account object associated with the given login ID.
