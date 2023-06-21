@@ -132,6 +132,7 @@ export class BieForOasDocListRequest {
     den: string;
   };
   access: string;
+  states: string[] = [];
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
@@ -164,6 +165,7 @@ export class BieForOasDocListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
     this.access = params.get('access') || '';
+    this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
@@ -184,6 +186,9 @@ export class BieForOasDocListRequest {
 
     if (this.access && this.access.length > 0) {
       params = params.set('access', '' + this.access);
+    }
+    if (this.states && this.states.length > 0) {
+      params = params.set('states', this.states.join(','));
     }
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));

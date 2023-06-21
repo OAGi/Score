@@ -16,13 +16,11 @@ import {AccountListService} from '../../../../account-management/domain/account-
 import {AuthService} from '../../../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {PageRequest, PageResponse} from '../../../../basis/basis';
 import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../../common/utility';
 import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {B} from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'score-oas-doc-bie-list',

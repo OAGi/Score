@@ -63,6 +63,9 @@
   "OAS_DOC_CREATE":{
     "TITLE": "Create OpenAPI Doc"
   },
+  "OAS_DOC_ASSIGN":{
+    "TITLE": "Add BIE for OpenAPI Doc"
+  },
   "OAS_DOC_BIE_LIST":{
     "TITLE": "Bie List for Open API Doc"
   },
