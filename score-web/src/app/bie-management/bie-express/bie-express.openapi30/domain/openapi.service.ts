@@ -18,15 +18,6 @@ export class OpenAPIService {
     if (request.filters.title) {
       params = params.set('title', request.filters.title);
     }
-    if (request.filters.openAPIVersion) {
-      params = params.set('openAPIVersion', request.filters.openAPIVersion);
-    }
-    if (request.filters.version) {
-      params = params.set('version', request.filters.version);
-    }
-    if (request.filters.licenseName) {
-      params = params.set('licenseName', request.filters.licenseName);
-    }
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
@@ -115,14 +106,8 @@ export class OpenAPIService {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
-    if (request.filters.propertyTerm) {
-      params = params.set('propertyTerm', request.filters.propertyTerm);
-    }
     if (request.filters.bizCtxName) {
       params = params.set('bizCtxName', request.filters.bizCtxName);
-    }
-    if (request.filters.topLevelAsbiepId) {
-      params = params.set('topLevelAsbiepId', request.filters.topLevelAsbiepId.toString());
     }
     if (request.filters.den) {
       params = params.set('den', request.filters.den);

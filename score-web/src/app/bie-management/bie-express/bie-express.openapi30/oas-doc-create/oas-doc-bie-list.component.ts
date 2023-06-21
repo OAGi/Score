@@ -31,7 +31,7 @@ import {B} from '@angular/cdk/keycodes';
 })
 export class OasDocBieListComponent implements OnInit {
   subtitle = 'Select BIEs';
-  bieForOasDoc: BieForOasDoc;
+  oasDoc: OasDoc;
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
   releaseId: number;
@@ -70,7 +70,7 @@ export class OasDocBieListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bieForOasDoc = new BieForOasDoc();
+    this.oasDoc = new OasDoc();
     const oasDocId = this.route.snapshot.params.id;
 
     forkJoin(
