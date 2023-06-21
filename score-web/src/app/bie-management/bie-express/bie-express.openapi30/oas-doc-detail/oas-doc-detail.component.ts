@@ -11,13 +11,16 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {forkJoin} from 'rxjs';
-import { hashCode } from 'src/app/common/utility';
+import {hashCode} from 'src/app/common/utility';
+import {v4 as uuid} from 'uuid';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {WorkingRelease} from '../../../../release-management/domain/release';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -57,7 +60,9 @@ export class OasDocDetailComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService) { }
+              private confirmDialogService: ConfirmDialogService,
+              private dialog: MatDialog) {
+  }
 
   ngOnInit(): void {
     this.oasDoc = new OasDoc();
@@ -92,7 +97,8 @@ export class OasDocDetailComponent implements OnInit {
         this.isUpdating = false;
       });
   }
-  init(oasDoc: OasDoc){
+
+  init(oasDoc: OasDoc) {
     this.hashCode = hashCode(oasDoc);
     this.oasDoc = oasDoc;
     this.isUpdating = false;
@@ -161,8 +167,9 @@ export class OasDocDetailComponent implements OnInit {
     this.bizCtxSearch = '';
     this.applyFilter(this.bizCtxSearch);
   }
-  get access(): string{
-    if (this.oasDoc){
+
+  get access(): string {
+    if (this.oasDoc) {
       return this.oasDoc.access;
     }
     return '';
@@ -205,7 +212,8 @@ export class OasDocDetailComponent implements OnInit {
       'Another Open API Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'
     ];
 
-    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {
+    });
   }
 
   openDialogOasDocUpdateIgnore() {
@@ -255,6 +263,107 @@ export class OasDocDetailComponent implements OnInit {
     this.router.navigateByUrl('/profile_bie/express/oas_doc/' + this.oasDoc.oasDocId + '/bie_list');
   }
 
+  openDialog(bieForOasDoc?: BieForOasDoc) {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.data = {};
+    dialogConfig.data.bieForOasDoc = new BieForOasDoc();
+    // Default indicator values
+    dialogConfig.data.isEditable = this.isEditable();
+
+    const isAddAction: boolean = (bieForOasDoc === undefined);
+
+    this.isUpdating = true;
+    const dialogRef = this.dialog.open(OasDocAssignDialogComponent, dialogConfig);
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.isUpdating = false;
+    })).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      const data = this.dataSource.data;
+      if (isAddAction) {
+        for (const bieAdded of data) {
+          if (bieAdded.propertyTerm === result.propertyTerm) {
+            this.snackBar.open(result.propertyTerm + ' already exist', '', {
+              duration: 3000,
+            });
+
+            return;
+          }
+        }
+
+        result.guid = uuid();
+        data.push(result);
+
+        this._updateDataSource(data);
+      } else {
+        for (const bieAdded of data) {
+          if (bieAdded.guid !== result.guid && bieAdded.propertyTerm === result.propertyTerm) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 3000,
+            });
+            return;
+          }
+        }
+
+        this._updateDataSource(data.map(row => {
+          if (row.guid === result.guid) {
+            return result;
+          } else {
+            return row;
+          }
+        }));
+      }
+    });
+  }
+
+  _updateDataSource(data: BieForOasDoc[]) {
+    this.dataSource.data = data;
+    this.oasDoc.bieList = data;
+  }
+
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.filter(row => this.isAvailable(row)).length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.data.forEach(row => this.select(row));
+  }
+
+  select(row: BieForOasDoc) {
+    if (this.isAvailable(row)) {
+      this.selection.select(row);
+    }
+  }
+
+  isAvailable(bieForOasDoc: BieForOasDoc) {
+    return this.oasDoc.bieList != null;
+  }
+
+  toggle(row: BieForOasDoc) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BieForOasDoc) {
+    return this.selection.isSelected(row);
+  }
+
+  isEditable(): boolean {
+    return this.access === 'CanEdit';
+  }
+
   isDirty(): boolean {
     return !!this.oasDoc.oasDocId
       || this.oasDoc.title && this.oasDoc.title.length > 0
@@ -266,5 +375,26 @@ export class OasDocDetailComponent implements OnInit {
       return this.oasDoc.releaseId === this.workingRelease.releaseId;
     }
     return false;
+  }
+  removeBieForOasDoc() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove selected BIE from the OpenAPI Doc?';
+    dialogConfig.data.content = ['Are you sure you want to remove the selected BIE?'];
+    dialogConfig.data.action = 'Remove';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 }

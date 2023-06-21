@@ -49,9 +49,8 @@
   <mat-card>
     <mat-card-header class="align-items-baseline">
       <mat-card-title>Bie List</mat-card-title>
-      <div style="padding: 8px 0 8px 12px;" *ngIf="access === 'CanEdit'">
-        <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary"
-                [disabled]="access !== 'CanEdit' || isDisabled(oasDoc)">
+      <div style="padding: 8px 0 8px 12px;">
+        <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary">
           <mat-icon>add</mat-icon>
           Add
         </button>
