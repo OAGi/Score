@@ -119,10 +119,10 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
         BieForOasDoc bieForOasDoc = null;
 
-        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
-        if (topLevelAsbiepId != null) {
+        BigInteger oasDocId = request.getOasDocId();
+        if (oasDocId != null) {
             bieForOasDoc = (BieForOasDoc) select()
-                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                    .where(OAS_DOC.OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
                     .fetchOne(mapper());
         }
 
