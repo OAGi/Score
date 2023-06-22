@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {BieList, BieListRequest} from '../../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {SimpleRelease} from '../../../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
@@ -18,6 +17,8 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
+import {BieForOasDoc, BieForOasDocListRequest} from '../domain/openapi-doc';
+import {OpenAPIService} from '../domain/openapi.service';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -33,7 +34,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
     'lastUpdateTimestamp'
   ];
-  dataSource = new MatTableDataSource<BieList>();
+  dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
   loading = false;
@@ -55,11 +56,12 @@ export class OasDocAssignDialogComponent implements OnInit {
   selectedSuppressRootIndicator: string;
   messageBodyList: string[] = ['requestBody', 'responseBody'];
   selectedMessageBody: string;
-  request: BieListRequest;
+  request: BieForOasDocListRequest;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private bieListService: BieListService,
+              private openAPIService: OpenAPIService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
               private auth: AuthService,
@@ -72,7 +74,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   ngOnInit(): void {
 
     // Init BIE table
-    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
+    this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
     this.request.excludePropertyTerms = ['Meta Header', 'Pagination Response'];
@@ -85,7 +87,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.loadBieForOasDocList();
     });
 
     forkJoin([
@@ -109,28 +111,28 @@ export class OasDocAssignDialogComponent implements OnInit {
         this.request.release = this.releases[0];
       }
 
-      this.loadBieList(true);
+      this.loadBieForOasDocList(true);
     });
   }
 
-  loadBieList(isInit?: boolean) {
+  loadBieForOasDocList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.bieListService.getBieListWithRequest(this.request).pipe(
+    this.openAPIService.getBieForOasDocListWithRequest(this.request).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieList) => {
+      this.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
-      this.dataSource.data.forEach((elm: BieList) => {
+      this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
       });
 
@@ -144,7 +146,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.loadBieList();
+    this.loadBieForOasDocList();
   }
 
   onChange(property?: string, source?) {
@@ -175,11 +177,11 @@ export class OasDocAssignDialogComponent implements OnInit {
     }
   }
 
-  select(row: BieList) {
+  select(row: BieForOasDoc) {
     this.selection.select(row.topLevelAsbiepId);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieForOasDoc) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.topLevelAsbiepId);
     } else {
@@ -187,7 +189,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieForOasDoc) {
     return this.selection.isSelected(row.topLevelAsbiepId);
   }
 

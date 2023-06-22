@@ -96,29 +96,17 @@ export class OpenAPIService {
     });
   }
 
-  getBieListForOasDoc(request: BieForOasDocListRequest): Observable<PageResponse<BieForOasDoc>> {
+  getBieForOasDocListWithRequest(request: BieForOasDocListRequest): Observable<PageResponse<BieForOasDoc>>{
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
-    if (request.filters.bizCtxName) {
-      params = params.set('bizCtxName', request.filters.bizCtxName);
-    }
-    if (request.filters.den) {
-      params = params.set('den', request.filters.den);
-    }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId.toString());
-    }
     if (request.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
     }
     if (request.updaterLoginIds.length > 0) {
       params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
-    }
-    if (request.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
     }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
@@ -126,7 +114,33 @@ export class OpenAPIService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
+    if (request.filters.den) {
+      params = params.set('den', request.filters.den);
+    }
+    if (request.filters.propertyTerm) {
+      params = params.set('propertyTerm', request.filters.propertyTerm);
+    }
+    if (request.filters.businessContext) {
+      params = params.set('businessContext', request.filters.businessContext);
+    }
+    if (request.states.length > 0) {
+      params = params.set('states', request.states.join(','));
+    }
+    if (request.access) {
+      params = params.set('access', request.access);
+    }
+    if (request.excludePropertyTerms.length > 0) {
+      params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
+    }
+    if (request.excludeTopLevelAsbiepIds.length > 0) {
+      params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
+    }
+    if (request.release) {
+      params = params.set('releaseId', request.release.releaseId.toString());
+    }
+    if (request.ownedByDeveloper !== undefined) {
+      params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
+    }
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/bie_list', {params});
   }
-
 }

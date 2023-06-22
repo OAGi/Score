@@ -132,6 +132,8 @@ export class BieForOasDocListRequest {
     businessContext: string;
     den: string;
   };
+  excludePropertyTerms: string[] = [];
+  excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
   updaterUsernameList: string[] = [];
@@ -165,6 +167,8 @@ export class BieForOasDocListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
+    this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
+    this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
@@ -189,6 +193,12 @@ export class BieForOasDocListRequest {
       .set('pageSize', '' + this.page.pageSize);
     if (this.release) {
       params = params.set('releaseId', this.release.releaseId.toString());
+    }
+    if (this.excludePropertyTerms && this.excludePropertyTerms.length > 0) {
+      params = params.set('excludePropertyTerms', this.excludePropertyTerms.join(','));
+    }
+    if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
+      params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));
     }
     if (this.access && this.access.length > 0) {
       params = params.set('access', '' + this.access);
