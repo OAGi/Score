@@ -15,7 +15,7 @@
                 <mat-label>Branch</mat-label>
                 <mat-select [(ngModel)]="request.release"
                             (ngModelChange)="onChange('branch', request.release);
-                                            this.paginator.pageIndex = 0; this.selection.clear();this.loadBieList();">
+                                            this.paginator.pageIndex = 0; this.selection.clear();this.loadBieForOasDocList();">
                   <mat-select-trigger class="d-flex">
                     <span>{{ request.release.releaseNum }}</span>
                     <span class="f12 ml-auto {{ request.release.state }}">
@@ -87,7 +87,7 @@
                 <mat-form-field>
                   <input matInput [(ngModel)]="request.filters.den"
                          (ngModelChange)="onChange('filters.den', request.filters.den)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieForOasDocList();"
                          placeholder="DEN">
                 </mat-form-field>
               </div>
@@ -95,7 +95,7 @@
                 <mat-form-field>
                   <input matInput [(ngModel)]="request.filters.businessContext"
                          (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList(); "
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieForOasDocList(); "
                          placeholder="Business Context">
                 </mat-form-field>
               </div>
@@ -138,7 +138,7 @@
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
+                (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieForOasDocList();">
           <mat-icon>search</mat-icon>
           Search
         </button>

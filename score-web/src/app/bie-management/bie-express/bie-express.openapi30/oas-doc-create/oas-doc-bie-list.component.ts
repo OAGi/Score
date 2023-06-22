@@ -185,7 +185,7 @@ export class OasDocBieListComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.openAPIService.getBieListForOasDoc(this.request).pipe(
+    this.openAPIService.getBieForOasDocListWithRequest(this.request).pipe(
       finalize(() => {
         this.loading = false;
       })
