@@ -49,10 +49,12 @@ export class OasDocAssignDialogComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   verbs: string[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
   selectedVerb: string;
-  arrayIndicator: string[] = ['TRUE', 'FALSE'];
+  arrayIndicators: string[] = ['TRUE', 'FALSE'];
   selectedArrayIndicator: string;
-  suppressRootIndicator: string[] = ['TRUE', 'FALSE'];
-  messageBodys: string[] = ['requestBody', 'responseBody'];
+  suppressRootIndicators: string[] = ['TRUE', 'FALSE'];
+  selectedSuppressRootIndicator: string;
+  messageBodyList: string[] = ['requestBody', 'responseBody'];
+  selectedMessageBody: string;
   request: BieListRequest;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -142,6 +144,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
+    this.loadBieList();
   }
 
   onChange(property?: string, source?) {

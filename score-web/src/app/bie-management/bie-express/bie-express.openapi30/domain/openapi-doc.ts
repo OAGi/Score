@@ -128,7 +128,8 @@ export interface simpleOasDoc {
 export class BieForOasDocListRequest {
   release: SimpleRelease;
   filters: {
-    bizCtxName: string;
+    propertyTerm: string;
+    businessContext: string;
     den: string;
   };
   access: string;
@@ -141,7 +142,7 @@ export class BieForOasDocListRequest {
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   page: PageRequest = new PageRequest();
-
+  ownedByDeveloper: boolean = undefined;
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
@@ -166,14 +167,17 @@ export class BieForOasDocListRequest {
     }
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
+    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
-      bizCtxName: params.get('bizCtxname') || '',
-      den: params.get('den') || '',
+      propertyTerm: params.get('propertyTerm') || '',
+      businessContext: params.get('businessContext') || '',
+      den: params.get('den') || ''
     };
   }
 
@@ -183,12 +187,20 @@ export class BieForOasDocListRequest {
       .set('sortDirection', this.page.sortDirection)
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
-
+    if (this.release) {
+      params = params.set('releaseId', this.release.releaseId.toString());
+    }
     if (this.access && this.access.length > 0) {
       params = params.set('access', '' + this.access);
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
+      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    }
+    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
+      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
     }
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
@@ -199,8 +211,11 @@ export class BieForOasDocListRequest {
     if (this.updatedDate.end) {
       params = params.set('updateEnd', '' + this.updatedDate.end.getTime());
     }
-    if (this.filters.bizCtxName && this.filters.bizCtxName.length > 0) {
-      params = params.set('businessContext', '' + this.filters.bizCtxName);
+    if (this.filters.propertyTerm && this.filters.propertyTerm.length > 0) {
+      params = params.set('propertyTerm', '' + this.filters.propertyTerm);
+    }
+    if (this.filters.businessContext && this.filters.businessContext.length > 0) {
+      params = params.set('businessContext', '' + this.filters.businessContext);
     }
     if (this.filters.den && this.filters.den.length > 0) {
       params = params.set('den', '' + this.filters.den);
@@ -218,9 +233,11 @@ export class BieForOasDocListRequest {
 export class BieForOasDoc {
   oasDocId: number;
   topLevelAsbiepId: number;
+  den: string;
   propertyTerm: string;
   guid: string;
-  releaseId: number;
+  bizCtxId: number;
+  bizCtxName: string;
   access: string;
   releaseNum: string;
   owner: string;
