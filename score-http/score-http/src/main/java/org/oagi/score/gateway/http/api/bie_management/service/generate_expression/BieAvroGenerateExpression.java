@@ -7,6 +7,7 @@ import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateEx
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Utility;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.oagi.score.service.common.data.BCCEntityType;
 import org.slf4j.Logger;
@@ -24,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -113,6 +113,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         root.setNamespace(namespace);
         root.setType("record");
         root.setName(name);
+        root.setDocumentation(asbiep.getDefinition());
 
         fillProperties(root, abie, generationContext);
     }
@@ -182,6 +183,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
         avroObj.setType(type);
         avroObj.setName(name);
+        avroObj.setDocumentation(bbie.getDefinition());
         avroObj.setArray(isArray);
         avroObj.setNullable(isNillable || minVal == 0);
     }
@@ -234,6 +236,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
         AvroObject avroObj = new AvroObject(parent);
         avroObj.setName(name);
+        avroObj.setDocumentation(bbieSc.getDefinition());
         avroObj.setType(type);
         avroObj.setNullable(minVal == 0);
     }
@@ -281,6 +284,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
         avroObj.setType(type);
         avroObj.setName(name);
+        avroObj.setDocumentation(asbie.getDefinition());
         avroObj.setArray(isArray);
         avroObj.setNullable(isNillable || minVal == 0);
     }
@@ -367,6 +371,8 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
         private String namespace;
 
+        private String documentation;
+
         private boolean array;
 
         private boolean nullable;
@@ -428,6 +434,14 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
             this.namespace = namespace;
         }
 
+        public String getDocumentation() {
+            return documentation;
+        }
+
+        public void setDocumentation(String documentation) {
+            this.documentation = documentation;
+        }
+
         public boolean isArray() {
             return array;
         }
@@ -470,6 +484,9 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
                 properties.put("name", getRecordName());
             } else {
                 properties.put("name", getName());
+            }
+            if (option.isBieDefinition() && StringUtils.hasLength(getDocumentation())) {
+                properties.put("doc", getDocumentation());
             }
             if (isRecord && !getChildren().isEmpty()) {
                 properties.put("fields", getChildren().stream()
