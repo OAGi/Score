@@ -8,6 +8,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {CcList, CcListRequest} from '../cc-list/domain/cc-list';
 import {ExtensionDetailComponent} from '../extension-detail/extension-detail.component';
 import {RefactorDialogService} from './domain/refactor-dialog.service';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -46,6 +47,8 @@ export class RefactorDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
               private service: RefactorDialogService,
               private accountService: AccountListService,
+              private router: Router,
+              private route: ActivatedRoute,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }

@@ -145,6 +145,7 @@ export class BieForOasDocListRequest {
   updaterLoginIds: string[] = [];
   page: PageRequest = new PageRequest();
   ownedByDeveloper: boolean = undefined;
+
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
@@ -167,6 +168,8 @@ export class BieForOasDocListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
+    this.release = new SimpleRelease();
+    this.release.releaseId = Number(params.get('releaseId') || 0);
     this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access') || '';

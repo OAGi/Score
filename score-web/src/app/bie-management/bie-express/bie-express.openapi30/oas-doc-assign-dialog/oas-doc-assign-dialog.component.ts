@@ -1,14 +1,13 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {SimpleRelease} from '../../../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {BieListService} from '../../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {ReleaseService} from '../../../../release-management/domain/release.service';
 import {AuthService} from '../../../../authentication/auth.service';
-import {MatDialog} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -17,7 +16,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
-import {BieForOasDoc, BieForOasDocListRequest} from '../domain/openapi-doc';
+import {BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 
 @Component({
@@ -32,13 +31,13 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
     'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
-    'lastUpdateTimestamp'
+    'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
   loading = false;
-
+  oasDoc: OasDoc;
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
@@ -60,25 +59,26 @@ export class OasDocAssignDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-  constructor(private bieListService: BieListService,
-              private openAPIService: OpenAPIService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
+  constructor(
+    private openAPIService: OpenAPIService,
+    private accountService: AccountListService,
+    private releaseService: ReleaseService,
+    private auth: AuthService,
+    private dialog: MatDialog,
+    private location: Location,
+    private router: Router,
+    private route: ActivatedRoute,
+    public dialogRef: MatDialogRef<OasDocAssignDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
   }
 
   ngOnInit(): void {
-
-    // Init BIE table
+    this.oasDoc = this.data.oasDoc;
+    // Init BIE list table for OasDoc
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
-    this.request.excludePropertyTerms = ['Meta Header', 'Pagination Response'];
-
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
@@ -122,7 +122,7 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.openAPIService.getBieForOasDocListWithRequest(this.request).pipe(
+    this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
       finalize(() => {
         this.loading = false;
       })
@@ -135,7 +135,6 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
       });
-
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
@@ -194,5 +193,9 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   createBieForOasDoc() {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
   }
 }

@@ -96,7 +96,7 @@ export class OpenAPIService {
     });
   }
 
-  getBieForOasDocListWithRequest(request: BieForOasDocListRequest): Observable<PageResponse<BieForOasDoc>>{
+  getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>>{
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -141,6 +141,6 @@ export class OpenAPIService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
-    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/bie_list', {params});
+    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list', {params});
   }
 }

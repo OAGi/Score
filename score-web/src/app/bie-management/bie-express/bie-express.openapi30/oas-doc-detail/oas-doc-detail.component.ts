@@ -111,7 +111,7 @@ export class OasDocDetailComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.openAPIService.getBieForOasDocListWithRequest(this.request).pipe(
+    this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
       finalize(() => {
         this.loading = false;
       })

@@ -157,9 +157,17 @@
 
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef></th>
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="$event ? masterToggle() : null"
+                            *ngIf="access === 'CanEdit'"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()"
+                            *ngIf="access === 'CanEdit'"
+                            [disabled]="!isAvailable(row) || isRevisionValue(row)"
                             (change)="$event ? toggle(row) : null"
                             [checked]="isSelected(row)">
               </mat-checkbox>
@@ -193,19 +201,6 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="businessContexts">
-            <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="businessContextSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
-                <mat-option *ngFor="let businessContext of element.businessContexts" [value]="businessContext">
-                  <span>
-                    {{ businessContext.name }}
-                  </span>
-                </mat-option>
-              </mat-select>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
             <td mat-cell *matCellDef="let element">
@@ -215,51 +210,50 @@
 
           <ng-container matColumnDef="verb">
             <th mat-header-cell *matHeaderCellDef> Verb</th>
-            <td mat-cell>
-              <div><mat-select [(ngModel)]="selectedVerb" multiple>
-                <mat-option *ngFor="let verb of verbs" [value]="verb">
-                  {{verb}}
-                </mat-option>
-              </mat-select></div>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.verb">{{ element.verb }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="arrayIndicator">
             <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
-            <td mat-cell>
-              <div>
-                <mat-select [(ngModel)]="selectedArrayIndicator" multiple>
-                  <mat-option *ngFor="let arrayIndicator of arrayIndicators" [value]="arrayIndicator">
-                    {{arrayIndicator}}
-                  </mat-option>
-                </mat-select>
-              </div>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.arrayIndicator">{{ element.arrayIndicator }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="suppressRoot">
             <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
-            <td mat-cell>
-              <div>
-                <mat-select [(ngModel)]="selectedSuppressRootIndicator" multiple>
-                  <mat-option *ngFor="let suppressRootIndicator of suppressRootIndicators" [value]="suppressRootIndicator">
-                    {{suppressRootIndicator}}
-                  </mat-option>
-                </mat-select>
-              </div>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.suprressRoot }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="messageBody">
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
-            <td mat-cell>
-              <div>
-                <mat-select [(ngModel)]="selectedMessageBody" multiple>
-                  <mat-option *ngFor="let messageBody of messageBodyList" [value]="messageBody">
-                    {{messageBody}}
-                  </mat-option>
-                </mat-select>
-              </div>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.messageBody }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="resourceName">
+            <th mat-header-cell *matHeaderCellDef> Resource Name</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.resourceName }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="operationId">
+            <th mat-header-cell *matHeaderCellDef> Operation Id</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.operationId }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tagName">
+            <th mat-header-cell *matHeaderCellDef> Tag Name</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.tagName }}</div>
             </td>
           </ng-container>
 
@@ -290,6 +284,11 @@
       Add
     </button>
   </div>
+
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+      Close
+    </button>
 </div>
 
 
