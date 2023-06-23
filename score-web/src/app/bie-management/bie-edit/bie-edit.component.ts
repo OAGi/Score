@@ -1766,9 +1766,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
     });
 
-    if (request.length > 10) {
-      this.loading = true;
-    }
+    this.loading = true;
     this.isUpdating = true;
 
     if (this.rootNode.isChanged) {
