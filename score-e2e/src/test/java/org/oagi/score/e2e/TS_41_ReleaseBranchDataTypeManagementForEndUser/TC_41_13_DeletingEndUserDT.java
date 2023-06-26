@@ -14,7 +14,9 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +73,56 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
             viewEditCoreComponentPage.setDEN(dt.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+    }
+    @Test
+    @DisplayName("TC_41_13_TA_2")
+    public void test_TA_2() {
+        AppUserObject endUserA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        ArrayList<DTObject> derivedBDTs = new ArrayList<>();
+        DTObject baseCDT;
+        {
+            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUserA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespace, "WIP");
+            dtForTesting.add(randomBDT);
+
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, endUserA, namespace, "WIP");
+            derivedBDTs.add(derivedBDTLevelOne);
+        }
+
+        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.hitDeleteButton();
+
+            for (DTObject derivedDT : derivedBDTs){
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+                WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());
+                assertTrue(node.isDisplayed());
+                assertEquals("Invalid state", dtViewEditPage.getInvalidStateIconText(node));
+            }
+
+            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.hitRestoreButton();
+
+            for (DTObject derivedDT : derivedBDTs){
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+                WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());
+                assertTrue(node.isDisplayed());
+                assertThrows(NoSuchElementException.class, () -> dtViewEditPage.getInvalidStateIconText(node));
+            }
         }
     }
 

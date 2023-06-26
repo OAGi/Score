@@ -322,6 +322,8 @@ public interface DTViewEditPage extends Page {
 
     void moveToProduction();
 
+    String getInvalidStateIconText(WebElement node);
+
     interface SupplementaryComponentPanel {
         void setCardinality(String cardinality);
 

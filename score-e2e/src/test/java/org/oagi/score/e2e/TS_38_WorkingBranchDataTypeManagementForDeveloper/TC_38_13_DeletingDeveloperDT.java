@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
@@ -15,7 +14,9 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,58 @@ public class TC_38_13_DeletingDeveloperDT extends BaseTest {
             viewEditCoreComponentPage.setDEN(dt.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+        }
+    }
+
+    @Test
+    @DisplayName("TC_38_13_TA_2")
+    public void test_TA_2() {
+        AppUserObject developerA;
+        ReleaseObject branch;
+        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        ArrayList<DTObject> derivedBDTs = new ArrayList<>();
+        DTObject baseCDT;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            dtForTesting.add(randomBDT);
+
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, developerA, namespace, "WIP");
+            derivedBDTs.add(derivedBDTLevelOne);
+        }
+
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (DTObject dt : dtForTesting) {
+            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.hitDeleteButton();
+
+            for (DTObject derivedDT : derivedBDTs){
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+                WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());
+                assertTrue(node.isDisplayed());
+                assertEquals("Invalid state", dtViewEditPage.getInvalidStateIconText(node));
+            }
+
+            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            dtViewEditPage.hitRestoreButton();
+
+            for (DTObject derivedDT : derivedBDTs){
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+                WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());
+                assertTrue(node.isDisplayed());
+                assertThrows(NoSuchElementException.class, () -> dtViewEditPage.getInvalidStateIconText(node));
+            }
+
         }
     }
 

@@ -10,6 +10,7 @@ import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -760,6 +761,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public String getInvalidStateIconText(WebElement node) {
+        WebElement element = node.findElement(By.xpath("//mat-icon[contains(text(), \"error\")]"));
+        return element.getAttribute("mattooltip").toString();
     }
 
     @Override
