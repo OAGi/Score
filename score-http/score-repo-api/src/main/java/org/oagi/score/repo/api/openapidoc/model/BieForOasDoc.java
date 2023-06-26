@@ -12,7 +12,7 @@ public class BieForOasDoc extends Auditable {
     private BigInteger oasDocId;
     private String propertyTerm;
     private String guid;
-    private String owner;
+    private ScoreUser owner;
     private String version;
     private String status;
     private String state;
@@ -70,11 +70,11 @@ public class BieForOasDoc extends Auditable {
         this.guid = guid;
     }
 
-    public String getOwner() {
+    public ScoreUser getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(ScoreUser owner) {
         this.owner = owner;
     }
 
@@ -198,8 +198,9 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId, String propertyTerm, String guid, String owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, ScoreUser owner, String version, String status, String state, String verb, boolean arrayIndicator, boolean suppressRoot, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
+        this.releaseId = releaseId;
         this.oasDocId = oasDocId;
         this.propertyTerm = propertyTerm;
         this.guid = guid;
@@ -222,12 +223,13 @@ public class BieForOasDoc extends Auditable {
 
     @Override
     public String toString() {
-        return "BieListForOasDoc{" +
+        return "BieForOasDoc{" +
                 "topLevelAsbiepId=" + topLevelAsbiepId +
+                ", releaseId=" + releaseId +
                 ", oasDocId=" + oasDocId +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", guid='" + guid + '\'' +
-                ", owner='" + owner + '\'' +
+                ", owner=" + owner +
                 ", version='" + version + '\'' +
                 ", status='" + status + '\'' +
                 ", state='" + state + '\'' +

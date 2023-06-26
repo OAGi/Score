@@ -127,6 +127,21 @@ public class OpenAPIDocController {
         }
     }
 
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public BieForOasDoc getBieForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @PathVariable("id") BigInteger oasDocId) {
+
+        GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
+
+        request.setOasDocId(oasDocId);
+
+        GetBieForOasDocResponse response = oasDocService.getBieForOasDoc(request);
+
+        return response.getBieForOasDoc();
+    }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public OasDoc getOasDoc(
@@ -187,20 +202,6 @@ public class OpenAPIDocController {
         }
     }
 
-    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieForOasDoc getBieForOasDoc(
-            @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @PathVariable("id") BigInteger oasDocId) {
-
-        GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
-
-        request.setOasDocId(oasDocId);
-
-        GetBieForOasDocResponse response = oasDocService.getBieForOasDoc(request);
-
-        return response.getBieForOasDoc();
-    }
 
 
 }
