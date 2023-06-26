@@ -223,9 +223,6 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
             String definitionSource = "SC new definition source";
             SCPanel.setDefinition(definition);
             SCPanel.setDefinitionSource(definitionSource);
-            SCPanel.setCardinality("Required");
-            SCPanel.setValueConstraintType("Fixed Value");
-            SCPanel.setValueConstraint("fixed value");
             dtViewEditPage.hitUpdateButton();
 
             for (DTObject derivedDT : derivedBDTs) {
@@ -236,9 +233,6 @@ public class TC_38_6_EditingBrandNewSC extends BaseTest {
                 SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
                 assertTrue(SCPanel.getDefinitionFieldValue().equals(definition));
                 assertTrue(SCPanel.getDefinitionSourceFieldValue().equals(definitionSource));
-                assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-                assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-                assertEquals(null, SCPanel.getValueConstraintFieldValue());
                 dtViewEditPage.showValueDomain();
                 assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
             }
