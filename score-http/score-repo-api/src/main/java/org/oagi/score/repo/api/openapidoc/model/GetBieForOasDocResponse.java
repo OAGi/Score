@@ -1,15 +1,12 @@
 package org.oagi.score.repo.api.openapidoc.model;
 
-import org.oagi.score.repo.api.base.Response;
+import org.oagi.score.repo.api.base.PaginationResponse;
 
-public class GetBieForOasDocResponse extends Response {
-    private final BieForOasDoc bieForOasDoc;
+import java.util.List;
 
-    public GetBieForOasDocResponse(BieForOasDoc bieForOasDoc) {
-        this.bieForOasDoc = bieForOasDoc;
-    }
+public class GetBieForOasDocResponse extends PaginationResponse<BieForOasDoc> {
 
-    public final BieForOasDoc getBieForOasDoc() {
-        return bieForOasDoc;
+    public GetBieForOasDocResponse(List<BieForOasDoc> results, int page, int size, int length) {
+        super(results, page, size, length);
     }
 }

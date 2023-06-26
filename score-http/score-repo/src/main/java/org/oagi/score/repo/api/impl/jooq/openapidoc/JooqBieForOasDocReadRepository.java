@@ -148,16 +148,15 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
 
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        BieForOasDoc bieForOasDoc = null;
+        List<BieForOasDoc> bieForOasDoc = null;
 
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
-            bieForOasDoc = (BieForOasDoc) select()
+            bieForOasDoc = select()
                     .where(or(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
-                    .fetchOne(mapper());
+                    .fetch(mapper());
         }
-
-        return new GetBieForOasDocResponse(bieForOasDoc);
+        return new GetBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
     }
 
     private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {

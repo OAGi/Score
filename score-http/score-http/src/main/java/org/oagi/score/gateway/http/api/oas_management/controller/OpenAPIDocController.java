@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
+import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -22,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
@@ -131,7 +134,7 @@ public class OpenAPIDocController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieForOasDoc getBieForOasDoc(
+    public PageResponse<BieForOasDoc> getBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger oasDocId) {
 
@@ -139,9 +142,15 @@ public class OpenAPIDocController {
 
         request.setOasDocId(oasDocId);
 
-        GetBieForOasDocResponse response = oasDocService.getBieForOasDoc(request);
+        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
 
-        return response.getBieForOasDoc();
+        PageResponse<BieForOasDoc> pageResponse = new PageResponse<>();
+        pageResponse.setList(bieForOasDocList.getResults());
+        pageResponse.setPage(bieForOasDocList.getPage());
+        pageResponse.setSize(bieForOasDocList.getSize());
+        pageResponse.setLength(bieForOasDocList.getLength());
+
+        return pageResponse;
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.PUT,
