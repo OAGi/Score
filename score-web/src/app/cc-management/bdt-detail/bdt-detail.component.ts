@@ -293,6 +293,19 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
+  isInvalidState(node: CcFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+
+    if (!(node instanceof DtFlatNode) || !node.detail) {
+      return false;
+    }
+
+    const detail = node.detail as CcDtNodeDetail;
+    return detail.basedBdtState === 'Deleted';
+  }
+
   copyLink(node: CcFlatNode, $event?) {
     if ($event) {
       $event.preventDefault();

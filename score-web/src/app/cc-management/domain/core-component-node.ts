@@ -1526,6 +1526,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
   basedBdtId: number;
   basedBdtManifestId: number;
   basedBdtDen: string;
+  basedBdtState: string;
   private _sixDigitId: string;
   private _contentComponentDefinition: string;
   commonlyUsed: boolean;
@@ -1566,6 +1567,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this.basedBdtId = obj.basedBdtId;
     this.basedBdtManifestId = obj.basedBdtManifestId;
     this.basedBdtDen = obj.basedBdtDen;
+    this.basedBdtState = obj.basedBdtState;
     this._sixDigitId = obj.sixDigitId;
     this._contentComponentDefinition = obj.contentComponentDefinition;
     this.commonlyUsed = obj.commonlyUsed;
@@ -1859,6 +1861,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
       basedBdtId: this.basedBdtId,
       basedBdtManifestId: this.basedBdtManifestId,
       basedBdtDen: this.basedBdtDen,
+      basedBdtState: this.basedBdtState,
       sixDigitId: this._sixDigitId,
       contentComponentDefinition: this.contentComponentDefinition,
       commonlyUsed: this.commonlyUsed,
@@ -1876,7 +1879,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
 
   get hashCode(): number {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
-      this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
+      this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState, this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
       this._namespaceId, this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtPriRestriList);
   }
