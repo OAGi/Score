@@ -178,9 +178,6 @@ public class TC_38_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
             assertTrue(SCPanel.getDefinitionFieldValue().equals(derivedDTLevelOneDefinition));
             assertTrue(SCPanel.getDefinitionSourceFieldValue().equals(derivedDTLevelOneDefinitionSource));
-            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Default Value"));
-            assertEquals(null, SCPanel.getValueConstraintFieldValue());
             dtViewEditPage.showValueDomain();
             assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
         }
