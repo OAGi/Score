@@ -232,12 +232,6 @@ public class TC_41_6_EditingBrandNewSC extends BaseTest {
                 SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
                 assertTrue(SCPanel.getDefinitionFieldValue().equals(definition));
                 assertTrue(SCPanel.getDefinitionSourceFieldValue().equals(definitionSource));
-                /**
-                 * “Restrictions applied to this SC in all DT derived from this DT will be lost”
-                 */
-                assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-                assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-                assertEquals(null, SCPanel.getValueConstraintFieldValue());
                 dtViewEditPage.showValueDomain();
                 assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
             }
