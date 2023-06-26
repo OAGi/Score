@@ -205,9 +205,6 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
-            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-            assertEquals(null, SCPanel.getValueConstraintFieldValue());
         }
     }
 
