@@ -22,6 +22,7 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private BigInteger basedBdtId;
     private BigInteger basedBdtManifestId;
     private String basedBdtDen;
+    private String basedBdtState;
     private String contentComponentDefinition;
     private boolean commonlyUsed;
     private boolean deprecated;
