@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function17;
+import org.jooq.Function14;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row17;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -76,24 +76,6 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * request body is required in the request. Defaults to false.
      */
     public final TableField<OasRequestRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Determines if the request body is required in the request. Defaults to false.");
-
-    /**
-     * The column <code>oagi.oas_request.content_media_type_id</code>. REQUIRED.
-     * The reference of the content media type of the request body.
-     */
-    public final TableField<OasRequestRecord, ULong> CONTENT_MEDIA_TYPE_ID = createField(DSL.name("content_media_type_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "REQUIRED. The reference of the content media type of the request body.");
-
-    /**
-     * The column <code>oagi.oas_request.schema_reference</code>. On POST, PUT,
-     * and PATCH, $ref is present.
-     */
-    public final TableField<OasRequestRecord, String> SCHEMA_REFERENCE = createField(DSL.name("schema_reference"), SQLDataType.CLOB.nullable(false), this, "On POST, PUT, and PATCH, $ref is present.");
-
-    /**
-     * The column <code>oagi.oas_request.example</code>. On POST, PUT, and
-     * PATCH, $ref is present.
-     */
-    public final TableField<OasRequestRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB.nullable(false), this, "On POST, PUT, and PATCH, $ref is present.");
 
     /**
      * The column <code>oagi.oas_request.oas_message_body_id</code>.
@@ -202,11 +184,10 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
 
     @Override
     public List<ForeignKey<OasRequestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_REQUEST_OAS_OPERATION_ID_FK, Keys.OAS_REQUEST_CONTENT_MEDIA_TYPE_ID_FK, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_REQUEST_CREATED_BY_FK, Keys.OAS_REQUEST_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_REQUEST_OAS_OPERATION_ID_FK, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_REQUEST_CREATED_BY_FK, Keys.OAS_REQUEST_LAST_UPDATED_BY_FK);
     }
 
     private transient OasOperation _oasOperation;
-    private transient OasMediaType _oasMediaType;
     private transient OasMessageBody _oasMessageBody;
     private transient AppUser _oasRequestCreatedByFk;
     private transient AppUser _oasRequestLastUpdatedByFk;
@@ -219,16 +200,6 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
             _oasOperation = new OasOperation(this, Keys.OAS_REQUEST_OAS_OPERATION_ID_FK);
 
         return _oasOperation;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_media_type</code> table.
-     */
-    public OasMediaType oasMediaType() {
-        if (_oasMediaType == null)
-            _oasMediaType = new OasMediaType(this, Keys.OAS_REQUEST_CONTENT_MEDIA_TYPE_ID_FK);
-
-        return _oasMediaType;
     }
 
     /**
@@ -304,18 +275,18 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<ULong, ULong, String, Byte, ULong, String, String, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row14<ULong, ULong, String, Byte, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function17<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -323,7 +294,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

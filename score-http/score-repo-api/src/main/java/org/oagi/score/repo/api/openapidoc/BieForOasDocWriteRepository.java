@@ -2,11 +2,12 @@ package org.oagi.score.repo.api.openapidoc;
 
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.springframework.security.core.AuthenticatedPrincipal;
 
 public interface BieForOasDocWriteRepository {
 
-    BieForOasDocResponse assignBieForOasDoc(
-            BieForOasDocRequest request) throws ScoreDataAccessException;
+    AddBieForOasDocResponse assignBieForOasDoc(AuthenticatedPrincipal user,
+                                               AddBieForOasDocRequest request) throws ScoreDataAccessException;
 
     //    todo
     UpdateBieForOasDocResponse updateBieForOasDoc(

@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
+import org.jooq.Function6;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.Row6;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -64,12 +64,6 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      * reference of the ASBIEP record.
      */
     public final TableField<OasMessageBodyRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the ASBIEP record.");
-
-    /**
-     * The column <code>oagi.oas_message_body.oas_example_id</code>. A reference
-     * of the example record.
-     */
-    public final TableField<OasMessageBodyRecord, ULong> OAS_EXAMPLE_ID = createField(DSL.name("oas_example_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the example record.");
 
     /**
      * The column <code>oagi.oas_message_body.created_by</code>. The user who
@@ -145,11 +139,10 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
     @Override
     public List<ForeignKey<OasMessageBodyRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_OAS_EXAMPLE_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
     }
 
     private transient TopLevelAsbiep _topLevelAsbiep;
-    private transient OasExample _oasExample;
     private transient AppUser _oasMessageBodyCreatedByFk;
     private transient AppUser _oasMessageBodyLastUpdatedByFk;
 
@@ -162,16 +155,6 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
             _topLevelAsbiep = new TopLevelAsbiep(this, Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK);
 
         return _topLevelAsbiep;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_example</code> table.
-     */
-    public OasExample oasExample() {
-        if (_oasExample == null)
-            _oasExample = new OasExample(this, Keys.OAS_MESSAGE_BODY_OAS_EXAMPLE_ID_FK);
-
-        return _oasExample;
     }
 
     /**
@@ -236,18 +219,18 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row6 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row6<ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row6) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -255,7 +238,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

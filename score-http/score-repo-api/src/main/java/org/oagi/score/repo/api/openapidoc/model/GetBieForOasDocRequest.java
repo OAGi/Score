@@ -7,7 +7,6 @@ import java.math.BigInteger;
 
 public class GetBieForOasDocRequest extends Request {
     private BigInteger oasDocId;
-
     public GetBieForOasDocRequest(ScoreUser requester) {
         super(requester);
         this.oasDocId = oasDocId;

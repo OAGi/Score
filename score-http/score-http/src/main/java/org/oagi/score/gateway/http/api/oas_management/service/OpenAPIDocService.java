@@ -7,6 +7,7 @@ import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,11 @@ public class OpenAPIDocService {
 
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) {
         GetBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDoc(request);
+        return response;
+    }
+
+    public AddBieForOasDocResponse addBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) {
+        AddBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocWriteRepository().assignBieForOasDoc(user, request);
         return response;
     }
 

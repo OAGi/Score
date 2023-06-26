@@ -95,7 +95,7 @@
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
                               *ngIf="access === 'CanEdit'"
-                              [disabled]="!isAvailable(row) || isRevisionValue(row)"
+                              [disabled]="!isAvailable(row)"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>

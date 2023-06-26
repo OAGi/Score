@@ -4,8 +4,8 @@ import org.jooq.DSLContext;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;
-import org.oagi.score.repo.api.openapidoc.OasDocWriteRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.springframework.security.core.AuthenticatedPrincipal;
 
 public class JooqBieForOasDocWriteRepository extends JooqScoreRepository
         implements BieForOasDocWriteRepository {
@@ -14,7 +14,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository
     }
 
     @Override
-    public BieForOasDocResponse assignBieForOasDoc(BieForOasDocRequest request) throws ScoreDataAccessException {
+    public AddBieForOasDocResponse assignBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) throws ScoreDataAccessException {
         return null;
     }
 

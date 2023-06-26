@@ -5,10 +5,10 @@ import org.oagi.score.repo.api.base.Response;
 import java.math.BigInteger;
 import java.util.List;
 
-public class BieForOasDocResponse extends Response {
+public class AddBieForOasDocResponse extends Response {
     private final List<BigInteger> bieForOasDocIdList;
 
-    public BieForOasDocResponse(List<BigInteger> bieForOasDocIdList) {
+    public AddBieForOasDocResponse(List<BigInteger> bieForOasDocIdList) {
         this.bieForOasDocIdList = bieForOasDocIdList;
     }
 

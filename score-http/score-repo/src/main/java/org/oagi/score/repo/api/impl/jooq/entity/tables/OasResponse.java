@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function17;
+import org.jooq.Function14;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row17;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -75,24 +75,6 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * CommonMark syntax MAY be used for rich text representation.
      */
     public final TableField<OasResponseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A brief description of the response body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
-
-    /**
-     * The column <code>oagi.oas_response.content_media_type_id</code>.
-     * REQUIRED. The reference of the content media type of the response body.
-     */
-    public final TableField<OasResponseRecord, ULong> CONTENT_MEDIA_TYPE_ID = createField(DSL.name("content_media_type_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "REQUIRED. The reference of the content media type of the response body.");
-
-    /**
-     * The column <code>oagi.oas_response.schema_reference</code>. On POST, PUT,
-     * and PATCH, $ref is present.
-     */
-    public final TableField<OasResponseRecord, String> SCHEMA_REFERENCE = createField(DSL.name("schema_reference"), SQLDataType.CLOB.nullable(false), this, "On POST, PUT, and PATCH, $ref is present.");
-
-    /**
-     * The column <code>oagi.oas_response.example</code>. On POST, PUT, and
-     * PATCH, $ref is present.
-     */
-    public final TableField<OasResponseRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB.nullable(false), this, "On POST, PUT, and PATCH, $ref is present.");
 
     /**
      * The column <code>oagi.oas_response.oas_message_body_id</code>.
@@ -198,11 +180,10 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
 
     @Override
     public List<ForeignKey<OasResponseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_CONTENT_MEDIA_TYPE_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK);
     }
 
     private transient OasOperation _oasOperation;
-    private transient OasMediaType _oasMediaType;
     private transient OasMessageBody _oasMessageBody;
     private transient AppUser _oasResponseCreatedByFk;
     private transient AppUser _oasResponseLastUpdatedByFk;
@@ -215,16 +196,6 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
             _oasOperation = new OasOperation(this, Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK);
 
         return _oasOperation;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_media_type</code> table.
-     */
-    public OasMediaType oasMediaType() {
-        if (_oasMediaType == null)
-            _oasMediaType = new OasMediaType(this, Keys.OAS_RESPONSE_CONTENT_MEDIA_TYPE_ID_FK);
-
-        return _oasMediaType;
     }
 
     /**
@@ -300,18 +271,18 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<ULong, ULong, Integer, String, ULong, String, String, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row14<ULong, ULong, Integer, String, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function17<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -319,7 +290,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

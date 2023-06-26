@@ -1,5 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -140,6 +142,17 @@ public class OpenAPIDocController {
         GetBieForOasDocResponse response = oasDocService.getBieForOasDoc(request);
 
         return response.getBieForOasDoc();
+    }
+
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public AddBieForOasDocResponse addBieForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody AddBieForOasDocRequest addBieForOasDocRequest) {
+
+        AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, addBieForOasDocRequest);
+
+        return response;
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}", method = RequestMethod.GET,
