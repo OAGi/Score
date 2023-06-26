@@ -12,6 +12,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
@@ -68,21 +69,23 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         for (DTObject dt : dtForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             dtViewEditPage.hitReviseButton();
             assertTrue(dtViewEditPage.getStateFieldValue().equals("WIP"));
             assertTrue(Integer.valueOf(dtViewEditPage.getRevisionFieldValue()) > 1);
+
             /**
              * Test Assertion #38.10.1.a
              */
-            if (dtViewEditPage.getDefinitionFieldValue() == null){
+            if (dtViewEditPage.getDefinitionFieldValue() == null) {
                 click(dtViewEditPage.getUpdateButton(true));
                 assertEquals("Are you sure you want to update this without definitions?",
                         dtViewEditPage.getDefinitionWarningDialogMessage());
                 dtViewEditPage.hitUpdateAnywayButton();
             }
+
             /**
              * Test Assertion #38.10.1.b
              */
@@ -90,6 +93,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             assertDoesNotThrow(() -> dtViewEditPage.addCodeListValueDomain(codeList.getName()));
             dtViewEditPage.selectValueDomain(codeList.getName());
             assertDoesNotThrow(() -> dtViewEditPage.discardValueDomain());
+
             /**
              * Test Assertion #38.10.1.c
              */
@@ -97,7 +101,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             waitFor(Duration.ofMillis(3000L));
             DTObject revisedDT = getAPIFactory().getCoreComponentAPI().getRevisedDT(dt);
             DTSCObject dtSC = getAPIFactory().getCoreComponentAPI().getNewlyCreatedSCForDT(revisedDT.getDtId(), branch.getReleaseNumber());
-            String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +dtSC.getRepresentationTerm();
+            String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + dtSC.getRepresentationTerm();
             WebElement supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + revisedDT.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             DTViewEditPage.SupplementaryComponentPanel SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
@@ -106,17 +110,18 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             SCPanel.setValueConstraintType("Fixed Value");
             SCPanel.setValueConstraint("fixed value");
             List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
-            String representationTerm = representationTermsForCDTs.get(representationTermsForCDTs.size()-1);
+            String representationTerm = representationTermsForCDTs.get(representationTermsForCDTs.size() - 1);
             SCPanel.selectRepresentationTerm(representationTerm);
-            dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +SCPanel.getRepresentationSelectFieldValue();
+            dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + SCPanel.getRepresentationSelectFieldValue();
             dtViewEditPage.hitUpdateButton();
             dtViewEditPage.removeSupplementaryComponent("/" + revisedDT.getDen() + "/" + dtSCName);
+
             /**
              * Test Assertion #38.10.1.d
              */
             List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(baseCDT.getDtId(), branch.getReleaseNumber());
             DTSCObject existingDTSC = supplementaryComponentsFromTheBaseDT.get(0);
-            String existingDTSCName = existingDTSC.getObjectClassTerm() + ". " + existingDTSC.getPropertyTerm() + ". " +existingDTSC.getRepresentationTerm();
+            String existingDTSCName = existingDTSC.getObjectClassTerm() + ". " + existingDTSC.getPropertyTerm() + ". " + existingDTSC.getRepresentationTerm();
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + revisedDT.getDen() + "/" + existingDTSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
@@ -124,10 +129,10 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             SCPanel.setValueConstraintType("Fixed Value");
             SCPanel.setValueConstraint("fixed value");
             dtViewEditPage.hitUpdateButton();
-            assertThrows(TimeoutException.class, () -> dtViewEditPage.removeSupplementaryComponent("/" + revisedDT.getDen() + "/" + existingDTSCName));
+            assertThrows(WebDriverException.class, () -> dtViewEditPage.removeSupplementaryComponent("/" + revisedDT.getDen() + "/" + existingDTSCName));
 
+            viewEditCoreComponentPage.openPage();
         }
-
     }
 
     @Test

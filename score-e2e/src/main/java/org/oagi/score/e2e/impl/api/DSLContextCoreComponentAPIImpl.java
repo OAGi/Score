@@ -725,6 +725,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                             .fetchOne();
 
                     dtSc.setDtScId(null);
+                    dtSc.setBasedDtScId(oldDtScId);
                     dtSc.setOwnerDtId(bdtId);
                     if (isCdt) {
                         RefSpecRecord refSpec = null;
@@ -767,6 +768,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     ULong oldDtScManifestId = dtScManifest.getDtScManifestId();
 
                     dtScManifest.setDtScManifestId(null);
+                    dtScManifest.setBasedDtScManifestId(oldDtScManifestId);
                     dtScManifest.setDtScId(dtSc.getDtScId());
                     dtScManifest.setOwnerDtManifestId(dtManifestId);
                     dtScManifest.setDtScManifestId(
