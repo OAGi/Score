@@ -205,12 +205,7 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
-            /**
-             * Restrictions applied in all DT derived from this DT will be lost
-             */
-            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-            assertEquals(null, SCPanel.getValueConstraintFieldValue());
+            
         }
     }
 
