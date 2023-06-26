@@ -13,6 +13,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository
         super(dslContext);
     }
 
+
     @Override
     public AddBieForOasDocResponse assignBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) throws ScoreDataAccessException {
         return null;
