@@ -2,10 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.service;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
-import org.oagi.score.gateway.http.api.bie_management.data.BieList;
-import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
@@ -15,28 +12,23 @@ import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
-import org.oagi.score.service.common.data.*;
+import org.oagi.score.service.businesscontext.BusinessContextService;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.jooq.impl.DSL.or;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_DOC;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,7 +46,11 @@ public class OpenAPIDocService {
     @Autowired
     private BusinessInformationEntityRepository bieRepository;
     @Autowired
+    private BusinessContextService businessContextService;
+    @Autowired
     private OasDocRepository oasDocRepository;
+    @Autowired
+    private ApplicationConfigurationService applicationConfigurationService;
     @Autowired
     private DSLContext dslContext;
 
@@ -95,11 +91,6 @@ public class OpenAPIDocService {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);
         PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
-
-
-
-
-                bieRepository.selectBieLists()
                 .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
@@ -115,14 +106,14 @@ public class OpenAPIDocService {
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
                 .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
-                .fetchInto(BieList.class);
+                .fetchInto(BieForOasDoc.class);
 
-        List<BieList> bieLists = result.getResult();
-        bieLists.forEach(bieList -> {
+        List<BieForOasDoc> bieForOasDocList = result.getResult();
+        bieForOasDocList.forEach(bieForOasDoc -> {
 
             GetBusinessContextListRequest getBusinessContextListRequest =
                     new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
-                            .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
+                            .withTopLevelAsbiepIdList(Arrays.asList(bieForOasDoc.getTopLevelAsbiepId()))
                             .withName(request.getBusinessContext());
 
             getBusinessContextListRequest.setPageIndex(-1);
@@ -131,19 +122,17 @@ public class OpenAPIDocService {
             GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
                     .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
-            bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
-            bieList.setAccess(
-                    AccessPrivilege.toAccessPrivilege(requester, bieList.getOwnerUserId(), bieList.getState())
-            );
+            bieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
         });
 
-        PageResponse<BieList> response = new PageResponse();
-        response.setList(bieLists);
+        PageResponse<BieForOasDoc> response = new PageResponse();
+        response.setList(bieForOasDocList);
         response.setPage(pageRequest.getPageIndex());
         response.setSize(pageRequest.getPageSize());
         response.setLength(result.getPageCount());
         return response;
     }
+
     @Transactional
     public AddBieForOasDocResponse addBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) {
         BigInteger userId = sessionService.userId(user);
@@ -184,7 +173,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        if(request.isOasRequest()){
+        if (request.isOasRequest()) {
             ULong oasRequestId = oasDocRepository.insertOasRequest()
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
@@ -197,7 +186,7 @@ public class OpenAPIDocService {
                     .setRequired(request.isRequiredForRequestBody())
                     .setTimestamp(millis)
                     .execute();
-        }else{
+        } else {
             ULong oasResponseId = oasDocRepository.insertOasResponse()
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
@@ -210,7 +199,7 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
-        AddBieForOasDocResponse response =  scoreRepositoryFactory.createBieForOasDocReadRepository().addBieForOasDoc(request);
+        AddBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().addBieForOasDoc(request);
         return response;
     }
 

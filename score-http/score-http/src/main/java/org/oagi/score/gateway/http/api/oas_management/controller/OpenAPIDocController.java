@@ -1,8 +1,5 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
-import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -20,12 +17,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
@@ -197,8 +196,7 @@ public class OpenAPIDocController {
         pageRequest.setPageIndex(pageIndex);
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
-        return bieService.getBieList(user, request);
-        return oasDocService.selectBieForOasDoc(request);
+        return oasDocService.selectBieForOasDoc(requester, request);
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,

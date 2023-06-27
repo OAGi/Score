@@ -1,6 +1,7 @@
 package org.oagi.score.repo;
 
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -355,9 +356,52 @@ public class OasDocRepository {
         }
 
         public <E> PaginationResponse<E> fetchInto(Class<? extends E> type) {
-            return selectBieForOasDocLists(this, type);
+            return selectBieForOasDocList(this, type);
         }
     }
+    private <E> PaginationResponse<E> selectBieForOasDocList(SelectBieForOasDocListArguments arguments, Class<? extends E> type) {
+        SelectOnConditionStep<Record> step = getSelectOnConditionStep(arguments);
+        SelectConnectByStep<Record> conditionStep = step.where(arguments.getConditions());
+
+        int pageCount = dslContext.fetchCount(conditionStep);
+
+        List<SortField<?>> sortFields = arguments.getSortFields();
+        SelectWithTiesAfterOffsetStep<Record> offsetStep = null;
+        if (!sortFields.isEmpty()) {
+            if (arguments.getOffset() >= 0 && arguments.getNumberOfRows() >= 0) {
+                offsetStep = conditionStep.orderBy(sortFields)
+                        .limit(arguments.getOffset(), arguments.getNumberOfRows());
+            }
+        } else {
+            if (arguments.getOffset() >= 0 && arguments.getNumberOfRows() >= 0) {
+                offsetStep = conditionStep
+                        .limit(arguments.getOffset(), arguments.getNumberOfRows());
+            }
+        }
+
+        return new PaginationResponse<>(pageCount,
+                (offsetStep != null) ?
+                        offsetStep.fetchInto(type) : conditionStep.fetchInto(type));
+    }
+
+    private SelectOnConditionStep<Record> getSelectOnConditionStep(SelectBieForOasDocListArguments arguments) {
+        List<Field> selectFields = arguments.selectFields();
+        return dslContext.selectDistinct(selectFields)
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIEP).on(and(
+                        ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID),
+                        ASBIEP.ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.ASBIEP_ID))
+                )
+                .join(ABIE).on(ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.ABIE_ID))
+                .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(APP_USER).on(APP_USER.APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
+                .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
+                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
+                .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID));
+    }
+
 
     public SelectBieForOasDocListArguments selectBieForOasDocLists() {
         return new SelectBieForOasDocListArguments();

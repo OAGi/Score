@@ -4,6 +4,7 @@ import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
@@ -92,7 +93,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         return record -> {
             BieForOasDoc bieForOasDoc = new BieForOasDoc();
             bieForOasDoc.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
-            bieForOasDoc.setState(record.get(TOP_LEVEL_ASBIEP.STATE));
+            bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
             bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
             bieForOasDoc.setPropertyTerm(record.get(ASCCP.DEN));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
@@ -100,7 +101,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb")));
                 bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator")) == (byte) 1);
-                bieForOasDoc.setSuppressRoot(record.get( OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator")) == (byte) 1);
+                bieForOasDoc.setSuppressRootIndicator(record.get( OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator")) == (byte) 1);
                 bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("req_oas_resource").PATH.as("req_resource_name")));
                 bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id")));
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name")));
@@ -109,7 +110,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb")));
                 bieForOasDoc.setArrayIndicator(record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("res_array_indicator")) == (byte) 1);
-                bieForOasDoc.setSuppressRoot(record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("res_suppress_root_indicator")) == (byte) 1);
+                bieForOasDoc.setSuppressRootIndicator(record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("res_suppress_root_indicator")) == (byte) 1);
                 bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("res_oas_resource").PATH.as("res_resource_name")));
                 bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("res_oas_operation").OPERATION_ID.as("res_operation_id")));
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name")));
