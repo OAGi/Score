@@ -10,12 +10,10 @@ import java.util.Collection;
 public class AddBieForOasDocRequest extends Request {
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
-    private BigInteger oasTagId;
-    private BigInteger oasMessageBodyId;
-    private BigInteger oasResourceId;
-    private BigInteger oasOperationId;
-    private BigInteger oasRequestId;
-    private BigInteger oasResponseId;
+    private String path;
+    private String ref;
+
+
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -43,52 +41,20 @@ public class AddBieForOasDocRequest extends Request {
         this.oasDocId = oasDocId;
     }
 
-    public BigInteger getOasTagId() {
-        return oasTagId;
+    public String getPath() {
+        return path;
     }
 
-    public void setOasTagId(BigInteger oasTagId) {
-        this.oasTagId = oasTagId;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public BigInteger getOasMessageBodyId() {
-        return oasMessageBodyId;
+    public String getRef() {
+        return ref;
     }
 
-    public void setOasMessageBodyId(BigInteger oasMessageBodyId) {
-        this.oasMessageBodyId = oasMessageBodyId;
-    }
-
-    public BigInteger getOasResourceId() {
-        return oasResourceId;
-    }
-
-    public void setOasResourceId(BigInteger oasResourceId) {
-        this.oasResourceId = oasResourceId;
-    }
-
-    public BigInteger getOasOperationId() {
-        return oasOperationId;
-    }
-
-    public void setOasOperationId(BigInteger oasOperationId) {
-        this.oasOperationId = oasOperationId;
-    }
-
-    public BigInteger getOasRequestId() {
-        return oasRequestId;
-    }
-
-    public void setOasRequestId(BigInteger oasRequestId) {
-        this.oasRequestId = oasRequestId;
-    }
-
-    public BigInteger getOasResponseId() {
-        return oasResponseId;
-    }
-
-    public void setOasResponseId(BigInteger oasResponseId) {
-        this.oasResponseId = oasResponseId;
+    public void setRef(String ref) {
+        this.ref = ref;
     }
 
     public Collection<String> getUpdaterUsernameList() {
@@ -115,20 +81,5 @@ public class AddBieForOasDocRequest extends Request {
         this.updateEndDate = updateEndDate;
     }
 
-    @Override
-    public String toString() {
-        return "AddBieForOasDocRequest{" +
-                "topLevelAsbiepId=" + topLevelAsbiepId +
-                ", oasDocId=" + oasDocId +
-                ", oasTagId=" + oasTagId +
-                ", oasMessageBodyId=" + oasMessageBodyId +
-                ", oasResourceId=" + oasResourceId +
-                ", oasOperationId=" + oasOperationId +
-                ", oasRequestId=" + oasRequestId +
-                ", oasResponseId=" + oasResponseId +
-                ", updaterUsernameList=" + updaterUsernameList +
-                ", updateStartDate=" + updateStartDate +
-                ", updateEndDate=" + updateEndDate +
-                '}';
-    }
+
 }

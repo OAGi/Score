@@ -5,11 +5,15 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.BusinessInformationEntityRepository;
+import org.oagi.score.repo.CoreComponentRepository;
 import org.oagi.score.repo.OasDocRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.common.data.OagisComponentType;
@@ -36,6 +40,10 @@ public class OpenAPIDocService {
     private SessionService sessionService;
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
+    @Autowired
+    private CoreComponentRepository ccRepository;
+    @Autowired
+    private BusinessInformationEntityRepository bieRepository;
     @Autowired
     private OasDocRepository oasDocRepository;
     @Autowired
@@ -86,37 +94,36 @@ public class OpenAPIDocService {
         if (request.getTopLevelAsbiepId() == null) {
             throw new IllegalArgumentException("`TopLevelAsbiepId` parameter must not be null.");
         }
-        AsccpManifestRecord asccpManifest =
-                ccRepository.getAsccpManifestByManifestId(request.asccpManifestId());
-        if (asccpManifest == null) {
-            throw new IllegalArgumentException();
-        }
-        AccManifestRecord accManifestRecord = ccRepository.getAccManifestByManifestId(asccpManifest.getRoleOfAccManifestId());
-        AccRecord accRecord = ccRepository.getAccById(accManifestRecord.getAccId());
-        if (OagisComponentType.valueOf(accRecord.getOagisComponentType()).isGroup()) {
-            throw new IllegalArgumentException("Cannot create BIE of `ASCCP` with group `ACC`.");
-        }
+
+        long millis = System.currentTimeMillis();
+
+        ULong oasMessageBodyId = oasDocRepository.insertOasMessageBody()
+                .setUserId(userId)
+                .setTopLevelAsbiepId(request.getTopLevelAsbiepId())
+                .setTimestamp(millis)
+                .execute();
+
+        ULong oasResourceId = oasDocRepository.insertOasResource()
+                .setUserId(userId)
+                .setOasDocId(request.getOasDocId())
+                .setPath(request.getPath())
+                .setRef(request.getRef())
+                .setTimestamp(millis)
+                .execute();
+
+
+
+
+
 
         String asccpPath = "ASCCP-" + asccpManifest.getAsccpManifestId();
         String accPath = "ACC-" + asccpManifest.getRoleOfAccManifestId();
         accPath = String.join(">",
                 Arrays.asList(asccpPath, accPath));
 
-        long millis = System.currentTimeMillis();
 
-        ULong topLevelAsbiepId = bieRepository.insertTopLevelAsbiep()
-                .setUserId(userId)
-                .setReleaseId(asccpManifest.getReleaseId())
-                .setTimestamp(millis)
-                .execute();
 
-        ULong abieId = bieRepository.insertAbie()
-                .setUserId(userId)
-                .setTopLevelAsbiepId(topLevelAsbiepId)
-                .setAccManifestId(asccpManifest.getRoleOfAccManifestId())
-                .setPath(accPath)
-                .setTimestamp(millis)
-                .execute();
+
 
         bieRepository.insertBizCtxAssignments()
                 .setTopLevelAsbiepId(topLevelAsbiepId)
