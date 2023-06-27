@@ -4,11 +4,17 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
+import org.oagi.score.gateway.http.api.bie_management.data.BieList;
+import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
+import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.CoreComponentRepository;
 import org.oagi.score.repo.OasDocRepository;
+import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
@@ -16,7 +22,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestReco
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
-import org.oagi.score.service.common.data.OagisComponentType;
+import org.oagi.score.service.common.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -82,6 +88,60 @@ public class OpenAPIDocService {
 
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) {
         GetBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDoc(request);
+        return response;
+    }
+
+    public PageResponse<BieForOasDoc> selectBieForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
+        PageRequest pageRequest = request.getPageRequest();
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
+
+
+
+
+                bieRepository.selectBieLists()
+                .setDen(request.getDen())
+                .setPropertyTerm(request.getPropertyTerm())
+                .setBusinessContext(request.getBusinessContext())
+                .setAsccpManifestId(request.getAsccpManifestId())
+                .setExcludePropertyTerms(request.getExcludePropertyTerms())
+                .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
+                .setStates(request.getStates())
+                .setReleaseId(request.getReleaseId())
+                .setOwnerLoginIds(request.getOwnerLoginIds())
+                .setUpdaterLoginIds(request.getUpdaterLoginIds())
+                .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
+                .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
+                .setOwnedByDeveloper(request.getOwnedByDeveloper())
+                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
+                .fetchInto(BieList.class);
+
+        List<BieList> bieLists = result.getResult();
+        bieLists.forEach(bieList -> {
+
+            GetBusinessContextListRequest getBusinessContextListRequest =
+                    new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
+                            .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
+                            .withName(request.getBusinessContext());
+
+            getBusinessContextListRequest.setPageIndex(-1);
+            getBusinessContextListRequest.setPageSize(-1);
+
+            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+
+            bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieList.setAccess(
+                    AccessPrivilege.toAccessPrivilege(requester, bieList.getOwnerUserId(), bieList.getState())
+            );
+        });
+
+        PageResponse<BieList> response = new PageResponse();
+        response.setList(bieLists);
+        response.setPage(pageRequest.getPageIndex());
+        response.setSize(pageRequest.getPageSize());
+        response.setLength(result.getPageCount());
         return response;
     }
     @Transactional

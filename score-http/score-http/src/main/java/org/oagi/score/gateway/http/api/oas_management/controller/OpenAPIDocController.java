@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateResponse;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
+import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
@@ -156,8 +157,7 @@ public class OpenAPIDocController {
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize) {
 
-        BieListRequest request = new BieListRequest();
-
+        BieForOasDocListRequest request = new BieForOasDocListRequest();
         request.setDen(den);
         request.setPropertyTerm(propertyTerm);
         request.setBusinessContext(businessContext);
@@ -198,20 +198,7 @@ public class OpenAPIDocController {
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
         return bieService.getBieList(user, request);
-
-        GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
-
-        request.setOasDocId(oasDocId);
-
-        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
-
-        PageResponse<BieForOasDoc> pageResponse = new PageResponse<>();
-        pageResponse.setList(bieForOasDocList.getResults());
-        pageResponse.setPage(bieForOasDocList.getPage());
-        pageResponse.setSize(bieForOasDocList.getSize());
-        pageResponse.setLength(bieForOasDocList.getLength());
-
-        return pageResponse;
+        return oasDocService.selectBieForOasDoc(request);
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,

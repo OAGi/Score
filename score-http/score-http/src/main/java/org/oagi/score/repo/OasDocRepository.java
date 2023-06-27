@@ -1,25 +1,33 @@
 package org.oagi.score.repo;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Insert;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import org.oagi.score.repo.api.security.AccessControl;
+import org.oagi.score.service.common.data.AccessPrivilege;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.helper.Utility.sha256;
+import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
+import static org.oagi.score.repo.api.bie.model.BieState.*;
+import static org.oagi.score.repo.api.bie.model.BieState.Initiating;
+import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -69,6 +77,290 @@ public class OasDocRepository {
                     .fetchOneInto(Integer.class) == 0;
         } else
             throw new ScoreDataAccessException("Wrong input data");
+    }
+    public class SelectBieForOasDocListArguments {
+
+        private final List<Field> selectFields = new ArrayList<>();
+        private final List<Condition> conditions = new ArrayList<>();
+        private List<SortField<?>> sortFields = new ArrayList<>();
+        private int offset = -1;
+        private int numberOfRows = -1;
+
+        private String den;
+        private String type;
+
+        SelectBieForOasDocListArguments() {
+            selectFields.addAll(Arrays.asList(
+                    TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                    TOP_LEVEL_ASBIEP.VERSION,
+                    TOP_LEVEL_ASBIEP.STATUS,
+                    ABIE.GUID,
+                    ASCCP.DEN,
+                    ASCCP.PROPERTY_TERM,
+                    RELEASE.RELEASE_NUM,
+                    TOP_LEVEL_ASBIEP.OWNER_USER_ID,
+                    APP_USER.LOGIN_ID.as("owner"),
+                    ASBIEP.BIZ_TERM,
+                    ASBIEP.REMARK,
+                    TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
+                    APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
+                    TOP_LEVEL_ASBIEP.STATE));
+        }
+
+        public List<Field> selectFields() {
+            return this.selectFields;
+        }
+
+        public SelectBieForOasDocListArguments setDen(String den) {
+            if (StringUtils.hasLength(den)) {
+                conditions.addAll(contains(den, ASCCP.DEN));
+                selectFields.add(
+                        val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
+                                        .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
+                                .as("score")
+                );
+                sortFields.add(field("score").desc());
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setPropertyTerm(String propertyTerm) {
+            if (StringUtils.hasLength(propertyTerm)) {
+                conditions.addAll(contains(propertyTerm, ASCCP.PROPERTY_TERM));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setBusinessContext(String businessContext) {
+            if (StringUtils.hasLength(businessContext)) {
+                conditions.addAll(contains(businessContext, BIZ_CTX.NAME));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setAsccpManifestId(BigInteger asccpManifestId) {
+            if (asccpManifestId != null && asccpManifestId.longValue() > 0L) {
+                conditions.add(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setExcludePropertyTerms(List<String> excludePropertyTerms) {
+            if (!excludePropertyTerms.isEmpty()) {
+                conditions.add(ASCCP.PROPERTY_TERM.notIn(excludePropertyTerms));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setExcludeTopLevelAsbiepIds(List<BigInteger> excludeTopLevelAsbiepIds) {
+            if (!excludeTopLevelAsbiepIds.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.notIn(
+                        excludeTopLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setIncludeTopLevelAsbiepIds(List<BigInteger> includeTopLevelAsbiepIds) {
+            if (!includeTopLevelAsbiepIds.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
+                        includeTopLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setStates(List<BieState> states) {
+            if (!states.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.STATE.in(states.stream().map(e -> e.name()).collect(Collectors.toList())));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setBieIdAndType(BigInteger bieId, List<String> types) {
+            if (types.size() == 1) {
+                String type = types.get(0);
+                if (type.equals("ASBIE")) {
+                    conditions.add(ASBIE.ASBIE_ID.eq(ULong.valueOf(bieId)));
+                } else if (type.equals("BBIE")) {
+                    conditions.add(BBIE.BBIE_ID.eq(ULong.valueOf(bieId)));
+                }
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setOwnerLoginIds(List<String> ownerLoginIds) {
+            if (!ownerLoginIds.isEmpty()) {
+                conditions.add(APP_USER.LOGIN_ID.in(ownerLoginIds));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setUpdaterLoginIds(List<String> updaterLoginIds) {
+            if (!updaterLoginIds.isEmpty()) {
+                conditions.add(APP_USER.as("updater").LOGIN_ID.in(updaterLoginIds));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setUpdateDate(Date from, Date to) {
+            return setUpdateDate(
+                    (from != null) ? new Timestamp(from.getTime()).toLocalDateTime() : null,
+                    (to != null) ? new Timestamp(to.getTime()).toLocalDateTime() : null
+            );
+        }
+
+        public SelectBieForOasDocListArguments setUpdateDate(LocalDateTime from, LocalDateTime to) {
+            if (from != null) {
+                conditions.add(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.greaterOrEqual(from));
+            }
+            if (to != null) {
+                conditions.add(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.lessThan(to));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setAccess(ULong userId, AccessPrivilege access) {
+            if (access != null) {
+                switch (access) {
+                    case CanEdit:
+                        conditions.add(
+                                and(
+                                        TOP_LEVEL_ASBIEP.STATE.notEqual(Initiating.name()),
+                                        TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(userId)
+                                )
+                        );
+                        break;
+
+                    case CanView:
+                        conditions.add(
+                                or(
+                                        TOP_LEVEL_ASBIEP.STATE.in(QA.name(), Production.name()),
+                                        and(
+                                                TOP_LEVEL_ASBIEP.STATE.notEqual(Initiating.name()),
+                                                TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(userId)
+                                        )
+                                )
+                        );
+                        break;
+                }
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setSort(String field, String direction) {
+            if (StringUtils.hasLength(field)) {
+                SortField<?> sortField = null;
+                switch (field) {
+                    case "state":
+                        if ("asc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.STATE.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.STATE.desc();
+                        }
+
+                        break;
+
+                    case "topLevelAsccpPropertyTerm":
+                        if ("asc".equals(direction)) {
+                            sortField = ASCCP.PROPERTY_TERM.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = ASCCP.PROPERTY_TERM.desc();
+                        }
+
+                        break;
+
+                    case "den":
+                        if ("asc".equals(direction)) {
+                            sortField = ASCCP.DEN.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = ASCCP.DEN.desc();
+                        }
+                        break;
+
+                    case "releaseNum":
+                        if ("asc".equals(direction)) {
+                            sortField = RELEASE.RELEASE_NUM.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = RELEASE.RELEASE_NUM.desc();
+                        }
+
+                        break;
+
+                    case "lastUpdateTimestamp":
+                        if ("asc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.desc();
+                        }
+
+                        break;
+                }
+
+                if (sortField != null) {
+                    this.sortFields.add(0, sortField);
+                }
+            }
+
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setOffset(int offset, int numberOfRows) {
+            this.offset = offset;
+            this.numberOfRows = numberOfRows;
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setReleaseId(BigInteger releaseId) {
+            if (releaseId != null && releaseId.longValue() > 0) {
+                conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setOwnedByDeveloper(Boolean ownedByDeveloper) {
+            if (ownedByDeveloper != null) {
+                conditions.add(APP_USER.IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
+            }
+            return this;
+        }
+
+        public List<Condition> getConditions() {
+            return conditions;
+        }
+
+        public List<SortField<?>> getSortFields() {
+            return this.sortFields;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getNumberOfRows() {
+            return numberOfRows;
+        }
+
+        public String getDen() {
+            return den;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public <E> PaginationResponse<E> fetchInto(Class<? extends E> type) {
+            return selectBieForOasDocLists(this, type);
+        }
+    }
+
+    public SelectBieForOasDocListArguments selectBieForOasDocLists() {
+        return new SelectBieForOasDocListArguments();
     }
 
     public class InsertOasMessageBodyArguments {
