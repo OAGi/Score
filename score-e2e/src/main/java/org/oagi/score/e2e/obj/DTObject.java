@@ -65,8 +65,8 @@ public class DTObject {
         bdt.setRepresentationTerm(baseDataType.getRepresentationTerm());
         bdt.setQualifier(randomQualifier);
         bdt.setDen(bdt.getQualifier() + "_ " + bdt.getDataTypeTerm() + ". Type");
-        bdt.setDefinition(randomPrint(50, 100).trim());
-        bdt.setDefinitionSource(randomPrint(50, 100).trim());
+        bdt.setDefinition(baseDataType.getDefinition());
+        bdt.setDefinitionSource(baseDataType.getDefinitionSource());
         bdt.setNamespaceId(namespace.getNamespaceId());
         bdt.setDeprecated(false);
         bdt.setState(state);

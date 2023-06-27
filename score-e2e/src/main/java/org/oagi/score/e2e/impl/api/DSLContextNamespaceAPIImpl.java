@@ -118,4 +118,17 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
                 .fetchOne();
         return mapper(namespaceRecord);
     }
+
+    @Override
+    public ArrayList<NamespaceObject> getNonStandardNamespacesURIs() {
+        List<NamespaceRecord> standardNamespaces = dslContext.selectFrom(NAMESPACE)
+                .where(NAMESPACE.IS_STD_NMSP.eq((byte) 0))
+                .fetchInto(NamespaceRecord.class);
+        ArrayList<NamespaceObject> namespaceObjectsList = new ArrayList<>();
+        for (NamespaceRecord record: standardNamespaces){
+            NamespaceObject namespace = mapper(record);
+            namespaceObjectsList.add(namespace);
+        }
+        return namespaceObjectsList;
+    }
 }
