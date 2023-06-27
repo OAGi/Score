@@ -159,6 +159,19 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         return new GetBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
     }
 
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public AddBieForOasDocResponse addBieForOasDoc(AddBieForOasDocRequest request) throws ScoreDataAccessException {
+        List<BieForOasDoc> bieForOasDoc = null;
+
+        BigInteger oasDocId = request.getOasDocId();
+        if (oasDocId != null) {
+            bieForOasDoc = select()
+                    .where(or(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
+                    .fetch(mapper());
+        }
+        return new AddBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
+    }
+
     private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
         List<Condition> conditions = new ArrayList();
 

@@ -29,6 +29,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jooq.impl.DSL.or;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_DOC;
+
 @Service
 @Transactional(readOnly = true)
 public class OpenAPIDocService {
@@ -84,6 +87,7 @@ public class OpenAPIDocService {
 
     @Transactional
     public AddBieForOasDocResponse addBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) {
+        List<BieForOasDoc> bieForOasDoc = null;
         BigInteger userId = sessionService.userId(user);
         if (userId == null) {
             throw new IllegalArgumentException("`userId` parameter must not be null.");
@@ -111,41 +115,19 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-
-
-
-
-
-        String asccpPath = "ASCCP-" + asccpManifest.getAsccpManifestId();
-        String accPath = "ACC-" + asccpManifest.getRoleOfAccManifestId();
-        accPath = String.join(">",
-                Arrays.asList(asccpPath, accPath));
-
-
-
-
-
-        bieRepository.insertBizCtxAssignments()
-                .setTopLevelAsbiepId(topLevelAsbiepId)
-                .setBizCtxIds(bizCtxIds)
-                .execute();
-
-        ULong asbiepId = bieRepository.insertAsbiep()
-                .setAsccpManifestId(asccpManifest.getAsccpManifestId())
-                .setRoleOfAbieId(abieId)
-                .setTopLevelAsbiepId(topLevelAsbiepId)
-                .setPath(asccpPath)
+        ULong oasOperationId = oasDocRepository.insertOasOperation()
                 .setUserId(userId)
+                .setOperationId(request.getOperationId())
+                .setOasResourceId(oasResourceId)
+                .setVerb(request.getVerb())
+                .setSummary(request.getSummary())
+                .setDescription(request.getDescription())
+                .setDeprecated(request.isDeprecated())
                 .setTimestamp(millis)
                 .execute();
 
-        bieRepository.updateTopLevelAsbiep()
-                .setAsbiepId(asbiepId)
-                .setTopLevelAsbiepId(topLevelAsbiepId)
-                .execute();
 
-        BieCreateResponse response = new BieCreateResponse();
-        response.setTopLevelAsbiepId(topLevelAsbiepId.toBigInteger());
+        AddBieForOasDocResponse response =  scoreRepositoryFactory.createBieForOasDocReadRepository().addBieForOasDoc(request);
         return response;
     }
 

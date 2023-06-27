@@ -12,6 +12,11 @@ public class AddBieForOasDocRequest extends Request {
     private BigInteger oasDocId;
     private String path;
     private String ref;
+    private String verb;
+    private String operationId;
+    private String summary;
+    private String description;
+    private boolean deprecated;
 
 
     private Collection<String> updaterUsernameList;
@@ -55,6 +60,46 @@ public class AddBieForOasDocRequest extends Request {
 
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    public String getVerb() {
+        return verb;
+    }
+
+    public void setVerb(String verb) {
+        this.verb = verb;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public Collection<String> getUpdaterUsernameList() {
