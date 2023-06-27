@@ -258,16 +258,11 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
-
-  listBIE() {
-    this.router.navigateByUrl('/profile_bie/express/oas_doc/' + this.oasDoc.oasDocId + '/bie_list');
-  }
-
   openDialog(bieForOasDoc?: BieForOasDoc) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {};
-    dialogConfig.data.bieForOasDoc = new BieForOasDoc();
+    dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
     dialogConfig.data.isEditable = this.isEditable();
 

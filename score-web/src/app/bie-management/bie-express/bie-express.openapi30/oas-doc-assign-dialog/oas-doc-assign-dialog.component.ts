@@ -79,7 +79,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.loadBieForOasDocList();
+      this.selectBieForOasDocList();
     });
 
     forkJoin([
@@ -103,18 +103,18 @@ export class OasDocAssignDialogComponent implements OnInit {
         this.request.release = this.releases[0];
       }
 
-      this.loadBieForOasDocList(true);
+      this.selectBieForOasDocList(true);
     });
   }
 
-  loadBieForOasDocList(isInit?: boolean) {
+  selectBieForOasDocList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
+    this.openAPIService.selectBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
       finalize(() => {
         this.loading = false;
       })
@@ -137,7 +137,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.loadBieForOasDocList();
+    this.selectBieForOasDocList();
   }
 
   onChange(property?: string, source?) {
