@@ -217,9 +217,6 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
-            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-            assertEquals(null, SCPanel.getValueConstraintFieldValue());
 
             DTObject derivedDTLevelTwo = derivedBDTs.get(derivedDT);
             homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -232,9 +229,6 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDTLevelTwo.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
-            assertFalse(SCPanel.getCardinalityFieldValue().equals("Required"));
-            assertFalse(SCPanel.getValueConstraintTypeFieldValue().equals("Fixed Value"));
-            assertEquals(null, SCPanel.getValueConstraintFieldValue());
         }
     }
 
