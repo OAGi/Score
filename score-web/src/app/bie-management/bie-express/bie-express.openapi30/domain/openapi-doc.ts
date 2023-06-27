@@ -130,6 +130,7 @@ export class BieForOasDocListRequest {
   filters: {
     propertyTerm: string;
     businessContext: string;
+    asccpManifestId: number;
     den: string;
   };
   excludePropertyTerms: string[] = [];
@@ -184,6 +185,7 @@ export class BieForOasDocListRequest {
     this.filters = {
       propertyTerm: params.get('propertyTerm') || '',
       businessContext: params.get('businessContext') || '',
+      asccpManifestId: Number(params.get('asccpManifestId')) || 0,
       den: params.get('den') || ''
     };
   }
@@ -229,6 +231,9 @@ export class BieForOasDocListRequest {
     }
     if (this.filters.businessContext && this.filters.businessContext.length > 0) {
       params = params.set('businessContext', '' + this.filters.businessContext);
+    }
+    if (this.filters.asccpManifestId) {
+      params = params.set('asccpManifestId', this.filters.asccpManifestId.toString());
     }
     if (this.filters.den && this.filters.den.length > 0) {
       params = params.set('den', '' + this.filters.den);

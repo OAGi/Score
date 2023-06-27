@@ -551,6 +551,7 @@ public class OasDocRepository {
 
         public InsertOasResponseArguments setHttpStatusCode(String httpStatusCode) {
             this.httpStatusCode = httpStatusCode;
+            return this;
         }
 
         public boolean isIncludeConfirmIndicator() {
@@ -559,6 +560,7 @@ public class OasDocRepository {
 
         public InsertOasResponseArguments setIncludeConfirmIndicator(boolean includeConfirmIndicator) {
             this.includeConfirmIndicator = includeConfirmIndicator;
+            return this;
         }
 
         public InsertOasResponseArguments setTimestamp(long millis) {
@@ -601,8 +603,5 @@ public class OasDocRepository {
                 .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                 .fetchOne().value1();
     }
-
-
-
 
 }

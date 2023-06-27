@@ -1,7 +1,8 @@
-package org.oagi.score.gateway.http.api.bie_management.data;
+package org.oagi.score.gateway.http.api.oas_management.data;
 
 import lombok.Data;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.businesscontext.model.BusinessContext;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 
@@ -11,13 +12,11 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class BieListRequest {
-
+public class BieForOasDocListRequest {
     private String den;
     private String propertyTerm;
     private String businessContext;
     private BigInteger asccpManifestId;
-    private BigInteger usageTopLevelAsbiepId;
     private AccessPrivilege access;
     private List<String> excludePropertyTerms = Collections.emptyList();
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();
@@ -30,6 +29,13 @@ public class BieListRequest {
     private Date updateEndDate;
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
     private Boolean ownedByDeveloper;
-    private String asccBccDen;
-    private BigInteger bieId;
+    private BigInteger topLevelAsbiepId;
+    private String verb;
+    private boolean arrayIndicator;
+    private boolean suppressRootIndicator;
+    private String messageBody;
+    private String resourceName;
+    private String operationId;
+    private String tagName;
+
 }

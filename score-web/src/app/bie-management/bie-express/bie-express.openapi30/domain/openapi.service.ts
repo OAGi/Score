@@ -123,6 +123,9 @@ export class OpenAPIService {
     if (request.filters.businessContext) {
       params = params.set('businessContext', request.filters.businessContext);
     }
+    if (request.filters.asccpManifestId) {
+      params = params.set('asccpManifestId', '' + request.filters.asccpManifestId);
+    }
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
@@ -141,6 +144,6 @@ export class OpenAPIService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
-    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list', {params});
+    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/select_bie', {params});
   }
 }

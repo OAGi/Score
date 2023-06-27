@@ -47,14 +47,6 @@ export class OasDocAssignDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
-  verbs: string[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-  selectedVerb: string;
-  arrayIndicators: string[] = ['TRUE', 'FALSE'];
-  selectedArrayIndicator: string;
-  suppressRootIndicators: string[] = ['TRUE', 'FALSE'];
-  selectedSuppressRootIndicator: string;
-  messageBodyList: string[] = ['requestBody', 'responseBody'];
-  selectedMessageBody: string;
   request: BieForOasDocListRequest;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -192,7 +184,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
-  createBieForOasDoc() {
+  addBieForOasDoc() {
   }
 
   onNoClick(): void {
