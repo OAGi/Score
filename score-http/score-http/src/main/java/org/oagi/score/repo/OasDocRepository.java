@@ -2,6 +2,7 @@ package org.oagi.score.repo;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Insert;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -319,6 +320,285 @@ public class OasDocRepository {
                 .set(OAS_OPERATION.DESCRIPTION, arguments.getDescription())
                 .set(OAS_OPERATION.DEPRECATED, (byte) (arguments.isDeprecated() ? 1 : 0))
                 .returningResult(OAS_OPERATION.OAS_OPERATION_ID)
+                .fetchOne().value1();
+    }
+
+    public class InsertOasRequestArguments {
+        private ULong userId;
+        private ULong oasOperationId;
+        private ULong oasMessageBodyId;
+        private String description;
+        private boolean required;
+        private boolean makeArrayIndicator;
+        private boolean suppressRootIndicator;
+        private boolean includeMetaHeaderIndicator;
+        private boolean includePaginationIndicator;
+        private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
+
+        public InsertOasRequestArguments setUserId(BigInteger userId) {
+            return setUserId(ULong.valueOf(userId));
+        }
+        public InsertOasRequestArguments setUserId(ULong userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public ULong getOasOperationId() {
+            return oasOperationId;
+        }
+        public InsertOasRequestArguments setOasOperationId(BigInteger oasOperationId) {
+            return setOasOperationId(ULong.valueOf(oasOperationId));
+        }
+
+        public InsertOasRequestArguments setOasOperationId(ULong oasOperationId) {
+            this.oasOperationId = oasOperationId;
+            return this;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public InsertOasRequestArguments setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+        public boolean isRequired() {
+            return required;
+        }
+
+        public InsertOasRequestArguments setRequired(boolean required) {
+            this.required = required;
+            return this;
+        }
+
+        public ULong getOasMessageBodyId() {
+            return oasMessageBodyId;
+        }
+
+        public InsertOasRequestArguments setOasMessageBodyId(ULong oasMessageBodyId) {
+            this.oasMessageBodyId = oasMessageBodyId;
+            return this;
+        }
+
+        public boolean isMakeArrayIndicator() {
+            return makeArrayIndicator;
+        }
+
+        public InsertOasRequestArguments setMakeArrayIndicator(boolean makeArrayIndicator) {
+            this.makeArrayIndicator = makeArrayIndicator;
+            return this;
+        }
+
+        public boolean isSuppressRootIndicator() {
+            return suppressRootIndicator;
+        }
+
+        public InsertOasRequestArguments setSuppressRootIndicator(boolean suppressRootIndicator) {
+            this.suppressRootIndicator = suppressRootIndicator;
+            return this;
+        }
+
+        public boolean isIncludeMetaHeaderIndicator() {
+            return includeMetaHeaderIndicator;
+        }
+
+        public InsertOasRequestArguments setIncludeMetaHeaderIndicator(boolean includeMetaHeaderIndicator) {
+            this.includeMetaHeaderIndicator = includeMetaHeaderIndicator;
+            return this;
+        }
+
+        public boolean isIncludePaginationIndicator() {
+            return includePaginationIndicator;
+        }
+
+        public InsertOasRequestArguments setIncludePaginationIndicator(boolean includePaginationIndicator) {
+            this.includePaginationIndicator = includePaginationIndicator;
+            return this;
+        }
+
+        public InsertOasRequestArguments setTimestamp(long millis) {
+            return setTimestamp(new Timestamp(millis).toLocalDateTime());
+        }
+        public InsertOasRequestArguments setTimestamp(Date date) {
+            return setTimestamp(new Timestamp(date.getTime()).toLocalDateTime());
+        }
+        public InsertOasRequestArguments setTimestamp(LocalDateTime timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+        public ULong getUserId() {
+            return userId;
+        }
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+        public ULong execute() {
+            return insertOasRequest(this);
+        }
+    }
+    public InsertOasRequestArguments insertOasRequest() {
+        return new InsertOasRequestArguments();
+    }
+    private ULong insertOasRequest(InsertOasRequestArguments arguments) {
+        return dslContext.insertInto(OAS_REQUEST)
+                .set(OAS_REQUEST.CREATED_BY, arguments.getUserId())
+                .set(OAS_REQUEST.LAST_UPDATED_BY, arguments.getUserId())
+                .set(OAS_REQUEST.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_REQUEST.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_REQUEST.OAS_MESSAGE_BODY_ID, arguments.getOasMessageBodyId())
+                .set(OAS_REQUEST.OAS_OPERATION_ID, arguments.getOasOperationId())
+                .set(OAS_REQUEST.DESCRIPTION, arguments.getDescription())
+                .set(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR, (byte) (arguments.isSuppressRootIndicator() ? 1 : 0))
+                .set(OAS_REQUEST.MAKE_ARRAY_INDICATOR, (byte) (arguments.makeArrayIndicator ? 1 : 0) )
+                .set(OAS_REQUEST.INCLUDE_META_HEADER_INDICATOR,(byte) (arguments.includeMetaHeaderIndicator ? 1 : 0))
+                .set(OAS_REQUEST.INCLUDE_PAGINATION_INDICATOR,(byte) (arguments.includePaginationIndicator ? 1 : 0))
+                .set(OAS_REQUEST.IS_CALLBACK, (byte) 0)
+                .set(OAS_REQUEST.REQUIRED, (byte)(arguments.isRequired() ? 1 : 0))
+                .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
+                .fetchOne().value1();
+    }
+
+    public class InsertOasResponseArguments {
+        private ULong userId;
+        private ULong oasOperationId;
+        private ULong oasMessageBodyId;
+        private String description;
+        private String httpStatusCode;
+        private boolean makeArrayIndicator;
+        private boolean suppressRootIndicator;
+        private boolean includeMetaHeaderIndicator;
+        private boolean includePaginationIndicator;
+        private boolean includeConfirmIndicator;
+        private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
+
+        public InsertOasResponseArguments setUserId(BigInteger userId) {
+            return setUserId(ULong.valueOf(userId));
+        }
+        public InsertOasResponseArguments setUserId(ULong userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public ULong getOasOperationId() {
+            return oasOperationId;
+        }
+        public InsertOasResponseArguments setOasOperationId(BigInteger oasOperationId) {
+            return setOasOperationId(ULong.valueOf(oasOperationId));
+        }
+
+        public InsertOasResponseArguments setOasOperationId(ULong oasOperationId) {
+            this.oasOperationId = oasOperationId;
+            return this;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public InsertOasResponseArguments setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+        public ULong getOasMessageBodyId() {
+            return oasMessageBodyId;
+        }
+
+        public InsertOasResponseArguments setOasMessageBodyId(ULong oasMessageBodyId) {
+            this.oasMessageBodyId = oasMessageBodyId;
+            return this;
+        }
+
+        public boolean isMakeArrayIndicator() {
+            return makeArrayIndicator;
+        }
+
+        public InsertOasResponseArguments setMakeArrayIndicator(boolean makeArrayIndicator) {
+            this.makeArrayIndicator = makeArrayIndicator;
+            return this;
+        }
+
+        public boolean isSuppressRootIndicator() {
+            return suppressRootIndicator;
+        }
+
+        public InsertOasResponseArguments setSuppressRootIndicator(boolean suppressRootIndicator) {
+            this.suppressRootIndicator = suppressRootIndicator;
+            return this;
+        }
+
+        public boolean isIncludeMetaHeaderIndicator() {
+            return includeMetaHeaderIndicator;
+        }
+
+        public InsertOasResponseArguments setIncludeMetaHeaderIndicator(boolean includeMetaHeaderIndicator) {
+            this.includeMetaHeaderIndicator = includeMetaHeaderIndicator;
+            return this;
+        }
+
+        public boolean isIncludePaginationIndicator() {
+            return includePaginationIndicator;
+        }
+
+        public InsertOasResponseArguments setIncludePaginationIndicator(boolean includePaginationIndicator) {
+            this.includePaginationIndicator = includePaginationIndicator;
+            return this;
+        }
+
+        public String getHttpStatusCode() {
+            return httpStatusCode;
+        }
+
+        public InsertOasResponseArguments setHttpStatusCode(String httpStatusCode) {
+            this.httpStatusCode = httpStatusCode;
+        }
+
+        public boolean isIncludeConfirmIndicator() {
+            return includeConfirmIndicator;
+        }
+
+        public InsertOasResponseArguments setIncludeConfirmIndicator(boolean includeConfirmIndicator) {
+            this.includeConfirmIndicator = includeConfirmIndicator;
+        }
+
+        public InsertOasResponseArguments setTimestamp(long millis) {
+            return setTimestamp(new Timestamp(millis).toLocalDateTime());
+        }
+        public InsertOasResponseArguments setTimestamp(Date date) {
+            return setTimestamp(new Timestamp(date.getTime()).toLocalDateTime());
+        }
+        public InsertOasResponseArguments setTimestamp(LocalDateTime timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+        public ULong getUserId() {
+            return userId;
+        }
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+        public ULong execute() {
+            return insertOasResponse(this);
+        }
+    }
+    public InsertOasResponseArguments insertOasResponse() {
+        return new InsertOasResponseArguments();
+    }
+    private ULong insertOasResponse(InsertOasResponseArguments arguments) {
+        return dslContext.insertInto(OAS_RESPONSE)
+                .set(OAS_RESPONSE.CREATED_BY, arguments.getUserId())
+                .set(OAS_RESPONSE.LAST_UPDATED_BY, arguments.getUserId())
+                .set(OAS_RESPONSE.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESPONSE.OAS_MESSAGE_BODY_ID, arguments.getOasMessageBodyId())
+                .set(OAS_RESPONSE.OAS_OPERATION_ID, arguments.getOasOperationId())
+                .set(OAS_RESPONSE.DESCRIPTION, arguments.getDescription())
+                .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (arguments.isSuppressRootIndicator() ? 1 : 0))
+                .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (arguments.makeArrayIndicator ? 1 : 0) )
+                .set(OAS_RESPONSE.INCLUDE_META_HEADER_INDICATOR,(byte) (arguments.includeMetaHeaderIndicator ? 1 : 0))
+                .set(OAS_RESPONSE.INCLUDE_PAGINATION_INDICATOR,(byte) (arguments.includePaginationIndicator ? 1 : 0))
+                .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
+                .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                 .fetchOne().value1();
     }
 

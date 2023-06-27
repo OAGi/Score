@@ -8,16 +8,27 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class AddBieForOasDocRequest extends Request {
+    private boolean isOasRequest;
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
+    private String operationId;
     private String path;
     private String ref;
     private String verb;
-    private String operationId;
     private String summary;
-    private String description;
-    private boolean deprecated;
-
+    private String descriptionForOperation;
+    private boolean deprecatedForOperation;
+    private String req_description;
+    private boolean requiredForRequestBody;
+    private boolean req_makeArrayIndicator;
+    private boolean req_suppressRootIndicator;
+    private boolean req_includeMetaHeaderIndicator;
+    private boolean req_includePaginationIndicator;
+    private String res_description;
+    private boolean res_makeArrayIndicator;
+    private boolean res_suppressRootIndicator;
+    private boolean res_includeMetaHeaderIndicator;
+    private boolean res_includePaginationIndicator;
 
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
@@ -30,6 +41,13 @@ public class AddBieForOasDocRequest extends Request {
         super(requester);
     }
 
+    public boolean isOasRequest() {
+        return isOasRequest;
+    }
+
+    public void setOasRequest(boolean oasRequest) {
+        isOasRequest = oasRequest;
+    }
     public BigInteger getTopLevelAsbiepId() {
         return topLevelAsbiepId;
     }
@@ -86,20 +104,108 @@ public class AddBieForOasDocRequest extends Request {
         this.summary = summary;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionForOperation() {
+        return descriptionForOperation;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionForOperation(String descriptionForOperation) {
+        this.descriptionForOperation = descriptionForOperation;
     }
 
-    public boolean isDeprecated() {
-        return deprecated;
+    public boolean isDeprecatedForOperation() {
+        return deprecatedForOperation;
     }
 
-    public void setDeprecated(boolean deprecated) {
-        this.deprecated = deprecated;
+    public void setDeprecatedForOperation(boolean deprecatedForOperation) {
+        this.deprecatedForOperation = deprecatedForOperation;
+    }
+
+    public String getReq_description() {
+        return req_description;
+    }
+
+    public void setReq_description(String req_description) {
+        this.req_description = req_description;
+    }
+
+    public boolean isRequiredForRequestBody() {
+        return requiredForRequestBody;
+    }
+
+    public void setRequiredForRequestBody(boolean requiredForRequestBody) {
+        this.requiredForRequestBody = requiredForRequestBody;
+    }
+
+    public boolean isReq_makeArrayIndicator() {
+        return req_makeArrayIndicator;
+    }
+
+    public void setReq_makeArrayIndicator(boolean req_makeArrayIndicator) {
+        this.req_makeArrayIndicator = req_makeArrayIndicator;
+    }
+
+    public boolean isReq_suppressRootIndicator() {
+        return req_suppressRootIndicator;
+    }
+
+    public void setReq_suppressRootIndicator(boolean req_suppressRootIndicator) {
+        this.req_suppressRootIndicator = req_suppressRootIndicator;
+    }
+
+    public boolean isReq_includeMetaHeaderIndicator() {
+        return req_includeMetaHeaderIndicator;
+    }
+
+    public void setReq_includeMetaHeaderIndicator(boolean req_includeMetaHeaderIndicator) {
+        this.req_includeMetaHeaderIndicator = req_includeMetaHeaderIndicator;
+    }
+
+    public boolean isReq_includePaginationIndicator() {
+        return req_includePaginationIndicator;
+    }
+
+    public void setReq_includePaginationIndicator(boolean req_includePaginationIndicator) {
+        this.req_includePaginationIndicator = req_includePaginationIndicator;
+    }
+
+    public String getRes_description() {
+        return res_description;
+    }
+
+    public void setRes_description(String res_description) {
+        this.res_description = res_description;
+    }
+
+    public boolean isRes_makeArrayIndicator() {
+        return res_makeArrayIndicator;
+    }
+
+    public void setRes_makeArrayIndicator(boolean res_makeArrayIndicator) {
+        this.res_makeArrayIndicator = res_makeArrayIndicator;
+    }
+
+    public boolean isRes_suppressRootIndicator() {
+        return res_suppressRootIndicator;
+    }
+
+    public void setRes_suppressRootIndicator(boolean res_suppressRootIndicator) {
+        this.res_suppressRootIndicator = res_suppressRootIndicator;
+    }
+
+    public boolean isRes_includeMetaHeaderIndicator() {
+        return res_includeMetaHeaderIndicator;
+    }
+
+    public void setRes_includeMetaHeaderIndicator(boolean res_includeMetaHeaderIndicator) {
+        this.res_includeMetaHeaderIndicator = res_includeMetaHeaderIndicator;
+    }
+
+    public boolean isRes_includePaginationIndicator() {
+        return res_includePaginationIndicator;
+    }
+
+    public void setRes_includePaginationIndicator(boolean res_includePaginationIndicator) {
+        this.res_includePaginationIndicator = res_includePaginationIndicator;
     }
 
     public Collection<String> getUpdaterUsernameList() {

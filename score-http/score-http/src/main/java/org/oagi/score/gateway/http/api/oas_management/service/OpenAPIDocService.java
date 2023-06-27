@@ -84,10 +84,8 @@ public class OpenAPIDocService {
         GetBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDoc(request);
         return response;
     }
-
     @Transactional
     public AddBieForOasDocResponse addBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) {
-        List<BieForOasDoc> bieForOasDoc = null;
         BigInteger userId = sessionService.userId(user);
         if (userId == null) {
             throw new IllegalArgumentException("`userId` parameter must not be null.");
@@ -121,12 +119,37 @@ public class OpenAPIDocService {
                 .setOasResourceId(oasResourceId)
                 .setVerb(request.getVerb())
                 .setSummary(request.getSummary())
-                .setDescription(request.getDescription())
-                .setDeprecated(request.isDeprecated())
+                .setDescription(request.getDescriptionForOperation())
+                .setDeprecated(request.isDeprecatedForOperation())
                 .setTimestamp(millis)
                 .execute();
 
-
+        if(request.isOasRequest()){
+            ULong oasRequestId = oasDocRepository.insertOasRequest()
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasMessageBodyId(oasMessageBodyId)
+                    .setDescription(request.getReq_description())
+                    .setMakeArrayIndicator(request.isReq_makeArrayIndicator())
+                    .setSuppressRootIndicator(request.isReq_suppressRootIndicator())
+                    .setIncludePaginationIndicator(request.isReq_includePaginationIndicator())
+                    .setIncludeMetaHeaderIndicator(request.isReq_includeMetaHeaderIndicator())
+                    .setRequired(request.isRequiredForRequestBody())
+                    .setTimestamp(millis)
+                    .execute();
+        }else{
+            ULong oasResponseId = oasDocRepository.insertOasResponse()
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasMessageBodyId(oasMessageBodyId)
+                    .setDescription(request.getRes_description())
+                    .setMakeArrayIndicator(request.isRes_makeArrayIndicator())
+                    .setSuppressRootIndicator(request.isRes_suppressRootIndicator())
+                    .setIncludePaginationIndicator(request.isRes_includePaginationIndicator())
+                    .setIncludeMetaHeaderIndicator(request.isRes_includeMetaHeaderIndicator())
+                    .setTimestamp(millis)
+                    .execute();
+        }
         AddBieForOasDocResponse response =  scoreRepositoryFactory.createBieForOasDocReadRepository().addBieForOasDoc(request);
         return response;
     }
