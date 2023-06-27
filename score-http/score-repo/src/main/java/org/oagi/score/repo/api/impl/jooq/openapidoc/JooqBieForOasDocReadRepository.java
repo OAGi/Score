@@ -117,18 +117,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setMessageBody("response Body");
             }
             bieForOasDoc.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
-            ScoreRole ownerRole = (byte) 1 == record.get(APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer")) ? DEVELOPER : END_USER;
-            boolean isOwnerAdmin = (byte) 1 == record.get(APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"));
-            bieForOasDoc.setOwner(
-                    (isOwnerAdmin) ?
-                            new ScoreUser(
-                                    record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
-                                    record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
-                                    Arrays.asList(ownerRole, ADMINISTRATOR)) :
-                            new ScoreUser(
-                                    record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
-                                    record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
-                                    ownerRole));
+            bieForOasDoc.setOwner(record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toString());
             bieForOasDoc.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),

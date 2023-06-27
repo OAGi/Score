@@ -101,8 +101,6 @@ public class OasDocRepository {
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                     APP_USER.LOGIN_ID.as("owner"),
-                    ASBIEP.BIZ_TERM,
-                    ASBIEP.REMARK,
                     TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
                     APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                     TOP_LEVEL_ASBIEP.STATE));
@@ -177,19 +175,6 @@ public class OasDocRepository {
             }
             return this;
         }
-
-        public SelectBieForOasDocListArguments setBieIdAndType(BigInteger bieId, List<String> types) {
-            if (types.size() == 1) {
-                String type = types.get(0);
-                if (type.equals("ASBIE")) {
-                    conditions.add(ASBIE.ASBIE_ID.eq(ULong.valueOf(bieId)));
-                } else if (type.equals("BBIE")) {
-                    conditions.add(BBIE.BBIE_ID.eq(ULong.valueOf(bieId)));
-                }
-            }
-            return this;
-        }
-
         public SelectBieForOasDocListArguments setType(String type) {
             this.type = type;
             return this;
