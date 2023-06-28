@@ -53,6 +53,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
+import {MultiActionsSnackBarComponent} from "../../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
 
 
 @Component({
@@ -768,10 +769,18 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               .pipe(finalize(() => {
                 this.isUpdating = false;
               })).subscribe(_ => {
-              this.snackBar.open('Making BIE reusable request queued', '', {
-                duration: 3000,
+              this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+                data: {
+                  titleIcon: 'info',
+                  title: 'Info',
+                  message: 'The request for making the BIE is processing. The processed BIE will appear on the BIE list.',
+                  action: 'Go to \'View/Edit BIE\' page',
+                  onAction: (data, snackBarRef) => {
+                    this.router.navigateByUrl('/profile_bie');
+                    snackBarRef.dismissWithAction();
+                  }
+                }
               });
-              this.router.navigateByUrl('/profile_bie');
             });
           });
         }

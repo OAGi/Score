@@ -32,4 +32,6 @@ public interface NamespaceAPI {
     ArrayList<NamespaceObject> getStandardNamespacesURIs();
 
     NamespaceObject getNamespaceById(BigInteger namespaceId);
+
+    ArrayList<NamespaceObject> getNonStandardNamespacesURIs();
 }

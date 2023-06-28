@@ -1,8 +1,10 @@
 package org.oagi.score.e2e.api;
 
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScRecord;
 import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -140,9 +142,9 @@ public interface CoreComponentAPI {
                                 NamespaceObject namespace, String state);
 
     /**
-     * Create a random BDT.
+     * Create a random BDT with the CCTS DT v3.1 specification rule.
      *
-     * @param baseDataType The base data type
+     * @param baseDataType the base data type
      * @param creator      account who creates this BDT
      * @param namespace    namespace
      * @param state        BDT state
@@ -150,6 +152,19 @@ public interface CoreComponentAPI {
      */
     DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
                              NamespaceObject namespace, String state);
+
+    /**
+     * Create a random BDT.
+     *
+     * @param baseDataType the base data type
+     * @param creator      account who creates this BDT
+     * @param namespace    namespace
+     * @param state        BDT state
+     * @param refSpec      reference specification. Used only if the base data type is CDT.
+     * @return created BDT object
+     */
+    DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
+                             NamespaceObject namespace, String state, ReferenceSpec refSpec);
 
     ACCObject createRevisedACC(ACCObject prevAcc, AppUserObject creator, ReleaseObject release, String state);
 
@@ -187,4 +202,17 @@ public interface CoreComponentAPI {
 
     BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 
+    List<DTSCObject> getSupplementaryComponentsForDT(BigInteger dtID, String release);
+
+    DTSCObject getNewlyCreatedSCForDT(BigInteger dtId, String releaseNumber);
+
+    boolean SCPropertyTermIsUnique(DTObject dataType, String release, String objectClassTerm, String representationTerm, String propertyTerm);
+
+    List<String> getRepresentationTermsForCDTs(String release);
+
+    List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm);
+
+    String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm);
+
+    DTObject getRevisedDT(DTObject previousDT);
 }
