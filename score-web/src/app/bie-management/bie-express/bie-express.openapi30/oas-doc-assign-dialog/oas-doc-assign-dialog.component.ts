@@ -31,7 +31,7 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
     'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
-    'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
+    'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<number>(true, []);
@@ -39,6 +39,8 @@ export class OasDocAssignDialogComponent implements OnInit {
   verbSelection = {};
   loading = false;
   oasDoc: OasDoc;
+  arrayIndicator: boolean;
+  suppressRootIndicator: boolean;
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
