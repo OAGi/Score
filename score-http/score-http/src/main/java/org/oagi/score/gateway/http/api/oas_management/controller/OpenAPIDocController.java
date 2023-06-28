@@ -220,7 +220,7 @@ public class OpenAPIDocController {
         return pageResponse;
     }
 
-    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.POST,
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AddBieForOasDocResponse addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
