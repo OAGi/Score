@@ -22,6 +22,7 @@ public class BieForOasDocListRequest {
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();
     private List<BieState> states = Collections.emptyList();
     private List<String> types = Collections.emptyList();
+    private List<String> verbs = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();
     private BigInteger releaseId;
@@ -30,7 +31,7 @@ public class BieForOasDocListRequest {
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
     private Boolean ownedByDeveloper;
     private BigInteger topLevelAsbiepId;
-    private String verb;
+    private BigInteger oasDocId;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
     private String messageBody;

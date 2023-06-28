@@ -91,6 +91,7 @@ public class OpenAPIDocService {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);
         PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
+                .setOasDocId(request.getOasDocId())
                 .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
@@ -123,6 +124,7 @@ public class OpenAPIDocService {
                     .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
             bieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieForOasDoc.setVerbs(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE"));
         });
 
         PageResponse<BieForOasDoc> response = new PageResponse();

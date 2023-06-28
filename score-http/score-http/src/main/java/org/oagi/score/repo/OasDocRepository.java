@@ -110,6 +110,13 @@ public class OasDocRepository {
             return this.selectFields;
         }
 
+        public SelectBieForOasDocListArguments setOasDocId(BigInteger oasDocId) {
+            if (oasDocId != null && oasDocId.longValue() > 0L) {
+                conditions.add(OAS_DOC.OAS_DOC_ID.eq(ULong.valueOf(oasDocId)));
+            }
+            return this;
+        }
+
         public SelectBieForOasDocListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
                 conditions.addAll(contains(den, ASCCP.DEN));

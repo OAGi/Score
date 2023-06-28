@@ -22,7 +22,7 @@ public class BieForOasDoc extends Auditable {
     private String status;
     private BieState state;
     private String access;
-    private String verb;
+    private List<String> verbs;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
     private String messageBody;
@@ -125,12 +125,12 @@ public class BieForOasDoc extends Auditable {
         this.access = access;
     }
 
-    public String getVerb() {
-        return verb;
+    public List<String> getVerbs() {
+        return verbs;
     }
 
-    public void setVerb(String verb) {
-        this.verb = verb;
+    public void setVerbs(List<String> verbs) {
+        this.verbs = verbs;
     }
 
     public boolean isArrayIndicator() {
@@ -229,7 +229,7 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, String verb, boolean arrayIndicator, boolean suppressRootIndicator, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, boolean arrayIndicator, boolean suppressRootIndicator, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.releaseId = releaseId;
         this.oasDocId = oasDocId;
@@ -242,7 +242,7 @@ public class BieForOasDoc extends Auditable {
         this.status = status;
         this.state = state;
         this.access = access;
-        this.verb = verb;
+        this.verbs = verbs;
         this.arrayIndicator = arrayIndicator;
         this.suppressRootIndicator = suppressRootIndicator;
         this.messageBody = messageBody;
@@ -265,11 +265,12 @@ public class BieForOasDoc extends Auditable {
                 ", guid='" + guid + '\'' +
                 ", businessContexts=" + businessContexts +
                 ", ownerUserId=" + ownerUserId +
-                ", owner=" + owner +
+                ", owner='" + owner + '\'' +
                 ", version='" + version + '\'' +
                 ", status='" + status + '\'' +
                 ", state=" + state +
-                ", verb='" + verb + '\'' +
+                ", access='" + access + '\'' +
+                ", verbs=" + verbs +
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
                 ", messageBody='" + messageBody + '\'' +
