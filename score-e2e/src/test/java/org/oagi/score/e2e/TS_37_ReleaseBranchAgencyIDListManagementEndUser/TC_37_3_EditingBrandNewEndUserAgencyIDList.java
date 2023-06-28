@@ -201,10 +201,15 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
                 getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDListObject);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
-        editAgencyIDListPage.hitDeriveAgencyIDListButton();
+        /*
+         * In multi-testing scenarios, other test cases could make it can't find 'Derive Agency ID List' button.
+         */
+        EditAgencyIDListPage editAgencyIDListPage = retry(() -> {
+            ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+            EditAgencyIDListPage page = viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+            page.hitDeriveAgencyIDListButton();
+            return page;
+        });
 
         String listId = randomNumeric(5, 10);
         String versionId = randomAlphanumeric(5, 10);
@@ -225,6 +230,8 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         click(td);
         editAgencyIDListPage.hitRemoveAgencyIDListValueButton();
         editAgencyIDListPage.hitUpdateButton();
+
+        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
         viewEditAgencyIDListPage.openPage();
         editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(name, release.getReleaseNumber());
