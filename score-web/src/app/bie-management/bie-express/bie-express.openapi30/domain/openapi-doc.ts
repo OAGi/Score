@@ -265,7 +265,7 @@ export class BieForOasDoc {
   businessContexts: BusinessContext[];
   lastUpdateTimestamp: Date;
   lastUpdateUser: string;
-  verb: string;
+  verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
   messageBody: string;

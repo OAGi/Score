@@ -211,7 +211,13 @@
           <ng-container matColumnDef="verb">
             <th mat-header-cell *matHeaderCellDef> Verb</th>
             <td mat-cell *matCellDef="let element">
-              <div [matTooltip]="element.verb">{{ element.verb }}</div>
+              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+                <mat-option *ngFor="let verb of element.verbs" [value]="verb">
+                  <span>
+                    {{ verb}}
+                  </span>
+                </mat-option>
+              </mat-select>
             </td>
           </ng-container>
 

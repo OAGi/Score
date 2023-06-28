@@ -36,6 +36,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
+  verbSelection = {};
   loading = false;
   oasDoc: OasDoc;
   loginIdList: string[] = [];
@@ -126,6 +127,7 @@ export class OasDocAssignDialogComponent implements OnInit {
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
+        this.verbSelection[elm.topLevelAsbiepId] = elm.verbs[0];
       });
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
