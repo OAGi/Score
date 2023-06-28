@@ -37,6 +37,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
   verbSelection = {};
+  messageBodySelection = {};
   loading = false;
   oasDoc: OasDoc;
   arrayIndicator: boolean;
@@ -130,6 +131,7 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
         this.verbSelection[elm.topLevelAsbiepId] = elm.verbs[0];
+        this.messageBodySelection[elm.topLevelAsbiepId] = elm.messageBody[0];
       });
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());

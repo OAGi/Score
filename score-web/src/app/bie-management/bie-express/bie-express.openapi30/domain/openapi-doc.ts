@@ -268,7 +268,7 @@ export class BieForOasDoc {
   verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
-  messageBody: string;
+  messageBody: string[];
   resourceName: string;
   operationId: string;
   tagName: string;

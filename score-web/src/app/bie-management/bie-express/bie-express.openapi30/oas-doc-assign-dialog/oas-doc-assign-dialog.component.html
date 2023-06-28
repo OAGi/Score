@@ -236,7 +236,13 @@
           <ng-container matColumnDef="messageBody">
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
             <td mat-cell *matCellDef="let element">
-              <div>{{ element.messageBody }}</div>
+              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+                <mat-option *ngFor="let messageBody of element.messageBody" [value]="messageBody">
+                  <span>
+                    {{ messageBody}}
+                  </span>
+                </mat-option>
+              </mat-select>
             </td>
           </ng-container>
 
