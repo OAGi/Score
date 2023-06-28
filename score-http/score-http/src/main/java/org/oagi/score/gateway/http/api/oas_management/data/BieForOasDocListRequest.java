@@ -23,6 +23,7 @@ public class BieForOasDocListRequest {
     private List<BieState> states = Collections.emptyList();
     private List<String> types = Collections.emptyList();
     private List<String> verbs = Collections.emptyList();
+    private List<String> messageBody = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();
     private BigInteger releaseId;
@@ -34,7 +35,6 @@ public class BieForOasDocListRequest {
     private BigInteger oasDocId;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
-    private String messageBody;
     private String resourceName;
     private String operationId;
     private String tagName;

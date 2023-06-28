@@ -23,9 +23,9 @@ public class BieForOasDoc extends Auditable {
     private BieState state;
     private String access;
     private List<String> verbs;
+    private List<String> messageBody;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
-    private String messageBody;
     private String resourceName;
     private String operationId;
     private String tagName;
@@ -157,11 +157,11 @@ public class BieForOasDoc extends Auditable {
         this.suppressRootIndicator = suppressRootIndicator;
     }
 
-    public String getMessageBody() {
+    public List<String> getMessageBody() {
         return messageBody;
     }
 
-    public void setMessageBody(String messageBody) {
+    public void setMessageBody(List<String> messageBody) {
         this.messageBody = messageBody;
     }
 
@@ -229,7 +229,7 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, boolean arrayIndicator, boolean suppressRootIndicator, String messageBody, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, List<String> messageBody, boolean arrayIndicator, boolean suppressRootIndicator, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.releaseId = releaseId;
         this.oasDocId = oasDocId;
@@ -243,9 +243,9 @@ public class BieForOasDoc extends Auditable {
         this.state = state;
         this.access = access;
         this.verbs = verbs;
+        this.messageBody = messageBody;
         this.arrayIndicator = arrayIndicator;
         this.suppressRootIndicator = suppressRootIndicator;
-        this.messageBody = messageBody;
         this.resourceName = resourceName;
         this.operationId = operationId;
         this.tagName = tagName;
