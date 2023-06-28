@@ -106,7 +106,7 @@ public class OpenAPIDocController {
         return oasDocService.checkOasDocTitleUniqueness(oasDoc);
     }
 
-    @RequestMapping(value = "/oas_doc", method = RequestMethod.PUT)
+    @RequestMapping(value = "/oas_doc", method = RequestMethod.POST)
     public ResponseEntity create(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody OasDoc oasDoc) {
@@ -220,7 +220,7 @@ public class OpenAPIDocController {
         return pageResponse;
     }
 
-    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.PUT,
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AddBieForOasDocResponse addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
