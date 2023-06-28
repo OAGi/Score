@@ -225,9 +225,8 @@ public class OpenAPIDocController {
     public AddBieForOasDocResponse addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody AddBieForOasDocRequest addBieForOasDocRequest) {
-
+        addBieForOasDocRequest.setRequester(authenticationService.asScoreUser(requester));
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, addBieForOasDocRequest);
-
         return response;
     }
 
