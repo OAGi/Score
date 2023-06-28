@@ -139,6 +139,8 @@ export class OasDocAssignDialogComponent implements OnInit {
     }, error => {
       this.dataSource.data = [];
       this.businessContextSelection = {};
+      this.verbSelection = {};
+      this.messageBodySelection = {};
     });
   }
 
@@ -191,6 +193,9 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   addBieForOasDoc() {
+    const selectedTopLevelAsbiepIds = this.selection.selected;
+    this.openAPIService.addBieForOasDoc();
+
   }
 
   onNoClick(): void {
