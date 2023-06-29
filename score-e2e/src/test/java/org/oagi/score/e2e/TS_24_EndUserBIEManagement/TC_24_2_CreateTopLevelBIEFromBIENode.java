@@ -137,6 +137,7 @@ public class TC_24_2_CreateTopLevelBIEFromBIENode extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("13", getText(asbiePanel.getCardinalityMaxField()));
         assertEquals("7", getText(asbiePanel.getCardinalityMinField()));
+        editBIEPage.openPage();
         topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(userb.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
     }
