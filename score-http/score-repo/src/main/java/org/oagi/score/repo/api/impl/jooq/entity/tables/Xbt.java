@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function16;
+import org.jooq.Function17;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -91,6 +91,11 @@ public class Xbt extends TableImpl<XbtRecord> {
      * The column <code>oagi.xbt.openapi30_map</code>.
      */
     public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500), this, "");
+
+    /**
+     * The column <code>oagi.xbt.avro_map</code>.
+     */
+    public final TableField<XbtRecord, String> AVRO_MAP = createField(DSL.name("avro_map"), SQLDataType.VARCHAR(500), this, "");
 
     /**
      * The column <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
@@ -289,18 +294,18 @@ public class Xbt extends TableImpl<XbtRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<ULong, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<ULong, String, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function16<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -308,7 +313,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function16<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

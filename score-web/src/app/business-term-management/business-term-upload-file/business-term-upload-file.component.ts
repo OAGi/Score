@@ -65,10 +65,10 @@ export class BusinessTermUploadFileComponent implements OnInit {
           }
         }
       }, error => {
-        this.snackBar.open('Error occurred.', '', {
+        const errorMessage = error.headers.get('X-Error-Message') || 'Error occurred.';
+        this.snackBar.open(errorMessage, '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/business_term_management/business_term');
       });
     }
   }
