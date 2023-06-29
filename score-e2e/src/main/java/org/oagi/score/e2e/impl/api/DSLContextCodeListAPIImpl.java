@@ -274,6 +274,8 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     public void updateCodeList(CodeListObject codeListWIP) {
         dslContext.update(CODE_LIST)
                 .set(CODE_LIST.IS_DEPRECATED, (byte) (codeListWIP.isDeprecated() ? 1 : 0))
+                .set(CODE_LIST.VERSION_ID, codeListWIP.getVersionId())
+                .set(CODE_LIST.DEFINITION, codeListWIP.getDefinition())
                 .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeListWIP.getCodeListId())))
                 .execute();
     }
