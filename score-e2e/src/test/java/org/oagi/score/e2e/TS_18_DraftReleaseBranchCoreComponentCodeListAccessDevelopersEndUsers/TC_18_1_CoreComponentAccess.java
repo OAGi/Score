@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDe
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -97,7 +98,10 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
-        waitFor(Duration.ofSeconds(300L));
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do{
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while(!newDraftRelease.getState().equals("Draft"));
         homePage.logout();
     }
 
@@ -184,6 +188,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         for (String state : ccStates) {
             viewEditCoreComponentPage.setState(state);
+            escape(getDriver());
             viewEditCoreComponentPage.hitSearchButton();
             assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
         }
@@ -260,16 +265,20 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
      * We cannot change BDT now
      */
     @Test
+    @Disabled
     public void test_TA_18_1_5_d() {
-
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
     }
 
     /**
      * Position of an association changes.
      */
     @Test
+    @Disabled
     public void test_TA_18_1_5_e() {
-
+        thisAccountWillBeDeletedAfterTests(developer);
+        thisAccountWillBeDeletedAfterTests(endUser);
     }
 
     private class RandomCoreComponentWithStateContainer {
