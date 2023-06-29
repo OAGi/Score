@@ -974,7 +974,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("WIP", getText(topLevelASBIEPPanel.getStateField()));
     }
-
     @Test
     public void test_TA_24_1_12() {
         ASCCPObject asccp, asccp_for_usera;
