@@ -1,16 +1,12 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.JSON;
+import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
 import org.oagi.score.e2e.obj.*;
 
@@ -20,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -630,6 +625,12 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
     @Override
     public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+        return createRandomBDT(baseDataType, creator, namespace, state, ReferenceSpec.CCTS_DT_v3_1);
+    }
+
+    @Override
+    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state,
+                                    ReferenceSpec referenceSpec) {
         DTObject bdt = DTObject.createRandomDT(baseDataType, creator, namespace, state);
         bdt.setReleaseId(baseDataType.getReleaseId());
         DtRecord dtRecord = new DtRecord();
@@ -718,12 +719,41 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dslContext.selectFrom(DT_SC_MANIFEST)
                 .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(ULong.valueOf(baseDataType.getDtManifestId())))
                 .fetch().forEach(dtScManifest -> {
+                    ULong oldDtScId = dtScManifest.getDtScId();
                     DtScRecord dtSc = dslContext.selectFrom(DT_SC)
-                            .where(DT_SC.DT_SC_ID.eq(dtScManifest.getDtScId()))
+                            .where(DT_SC.DT_SC_ID.eq(oldDtScId))
                             .fetchOne();
 
                     dtSc.setDtScId(null);
+                    dtSc.setBasedDtScId(oldDtScId);
                     dtSc.setOwnerDtId(bdtId);
+                    if (isCdt) {
+                        RefSpecRecord refSpec = null;
+                        switch (referenceSpec) {
+                            case CCTS_DT_v3_1:
+                                refSpec = dslContext.selectFrom(REF_SPEC)
+                                        .where(REF_SPEC.SPEC.eq("CCTS DT v3.1"))
+                                        .fetchOne();
+                                break;
+                            case ISO_15000_5:
+                                refSpec = dslContext.selectFrom(REF_SPEC)
+                                        .where(REF_SPEC.SPEC.eq("ISO 15000:5 (2014) CCT"))
+                                        .fetchOne();
+                                break;
+                        }
+                        if (refSpec != null) {
+                            CdtScRefSpecRecord cdtScRefSpec = dslContext.selectFrom(CDT_SC_REF_SPEC)
+                                    .where(and(
+                                            CDT_SC_REF_SPEC.REF_SPEC_ID.eq(refSpec.getRefSpecId()),
+                                            CDT_SC_REF_SPEC.CDT_SC_ID.eq(oldDtScId)
+                                    ))
+                                    .fetchOptional().orElse(null);
+                            if (cdtScRefSpec == null) {
+                                dtSc.setCardinalityMax(0);
+                            }
+                        }
+                    }
+
                     dtSc.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
                     dtSc.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
                     dtSc.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
@@ -738,6 +768,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     ULong oldDtScManifestId = dtScManifest.getDtScManifestId();
 
                     dtScManifest.setDtScManifestId(null);
+                    dtScManifest.setBasedDtScManifestId(oldDtScManifestId);
                     dtScManifest.setDtScId(dtSc.getDtScId());
                     dtScManifest.setOwnerDtManifestId(dtManifestId);
                     dtScManifest.setDtScManifestId(
@@ -748,7 +779,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
                     if (isCdt) {
                         List<CdtScAwdPriRecord> cdtScAwdPriList = dslContext.selectFrom(CDT_SC_AWD_PRI)
-                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(dtSc.getDtScId()))
+                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(oldDtScId))
                                 .fetch();
                         for (CdtScAwdPriRecord cdtScAwdPri : cdtScAwdPriList) {
                             List<CdtScAwdPriXpsTypeMapRecord> cdtScAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
@@ -764,7 +795,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                                         .execute();
                             }
                         }
-
                     } else {
                         List<BdtScPriRestriRecord> bdtScPriRestriList = dslContext.selectFrom(BDT_SC_PRI_RESTRI)
                                 .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(oldDtScManifestId))
@@ -1505,6 +1535,139 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .from(RELEASE)
                 .where(RELEASE.RELEASE_NUM.eq(releaseNum))
                 .fetchOneInto(ULong.class);
+    }
+
+    @Override
+    public List<DTSCObject> getSupplementaryComponentsForDT(BigInteger dtID, String release) {
+        List<DTSCObject> dtList = new ArrayList<>();
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        List<Result<Record>> result = dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT_SC_MANIFEST).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(CDT_SC_REF_SPEC).on(DT_SC.DT_SC_ID.eq(CDT_SC_REF_SPEC.CDT_SC_ID))
+                .join(REF_SPEC).on(CDT_SC_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
+                .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)).and(REF_SPEC.SPEC.eq("CCTS DT v3.1")))
+                .fetchMany();
+        for (Result<Record> r: result){
+            for (int i=0; i<r.size(); i++){
+                DTSCObject dtSC = dtSCMapper(r.get(i));
+                dtList.add(dtSC);
+            }
+        }
+        return dtList;
+    }
+
+    @Override
+    public boolean SCPropertyTermIsUnique(DTObject dataType, String release, String objectClassTerm, String representationTerm, String propertyTerm) {
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        List<Result<Record>> result = dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT.DT_ID.eq(ULong.valueOf(dataType.getDtId())),
+                        RELEASE.RELEASE_NUM.eq(release), DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm), DT_SC.REPRESENTATION_TERM.eq(representationTerm),
+                        DT_SC.PROPERTY_TERM.eq(propertyTerm)))
+                .fetchMany();
+        if (result.size()>1){
+            return false;
+        } else return true;
+    }
+
+    @Override
+    public List<String> getRepresentationTermsForCDTs(String release) {
+        List<String> representationTerms = new ArrayList<>();
+
+        representationTerms = dslContext.select(DT.REPRESENTATION_TERM)
+                .from(DT)
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(CDT_REF_SPEC).on(DT.DT_ID.eq(CDT_REF_SPEC.CDT_ID))
+                .join(REF_SPEC).on(CDT_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
+                .where(and(RELEASE.RELEASE_NUM.eq(release), REF_SPEC.SPEC.eq("CCTS DT v3.1")))
+                .fetch(DT.REPRESENTATION_TERM);
+        return representationTerms;
+    }
+
+    @Override
+    public List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm) {
+        List<String> valueDomains = new ArrayList<>();
+
+        valueDomains = dslContext.select()
+                .from(DT)
+                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
+                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .where(DT.REPRESENTATION_TERM.eq(representationTerm))
+                .fetch(CDT_PRI.NAME);
+        return valueDomains;
+    }
+
+    @Override
+    public String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm) {
+        return dslContext.select(CDT_PRI.NAME)
+                .from(DT)
+                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
+                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .where(DT.REPRESENTATION_TERM.eq(representationTerm).and(CDT_AWD_PRI.IS_DEFAULT.eq((byte) 1)))
+                .fetchOneInto(String.class);
+    }
+
+    @Override
+    public DTObject getRevisedDT(DTObject previousDT) {
+        List<Field<?>> fields = new ArrayList();
+        fields.add(DT_MANIFEST.DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
+        fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(DT.fields()));
+        return dslContext.select(fields)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .where(DT.PREV_DT_ID.eq(ULong.valueOf(previousDT.getDtId())))
+                .fetchOne(record -> dtMapper(record));
+    }
+
+    @Override
+    public DTSCObject getNewlyCreatedSCForDT(BigInteger dtId, String releaseNumber) {
+        ULong latestSCId = dslContext.select(DSL.max(DT_SC.DT_SC_ID))
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT.DT_ID.eq(ULong.valueOf(dtId)),
+                        RELEASE.RELEASE_NUM.eq(releaseNumber)))
+                .fetchOneInto(ULong.class);
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(DT_SC.fields()));
+        return dslContext.select(fields)
+                .from(DT_SC)
+                .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(and(DT_SC.DT_SC_ID.eq(latestSCId)))
+                .fetchOne(record -> dtSCMapper(record));
+    }
+
+
+
+    private DTSCObject dtSCMapper(org.jooq.Record record) {
+        DTSCObject dtSC = new DTSCObject();
+        dtSC.setDtSCId(record.get(DT_SC.DT_SC_ID).toBigInteger());
+        dtSC.setOwnerDTId(record.get(DT_SC.OWNER_DT_ID).toBigInteger());
+        dtSC.setGuid(record.get(DT_SC.GUID));
+        dtSC.setObjectClassTerm(record.get(DT_SC.OBJECT_CLASS_TERM));
+        dtSC.setPropertyTerm(record.get(DT_SC.PROPERTY_TERM));
+        dtSC.setRepresentationTerm(record.get(DT_SC.REPRESENTATION_TERM));
+        dtSC.setDefinition(record.get(DT_SC.DEFINITION));
+        dtSC.setDefinitionSource(record.get(DT_SC.DEFINITION_SOURCE));
+        dtSC.setOwnerUserId(record.get(DT_SC.OWNER_USER_ID).toBigInteger());
+        dtSC.setCreatedBy(record.get(DT_SC.CREATED_BY).toBigInteger());
+        dtSC.setLastUpdatedBy(record.get(DT_SC.LAST_UPDATED_BY).toBigInteger());
+        return dtSC;
     }
 
 }

@@ -9,6 +9,7 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.agency_id_list.AddCommentDialog;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
+import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
@@ -31,6 +32,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+    private static final By BASED_AGENCY_ID_LIST_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Based Agency ID List\")]//ancestor::mat-form-field//input");
     private static final By AGENCY_ID_LIST_NAME_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By LIST_ID_FIELD_LOCATOR =
@@ -41,20 +44,34 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//mat-select");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
+    private static final By DEPRECATED_CHECKBOX_LOCATOR =
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox[1]");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+    private static final By REMARK_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+    private static final By RESTORE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
+    public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    private static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
@@ -69,6 +86,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
     private static final By BACK_TO_WIP_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
+    private static final By DERIVE_AGENCY_ID_LIST_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Derive Agency ID List based on this\")]//ancestor::button[1]");
     private static final By ADD_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
     private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
@@ -89,9 +108,9 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     protected String getPageUrl() {
-        if (this.agencyIDList.getAgencyIDListManifestId()!=null){
+        if (this.agencyIDList.getAgencyIDListManifestId() != null) {
             return getConfig().getBaseUrl().resolve("/agency_id_list/" + this.agencyIDList.getAgencyIDListManifestId()).toString();
-        }else{
+        } else {
             return getConfig().getBaseUrl().resolve("/agency_id_list/" + this.agencyIDList.getAgencyIDListId()).toString();
         }
     }
@@ -122,6 +141,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public void setListID(String listId) {
+        sendKeys(getListIDField(), listId);
+    }
+
+    @Override
     public WebElement getCoreComponentField() {
         return visibilityOfElementLocated(getDriver(), CORE_COMPONENT_FIELD_LOCATOR);
     }
@@ -149,6 +173,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getOwnerField() {
         return visibilityOfElementLocated(getDriver(), OWNER_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getBasedAgencyIDListField() {
+        return visibilityOfElementLocated(getDriver(), BASED_AGENCY_ID_LIST_FIELD_LOCATOR);
     }
 
     @Override
@@ -189,6 +218,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public WebElement getDeprecatedCheckbox() {
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_CHECKBOX_LOCATOR);
+    }
+
+    @Override
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
@@ -206,6 +240,16 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setDefinitionSource(String definitionSource) {
         sendKeys(getDefinitionSourceField(), definitionSource);
+    }
+
+    @Override
+    public WebElement getRemarkField() {
+        return visibilityOfElementLocated(getDriver(), REMARK_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        sendKeys(getRemarkField(), remark);
     }
 
     @Override
@@ -236,6 +280,27 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     }
 
     @Override
+    public void delete() {
+        click(getDeleteButton(true));
+        click(elementToBeClickable(getDriver(), CONFIRM_DELETE_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getRestoreButton() {
+        return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void restore() {
+        click(getRestoreButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_RESTORE_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
     public WebElement getCommentButton() {
         return elementToBeClickable(getDriver(), COMMENT_BUTTON_LOCATOR);
     }
@@ -259,6 +324,19 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
         click(elementToBeClickable(getDriver(), CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getAmendButton() {
+        return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void amend() {
+        click(getAmendButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -349,6 +427,21 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             click(getBackToWIPButton());
             waitFor(ofMillis(1000L));
             click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getDeriveAgencyIDListButton() {
+        return elementToBeClickable(getDriver(), DERIVE_AGENCY_ID_LIST_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitDeriveAgencyIDListButton() {
+        retry(() -> {
+            click(getDeriveAgencyIDListButton());
+            waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));

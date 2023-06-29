@@ -280,6 +280,10 @@
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
+                        <div class="pl-2 align-self-center" *ngIf="isInvalidState(node)">
+                          <mat-icon matTooltip="Invalid state">error</mat-icon>
+                        </div>
+
                         <span [class]="['pl-2', 'align-self-center']"
                               *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
