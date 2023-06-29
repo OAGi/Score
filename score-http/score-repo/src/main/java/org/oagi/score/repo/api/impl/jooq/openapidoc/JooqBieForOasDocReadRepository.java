@@ -100,7 +100,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
             bieForOasDoc.setPropertyTerm(record.get(ASCCP.DEN));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
-            if (OAS_REQUEST != null) {
+            if (record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")) != null) {
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerbs(Arrays.asList(record.get(OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb"))));
                 bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator")) == (byte) 1);
@@ -109,7 +109,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id")));
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name")));
                 bieForOasDoc.setMessageBody(Arrays.asList("requestBody"));
-            } else if (OAS_RESPONSE != null) {
+            } else if (record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")) != null) {
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerbs(Arrays.asList(record.get(OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb"))));
                 bieForOasDoc.setArrayIndicator(record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("res_array_indicator")) == (byte) 1);
@@ -146,7 +146,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
             bieForOasDoc = select()
-                    .where(or(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
+                    .where(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
                     .fetch(mapper());
         }
         return new GetBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
@@ -173,40 +173,11 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
 
     private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
         List<Condition> conditions = new ArrayList();
-
-        if (request.getTopLevelAsbiepIdList() != null && !request.getTopLevelAsbiepIdList().isEmpty()) {
-            if (request.getTopLevelAsbiepIdList().size() == 1) {
-                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(
-                        ULong.valueOf(request.getTopLevelAsbiepIdList().iterator().next())
-                ));
-            } else {
-                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
-                        request.getTopLevelAsbiepIdList().stream()
-                                .map(e -> ULong.valueOf(e)).collect(Collectors.toList())
-                ));
-            }
-        }
-
         if (request.getOasDocId() != null) {
-            conditions.add(OAS_DOC.OAS_DOC_ID.eq(
+            conditions.add(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id").eq(
                     ULong.valueOf(request.getOasDocId())
             ));
         }
-
-
-        if (!request.getUpdaterUsernameList().isEmpty()) {
-            conditions.add(APP_USER.as("updater").LOGIN_ID.in(
-                    new HashSet<>(request.getUpdaterUsernameList()).stream()
-                            .filter(e -> StringUtils.hasLength(e)).map(e -> trim(e)).collect(Collectors.toList())
-            ));
-        }
-        if (request.getUpdateStartDate() != null) {
-            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.greaterOrEqual(request.getUpdateStartDate()));
-        }
-        if (request.getUpdateEndDate() != null) {
-            conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.lessThan(request.getUpdateEndDate()));
-        }
-
         return conditions;
     }
 

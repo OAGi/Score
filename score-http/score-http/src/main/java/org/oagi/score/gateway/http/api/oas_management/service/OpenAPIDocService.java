@@ -86,6 +86,11 @@ public class OpenAPIDocService {
         return response;
     }
 
+    public GetBieForOasDocListResponse getBieForOasDocList(GetBieForOasDocListRequest request) {
+        GetBieForOasDocListResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDocList(request);
+        return response;
+    }
+
     public PageResponse<BieForOasDoc> selectBieForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);
