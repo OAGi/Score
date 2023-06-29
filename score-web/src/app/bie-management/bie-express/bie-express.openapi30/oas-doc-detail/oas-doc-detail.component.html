@@ -106,8 +106,8 @@
               <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
                 <div class="den word-break-all">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                     matTooltip="{{ element.den }}">
-                    <span>{{ element.den }}</span>
+                     matTooltip="{{ element.propertyTerm }}">
+                    <span>{{ element.propertyTerm }}</span>
                   </a>
                 </div>
                 <div class="description">{{ element.guid }}</div>
@@ -131,7 +131,7 @@
             <ng-container matColumnDef="verb">
               <th mat-header-cell *matHeaderCellDef> Verb</th>
               <td mat-cell *matCellDef="let element">
-                <div [matTooltip]="element.verb">{{ element.verb }}</div>
+                <div [matTooltip]="element.verbs">{{ element.verbs }}</div>
               </td>
             </ng-container>
 
@@ -145,7 +145,7 @@
             <ng-container matColumnDef="suppressRoot">
               <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.suprressRoot }}</div>
+                <div>{{ element.suppressRootIndicator }}</div>
               </td>
             </ng-container>
 

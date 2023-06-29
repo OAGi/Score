@@ -137,16 +137,16 @@ export class BieForOasDocListRequest {
   excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
+  types: string[] = [];
+  ownerLoginIds: string[] = [];
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
   };
-  ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   page: PageRequest = new PageRequest();
   ownedByDeveloper: boolean = undefined;
-
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
@@ -175,6 +175,7 @@ export class BieForOasDocListRequest {
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
@@ -189,13 +190,13 @@ export class BieForOasDocListRequest {
       den: params.get('den') || ''
     };
   }
-
-  toParams(): HttpParams {
+  toQuery(extras?): string {
     let params = new HttpParams()
       .set('sortActive', this.page.sortActive)
       .set('sortDirection', this.page.sortDirection)
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
+
     if (this.release) {
       params = params.set('releaseId', this.release.releaseId.toString());
     }
@@ -205,11 +206,14 @@ export class BieForOasDocListRequest {
     if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));
     }
-    if (this.access && this.access.length > 0) {
-      params = params.set('access', '' + this.access);
-    }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.types && this.types.length > 0) {
+      params = params.set('types', this.types.join(','));
+    }
+    if (this.access && this.access.length > 0) {
+      params = params.set('access', this.access);
     }
     if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
@@ -217,14 +221,11 @@ export class BieForOasDocListRequest {
     if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
       params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
     }
-    if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
-    }
     if (this.updatedDate.start) {
-      params = params.set('updateStart', '' + this.updatedDate.start.getTime());
+      params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
     }
     if (this.updatedDate.end) {
-      params = params.set('updateEnd', '' + this.updatedDate.end.getTime());
+      params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
     }
     if (this.filters.propertyTerm && this.filters.propertyTerm.length > 0) {
       params = params.set('propertyTerm', '' + this.filters.propertyTerm);
@@ -238,11 +239,11 @@ export class BieForOasDocListRequest {
     if (this.filters.den && this.filters.den.length > 0) {
       params = params.set('den', '' + this.filters.den);
     }
-    return params;
-  }
-
-  toQuery(): string {
-    const params = this.toParams();
+    if (extras) {
+      Object.keys(extras).forEach(key => {
+        params = params.set(key.toString(), extras[key]);
+      });
+    }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
@@ -272,4 +273,14 @@ export class BieForOasDoc {
   resourceName: string;
   operationId: string;
   tagName: string;
+}
+export class AssignBieForOasDoc {
+  isOasRequest: boolean;
+  oasDocId: number;
+  topLevelAsbiepId: number;
+  den: string;
+  verb: string;
+  arrayIndicator: boolean;
+  suppressRoot: boolean;
+  messageBody: string;
 }

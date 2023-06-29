@@ -16,8 +16,9 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
-import {BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
+import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -34,7 +35,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
-  selection = new SelectionModel<number>(true, []);
+  selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
   verbSelection = {};
   messageBodySelection = {};
@@ -52,6 +53,8 @@ export class OasDocAssignDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieForOasDocListRequest;
+  assignBieForOasDoc: AssignBieForOasDoc;
+  assignBieForOasDocList: AssignBieForOasDoc[];
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -64,6 +67,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<OasDocAssignDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -71,6 +75,8 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.oasDoc = this.data.oasDoc;
+    this.assignBieForOasDoc = new AssignBieForOasDoc();
+    this.assignBieForOasDocList = [];
     // Init BIE list table for OasDoc
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
@@ -177,24 +183,44 @@ export class OasDocAssignDialogComponent implements OnInit {
   }
 
   select(row: BieForOasDoc) {
-    this.selection.select(row.topLevelAsbiepId);
+    this.selection.select(row);
   }
 
   toggle(row: BieForOasDoc) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAsbiepId);
+      this.selection.deselect(row);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BieForOasDoc) {
-    return this.selection.isSelected(row.topLevelAsbiepId);
+    return this.selection.isSelected(row);
   }
 
   addBieForOasDoc() {
-    const selectedTopLevelAsbiepIds = this.selection.selected;
-    this.openAPIService.addBieForOasDoc();
+    const selectedBieForOasDocs = this.selection.selected;
+    for (const bieForOasDoc of selectedBieForOasDocs) {
+      this.assignBieForOasDoc.den = bieForOasDoc.den;
+      this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
+      this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
+      if (this.assignBieForOasDoc.verb === 'GET') {
+        this.assignBieForOasDoc.isOasRequest = true;
+        this.assignBieForOasDoc.messageBody = 'responseBody';
+      } else {
+        this.assignBieForOasDoc.isOasRequest = false;
+        this.assignBieForOasDoc.messageBody = 'requestBody';
+      }
+      this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
+      this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
+      this.assignBieForOasDoc.suppressRoot = bieForOasDoc.suppressRoot;
+    }
+    this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
+      this.snackBar.open('Added', '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/profile_bie/express/oas_doc/' + this.oasDoc.oasDocId);
+    });
 
   }
 
