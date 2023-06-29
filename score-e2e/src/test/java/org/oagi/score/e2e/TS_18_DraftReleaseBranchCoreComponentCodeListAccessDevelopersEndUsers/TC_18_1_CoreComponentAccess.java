@@ -99,9 +99,9 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do{
+        do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while(!newDraftRelease.getState().equals("Draft"));
+        } while (!newDraftRelease.getState().equals("Draft"));
         homePage.logout();
     }
 
