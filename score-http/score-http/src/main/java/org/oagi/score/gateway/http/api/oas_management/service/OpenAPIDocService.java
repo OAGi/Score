@@ -15,7 +15,6 @@ import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRespo
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -181,11 +180,11 @@ public class OpenAPIDocService {
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
                     .setOasMessageBodyId(oasMessageBodyId)
-                    .setDescription(request.getReq_description())
-                    .setMakeArrayIndicator(request.isReq_makeArrayIndicator())
-                    .setSuppressRootIndicator(request.isReq_suppressRootIndicator())
-                    .setIncludePaginationIndicator(request.isReq_includePaginationIndicator())
-                    .setIncludeMetaHeaderIndicator(request.isReq_includeMetaHeaderIndicator())
+                    .setDescription(request.getDescription())
+                    .setMakeArrayIndicator(request.isMakeArrayIndicator())
+                    .setSuppressRootIndicator(request.isSuppressRootIndicator())
+                    .setIncludePaginationIndicator(request.isIncludePaginationIndicator())
+                    .setIncludeMetaHeaderIndicator(request.isIncludeMetaHeaderIndicator())
                     .setRequired(request.isRequiredForRequestBody())
                     .setTimestamp(millis)
                     .execute();
@@ -194,11 +193,11 @@ public class OpenAPIDocService {
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
                     .setOasMessageBodyId(oasMessageBodyId)
-                    .setDescription(request.getRes_description())
-                    .setMakeArrayIndicator(request.isRes_makeArrayIndicator())
-                    .setSuppressRootIndicator(request.isRes_suppressRootIndicator())
-                    .setIncludePaginationIndicator(request.isRes_includePaginationIndicator())
-                    .setIncludeMetaHeaderIndicator(request.isRes_includeMetaHeaderIndicator())
+                    .setDescription(request.getDescription())
+                    .setMakeArrayIndicator(request.isMakeArrayIndicator())
+                    .setSuppressRootIndicator(request.isSuppressRootIndicator())
+                    .setIncludePaginationIndicator(request.isIncludePaginationIndicator())
+                    .setIncludeMetaHeaderIndicator(request.isIncludeMetaHeaderIndicator())
                     .setTimestamp(millis)
                     .execute();
         }

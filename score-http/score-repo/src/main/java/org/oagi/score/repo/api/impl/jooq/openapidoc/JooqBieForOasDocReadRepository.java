@@ -6,6 +6,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasDocRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
@@ -41,6 +42,8 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
                         ASCCP.DEN,
+                        APP_USER.as("owner").LOGIN_ID.as("owner"),
+                        APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                         APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                         APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
                         APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
@@ -154,9 +157,15 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         List<BieForOasDoc> bieForOasDoc = null;
 
         BigInteger oasDocId = request.getOasDocId();
-        if (oasDocId != null) {
+        if (oasDocId != null && request.isOasRequest()) {
             bieForOasDoc = select()
-                    .where(or(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
+                    .where(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
+                    .fetch(mapper());
+        }
+
+        if (oasDocId != null && !request.isOasRequest()){
+            bieForOasDoc = select()
+                    .where(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
                     .fetch(mapper());
         }
         return new AddBieForOasDocResponse(bieForOasDoc, 1, 1, 1);

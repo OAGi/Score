@@ -1,9 +1,12 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.checkerframework.checker.units.qual.A;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.bie.model.TopLevelAsbiep;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
@@ -224,9 +227,26 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AddBieForOasDocResponse addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @RequestBody AddBieForOasDocRequest addBieForOasDocRequest) {
-        addBieForOasDocRequest.setRequester(authenticationService.asScoreUser(requester));
-        AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, addBieForOasDocRequest);
+            @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
+
+        AddBieForOasDocRequest request = new AddBieForOasDocRequest(authenticationService.asScoreUser(requester));
+        request.setOasRequest(assignBieForOasDoc.isOasRequest());
+        request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
+        request.setOasDocId(assignBieForOasDoc.getOasDocId());
+        request.setVerb(assignBieForOasDoc.getVerb());
+        request.setOperationId(request.getVerb() + ' ' + assignBieForOasDoc.getDen());
+        request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
+        request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
+        if (request.isOasRequest()){
+            request.setRequiredForRequestBody(true);
+        }
+        if (request.isMakeArrayIndicator()){
+            request.setPath("/" + assignBieForOasDoc.getDen() +"/list");
+        }else{
+            request.setPath("/" + assignBieForOasDoc.getDen());
+        }
+        request.setDeprecatedForOperation(false);
+        AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
         return response;
     }
 
