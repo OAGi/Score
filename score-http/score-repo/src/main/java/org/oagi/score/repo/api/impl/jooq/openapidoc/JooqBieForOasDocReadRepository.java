@@ -6,24 +6,22 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasDocRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.security.AccessControl;
-import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
-import static org.oagi.score.repo.api.user.model.ScoreRole.*;
+import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
 public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         implements BieForOasDocReadRepository {
@@ -43,7 +41,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         ASCCP.GUID,
                         ASCCP.DEN,
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
-                        APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                         APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                         APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
                         APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
@@ -98,13 +95,13 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
             bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
             bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
-            bieForOasDoc.setPropertyTerm(record.get(ASCCP.DEN));
+            bieForOasDoc.setDen(record.get(ASCCP.DEN));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
             if (record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")) != null) {
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerbs(Arrays.asList(record.get(OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb"))));
                 bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator")) == (byte) 1);
-                bieForOasDoc.setSuppressRootIndicator(record.get( OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator")) == (byte) 1);
+                bieForOasDoc.setSuppressRootIndicator(record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator")) == (byte) 1);
                 bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("req_oas_resource").PATH.as("req_resource_name")));
                 bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id")));
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name")));
@@ -120,7 +117,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setMessageBody(Arrays.asList("responseBody"));
             }
             bieForOasDoc.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
-            bieForOasDoc.setOwner(record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toString());
+            bieForOasDoc.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")).toString());
             bieForOasDoc.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
@@ -163,7 +160,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     .fetch(mapper());
         }
 
-        if (oasDocId != null && !request.isOasRequest()){
+        if (oasDocId != null && !request.isOasRequest()) {
             bieForOasDoc = select()
                     .where(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
                     .fetch(mapper());

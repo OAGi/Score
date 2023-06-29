@@ -13,6 +13,7 @@ public class BieForOasDoc extends Auditable {
     private BigInteger topLevelAsbiepId;
     private BigInteger releaseId;
     private BigInteger oasDocId;
+    private String den;
     private String propertyTerm;
     private String guid;
     private List<BusinessContext> businessContexts;
@@ -67,6 +68,14 @@ public class BieForOasDoc extends Auditable {
 
     public void setOwnerUserId(BigInteger ownerUserId) {
         this.ownerUserId = ownerUserId;
+    }
+
+    public String getDen() {
+        return den;
+    }
+
+    public void setDen(String den) {
+        this.den = den;
     }
 
     public String getPropertyTerm() {
@@ -229,10 +238,11 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, List<String> messageBody, boolean arrayIndicator, boolean suppressRootIndicator, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, String den, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, List<String> messageBody, boolean arrayIndicator, boolean suppressRootIndicator, String resourceName, String operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         this.releaseId = releaseId;
         this.oasDocId = oasDocId;
+        this.den = den;
         this.propertyTerm = propertyTerm;
         this.guid = guid;
         this.businessContexts = businessContexts;
@@ -261,6 +271,7 @@ public class BieForOasDoc extends Auditable {
                 "topLevelAsbiepId=" + topLevelAsbiepId +
                 ", releaseId=" + releaseId +
                 ", oasDocId=" + oasDocId +
+                ", den='" + den + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", guid='" + guid + '\'' +
                 ", businessContexts=" + businessContexts +
@@ -271,9 +282,9 @@ public class BieForOasDoc extends Auditable {
                 ", state=" + state +
                 ", access='" + access + '\'' +
                 ", verbs=" + verbs +
+                ", messageBody=" + messageBody +
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
-                ", messageBody='" + messageBody + '\'' +
                 ", resourceName='" + resourceName + '\'' +
                 ", operationId='" + operationId + '\'' +
                 ", tagName='" + tagName + '\'' +

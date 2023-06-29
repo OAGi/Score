@@ -6,6 +6,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -397,6 +398,352 @@ public class OasDocRepository {
 
     public SelectBieForOasDocListArguments selectBieForOasDocLists() {
         return new SelectBieForOasDocListArguments();
+    }
+
+    public class GetBieListForOasDocArguments {
+
+        private final List<Field> selectFields = new ArrayList<>();
+        private final List<Condition> conditions = new ArrayList<>();
+        private List<SortField<?>> sortFields = new ArrayList<>();
+        private int offset = -1;
+        private int numberOfRows = -1;
+
+        private String den;
+        private String type;
+
+        GetBieListForOasDocArguments() {
+            selectFields.addAll(Arrays.asList(
+                    TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                    TOP_LEVEL_ASBIEP.STATE,
+                    TOP_LEVEL_ASBIEP.VERSION,
+                    TOP_LEVEL_ASBIEP.RELEASE_ID,
+                    ASBIEP.ASBIEP_ID,
+                    ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                    ASCCP.ASCCP_ID,
+                    ASCCP.GUID,
+                    ASCCP.DEN,
+                    APP_USER.as("owner").LOGIN_ID.as("owner"),
+                    APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
+                    APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                    APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                    APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
+                    OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id"),
+                    OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id"),
+                    OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb"),
+                    OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb"),
+                    OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name"),
+                    OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name"),
+                    OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator"),
+                    OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("res_array_indicator"),
+                    OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator"),
+                    OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("res_suppress_root_indicator"),
+                    OAS_RESOURCE.as("req_oas_resource").PATH.as("req_resource_name"),
+                    OAS_RESOURCE.as("res_oas_resource").PATH.as("res_resource_name"),
+                    OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id"),
+                    OAS_OPERATION.as("res_oas_operation").OPERATION_ID.as("res_operation_id"),
+                    APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                    APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                    APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                    APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                    APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                    APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                    OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
+                    OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP));
+        }
+
+        public List<Field> selectFields() {
+            return this.selectFields;
+        }
+
+        public GetBieListForOasDocArguments setOasDocId(BigInteger oasDocId) {
+            if (oasDocId != null && oasDocId.longValue() > 0L) {
+                conditions.add(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setDen(String den) {
+            if (StringUtils.hasLength(den)) {
+                conditions.addAll(contains(den, ASCCP.DEN));
+                selectFields.add(
+                        val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
+                                        .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
+                                .as("score")
+                );
+                sortFields.add(field("score").desc());
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setPropertyTerm(String propertyTerm) {
+            if (StringUtils.hasLength(propertyTerm)) {
+                conditions.addAll(contains(propertyTerm, ASCCP.PROPERTY_TERM));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setBusinessContext(String businessContext) {
+            if (StringUtils.hasLength(businessContext)) {
+                conditions.addAll(contains(businessContext, BIZ_CTX.NAME));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setAsccpManifestId(BigInteger asccpManifestId) {
+            if (asccpManifestId != null && asccpManifestId.longValue() > 0L) {
+                conditions.add(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setExcludePropertyTerms(List<String> excludePropertyTerms) {
+            if (!excludePropertyTerms.isEmpty()) {
+                conditions.add(ASCCP.PROPERTY_TERM.notIn(excludePropertyTerms));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setExcludeTopLevelAsbiepIds(List<BigInteger> excludeTopLevelAsbiepIds) {
+            if (!excludeTopLevelAsbiepIds.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.notIn(
+                        excludeTopLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setIncludeTopLevelAsbiepIds(List<BigInteger> includeTopLevelAsbiepIds) {
+            if (!includeTopLevelAsbiepIds.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
+                        includeTopLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setStates(List<BieState> states) {
+            if (!states.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.STATE.in(states.stream().map(e -> e.name()).collect(Collectors.toList())));
+            }
+            return this;
+        }
+        public GetBieListForOasDocArguments setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setOwnerLoginIds(List<String> ownerLoginIds) {
+            if (!ownerLoginIds.isEmpty()) {
+                conditions.add(APP_USER.LOGIN_ID.in(ownerLoginIds));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setUpdaterLoginIds(List<String> updaterLoginIds) {
+            if (!updaterLoginIds.isEmpty()) {
+                conditions.add(APP_USER.as("updater").LOGIN_ID.in(updaterLoginIds));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setUpdateDate(Date from, Date to) {
+            return setUpdateDate(
+                    (from != null) ? new Timestamp(from.getTime()).toLocalDateTime() : null,
+                    (to != null) ? new Timestamp(to.getTime()).toLocalDateTime() : null
+            );
+        }
+
+        public GetBieListForOasDocArguments setUpdateDate(LocalDateTime from, LocalDateTime to) {
+            if (from != null) {
+                conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.greaterOrEqual(from));
+            }
+            if (to != null) {
+                conditions.add(OAS_DOC.LAST_UPDATE_TIMESTAMP.lessThan(to));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setAccess(ULong userId, AccessPrivilege access) {
+            if (access != null) {
+                switch (access) {
+                    case CanEdit:
+                        conditions.add(
+                                and(
+                                        TOP_LEVEL_ASBIEP.STATE.notEqual(Initiating.name()),
+                                        TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(userId)
+                                )
+                        );
+                        break;
+
+                    case CanView:
+                        conditions.add(
+                                or(
+                                        TOP_LEVEL_ASBIEP.STATE.in(QA.name(), Production.name()),
+                                        and(
+                                                TOP_LEVEL_ASBIEP.STATE.notEqual(Initiating.name()),
+                                                TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(userId)
+                                        )
+                                )
+                        );
+                        break;
+                }
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setSort(String field, String direction) {
+            if (StringUtils.hasLength(field)) {
+                SortField<?> sortField = null;
+                switch (field) {
+                    case "state":
+                        if ("asc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.STATE.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.STATE.desc();
+                        }
+
+                        break;
+
+                    case "topLevelAsccpPropertyTerm":
+                        if ("asc".equals(direction)) {
+                            sortField = ASCCP.PROPERTY_TERM.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = ASCCP.PROPERTY_TERM.desc();
+                        }
+
+                        break;
+
+                    case "den":
+                        if ("asc".equals(direction)) {
+                            sortField = ASCCP.DEN.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = ASCCP.DEN.desc();
+                        }
+                        break;
+
+                    case "releaseNum":
+                        if ("asc".equals(direction)) {
+                            sortField = RELEASE.RELEASE_NUM.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = RELEASE.RELEASE_NUM.desc();
+                        }
+
+                        break;
+
+                    case "lastUpdateTimestamp":
+                        if ("asc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.asc();
+                        } else if ("desc".equals(direction)) {
+                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.desc();
+                        }
+
+                        break;
+                }
+
+                if (sortField != null) {
+                    this.sortFields.add(0, sortField);
+                }
+            }
+
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setOffset(int offset, int numberOfRows) {
+            this.offset = offset;
+            this.numberOfRows = numberOfRows;
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setReleaseId(BigInteger releaseId) {
+            if (releaseId != null && releaseId.longValue() > 0) {
+                conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
+            }
+            return this;
+        }
+
+        public GetBieListForOasDocArguments setOwnedByDeveloper(Boolean ownedByDeveloper) {
+            if (ownedByDeveloper != null) {
+                conditions.add(APP_USER.IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
+            }
+            return this;
+        }
+
+        public List<Condition> getConditions() {
+            return conditions;
+        }
+
+        public List<SortField<?>> getSortFields() {
+            return this.sortFields;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getNumberOfRows() {
+            return numberOfRows;
+        }
+
+        public String getDen() {
+            return den;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public <E> PaginationResponse<E> fetchInto(Class<? extends E> type) {
+            return getBieListForOasDoc(this, type);
+        }
+    }
+    private <E> PaginationResponse<E> getBieListForOasDoc(GetBieListForOasDocArguments arguments, Class<? extends E> type) {
+        SelectOnConditionStep<Record> step = getSelectOnConditionStep(arguments);
+        SelectConnectByStep<Record> conditionStep = step.where(arguments.getConditions());
+
+        int pageCount = dslContext.fetchCount(conditionStep);
+
+        List<SortField<?>> sortFields = arguments.getSortFields();
+        SelectWithTiesAfterOffsetStep<Record> offsetStep = null;
+        if (!sortFields.isEmpty()) {
+            if (arguments.getOffset() >= 0 && arguments.getNumberOfRows() >= 0) {
+                offsetStep = conditionStep.orderBy(sortFields)
+                        .limit(arguments.getOffset(), arguments.getNumberOfRows());
+            }
+        } else {
+            if (arguments.getOffset() >= 0 && arguments.getNumberOfRows() >= 0) {
+                offsetStep = conditionStep
+                        .limit(arguments.getOffset(), arguments.getNumberOfRows());
+            }
+        }
+
+        return new PaginationResponse<>(pageCount,
+                (offsetStep != null) ?
+                        offsetStep.fetchInto(type) : conditionStep.fetchInto(type));
+    }
+
+    private SelectOnConditionStep<Record> getSelectOnConditionStep(GetBieListForOasDocArguments arguments) {
+        List<Field> selectFields = arguments.selectFields();
+        return dslContext.selectDistinct(selectFields)
+                .from(OAS_MESSAGE_BODY)
+                .leftJoin(OAS_REQUEST).on(OAS_REQUEST.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                .leftJoin(OAS_OPERATION.as("req_oas_operation")).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_RESOURCE.as("req_oas_resource")).on(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.eq(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID))
+                .leftJoin(OAS_DOC.as("req_oas_doc")).on(OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("req_oas_doc").OAS_DOC_ID))
+                .leftJoin(OAS_DOC_TAG.as("req_oas_doc_tag")).on(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(OAS_DOC_TAG.as("req_oas_doc_tag").OAS_DOC_ID))
+                .leftJoin(OAS_TAG.as("req_oas_tag")).on(OAS_DOC_TAG.as("req_oas_doc_tag").OAS_TAG_ID.eq(OAS_TAG.as("req_oas_tag").OAS_TAG_ID))
+                .leftJoin(OAS_RESPONSE).on(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                .leftJoin(OAS_OPERATION.as("res_oas_operation")).on(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_RESOURCE.as("res_oas_resource")).on(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.eq(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID))
+                .leftJoin(OAS_DOC.as("res_oas_doc")).on(OAS_RESOURCE.as("res_oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("res_oas_doc").OAS_DOC_ID))
+                .leftJoin(OAS_DOC_TAG.as("res_oas_doc_tag")).on(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(OAS_DOC_TAG.as("res_oas_doc_tag").OAS_DOC_ID))
+                .leftJoin(OAS_TAG.as("res_oas_tag")).on(OAS_DOC_TAG.as("res_oas_doc_tag").OAS_TAG_ID.eq(OAS_TAG.as("res_oas_tag").OAS_TAG_ID))
+                .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(APP_USER.as("owner")).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
+                .join(APP_USER.as("creator")).on(OAS_MESSAGE_BODY.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(OAS_MESSAGE_BODY.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
     }
 
     public class InsertOasMessageBodyArguments {

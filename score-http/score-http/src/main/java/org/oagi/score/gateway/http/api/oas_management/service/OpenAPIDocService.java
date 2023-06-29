@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.oas_management.service;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.bie_management.data.BieList;
+import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
@@ -12,9 +14,11 @@ import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.impl.jooq.openapidoc.JooqBieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
+import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -86,10 +90,44 @@ public class OpenAPIDocService {
         return response;
     }
 
-    public GetBieForOasDocListResponse getBieForOasDocList(GetBieForOasDocListRequest request) {
-        GetBieForOasDocListResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDocList(request);
+    public PageResponse<BieForOasDoc> getBieListForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
+        PageRequest pageRequest = request.getPageRequest();
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
+                .setOasDocId(request.getOasDocId())
+                .setBusinessContext(request.getBusinessContext())
+                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
+                .fetchInto(BieForOasDoc.class);
+
+        List<BieForOasDoc> bieForOasDocList = result.getResult();
+        bieForOasDocList.forEach(bieForOasDoc -> {
+
+            GetBusinessContextListRequest getBusinessContextListRequest =
+                    new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
+                            .withTopLevelAsbiepIdList(Arrays.asList(bieForOasDoc.getTopLevelAsbiepId()))
+                            .withName(request.getBusinessContext());
+
+            getBusinessContextListRequest.setPageIndex(-1);
+            getBusinessContextListRequest.setPageSize(-1);
+
+            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+
+            bieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieForOasDoc.setAccess(
+                    AccessPrivilege.toAccessPrivilege(requester, bieForOasDoc.getOwnerUserId(), bieForOasDoc.getState()).toString()
+            );
+        });
+
+        PageResponse<BieForOasDoc> response = new PageResponse();
+        response.setList(bieForOasDocList);
+        response.setPage(pageRequest.getPageIndex());
+        response.setSize(pageRequest.getPageSize());
+        response.setLength(result.getPageCount());
         return response;
     }
+
 
     public PageResponse<BieForOasDoc> selectBieForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
