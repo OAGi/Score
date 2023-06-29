@@ -13,6 +13,7 @@ import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-di
 import {forkJoin} from 'rxjs';
 import {hashCode} from 'src/app/common/utility';
 import {v4 as uuid} from 'uuid';
+import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {WorkingRelease} from '../../../../release-management/domain/release';
 import {MatTableDataSource} from '@angular/material/table';
@@ -21,6 +22,7 @@ import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
+import {BieExpressOption} from '../../domain/generate-expression';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -39,7 +41,7 @@ export class OasDocDetailComponent implements OnInit {
   disabled: boolean;
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
+    'select', 'state', 'den', 'owner', 'businessContexts', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
@@ -48,6 +50,9 @@ export class OasDocDetailComponent implements OnInit {
   request: BieForOasDocListRequest;
   loading = false;
   isUpdating: boolean;
+  option: BieExpressOption;
+  openApiFormats: string[] = ['YAML', 'JSON'];
+  topLevelAsbiepIds: number[];
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -65,6 +70,12 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.topLevelAsbiepIds = [];
+    this.option = new BieExpressOption();
+    this.option.bieDefinition = true;
+    this.option.packageOption = 'ALL';
+    // Default Open API expression format is 'YAML'.
+    this.option.openAPIExpressionFormat = 'YAML';
     this.oasDoc = new OasDoc();
     this.oasDoc.used = true;
     const oasDocId = this.route.snapshot.params.id;
@@ -374,6 +385,57 @@ export class OasDocDetailComponent implements OnInit {
       return this.oasDoc.releaseId === this.workingRelease.releaseId;
     }
     return false;
+  }
+
+  generate() {
+    const bieForOasDocs = this.selection.selected;
+
+    this.option.filenames = {};
+    this.option.bizCtxIds = {};
+    for (const bieForOasDoc of bieForOasDocs) {
+      this.topLevelAsbiepIds.push(bieForOasDoc.topLevelAsbiepId);
+      const filename = this.getFilename(bieForOasDoc.topLevelAsbiepId);
+      this.option.filenames[bieForOasDoc.topLevelAsbiepId] = filename;
+
+      const selectedBusinessContext = this.businessContextSelection[bieForOasDoc.topLevelAsbiepId];
+      this.option.bizCtxIds[bieForOasDoc.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
+    }
+
+    this.loading = true;
+    this.openAPIService.generate(this.topLevelAsbiepIds, this.option, this.oasDoc).subscribe(resp => {
+
+      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+    });
+  }
+  getFilename(topLevelAsbiepId: number): string {
+    const topLevelAsbiep = this.dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
+    const separator = '';
+
+    let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
+    if (this.option.includeBusinessContextInFilename) {
+      const selectedBusinessContext = this.businessContextSelection[topLevelAsbiepId];
+      if (!!selectedBusinessContext) {
+        filename += '-' + selectedBusinessContext.name.trim().split(' ').join(separator);
+      }
+    }
+    if (this.option.includeVersionInFilename) {
+      if (!!topLevelAsbiep.version) {
+        const versionSeparator = '_';
+        filename += '-' + topLevelAsbiep.version.trim().split(' ').join(versionSeparator)
+          .split('.').join(versionSeparator);
+      }
+    }
+    return filename;
+  }
+  _getFilenameFromContentDisposition(resp) {
+    const contentDisposition = resp.headers.get('Content-Disposition') || '';
+    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
   removeBieForOasDoc() {
     const dialogConfig = this.confirmDialogService.newConfig();

@@ -1,8 +1,10 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc, OasDocListRequest} from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
+import {BieExpressOption} from '../../domain/generate-expression';
+import {base64Encode} from '../../../../common/utility';
 
 @Injectable()
 export class OpenAPIService {
@@ -208,5 +210,31 @@ export class OpenAPIService {
             arrayIndicator: assignBieForOasDoc.arrayIndicator,
             suppressRoot: assignBieForOasDoc.suppressRoot,
             messageBody: assignBieForOasDoc.messageBody});
+  }
+
+  generate(topLevelAsbiepIds: number[], option: BieExpressOption, oasDoc: OasDoc): Observable<HttpResponse<Blob>> {
+    let params: HttpParams = new HttpParams()
+      .set('topLevelAsbiepIds', topLevelAsbiepIds.join(','));
+    Object.getOwnPropertyNames(option).forEach(key => {
+      const value = option[key];
+      if (value) {
+        if (key === 'filenames') {
+          for (const topLevelAsbiepId of Object.keys(value)) {
+            params = params.set('filenames[' + topLevelAsbiepId + ']', value[topLevelAsbiepId]);
+          }
+        } else if (key === 'bizCtxIds') {
+          for (const topLevelAsbiepId of Object.keys(value)) {
+            params = params.set('bizCtxIds[' + topLevelAsbiepId + ']', Number(value[topLevelAsbiepId]));
+          }
+        } else {
+          params = params.set(key, option[key]);
+        }
+      }
+    });
+    return this.http.get('api/oas_doc/' + oasDoc.oasDocId + '/generate', {
+      params: new HttpParams().set('data', base64Encode(params.toString())),
+      observe: 'response',
+      responseType: 'blob'
+    });
   }
 }
