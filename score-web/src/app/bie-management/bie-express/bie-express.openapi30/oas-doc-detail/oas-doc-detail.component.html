@@ -192,6 +192,7 @@
 
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
         </div>
       </mat-card-content>

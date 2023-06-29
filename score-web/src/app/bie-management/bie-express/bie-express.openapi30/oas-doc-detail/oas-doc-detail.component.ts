@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieForOasDoc, BieForOasDocListRequest, OasDoc, simpleOasDoc} from '../domain/openapi-doc';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator} from '@angular/material/paginator';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {OpenAPIService} from '../domain/openapi.service';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
@@ -149,6 +149,10 @@ export class OasDocDetailComponent implements OnInit {
 
   back() {
     this.location.back();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.loadBieListForOasDoc();
   }
 
   update() {

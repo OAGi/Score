@@ -48,7 +48,7 @@ export class OpenAPIService {
     if ('' + oasDoc.oasDocId === 'undefined' || !oasDoc.oasDocId) {
       oasDoc.oasDocId = null;
     }
-    return this.http.put('/api/oas_doc', {
+    return this.http.post('/api/oas_doc', {
       oasDocId: oasDoc.oasDocId,
       title: oasDoc.title,
       openAPIVersion: oasDoc.openAPIVersion,
