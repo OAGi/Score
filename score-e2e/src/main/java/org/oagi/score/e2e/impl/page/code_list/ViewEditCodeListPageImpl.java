@@ -190,12 +190,12 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
                  */
                 WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox"));
-                String statusSecondOption = otherOptionField.getAttribute("ng-reflect-state").toString();
+                String statusSecondOption = otherOptionField.getAttribute("ng-reflect-state");
                 if (statusSecondOption.equals("checked")) {
                     click(otherOptionField);
                 }
                 String statusFirstOption = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
+                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state");
 
                 if (statusFirstOption.equals("checked")) {
                     escape(getDriver());
@@ -208,12 +208,12 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             } else {
                 WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox"));
-                String status = otherOptionField.getAttribute("ng-reflect-state").toString();
+                String status = otherOptionField.getAttribute("ng-reflect-state");
                 if (status.equals("checked")) {
                     click(otherOptionField);
                 }
                 String statusFirstOption = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state").toString();
+                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state");
 
                 if (statusFirstOption.equals("checked")) {
                     escape(getDriver());

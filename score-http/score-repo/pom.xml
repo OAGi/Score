@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-repo</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0-alpha</version>
     <packaging>jar</packaging>
 
     <name>score-repo</name>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-repo-api</artifactId>
-            <version>3.0.4</version>
+            <version>3.1.0-alpha</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

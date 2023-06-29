@@ -98,6 +98,4 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
         assert getSnackBar(getDriver(), "Created").isDisplayed();
         return this.parent;
     }
-
-
 }

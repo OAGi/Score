@@ -50,12 +50,24 @@ public interface EditAgencyIDListPage extends Page {
     WebElement getOwnerField();
 
     /**
+     * Return the UI element of the 'Based Agency ID List' field.
+     *
+     * @return the UI element of the 'Based Agency ID List' field
+     */
+    WebElement getBasedAgencyIDListField();
+
+    /**
      * Return the UI element of the 'Name' field.
      *
      * @return the UI element of the 'Name' field
      */
     WebElement getAgencyIDListNameField();
 
+    /**
+     * Set the 'Name' field.
+     *
+     * @param agencyIDListName Name
+     */
     void setName(String agencyIDListName);
 
     /**
@@ -66,12 +78,24 @@ public interface EditAgencyIDListPage extends Page {
     WebElement getListIDField();
 
     /**
+     * Set the 'List ID' field.
+     *
+     * @param listId List ID
+     */
+    void setListID(String listId);
+
+    /**
      * Return the UI element of the 'Version' field.
      *
      * @return the UI element of the 'Version' field
      */
     WebElement getVersionField();
 
+    /**
+     * Set the 'Version' field.
+     *
+     * @param version Version
+     */
     void setVersion(String version);
 
     /**
@@ -81,6 +105,11 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getAgencyIDListValueSelectField();
 
+    /**
+     * Set the 'Agency ID List Value' select field.
+     *
+     * @param agencyIDListValue Agency ID List Value object
+     */
     void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue);
 
     /**
@@ -90,7 +119,19 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getNamespaceSelectField();
 
+    /**
+     * Set the 'Namespace' select field.
+     *
+     * @param namespace Namespace object
+     */
     void setNamespace(NamespaceObject namespace);
+
+    /**
+     * Return the UI element of the 'Deprecated' checkbox.
+     *
+     * @return the UI element of the 'Deprecated' checkbox
+     */
+    WebElement getDeprecatedCheckbox();
 
     /**
      * Return the UI element of the 'Definition' field.
@@ -99,6 +140,11 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getDefinitionField();
 
+    /**
+     * Set the 'Definition' select field.
+     *
+     * @param definition Definition
+     */
     void setDefinition(String definition);
 
     /**
@@ -108,7 +154,26 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getDefinitionSourceField();
 
+    /**
+     * Set the 'Definition Source' select field.
+     *
+     * @param definitionSource Definition Source
+     */
     void setDefinitionSource(String definitionSource);
+
+    /**
+     * Return the UI element of the 'Remark' field.
+     *
+     * @return the UI element of the 'Remark' field
+     */
+    WebElement getRemarkField();
+
+    /**
+     * Set the 'Remark' select field.
+     *
+     * @param remark Remark
+     */
+    void setRemark(String remark);
 
     /**
      * Return the UI element of the 'Update' button.
@@ -118,6 +183,9 @@ public interface EditAgencyIDListPage extends Page {
      */
     WebElement getUpdateButton(boolean enabled);
 
+    /**
+     * Hit the 'Update' button.
+     */
     void hitUpdateButton();
 
     /**
@@ -127,6 +195,23 @@ public interface EditAgencyIDListPage extends Page {
      * @return the UI element of the 'Delete' button
      */
     WebElement getDeleteButton(boolean enabled);
+
+    /**
+     * Delete the agency ID list.
+     */
+    void delete();
+
+    /**
+     * Return the UI element of the 'Restore' button.
+     *
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getRestoreButton();
+
+    /**
+     * Restore the deleted agency ID list.
+     */
+    void restore();
 
     /**
      * Return the UI element of the 'Comment' button.
@@ -153,6 +238,18 @@ public interface EditAgencyIDListPage extends Page {
      * Revise the current Agency ID List.
      */
     void revise();
+
+    /**
+     * Return the UI element of the 'Amend' button.
+     *
+     * @return the UI element of the 'Amend' button
+     */
+    WebElement getAmendButton();
+
+    /**
+     * Amend the current Agency ID List.
+     */
+    void amend();
 
     /**
      * Return the UI element of the 'Cancel' button.
@@ -225,6 +322,18 @@ public interface EditAgencyIDListPage extends Page {
      * Move the state of the agency ID list back to 'WIP'.
      */
     void backToWIP();
+
+    /**
+     * Return the UI element of the 'Derived Agency ID List' button.
+     *
+     * @return the UI element of the 'Derived Agency ID List' button
+     */
+    WebElement getDeriveAgencyIDListButton();
+
+    /**
+     * Hit the 'Derived Agency ID List' button.
+     */
+    void hitDeriveAgencyIDListButton();
 
     /**
      * Return the UI element of the 'Add' button for the new agency ID list value.

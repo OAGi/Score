@@ -23,6 +23,11 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     }
 
     @Override
+    public List<AppUserObject> getAppUsers() {
+        return dslContext.selectFrom(APP_USER).fetch(record -> mapper(record));
+    }
+
+    @Override
     public AppUserObject getAppUserByLoginID(String loginID) {
         AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.LOGIN_ID.eq(loginID))
@@ -141,6 +146,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             deleteContextSchemeByAppUserId(txContext, appUserId);
             deleteContextCategoryByAppUserId(txContext, appUserId);
             deleteNamespaceByAppUserId(txContext, appUserId);
+            deleteReleaseByAppUserId(txContext, appUserId);
 
             txContext.deleteFrom(APP_USER)
                     .where(APP_USER.APP_USER_ID.eq(appUserId))
@@ -679,6 +685,15 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .where(or(
                         NAMESPACE.CREATED_BY.eq(appUserId),
                         NAMESPACE.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .execute();
+    }
+
+    private void deleteReleaseByAppUserId(DSLContext dslContext, ULong appUserId) {
+        dslContext.deleteFrom(RELEASE)
+                .where(or(
+                        RELEASE.CREATED_BY.eq(appUserId),
+                        RELEASE.LAST_UPDATED_BY.eq(appUserId)
                 ))
                 .execute();
     }
