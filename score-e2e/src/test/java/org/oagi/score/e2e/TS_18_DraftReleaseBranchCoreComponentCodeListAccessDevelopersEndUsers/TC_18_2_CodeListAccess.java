@@ -80,7 +80,11 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
-        waitFor(Duration.ofMillis(6000L));
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do{
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while(!newDraftRelease.getState().equals("Draft"));
         homePage.logout();
     }
 
