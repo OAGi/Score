@@ -110,7 +110,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         click(getStateSelectField());
         waitFor(ofMillis(2000L));
         WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[text() = \"" + state + "\"]"));
+                By.xpath("//span[.=\""+state+"\"]//ancestor::mat-option[1]"));
         click(optionField);
     }
 
