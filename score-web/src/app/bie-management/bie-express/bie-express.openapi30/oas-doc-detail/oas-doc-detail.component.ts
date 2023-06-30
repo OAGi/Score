@@ -73,7 +73,6 @@ export class OasDocDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.topLevelAsbiepIds = [];
-    this.options = [];
     this.bieOption = new BieExpressOption();
     this.bieOption.bieDefinition = true;
     this.bieOption.packageOption = 'ALL';
@@ -419,13 +418,13 @@ export class OasDocDetailComponent implements OnInit {
     const separator = '';
 
     let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
-    if (this.option.includeBusinessContextInFilename) {
+    if (this.bieOption.includeBusinessContextInFilename) {
       const selectedBusinessContext = this.businessContextSelection[topLevelAsbiepId];
       if (!!selectedBusinessContext) {
         filename += '-' + selectedBusinessContext.name.trim().split(' ').join(separator);
       }
     }
-    if (this.option.includeVersionInFilename) {
+    if (this.bieOption.includeVersionInFilename) {
       if (!!topLevelAsbiep.version) {
         const versionSeparator = '_';
         filename += '-' + topLevelAsbiep.version.trim().split(' ').join(versionSeparator)
