@@ -23,6 +23,7 @@ import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {BieExpressOption} from '../../domain/generate-expression';
+import {BieExpressComponent} from '../../bie-express.component';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -50,7 +51,8 @@ export class OasDocDetailComponent implements OnInit {
   request: BieForOasDocListRequest;
   loading = false;
   isUpdating: boolean;
-  option: BieExpressOption;
+  bieOptions = {};
+  bieOption: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
 
@@ -71,11 +73,12 @@ export class OasDocDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.topLevelAsbiepIds = [];
-    this.option = new BieExpressOption();
-    this.option.bieDefinition = true;
-    this.option.packageOption = 'ALL';
+    this.options = [];
+    this.bieOption = new BieExpressOption();
+    this.bieOption.bieDefinition = true;
+    this.bieOption.packageOption = 'ALL';
     // Default Open API expression format is 'YAML'.
-    this.option.openAPIExpressionFormat = 'YAML';
+    this.bieOption.openAPIExpressionFormat = 'YAML';
     this.oasDoc = new OasDoc();
     this.oasDoc.used = true;
     const oasDocId = this.route.snapshot.params.id;
@@ -389,20 +392,19 @@ export class OasDocDetailComponent implements OnInit {
 
   generate() {
     const bieForOasDocs = this.selection.selected;
-
-    this.option.filenames = {};
-    this.option.bizCtxIds = {};
+    this.bieOption.filenames = {};
+    this.bieOption.bizCtxIds = {};
     for (const bieForOasDoc of bieForOasDocs) {
       this.topLevelAsbiepIds.push(bieForOasDoc.topLevelAsbiepId);
       const filename = this.getFilename(bieForOasDoc.topLevelAsbiepId);
-      this.option.filenames[bieForOasDoc.topLevelAsbiepId] = filename;
-
+      this.bieOption.filenames[bieForOasDoc.topLevelAsbiepId] = filename;
       const selectedBusinessContext = this.businessContextSelection[bieForOasDoc.topLevelAsbiepId];
-      this.option.bizCtxIds[bieForOasDoc.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
+      this.bieOption.bizCtxIds[bieForOasDoc.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
+      this.bieOptions[bieForOasDoc.topLevelAsbiepId] = this.bieOption;
     }
 
     this.loading = true;
-    this.openAPIService.generate(this.topLevelAsbiepIds, this.option, this.oasDoc).subscribe(resp => {
+    this.openAPIService.generate(this.topLevelAsbiepIds, this.bieOption, this.oasDoc).subscribe(resp => {
 
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
       saveAs(blob, this._getFilenameFromContentDisposition(resp));
