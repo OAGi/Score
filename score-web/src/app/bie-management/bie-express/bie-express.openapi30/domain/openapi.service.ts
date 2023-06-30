@@ -201,7 +201,7 @@ export class OpenAPIService {
   }
 
   assignBieForOasDoc(assignBieForOasDoc: AssignBieForOasDoc): Observable<PageResponse<any>>{
-    return this.http.put<PageResponse<BieForOasDoc>>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
+    return this.http.post<PageResponse<BieForOasDoc>>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
       {oasDocId: assignBieForOasDoc.oasDocId,
             isOasRequest: assignBieForOasDoc.isOasRequest,
             topLevelAsbiepId: assignBieForOasDoc.topLevelAsbiepId,
