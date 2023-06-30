@@ -1,12 +1,9 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
-import org.checkerframework.checker.units.qual.A;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.repo.api.bie.model.TopLevelAsbiep;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
@@ -222,74 +219,6 @@ public class OpenAPIDocController {
 
         return pageResponse;
     }
-
-    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list2", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public PageResponse<BieForOasDoc> getBieListForOasDoc(
-            @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @PathVariable("id") BigInteger oasDocId,
-            @RequestParam(name = "den", required = false) String den,
-            @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
-            @RequestParam(name = "businessContext", required = false) String businessContext,
-            @RequestParam(name = "asccpManifestId", required = false) BigInteger asccpManifestId,
-            @RequestParam(name = "access", required = false) String access,
-            @RequestParam(name = "states", required = false) String states,
-            @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
-            @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
-            @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
-            @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
-            @RequestParam(name = "updateStart", required = false) String updateStart,
-            @RequestParam(name = "updateEnd", required = false) String updateEnd,
-            @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
-            @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
-            @RequestParam(name = "sortActive") String sortActive,
-            @RequestParam(name = "sortDirection") String sortDirection,
-            @RequestParam(name = "pageIndex") int pageIndex,
-            @RequestParam(name = "pageSize") int pageSize) {
-
-        BieForOasDocListRequest request = new BieForOasDocListRequest();
-        request.setDen(den);
-        request.setPropertyTerm(propertyTerm);
-        request.setBusinessContext(businessContext);
-        request.setAsccpManifestId(asccpManifestId);
-        request.setAccess(org.springframework.util.StringUtils.hasLength(access) ? AccessPrivilege.valueOf(access) : null);
-        request.setStates(org.springframework.util.StringUtils.hasLength(states) ?
-                Arrays.asList(states.split(",")).stream()
-                        .map(e -> BieState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
-        request.setExcludePropertyTerms(!org.springframework.util.StringUtils.hasLength(excludePropertyTerms) ? Collections.emptyList() :
-                Arrays.asList(excludePropertyTerms.split(",")).stream().map(e -> e.trim()).filter(e -> org.springframework.util.StringUtils.hasLength(e)).collect(Collectors.toList()));
-        request.setExcludeTopLevelAsbiepIds(!org.springframework.util.StringUtils.hasLength(excludeTopLevelAsbiepIds) ? Collections.emptyList() :
-                Arrays.asList(excludeTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> org.springframework.util.StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
-        request.setOwnerLoginIds(!org.springframework.util.StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
-                Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> org.springframework.util.StringUtils.hasLength(e)).collect(Collectors.toList()));
-        request.setUpdaterLoginIds(!org.springframework.util.StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
-                Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> org.springframework.util.StringUtils.hasLength(e)).collect(Collectors.toList()));
-
-        request.setOwnedByDeveloper(ownedByDeveloper);
-
-        if (releaseId != null && releaseId.compareTo(BigInteger.ZERO) > 0) {
-            request.setReleaseId(releaseId);
-        }
-
-        if (org.springframework.util.StringUtils.hasLength(updateStart)) {
-            request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));
-        }
-        if (org.springframework.util.StringUtils.hasLength(updateEnd)) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(Long.valueOf(updateEnd));
-            calendar.add(Calendar.DATE, 1);
-            request.setUpdateEndDate(calendar.getTime());
-        }
-
-        PageRequest pageRequest = new PageRequest();
-        pageRequest.setSortActive(sortActive);
-        pageRequest.setSortDirection(sortDirection);
-        pageRequest.setPageIndex(pageIndex);
-        pageRequest.setPageSize(pageSize);
-        request.setPageRequest(pageRequest);
-        return oasDocService.getBieListForOasDoc(requester, request);
-    }
-
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AddBieForOasDocResponse addBieForOasDoc(
@@ -304,12 +233,12 @@ public class OpenAPIDocController {
         request.setOperationId(request.getVerb() + ' ' + assignBieForOasDoc.getDen());
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
-        if (request.isOasRequest()){
+        if (request.isOasRequest()) {
             request.setRequiredForRequestBody(true);
         }
-        if (request.isMakeArrayIndicator()){
-            request.setPath("/" + assignBieForOasDoc.getDen() +"/list");
-        }else{
+        if (request.isMakeArrayIndicator()) {
+            request.setPath("/" + assignBieForOasDoc.getDen() + "/list");
+        } else {
             request.setPath("/" + assignBieForOasDoc.getDen());
         }
         request.setDeprecatedForOperation(false);
@@ -376,7 +305,6 @@ public class OpenAPIDocController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 
 
 }
