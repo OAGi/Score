@@ -1,8 +1,6 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
 import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;

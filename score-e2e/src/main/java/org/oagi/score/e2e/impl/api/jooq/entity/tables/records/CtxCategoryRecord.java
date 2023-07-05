@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record8;
@@ -14,22 +12,39 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxCategory;
 
+import java.time.LocalDateTime;
+
 
 /**
  * This table captures the context category. Examples of context categories as
  * described in the CCTS are business process, industry, etc.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> implements Record8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ctx_category.ctx_category_id</code>. Internal,
-     * primary, database key.
+     * Create a detached CtxCategoryRecord
      */
-    public void setCtxCategoryId(ULong value) {
-        set(0, value);
+    public CtxCategoryRecord() {
+        super(CtxCategory.CTX_CATEGORY);
+    }
+
+    /**
+     * Create a detached, initialised CtxCategoryRecord
+     */
+    public CtxCategoryRecord(ULong ctxCategoryId, String guid, String name, String description, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(CtxCategory.CTX_CATEGORY);
+
+        setCtxCategoryId(ctxCategoryId);
+        setGuid(guid);
+        setName(name);
+        setDescription(description);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 
     /**
@@ -41,11 +56,11 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>oagi.ctx_category.ctx_category_id</code>. Internal,
+     * primary, database key.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setCtxCategoryId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -57,11 +72,11 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.name</code>. Short name of the context
-     * category.
+     * Setter for <code>oagi.ctx_category.guid</code>. A globally unique
+     * identifier (GUID).
      */
-    public void setName(String value) {
-        set(2, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -73,11 +88,11 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.description</code>. Explanation of
-     * what the context category is.
+     * Setter for <code>oagi.ctx_category.name</code>. Short name of the context
+     * category.
      */
-    public void setDescription(String value) {
-        set(3, value);
+    public void setName(String value) {
+        set(2, value);
     }
 
     /**
@@ -89,11 +104,11 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the context category.
+     * Setter for <code>oagi.ctx_category.description</code>. Explanation of
+     * what the context category is.
      */
-    public void setCreatedBy(ULong value) {
-        set(4, value);
+    public void setDescription(String value) {
+        set(3, value);
     }
 
     /**
@@ -105,12 +120,11 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
-     * category.
+     * Setter for <code>oagi.ctx_category.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created the context category.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(5, value);
+    public void setCreatedBy(ULong value) {
+        set(4, value);
     }
 
     /**
@@ -123,11 +137,12 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
-     * when the context category was created.
+     * Setter for <code>oagi.ctx_category.last_updated_by</code>. Foreign key to
+     * the APP_USER table. It identifies the user who last updated the context
+     * category.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(6, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(5, value);
     }
 
     /**
@@ -139,12 +154,16 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.last_update_timestamp</code>.
-     * Timestamp when the context category was last updated.
+     * Setter for <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
+     * when the context category was created.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(7, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(6, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.ctx_category.last_update_timestamp</code>.
@@ -155,17 +174,21 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record8 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.ctx_category.last_update_timestamp</code>.
+     * Timestamp when the context category was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(7, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record8 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
@@ -339,6 +362,10 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public CtxCategoryRecord value8(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -356,32 +383,5 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
         value7(value7);
         value8(value8);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached CtxCategoryRecord
-     */
-    public CtxCategoryRecord() {
-        super(CtxCategory.CTX_CATEGORY);
-    }
-
-    /**
-     * Create a detached, initialised CtxCategoryRecord
-     */
-    public CtxCategoryRecord(ULong ctxCategoryId, String guid, String name, String description, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(CtxCategory.CTX_CATEGORY);
-
-        setCtxCategoryId(ctxCategoryId);
-        setGuid(guid);
-        setName(name);
-        setDescription(description);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 }

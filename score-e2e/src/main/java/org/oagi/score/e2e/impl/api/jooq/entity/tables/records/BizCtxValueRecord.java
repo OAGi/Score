@@ -18,17 +18,27 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
  * provides the associations between a business context and a context scheme
  * value.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> implements Record3<ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
-     * internal database key.
+     * Create a detached BizCtxValueRecord
      */
-    public void setBizCtxValueId(ULong value) {
-        set(0, value);
+    public BizCtxValueRecord() {
+        super(BizCtxValue.BIZ_CTX_VALUE);
+    }
+
+    /**
+     * Create a detached, initialised BizCtxValueRecord
+     */
+    public BizCtxValueRecord(ULong bizCtxValueId, ULong bizCtxId, ULong ctxSchemeValueId) {
+        super(BizCtxValue.BIZ_CTX_VALUE);
+
+        setBizCtxValueId(bizCtxValueId);
+        setBizCtxId(bizCtxId);
+        setCtxSchemeValueId(ctxSchemeValueId);
     }
 
     /**
@@ -40,11 +50,11 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
-     * biz_ctx table.
+     * Setter for <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
+     * internal database key.
      */
-    public void setBizCtxId(ULong value) {
-        set(1, value);
+    public void setBizCtxValueId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -56,12 +66,16 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
-     * key to the CTX_SCHEME_VALUE table.
+     * Setter for <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
+     * biz_ctx table.
      */
-    public void setCtxSchemeValueId(ULong value) {
-        set(2, value);
+    public void setBizCtxId(ULong value) {
+        set(1, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
@@ -72,17 +86,21 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record3 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
+     * key to the CTX_SCHEME_VALUE table.
+     */
+    public void setCtxSchemeValueId(ULong value) {
+        set(2, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row3<ULong, ULong, ULong> fieldsRow() {
@@ -151,6 +169,10 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BizCtxValueRecord value3(ULong value) {
         setCtxSchemeValueId(value);
@@ -163,27 +185,5 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
         value2(value2);
         value3(value3);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BizCtxValueRecord
-     */
-    public BizCtxValueRecord() {
-        super(BizCtxValue.BIZ_CTX_VALUE);
-    }
-
-    /**
-     * Create a detached, initialised BizCtxValueRecord
-     */
-    public BizCtxValueRecord(ULong bizCtxValueId, ULong bizCtxId, ULong ctxSchemeValueId) {
-        super(BizCtxValue.BIZ_CTX_VALUE);
-
-        setBizCtxValueId(bizCtxValueId);
-        setBizCtxId(bizCtxId);
-        setCtxSchemeValueId(ctxSchemeValueId);
     }
 }

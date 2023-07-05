@@ -4,25 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function10;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row10;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -31,73 +14,61 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TopLevelAsbiepRecord;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This table indexes the ASBIEP which is a top-level ASBIEP. This table and the
  * owner_top_level_asbiep_id column in all BIE tables allow all related BIEs to
  * be retrieved all at once speeding up the profile BOD transactions.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.top_level_asbiep</code>
      */
     public static final TopLevelAsbiep TOP_LEVEL_ASBIEP = new TopLevelAsbiep();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<TopLevelAsbiepRecord> getRecordType() {
-        return TopLevelAsbiepRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.top_level_asbiep.top_level_asbiep_id</code>. A
      * internal, primary database key of an top-level ASBIEP.
      */
     public final TableField<TopLevelAsbiepRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "A internal, primary database key of an top-level ASBIEP.");
-
     /**
      * The column <code>oagi.top_level_asbiep.asbiep_id</code>. Foreign key to
      * the ASBIEP table pointing to a record which is a top-level ASBIEP.
      */
     public final TableField<TopLevelAsbiepRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the ASBIEP table pointing to a record which is a top-level ASBIEP.");
-
     /**
      * The column <code>oagi.top_level_asbiep.owner_user_id</code>.
      */
     public final TableField<TopLevelAsbiepRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
-
     /**
      * The column <code>oagi.top_level_asbiep.last_update_timestamp</code>. The
      * timestamp when among all related bie records was last updated.
      */
     public final TableField<TopLevelAsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "The timestamp when among all related bie records was last updated.");
-
     /**
      * The column <code>oagi.top_level_asbiep.last_updated_by</code>. A foreign
      * key referring to the last user who has updated any related bie records.
      */
     public final TableField<TopLevelAsbiepRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated any related bie records.");
-
     /**
      * The column <code>oagi.top_level_asbiep.release_id</code>. Foreign key to
      * the RELEASE table. It identifies the release, for which this module is
      * associated.
      */
     public final TableField<TopLevelAsbiepRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the RELEASE table. It identifies the release, for which this module is associated.");
-
     /**
      * The column <code>oagi.top_level_asbiep.version</code>. This column hold a
      * version number assigned by the user. This column is only used by the
      * top-level ASBIEP. No format of version is enforced.
      */
     public final TableField<TopLevelAsbiepRecord, String> VERSION = createField(DSL.name("version"), SQLDataType.VARCHAR(45), this, "This column hold a version number assigned by the user. This column is only used by the top-level ASBIEP. No format of version is enforced.");
-
     /**
      * The column <code>oagi.top_level_asbiep.status</code>. This is different
      * from the STATE column which is CRUD life cycle of an entity. The use case
@@ -107,18 +78,20 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * top-level ASBIEP can use this field.
      */
     public final TableField<TopLevelAsbiepRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(45), this, "This is different from the STATE column which is CRUD life cycle of an entity. The use case for this is to allow the user to indicate the usage status of a top-level ASBIEP (a profile BOD). An integration architect can use this column. Example values are ?Prototype?, ?Test?, and ?Production?. Only the top-level ASBIEP can use this field.");
-
     /**
      * The column <code>oagi.top_level_asbiep.state</code>.
      */
     public final TableField<TopLevelAsbiepRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "");
-
     /**
      * The column <code>oagi.top_level_asbiep.inverse_mode</code>. If this is
      * true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be
      * treated as used BIEs.
      */
     public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
+    private transient Asbiep _asbiep;
+    private transient AppUser _topLevelAsbiepOwnerUserIdFk;
+    private transient AppUser _topLevelAsbiepLastUpdatedByFk;
+    private transient Release _release;
 
     private TopLevelAsbiep(Name alias, Table<TopLevelAsbiepRecord> aliased) {
         this(alias, aliased, null);
@@ -153,6 +126,14 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         super(child, key, TOP_LEVEL_ASBIEP);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<TopLevelAsbiepRecord> getRecordType() {
+        return TopLevelAsbiepRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -172,11 +153,6 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
     public List<ForeignKey<TopLevelAsbiepRecord, ?>> getReferences() {
         return Arrays.asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK);
     }
-
-    private transient Asbiep _asbiep;
-    private transient AppUser _topLevelAsbiepOwnerUserIdFk;
-    private transient AppUser _topLevelAsbiepLastUpdatedByFk;
-    private transient Release _release;
 
     /**
      * Get the implicit join path to the <code>oagi.asbiep</code> table.

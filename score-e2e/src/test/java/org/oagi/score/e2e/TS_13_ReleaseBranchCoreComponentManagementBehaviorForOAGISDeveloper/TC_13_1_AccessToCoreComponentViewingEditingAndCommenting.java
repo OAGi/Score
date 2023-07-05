@@ -20,7 +20,7 @@ import org.openqa.selenium.TimeoutException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends BaseTest {
@@ -613,6 +613,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_13_1_TA_4")
     public void test_TA_4() {
@@ -703,7 +704,9 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getObjectClassTermField());
             assertDisabled(accViewEditPage.getDENField());
-            assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitAmendButton();});
+            assertThrows(TimeoutException.class, () -> {
+                accViewEditPage.hitAmendButton();
+            });
             AddCommentDialog addCommentDialog = accViewEditPage.openCommentsDialog("/" + acc.getDen());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -720,7 +723,9 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getObjectClassTermField());
             assertDisabled(accViewEditPage.getDENField());
-            assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitAmendButton();});
+            assertThrows(TimeoutException.class, () -> {
+                accViewEditPage.hitAmendButton();
+            });
             AddCommentDialog addCommentDialog = accViewEditPage.openCommentsDialog("/" + accExtension.getDen());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -737,7 +742,9 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(bccpViewEditPage.getDENField());
             assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertEquals("Production", bccp.getState());
-            assertThrows(TimeoutException.class, ()-> {bccpViewEditPage.hitAmendButton();});
+            assertThrows(TimeoutException.class, () -> {
+                bccpViewEditPage.hitAmendButton();
+            });
             AddCommentDialog addCommentDialog = bccpViewEditPage.openCommentsDialog("/" + bccp.getPropertyTerm());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -754,12 +761,15 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(asccpViewEditPage.getDENField());
             assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertEquals("Production", asccp.getState());
-            assertThrows(TimeoutException.class, ()-> {asccpViewEditPage.hitAmendButton();});
+            assertThrows(TimeoutException.class, () -> {
+                asccpViewEditPage.hitAmendButton();
+            });
             AddCommentDialog addCommentDialog = asccpViewEditPage.openCommentsDialog("/" + asccp.getPropertyTerm());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_13_1_TA_5_and_TC_13_1_TA_5")
     public void test_TA_5_and_TA_6() {
@@ -792,7 +802,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             bccpForTesting.add(bccp);
-           coreComponentAPI.appendBCC(acc, bccp, "Published");
+            coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
             asccpForTesting.add(asccp);
 
@@ -821,7 +831,9 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getObjectClassTermField());
             assertDisabled(accViewEditPage.getDENField());
-            assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                accViewEditPage.hitReviseButton();
+            });
             AddCommentDialog addCommentDialog = accViewEditPage.openCommentsDialog("/" + acc.getDen());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -836,7 +848,9 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(bccpViewEditPage.getDENField());
             assertDisabled(bccpViewEditPage.getPropertyTermField());
             assertEquals("Published", bccp.getState());
-            assertThrows(TimeoutException.class, ()-> {bccpViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                bccpViewEditPage.hitReviseButton();
+            });
             AddCommentDialog addCommentDialog = bccpViewEditPage.openCommentsDialog("/" + bccp.getPropertyTerm());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
@@ -851,12 +865,15 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertDisabled(asccpViewEditPage.getDENField());
             assertDisabled(asccpViewEditPage.getPropertyTermField());
             assertEquals("Published", asccp.getState());
-            assertThrows(TimeoutException.class, ()-> {asccpViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                asccpViewEditPage.hitReviseButton();
+            });
             AddCommentDialog addCommentDialog = asccpViewEditPage.openCommentsDialog("/" + asccp.getPropertyTerm());
             addCommentDialog.setComment("some comment");
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_13_1_TA_7")
     public void test_TA_7() {
@@ -871,10 +888,18 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(release.getReleaseNumber());
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateACCButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateASCCPButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateBCCPButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateDTButton();});
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateACCButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateASCCPButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateBCCPButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateDTButton();
+        });
     }
 
     @AfterEach

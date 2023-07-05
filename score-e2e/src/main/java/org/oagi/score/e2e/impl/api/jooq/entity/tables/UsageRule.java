@@ -4,22 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function3;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -28,6 +14,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UsageRuleRecord;
 
+import java.util.function.Function;
+
 
 /**
  * This table captures a usage rule information. A usage rule may be expressed
@@ -35,36 +23,24 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UsageRuleRecord;
  * USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create
  * a usage rule expression with the unstructured constraint type.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class UsageRule extends TableImpl<UsageRuleRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.usage_rule</code>
      */
     public static final UsageRule USAGE_RULE = new UsageRule();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<UsageRuleRecord> getRecordType() {
-        return UsageRuleRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
      * usage rule.
      */
     public final TableField<UsageRuleRecord, ULong> USAGE_RULE_ID = createField(DSL.name("usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the usage rule.");
-
     /**
      * The column <code>oagi.usage_rule.name</code>. Short nmenomic name of the
      * usage rule.
      */
     public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB, this, "Short nmenomic name of the usage rule.");
-
     /**
      * The column <code>oagi.usage_rule.condition_type</code>. Condition type
      * according to the CC specification. It is a value list column. 0 =
@@ -103,6 +79,14 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     public <O extends Record> UsageRule(Table<O> child, ForeignKey<O, UsageRuleRecord> key) {
         super(child, key, USAGE_RULE);
+    }
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<UsageRuleRecord> getRecordType() {
+        return UsageRuleRecord.class;
     }
 
     @Override

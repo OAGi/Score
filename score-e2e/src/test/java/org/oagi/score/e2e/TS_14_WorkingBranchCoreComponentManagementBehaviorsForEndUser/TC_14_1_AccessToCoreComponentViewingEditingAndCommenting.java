@@ -475,6 +475,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_14_1_TA_4")
     public void test_TA_4() {
@@ -564,6 +565,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_14_1_TA_5")
     public void test_TA_5() {
@@ -653,6 +655,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_14_1_TA_6")
     public void test_TA_6() {
@@ -742,6 +745,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_14_1_TA_7")
     public void test_TA_7() {
@@ -831,6 +835,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             addCommentDialog.hitCloseButton();
         }
     }
+
     @Test
     @DisplayName("TC_14_1_TA_8")
     public void test_TA_8() {
@@ -845,11 +850,20 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(release.getReleaseNumber());
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateACCButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateASCCPButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateBCCPButton();});
-        assertThrows(TimeoutException.class, () -> {viewEditCoreComponentPage.getCreateDTButton();});
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateACCButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateASCCPButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateBCCPButton();
+        });
+        assertThrows(TimeoutException.class, () -> {
+            viewEditCoreComponentPage.getCreateDTButton();
+        });
     }
+
     @Test
     @DisplayName("TC_14_1_TA_9")
     public void test_TA_9() {
@@ -982,19 +996,25 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ACCObject acc : accForTesting) {
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
-            assertThrows(TimeoutException.class, ()-> {accViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                accViewEditPage.hitReviseButton();
+            });
         }
 
         for (BCCPObject bccp : bccpForTesting) {
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
-            assertThrows(TimeoutException.class, ()-> {bccpViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                bccpViewEditPage.hitReviseButton();
+            });
         }
 
         for (ASCCPObject asccp : asccpForTesting) {
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
-            assertThrows(TimeoutException.class, ()-> {asccpViewEditPage.hitReviseButton();});
+            assertThrows(TimeoutException.class, () -> {
+                asccpViewEditPage.hitReviseButton();
+            });
         }
     }
 

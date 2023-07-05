@@ -80,7 +80,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
         String den = record.get(ACC.DEN);
-        if (den.contains("User Extension Group")){
+        if (den.contains("User Extension Group")) {
             acc.setLocalExtension(true);
         }
         acc.setOwnerUserId(record.get(ACC.OWNER_USER_ID).toBigInteger());
@@ -1073,7 +1073,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.DEFINITION_SOURCE, acc.getDefinitionSource())
                 .set(ACC.NAMESPACE_ID, ULong.valueOf(acc.getNamespaceId()))
                 .set(ACC.IS_DEPRECATED, (byte) (acc.isDeprecated() ? 1 : 0))
-                .set(ACC.IS_ABSTRACT, (byte)(acc.isAbstract() ? 1 : 0))
+                .set(ACC.IS_ABSTRACT, (byte) (acc.isAbstract() ? 1 : 0))
                 .set(ACC.STATE, acc.getState())
                 .set(ACC.OAGIS_COMPONENT_TYPE, acc.getComponentType().getValue())
                 .set(ACC.CREATION_TIMESTAMP, acc.getCreationTimestamp())

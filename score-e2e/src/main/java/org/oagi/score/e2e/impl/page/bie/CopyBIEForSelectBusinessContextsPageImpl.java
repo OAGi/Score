@@ -6,7 +6,6 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBusinessContextsPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;

@@ -2,7 +2,6 @@ package org.oagi.score.e2e.page.agency_id_list;
 
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ public interface ViewEditAgencyIDListPage extends Page {
     /**
      * Open the 'Edit Agency ID List' page by the name of the agency ID list and the branch.
      *
-     * @param name the name of the agency ID list
+     * @param name   the name of the agency ID list
      * @param branch the branch
      * @return the 'Edit Agency ID List' page
      */

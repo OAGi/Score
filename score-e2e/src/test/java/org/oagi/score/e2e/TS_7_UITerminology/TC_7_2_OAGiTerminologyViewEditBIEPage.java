@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_7_UITerminology;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

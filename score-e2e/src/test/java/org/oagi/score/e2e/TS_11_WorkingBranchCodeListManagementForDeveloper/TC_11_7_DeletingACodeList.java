@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -241,14 +240,20 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField()))>1);
-            assertThrows(TimeoutException.class, () -> {editCodeListPageNew.hitDeleteButton();});
+            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPageNew.hitDeleteButton();
+            });
             editCodeListPageNew.moveToDraft();
             assertEquals("Draft", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPageNew.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPageNew.hitDeleteButton();
+            });
             editCodeListPageNew.moveToCandidate();
             assertEquals("Candidate", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPageNew.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPageNew.hitDeleteButton();
+            });
         }
     }
 

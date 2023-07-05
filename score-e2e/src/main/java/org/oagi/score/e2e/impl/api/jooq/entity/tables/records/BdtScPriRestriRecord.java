@@ -22,7 +22,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
  * which is a code list, while the last one specifies the primitive which is an
  * agency identification list. Only one column among the three can have a value
  * in a particular record.
- * 
+ * <p>
  * It should be noted that the table does not store the fact about primitive
  * restriction hierarchical relationships. In other words, if a BDT SC is
  * derived from another BDT SC and the derivative BDT SC applies some primitive
@@ -30,17 +30,30 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
  * BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the
  * BDT_SC_PRI_RESTRI key.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriRecord> implements Record6<ULong, ULong, ULong, ULong, ULong, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>.
-     * Primary, internal database key.
+     * Create a detached BdtScPriRestriRecord
      */
-    public void setBdtScPriRestriId(ULong value) {
-        set(0, value);
+    public BdtScPriRestriRecord() {
+        super(BdtScPriRestri.BDT_SC_PRI_RESTRI);
+    }
+
+    /**
+     * Create a detached, initialised BdtScPriRestriRecord
+     */
+    public BdtScPriRestriRecord(ULong bdtScPriRestriId, ULong bdtScManifestId, ULong cdtScAwdPriXpsTypeMapId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
+        super(BdtScPriRestri.BDT_SC_PRI_RESTRI);
+
+        setBdtScPriRestriId(bdtScPriRestriId);
+        setBdtScManifestId(bdtScManifestId);
+        setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
+        setCodeListManifestId(codeListManifestId);
+        setAgencyIdListManifestId(agencyIdListManifestId);
+        setIsDefault(isDefault);
     }
 
     /**
@@ -52,12 +65,11 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_manifest_id</code>.
-     * Foreign key to the DT_SC_MANIFEST table. It shall point to only DT that
-     * is a BDT (not a CDT).
+     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_pri_restri_id</code>.
+     * Primary, internal database key.
      */
-    public void setBdtScManifestId(ULong value) {
-        set(1, value);
+    public void setBdtScPriRestriId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -70,14 +82,12 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     /**
-     * Setter for
-     * <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This
-     * column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It
-     * allows for a primitive restriction based on a built-in type of schema
-     * expressions.
+     * Setter for <code>oagi.bdt_sc_pri_restri.bdt_sc_manifest_id</code>.
+     * Foreign key to the DT_SC_MANIFEST table. It shall point to only DT that
+     * is a BDT (not a CDT).
      */
-    public void setCdtScAwdPriXpsTypeMapId(ULong value) {
-        set(2, value);
+    public void setBdtScManifestId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -92,11 +102,14 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.code_list_manifest_id</code>.
-     * Foreign key to the CODE_LIST_MANIFEST table.
+     * Setter for
+     * <code>oagi.bdt_sc_pri_restri.cdt_sc_awd_pri_xps_type_map_id</code>. This
+     * column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It
+     * allows for a primitive restriction based on a built-in type of schema
+     * expressions.
      */
-    public void setCodeListManifestId(ULong value) {
-        set(3, value);
+    public void setCdtScAwdPriXpsTypeMapId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -108,13 +121,11 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     /**
-     * Setter for
-     * <code>oagi.bdt_sc_pri_restri.agency_id_list_manifest_id</code>. This is a
-     * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
-     * that the BDT content can be restricted to an agency identification.
+     * Setter for <code>oagi.bdt_sc_pri_restri.code_list_manifest_id</code>.
+     * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public void setAgencyIdListManifestId(ULong value) {
-        set(4, value);
+    public void setCodeListManifestId(ULong value) {
+        set(3, value);
     }
 
     /**
@@ -128,13 +139,18 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     /**
-     * Setter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column
-     * specifies the default primitive for a BDT. It is typically the most
-     * generic primitive allowed for the BDT.
+     * Setter for
+     * <code>oagi.bdt_sc_pri_restri.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
+     * that the BDT content can be restricted to an agency identification.
      */
-    public void setIsDefault(Byte value) {
-        set(5, value);
+    public void setAgencyIdListManifestId(ULong value) {
+        set(4, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column
@@ -146,17 +162,22 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record6 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.bdt_sc_pri_restri.is_default</code>. This column
+     * specifies the default primitive for a BDT. It is typically the most
+     * generic primitive allowed for the BDT.
+     */
+    public void setIsDefault(Byte value) {
+        set(5, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row6<ULong, ULong, ULong, ULong, ULong, Byte> fieldsRow() {
@@ -288,6 +309,10 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BdtScPriRestriRecord value6(Byte value) {
         setIsDefault(value);
@@ -303,30 +328,5 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
         value5(value5);
         value6(value6);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BdtScPriRestriRecord
-     */
-    public BdtScPriRestriRecord() {
-        super(BdtScPriRestri.BDT_SC_PRI_RESTRI);
-    }
-
-    /**
-     * Create a detached, initialised BdtScPriRestriRecord
-     */
-    public BdtScPriRestriRecord(ULong bdtScPriRestriId, ULong bdtScManifestId, ULong cdtScAwdPriXpsTypeMapId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
-        super(BdtScPriRestri.BDT_SC_PRI_RESTRI);
-
-        setBdtScPriRestriId(bdtScPriRestriId);
-        setBdtScManifestId(bdtScManifestId);
-        setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
-        setCodeListManifestId(codeListManifestId);
-        setAgencyIdListManifestId(agencyIdListManifestId);
-        setIsDefault(isDefault);
     }
 }

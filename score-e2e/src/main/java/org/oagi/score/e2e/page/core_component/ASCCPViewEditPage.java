@@ -547,7 +547,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -612,7 +611,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
-         *
          * @param definitionSource
          */
         void setDefinitionSource(String definitionSource);
@@ -625,7 +623,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionField();
 
         /**
-         *
          * @param definition
          */
         void setDefinition(String definition);

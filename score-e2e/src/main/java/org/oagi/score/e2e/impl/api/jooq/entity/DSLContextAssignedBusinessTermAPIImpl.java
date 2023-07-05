@@ -21,24 +21,24 @@ public class DSLContextAssignedBusinessTermAPIImpl implements AssignedBusinessTe
     }
 
     @Override
-    public AssignedBusinessTermObject getAssignedBusinessTermByName(String businessTermName){
+    public AssignedBusinessTermObject getAssignedBusinessTermByName(String businessTermName) {
         return null;
 
     }
 
     @Override
-    public AssignedBusinessTermObject[] getAssignedBusinessTermByBIE(String bieName){
+    public AssignedBusinessTermObject[] getAssignedBusinessTermByBIE(String bieName) {
         return null;
     }
 
     @Override
     public AssignedBusinessTermObject createRandomAssignedBusinessTerm(BusinessTermObject businessTerm, ABIEObject aBIE,
-                                                                       AppUserObject creator){
+                                                                       AppUserObject creator) {
         return null;
     }
 
     @Override
-    public void deleteAssignedBusinessTermById(BigInteger businessTermID){
+    public void deleteAssignedBusinessTermById(BigInteger businessTermID) {
 
     }
 

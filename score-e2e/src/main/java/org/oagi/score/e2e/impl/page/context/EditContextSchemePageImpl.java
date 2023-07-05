@@ -4,10 +4,11 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.obj.ContextSchemeObject;
 import org.oagi.score.e2e.obj.ContextSchemeValueObject;
-import org.oagi.score.e2e.page.context.*;
+import org.oagi.score.e2e.page.context.ContextSchemeValueDialog;
+import org.oagi.score.e2e.page.context.EditContextSchemePage;
+import org.oagi.score.e2e.page.context.LoadFromCodeListDialog;
+import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.*;
-
-import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;

@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.page.core_component;
 
-import org.oagi.score.e2e.impl.page.core_component.ASCCPViewEditPageImpl;
 import org.oagi.score.e2e.page.Dialog;
 import org.openqa.selenium.WebElement;
 
@@ -213,6 +212,7 @@ public interface ASCCPChangeACCDialog extends Dialog {
 
     /**
      * Return ASCCPViewEditPage after a new ACC is selected and updated
+     *
      * @param accDen ACC DEN
      * @return ASCCPViewEditPage
      */
