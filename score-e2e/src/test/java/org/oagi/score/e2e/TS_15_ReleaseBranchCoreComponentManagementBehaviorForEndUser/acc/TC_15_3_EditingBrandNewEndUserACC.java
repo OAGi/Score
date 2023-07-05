@@ -211,6 +211,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         isHidden("//mat-option//span[.=\" OAGIS10 BODs \"]//ancestor::mat-option");
         escape(getDriver());
     }
+
     private void isHidden(String xpath) {
         try {
             getDriver().findElement(By.xpath(xpath + "[@hidden]"));

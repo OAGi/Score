@@ -21,7 +21,8 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_17_6_DeletingACodeList extends BaseTest {
@@ -124,6 +125,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             viewEditCoreComponentPage.openPage();
         }
     }
+
     @Test
     @DisplayName("TC_17_6_TA_3")
     public void test_TA_3() {
@@ -147,14 +149,20 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
             editCodeListPage.hitAmendButton();
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField()))>1);
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
             editCodeListPage.moveToQA();
             assertEquals("QA", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
             editCodeListPage.moveToProduction();
             assertEquals("Production", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
         }
     }
 

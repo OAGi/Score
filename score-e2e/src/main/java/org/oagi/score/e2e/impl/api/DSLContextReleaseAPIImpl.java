@@ -46,7 +46,8 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
     public ReleaseObject getTheLatestRelease() {
         ULong maxReleaseId = dslContext.select(DSL.max(RELEASE.RELEASE_ID))
                 .from(RELEASE)
-                .fetchOneInto(ULong.class);;
+                .fetchOneInto(ULong.class);
+        ;
         ReleaseRecord release = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(maxReleaseId))
                 .fetchOptional().orElse(null);

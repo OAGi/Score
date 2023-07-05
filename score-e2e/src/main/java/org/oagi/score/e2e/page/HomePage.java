@@ -121,6 +121,10 @@ public interface HomePage extends Page {
 
     UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
 
+    MyUEsByStatesPanel openMyUEsByStatesPanel();
+
+    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
+
     interface TotalBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
@@ -311,13 +315,12 @@ public interface HomePage extends Page {
 
     }
 
-    MyUEsByStatesPanel openMyUEsByStatesPanel();
-
     interface MyUnusedUEsInBIEsPanel {
 
-        /**Return the table record in the table based on the user extension name and association DEN
+        /**
+         * Return the table record in the table based on the user extension name and association DEN
          *
-         * @param ueName  user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the table record UI element
          */
@@ -326,14 +329,12 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
          *
-         * @param ueName user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the 'View/Edit Core Component' page object
          */
         ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN);
 
     }
-
-    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
 
 }

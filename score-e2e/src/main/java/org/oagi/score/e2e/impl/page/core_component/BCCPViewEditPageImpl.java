@@ -18,6 +18,16 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
+    public static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -60,16 +70,6 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
             By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
-    public static final By REVISE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
-    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
-    public static final By AMEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
-    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -420,6 +420,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 public ASCCPanel getASCCPanel() {
                     return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public ASCCPPanel getASCCPPanel() {
                     return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -478,10 +479,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 public BCCPanel getBCCPanel() {
                     return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
                 }
+
                 @Override
                 public DTPanel getDTPanel() {
                     return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
@@ -500,16 +503,19 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         waitFor(ofMillis(1000L));
         assert getText(getNamespaceSelectField()).equals(namespace);
     }
+
     @Override
     public WebElement getNamespaceSelectField() {
         return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
     }
+
     @Override
     public void hitUpdateAnywayButton() {
         retry(() -> click(getUpdateButton(true)));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
+
     @Override
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);

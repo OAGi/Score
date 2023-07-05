@@ -20,12 +20,6 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage {
 
-    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
-
     public static final By DEN_COMPONENT_LOCATOR_FOR_ASCC =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input[@Value=\"ASCC\"]" +
                     "//ancestor::mat-tab-group//descendant::mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
@@ -39,7 +33,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By RESTORE_BUTTON_LOCATOR =
@@ -48,9 +41,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
-
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
@@ -858,6 +854,66 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
                 baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
     }
 
+    private WebElement getInputFieldByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+    }
+
+    @Override
+    public void hitUpdateButton() {
+        retry(() -> {
+            click(getUpdateButton(true));
+            waitFor(ofMillis(1000L));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getUpdateButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToDraft() {
+        click(getMoveToDraft(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public void moveToCandidate() {
+        click(getMoveToCandidate(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public WebElement getMoveToDraft(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public WebElement getMoveToCandidate(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
+        }
+    }
+
     private class ACCPanelImpl implements ACCPanel {
 
         private final String baseXPath;
@@ -1375,66 +1431,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         @Override
         public void setDefinition(String definition) {
             sendKeys(getDefinitionField(), definition);
-        }
-    }
-
-    private WebElement getInputFieldByName(String name) {
-        return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
-    }
-
-    @Override
-    public void hitUpdateButton() {
-        retry(() -> {
-            click(getUpdateButton(true));
-            waitFor(ofMillis(1000L));
-        });
-        invisibilityOfLoadingContainerElement(getDriver());
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-    }
-
-    @Override
-    public WebElement getUpdateButton(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), UPDATE_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public void moveToDraft() {
-        click(getMoveToDraft(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
-    }
-
-    @Override
-    public void moveToCandidate() {
-        click(getMoveToCandidate(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
-        invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
-    }
-
-    @Override
-    public WebElement getMoveToDraft(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
-        }
-    }
-
-    @Override
-    public WebElement getMoveToCandidate(boolean enabled) {
-        if (enabled) {
-            return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
-        } else {
-            return visibilityOfElementLocated(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
         }
     }
 

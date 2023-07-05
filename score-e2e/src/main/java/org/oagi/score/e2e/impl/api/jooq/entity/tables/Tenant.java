@@ -4,22 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function2;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -28,33 +14,24 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TenantRecord;
 
+import java.util.function.Function;
+
 
 /**
  * This table about the user tenant role.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class Tenant extends TableImpl<TenantRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.tenant</code>
      */
     public static final Tenant TENANT = new Tenant();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<TenantRecord> getRecordType() {
-        return TenantRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.tenant.tenant_id</code>. Primary key column.
      */
     public final TableField<TenantRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
-
     /**
      * The column <code>oagi.tenant.name</code>. The name of the tenant.
      */
@@ -91,6 +68,14 @@ public class Tenant extends TableImpl<TenantRecord> {
 
     public <O extends Record> Tenant(Table<O> child, ForeignKey<O, TenantRecord> key) {
         super(child, key, TENANT);
+    }
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<TenantRecord> getRecordType() {
+        return TenantRecord.class;
     }
 
     @Override

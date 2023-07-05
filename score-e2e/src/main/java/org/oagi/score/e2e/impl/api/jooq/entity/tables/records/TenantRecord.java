@@ -16,16 +16,26 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
 /**
  * This table about the user tenant role.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements Record2<ULong, String> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.tenant.tenant_id</code>. Primary key column.
+     * Create a detached TenantRecord
      */
-    public void setTenantId(ULong value) {
-        set(0, value);
+    public TenantRecord() {
+        super(Tenant.TENANT);
+    }
+
+    /**
+     * Create a detached, initialised TenantRecord
+     */
+    public TenantRecord(ULong tenantId, String name) {
+        super(Tenant.TENANT);
+
+        setTenantId(tenantId);
+        setName(name);
     }
 
     /**
@@ -36,11 +46,15 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements R
     }
 
     /**
-     * Setter for <code>oagi.tenant.name</code>. The name of the tenant.
+     * Setter for <code>oagi.tenant.tenant_id</code>. Primary key column.
      */
-    public void setName(String value) {
-        set(1, value);
+    public void setTenantId(ULong value) {
+        set(0, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.tenant.name</code>. The name of the tenant.
@@ -50,17 +64,20 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements R
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record2 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.tenant.name</code>. The name of the tenant.
+     */
+    public void setName(String value) {
+        set(1, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record2 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row2<ULong, String> fieldsRow() {
@@ -108,6 +125,10 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements R
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public TenantRecord value2(String value) {
         setName(value);
@@ -119,26 +140,5 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements R
         value1(value1);
         value2(value2);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached TenantRecord
-     */
-    public TenantRecord() {
-        super(Tenant.TENANT);
-    }
-
-    /**
-     * Create a detached, initialised TenantRecord
-     */
-    public TenantRecord(ULong tenantId, String name) {
-        super(Tenant.TENANT);
-
-        setTenantId(tenantId);
-        setName(name);
     }
 }

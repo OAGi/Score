@@ -17,17 +17,29 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
  * This table stores the context scheme values for a particular context scheme
  * in the CTX_SCHEME table.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueRecord> implements Record5<ULong, String, String, String, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>.
-     * Primary, internal database key.
+     * Create a detached CtxSchemeValueRecord
      */
-    public void setCtxSchemeValueId(ULong value) {
-        set(0, value);
+    public CtxSchemeValueRecord() {
+        super(CtxSchemeValue.CTX_SCHEME_VALUE);
+    }
+
+    /**
+     * Create a detached, initialised CtxSchemeValueRecord
+     */
+    public CtxSchemeValueRecord(ULong ctxSchemeValueId, String guid, String value, String meaning, ULong ownerCtxSchemeId) {
+        super(CtxSchemeValue.CTX_SCHEME_VALUE);
+
+        setCtxSchemeValueId(ctxSchemeValueId);
+        setGuid(guid);
+        setValue(value);
+        setMeaning(meaning);
+        setOwnerCtxSchemeId(ownerCtxSchemeId);
     }
 
     /**
@@ -39,11 +51,11 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>oagi.ctx_scheme_value.ctx_scheme_value_id</code>.
+     * Primary, internal database key.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setCtxSchemeValueId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -55,11 +67,11 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.value</code>. A short value for
-     * the scheme value similar to the code list value.
+     * Setter for <code>oagi.ctx_scheme_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
-    public void setValue(String value) {
-        set(2, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -71,11 +83,11 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.meaning</code>. The description,
-     * explanatiion of the scheme value.
+     * Setter for <code>oagi.ctx_scheme_value.value</code>. A short value for
+     * the scheme value similar to the code list value.
      */
-    public void setMeaning(String value) {
-        set(3, value);
+    public void setValue(String value) {
+        set(2, value);
     }
 
     /**
@@ -87,13 +99,16 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.
-     * Foreign key to the CTX_SCHEME table. It identifies the context scheme, to
-     * which this scheme value belongs.
+     * Setter for <code>oagi.ctx_scheme_value.meaning</code>. The description,
+     * explanatiion of the scheme value.
      */
-    public void setOwnerCtxSchemeId(ULong value) {
-        set(4, value);
+    public void setMeaning(String value) {
+        set(3, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.
@@ -105,17 +120,22 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record5 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.
+     * Foreign key to the CTX_SCHEME table. It identifies the context scheme, to
+     * which this scheme value belongs.
+     */
+    public void setOwnerCtxSchemeId(ULong value) {
+        set(4, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record5 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row5<ULong, String, String, String, ULong> fieldsRow() {
@@ -226,6 +246,10 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public CtxSchemeValueRecord value5(ULong value) {
         setOwnerCtxSchemeId(value);
@@ -240,29 +264,5 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
         value4(value4);
         value5(value5);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached CtxSchemeValueRecord
-     */
-    public CtxSchemeValueRecord() {
-        super(CtxSchemeValue.CTX_SCHEME_VALUE);
-    }
-
-    /**
-     * Create a detached, initialised CtxSchemeValueRecord
-     */
-    public CtxSchemeValueRecord(ULong ctxSchemeValueId, String guid, String value, String meaning, ULong ownerCtxSchemeId) {
-        super(CtxSchemeValue.CTX_SCHEME_VALUE);
-
-        setCtxSchemeValueId(ctxSchemeValueId);
-        setGuid(guid);
-        setValue(value);
-        setMeaning(meaning);
-        setOwnerCtxSchemeId(ownerCtxSchemeId);
     }
 }

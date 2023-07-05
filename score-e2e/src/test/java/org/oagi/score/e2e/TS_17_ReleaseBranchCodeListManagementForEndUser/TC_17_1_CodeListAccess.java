@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
 
@@ -112,17 +111,24 @@ public class TC_17_1_CodeListAccess extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(endUserA.getAppUserId(), cl.getOwnerUserId());
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
-            if (owner.isDeveloper()){
-                if (cl.getState().equals("Published")){
-                    assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
-                }else{
-                    assertThrows(NoSuchElementException.class, () ->{viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
+            if (owner.isDeveloper()) {
+                if (cl.getState().equals("Published")) {
+                    assertDoesNotThrow(() -> {
+                        viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                    });
+                } else {
+                    assertThrows(NoSuchElementException.class, () -> {
+                        viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                    });
                 }
-            }else{
-                assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
+            } else {
+                assertDoesNotThrow(() -> {
+                    viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                });
             }
         }
     }
+
     @Test
     @DisplayName("TC_17_1_TA_2")
     public void test_TA_2() {
@@ -209,7 +215,9 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             assertDisabled(editCodeListPage.getVersionField());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.getAddCodeListValueButton();
+            });
             CodeListValueObject value = codeListValuesMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -262,7 +270,9 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             assertDisabled(editCodeListPage.getVersionField());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.getAddCodeListValueButton();
+            });
             CodeListValueObject value = codeListValuesMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -270,6 +280,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             escape(getDriver());
         }
     }
+
     @Test
     @DisplayName("TC_17_1_TA_5")
     public void test_TA_5() {
@@ -308,7 +319,9 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             assertDisabled(editCodeListPage.getVersionField());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.getAddCodeListValueButton();
+            });
             CodeListValueObject value = codeListValuesMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();

@@ -22,7 +22,11 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
     private static final By CREATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
     private final ViewEditBusinessTermPageImpl parent;
-    public CreateBusinessTermPageImpl(ViewEditBusinessTermPageImpl parent){ super(parent); this.parent = parent;}
+
+    public CreateBusinessTermPageImpl(ViewEditBusinessTermPageImpl parent) {
+        super(parent);
+        this.parent = parent;
+    }
 
     @Override
     protected String getPageUrl() {
@@ -57,7 +61,9 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
     }
 
     @Override
-    public void setExternalReferenceURI(String externalReferenceURI){sendKeys(getExternalReferenceURIField(), externalReferenceURI);}
+    public void setExternalReferenceURI(String externalReferenceURI) {
+        sendKeys(getExternalReferenceURIField(), externalReferenceURI);
+    }
 
     @Override
     public WebElement getExternalReferenceIDField() {
@@ -65,7 +71,9 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
     }
 
     @Override
-    public void setExternalReferenceID(String externalReferenceID){sendKeys(getExternalReferenceURIField(), externalReferenceID);}
+    public void setExternalReferenceID(String externalReferenceID) {
+        sendKeys(getExternalReferenceURIField(), externalReferenceID);
+    }
 
     @Override
     public WebElement getCommentField() {

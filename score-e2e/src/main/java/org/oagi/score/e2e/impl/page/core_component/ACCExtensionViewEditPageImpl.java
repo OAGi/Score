@@ -5,7 +5,6 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -17,69 +16,50 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
 
-    private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
-
-    private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
-
-    private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
-
-    private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
-
-    private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
-
-    private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
-
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
-
-    private static final By DEN_COMPONENT_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
-
-    private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
-
-    private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
-
-    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
-
-    private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-
-    private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
-
-    private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
-
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
-    private static final By DELETE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
-
-    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
-
-    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
-
-    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
-
-    private static final By AMEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
-
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
     public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+    private static final By CORE_COMPONENT_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
+    private static final By RELEASE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+    private static final By REVISION_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+    private static final By STATE_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+    private static final By OWNER_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+    private static final By GUID_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
+    private static final By DEN_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+    private static final By DEN_COMPONENT_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
+    private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+    private static final By NAMESPACE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+    private static final By DEFINITION_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By SEARCH_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+    private static final By DELETE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to WIP\")]//ancestor::button[1]");
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
+    private static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
     public ACCExtensionViewEditPageImpl(BasePage parent) {
         super(parent);
@@ -234,6 +214,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         click(elementToBeClickable(getDriver(), CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR));
         waitFor(ofMillis(1000L));
     }
+
     @Override
     public WebElement getDeleteButton(boolean enabled) {
         if (enabled) {

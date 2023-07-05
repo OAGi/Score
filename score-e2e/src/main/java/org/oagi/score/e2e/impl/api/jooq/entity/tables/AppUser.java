@@ -4,24 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function8;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -30,67 +14,54 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This table captures the user information for authentication and authorization
  * purposes.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class AppUser extends TableImpl<AppUserRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.app_user</code>
      */
     public static final AppUser APP_USER = new AppUser();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<AppUserRecord> getRecordType() {
-        return AppUserRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.app_user.app_user_id</code>. Primary key column.
      */
     public final TableField<AppUserRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
-
     /**
      * The column <code>oagi.app_user.login_id</code>. User Id of the user.
      */
     public final TableField<AppUserRecord, String> LOGIN_ID = createField(DSL.name("login_id"), SQLDataType.VARCHAR(45).nullable(false), this, "User Id of the user.");
-
     /**
      * The column <code>oagi.app_user.password</code>. Password to authenticate
      * the user.
      */
     public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100), this, "Password to authenticate the user.");
-
     /**
      * The column <code>oagi.app_user.name</code>. Full name of the user.
      */
     public final TableField<AppUserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Full name of the user.");
-
     /**
      * The column <code>oagi.app_user.organization</code>. The company the user
      * represents.
      */
     public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100), this, "The company the user represents.");
-
     /**
      * The column <code>oagi.app_user.is_developer</code>.
      */
     public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT, this, "");
-
     /**
      * The column <code>oagi.app_user.is_admin</code>. Indicator whether the
      * user has an admin role or not.
      */
     public final TableField<AppUserRecord, Byte> IS_ADMIN = createField(DSL.name("is_admin"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicator whether the user has an admin role or not.");
-
     /**
      * The column <code>oagi.app_user.is_enabled</code>.
      */
@@ -127,6 +98,14 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     public <O extends Record> AppUser(Table<O> child, ForeignKey<O, AppUserRecord> key) {
         super(child, key, APP_USER);
+    }
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<AppUserRecord> getRecordType() {
+        return AppUserRecord.class;
     }
 
     @Override

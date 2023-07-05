@@ -1,13 +1,11 @@
 package org.oagi.score.e2e.TS_6_EndUserAccessRightScoreCoreFunctions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.DataType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.obj.*;
@@ -21,7 +19,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
 
@@ -2151,7 +2148,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.updateACC(accReleaseTwo);
 
             BCCPObject bccpReleaseTwo = coreComponentAPI.
-                    createRevisedBCCP(bccpReleaseOne, dataTypeReleaseTwo, endUserForCC, releaseTwo,"Published");
+                    createRevisedBCCP(bccpReleaseOne, dataTypeReleaseTwo, endUserForCC, releaseTwo, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setCardinalityMax(3);
             bccReleaseTwo.setCardinalityMin(3);
@@ -2184,7 +2181,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();;
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ;
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -2289,6 +2287,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             }
         }
     }
+
     @Test
     @DisplayName("TC_6_2_TA_6_5_4")
     public void test_TA_6_5_4() {
@@ -2680,7 +2679,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             /**
              * The end user ACC of the ASCCP has a Group component type and is NOT in the Production state.
              */
-            ACCObject accToAppendReleaseTwo = coreComponentAPI.createRevisedACC(accToAppendReleaseOne, endUserForCCFirst, releaseTwo,"QA");
+            ACCObject accToAppendReleaseTwo = coreComponentAPI.createRevisedACC(accToAppendReleaseOne, endUserForCCFirst, releaseTwo, "QA");
             BCCPObject bccpToAppendReleaseTwo = coreComponentAPI.createRevisedBCCP(bccpToAppendReleaseOne, dataTypeReleaseTwo, endUserForCCFirst, releaseTwo, "QA");
             coreComponentAPI.appendBCC(accToAppendReleaseTwo, bccpToAppendReleaseTwo, "QA");
             accBCCPMap.put(accToAppendReleaseTwo, bccpToAppendReleaseTwo);

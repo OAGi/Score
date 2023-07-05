@@ -1,17 +1,11 @@
 package org.oagi.score.e2e.impl.page.agency_id_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
-import org.oagi.score.e2e.impl.page.code_list.EditCodeListPageImpl;
-import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
-import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -24,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEditAgencyIDListPage {
 

@@ -18,6 +18,20 @@ public interface AboutPage extends Page {
     VersionList getVersionList();
 
     /**
+     * Return the UI element of the 'Contributors' link.
+     *
+     * @return the UI element of the 'Contributors' link
+     */
+    WebElement getContributorsLink();
+
+    /**
+     * Return the UI element of the License text.
+     *
+     * @return the UI element of the License text
+     */
+    WebElement getLicense();
+
+    /**
      * The list of product versions.
      */
     interface VersionList {
@@ -38,19 +52,5 @@ public interface AboutPage extends Page {
         WebElement getItemByName(String name);
 
     }
-
-    /**
-     * Return the UI element of the 'Contributors' link.
-     *
-     * @return the UI element of the 'Contributors' link
-     */
-    WebElement getContributorsLink();
-
-    /**
-     * Return the UI element of the License text.
-     *
-     * @return the UI element of the License text
-     */
-    WebElement getLicense();
 
 }

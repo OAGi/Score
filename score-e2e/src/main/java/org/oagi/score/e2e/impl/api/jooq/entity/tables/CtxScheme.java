@@ -4,25 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function13;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row13;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -31,110 +14,97 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxSchemeRecord;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This table represents a context scheme (a classification scheme) for a
  * context category.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class CtxScheme extends TableImpl<CtxSchemeRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.ctx_scheme</code>
      */
     public static final CtxScheme CTX_SCHEME = new CtxScheme();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<CtxSchemeRecord> getRecordType() {
-        return CtxSchemeRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary,
      * database key.
      */
     public final TableField<CtxSchemeRecord, ULong> CTX_SCHEME_ID = createField(DSL.name("ctx_scheme_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary, database key.");
-
     /**
      * The column <code>oagi.ctx_scheme.guid</code>. A globally unique
      * identifier (GUID).
      */
     public final TableField<CtxSchemeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
-
     /**
      * The column <code>oagi.ctx_scheme.scheme_id</code>. External
-     * identification of the scheme. 
+     * identification of the scheme.
      */
     public final TableField<CtxSchemeRecord, String> SCHEME_ID = createField(DSL.name("scheme_id"), SQLDataType.VARCHAR(45).nullable(false), this, "External identification of the scheme. ");
-
     /**
      * The column <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
      * the context scheme.
      */
     public final TableField<CtxSchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(255), this, "Pretty print name of the context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.description</code>. Description of the
      * context scheme.
      */
     public final TableField<CtxSchemeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Description of the context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
      * of the agency maintaining the scheme. This column currently does not use
      * the AGENCY_ID_LIST table. It is just a free form text at this point.
      */
     public final TableField<CtxSchemeRecord, String> SCHEME_AGENCY_ID = createField(DSL.name("scheme_agency_id"), SQLDataType.VARCHAR(45).nullable(false), this, "Identification of the agency maintaining the scheme. This column currently does not use the AGENCY_ID_LIST table. It is just a free form text at this point.");
-
     /**
      * The column <code>oagi.ctx_scheme.scheme_version_id</code>. Version number
      * of the context scheme.
      */
     public final TableField<CtxSchemeRecord, String> SCHEME_VERSION_ID = createField(DSL.name("scheme_version_id"), SQLDataType.VARCHAR(45).nullable(false), this, "Version number of the context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.ctx_category_id</code>. This the foreign
      * key to the CTX_CATEGORY table. It identifies the context category
      * associated with this context scheme.
      */
     public final TableField<CtxSchemeRecord, ULong> CTX_CATEGORY_ID = createField(DSL.name("ctx_category_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This the foreign key to the CTX_CATEGORY table. It identifies the context category associated with this context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.code_list_id</code>. This is the foreign
      * key to the CODE_LIST table. It identifies the code list associated with
      * this context scheme.
      */
     public final TableField<CtxSchemeRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is the foreign key to the CODE_LIST table. It identifies the code list associated with this context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who created this context scheme.
      */
     public final TableField<CtxSchemeRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.last_updated_by</code>. Foreign key to
      * the APP_USER table. It identifies the user who last updated the context
      * scheme.
      */
     public final TableField<CtxSchemeRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It identifies the user who last updated the context scheme.");
-
     /**
      * The column <code>oagi.ctx_scheme.creation_timestamp</code>. Timestamp
      * when the scheme was created.
      */
     public final TableField<CtxSchemeRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the scheme was created.");
-
     /**
      * The column <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
      * when the scheme was last updated.
      */
     public final TableField<CtxSchemeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the scheme was last updated.");
+    private transient CtxCategory _ctxCategory;
+    private transient CodeList _codeList;
+    private transient AppUser _ctxSchemeCreatedByFk;
+    private transient AppUser _ctxSchemeLastUpdatedByFk;
 
     private CtxScheme(Name alias, Table<CtxSchemeRecord> aliased) {
         this(alias, aliased, null);
@@ -169,6 +139,14 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
         super(child, key, CTX_SCHEME);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<CtxSchemeRecord> getRecordType() {
+        return CtxSchemeRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -193,11 +171,6 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
     public List<ForeignKey<CtxSchemeRecord, ?>> getReferences() {
         return Arrays.asList(Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, Keys.CTX_SCHEME_CODE_LIST_ID_FK, Keys.CTX_SCHEME_CREATED_BY_FK, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
     }
-
-    private transient CtxCategory _ctxCategory;
-    private transient CodeList _codeList;
-    private transient AppUser _ctxSchemeCreatedByFk;
-    private transient AppUser _ctxSchemeLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.ctx_category</code> table.

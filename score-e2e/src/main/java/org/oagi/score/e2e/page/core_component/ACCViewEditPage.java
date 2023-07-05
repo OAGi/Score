@@ -129,7 +129,6 @@ public interface ACCViewEditPage extends Page {
     WebElement getObjectClassTermField();
 
     /**
-     *
      * @param objectClassTerm
      */
     void setObjectClassTerm(String objectClassTerm);
@@ -212,7 +211,6 @@ public interface ACCViewEditPage extends Page {
      * remove the base ACC by clicking 'Delete' context menu.
      *
      * @param path node path
-     *
      */
     void deleteBaseACC(String path);
 
@@ -246,7 +244,7 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the 'Create ASCCP from this' dialog object
      */
-    WebElement  createASCCPfromThis(String path);
+    WebElement createASCCPfromThis(String path);
 
     /**
      * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.
@@ -283,6 +281,7 @@ public interface ACCViewEditPage extends Page {
 
     /**
      * Open the association selection dialog by clicking 'Refactor/Refactor to Base' context menu.
+     *
      * @param path
      * @param associationPropertyTerm ASCCP or BCCP propertyTerm
      * @return
@@ -291,8 +290,8 @@ public interface ACCViewEditPage extends Page {
 
     /**
      * Ungroup the association by clicking 'Refactor/Ungroup' context menu
-     * @param path
      *
+     * @param path
      */
     void unGroup(String path);
 
@@ -583,6 +582,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * Set the "Object Class Term" field with given text.
+         *
          * @param objectClassTerm
          */
         void setObjectClassTerm(String objectClassTerm);
@@ -716,6 +716,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Cardinality Min' field by the given text
+         *
          * @param cardinalityMin
          */
         void setCardinalityMinField(String cardinalityMin);
@@ -729,6 +730,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Cardinality Max' field by the given text
+         *
          * @param cardinalityMax
          */
         void setCardinalityMaxField(String cardinalityMax);
@@ -756,6 +758,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * Set the UI element of the 'Definition' field
+         *
          * @param newDefinition
          */
         void setDefinition(String newDefinition);
@@ -959,6 +962,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Cardinality Min' field by the given text.
+         *
          * @param cardinalityMin
          */
         void setCardinalityMinField(String cardinalityMin);
@@ -972,6 +976,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Cardinality Max' field by the given text.
+         *
          * @param cardinalityMax
          */
         void setCardinalityMaxField(String cardinalityMax);
@@ -985,6 +990,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Entity Type' select field by given text.
+         *
          * @param entityType Element or Attribute
          */
         void setEntityType(String entityType);
@@ -1005,6 +1011,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Value Constraint' select field with the given text
+         *
          * @param valueConstraint 'Default Value' or 'Fixed Value' or None
          */
         void setValueConstraint(String valueConstraint);
@@ -1025,6 +1032,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Default Value' field with the given text.
+         *
          * @param defaultValue
          */
         void setDefaultValue(String defaultValue);
@@ -1045,6 +1053,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Definition Source' field with given text
+         *
          * @param definitionSource
          */
         void setDefinitionSource(String definitionSource);
@@ -1058,6 +1067,7 @@ public interface ACCViewEditPage extends Page {
 
         /**
          * set the UI element of the 'Definition' field with the given text.
+         *
          * @param definition
          */
         void setDefinition(String definition);

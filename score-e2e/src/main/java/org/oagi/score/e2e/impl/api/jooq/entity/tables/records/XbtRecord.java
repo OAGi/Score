@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record16;
@@ -14,22 +12,48 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt;
 
+import java.time.LocalDateTime;
+
 
 /**
  * This table stores XML schema built-in types and OAGIS built-in types. OAGIS
  * built-in types are those types defined in the XMLSchemaBuiltinType and the
  * XMLSchemaBuiltinType Patterns schemas.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record16<ULong, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.xbt.xbt_id</code>. Primary, internal database key.
+     * Create a detached XbtRecord
      */
-    public void setXbtId(ULong value) {
-        set(0, value);
+    public XbtRecord() {
+        super(Xbt.XBT);
+    }
+
+    /**
+     * Create a detached, initialised XbtRecord
+     */
+    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String openapi30Map, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
+        super(Xbt.XBT);
+
+        setXbtId(xbtId);
+        setGuid(guid);
+        setName(name);
+        setBuiltinType(builtinType);
+        setJbtDraft05Map(jbtDraft05Map);
+        setOpenapi30Map(openapi30Map);
+        setSubtypeOfXbtId(subtypeOfXbtId);
+        setSchemaDefinition(schemaDefinition);
+        setRevisionDoc(revisionDoc);
+        setState(state);
+        setCreatedBy(createdBy);
+        setOwnerUserId(ownerUserId);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setIsDeprecated(isDeprecated);
     }
 
     /**
@@ -40,11 +64,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>oagi.xbt.xbt_id</code>. Primary, internal database key.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setXbtId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -56,11 +79,11 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.name</code>. Human understandable name of the
-     * built-in type.
+     * Setter for <code>oagi.xbt.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public void setName(String value) {
-        set(2, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -72,13 +95,11 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
-     * appear in the XML schema including the namespace prefix. Namespace prefix
-     * for the XML schema namespace is assumed to be 'xsd' and a default prefix
-     * for the OAGIS built-int type.
+     * Setter for <code>oagi.xbt.name</code>. Human understandable name of the
+     * built-in type.
      */
-    public void setBuiltinType(String value) {
-        set(3, value);
+    public void setName(String value) {
+        set(2, value);
     }
 
     /**
@@ -92,10 +113,13 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.jbt_draft05_map</code>.
+     * Setter for <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
+     * appear in the XML schema including the namespace prefix. Namespace prefix
+     * for the XML schema namespace is assumed to be 'xsd' and a default prefix
+     * for the OAGIS built-int type.
      */
-    public void setJbtDraft05Map(String value) {
-        set(4, value);
+    public void setBuiltinType(String value) {
+        set(3, value);
     }
 
     /**
@@ -106,10 +130,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.openapi30_map</code>.
+     * Setter for <code>oagi.xbt.jbt_draft05_map</code>.
      */
-    public void setOpenapi30Map(String value) {
-        set(5, value);
+    public void setJbtDraft05Map(String value) {
+        set(4, value);
     }
 
     /**
@@ -120,11 +144,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
-     * XBT table itself. It indicates a super type of this XSD built-in type.
+     * Setter for <code>oagi.xbt.openapi30_map</code>.
      */
-    public void setSubtypeOfXbtId(ULong value) {
-        set(6, value);
+    public void setOpenapi30Map(String value) {
+        set(5, value);
     }
 
     /**
@@ -136,10 +159,11 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.schema_definition</code>.
+     * Setter for <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
+     * XBT table itself. It indicates a super type of this XSD built-in type.
      */
-    public void setSchemaDefinition(String value) {
-        set(7, value);
+    public void setSubtypeOfXbtId(ULong value) {
+        set(6, value);
     }
 
     /**
@@ -150,10 +174,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.revision_doc</code>.
+     * Setter for <code>oagi.xbt.schema_definition</code>.
      */
-    public void setRevisionDoc(String value) {
-        set(8, value);
+    public void setSchemaDefinition(String value) {
+        set(7, value);
     }
 
     /**
@@ -164,10 +188,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.state</code>.
+     * Setter for <code>oagi.xbt.revision_doc</code>.
      */
-    public void setState(Integer value) {
-        set(9, value);
+    public void setRevisionDoc(String value) {
+        set(8, value);
     }
 
     /**
@@ -178,10 +202,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.created_by</code>.
+     * Setter for <code>oagi.xbt.state</code>.
      */
-    public void setCreatedBy(ULong value) {
-        set(10, value);
+    public void setState(Integer value) {
+        set(9, value);
     }
 
     /**
@@ -192,10 +216,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.owner_user_id</code>.
+     * Setter for <code>oagi.xbt.created_by</code>.
      */
-    public void setOwnerUserId(ULong value) {
-        set(11, value);
+    public void setCreatedBy(ULong value) {
+        set(10, value);
     }
 
     /**
@@ -206,10 +230,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.last_updated_by</code>.
+     * Setter for <code>oagi.xbt.owner_user_id</code>.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(12, value);
+    public void setOwnerUserId(ULong value) {
+        set(11, value);
     }
 
     /**
@@ -220,10 +244,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.creation_timestamp</code>.
+     * Setter for <code>oagi.xbt.last_updated_by</code>.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(13, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(12, value);
     }
 
     /**
@@ -234,10 +258,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.last_update_timestamp</code>.
+     * Setter for <code>oagi.xbt.creation_timestamp</code>.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(14, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(13, value);
     }
 
     /**
@@ -248,11 +272,15 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     /**
-     * Setter for <code>oagi.xbt.is_deprecated</code>.
+     * Setter for <code>oagi.xbt.last_update_timestamp</code>.
      */
-    public void setIsDeprecated(Byte value) {
-        set(15, value);
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(14, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.xbt.is_deprecated</code>.
@@ -262,17 +290,20 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record16 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.xbt.is_deprecated</code>.
+     */
+    public void setIsDeprecated(Byte value) {
+        set(15, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record16 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row16<ULong, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
@@ -614,6 +645,10 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public XbtRecord value16(Byte value) {
         setIsDeprecated(value);
@@ -639,40 +674,5 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record1
         value15(value15);
         value16(value16);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached XbtRecord
-     */
-    public XbtRecord() {
-        super(Xbt.XBT);
-    }
-
-    /**
-     * Create a detached, initialised XbtRecord
-     */
-    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String openapi30Map, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
-        super(Xbt.XBT);
-
-        setXbtId(xbtId);
-        setGuid(guid);
-        setName(name);
-        setBuiltinType(builtinType);
-        setJbtDraft05Map(jbtDraft05Map);
-        setOpenapi30Map(openapi30Map);
-        setSubtypeOfXbtId(subtypeOfXbtId);
-        setSchemaDefinition(schemaDefinition);
-        setRevisionDoc(revisionDoc);
-        setState(state);
-        setCreatedBy(createdBy);
-        setOwnerUserId(ownerUserId);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setIsDeprecated(isDeprecated);
     }
 }

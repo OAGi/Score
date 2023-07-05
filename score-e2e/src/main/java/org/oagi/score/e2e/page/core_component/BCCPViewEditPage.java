@@ -787,7 +787,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -819,7 +818,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param valueConstraint
          */
         void setValueConstraint(String valueConstraint);
@@ -832,7 +830,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getFixedValueField();
 
         /**
-         *
          * @param fixedValue
          */
         void setFixedValue(String fixedValue);
@@ -845,7 +842,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getDefaultValueField();
 
         /**
-         *
          * @param defaultValue
          */
         void setDefaultValue(String defaultValue);
