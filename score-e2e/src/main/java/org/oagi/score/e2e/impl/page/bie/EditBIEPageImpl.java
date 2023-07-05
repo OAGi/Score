@@ -146,46 +146,31 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(node);
-        new Actions(getDriver()).sendKeys("O").perform();
-        try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                return node;
-            }
-        } catch (WebDriverException ignore) {
-        }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return node;
+        return clickOnDropDownMenuByPathAndLevel(path, -1);
     }
 
     @Override
     public WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
-        click(node);
-        new Actions(getDriver()).sendKeys("O").perform();
-        try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                return node;
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            String nodeName = nodes[nodes.length - 1];
+            WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            try {
+                if (visibilityOfElementLocated(getDriver(),
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    return node;
+                }
+            } catch (WebDriverException ignore) {
             }
-        } catch (WebDriverException ignore) {
-        }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return node;
+            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+            click(contextMenuIcon);
+            assert visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+            return node;
+        });
     }
 
     @Override
@@ -326,22 +311,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement getNodeByName(String nodeName) {
-        By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
-        return visibilityOfElementLocated(getDriver(), nodeLocator);
+        return getNodeByNameAndDataLevel(nodeName, -1);
     }
 
     private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
-        By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")][@data-level=\"" + dataLevel + "\"]");
+        String xpathExpr = "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]";
+        if (dataLevel >= 0) {
+            xpathExpr += "[@data-level=\"" + dataLevel + "\"]";
+        }
+        By nodeLocator = By.xpath(xpathExpr);
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override

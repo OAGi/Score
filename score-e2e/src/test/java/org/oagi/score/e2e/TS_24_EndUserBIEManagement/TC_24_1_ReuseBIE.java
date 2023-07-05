@@ -1224,10 +1224,9 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
     }
+
     @Test
     public void test_TA_24_1_15() {
-
-
     }
 
     @Test
