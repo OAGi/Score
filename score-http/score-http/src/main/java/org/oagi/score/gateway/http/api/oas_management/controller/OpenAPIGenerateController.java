@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +31,7 @@ public class OpenAPIGenerateController {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private BieGenerateService service;
+    private OpenAPIGenerateService service;
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -40,6 +41,9 @@ public class OpenAPIGenerateController {
         List<BigInteger> topLevelAsbiepIds = popTopLevelAsbiepIds(params);
         GenerateExpressionOption option =
                 objectMapper.convertValue(params, GenerateExpressionOption.class);
+
+        //read arrayIndicator and suppressRoot information from database based on topLevelAsbiepIds
+
 
         BieGenerateExpressionResult bieGenerateExpressionResult = service.generate(user, topLevelAsbiepIds, option);
 
