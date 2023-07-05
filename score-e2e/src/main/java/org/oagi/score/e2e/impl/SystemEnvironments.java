@@ -4,13 +4,6 @@ import java.util.Locale;
 
 public class SystemEnvironments {
 
-    public enum OperatingSystem {
-        Windows,
-        MacOSX,
-        Linux,
-        Other;
-    }
-
     public static OperatingSystem getOperatingSystem() {
         String osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
         if (osName.contains("mac") || osName.contains("darwin")) {
@@ -22,6 +15,13 @@ public class SystemEnvironments {
         } else {
             return OperatingSystem.Other;
         }
+    }
+
+    public enum OperatingSystem {
+        Windows,
+        MacOSX,
+        Linux,
+        Other;
     }
 
 }

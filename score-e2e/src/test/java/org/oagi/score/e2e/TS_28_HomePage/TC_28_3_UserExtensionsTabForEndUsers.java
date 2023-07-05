@@ -32,6 +32,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
+    private static int extractNumberFromText(String text) {
+        return Integer.valueOf(text.replaceAll("\\D", ""));
+    }
+
     @BeforeEach
     public void init() {
         super.init();
@@ -39,207 +43,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private class UserTopLevelASBIEPContainer {
-
-        private AppUserObject appUser;
-        private NamespaceObject userNamespace;
-        int numberOfWIPUEGs;
-        int numberOfQAUEGs;
-        int numberOfProductionUEGs;
-
-        private List<Pair<String, String>> ccWIPList = new ArrayList<Pair<String, String>>();
-        private List<Pair<String, String>> ccQAList = new ArrayList<Pair<String, String>>();
-        private List<Pair<String, String>> ccProductionList = new ArrayList<Pair<String, String>>();
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
-            this(appUser, release, namespace, nextInt(1, 3), nextInt(1, 3), nextInt(1, 3));
-        }
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
-                                           int numberOfWIPUEGs, int numberOfQAUEGs, int numberOfProductionUEGs) {
-            this.appUser = appUser;
-            this.userNamespace = userNamespace;
-            this.numberOfWIPUEGs = numberOfWIPUEGs;
-            this.numberOfQAUEGs = numberOfQAUEGs;
-            this.numberOfProductionUEGs = numberOfProductionUEGs;
-
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
-            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developer);
-
-            HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
-            for (int i = 0; i < numberOfWIPUEGs; ++i) {
-                ASCCPObject asccp;
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                }
-                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
-
-                BIEMenu bieMenu = homePage.getBIEMenu();
-                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                ACCExtensionViewEditPage accExtensionViewEditPage =
-                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                accExtensionViewEditPage.setNamespace(userNamespace);
-                accExtensionViewEditPage.hitUpdateButton();
-                ccWIPList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
-            }
-
-            for (int i = 0; i < numberOfQAUEGs; ++i) {
-                ASCCPObject asccp;
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                }
-                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
-
-                BIEMenu bieMenu = homePage.getBIEMenu();
-                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                ACCExtensionViewEditPage accExtensionViewEditPage =
-                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                accExtensionViewEditPage.setNamespace(userNamespace);
-                accExtensionViewEditPage.hitUpdateButton();
-                ccQAList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
-                accExtensionViewEditPage.moveToQA();
-
-                topLevelAsbiep.setState("QA");
-                getAPIFactory().getBusinessInformationEntityAPI()
-                        .updateTopLevelASBIEP(topLevelAsbiep);
-
-            }
-
-            for (int i = 0; i < numberOfProductionUEGs; ++i) {
-                ASCCPObject asccp;
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                }
-                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
-
-                BIEMenu bieMenu = homePage.getBIEMenu();
-                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                ACCExtensionViewEditPage accExtensionViewEditPage =
-                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                accExtensionViewEditPage.setNamespace(userNamespace);
-                accExtensionViewEditPage.hitUpdateButton();
-
-                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
-                accExtensionViewEditPage.moveToQA();
-
-                topLevelAsbiep.setState("QA");
-                getAPIFactory().getBusinessInformationEntityAPI()
-                        .updateTopLevelASBIEP(topLevelAsbiep);
-
-                accExtensionViewEditPage.moveToProduction();
-
-                topLevelAsbiep.setState("Production");
-                getAPIFactory().getBusinessInformationEntityAPI()
-                        .updateTopLevelASBIEP(topLevelAsbiep);
-            }
-
-            homePage.logout();
-        }
-
-    }
-
-    private class UserExtensionGroupContainer {
-
-        private AppUserObject appUser;
-        private NamespaceObject userNamespace;
-        int numberOfProductionUEGs;
-        private Map<TopLevelASBIEPObject, BCCPObject> bieBCCPMap = new HashMap<>();
-        private Map<ASCCPObject, BCCPObject> ueBCCPMap = new HashMap<>();
-
-        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
-            this(appUser, release, namespace, nextInt(2, 5));
-        }
-
-        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
-                                           int numberOfProductionUEGs) {
-            this.appUser = appUser;
-            this.userNamespace = userNamespace;
-            this.numberOfProductionUEGs = numberOfProductionUEGs;
-
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
-            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developer);
-
-            HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
-
-            for (int i = 0; i < numberOfProductionUEGs; ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccpToAppend;
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-
-                }
-                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
-                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
-
-                bieBCCPMap.put(topLevelAsbiep, bccpToAppend);
-                ueBCCPMap.put(asccp, bccpToAppend);
-                BIEMenu bieMenu = homePage.getBIEMenu();
-                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-                ACCExtensionViewEditPage accExtensionViewEditPage =
-                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                getDriver().manage().window().maximize();
-                SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
-                selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
-
-                accExtensionViewEditPage.setNamespace(userNamespace);
-                accExtensionViewEditPage.hitUpdateButton();
-
-                accExtensionViewEditPage.moveToQA();
-
-                topLevelAsbiep.setState("QA");
-                getAPIFactory().getBusinessInformationEntityAPI()
-                        .updateTopLevelASBIEP(topLevelAsbiep);
-
-                accExtensionViewEditPage.moveToProduction();
-
-                topLevelAsbiep.setState("Production");
-                getAPIFactory().getBusinessInformationEntityAPI()
-                        .updateTopLevelASBIEP(topLevelAsbiep);
-            }
-
-            homePage.logout();
-        }
-
-    }
-
-    private static int extractNumberFromText(String text) {
-        return Integer.valueOf(text.replaceAll("\\D", ""));
     }
 
     @Test
@@ -673,8 +476,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         ACCExtensionViewEditPage.moveToQA();
         ACCExtensionViewEditPage.moveToProduction();
 
-        int loop =2;
-        while (loop > 0){
+        int loop = 2;
+        while (loop > 0) {
             bieMenu.openViewEditBIESubMenu();
             viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
@@ -751,8 +554,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         ACCExtensionViewEditPage.moveToQA();
         ACCExtensionViewEditPage.moveToProduction();
 
-        int loop =2;
-        while (loop > 0){
+        int loop = 2;
+        while (loop > 0) {
             bieMenu.openViewEditBIESubMenu();
             viewEditBIEPage.openEditBIEPage(useraBIEWIP);
 
@@ -770,7 +573,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";
         WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
-        ACCExtensionViewEditPage accExtensionViewEditPage = (ACCExtensionViewEditPage)click(td);
+        ACCExtensionViewEditPage accExtensionViewEditPage = (ACCExtensionViewEditPage) click(td);
         assertTrue(accExtensionViewEditPage.getAmendButton(true).isDisplayed());
     }
 
@@ -782,5 +585,201 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
         });
+    }
+
+    private class UserTopLevelASBIEPContainer {
+
+        int numberOfWIPUEGs;
+        int numberOfQAUEGs;
+        int numberOfProductionUEGs;
+        private AppUserObject appUser;
+        private NamespaceObject userNamespace;
+        private List<Pair<String, String>> ccWIPList = new ArrayList<Pair<String, String>>();
+        private List<Pair<String, String>> ccQAList = new ArrayList<Pair<String, String>>();
+        private List<Pair<String, String>> ccProductionList = new ArrayList<Pair<String, String>>();
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
+            this(appUser, release, namespace, nextInt(1, 3), nextInt(1, 3), nextInt(1, 3));
+        }
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
+                                           int numberOfWIPUEGs, int numberOfQAUEGs, int numberOfProductionUEGs) {
+            this.appUser = appUser;
+            this.userNamespace = userNamespace;
+            this.numberOfWIPUEGs = numberOfWIPUEGs;
+            this.numberOfQAUEGs = numberOfQAUEGs;
+            this.numberOfProductionUEGs = numberOfProductionUEGs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
+            for (int i = 0; i < numberOfWIPUEGs; ++i) {
+                ASCCPObject asccp;
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                }
+                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
+
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                accExtensionViewEditPage.setNamespace(userNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+                ccWIPList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+            }
+
+            for (int i = 0; i < numberOfQAUEGs; ++i) {
+                ASCCPObject asccp;
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                }
+                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
+
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                accExtensionViewEditPage.setNamespace(userNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+                ccQAList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                accExtensionViewEditPage.moveToQA();
+
+                topLevelAsbiep.setState("QA");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+
+            }
+
+            for (int i = 0; i < numberOfProductionUEGs; ++i) {
+                ASCCPObject asccp;
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                }
+                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
+
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                accExtensionViewEditPage.setNamespace(userNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+
+                ccProductionList.add(new Pair<String, String>(accExtensionViewEditPage.getDENFieldValue(), this.appUser.getLoginId()));
+                accExtensionViewEditPage.moveToQA();
+
+                topLevelAsbiep.setState("QA");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+
+                accExtensionViewEditPage.moveToProduction();
+
+                topLevelAsbiep.setState("Production");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+            }
+
+            homePage.logout();
+        }
+
+    }
+
+    private class UserExtensionGroupContainer {
+
+        int numberOfProductionUEGs;
+        private AppUserObject appUser;
+        private NamespaceObject userNamespace;
+        private Map<TopLevelASBIEPObject, BCCPObject> bieBCCPMap = new HashMap<>();
+        private Map<ASCCPObject, BCCPObject> ueBCCPMap = new HashMap<>();
+
+        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
+            this(appUser, release, namespace, nextInt(2, 5));
+        }
+
+        public UserExtensionGroupContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
+                                           int numberOfProductionUEGs) {
+            this.appUser = appUser;
+            this.userNamespace = userNamespace;
+            this.numberOfProductionUEGs = numberOfProductionUEGs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
+
+            for (int i = 0; i < numberOfProductionUEGs; ++i) {
+                ASCCPObject asccp;
+                BCCPObject bccpToAppend;
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+                    ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+                    coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+
+                }
+                TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()
+                        .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, this.appUser, "WIP");
+
+                bieBCCPMap.put(topLevelAsbiep, bccpToAppend);
+                ueBCCPMap.put(asccp, bccpToAppend);
+                BIEMenu bieMenu = homePage.getBIEMenu();
+                ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+                EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+                ACCExtensionViewEditPage accExtensionViewEditPage =
+                        editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+                getDriver().manage().window().maximize();
+                SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+                selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
+
+                accExtensionViewEditPage.setNamespace(userNamespace);
+                accExtensionViewEditPage.hitUpdateButton();
+
+                accExtensionViewEditPage.moveToQA();
+
+                topLevelAsbiep.setState("QA");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+
+                accExtensionViewEditPage.moveToProduction();
+
+                topLevelAsbiep.setState("Production");
+                getAPIFactory().getBusinessInformationEntityAPI()
+                        .updateTopLevelASBIEP(topLevelAsbiep);
+            }
+
+            homePage.logout();
+        }
+
     }
 }

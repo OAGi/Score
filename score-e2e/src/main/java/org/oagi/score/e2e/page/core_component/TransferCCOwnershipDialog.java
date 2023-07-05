@@ -89,6 +89,7 @@ public interface TransferCCOwnershipDialog extends Dialog {
 
     /**
      * Return the UI checkbox for select at given index
+     *
      * @param idx index
      * @return the UI checkbox element
      */

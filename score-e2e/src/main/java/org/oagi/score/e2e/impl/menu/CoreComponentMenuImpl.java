@@ -18,7 +18,6 @@ import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
 
-import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreComponentMenu {

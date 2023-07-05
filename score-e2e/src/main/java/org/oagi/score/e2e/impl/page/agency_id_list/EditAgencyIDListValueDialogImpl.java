@@ -73,14 +73,17 @@ public class EditAgencyIDListValueDialogImpl implements EditAgencyIDListValueDia
     public WebElement getValueField() {
         return visibilityOfElementLocated(getDriver(), VALUE_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getMeaningField() {
         return visibilityOfElementLocated(getDriver(), MEANING_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
@@ -114,6 +117,7 @@ public class EditAgencyIDListValueDialogImpl implements EditAgencyIDListValueDia
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getSaveButton() {
         return elementToBeClickable(getDriver(), SAVE_BUTTON_LOCATOR);

@@ -9,8 +9,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
-
 import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.oagi.score.e2e.impl.PageHelper.*;

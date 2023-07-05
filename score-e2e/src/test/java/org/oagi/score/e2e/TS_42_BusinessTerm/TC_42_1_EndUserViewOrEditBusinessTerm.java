@@ -36,6 +36,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
+
     private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
         this.randomBusinessTerms.add(businessTerm);
     }

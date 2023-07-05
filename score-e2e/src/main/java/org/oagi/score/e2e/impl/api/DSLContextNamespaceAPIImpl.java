@@ -1,8 +1,6 @@
 package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.NamespaceAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
@@ -104,7 +102,7 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
                 .where(NAMESPACE.IS_STD_NMSP.eq((byte) 1))
                 .fetchInto(NamespaceRecord.class);
         ArrayList<NamespaceObject> namespaceObjectsList = new ArrayList<>();
-        for (NamespaceRecord record: standardNamespaces){
+        for (NamespaceRecord record : standardNamespaces) {
             NamespaceObject namespace = mapper(record);
             namespaceObjectsList.add(namespace);
         }

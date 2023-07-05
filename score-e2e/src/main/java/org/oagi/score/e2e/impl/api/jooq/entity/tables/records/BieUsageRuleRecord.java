@@ -19,17 +19,31 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
  * In a particular record, either only one of the TARGET_ABIE_ID,
  * TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> implements Record7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.bie_usage_rule_id</code>. Primary
-     * key of the table.
+     * Create a detached BieUsageRuleRecord
      */
-    public void setBieUsageRuleId(ULong value) {
-        set(0, value);
+    public BieUsageRuleRecord() {
+        super(BieUsageRule.BIE_USAGE_RULE);
+    }
+
+    /**
+     * Create a detached, initialised BieUsageRuleRecord
+     */
+    public BieUsageRuleRecord(ULong bieUsageRuleId, ULong assignedUsageRuleId, ULong targetAbieId, ULong targetAsbieId, ULong targetAsbiepId, ULong targetBbieId, ULong targetBbiepId) {
+        super(BieUsageRule.BIE_USAGE_RULE);
+
+        setBieUsageRuleId(bieUsageRuleId);
+        setAssignedUsageRuleId(assignedUsageRuleId);
+        setTargetAbieId(targetAbieId);
+        setTargetAsbieId(targetAsbieId);
+        setTargetAsbiepId(targetAsbiepId);
+        setTargetBbieId(targetBbieId);
+        setTargetBbiepId(targetBbiepId);
     }
 
     /**
@@ -41,12 +55,11 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.assigned_usage_rule_id</code>.
-     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
-     * a BIE.
+     * Setter for <code>oagi.bie_usage_rule.bie_usage_rule_id</code>. Primary
+     * key of the table.
      */
-    public void setAssignedUsageRuleId(ULong value) {
-        set(1, value);
+    public void setBieUsageRuleId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -59,12 +72,12 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.target_abie_id</code>. Foreign key
-     * to the ABIE table indicating the ABIE, to which the usage rule is
-     * applied.
+     * Setter for <code>oagi.bie_usage_rule.assigned_usage_rule_id</code>.
+     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
+     * a BIE.
      */
-    public void setTargetAbieId(ULong value) {
-        set(2, value);
+    public void setAssignedUsageRuleId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -77,12 +90,12 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.target_asbie_id</code>. Foreign key
-     * to the ASBIE table indicating the ASBIE, to which the usage rule is
+     * Setter for <code>oagi.bie_usage_rule.target_abie_id</code>. Foreign key
+     * to the ABIE table indicating the ABIE, to which the usage rule is
      * applied.
      */
-    public void setTargetAsbieId(ULong value) {
-        set(3, value);
+    public void setTargetAbieId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -95,12 +108,12 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.target_asbiep_id</code>. Foreign key
-     * to the ASBIEP table indicating the ASBIEP, to which the usage rule is
+     * Setter for <code>oagi.bie_usage_rule.target_asbie_id</code>. Foreign key
+     * to the ASBIE table indicating the ASBIE, to which the usage rule is
      * applied.
      */
-    public void setTargetAsbiepId(ULong value) {
-        set(4, value);
+    public void setTargetAsbieId(ULong value) {
+        set(3, value);
     }
 
     /**
@@ -113,12 +126,12 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.target_bbie_id</code>. Foreign key
-     * to the BBIE table indicating the BBIE, to which the usage rule is
+     * Setter for <code>oagi.bie_usage_rule.target_asbiep_id</code>. Foreign key
+     * to the ASBIEP table indicating the ASBIEP, to which the usage rule is
      * applied.
      */
-    public void setTargetBbieId(ULong value) {
-        set(5, value);
+    public void setTargetAsbiepId(ULong value) {
+        set(4, value);
     }
 
     /**
@@ -131,13 +144,17 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_usage_rule.target_bbiep_id</code>. Foreign key
-     * to the BBIEP table indicating the ABIEP, to which the usage rule is
+     * Setter for <code>oagi.bie_usage_rule.target_bbie_id</code>. Foreign key
+     * to the BBIE table indicating the BBIE, to which the usage rule is
      * applied.
      */
-    public void setTargetBbiepId(ULong value) {
-        set(6, value);
+    public void setTargetBbieId(ULong value) {
+        set(5, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.bie_usage_rule.target_bbiep_id</code>. Foreign key
@@ -149,17 +166,22 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record7 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.bie_usage_rule.target_bbiep_id</code>. Foreign key
+     * to the BBIEP table indicating the ABIEP, to which the usage rule is
+     * applied.
+     */
+    public void setTargetBbiepId(ULong value) {
+        set(6, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record7 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> fieldsRow() {
@@ -312,6 +334,10 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BieUsageRuleRecord value7(ULong value) {
         setTargetBbiepId(value);
@@ -328,31 +354,5 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
         value6(value6);
         value7(value7);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BieUsageRuleRecord
-     */
-    public BieUsageRuleRecord() {
-        super(BieUsageRule.BIE_USAGE_RULE);
-    }
-
-    /**
-     * Create a detached, initialised BieUsageRuleRecord
-     */
-    public BieUsageRuleRecord(ULong bieUsageRuleId, ULong assignedUsageRuleId, ULong targetAbieId, ULong targetAsbieId, ULong targetAsbiepId, ULong targetBbieId, ULong targetBbiepId) {
-        super(BieUsageRule.BIE_USAGE_RULE);
-
-        setBieUsageRuleId(bieUsageRuleId);
-        setAssignedUsageRuleId(assignedUsageRuleId);
-        setTargetAbieId(targetAbieId);
-        setTargetAsbieId(targetAsbieId);
-        setTargetAsbiepId(targetAsbiepId);
-        setTargetBbieId(targetBbieId);
-        setTargetBbiepId(targetBbiepId);
     }
 }

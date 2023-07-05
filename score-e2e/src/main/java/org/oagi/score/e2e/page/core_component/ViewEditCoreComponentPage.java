@@ -35,6 +35,7 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Set the UI element of the 'Type' select field with the given type.
+     *
      * @param type
      */
     void setTypeSelect(String type);
@@ -48,6 +49,7 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Set the UI element of the 'State' select field with the given type.
+     *
      * @param state
      */
     void setState(String state);
@@ -158,7 +160,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the ACC filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the ACC page object
      */
@@ -175,7 +177,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the ASCCP filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the ASCCP page object
      */
@@ -192,7 +194,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the BCCP filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the BCCP page object
      */
@@ -209,7 +211,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the DT filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the DT page object
      */
@@ -326,6 +328,7 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Return a unique table record based on the Core Component name and the owner
+     *
      * @param name  the Core Component name
      * @param owner
      * @return a single table record based on the Core Component name and the owner

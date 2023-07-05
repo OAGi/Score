@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.bie;
 
-import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -11,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePaginationResponseProfileBIEDialog {
 

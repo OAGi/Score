@@ -4,22 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function2;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -28,35 +14,26 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BlobContentRecord;
 
+import java.util.function.Function;
+
 
 /**
  * This table stores schemas whose content is only imported as a whole and is
  * represented in Blob.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BlobContent extends TableImpl<BlobContentRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.blob_content</code>
      */
     public static final BlobContent BLOB_CONTENT = new BlobContent();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<BlobContentRecord> getRecordType() {
-        return BlobContentRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.blob_content.blob_content_id</code>. Primary,
      * internal database key.
      */
     public final TableField<BlobContentRecord, ULong> BLOB_CONTENT_ID = createField(DSL.name("blob_content_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
-
     /**
      * The column <code>oagi.blob_content.content</code>. The Blob content of
      * the schema file.
@@ -94,6 +71,14 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
 
     public <O extends Record> BlobContent(Table<O> child, ForeignKey<O, BlobContentRecord> key) {
         super(child, key, BLOB_CONTENT);
+    }
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<BlobContentRecord> getRecordType() {
+        return BlobContentRecord.class;
     }
 
     @Override

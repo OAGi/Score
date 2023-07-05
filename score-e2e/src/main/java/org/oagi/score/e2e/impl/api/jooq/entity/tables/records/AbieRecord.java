@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record15;
@@ -14,27 +12,51 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie;
 
+import java.time.LocalDateTime;
+
 
 /**
  * The ABIE table stores information about an ABIE, which is a contextualized
  * ACC. The context is represented by the BUSINESS_CTX_ID column that refers to
  * a business context. Each ABIE must have a business context and a based ACC.
- * 
+ * <p>
  * It should be noted that, per design document, there is no corresponding ABIE
  * created for an ACC which will not show up in the instance document such as
  * ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP", "USER_EXTENSION_GROUP", etc.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Record15<ULong, String, ULong, String, String, ULong, String, ULong, ULong, LocalDateTime, LocalDateTime, Integer, String, String, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.abie.abie_id</code>. A internal, primary database
-     * key of an ABIE.
+     * Create a detached AbieRecord
      */
-    public void setAbieId(ULong value) {
-        set(0, value);
+    public AbieRecord() {
+        super(Abie.ABIE);
+    }
+
+    /**
+     * Create a detached, initialised AbieRecord
+     */
+    public AbieRecord(ULong abieId, String guid, ULong basedAccManifestId, String path, String hashPath, ULong bizCtxId, String definition, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Integer state, String remark, String bizTerm, ULong ownerTopLevelAsbiepId) {
+        super(Abie.ABIE);
+
+        setAbieId(abieId);
+        setGuid(guid);
+        setBasedAccManifestId(basedAccManifestId);
+        setPath(path);
+        setHashPath(hashPath);
+        setBizCtxId(bizCtxId);
+        setDefinition(definition);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setState(state);
+        setRemark(remark);
+        setBizTerm(bizTerm);
+        setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
     }
 
     /**
@@ -46,11 +68,11 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>oagi.abie.abie_id</code>. A internal, primary database
+     * key of an ABIE.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setAbieId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -62,12 +84,11 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.based_acc_manifest_id</code>. A foreign key to
-     * the ACC_MANIFEST table refering to the ACC, on which the business context
-     * has been applied to derive this ABIE.
+     * Setter for <code>oagi.abie.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public void setBasedAccManifestId(ULong value) {
-        set(2, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -80,10 +101,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.path</code>.
+     * Setter for <code>oagi.abie.based_acc_manifest_id</code>. A foreign key to
+     * the ACC_MANIFEST table refering to the ACC, on which the business context
+     * has been applied to derive this ABIE.
      */
-    public void setPath(String value) {
-        set(3, value);
+    public void setBasedAccManifestId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -94,12 +117,10 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.hash_path</code>. hash_path generated from the
-     * path of the component graph using hash function, so that it is unique in
-     * the graph.
+     * Setter for <code>oagi.abie.path</code>.
      */
-    public void setHashPath(String value) {
-        set(4, value);
+    public void setPath(String value) {
+        set(3, value);
     }
 
     /**
@@ -112,12 +133,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.biz_ctx_id</code>. (Deprecated) A foreign key
-     * to the BIZ_CTX table. This column stores the business context assigned to
-     * the ABIE.
+     * Setter for <code>oagi.abie.hash_path</code>. hash_path generated from the
+     * path of the component graph using hash function, so that it is unique in
+     * the graph.
      */
-    public void setBizCtxId(ULong value) {
-        set(5, value);
+    public void setHashPath(String value) {
+        set(4, value);
     }
 
     /**
@@ -130,12 +151,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.definition</code>. Definition to override the
-     * ACC's definition. If NULL, it means that the definition should be
-     * inherited from the based CC.
+     * Setter for <code>oagi.abie.biz_ctx_id</code>. (Deprecated) A foreign key
+     * to the BIZ_CTX table. This column stores the business context assigned to
+     * the ABIE.
      */
-    public void setDefinition(String value) {
-        set(6, value);
+    public void setBizCtxId(ULong value) {
+        set(5, value);
     }
 
     /**
@@ -148,13 +169,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.created_by</code>. A foreign key referring to
-     * the user who creates the ABIE. The creator of the ABIE is also its owner
-     * by default. ABIEs created as children of another ABIE have the same
-     * CREATED_BY as its parent.
+     * Setter for <code>oagi.abie.definition</code>. Definition to override the
+     * ACC's definition. If NULL, it means that the definition should be
+     * inherited from the based CC.
      */
-    public void setCreatedBy(ULong value) {
-        set(7, value);
+    public void setDefinition(String value) {
+        set(6, value);
     }
 
     /**
@@ -168,12 +188,13 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the ABIE record. This may be
-     * the user who is in the same group as the creator.
+     * Setter for <code>oagi.abie.created_by</code>. A foreign key referring to
+     * the user who creates the ABIE. The creator of the ABIE is also its owner
+     * by default. ABIEs created as children of another ABIE have the same
+     * CREATED_BY as its parent.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(8, value);
+    public void setCreatedBy(ULong value) {
+        set(7, value);
     }
 
     /**
@@ -186,12 +207,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.creation_timestamp</code>. Timestamp when the
-     * ABIE record was first created. ABIEs created as children of another ABIE
-     * have the same CREATION_TIMESTAMP.
+     * Setter for <code>oagi.abie.last_updated_by</code>. A foreign key
+     * referring to the last user who has updated the ABIE record. This may be
+     * the user who is in the same group as the creator.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(9, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(8, value);
     }
 
     /**
@@ -204,11 +225,12 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.last_update_timestamp</code>. The timestamp
-     * when the ABIE was last updated.
+     * Setter for <code>oagi.abie.creation_timestamp</code>. Timestamp when the
+     * ABIE record was first created. ABIEs created as children of another ABIE
+     * have the same CREATION_TIMESTAMP.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(10, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(9, value);
     }
 
     /**
@@ -220,15 +242,11 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.state</code>. 2 = EDITING, 4 = PUBLISHED. This
-     * column is only used with a top-level ABIE, because that is the only entry
-     * point for editing. The state value indicates the visibility of the
-     * top-level ABIE to users other than the owner. In the user group
-     * environment, a logic can apply that other users in the group can see the
-     * top-level ABIE only when it is in the 'Published' state.
+     * Setter for <code>oagi.abie.last_update_timestamp</code>. The timestamp
+     * when the ABIE was last updated.
      */
-    public void setState(Integer value) {
-        set(11, value);
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(10, value);
     }
 
     /**
@@ -244,18 +262,15 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.remark</code>. This column allows the user to
-     * specify very context-specific usage of the BIE. It is different from the
-     * DEFINITION column in that the DEFINITION column is a description
-     * conveying the meaning of the associated concept. Remarks may be a very
-     * implementation specific instruction or others. For example, BOM BOD, as
-     * an ACC, is a generic BOM structure. In a particular context, a BOM ABIE
-     * can be a Super BOM. Explanation of the Super BOM concept should be
-     * captured in the Definition of the ABIE. A remark about that ABIE may be
-     * "Type of BOM should be recognized in the BOM/typeCode."
+     * Setter for <code>oagi.abie.state</code>. 2 = EDITING, 4 = PUBLISHED. This
+     * column is only used with a top-level ABIE, because that is the only entry
+     * point for editing. The state value indicates the visibility of the
+     * top-level ABIE to users other than the owner. In the user group
+     * environment, a logic can apply that other users in the group can see the
+     * top-level ABIE only when it is in the 'Published' state.
      */
-    public void setRemark(String value) {
-        set(12, value);
+    public void setState(Integer value) {
+        set(11, value);
     }
 
     /**
@@ -274,12 +289,18 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.biz_term</code>. To indicate what the BIE is
-     * called in a particular business context. With this current design, only
-     * one business term is allowed per business context.
+     * Setter for <code>oagi.abie.remark</code>. This column allows the user to
+     * specify very context-specific usage of the BIE. It is different from the
+     * DEFINITION column in that the DEFINITION column is a description
+     * conveying the meaning of the associated concept. Remarks may be a very
+     * implementation specific instruction or others. For example, BOM BOD, as
+     * an ACC, is a generic BOM structure. In a particular context, a BOM ABIE
+     * can be a Super BOM. Explanation of the Super BOM concept should be
+     * captured in the Definition of the ABIE. A remark about that ABIE may be
+     * "Type of BOM should be recognized in the BOM/typeCode."
      */
-    public void setBizTerm(String value) {
-        set(13, value);
+    public void setRemark(String value) {
+        set(12, value);
     }
 
     /**
@@ -292,12 +313,17 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.abie.owner_top_level_asbiep_id</code>. This is a
-     * foreign key to the top-level ASBIEP.
+     * Setter for <code>oagi.abie.biz_term</code>. To indicate what the BIE is
+     * called in a particular business context. With this current design, only
+     * one business term is allowed per business context.
      */
-    public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(14, value);
+    public void setBizTerm(String value) {
+        set(13, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.abie.owner_top_level_asbiep_id</code>. This is a
@@ -308,17 +334,21 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record15 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.abie.owner_top_level_asbiep_id</code>. This is a
+     * foreign key to the top-level ASBIEP.
+     */
+    public void setOwnerTopLevelAsbiepId(ULong value) {
+        set(14, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record15 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row15<ULong, String, ULong, String, String, ULong, String, ULong, ULong, LocalDateTime, LocalDateTime, Integer, String, String, ULong> fieldsRow() {
@@ -639,6 +669,10 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public AbieRecord value15(ULong value) {
         setOwnerTopLevelAsbiepId(value);
@@ -663,39 +697,5 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Recor
         value14(value14);
         value15(value15);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached AbieRecord
-     */
-    public AbieRecord() {
-        super(Abie.ABIE);
-    }
-
-    /**
-     * Create a detached, initialised AbieRecord
-     */
-    public AbieRecord(ULong abieId, String guid, ULong basedAccManifestId, String path, String hashPath, ULong bizCtxId, String definition, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Integer state, String remark, String bizTerm, ULong ownerTopLevelAsbiepId) {
-        super(Abie.ABIE);
-
-        setAbieId(abieId);
-        setGuid(guid);
-        setBasedAccManifestId(basedAccManifestId);
-        setPath(path);
-        setHashPath(hashPath);
-        setBizCtxId(bizCtxId);
-        setDefinition(definition);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setState(state);
-        setRemark(remark);
-        setBizTerm(bizTerm);
-        setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
     }
 }

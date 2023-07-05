@@ -4,24 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function7;
-import org.jooq.Identity;
-import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
-import org.jooq.Schema;
-import org.jooq.SelectField;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -30,6 +14,10 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUsageRuleRecord;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 
 /**
  * This is an intersection table. Per CCTS, a usage rule may be reused. This
@@ -37,71 +25,61 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUsageRuleRecord
  * In a particular record, either only one of the TARGET_ABIE_ID,
  * TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.bie_usage_rule</code>
      */
     public static final BieUsageRule BIE_USAGE_RULE = new BieUsageRule();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<BieUsageRuleRecord> getRecordType() {
-        return BieUsageRuleRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>oagi.bie_usage_rule.bie_usage_rule_id</code>. Primary
      * key of the table.
      */
     public final TableField<BieUsageRuleRecord, ULong> BIE_USAGE_RULE_ID = createField(DSL.name("bie_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the table.");
-
     /**
      * The column <code>oagi.bie_usage_rule.assigned_usage_rule_id</code>.
      * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
      * a BIE.
      */
     public final TableField<BieUsageRuleRecord, ULong> ASSIGNED_USAGE_RULE_ID = createField(DSL.name("assigned_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the USAGE_RULE table indicating the usage rule assigned to a BIE.");
-
     /**
      * The column <code>oagi.bie_usage_rule.target_abie_id</code>. Foreign key
      * to the ABIE table indicating the ABIE, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ABIE_ID = createField(DSL.name("target_abie_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the ABIE table indicating the ABIE, to which the usage rule is applied.");
-
     /**
      * The column <code>oagi.bie_usage_rule.target_asbie_id</code>. Foreign key
      * to the ASBIE table indicating the ASBIE, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ASBIE_ID = createField(DSL.name("target_asbie_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.");
-
     /**
      * The column <code>oagi.bie_usage_rule.target_asbiep_id</code>. Foreign key
      * to the ASBIEP table indicating the ASBIEP, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ASBIEP_ID = createField(DSL.name("target_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.");
-
     /**
      * The column <code>oagi.bie_usage_rule.target_bbie_id</code>. Foreign key
      * to the BBIE table indicating the BBIE, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIE_ID = createField(DSL.name("target_bbie_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.");
-
     /**
      * The column <code>oagi.bie_usage_rule.target_bbiep_id</code>. Foreign key
      * to the BBIEP table indicating the ABIEP, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIEP_ID = createField(DSL.name("target_bbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.");
+    private transient UsageRule _usageRule;
+    private transient Abie _abie;
+    private transient Asbie _asbie;
+    private transient Asbiep _asbiep;
+    private transient Bbie _bbie;
+    private transient Bbiep _bbiep;
 
     private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased) {
         this(alias, aliased, null);
@@ -136,6 +114,14 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         super(child, key, BIE_USAGE_RULE);
     }
 
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<BieUsageRuleRecord> getRecordType() {
+        return BieUsageRuleRecord.class;
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -155,13 +141,6 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     public List<ForeignKey<BieUsageRuleRecord, ?>> getReferences() {
         return Arrays.asList(Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
     }
-
-    private transient UsageRule _usageRule;
-    private transient Abie _abie;
-    private transient Asbie _asbie;
-    private transient Asbiep _asbiep;
-    private transient Bbie _bbie;
-    private transient Bbiep _bbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.usage_rule</code> table.

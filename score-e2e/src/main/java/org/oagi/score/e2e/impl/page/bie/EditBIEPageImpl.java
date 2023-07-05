@@ -39,6 +39,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Globally\")]");
 
+    private static final By RETAINED_REUSED_BIE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Retain Reused BIE\")]");
+
+    private static final By MAKE_BIE_REUSABLE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Make BIE reusable\")]");
+
     private static final By SETTINGS_ICON_LOCATOR =
             By.xpath("//mat-icon[text() = \"settings\"]");
 
@@ -140,24 +146,69 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(node);
-        new Actions(getDriver()).sendKeys("O").perform();
-        try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                return node;
+        return clickOnDropDownMenuByPathAndLevel(path, -1);
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel) {
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            String nodeName = nodes[nodes.length - 1];
+            WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            try {
+                if (visibilityOfElementLocated(getDriver(),
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    return node;
+                }
+            } catch (WebDriverException ignore) {
             }
-        } catch (WebDriverException ignore) {
-        }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return node;
+            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+            click(contextMenuIcon);
+            assert visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+            return node;
+        });
+    }
+
+    @Override
+    public void RetainReusedBIEOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Retain\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
+        });
+    }
+
+    @Override
+    public void MakeBIEReusableOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Make\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(2000L));
+        });
     }
 
     @Override
@@ -260,16 +311,25 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement getNodeByName(String nodeName) {
-        By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+        return getNodeByNameAndDataLevel(nodeName, -1);
+    }
+
+    private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
+        String xpathExpr = "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]";
+        if (dataLevel >= 0) {
+            xpathExpr += "[@data-level=\"" + dataLevel + "\"]";
+        }
+        By nodeLocator = By.xpath(xpathExpr);
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
@@ -409,6 +469,24 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         });*/
 
         WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
+        assert selectProfileBIEToReuse.isOpened();
+        return selectProfileBIEToReuse;
+
+    }
+
+    @Override
+    public SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel) {
+        WebElement node = clickOnDropDownMenuByPathAndLevel(path, dataLevel);
         try {
             click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
@@ -600,6 +678,69 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getTypeDefinitionField() {
             return getTextAreaFieldByName("Type Definition");
+        }
+    }
+
+    @Override
+    public ReusedASBIEPanel getReusedASBIEPanel(WebElement asccpNode) {
+        return retry(() -> {
+            click(asccpNode);
+            waitFor(ofMillis(500L));
+            return new ReusedASBIEPanelImpl("//div[contains(@class, \"detail-reused\")][1]");
+        });
+    }
+
+    private class ReusedASBIEPanelImpl implements ReusedASBIEPanel {
+
+        private final String baseXPath;
+
+        public ReusedASBIEPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName("Release");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName("State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName("Owner");
+        }
+
+        @Override
+        public WebElement getBusinessContextField() {
+            return getInputFieldByName("Business Context");
+        }
+
+        @Override
+        public WebElement getLegacyBusinessTermField() {
+            return getInputFieldByName("Legacy Business Term");
+        }
+
+        @Override
+        public WebElement getRemarkField() {
+            return getInputFieldByName("Remark");
+        }
+
+        @Override
+        public WebElement getVersionField() {
+            return getInputFieldByName("Version");
+        }
+
+        @Override
+        public WebElement getStatusField() {
+            return getInputFieldByName("Status");
+        }
+
+        @Override
+        public WebElement getContextDefinitionField() {
+            return getTextAreaFieldByName("Context Definition");
         }
     }
 

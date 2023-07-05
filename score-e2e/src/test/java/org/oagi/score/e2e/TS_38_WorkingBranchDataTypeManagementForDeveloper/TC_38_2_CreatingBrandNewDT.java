@@ -63,10 +63,10 @@ public class TC_38_2_CreatingBrandNewDT extends BaseTest {
         assertTrue(dtViewEditPage.getRepresentationTermFieldValue().equals(baseDT.getRepresentationTerm()));
         assertDisabled(dtViewEditPage.getRepresentationTermField());
         String den = "";
-        if (baseDT.getQualifier() != null){
+        if (baseDT.getQualifier() != null) {
             assertTrue(dtViewEditPage.getQualifierFieldValue().equals(baseDT.getQualifier()));
             den = baseDT.getQualifier() + "" + baseDT.getDataTypeTerm() + ". Type";
-        } else{
+        } else {
             assertEquals(null, dtViewEditPage.getQualifierFieldValue());
             den = baseDT.getDataTypeTerm() + ". Type";
         }
@@ -109,6 +109,7 @@ public class TC_38_2_CreatingBrandNewDT extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTableRecordByValue(newQualifier + "_ " + baseDT.getDen()));
     }
+
     @Test
     @DisplayName("TC_38_2_TA_2")
     public void test_TA_2() {

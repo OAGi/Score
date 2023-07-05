@@ -22,7 +22,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
@@ -134,22 +135,24 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-           ArrayList<CodeListValueObject> values = codeListCodeListValueMap.get(codeList);
-           for(CodeListValueObject value: values){
-               editCodeListPage.selectCodeListValue(value.getValue());
-               assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
-               EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
-               editCodeListValueDialog.setMeaning("new meaning for value");
-               editCodeListValueDialog.setDefinition("new definition for value");
-               editCodeListValueDialog.setDefinitionSource("new definition source for value");
-               boolean previousDeprecatedStatusForValue = value.isDeprecated();
-               if (previousDeprecatedStatusForValue == true){
-                   assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-               }else{
-                   assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
-               }
-               editCodeListValueDialog.hitSaveButton();
-           }
+            ArrayList<CodeListValueObject> values = codeListCodeListValueMap.get(codeList);
+            for (CodeListValueObject value : values) {
+                editCodeListPage.selectCodeListValue(value.getValue());
+                assertThrows(Exception.class, () -> {
+                    editCodeListPage.removeCodeListValue();
+                });
+                EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
+                editCodeListValueDialog.setMeaning("new meaning for value");
+                editCodeListValueDialog.setDefinition("new definition for value");
+                editCodeListValueDialog.setDefinitionSource("new definition source for value");
+                boolean previousDeprecatedStatusForValue = value.isDeprecated();
+                if (previousDeprecatedStatusForValue == true) {
+                    assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
+                } else {
+                    assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                }
+                editCodeListValueDialog.hitSaveButton();
+            }
         }
 
     }
@@ -195,6 +198,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             editCodeListValueDialog.hitSaveButton();
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_4")
     public void test_TA_4() {
@@ -234,6 +238,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assert message.equals(getSnackBarMessage(getDriver()));
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_5")
     public void test_TA_5() {
@@ -272,6 +277,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertDoesNotThrow(() -> editCodeListPage.removeCodeListValue());
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_6")
     public void test_TA_6() {
@@ -318,7 +324,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
             assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
             assertDoesNotThrow(() -> editCodeListPage.valueExists(oldValue.getValue()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.valueExists(newCodeValue);});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.valueExists(newCodeValue);
+            });
 
         }
     }

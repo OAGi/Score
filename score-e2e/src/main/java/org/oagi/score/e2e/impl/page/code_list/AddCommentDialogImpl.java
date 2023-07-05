@@ -9,7 +9,6 @@ import org.openqa.selenium.WebElement;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 public class AddCommentDialogImpl implements AddCommentDialog {
     private static final By COMMENT_BUTTON_LOCATOR =
@@ -49,6 +48,7 @@ public class AddCommentDialogImpl implements AddCommentDialog {
         sendKeys(getCommentField(), comment);
         hitCommentButton();
     }
+
     @Override
     public WebElement getCommentField() {
         return visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR);

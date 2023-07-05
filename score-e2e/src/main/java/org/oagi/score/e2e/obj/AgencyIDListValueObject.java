@@ -6,7 +6,8 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.RandomStringUtils.*;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 
 @Data
 public class AgencyIDListValueObject {

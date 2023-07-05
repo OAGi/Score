@@ -4,8 +4,6 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record7;
@@ -14,22 +12,38 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccBizterm;
 
+import java.time.LocalDateTime;
+
 
 /**
  * The bcc_bizterm table stores information about the aggregation between the
  * business term and BCC. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> implements Record7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.bcc_bizterm_id</code>. An internal,
-     * primary database key of an bcc_bizterm record.
+     * Create a detached BccBiztermRecord
      */
-    public void setBccBiztermId(ULong value) {
-        set(0, value);
+    public BccBiztermRecord() {
+        super(BccBizterm.BCC_BIZTERM);
+    }
+
+    /**
+     * Create a detached, initialised BccBiztermRecord
+     */
+    public BccBiztermRecord(ULong bccBiztermId, ULong businessTermId, ULong bccId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(BccBizterm.BCC_BIZTERM);
+
+        setBccBiztermId(bccBiztermId);
+        setBusinessTermId(businessTermId);
+        setBccId(bccId);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 
     /**
@@ -41,11 +55,11 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.business_term_id</code>. An internal ID
-     * of the associated business term
+     * Setter for <code>oagi.bcc_bizterm.bcc_bizterm_id</code>. An internal,
+     * primary database key of an bcc_bizterm record.
      */
-    public void setBusinessTermId(ULong value) {
-        set(1, value);
+    public void setBccBiztermId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -57,11 +71,11 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.bcc_id</code>. An internal ID of the
-     * associated BCC
+     * Setter for <code>oagi.bcc_bizterm.business_term_id</code>. An internal ID
+     * of the associated business term
      */
-    public void setBccId(ULong value) {
-        set(2, value);
+    public void setBusinessTermId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -73,12 +87,11 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the bcc_bizterm record. The creator of
-     * the bcc_bizterm is also its owner by default.
+     * Setter for <code>oagi.bcc_bizterm.bcc_id</code>. An internal ID of the
+     * associated BCC
      */
-    public void setCreatedBy(ULong value) {
-        set(3, value);
+    public void setBccId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -91,12 +104,12 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the bcc_bizterm record. This
-     * may be the user who is in the same group as the creator.
+     * Setter for <code>oagi.bcc_bizterm.created_by</code>. A foreign key
+     * referring to the user who creates the bcc_bizterm record. The creator of
+     * the bcc_bizterm is also its owner by default.
      */
-    public void setLastUpdatedBy(ULong value) {
-        set(4, value);
+    public void setCreatedBy(ULong value) {
+        set(3, value);
     }
 
     /**
@@ -109,11 +122,12 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.creation_timestamp</code>. Timestamp
-     * when the bcc_bizterm record was first created.
+     * Setter for <code>oagi.bcc_bizterm.last_updated_by</code>. A foreign key
+     * referring to the last user who has updated the bcc_bizterm record. This
+     * may be the user who is in the same group as the creator.
      */
-    public void setCreationTimestamp(LocalDateTime value) {
-        set(5, value);
+    public void setLastUpdatedBy(ULong value) {
+        set(4, value);
     }
 
     /**
@@ -125,12 +139,16 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     /**
-     * Setter for <code>oagi.bcc_bizterm.last_update_timestamp</code>. The
-     * timestamp when the bcc_bizterm was last updated.
+     * Setter for <code>oagi.bcc_bizterm.creation_timestamp</code>. Timestamp
+     * when the bcc_bizterm record was first created.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(6, value);
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(5, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.bcc_bizterm.last_update_timestamp</code>. The
@@ -141,17 +159,21 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record7 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.bcc_bizterm.last_update_timestamp</code>. The
+     * timestamp when the bcc_bizterm was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(6, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record7 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
@@ -304,6 +326,10 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public BccBiztermRecord value7(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -320,31 +346,5 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
         value6(value6);
         value7(value7);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached BccBiztermRecord
-     */
-    public BccBiztermRecord() {
-        super(BccBizterm.BCC_BIZTERM);
-    }
-
-    /**
-     * Create a detached, initialised BccBiztermRecord
-     */
-    public BccBiztermRecord(ULong bccBiztermId, ULong businessTermId, ULong bccId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(BccBizterm.BCC_BIZTERM);
-
-        setBccBiztermId(bccBiztermId);
-        setBusinessTermId(businessTermId);
-        setBccId(bccId);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
     }
 }

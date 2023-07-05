@@ -1,6 +1,9 @@
 package org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -14,7 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -58,7 +62,7 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        for(CodeListObject codeList : codeListForTesting){
+        for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
             editCodeListPage.hitRevise();

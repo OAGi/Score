@@ -2,10 +2,8 @@ package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
-import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;

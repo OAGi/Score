@@ -36,37 +36,29 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
-
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
-
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
-
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
-
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
-
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
         super(parent);
@@ -84,7 +76,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         assert "Express BIE".equals(getText(getTitle()));
     }
 
-    private String getCheckedAttribute(WebElement element){
+    private String getCheckedAttribute(WebElement element) {
         return element.findElement(By.xpath("label/span[1]/input")).getAttribute("aria-checked");
     }
 
@@ -105,6 +97,20 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
         });
+    }
+
+    @Override
+    public void selectBIEForExpression(String releaseNum, String topLevelASBIEPDEN) {
+        setBranch(releaseNum);
+        setDEN(topLevelASBIEPDEN);
+        hitSearchButton();
+
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(topLevelASBIEPDEN);
+            WebElement td = getColumnByName(tr, "select");
+            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        });
+
     }
 
     @Override
@@ -136,6 +142,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void setDEN(String den) {
         sendKeys(getDENField(), den);
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
@@ -146,10 +153,12 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         click(getSearchButton());
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
+
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
@@ -324,6 +333,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleIncludeCCTSDefinitionTag() {
         click(getIncludeCCTSDefinitionTagCheckbox().findElement(By.tagName("label")));
     }
+
     @Override
     public WebElement getIncludeCCTSDefinitionTagCheckbox() {
         return getCheckboxByName("Include CCTS_Definition Tag");
@@ -353,6 +363,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleIncludeWHOColumns() {
         click(getIncludeWHOColumnsCheckbox().findElement(By.tagName("label")));
     }
+
     @Override
     public WebElement getIncludeWHOColumnsCheckbox() {
         return getCheckboxByName("Include WHO Columns");
@@ -362,6 +373,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleBasedCCMetaData() {
         click(getBasedCCMetaDataCheckbox());
     }
+
     @Override
     public WebElement getBasedCCMetaDataCheckbox() {
         return getCheckboxByName("Based CC Meta Data");
@@ -396,56 +408,6 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public JSONSchemaExpressionOptions selectJSONSchemaExpression() {
         click(getJSONSchemaExpressionRadioButton());
         return new JSONSchemaExpressionOptionsImpl();
-    }
-
-    private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
-        @Override
-        public WebElement getMakeAsAnArrayCheckbox() {
-            return getCheckboxByName("Make as an array");
-        }
-
-        @Override
-        public void toggleMakeAsAnArray() {
-            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
-        }
-
-        @Override
-        public WebElement getIncludeMetaHeaderCheckbox() {
-            return getCheckboxByName("Include Meta Header");
-        }
-
-        @Override
-        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
-                click(getIncludeMetaHeaderCheckbox());
-            }else{
-                click(getIncludeMetaHeaderCheckbox());
-                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
-                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-                assert includeMetaHeaderProfileBIEDialog.isOpened();
-                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
-            }
-        }
-
-        @Override
-        public WebElement getIncludePaginationResponseCheckbox() {
-            return getCheckboxByName("Include Pagination Response");
-        }
-
-        @Override
-        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
-            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
-            if (checked.equals("true")){
-                click(getIncludePaginationResponseCheckbox());
-            }else{
-                click(getIncludePaginationResponseCheckbox());
-                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-                assert includePaginationResponseProfileBIEDialog.isOpened();
-                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
-            }
-        }
     }
 
     @Override
@@ -491,7 +453,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection) {
         setBranch(release.getReleaseNumber());
-        for (TopLevelASBIEPObject bie: biesForSelection){
+        for (TopLevelASBIEPObject bie : biesForSelection) {
             retry(() -> {
                 WebElement tr = getTableRecordByValue(bie.getDen());
                 WebElement td = getColumnByName(tr, "select");
@@ -529,6 +491,66 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public OpenAPIExpressionOptions selectOpenAPIExpression() {
         click(getOpenAPIExpressionRadioButton());
         return new OpenAPIExpressionOptionsImpl();
+    }
+
+    @Override
+    public void selectJSONOpenAPIFormat() {
+        retry(() -> {
+            click(getOpenAPIFormatSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
+            click(optionField);
+        });
+    }
+
+    private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
+        @Override
+        public WebElement getMakeAsAnArrayCheckbox() {
+            return getCheckboxByName("Make as an array");
+        }
+
+        @Override
+        public void toggleMakeAsAnArray() {
+            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+        }
+
+        @Override
+        public WebElement getIncludeMetaHeaderCheckbox() {
+            return getCheckboxByName("Include Meta Header");
+        }
+
+        @Override
+        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
+            if (checked.equals("true")) {
+                click(getIncludeMetaHeaderCheckbox());
+            } else {
+                click(getIncludeMetaHeaderCheckbox());
+                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includeMetaHeaderProfileBIEDialog.isOpened();
+                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            }
+        }
+
+        @Override
+        public WebElement getIncludePaginationResponseCheckbox() {
+            return getCheckboxByName("Include Pagination Response");
+        }
+
+        @Override
+        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
+            if (checked.equals("true")) {
+                click(getIncludePaginationResponseCheckbox());
+            } else {
+                click(getIncludePaginationResponseCheckbox());
+                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includePaginationResponseProfileBIEDialog.isOpened();
+                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            }
+        }
     }
 
     private class OpenAPIExpressionOptionsImpl implements OpenAPIExpressionOptions {
@@ -595,9 +617,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
+            if (checked.equals("true")) {
                 click(getIncludeMetaHeaderCheckbox());
-            }else{
+            } else {
                 click(getIncludeMetaHeaderCheckbox());
                 IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
                         new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
@@ -614,15 +636,15 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
-           if (checked.equals("true")){
-               click(getIncludePaginationResponseCheckbox());
-           }else{
-               click(getIncludePaginationResponseCheckbox());
-               IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                       new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-               assert includePaginationResponseProfileBIEDialog.isOpened();
-               includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
-           }
+            if (checked.equals("true")) {
+                click(getIncludePaginationResponseCheckbox());
+            } else {
+                click(getIncludePaginationResponseCheckbox());
+                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includePaginationResponseProfileBIEDialog.isOpened();
+                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            }
         }
     }
 
@@ -646,9 +668,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
+            if (checked.equals("true")) {
                 click(getIncludeMetaHeaderCheckbox());
-            }else{
+            } else {
                 click(getIncludeMetaHeaderCheckbox());
                 IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
                         new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
@@ -656,15 +678,5 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                 includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
             }
         }
-    }
-
-    @Override
-    public void selectJSONOpenAPIFormat() {
-        retry(() -> {
-            click(getOpenAPIFormatSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
-            click(optionField);
-        });
     }
 }

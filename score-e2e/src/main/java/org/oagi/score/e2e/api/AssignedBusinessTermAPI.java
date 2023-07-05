@@ -21,6 +21,7 @@ public interface AssignedBusinessTermAPI {
 
     /**
      * Return the assigned business term associated with the given BIE name
+     *
      * @param bieName BIE name
      * @return a list of assigned business term object
      */
@@ -28,13 +29,14 @@ public interface AssignedBusinessTermAPI {
 
     /**
      * Create the assigned business term as requested
+     *
      * @param businessTerm business term object
-     * @param aBIE  ABIE or BBIE object
-     * @param creator  account who creates this assigned business term
+     * @param aBIE         ABIE or BBIE object
+     * @param creator      account who creates this assigned business term
      * @return a created assigned business term object
      */
     AssignedBusinessTermObject createRandomAssignedBusinessTerm(BusinessTermObject businessTerm, ABIEObject aBIE,
-                                                AppUserObject creator);
+                                                                AppUserObject creator);
 
 
     void deleteAssignedBusinessTermById(BigInteger businessTermID);

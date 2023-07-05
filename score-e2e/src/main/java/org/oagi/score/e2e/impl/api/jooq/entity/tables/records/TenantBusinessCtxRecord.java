@@ -16,17 +16,27 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx;
 /**
  * This table captures the tenant role and theirs business contexts.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessCtxRecord> implements Record3<ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.tenant_business_ctx_id</code>.
-     * Primary key column.
+     * Create a detached TenantBusinessCtxRecord
      */
-    public void setTenantBusinessCtxId(ULong value) {
-        set(0, value);
+    public TenantBusinessCtxRecord() {
+        super(TenantBusinessCtx.TENANT_BUSINESS_CTX);
+    }
+
+    /**
+     * Create a detached, initialised TenantBusinessCtxRecord
+     */
+    public TenantBusinessCtxRecord(ULong tenantBusinessCtxId, ULong tenantId, ULong bizCtxId) {
+        super(TenantBusinessCtx.TENANT_BUSINESS_CTX);
+
+        setTenantBusinessCtxId(tenantBusinessCtxId);
+        setTenantId(tenantId);
+        setBizCtxId(bizCtxId);
     }
 
     /**
@@ -38,10 +48,11 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     }
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.tenant_id</code>. Tenant role.
+     * Setter for <code>oagi.tenant_business_ctx.tenant_business_ctx_id</code>.
+     * Primary key column.
      */
-    public void setTenantId(ULong value) {
-        set(1, value);
+    public void setTenantBusinessCtxId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -52,12 +63,15 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     }
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * business context for the company.
+     * Setter for <code>oagi.tenant_business_ctx.tenant_id</code>. Tenant role.
      */
-    public void setBizCtxId(ULong value) {
-        set(2, value);
+    public void setTenantId(ULong value) {
+        set(1, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
@@ -68,17 +82,21 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     }
 
     // -------------------------------------------------------------------------
-    // Primary key information
+    // Record3 type implementation
     // -------------------------------------------------------------------------
+
+    /**
+     * Setter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
+     * business context for the company.
+     */
+    public void setBizCtxId(ULong value) {
+        set(2, value);
+    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row3<ULong, ULong, ULong> fieldsRow() {
@@ -147,6 +165,10 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public TenantBusinessCtxRecord value3(ULong value) {
         setBizCtxId(value);
@@ -159,27 +181,5 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
         value2(value2);
         value3(value3);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached TenantBusinessCtxRecord
-     */
-    public TenantBusinessCtxRecord() {
-        super(TenantBusinessCtx.TENANT_BUSINESS_CTX);
-    }
-
-    /**
-     * Create a detached, initialised TenantBusinessCtxRecord
-     */
-    public TenantBusinessCtxRecord(ULong tenantBusinessCtxId, ULong tenantId, ULong bizCtxId) {
-        super(TenantBusinessCtx.TENANT_BUSINESS_CTX);
-
-        setTenantBusinessCtxId(tenantBusinessCtxId);
-        setTenantId(tenantId);
-        setBizCtxId(bizCtxId);
     }
 }
