@@ -237,8 +237,8 @@ export class OpenAPIService {
       responseType: 'blob'
     });
   }
-  generateOpenAPI(oasDoc: OasDoc): Observable<HttpResponse<Blob>> {
-    return this.http.get('api/oas_doc/' + oasDoc.oasDocId + '/generate', {
+  generateOpenAPI(oasDocId: number): Observable<HttpResponse<Blob>> {
+    return this.http.get('api/oas_doc/' + oasDocId + '/generate', {
       observe: 'response',
       responseType: 'blob'
     });

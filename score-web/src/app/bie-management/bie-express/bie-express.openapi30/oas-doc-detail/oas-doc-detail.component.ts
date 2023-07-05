@@ -389,7 +389,7 @@ export class OasDocDetailComponent implements OnInit {
   }
   generate() {
     this.loading = true;
-    this.openAPIService.generateOpenAPI(this.oasDoc).subscribe(resp => {
+    this.openAPIService.generateOpenAPI(this.oasDoc.oasDocId).subscribe(resp => {
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
       saveAs(blob, this._getFilenameFromContentDisposition(resp));
 
