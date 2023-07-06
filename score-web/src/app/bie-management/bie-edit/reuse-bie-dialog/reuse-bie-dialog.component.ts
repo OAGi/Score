@@ -57,7 +57,7 @@ export class ReuseBieDialogComponent implements OnInit {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.asccpManifestId = this.data.asccpManifestId;
-    this.request.release.releaseId = this.data.releaseId;
+    this.request.releases[0].releaseId = this.data.releaseId;
     this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;

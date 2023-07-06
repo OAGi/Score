@@ -22,22 +22,26 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Branch</mat-label>
-                <mat-select [(ngModel)]="request.release"
-                            (ngModelChange)="onReleaseChange(request.release)">
+                <mat-select [(ngModel)]="request.releases" [multiple]="true">
                   <mat-select-trigger class="d-flex">
-                    <span>{{ request.release.releaseNum }}</span>
-                    <span class="f12 ml-auto {{ request.release.state }}">
-                      {{ request.release.state | separate }}
+                    <span>{{ ((request.releases?.length || 0) > 0) ? request.releases[0].releaseNum : '' }}</span>
+                    <span *ngIf="(request.releases?.length || 0) > 1" class="ml-2 additional-selection">
+                      (+{{ (request.releases?.length || 0) - 1 }} {{ request.releases?.length === 2 ? 'other' : 'others' }})
+                    </span>
+                    <span class="f12 ml-auto {{ request.releases?.[0].state }}" *ngIf="(request.releases?.length || 0) === 1">
+                      {{ request.releases?.[0].state | separate }}
                     </span>
                   </mat-select-trigger>
                   <mat-option>
                     <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
+                                           [placeholderLabel]="'Search...'" [showToggleAllCheckbox]="true"
+                                           (toggleAll)="toggleAllForReleaseFilter($event)"
+                                           [toggleAllCheckboxTooltipMessage]="'Select All / Unselect All'"
                                            [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
                   </mat-option>
                   <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
                     <div class="d-flex">
-                      <span class="release-num">{{ release.releaseNum }}</span>
+                      <span class="pl-2 release-num">{{ release.releaseNum }}</span>
                       <span class="f12 ml-auto {{ release.state }}">
                         {{ release.state | separate }}
                       </span>
@@ -186,6 +190,13 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
             <td mat-cell *matCellDef="let element">
               <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="branch">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
             </td>
           </ng-container>
 

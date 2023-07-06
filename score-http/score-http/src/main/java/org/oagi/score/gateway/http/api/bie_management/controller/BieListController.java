@@ -46,7 +46,7 @@ public class BieListController {
                                             @RequestParam(name = "updateStart", required = false) String updateStart,
                                             @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
-                                            @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
+                                            @RequestParam(name = "releaseIds", required = false) String releaseIds,
                                             @RequestParam(name = "sortActive") String sortActive,
                                             @RequestParam(name = "sortDirection") String sortDirection,
                                             @RequestParam(name = "pageIndex") int pageIndex,
@@ -70,12 +70,9 @@ public class BieListController {
                 Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
-
         request.setOwnedByDeveloper(ownedByDeveloper);
-
-        if (releaseId != null && releaseId.compareTo(BigInteger.ZERO) > 0) {
-            request.setReleaseId(releaseId);
-        }
+        request.setReleaseIds(!StringUtils.hasLength(releaseIds) ? Collections.emptyList() :
+                Arrays.asList(releaseIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
 
         if (StringUtils.hasLength(updateStart)) {
             request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));
@@ -133,7 +130,7 @@ public class BieListController {
                                                              @RequestParam(name = "updateStart", required = false) String updateStart,
                                                              @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                                              @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
-                                                             @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
+                                                             @RequestParam(name = "releaseIds", required = false) String releaseIds,
                                                              @RequestParam(name = "sortActive") String sortActive,
                                                              @RequestParam(name = "sortDirection") String sortDirection,
                                                              @RequestParam(name = "pageIndex") int pageIndex,
@@ -156,10 +153,8 @@ public class BieListController {
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setOwnedByDeveloper(ownedByDeveloper);
-
-        if (releaseId != null && releaseId.longValue() > 0L) {
-            request.setReleaseId(releaseId);
-        }
+        request.setReleaseIds(!StringUtils.hasLength(releaseIds) ? Collections.emptyList() :
+                Arrays.asList(releaseIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
 
         if (StringUtils.hasLength(updateStart)) {
             request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));

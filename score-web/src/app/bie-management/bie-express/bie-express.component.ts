@@ -35,7 +35,7 @@ export class BieExpressComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'businessContexts',
+    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -45,6 +45,7 @@ export class BieExpressComponent implements OnInit {
 
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  selectedRelease: SimpleRelease;
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -114,13 +115,13 @@ export class BieExpressComponent implements OnInit {
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
       if (savedReleaseId) {
-        this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-        if (!this.request.release) {
-          this.request.release = this.releases[0];
-          saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+        this.selectedRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+        if (!this.selectedRelease) {
+          this.selectedRelease = this.releases[0];
+          saveBranch(this.auth.getUserToken(), 'BIE', this.selectedRelease.releaseId);
         }
       } else {
-        this.request.release = this.releases[0];
+        this.selectedRelease = this.releases[0];
       }
 
       this.loadBieList(true);
@@ -159,12 +160,21 @@ export class BieExpressComponent implements OnInit {
     }
   }
 
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    if (selectAllValue) {
+      this.request.releases = this.releases;
+    } else {
+      this.request.releases = [];
+    }
+  }
+
   loadBieList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+    this.request.releases = (!!this.selectedRelease) ? [this.selectedRelease,] : [];
 
     this.bieListService.getBieListWithRequest(this.request).pipe(
       finalize(() => {
@@ -273,7 +283,7 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
-      dialogConfig.data = this.request.release;
+      dialogConfig.data = this.selectedRelease;
       const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
@@ -311,7 +321,7 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
-      dialogConfig.data = this.request.release;
+      dialogConfig.data = this.selectedRelease;
       const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {

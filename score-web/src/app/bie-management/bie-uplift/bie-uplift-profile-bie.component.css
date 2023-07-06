@@ -38,6 +38,10 @@ tr.element-row:not(.expanded-row):active {
   width: 100px;
 }
 
+.mat-column-branch {
+  width: 80px;
+}
+
 .mat-column-owner {
   width: 140px;
   font-size: 13px;
