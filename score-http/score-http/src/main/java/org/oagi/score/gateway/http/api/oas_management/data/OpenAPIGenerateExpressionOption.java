@@ -1,8 +1,17 @@
 package org.oagi.score.gateway.http.api.oas_management.data;
 
-import java.math.BigInteger;
+import lombok.Data;
 
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Map;
+
+@Data
 public class OpenAPIGenerateExpressionOption {
+    private Map<BigInteger, String> filenames = Collections.emptyMap();
+    private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
+    private boolean includeBusinessContextInFilename;
+    private boolean includeVersionInFilename;
     private boolean bieDefinition = true;
     private boolean bieGuid;
     private boolean bieCctsMetaData;
@@ -13,6 +22,7 @@ public class OpenAPIGenerateExpressionOption {
     private boolean basedCcMetaData;
     private BigInteger metaHeaderTopLevelAsbiepId;
     private BigInteger paginationResponseTopLevelAsbiepId;
+    private String verb;
     private String openAPIExpressionFormat;
     private boolean openAPICodeGenerationFriendly;
     private boolean openAPI30GetTemplate;
@@ -28,4 +38,25 @@ public class OpenAPIGenerateExpressionOption {
     private boolean suppressRootPropertyForOpenAPI30PostTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30PostTemplate;
     private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate;
+    public boolean isGetTemplateAndPostTemplateOptionDifferent() {
+        if (isOpenAPI30GetTemplate() != isOpenAPI30PostTemplate()) {
+            return false;
+        }
+        if (isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
+            return true;
+        }
+        if (isArrayForJsonExpressionForOpenAPI30GetTemplate() !=
+                isArrayForJsonExpressionForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        if (isSuppressRootPropertyForOpenAPI30GetTemplate() !=
+                isSuppressRootPropertyForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        if (isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate() !=
+                isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
+            return true;
+        }
+        return false;
+    }
 }

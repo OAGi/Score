@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
@@ -116,7 +117,7 @@ public class OpenAPIGenerateService {
         return schemaExpressionFile;
     }
 
-    private String getFilenameByTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep, GenerateExpressionOption option) {
+    private String getFilenameByTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep, OpenAPIGenerateExpressionOption option) {
         Map<BigInteger, String> filenames = option.getFilenames();
         if (filenames != null && filenames.containsKey(topLevelAsbiep.getTopLevelAsbiepId())) {
             return filenames.get(topLevelAsbiep.getTopLevelAsbiepId());
@@ -174,7 +175,7 @@ public class OpenAPIGenerateService {
     private BieGenerateOpenApiExpression createBieGenerateExpression(OpenAPIGenerateExpressionOption option) {
 
         BieGenerateOpenApiExpression generateExpression;
-        generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
+        generateExpression = applicationContext.getBean(OpenAPIGenerateExpression.class);
         return generateExpression;
     }
 }

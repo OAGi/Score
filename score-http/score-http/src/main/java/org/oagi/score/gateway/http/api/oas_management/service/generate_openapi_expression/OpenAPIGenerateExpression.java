@@ -10,7 +10,6 @@ import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIExpressionFormat;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
@@ -33,8 +32,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
+
+import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
+import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.convertIdentifierToId;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 

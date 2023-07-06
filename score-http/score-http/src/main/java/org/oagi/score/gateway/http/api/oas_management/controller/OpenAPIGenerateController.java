@@ -3,7 +3,14 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
+import org.oagi.score.service.authentication.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -30,14 +37,51 @@ public class OpenAPIGenerateController {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private OpenAPIGenerateService service;
+    private AuthenticationService authenticationService;
+    @Autowired
+    private OpenAPIDocService oasDocService;
+    @Autowired
+    private OpenAPIGenerateService generateService;
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @PathVariable("id") BigInteger oasDocId) throws IOException {
 
-        Map<String, Object> params = convertValue(data);
-        List<BigInteger> topLevelAsbiepIds = popTopLevelAsbiepIds(params);
+        GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(user));
+
+        request.setOasDocId(oasDocId);
+
+        GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
+
+        List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
+        Map<BigInteger, OpenAPIGenerateExpressionOption> params = new HashMap<>();
+        if (bieListForOasDoc != null){
+            for (BieForOasDoc bieForOasDoc : bieListForOasDoc){
+                OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
+                openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerbs().get(0));
+                String verbOption = openAPIGenerateExpressionOption.getVerb();
+                switch(verbOption){
+                    case "GET":
+                        openAPIGenerateExpressionOption.setOpenAPI30GetTemplate(true);
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.isArrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        break;
+                    case "POST":
+                        openAPIGenerateExpressionOption.setOpenAPI30PostTemplate(true);
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.isArrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown verb option: " + verbOption);
+                }
+                if (!params.containsKey(bieForOasDoc.getTopLevelAsbiepId())) {
+                    params.put(bieForOasDoc.getTopLevelAsbiepId(), openAPIGenerateExpressionOption);
+                }
+
+            }
+        }
+
+
         GenerateExpressionOption option =
                 objectMapper.convertValue(params, GenerateExpressionOption.class);
 
