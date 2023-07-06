@@ -6,7 +6,7 @@ import {base64Decode, base64Encode} from '../../../common/utility';
 import {SimpleRelease} from '../../../release-management/domain/release';
 
 export class BieListRequest {
-  release: SimpleRelease;
+  releases: SimpleRelease[] = [];
   filters: {
     propertyTerm: string;
     businessContext: string;
@@ -30,8 +30,7 @@ export class BieListRequest {
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-    this.release = new SimpleRelease();
-    this.release.releaseId = Number(params.get('releaseId') || 0);
+    this.releases = [];
     this.page.sortActive = params.get('sortActive');
     if (this.page.sortActive !== '' && !this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
@@ -77,8 +76,8 @@ export class BieListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.release) {
-      params = params.set('releaseId', this.release.releaseId.toString());
+    if (this.releases) {
+      params = params.set('releaseIds', this.releases.filter(e => e.releaseId.toString()).join(','));
     }
     if (this.excludePropertyTerms && this.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', this.excludePropertyTerms.join(','));

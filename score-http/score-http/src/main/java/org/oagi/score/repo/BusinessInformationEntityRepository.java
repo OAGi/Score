@@ -689,9 +689,13 @@ public class BusinessInformationEntityRepository {
             return this;
         }
 
-        public SelectBieListArguments setReleaseId(BigInteger releaseId) {
-            if (releaseId != null && releaseId.longValue() > 0) {
-                conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
+        public SelectBieListArguments setReleaseIds(List<BigInteger> releaseIds) {
+            if (releaseIds != null && !releaseIds.isEmpty()) {
+                if (releaseIds.size() == 1) {
+                    conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseIds.get(0))));
+                } else {
+                    conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.in(releaseIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())));
+                }
             }
             return this;
         }

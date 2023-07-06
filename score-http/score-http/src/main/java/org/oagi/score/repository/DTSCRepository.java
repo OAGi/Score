@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class DTSCRepository implements ScoreRepository<DTSC> {
@@ -52,9 +55,16 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
     }
 
     @Override
-    public List<DTSC> findAllByReleaseId(BigInteger releaseId) {
+    public List<DTSC> findAllByReleaseIds(Collection<BigInteger> releaseIds) {
+        if (releaseIds == null || releaseIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getSelectJoinStep()
-                .where(Tables.DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .where(
+                        (releaseIds.size() == 1) ?
+                                Tables.DT_SC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseIds.iterator().next())) :
+                                Tables.DT_SC_MANIFEST.RELEASE_ID.in(releaseIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                )
                 .fetchInto(DTSC.class);
     }
 
