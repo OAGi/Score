@@ -1,13 +1,18 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.ImmutableMap;
+import org.apache.poi.sl.draw.geom.GuideIf;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIExpressionFormat;
+import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.slf4j.Logger;
@@ -32,10 +37,10 @@ import static org.oagi.score.gateway.http.api.bie_management.service.generate_ex
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
+
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class BieOpenAPIGenerateExpression implements BieGenerateExpression, InitializingBean {
-
+public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
     private static final String OPEN_API_VERSION = "3.0.3";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,7 +48,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     private ObjectMapper expressionMapper;
 
     private Map<String, Object> root;
-    private GenerateExpressionOption option;
+    private OpenAPIGenerateExpressionOption option;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -67,7 +72,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     }
 
     @Override
-    public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, GenerateExpressionOption option) {
+    public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, OpenAPIGenerateExpressionOption option) {
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
         if (mergedTopLevelAsbieps.size() == 0) {
@@ -106,7 +111,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     }
 
     @Override
-    public void generate(TopLevelAsbiep topLevelAsbiep, GenerationContext generationContext, GenerateExpressionOption option) {
+    public void generate(TopLevelAsbiep topLevelAsbiep, GenerationContext generationContext, OpenAPIGenerateExpressionOption option) {
         this.generationContext = generationContext;
         this.option = option;
 

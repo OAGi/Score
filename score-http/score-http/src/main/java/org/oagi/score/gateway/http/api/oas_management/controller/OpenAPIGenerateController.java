@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
-import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -12,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.FileInputStream;
@@ -35,7 +34,7 @@ public class OpenAPIGenerateController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @RequestParam("data") String data) throws IOException {
+                                                        @PathVariable("id") BigInteger oasDocId) throws IOException {
 
         Map<String, Object> params = convertValue(data);
         List<BigInteger> topLevelAsbiepIds = popTopLevelAsbiepIds(params);

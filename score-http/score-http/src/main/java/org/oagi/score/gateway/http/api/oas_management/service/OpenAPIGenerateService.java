@@ -6,9 +6,13 @@ import org.jooq.types.ULong;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
+import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
-import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -22,13 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BIZ_CTX;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,7 +46,7 @@ public class OpenAPIGenerateService {
 
     public BieGenerateExpressionResult generate(
             AuthenticatedPrincipal user, List<BigInteger> topLevelAsbiepIds,
-            GenerateExpressionOption option) throws BieGenerateFailureException {
+            OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
 
         List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
         File file = generateSchema(topLevelAsbieps, option);
@@ -77,7 +79,7 @@ public class OpenAPIGenerateService {
     }
 
     public File generateSchema(List<TopLevelAsbiep> topLevelAsbieps,
-                               GenerateExpressionOption option) throws BieGenerateFailureException {
+                               OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
         if (topLevelAsbieps == null || topLevelAsbieps.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -85,35 +87,13 @@ public class OpenAPIGenerateService {
             throw new IllegalArgumentException();
         }
 
-        String packageOption = option.getPackageOption();
-        if (packageOption != null) {
-            packageOption = packageOption.trim();
-        }
+        return generateSchemaForAll(topLevelAsbieps, option);
 
-        switch (packageOption.toUpperCase()) {
-            case "ALL":
-                return generateSchemaForAll(topLevelAsbieps, option);
-
-            case "EACH":
-                Map<BigInteger, File> files = generateSchemaForEach(topLevelAsbieps, option);
-                if (files.size() == 1) {
-                    return files.values().iterator().next();
-                }
-
-                try {
-                    return Zip.compression(files.values(), ScoreGuid.randomGuid());
-                } catch (IOException e) {
-                    throw new BieGenerateFailureException("Compression failure.", e);
-                }
-
-            default:
-                throw new IllegalStateException();
-        }
     }
 
     public File generateSchemaForAll(List<TopLevelAsbiep> topLevelAsbiepList,
-                                     GenerateExpressionOption option) throws BieGenerateFailureException {
-        BieGenerateExpression generateExpression = createBieGenerateExpression(option);
+                                     OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
+        BieGenerateOpenApiExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbiepList, option);
 
         for (TopLevelAsbiep topLevelAsbiep : topLevelAsbiepList) {
@@ -134,40 +114,6 @@ public class OpenAPIGenerateService {
             throw new BieGenerateFailureException("I/O operation failure.", e);
         }
         return schemaExpressionFile;
-    }
-
-    public Map<BigInteger, File> generateSchemaForEach(List<TopLevelAsbiep> topLevelAsbieps,
-                                                       GenerateExpressionOption option) throws BieGenerateFailureException {
-        Map<BigInteger, File> targetFiles = new HashMap();
-        BieGenerateExpression generateExpression = createBieGenerateExpression(option);
-        GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps, option);
-
-        Map<String, Integer> filenames = new HashMap();
-        for (TopLevelAsbiep topLevelAsbiep : topLevelAsbieps) {
-            try {
-                generateExpression.reset();
-            } catch (Exception e) {
-                throw new BieGenerateFailureException("Unexpected error occurs during initialization of the expression processor.");
-            }
-
-            generateExpression.generate(topLevelAsbiep, generationContext, option);
-            String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option);
-            int numOfFilenames = filenames.getOrDefault(filename, 0);
-            filenames.put(filename, numOfFilenames + 1);
-
-            if (numOfFilenames > 0) {
-                filename = filename + " (" + numOfFilenames + ")";
-            }
-
-            File schemaExpressionFile;
-            try {
-                schemaExpressionFile = generateExpression.asFile(filename);
-            } catch (IOException e) {
-                throw new BieGenerateFailureException("I/O operation failure.", e);
-            }
-            targetFiles.put(topLevelAsbiep.getTopLevelAsbiepId(), schemaExpressionFile);
-        }
-        return targetFiles;
     }
 
     private String getFilenameByTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep, GenerateExpressionOption option) {
@@ -225,33 +171,10 @@ public class OpenAPIGenerateService {
         return sb.toString();
     }
 
-    private BieGenerateExpression createBieGenerateExpression(GenerateExpressionOption option) {
-        String expressionOption = option.getExpressionOption();
-        if (expressionOption != null) {
-            expressionOption = expressionOption.trim();
-        }
+    private BieGenerateOpenApiExpression createBieGenerateExpression(OpenAPIGenerateExpressionOption option) {
 
-        BieGenerateExpression generateExpression;
-        switch (expressionOption.toUpperCase()) {
-            case "XML":
-                generateExpression = applicationContext.getBean(BieXMLGenerateExpression.class);
-                break;
-            case "JSON":
-                generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class);
-                break;
-            case "OPENAPI30":
-                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
-                break;
-            case "ODF":
-                generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);
-                break;
-            case "AVRO":
-                generateExpression = applicationContext.getBean(BieAvroGenerateExpression.class);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown expression option: " + expressionOption);
-        }
-
+        BieGenerateOpenApiExpression generateExpression;
+        generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
         return generateExpression;
     }
 }
