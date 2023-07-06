@@ -8,10 +8,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
 
@@ -19,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.oagi.score.e2e.impl.PageHelper.click;
+
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_33_1_DeveloperCodeListUplifting extends BaseTest {

@@ -35,4 +35,5 @@ public interface ReleaseAPI {
 
     ReleaseObject getTheLatestRelease();
 
+    List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
 }
