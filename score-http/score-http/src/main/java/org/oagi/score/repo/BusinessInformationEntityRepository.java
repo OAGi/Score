@@ -691,6 +691,10 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setReleaseIds(List<BigInteger> releaseIds) {
             if (releaseIds != null && !releaseIds.isEmpty()) {
+                releaseIds = releaseIds.stream().filter(e -> e.compareTo(BigInteger.ONE) == 1).collect(Collectors.toList());
+            }
+
+            if (releaseIds != null && !releaseIds.isEmpty()) {
                 if (releaseIds.size() == 1) {
                     conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseIds.get(0))));
                 } else {
