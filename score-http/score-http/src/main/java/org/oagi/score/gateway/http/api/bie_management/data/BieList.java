@@ -29,4 +29,11 @@ public class BieList {
     private String lastUpdateUser;
     private BieState state;
 
+    private BigInteger sourceTopLevelAsbiepId;
+    private BigInteger sourceReleaseId;
+    private String sourceDen;
+    private String sourceReleaseNum;
+    private String sourceAction;
+    private Date sourceTimestamp;
+
 }

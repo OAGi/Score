@@ -65,6 +65,9 @@ export class BieListService {
     if (request.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
     }
+    if (request.topLevelAsbiepIds.length > 0) {
+      params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
+    }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
     }

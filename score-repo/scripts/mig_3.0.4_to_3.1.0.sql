@@ -132,3 +132,10 @@ UPDATE `xbt` SET `avro_map` = '{"type":"string"}' WHERE `xbt_id` = 122;
 UPDATE `xbt` SET `avro_map` = '{"type":"string"}' WHERE `xbt_id` = 123;
 UPDATE `xbt` SET `avro_map` = '{"type":"string"}' WHERE `xbt_id` = 124;
 UPDATE `xbt` SET `avro_map` = '{"type":"string"}' WHERE `xbt_id` = 125;
+
+-- Add `top_level_asbiep`.`source_top_level_asbiep_id`, `top_level_asbiep`.`source_source_action`, and `top_level_asbiep`.`source_timestamp`
+ALTER TABLE `top_level_asbiep`
+    ADD COLUMN `source_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has linked to this record.',
+    ADD COLUMN `source_action` varchar(20) DEFAULT NULL COMMENT 'An action that had used to create a reference from the source (e.g., ''Copy'' or ''Uplift''.)',
+    ADD COLUMN `source_timestamp` datetime(6) DEFAULT NULL COMMENT 'A timestamp when a source reference had been made.',
+    ADD CONSTRAINT `top_level_asbiep_source_top_level_asbiep_id_fk` FOREIGN KEY (`source_top_level_asbiep_id`) REFERENCES `top_level_asbiep` (`top_level_asbiep_id`);

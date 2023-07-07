@@ -209,7 +209,17 @@
                   <span>{{ element.propertyTerm }}</span>
                 </a>
               </div>
-              <div class="description">{{ element.guid }}</div>
+              <div class="bie-guid">{{ element.guid }}</div>
+              <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId">
+                <a target="_blank" rel="noopener noreferrer"
+                   href="/profile_bie?{{ request.toQuery({
+                    den: element.sourceDen,
+                    releaseIds: element.sourceReleaseId,
+                    topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
+                  {{ element.sourceAction | pastTense }} from {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                </a>
+                at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+              </div>
             </td>
           </ng-container>
 

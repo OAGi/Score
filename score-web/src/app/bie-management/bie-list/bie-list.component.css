@@ -40,6 +40,11 @@ tr.element-row:not(.expanded-row):active {
   color: #767676 !important;
 }
 
+.bie-source {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
 .mat-card-content p {
   font-family: 'Roboto', 'sans-serif';
   margin-bottom: 0.5rem;
