@@ -46,11 +46,8 @@ public class OpenAPIGenerateService {
     private DSLContext dslContext;
 
     public BieGenerateExpressionResult generate(
-            AuthenticatedPrincipal user, List<BigInteger> topLevelAsbiepIds,
-            OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
-
-        List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
-        File file = generateSchema(topLevelAsbieps, option);
+            AuthenticatedPrincipal user, Map<BigInteger, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
+        File file = generateSchemaForAll(params);
         return toResult(file);
     }
 
@@ -78,22 +75,13 @@ public class OpenAPIGenerateService {
 
         return result;
     }
-
-    public File generateSchema(List<TopLevelAsbiep> topLevelAsbieps,
-                               OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
-        if (topLevelAsbieps == null || topLevelAsbieps.isEmpty()) {
-            throw new IllegalArgumentException();
+    public File generateSchemaForAll(Map<BigInteger, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
+        List<BigInteger> topLevelAsbiepIds = null;
+        for (BigInteger key: params.keySet()){
+            topLevelAsbiepIds.add(key);
         }
-        if (option == null) {
-            throw new IllegalArgumentException();
-        }
-
-        return generateSchemaForAll(topLevelAsbieps, option);
-
-    }
-
-    public File generateSchemaForAll(List<TopLevelAsbiep> topLevelAsbiepList,
-                                     OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
+        List<TopLevelAsbiep> topLevelAsbiepList = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
+        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
         BieGenerateOpenApiExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbiepList, option);
 

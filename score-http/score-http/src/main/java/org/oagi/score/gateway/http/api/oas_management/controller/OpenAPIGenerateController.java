@@ -76,19 +76,14 @@ public class OpenAPIGenerateController {
                 }
                 if (!params.containsKey(bieForOasDoc.getTopLevelAsbiepId())) {
                     params.put(bieForOasDoc.getTopLevelAsbiepId(), openAPIGenerateExpressionOption);
+                }else{
+                    params.put(bieForOasDoc.getTopLevelAsbiepId(), openAPIGenerateExpressionOption);
                 }
 
             }
         }
 
-
-        GenerateExpressionOption option =
-                objectMapper.convertValue(params, GenerateExpressionOption.class);
-
-        //read arrayIndicator and suppressRoot information from database based on topLevelAsbiepIds
-
-
-        BieGenerateExpressionResult bieGenerateExpressionResult = service.generate(user, topLevelAsbiepIds, option);
+        BieGenerateExpressionResult bieGenerateExpressionResult = generateService.generate(user, params);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bieGenerateExpressionResult.getFilename() + "\"")

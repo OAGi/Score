@@ -40,6 +40,7 @@ export class BieExpressOpenapi30Component implements OnInit {
 
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  selectedRelease: SimpleRelease;
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -96,13 +97,13 @@ export class BieExpressOpenapi30Component implements OnInit {
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
       if (savedReleaseId) {
-        this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-        if (!this.request.release) {
-          this.request.release = this.releases[0];
-          saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+        this.selectedRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+        if (!this.request.releases) {
+          this.selectedRelease = this.releases[0];
+          saveBranch(this.auth.getUserToken(), 'BIE', this.selectedRelease.releaseId);
         }
       } else {
-        this.request.release = this.releases[0];
+        this.selectedRelease = this.releases[0];
       }
       this.loadBieList(true);
     });
