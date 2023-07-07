@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function10;
+import org.jooq.Function13;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row10;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -120,6 +120,26 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      */
     public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
 
+    /**
+     * The column <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
+     * A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has
+     * linked to this record.
+     */
+    public final TableField<TopLevelAsbiepRecord, ULong> SOURCE_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("source_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has linked to this record.");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.source_action</code>. An action
+     * that had used to create a reference from the source (e.g., 'Copy' or
+     * 'Uplift'.)
+     */
+    public final TableField<TopLevelAsbiepRecord, String> SOURCE_ACTION = createField(DSL.name("source_action"), SQLDataType.VARCHAR(20), this, "An action that had used to create a reference from the source (e.g., 'Copy' or 'Uplift'.)");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.source_timestamp</code>. A
+     * timestamp when a source reference had been made.
+     */
+    public final TableField<TopLevelAsbiepRecord, LocalDateTime> SOURCE_TIMESTAMP = createField(DSL.name("source_timestamp"), SQLDataType.LOCALDATETIME(6), this, "A timestamp when a source reference had been made.");
+
     private TopLevelAsbiep(Name alias, Table<TopLevelAsbiepRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -170,13 +190,14 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
 
     @Override
     public List<ForeignKey<TopLevelAsbiepRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK);
+        return Arrays.asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK, Keys.TOP_LEVEL_ASBIEP_SOURCE_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient Asbiep _asbiep;
     private transient AppUser _topLevelAsbiepOwnerUserIdFk;
     private transient AppUser _topLevelAsbiepLastUpdatedByFk;
     private transient Release _release;
+    private transient TopLevelAsbiep _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.asbiep</code> table.
@@ -220,6 +241,17 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return _release;
     }
 
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table.
+     */
+    public TopLevelAsbiep topLevelAsbiep() {
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.TOP_LEVEL_ASBIEP_SOURCE_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
+    }
+
     @Override
     public TopLevelAsbiep as(String alias) {
         return new TopLevelAsbiep(DSL.name(alias), this);
@@ -260,18 +292,18 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row10 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function13<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -279,7 +311,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

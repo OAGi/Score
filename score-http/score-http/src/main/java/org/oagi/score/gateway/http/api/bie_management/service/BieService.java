@@ -183,6 +183,7 @@ public class BieService {
                 .setBusinessContext(request.getBusinessContext())
                 .setAsccpManifestId(request.getAsccpManifestId())
                 .setExcludePropertyTerms(request.getExcludePropertyTerms())
+                .setTopLevelAsbiepIds(request.getTopLevelAsbiepIds())
                 .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
                 .setStates(request.getStates())
                 .setReleaseIds(request.getReleaseIds())

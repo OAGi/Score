@@ -15,11 +15,13 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -95,6 +97,7 @@ export class BieListComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+      this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
       this.loadBieList(true);
     });
   }
