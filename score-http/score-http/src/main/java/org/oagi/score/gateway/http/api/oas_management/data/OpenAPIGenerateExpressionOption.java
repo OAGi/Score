@@ -8,8 +8,8 @@ import java.util.Map;
 
 @Data
 public class OpenAPIGenerateExpressionOption {
-    private Map<BigInteger, String> filenames = Collections.emptyMap();
-    private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
+    private String filename;
+    private BigInteger bizCtxId;
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;
     private boolean bieDefinition = true;
@@ -32,7 +32,6 @@ public class OpenAPIGenerateExpressionOption {
     private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate;
     private boolean includePaginationResponseForJsonForOpenAPI30GetTemplate;
     private BigInteger paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate;
-
     private boolean openAPI30PostTemplate;
     private boolean arrayForJsonExpressionForOpenAPI30PostTemplate;
     private boolean suppressRootPropertyForOpenAPI30PostTemplate;
