@@ -23,6 +23,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
         TS_16.class,
         TS_17.class,
         TS_18.class,
+        TS_21.class,
         TS_24.class,
         TS_27.class,
         TS_33.class,

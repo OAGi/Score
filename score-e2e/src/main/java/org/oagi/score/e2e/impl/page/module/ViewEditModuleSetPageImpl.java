@@ -6,10 +6,11 @@ import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditModuleSetPage {
+    private static final By NEW_MODULE_SET_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"New Module Set\")]//ancestor::button[1]");
 
     public ViewEditModuleSetPageImpl(BasePage parent) {
         super(parent);
@@ -32,4 +33,8 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
         return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
+    @Override
+    public WebElement getNewModuleSetButton() {
+        return elementToBeClickable(getDriver(), NEW_MODULE_SET_BUTTON_LOCATOR);
+    }
 }
