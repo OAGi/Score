@@ -70,8 +70,9 @@ public class OpenAPIGenerateService {
             topLevelAsbiepIds.add(key);
         }
         List<TopLevelAsbiep> topLevelAsbiepList = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
-        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
-        BieGenerateOpenApiExpression generateExpression = createBieGenerateExpression(option);
+        BieGenerateOpenApiExpression generateExpression = createBieGenerateOpenAPIExpression();
+        // leave metaHeader and pagination response untouched at this time for OpenAPI generation
+        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption(); //
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbiepList, option);
 
         for (TopLevelAsbiep topLevelAsbiep : topLevelAsbiepList) {
@@ -89,7 +90,7 @@ public class OpenAPIGenerateService {
         return schemaExpressionFile;
     }
 
-    private BieGenerateOpenApiExpression createBieGenerateExpression(OpenAPIGenerateExpressionOption option) {
+    private BieGenerateOpenApiExpression createBieGenerateOpenAPIExpression() {
 
         BieGenerateOpenApiExpression generateExpression;
         generateExpression = applicationContext.getBean(OpenAPIGenerateExpression.class);
