@@ -17,9 +17,9 @@ import org.openqa.selenium.WebDriverException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
@@ -290,6 +290,47 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         assertEquals(codeList.getRemark(), getText(editCodeListPage.getRemarkField()));
         assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
         assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(editCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+    }
+
+    @Test
+    @DisplayName("TC_33_2_TA_8")
+    public void test_TA_8() {
+        AppUserObject endUser;
+        CodeListObject codeList;
+        CodeListValueObject value;
+        ReleaseObject release;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Production");
+
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditCodeListPage editCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu().openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
+        editCodeListPage.hitAmendButton();
+        waitFor(ofMillis(500L));
+        CodeListObject amendedCL = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUser, release.getReleaseNumber());
+
+        UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
+        upliftCodeListPage.selectCodeList(amendedCL.getName());
+        upliftCodeListPage.hitUpliftButton(amendedCL.getName(), targetRelease.getReleaseNumber());
+        assertEquals(amendedCL.getName(), getText(editCodeListPage.getCodeListNameField()));
+        assertEquals(amendedCL.getListId(), getText(editCodeListPage.getListIDField()));
+        assertEquals(amendedCL.getVersionId(), getText(editCodeListPage.getVersionField()));
+        assertEquals(amendedCL.getRemark(), getText(editCodeListPage.getRemarkField()));
+        assertEquals(amendedCL.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+        assertEquals(amendedCL.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
         assertEquals("1", getText(editCodeListPage.getRevisionField()));
         assertEquals("WIP", getText(editCodeListPage.getStateField()));
         assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
