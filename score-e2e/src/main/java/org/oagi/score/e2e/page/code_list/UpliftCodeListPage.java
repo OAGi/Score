@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.code_list;
 
+import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -29,4 +30,8 @@ public interface UpliftCodeListPage extends Page {
     WebElement getTableRecordAtIndex(int idx);
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    EditCodeListPage hitUpliftButton(String name, String branch);
+
+    WebElement getUpliftButton(boolean enabled);
 }

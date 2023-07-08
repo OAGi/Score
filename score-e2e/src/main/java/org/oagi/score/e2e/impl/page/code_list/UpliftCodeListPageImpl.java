@@ -1,7 +1,9 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -20,6 +22,8 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CODE_LIST_FIELD_LOCATOR =
             By.xpath("//mat-card-content//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+    private static final By UPLIFT_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
     public UpliftCodeListPageImpl(BasePage parent) {
         super(parent);
@@ -125,4 +129,24 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
     }
+
+    @Override
+    public EditCodeListPage hitUpliftButton(String name, String branch) {
+        retry(() -> click(getUpliftButton(true)));
+        waitFor(ofMillis(500L));
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNum(name, branch);
+        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
+        assert editCodeListPage.isOpened();
+        return editCodeListPage;
+    }
+
+    @Override
+    public WebElement getUpliftButton(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), UPLIFT_BUTTON_LOCATOR);
+        }
+    }
+
 }

@@ -8,20 +8,18 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.openqa.selenium.WebDriverException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
@@ -120,6 +118,41 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             assertDoesNotThrow(() -> upliftCodeListPage.selectCodeList(cl.getName()));
         }
 
+    }
+
+    @Test
+    @DisplayName("TC_33_2_TA_3")
+    public void test_TA_3() {
+        AppUserObject endUser;
+        CodeListObject codeList;
+        CodeListValueObject value;
+        ReleaseObject release;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
+        upliftCodeListPage.selectCodeList(codeList.getName());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
+        assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
+        assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
+        assertEquals(codeList.getRemark(), getText(editCodeListPage.getRemarkField()));
+        assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+        assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(editCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
     }
 
     @AfterEach
