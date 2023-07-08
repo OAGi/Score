@@ -155,6 +155,41 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
     }
 
+    @Test
+    @DisplayName("TC_33_2_TA_4")
+    public void test_TA_4() {
+        AppUserObject endUser;
+        CodeListObject codeList;
+        CodeListValueObject value;
+        ReleaseObject release;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "QA");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
+        upliftCodeListPage.selectCodeList(codeList.getName());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
+        assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
+        assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
+        assertEquals(codeList.getRemark(), getText(editCodeListPage.getRemarkField()));
+        assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+        assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(editCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
