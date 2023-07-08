@@ -97,7 +97,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             CodeListObject codeListProduction = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
             codeListForTesting.add(codeListProduction);
 
-            CodeListObject codeListDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Production");
+            CodeListObject codeListDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
             codeListDeprecated.setDeprecated(true);
             getAPIFactory().getCodeListAPI().updateCodeList(codeListDeprecated);
             codeListForTesting.add(codeListDeprecated);
@@ -237,6 +237,44 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Deleted");
+            value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
+        upliftCodeListPage.selectCodeList(codeList.getName());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
+        assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
+        assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
+        assertEquals(codeList.getRemark(), getText(editCodeListPage.getRemarkField()));
+        assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+        assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(editCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+    }
+
+    @Test
+    @DisplayName("TC_33_2_TA_7")
+    public void test_TA_7() {
+        AppUserObject endUser;
+        CodeListObject codeList;
+        CodeListValueObject value;
+        ReleaseObject release;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
+            codeList.setDeprecated(true);
+            getAPIFactory().getCodeListAPI().updateCodeList(codeList);
+
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
