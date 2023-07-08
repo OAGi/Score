@@ -1,7 +1,10 @@
 package org.oagi.score.e2e.impl.page.module;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.code_list.UpliftCodeListPageImpl;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
+import org.oagi.score.e2e.page.module.EditModuleSetPage;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -36,5 +39,13 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     @Override
     public WebElement getNewModuleSetButton() {
         return elementToBeClickable(getDriver(), NEW_MODULE_SET_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public EditModuleSetPage hitNewModuleSetButton() {
+        retry(() -> click(getNewModuleSetButton()));
+        EditModuleSetPage editModuleSetPage = new EditModuleSetPageImpl(this);
+        assert editModuleSetPage.isOpened();
+        return editModuleSetPage;
     }
 }

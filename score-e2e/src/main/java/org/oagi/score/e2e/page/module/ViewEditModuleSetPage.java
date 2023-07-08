@@ -8,4 +8,6 @@ import org.openqa.selenium.WebElement;
  */
 public interface ViewEditModuleSetPage extends Page {
     WebElement getNewModuleSetButton();
+
+    EditModuleSetPage hitNewModuleSetButton();
 }

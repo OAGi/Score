@@ -8,15 +8,16 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.module.EditModuleSetPage;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
 import org.openqa.selenium.WebDriverException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_21_1_ManageModuleSet extends BaseTest {
@@ -45,7 +46,34 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         assertDoesNotThrow(() -> viewEditModuleSetPage.getNewModuleSetButton());
     }
-    
+
+    @Test
+    @DisplayName("TC_21_1_TA_2")
+    public void test_TA_2() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        /**
+         * Test Assertion #21.1.2
+         */
+        assertEquals("true", editModuleSetPage.getNameField().getAttribute("aria-required"));
+        assertEquals("false", editModuleSetPage.getDescriptionField().getAttribute("aria-required"));
+        editModuleSetPage.setName("new module");
+        editModuleSetPage.setDescription("Description");
+        /**
+         * Test Assertion #21.1.2.a
+         */
+        editModuleSetPage.toggleCreateModuleSetRelease();
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        editModuleSetPage.setRelease(release.getReleaseNumber());
+        editModuleSetPage.setModuleSetRelease("connectSpec 10.9 Module Set Release");
+        editModuleSetPage.hitCreateButton();
+    }
 
     @AfterEach
     public void tearDown() {
