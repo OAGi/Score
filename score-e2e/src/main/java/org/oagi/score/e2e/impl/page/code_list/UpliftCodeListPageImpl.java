@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -9,6 +10,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.math.BigInteger;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -131,10 +134,10 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     }
 
     @Override
-    public EditCodeListPage hitUpliftButton(String name, String branch) {
+    public EditCodeListPage hitUpliftButton(String name, String branch, AppUserObject createdBy) {
         retry(() -> click(getUpliftButton(true)));
         waitFor(ofMillis(500L));
-        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNum(name, branch);
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNumAndUser(name, branch, createdBy);
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
         assert editCodeListPage.isOpened();
         return editCodeListPage;

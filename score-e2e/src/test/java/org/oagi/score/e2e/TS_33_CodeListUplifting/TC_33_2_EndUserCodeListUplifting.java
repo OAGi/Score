@@ -142,7 +142,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -177,7 +177,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -211,7 +211,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -245,7 +245,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -283,7 +283,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -324,7 +324,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(amendedCL.getName());
-        upliftCodeListPage.hitUpliftButton(amendedCL.getName(), targetRelease.getReleaseNumber());
+        upliftCodeListPage.hitUpliftButton(amendedCL.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(amendedCL.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(amendedCL.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(amendedCL.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -342,26 +342,28 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     public void test_TA_9() {
         AppUserObject endUser;
         CodeListObject codeList;
-        List<CodeListValueObject> baseCodeListValues;
+        List<CodeListValueObject> baseCodeListValues = new ArrayList<>();
         ReleaseObject release;
+        ReleaseObject targetRelease;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("clm6DateFormatCode1_DateFormatCode", release.getReleaseNumber());
-            codeList = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, endUser, namespace, release, "WIP");
+            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
+                    getCodeListByCodeListNameAndReleaseNum("oacl_ControlCode", release.getReleaseNumber());
             baseCodeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(baseCodeList.getCodeListManifestId());
 
+            codeList = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, endUser, namespace, release, "WIP");
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
         upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
-        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList.getName(), targetRelease.getReleaseNumber(), endUser);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
         assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
@@ -371,7 +373,65 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         assertEquals("1", getText(editCodeListPage.getRevisionField()));
         assertEquals("WIP", getText(editCodeListPage.getStateField()));
         assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
-        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(baseCodeListValues.get(0).getValue()));
+        for (CodeListValueObject value : baseCodeListValues){
+            assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+        }
+    }
+
+    @Test
+    @DisplayName("TC_33_2_TA_10")
+    public void test_TA_10() {
+        AppUserObject endUser;
+        CodeListObject codeListEU;
+        CodeListObject codeListDev;
+        List<CodeListValueObject> baseCodeListValues = new ArrayList<>();
+        CodeListValueObject devCLValue;
+        ReleaseObject release;
+        ReleaseObject targetRelease;
+        {
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespaceDev = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
+                    getCodeListByCodeListNameAndReleaseNum("oacl_ControlCode", release.getReleaseNumber());
+            baseCodeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(baseCodeList.getCodeListManifestId());
+
+            codeListEU = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, endUser, namespaceEU, release, "WIP");
+
+            codeListDev = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, developer, namespaceDev, targetRelease, "Published");
+
+            devCLValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDev, developer);
+        }
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
+        upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
+        upliftCodeListPage.selectCodeList(codeListEU.getName());
+        EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeListEU.getName(), targetRelease.getReleaseNumber(), endUser);
+        assertEquals(codeListEU.getName(), getText(editCodeListPage.getCodeListNameField()));
+        assertEquals(codeListEU.getListId(), getText(editCodeListPage.getListIDField()));
+        assertEquals(codeListEU.getVersionId(), getText(editCodeListPage.getVersionField()));
+        assertEquals(codeListEU.getRemark(), getText(editCodeListPage.getRemarkField()));
+        assertEquals(codeListEU.getDefinition(), getText(editCodeListPage.getDefinitionField()));
+        assertEquals(codeListEU.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(editCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(editCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
+        for (CodeListValueObject value : baseCodeListValues) {
+            assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+        }
+
+        /**
+         * If the developer code list of the target release and the uplifted end user code list contain some same values,
+         * the developer code list values are used.
+         */
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(devCLValue.getValue()));
     }
 
     @AfterEach
