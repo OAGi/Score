@@ -1,8 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.service;
 
 import org.jooq.DSLContext;
-import org.jooq.Record2;
-import org.jooq.types.ULong;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
@@ -10,10 +8,6 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
-import org.oagi.score.gateway.http.helper.ScoreGuid;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxRecord;
-import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,9 +20,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
-import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -72,9 +63,10 @@ public class OpenAPIGenerateService {
 
         return result;
     }
+
     public File generateSchemaForAll(Map<BigInteger, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
         List<BigInteger> topLevelAsbiepIds = null;
-        for (BigInteger key: params.keySet()){
+        for (BigInteger key : params.keySet()) {
             topLevelAsbiepIds.add(key);
         }
         List<TopLevelAsbiep> topLevelAsbiepList = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);

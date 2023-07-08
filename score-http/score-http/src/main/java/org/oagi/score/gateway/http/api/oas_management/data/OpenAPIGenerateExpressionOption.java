@@ -13,13 +13,6 @@ public class OpenAPIGenerateExpressionOption {
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;
     private boolean bieDefinition = true;
-    private boolean bieGuid;
-    private boolean bieCctsMetaData;
-    private boolean businessContext;
-    private boolean includeCctsDefinitionTag;
-    private boolean includeWhoColumns;
-    private boolean bieOagiScoreMetaData;
-    private boolean basedCcMetaData;
     private BigInteger metaHeaderTopLevelAsbiepId;
     private BigInteger paginationResponseTopLevelAsbiepId;
     private String verb;
