@@ -12,16 +12,16 @@ import org.oagi.score.e2e.obj.ModuleSetObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.module.CreateModuleSetPage;
-import org.oagi.score.e2e.page.module.EditModuleSetPage;
-import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
+import org.oagi.score.e2e.page.module.*;
+import org.openqa.selenium.By;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_21_1_ManageModuleSet extends BaseTest {
@@ -103,8 +103,8 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_21_1_TA_4a")
-    public void test_TA_4a() {
+    @DisplayName("TC_21_1_TA_4")
+    public void test_TA_4() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -118,18 +118,44 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         createModuleSetPage.setName("New Module Set");
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
 
+        /**
+         * Test Assertion #21.1.4.a
+         */
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
         EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
         editModuleSetPage.addModule();
-        editModuleSetPage.addNewModuleFile();
-        assertEquals("true", editModuleSetPage.getModuleFileNameField().getAttribute("aria-required"));
-        editModuleSetPage.setModuleFileName("New module file");
-        editModuleSetPage.setNamespace(namespace.getUri());
-        editModuleSetPage.setModuleFileVersionNumber("New version");
-        assertEquals("false", editModuleSetPage.getNamespaceField().getAttribute("aria-required"));
-        assertEquals("false", editModuleSetPage.getModuleFileVersionNumberField().getAttribute("aria-required"));
-        editModuleSetPage.createModuleFile();
+        CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
+        assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
+        String moduleFileName = "New module file";
+        createModuleFileDialog.setModuleFileName(moduleFileName);
+        createModuleFileDialog.setNamespace(namespace.getUri());
+        createModuleFileDialog.setModuleFileVersionNumber("New version");
+        assertEquals("false", createModuleFileDialog.getNamespaceField().getAttribute("aria-required"));
+        assertEquals("false", createModuleFileDialog.getModuleFileVersionNumberField().getAttribute("aria-required"));
+        createModuleFileDialog.createModuleFile();
+        waitFor(ofMillis(500L));
+
+        /**
+         * Test Assertion #21.1.4.b
+         */
+        editModuleSetPage.addModule();
+        createModuleFileDialog = editModuleSetPage.addNewModuleFile();
+        createModuleFileDialog.setModuleFileName(moduleFileName);
+        createModuleFileDialog.setNamespace(namespace.getUri());
+        createModuleFileDialog.setModuleFileVersionNumber("New version");
+        createModuleFileDialog.createModuleFile();
+        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
+        assertTrue(errorMessage.contains("Duplicate module name exist."));
+        escape(getDriver());
+
+        EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
+        editModuleFileDialog.setModuleFileName("Changed module file name");
+        editModuleFileDialog.setModuleFileVersionNumber("");
+        editModuleFileDialog.updateModuleFile();
+        
+
     }
 
     @AfterEach

@@ -20,23 +20,13 @@ public interface EditModuleSetPage extends Page {
 
     void addModule();
 
-    void addNewModuleFile();
+    CreateModuleFileDialog addNewModuleFile();
 
-    WebElement getModuleFileNameField();
 
-    void setModuleFileName(String moduleFileName);
+    EditModuleFileDialog editModuleFile(String moduleFileName);
 
-    void setNamespace(String namespaceURI);
+    WebElement getModuleFileEditLink(String moduleFileName);
 
-    void setModuleFileVersionNumber(String moduleFileVersion);
+    WebElement getModuleFileByName(String moduleFileName);
 
-    WebElement getNamespaceSelectField();
-
-    WebElement getNamespaceField();
-
-    WebElement getModuleFileVersionNumberField();
-
-    void createModuleFile();
-
-    WebElement getCreateModuleFileButton();
 }
