@@ -25,9 +25,11 @@ public interface EditModuleSetPage extends Page {
 
     EditModuleFileDialog editModuleFile(String moduleFileName);
 
-    WebElement getModuleFileEditLink(String moduleFileName);
+    WebElement getModuleEditLink(String moduleName);
 
-    WebElement getModuleFileByName(String moduleFileName);
+    WebElement getModuleByName(String moduleName);
 
     CreateModuleDirectoryDialog addNewModuleDirectory();
+
+    EditModuleDirectoryDialog editModuleDirectory(String moduleDirectoryName);
 }

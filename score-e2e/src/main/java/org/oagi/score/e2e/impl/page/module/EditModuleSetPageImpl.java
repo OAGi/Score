@@ -3,10 +3,7 @@ package org.oagi.score.e2e.impl.page.module;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ModuleSetObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.module.CreateModuleDirectoryDialog;
-import org.oagi.score.e2e.page.module.CreateModuleFileDialog;
-import org.oagi.score.e2e.page.module.EditModuleFileDialog;
-import org.oagi.score.e2e.page.module.EditModuleSetPage;
+import org.oagi.score.e2e.page.module.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -108,21 +105,21 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     @Override
     public EditModuleFileDialog editModuleFile(String moduleFileName) {
-        click(getModuleFileByName(moduleFileName));
-        click(getModuleFileEditLink(moduleFileName));
+        click(getModuleByName(moduleFileName));
+        click(getModuleEditLink(moduleFileName));
         EditModuleFileDialog editModuleFileDialog = new EditModuleFileDialogImpl(this);
         assert editModuleFileDialog.isOpened();
         return  editModuleFileDialog;
     }
 
     @Override
-    public WebElement getModuleFileEditLink(String moduleFileName) {
-        return elementToBeClickable(getDriver(), By.xpath("//*[text() = \"" + moduleFileName + "\"]//ancestor::div//mat-icon[contains(text(), \"edit\")]"));
+    public WebElement getModuleEditLink(String moduleName) {
+        return elementToBeClickable(getDriver(), By.xpath("//*[text() = \"" + moduleName + "\"]//ancestor::div[2]//mat-icon[contains(text(), \"edit\")]"));
     }
 
     @Override
-    public WebElement getModuleFileByName(String moduleFileName) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[text() = \"" + moduleFileName + "\"]//ancestor::div[1]"));
+    public WebElement getModuleByName(String moduleName) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[text() = \"" + moduleName + "\"]//ancestor::div[1]"));
     }
 
     @Override
@@ -135,5 +132,14 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     private WebElement getAddNewModuleDirectoryButton() {
         return elementToBeClickable(getDriver(), By.xpath("//mat-expansion-panel//mat-panel-title[contains(text(), \"Create new module directory\")]"));
+    }
+
+    @Override
+    public EditModuleDirectoryDialog editModuleDirectory(String moduleDirectoryName) {
+        click(getModuleByName(moduleDirectoryName));
+        click(getModuleEditLink(moduleDirectoryName));
+        EditModuleDirectoryDialog editModuleDirectoryDialog = new EditModuleDirectoryDialogImpl(this);
+        assert editModuleDirectoryDialog.isOpened();
+        return editModuleDirectoryDialog;
     }
 }

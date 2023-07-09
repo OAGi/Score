@@ -165,6 +165,20 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
 
+        /**
+         * Test Assertion #21.1.4.d
+         */
+        editModuleSetPage.addModule();
+        createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
+        createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
+        createModuleDirectoryDialog.createModuleDirectory();
+        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
+        assertTrue(errorMessage.contains("Duplicate module name exist."));
+        escape(getDriver());
+
+        EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
+        editModuleDirectoryDialog.setModuleDirectoryName("Directory A - changed");
+        editModuleDirectoryDialog.updateModuleDirectory();
     }
 
     @AfterEach
