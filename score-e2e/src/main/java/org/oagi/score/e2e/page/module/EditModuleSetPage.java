@@ -29,4 +29,5 @@ public interface EditModuleSetPage extends Page {
 
     WebElement getModuleFileByName(String moduleFileName);
 
+    CreateModuleDirectoryDialog addNewModuleDirectory();
 }

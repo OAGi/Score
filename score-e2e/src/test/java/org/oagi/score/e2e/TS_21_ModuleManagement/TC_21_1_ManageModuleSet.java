@@ -154,7 +154,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         editModuleFileDialog.setModuleFileName("Changed module file name");
         editModuleFileDialog.setModuleFileVersionNumber("");
         editModuleFileDialog.updateModuleFile();
-        
+
+        /**
+         * Test Assertion #21.1.4.c
+         */
+        editModuleSetPage.addModule();
+        CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
+        String moduleDirectoryName = "Directory A";
+        assertEquals("true", createModuleDirectoryDialog.getModuleDirectoryNameField().getAttribute("aria-required"));
+        createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
+        createModuleDirectoryDialog.createModuleDirectory();
 
     }
 

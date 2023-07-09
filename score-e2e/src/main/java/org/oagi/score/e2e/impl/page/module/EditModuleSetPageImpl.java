@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.module;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ModuleSetObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.module.CreateModuleDirectoryDialog;
 import org.oagi.score.e2e.page.module.CreateModuleFileDialog;
 import org.oagi.score.e2e.page.module.EditModuleFileDialog;
 import org.oagi.score.e2e.page.module.EditModuleSetPage;
@@ -122,5 +123,17 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
     @Override
     public WebElement getModuleFileByName(String moduleFileName) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//*[text() = \"" + moduleFileName + "\"]//ancestor::div[1]"));
+    }
+
+    @Override
+    public CreateModuleDirectoryDialog addNewModuleDirectory() {
+        click(getAddNewModuleDirectoryButton());
+        CreateModuleDirectoryDialog createModuleDirectoryDialog = new CreateModuleDirectoryDialogImpl(this);
+        assert createModuleDirectoryDialog.isOpened();
+        return createModuleDirectoryDialog;
+    }
+
+    private WebElement getAddNewModuleDirectoryButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//mat-expansion-panel//mat-panel-title[contains(text(), \"Create new module directory\")]"));
     }
 }
