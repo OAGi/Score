@@ -35,7 +35,6 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
     private ObjectMapper mapper;
 
     private AvroObject root;
-    private AvroObjectDuplicateNameEliminator duplicateNameEliminator = new AvroObjectDuplicateNameEliminator();
     private GenerateExpressionOption option;
 
     @Autowired
@@ -298,7 +297,6 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
     @Override
     public File asFile(String filename) throws IOException {
         ensureRoot();
-        duplicateNameEliminator.eliminate();
 
         File tempFile = File.createTempFile(ScoreGuid.randomGuid(), null);
         tempFile = new File(tempFile.getParentFile(), filename + ".avsc");
@@ -307,56 +305,6 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         logger.info("Avro Schema is generated: " + tempFile);
 
         return tempFile;
-    }
-
-    private class AvroObjectDuplicateNameEliminator {
-
-        private Map<String, List<AvroObject>> avroObjectNameMap = new HashMap<>();
-
-        void add(AvroObject object, String name) {
-            List<AvroObject> objects;
-            if (avroObjectNameMap.containsKey(name)) {
-                objects = avroObjectNameMap.get(name);
-            } else {
-                objects = new ArrayList<>();
-                avroObjectNameMap.put(name, objects);
-            }
-            objects.add(object);
-        }
-
-        void eliminate() {
-            while (true) {
-                List<Map.Entry<String, List<AvroObject>>> duplicateNameList =
-                        avroObjectNameMap.entrySet().stream().filter(e -> e.getValue().size() > 1).collect(Collectors.toList());
-                if (duplicateNameList.isEmpty()) {
-                    break;
-                }
-
-                for (Map.Entry<String, List<AvroObject>> entry : duplicateNameList) {
-                    for (AvroObject object : entry.getValue()) {
-                        String recordName = object.getName();
-                        AvroObject parent = object.getParent();
-
-                        while (true) {
-                            if (parent == null) {
-                                break;
-                            }
-                            recordName = parent.getName() + recordName;
-                            if (recordName.length() > object.getRecordName().length()) {
-                                object.setRecordName(recordName);
-                                break;
-                            }
-
-                            parent = parent.getParent();
-                        }
-
-                        add(object, recordName);
-                    }
-
-                    avroObjectNameMap.remove(entry.getKey());
-                }
-            }
-        }
     }
 
     private class AvroObject {
@@ -412,12 +360,15 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
         public void setName(String name) {
             this.name = name;
-            duplicateNameEliminator.add(this, name);
         }
 
         public String getRecordName() {
             if (recordName == null) {
-                return getName();
+                if (this.getParent() != null) {
+                    recordName = this.getParent().getRecordName() + getName();
+                } else {
+                    recordName = getName();
+                }
             }
             return recordName;
         }

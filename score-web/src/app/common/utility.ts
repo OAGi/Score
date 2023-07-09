@@ -318,3 +318,20 @@ export class TruncatePipe implements PipeTransform {
   }
 
 }
+
+@Pipe({
+  name: 'pastTense'
+})
+export class PastTensePipe implements PipeTransform {
+  transform(value: string, ...args: any[]): any {
+    // TODO: Add exceptional cases if needs
+    if (value.endsWith('y')) {
+      return value.substring(0, value.length - 1) + 'ied';
+    }
+    if (value.endsWith('e')) {
+      return value + 'd';
+    }
+    return value + 'ed';
+  }
+
+}

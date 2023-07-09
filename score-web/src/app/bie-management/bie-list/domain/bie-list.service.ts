@@ -65,11 +65,14 @@ export class BieListService {
     if (request.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
     }
+    if (request.topLevelAsbiepIds.length > 0) {
+      params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
+    }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
     }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId.toString());
+    if (request.releases && request.releases.length > 0) {
+      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
@@ -159,8 +162,8 @@ export class BieListService {
     if (request.access) {
       params = params.set('access', request.access);
     }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId);
+    if (request.releases) {
+      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());

@@ -36,7 +36,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxList: BusinessContext[] = [];
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'businessContexts',
+    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -111,18 +111,6 @@ export class BieCopyProfileBieComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-      if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
-        if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
-          }
-        } else {
-          this.request.release = this.releases[0];
-        }
-      }
 
       this.bizCtxIds = resp.list.map(e => e.businessContextId);
       this.bizCtxList = resp.list;
@@ -170,6 +158,14 @@ export class BieCopyProfileBieComponent implements OnInit {
       case 'endDate':
         this.request.updatedDate.end = null;
         break;
+    }
+  }
+
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    if (selectAllValue) {
+      this.request.releases = this.releases;
+    } else {
+      this.request.releases = [];
     }
   }
 

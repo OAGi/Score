@@ -107,6 +107,7 @@ public class BieCopyService implements InitializingBean {
                 .setInverseMode(sourceTopLevelAsbiep.isInverseMode())
                 .setUserId(userId)
                 .setTimestamp(millis)
+                .setSource(sourceTopLevelAsbiepId, "Copy")
                 .execute();
 
         BieCopyRequestEvent bieCopyRequestEvent = new BieCopyRequestEvent(
