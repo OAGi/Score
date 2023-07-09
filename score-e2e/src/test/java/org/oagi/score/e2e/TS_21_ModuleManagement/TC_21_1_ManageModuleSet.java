@@ -9,6 +9,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.ModuleSetObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.module.CreateModuleSetPage;
@@ -99,6 +100,36 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         editModuleSetPage.setName("Updated Module Set Name");
         editModuleSetPage.setDescription("Updated Description");
         editModuleSetPage.hitUpdateButton();
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4a")
+    public void test_TA_4a() {
+        AppUserObject developer;
+        NamespaceObject namespace;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
+        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        editModuleSetPage.addModule();
+        editModuleSetPage.addNewModuleFile();
+        assertEquals("true", editModuleSetPage.getModuleFileNameField().getAttribute("aria-required"));
+        editModuleSetPage.setModuleFileName("New module file");
+        editModuleSetPage.setNamespace(namespace.getUri());
+        editModuleSetPage.setModuleFileVersionNumber("New version");
+        assertEquals("false", editModuleSetPage.getNamespaceField().getAttribute("aria-required"));
+        assertEquals("false", editModuleSetPage.getModuleFileVersionNumberField().getAttribute("aria-required"));
+        editModuleSetPage.createModuleFile();
     }
 
     @AfterEach
