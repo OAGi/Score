@@ -15,16 +15,15 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_25_1_ReuseBIE extends BaseTest {
@@ -203,23 +202,16 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         assertTrue(selectProfileBIEToReuseDialog.isOpened());
         escape(getDriver());
 
-        editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm());
+        editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_root.getPropertyTerm());
+        assertThrows(TimeoutException.class, () -> {visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"Reuse BIE\")]"));});
+        escape(getDriver());
 
+        editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_root.getPropertyTerm() +"/" + bccp_code_type.getPropertyTerm());
+        assertThrows(TimeoutException.class, () -> {visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"Reuse BIE\")]"));});
+        escape(getDriver());
 
-
-
-
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
-
-        editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
-
-
-
-
-
+        editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_root.getPropertyTerm() +"/" + bccp_indicator_type.getPropertyTerm());
+        assertThrows(TimeoutException.class, () -> {visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"Reuse BIE\")]"));});
     }
 
     @Test
