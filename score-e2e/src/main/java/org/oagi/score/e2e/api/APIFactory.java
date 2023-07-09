@@ -124,4 +124,6 @@ public interface APIFactory extends AutoCloseable {
      */
     BusinessInformationEntityAPI getBusinessInformationEntityAPI();
 
+    ModuleSetAPI getModuleSetAPI();
+
 }

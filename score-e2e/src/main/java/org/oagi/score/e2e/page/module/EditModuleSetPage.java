@@ -4,27 +4,15 @@ import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
 public interface EditModuleSetPage extends Page {
+    void setName(String name);
+
+    void setDescription(String description);
+
     WebElement getNameField();
 
     WebElement getDescriptionField();
 
-    void toggleCreateModuleSetRelease();
+    void hitUpdateButton();
 
-    WebElement getCreateModuleSetReleaseSelectField();
-
-    void setRelease(String releaseNumber);
-
-    WebElement getReleaseSelectField();
-
-    void setModuleSetRelease(String moduleSetRelease);
-
-    WebElement getModuleSetReleaseSelectField();
-
-    void hitCreateButton();
-
-    WebElement getCreateButton();
-
-    void setName(String name);
-
-    void setDescription(String description);
+    WebElement getUpdateButton(boolean enabled);
 }

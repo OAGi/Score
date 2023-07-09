@@ -1,19 +1,26 @@
 package org.oagi.score.e2e.impl.page.module;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.code_list.UpliftCodeListPageImpl;
+import org.oagi.score.e2e.obj.ModuleSetObject;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
+import org.oagi.score.e2e.page.module.CreateModuleSetPage;
 import org.oagi.score.e2e.page.module.EditModuleSetPage;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditModuleSetPage {
     private static final By NEW_MODULE_SET_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Module Set\")]//ancestor::button[1]");
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By NAME_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
 
     public ViewEditModuleSetPageImpl(BasePage parent) {
         super(parent);
@@ -42,10 +49,64 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     }
 
     @Override
-    public EditModuleSetPage hitNewModuleSetButton() {
+    public CreateModuleSetPage hitNewModuleSetButton() {
         retry(() -> click(getNewModuleSetButton()));
-        EditModuleSetPage editModuleSetPage = new EditModuleSetPageImpl(this);
+        CreateModuleSetPage editModuleSetPage = new CreateModuleSetPageImpl(this);
         assert editModuleSetPage.isOpened();
         return editModuleSetPage;
+    }
+
+    @Override
+    public EditModuleSetPage openModuleSetByName(ModuleSetObject moduleSet) {
+        setName(moduleSet.getName());
+        hitSearchButton();
+
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = getTableRecordAtIndex(1);
+                td = getColumnByName(tr, "name");
+            } catch (TimeoutException e) {
+                        throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSet.getName(), e);
+            }
+            String nameColumn = getText(td.findElement(By.tagName("a")));
+            if (!nameColumn.contains(moduleSet.getName())) {
+                throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSet.getName());
+            }
+            WebElement tdModuleName = td.findElement(By.cssSelector("a"));
+            // TODO:
+            // 'click' does not work when the browser hides the link.
+            getDriver().get(tdModuleName.getAttribute("href"));
+        });
+        EditModuleSetPage editModuleSetPage = new EditModuleSetPageImpl(this, moduleSet);
+        assert editModuleSetPage.isOpened();
+        return editModuleSetPage;
+    }
+    @Override
+    public WebElement getSearchButton() {
+        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitSearchButton() {
+        click(getSearchButton());
+        waitFor(ofMillis(500L));
+    }
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+    }
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+    @Override
+    public void setName(String name) {
+        sendKeys(getNameField(), name);
+    }
+    @Override
+    public WebElement getNameField() {
+        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
     }
 }

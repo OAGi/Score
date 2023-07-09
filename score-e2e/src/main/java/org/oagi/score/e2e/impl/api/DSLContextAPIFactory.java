@@ -116,6 +116,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public ModuleSetAPI getModuleSetAPI() {
+        return new DSLContextModuleSetAPIImpl(dslContext, this);
+    }
+
+    @Override
     public void close() throws Exception {
         if (dataSource != null) {
             dataSource.close();
