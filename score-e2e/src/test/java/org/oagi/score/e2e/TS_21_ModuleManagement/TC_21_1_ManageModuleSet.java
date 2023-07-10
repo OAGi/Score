@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.module.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -203,6 +204,27 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             assertDoesNotThrow(() -> editModuleSetPage.getModuleByName(submodule.getName()));
         }
 
+        /**
+         * Test Assertion #21.1.4.f
+         */
+        editModuleSetPage.addModule();
+        editModuleSetPage.copyFromExistingModuleSet();
+        selectedMduleSet = existingModuleSet.get(1);
+        copyModuleFromExistingModuleSetDialog.setModuleSet
+                (selectedMduleSet.getName());
+        modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedMduleSet.getModuleSetId());
+        ModuleObject selectedModuleSecond = modules.get(modules.size()-1);
+        submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModuleSecond.getModuleId());
+        ModuleObject selectedSubmodule = submodules.get(0);
+        copyModuleFromExistingModuleSetDialog.selectModule(selectedModuleSecond.getName());
+        copyModuleFromExistingModuleSetDialog.selectModule(selectedSubmodule.getName());
+        copyModuleFromExistingModuleSetDialog.toggleCopyAllSubmodules();
+        copyModuleFromExistingModuleSetDialog.copyModule();
+        click(editModuleSetPage.getModuleByName(selectedModuleSecond.getName()));
+        submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedSubmodule.getModuleId());
+        for (ModuleObject submodule: submodules){
+            assertThrows(WebDriverException.class, () -> editModuleSetPage.getModuleByName(submodule.getName()));
+        }
     }
 
     @AfterEach
