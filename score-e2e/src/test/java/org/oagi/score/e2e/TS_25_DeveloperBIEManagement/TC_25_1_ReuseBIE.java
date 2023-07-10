@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -358,7 +359,84 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_25_1_6() {
+        ASCCPObject developer_asccp, developer_asccp_for_usera;
+        ACCObject developer_acc, developer_acc_association;
+        AppUserObject anotherDeveloper, developer;
+        NamespaceObject developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject developerBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
+            /**
+             * The owner of the ASCCP is developer
+             */
+            developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_acc_association = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
+            ASCCObject ascc = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
+            developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
+        viewEditBIEPage.setDEN(developerBIE.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.setRemark("developerBIE remark");
+        topLevelASBIEPPanel.setContextDefinition("developerBIE definition");
+        topLevelASBIEPPanel.setBusinessTerm("developerBIE business term");
+        topLevelASBIEPPanel.setStatus("developerBIE status");
+        editBIEPage.hitUpdateButton();
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        bieMenu = homePage.getBIEMenu();
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        Boolean bieExisting = true;
+        viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + developer_asccp_for_usera.getDen() + "\")]//ancestor::tr")).size();
+        if (!bieExisting) {
+            CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
+            createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
+            bieExisting = true;
+        }
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
+        editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        WebElement asccpNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
+
+        assertEquals("developerBIE remark", getText(reusedASBIEPanel.getRemarkField()));
+        assertEquals("developerBIE business term", getText(reusedASBIEPanel.getLegacyBusinessTermField()));
+        assertEquals("developerBIE status", getText(reusedASBIEPanel.getStatusField()));
+
+        asccpNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertDisabled(asbiePanel.getCardinalityMaxField());
+        assertDisabled(asbiePanel.getCardinalityMinField());
+        assertDisabled(asbiePanel.getContextDefinitionField());
     }
 
     @Test
