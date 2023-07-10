@@ -15,4 +15,8 @@ public interface EditModuleFileDialog extends Dialog {
     WebElement getNamespaceSelectField();
 
     WebElement getModuleFileVersionNumberField();
+
+    void discardFile();
+
+    WebElement getDiscardModuleFileButton();
 }

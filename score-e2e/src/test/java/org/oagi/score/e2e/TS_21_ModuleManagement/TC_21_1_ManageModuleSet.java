@@ -227,6 +227,49 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_21_1_TA_5")
+    public void test_TA_5() {
+        AppUserObject developer;
+        NamespaceObject namespace;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
+
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
+        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        editModuleSetPage.addModule();
+        CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
+        String moduleFileName = "File A";
+        createModuleFileDialog.setModuleFileName(moduleFileName);
+        createModuleFileDialog.setNamespace(namespace.getUri());
+        createModuleFileDialog.setModuleFileVersionNumber("New version");
+        createModuleFileDialog.createModuleFile();
+        waitFor(ofMillis(500L));
+
+        EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
+        editModuleFileDialog.discardFile();
+
+        editModuleSetPage.addModule();
+        CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
+        String moduleDirectoryName = "Directory A";
+        createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
+        createModuleDirectoryDialog.createModuleDirectory();
+        waitFor(ofMillis(500L));
+
+        EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
+        editModuleDirectoryDialog.discardDirectory();
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

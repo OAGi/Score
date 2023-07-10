@@ -11,4 +11,8 @@ public interface EditModuleDirectoryDialog extends Dialog {
     void updateModuleDirectory();
 
     WebElement getUpdateModuleDirectoryButton();
+
+    void discardDirectory();
+
+    WebElement getDiscardModuleDirectoryButton();
 }
