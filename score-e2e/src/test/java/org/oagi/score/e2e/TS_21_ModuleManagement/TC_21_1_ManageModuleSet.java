@@ -282,11 +282,32 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         String messageDirectoryDiscard = "Are you sure you want to discard this and sub modules?";
         assertEquals(messageDirectoryDiscard, editModuleDirectoryDialog.getDiscardDirectoryMessage());
         click(editModuleDirectoryDialog.getContinueToDiscardDirectoryButton());
-        
+
         /**
          * Test Assertion #21.1.5.c
          */
 
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_6")
+    public void test_TA_6() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
+        viewEditModuleSetPage.openPage();
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
+        viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
+        assert "Discarded".equals(getSnackBarMessage(getDriver()));
     }
 
     @AfterEach

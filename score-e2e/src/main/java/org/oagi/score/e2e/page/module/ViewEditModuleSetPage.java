@@ -25,4 +25,8 @@ public interface ViewEditModuleSetPage extends Page {
     void setName(String name);
 
     WebElement getNameField();
+
+    void discardModuleSet(String moduleSetName);
+
+    WebElement clickOnDropDownMenu(WebElement element);
 }

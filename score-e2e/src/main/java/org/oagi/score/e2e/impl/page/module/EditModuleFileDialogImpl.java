@@ -21,7 +21,7 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
             By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-    private static final By CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
+    private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
@@ -109,7 +109,7 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
 
     @Override
     public WebElement getContinueToDiscardFileButton() {
-        return elementToBeClickable(getDriver(), CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR);
+        return elementToBeClickable(getDriver(), CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR);
     }
 
     @Override

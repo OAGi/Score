@@ -18,7 +18,7 @@ public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog 
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By DISCARD_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]");
-    private static final By CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
+    private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
@@ -81,7 +81,7 @@ public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog 
 
     @Override
     public WebElement getContinueToDiscardDirectoryButton() {
-        return elementToBeClickable(getDriver(), CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR);
+        return elementToBeClickable(getDriver(), CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR);
     }
 
     @Override
