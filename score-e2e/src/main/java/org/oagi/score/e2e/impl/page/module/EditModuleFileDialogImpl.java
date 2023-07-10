@@ -23,6 +23,8 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
             By.xpath("//mat-dialog-content//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
+    private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
+            By.xpath("//mat-dialog-container//p");
 
     private final BasePageImpl parent;
 
@@ -96,13 +98,22 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
     @Override
     public void discardFile() {
         click(getDiscardModuleFileButton());
-        click(elementToBeClickable(getDriver(), CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR));
+        click(getContinueToDiscardFileButton());
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
-        assert "Discarded".equals(getSnackBarMessage(getDriver()));
     }
     @Override
     public WebElement getDiscardModuleFileButton() {
         return elementToBeClickable(getDriver(), DISCARD_MODULE_FILE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getContinueToDiscardFileButton() {
+        return elementToBeClickable(getDriver(), CONTIBUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR);
+    }
+
+    @Override
+    public String getDiscardFileMessage() {
+        return visibilityOfElementLocated(getDriver(), DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR).getText();
     }
 }

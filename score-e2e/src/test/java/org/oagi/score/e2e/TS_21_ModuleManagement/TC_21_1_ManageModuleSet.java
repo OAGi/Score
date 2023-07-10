@@ -257,7 +257,14 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         waitFor(ofMillis(500L));
 
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
-        editModuleFileDialog.discardFile();
+        /**
+         * Test Assertion #21.1.5.b
+         */
+        String messageFileDiscard = "The CC assigned to this file will also be deleted.";
+
+        click(editModuleFileDialog.getDiscardModuleFileButton());
+        assertEquals(messageFileDiscard, editModuleFileDialog.getDiscardFileMessage());
+        click(editModuleFileDialog.getContinueToDiscardFileButton());
 
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
@@ -267,7 +274,19 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         waitFor(ofMillis(500L));
 
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
-        editModuleDirectoryDialog.discardDirectory();
+        click(editModuleDirectoryDialog.getDiscardModuleDirectoryButton());
+
+        /**
+         * Test Assertion #21.1.5.a
+         */
+        String messageDirectoryDiscard = "Are you sure you want to discard this and sub modules?";
+        assertEquals(messageDirectoryDiscard, editModuleDirectoryDialog.getDiscardDirectoryMessage());
+        click(editModuleDirectoryDialog.getContinueToDiscardDirectoryButton());
+        
+        /**
+         * Test Assertion #21.1.5.c
+         */
+
     }
 
     @AfterEach

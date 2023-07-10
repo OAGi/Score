@@ -34,4 +34,6 @@ public interface EditModuleSetPage extends Page {
     EditModuleDirectoryDialog editModuleDirectory(String moduleDirectoryName);
 
     CopyModuleFromExistingModuleSetDialog copyFromExistingModuleSet();
+
+    WebElement continueToDiscard();
 }

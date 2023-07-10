@@ -19,4 +19,8 @@ public interface EditModuleFileDialog extends Dialog {
     void discardFile();
 
     WebElement getDiscardModuleFileButton();
+
+    WebElement getContinueToDiscardFileButton();
+
+    String getDiscardFileMessage();
 }

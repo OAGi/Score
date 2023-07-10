@@ -15,4 +15,8 @@ public interface EditModuleDirectoryDialog extends Dialog {
     void discardDirectory();
 
     WebElement getDiscardModuleDirectoryButton();
+
+    WebElement getContinueToDiscardDirectoryButton();
+
+    String getDiscardDirectoryMessage();
 }

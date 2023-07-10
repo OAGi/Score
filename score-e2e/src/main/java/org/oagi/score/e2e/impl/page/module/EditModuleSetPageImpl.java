@@ -154,4 +154,9 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
     private WebElement getCopyFromExistingModuleSetButton() {
         return elementToBeClickable(getDriver(), By.xpath("//mat-expansion-panel//mat-panel-title[contains(text(), \"Copy from existing module set\")]"));
     }
+
+    @Override
+    public WebElement continueToDiscard() {
+        return null;
+    }
 }
