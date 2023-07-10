@@ -72,11 +72,17 @@ public class OpenAPIGenerateService {
         List<TopLevelAsbiep> topLevelAsbiepList = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
         BieGenerateOpenApiExpression generateExpression = createBieGenerateOpenAPIExpression();
         // leave metaHeader and pagination response untouched at this time for OpenAPI generation
-        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption(); //
+        // need to pass the params
+        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
+        if (option.getVerb().equals("GET")){
+            option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(params.get(topLevelAsbiepIds.get(0)).isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate());
+        } else if (option.getVerb().equals("POST")){
+            option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(params.get(topLevelAsbiepIds.get(0)).isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate());
+        }
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbiepList, option);
 
         for (TopLevelAsbiep topLevelAsbiep : topLevelAsbiepList) {
-            generateExpression.generate(topLevelAsbiep, generationContext, option);
+            generateExpression.generate(topLevelAsbiep, generationContext, params.get(topLevelAsbiep));
         }
 
         String filename = option.getFilename();
