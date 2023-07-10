@@ -309,6 +309,41 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
         assert "Discarded".equals(getSnackBarMessage(getDriver()));
     }
+
+    @Test
+    @DisplayName("TC_21_1_TA_7")
+    public void test_TA_7() {
+        AppUserObject developer;
+        ReleaseObject release;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
+
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        createModuleSetReleasePage.setName("Module Set Release Test");
+        createModuleSetReleasePage.setDescription("Description Test");
+        createModuleSetReleasePage.setModuleSet(moduleSet.getName());
+        createModuleSetReleasePage.setRelease(release.getReleaseNumber());
+        createModuleSetReleasePage.hitCreateButton();
+        waitFor(ofMillis(500L));
+
+        viewEditModuleSetPage.openPage();
+
+        viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
+        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
+        assertTrue(errorMessage.contains("Module set in use cannot be discarded."));
+    }
     @Test
     @DisplayName("TC_21_1_TA_8")
     public void test_TA_8() {
