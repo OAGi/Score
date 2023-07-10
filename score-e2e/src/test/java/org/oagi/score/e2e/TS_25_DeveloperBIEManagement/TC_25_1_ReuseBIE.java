@@ -10,16 +10,14 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
-import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.oagi.score.e2e.page.bie.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -441,7 +439,83 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_25_1_7() {
+        ASCCPObject developer_asccp_root, developer_asccp_lv2;
+        BCCPObject bccp_indicator_type, bccp_code_type;
+        ACCObject developer_acc, developer_acc_lv2;
+        AppUserObject anotherDeveloper, developer;
+        NamespaceObject developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject developerBIE, reusedBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
 
+            // Indicator. Type
+            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
+            bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
+            bccp_indicator_type.setNillable(false);
+            coreComponentAPI.updateBCCP(bccp_indicator_type);
+
+            /**
+             * The owner of the ASCCP is developer
+             */
+            developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_acc_lv2 = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
+            ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
+            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");;
+            bcc_indicator.setCardinalityMax(199);
+            bcc_indicator.setCardinalityMin(77);
+            bcc_indicator.setDefinition("BIE Copy will keep the definition");
+            coreComponentAPI.updateBCCP(bccp_indicator_type);
+            coreComponentAPI.appendExtension(developer_acc_lv2, developer, developerNamespace, "Published");
+            developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
+
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setDEN(developer_asccp_root.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+        escape(getDriver());
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        bieMenu = homePage.getBIEMenu();
+        CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage = bieMenu.openCopyBIESubMenu();
+        CopyBIEForSelectBIEPage copyBIEForSelectBIEPage = copyBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        copyBIEForSelectBIEPage.setDEN(developerBIE.getDen());
+        copyBIEForSelectBIEPage.hitSearchButton();
+        copyBIEForSelectBIEPage.copyBIE(developer_asccp_root.getDen(), current_release);
+
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setDEN(developerBIE.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        editBIEPage.openPage();
+        WebElement BCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + bccp_indicator_type.getPropertyTerm());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(BCCPNode);
+        assertEquals("199", getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals("77", getText(bbiePanel.getCardinalityMinField()));
+        assertEquals("BIE Copy will keep the definition", getText(bbiePanel.getContextDefinitionField()));
     }
 
     @Test
