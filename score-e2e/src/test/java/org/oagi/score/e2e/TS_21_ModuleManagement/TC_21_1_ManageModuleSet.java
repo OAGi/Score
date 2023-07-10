@@ -7,14 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.ModuleSetObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.module.*;
 import org.openqa.selenium.By;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,6 +162,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         assertEquals("true", createModuleDirectoryDialog.getModuleDirectoryNameField().getAttribute("aria-required"));
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
+        waitFor(ofMillis(500L));
 
         /**
          * Test Assertion #21.1.4.d
@@ -179,6 +178,31 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
         editModuleDirectoryDialog.setModuleDirectoryName("Directory A - changed");
         editModuleDirectoryDialog.updateModuleDirectory();
+
+        /**
+         * Test Assertion #21.1.4.e
+         */
+        editModuleSetPage.addModule();
+        CopyModuleFromExistingModuleSetDialog copyModuleFromExistingModuleSetDialog =
+                editModuleSetPage.copyFromExistingModuleSet();
+        List<ModuleSetObject> existingModuleSet = getAPIFactory().getModuleSetAPI().getAllModuleSets();
+        ModuleSetObject selectedMduleSet = existingModuleSet.get(0);
+        copyModuleFromExistingModuleSetDialog.setModuleSet
+                (selectedMduleSet.getName());
+
+        List<ModuleObject> modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedMduleSet.getModuleSetId());
+        ModuleObject selectedModule = modules.get(modules.size()-1);
+        copyModuleFromExistingModuleSetDialog.selectModule(selectedModule.getName());
+        copyModuleFromExistingModuleSetDialog.copyModule();
+        waitFor(Duration.ofSeconds(30));
+
+        assertDoesNotThrow(() -> editModuleSetPage.getModuleByName(selectedModule.getName()));
+        click(editModuleSetPage.getModuleByName(selectedModule.getName()));
+        List<ModuleObject> submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModule.getModuleId());
+        for (ModuleObject submodule: submodules){
+            assertDoesNotThrow(() -> editModuleSetPage.getModuleByName(submodule.getName()));
+        }
+
     }
 
     @AfterEach

@@ -126,4 +126,5 @@ public interface APIFactory extends AutoCloseable {
 
     ModuleSetAPI getModuleSetAPI();
 
+    ModuleAPI getModuleAPI();
 }

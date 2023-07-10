@@ -3,21 +3,19 @@ package org.oagi.score.e2e.impl.api;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.ModuleSetAPI;
 import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ModuleSetObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST;
 
 public class DSLContextModuleSetAPIImpl implements ModuleSetAPI {
 
@@ -41,6 +39,21 @@ public class DSLContextModuleSetAPIImpl implements ModuleSetAPI {
                 .from(MODULE_SET)
                 .where(MODULE_SET.MODULE_SET_ID.eq(latestModuleSetIDByUser))
                 .fetchOne(record -> moduleSetMapper(record));
+    }
+
+    @Override
+    public List<ModuleSetObject> getAllModuleSets() {
+        List<ModuleSetObject> moduleSets = new ArrayList<>();
+        List<Field<?>> fields = new ArrayList();
+        fields.addAll(Arrays.asList(MODULE_SET.fields()));
+        Result<Record> records = dslContext.select(fields)
+                .from(MODULE_SET)
+                .fetch();
+        for (Record r : records){
+            ModuleSetObject moduleSet = moduleSetMapper(r);
+            moduleSets.add(moduleSet);
+        }
+        return moduleSets;
     }
 
     private ModuleSetObject moduleSetMapper(Record record) {

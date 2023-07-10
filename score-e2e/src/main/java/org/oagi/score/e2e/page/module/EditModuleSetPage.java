@@ -32,4 +32,6 @@ public interface EditModuleSetPage extends Page {
     CreateModuleDirectoryDialog addNewModuleDirectory();
 
     EditModuleDirectoryDialog editModuleDirectory(String moduleDirectoryName);
+
+    CopyModuleFromExistingModuleSetDialog copyFromExistingModuleSet();
 }

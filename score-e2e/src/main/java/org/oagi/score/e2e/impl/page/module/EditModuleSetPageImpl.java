@@ -142,4 +142,16 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
         assert editModuleDirectoryDialog.isOpened();
         return editModuleDirectoryDialog;
     }
+
+    @Override
+    public CopyModuleFromExistingModuleSetDialog copyFromExistingModuleSet() {
+        click(getCopyFromExistingModuleSetButton());
+        CopyModuleFromExistingModuleSetDialog copyModuleFromExistingModuleSetDialog =
+                new CopyModuleFromExistingModuleSetDialogImpl(this);
+        assert copyModuleFromExistingModuleSetDialog.isOpened();
+        return copyModuleFromExistingModuleSetDialog;
+    }
+    private WebElement getCopyFromExistingModuleSetButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//mat-expansion-panel//mat-panel-title[contains(text(), \"Copy from existing module set\")]"));
+    }
 }
