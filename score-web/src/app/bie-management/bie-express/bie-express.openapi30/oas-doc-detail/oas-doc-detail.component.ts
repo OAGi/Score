@@ -11,7 +11,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {forkJoin} from 'rxjs';
-import {hashCode} from 'src/app/common/utility';
+import {hashCode, saveBranch} from 'src/app/common/utility';
 import {v4 as uuid} from 'uuid';
 import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
@@ -23,6 +23,7 @@ import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {BieExpressOption} from '../../domain/generate-expression';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -45,7 +46,7 @@ export class OasDocDetailComponent implements OnInit {
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
-  selection = new SelectionModel<BieForOasDoc>(false, []);
+  selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
   request: BieForOasDocListRequest;
   loading = false;
@@ -165,7 +166,36 @@ export class OasDocDetailComponent implements OnInit {
   onPageChange(event: PageEvent) {
     this.loadBieListForOasDoc();
   }
+  onChange(property?: string, source?){
+    if (property === 'branch'){
+      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
+    }
+    if (property === 'filters.den'){
+      this.sort.active = '';
+      this.sort.direction = '';
+    }
+  }
+  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = new Date(event.value);
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = new Date(event.value);
+        break;
+    }
+  }
 
+  reset(type: string) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = null;
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = null;
+        break;
+    }
+  }
   update() {
     this.checkUniqueness(this.oasDoc, (_) => {
       this.doUpdate();
@@ -334,43 +364,21 @@ export class OasDocDetailComponent implements OnInit {
     this.dataSource.data = data;
     this.oasDoc.bieList = data;
   }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => this.isAvailable(row)).length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
   select(row: BieForOasDoc) {
-    if (this.isAvailable(row)) {
-      this.selection.select(row);
-    }
+    this.selection.select(row.topLevelAsbiepId);
   }
 
-  isAvailable(bieForOasDoc: BieForOasDoc) {
-    return this.oasDoc.bieList != null;
+  isSelected(row: BieForOasDoc) {
+    return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
   toggle(row: BieForOasDoc) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row);
+      this.selection.deselect(row.topLevelAsbiepId);
     } else {
       this.select(row);
     }
   }
-
-  isSelected(row: BieForOasDoc) {
-    return this.selection.isSelected(row);
-  }
-
   isEditable(): boolean {
     return this.access === 'CanEdit';
   }
@@ -416,7 +424,7 @@ export class OasDocDetailComponent implements OnInit {
         if (result) {
           const newData = [];
           this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
+            if (!this.selection.isSelected(row.topLevelAsbiepId)) {
               newData.push(row);
             }
           });
