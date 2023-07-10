@@ -309,6 +309,35 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
         assert "Discarded".equals(getSnackBarMessage(getDriver()));
     }
+    @Test
+    @DisplayName("TC_21_1_TA_8")
+    public void test_TA_8() {
+        AppUserObject developer;
+        AppUserObject endUser;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(endUser);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
+        homePage.logout();
+
+        homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
+        homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        assertThrows(WebDriverException.class, () -> editModuleSetPage.setName("New Name EU"));
+        assertThrows(WebDriverException.class, () -> editModuleSetPage.setDescription("New Description EU"));
+        assertThrows(WebDriverException.class, () -> editModuleSetPage.hitUpdateButton());
+    }
 
     @AfterEach
     public void tearDown() {
