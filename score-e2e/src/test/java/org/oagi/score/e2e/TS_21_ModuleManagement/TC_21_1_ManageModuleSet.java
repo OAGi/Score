@@ -339,6 +339,36 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         assertThrows(WebDriverException.class, () -> editModuleSetPage.hitUpdateButton());
     }
 
+    @Test
+    @DisplayName("TC_21_1_TA_9")
+    public void test_TA_9() {
+        AppUserObject developerA;
+        AppUserObject developerB;
+        {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
+
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerB);
+        }
+        HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
+        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setDescription("Description");
+        createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
+        homePage.logout();
+
+        homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developerA);
+        homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        assertDoesNotThrow(() -> editModuleSetPage.setName("New Name Developer B"));
+        assertDoesNotThrow(() -> editModuleSetPage.setDescription("New Description Developer B"));
+        assertDoesNotThrow(() -> editModuleSetPage.hitUpdateButton());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
