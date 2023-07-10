@@ -144,17 +144,17 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         BizCtx bizCtx = generationContext.findBusinessContexts(topLevelAsbiep).stream()
                 .filter(e -> e.getBizCtxId().equals(bizCtxId))
                 .findAny().orElse(null);
-
-        String bizCtxName = bizCtx.getName();
-        // RESTful Web API Design V2 document
-        // [R85] For URI path segments, consisting of more than a single word, a hyphen character "-"
-        // SHOULD be used to separate the words.
         String delimiter = "-";
-        bizCtxName = bizCtxName.toLowerCase()
-                .replaceAll("\\s", delimiter)
-                .replaceAll("[^A-Za-z0-9]", delimiter);
-        pathName.append(bizCtxName).append("/");
-
+        if (bizCtx != null){
+            String bizCtxName = bizCtx.getName();
+            // RESTful Web API Design V2 document
+            // [R85] For URI path segments, consisting of more than a single word, a hyphen character "-"
+            // SHOULD be used to separate the words.
+            bizCtxName = bizCtxName.toLowerCase()
+                    .replaceAll("\\s", delimiter)
+                    .replaceAll("[^A-Za-z0-9]", delimiter);
+            pathName.append(bizCtxName).append("/");
+        }
         String version = topLevelAsbiep.getVersion();
         if (StringUtils.hasLength(version)) {
             version = version.toLowerCase()
