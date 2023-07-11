@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
@@ -40,6 +41,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By ALTERNATIVE_NAMESPACE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -61,13 +64,16 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
 
-    public ACCExtensionViewEditPageImpl(BasePage parent) {
+    private final ACCObject acc;
+
+    public ACCExtensionViewEditPageImpl(BasePage parent, ACCObject acc) {
         super(parent);
+        this.acc = acc;
     }
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/core_component/extension").toString();
+        return getConfig().getBaseUrl().resolve("/core_component/extension/" + this.acc.getAccManifestId()).toString();
     }
 
     @Override
@@ -192,7 +198,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void setNamespace(NamespaceObject namespace) {
-        click(getNamespaceField());
+        try {
+            click(getNamespaceField());
+        } catch (ElementClickInterceptedException e) {
+            click(elementToBeClickable(getDriver(), ALTERNATIVE_NAMESPACE_FIELD_LOCATOR));
+        }
         waitFor(ofMillis(1000L));
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
@@ -509,7 +519,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
         @Override
         public void setNamespace(String namespace) {
-            click(getNamespaceSelectField());
+            try {
+                click(getNamespaceSelectField());
+            } catch (ElementClickInterceptedException e) {
+                click(getAlternativeSelectFieldByName(baseXPath, "Namespace"));
+            }
             waitFor(ofMillis(1000L));
             WebElement option = elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
@@ -536,6 +550,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         private WebElement getSelectFieldByName(String baseXPath, String name) {
             return visibilityOfElementLocated(getDriver(), By.xpath(
                     baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
+        }
+
+        private WebElement getAlternativeSelectFieldByName(String baseXPath, String name) {
+            return visibilityOfElementLocated(getDriver(), By.xpath(
+                    baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]"));
         }
 
         private WebElement getInputFieldByName(String baseXPath, String name) {

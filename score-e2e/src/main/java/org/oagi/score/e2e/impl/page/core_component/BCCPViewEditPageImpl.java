@@ -66,6 +66,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//label/span[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By ALTERNATIVE_NAMESPACE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -522,7 +524,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public void setNamespace(String namespace) {
-        click(getNamespaceSelectField());
+        try {
+            click(getNamespaceSelectField());
+        } catch (ElementClickInterceptedException e) {
+            click(elementToBeClickable(getDriver(), ALTERNATIVE_NAMESPACE_FIELD_LOCATOR));
+        }
         waitFor(ofMillis(1000L));
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
@@ -561,6 +567,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private WebElement getSelectFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
+    }
+
+    private WebElement getAlternativeSelectFieldByName(String baseXPath, String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]"));
     }
 
     private WebElement getCheckboxByName(String baseXPath, String name) {
@@ -1017,7 +1028,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
         @Override
         public void setNamespace(String namespace) {
-            click(getNamespaceSelectField());
+            try {
+                click(getNamespaceSelectField());
+            } catch (ElementClickInterceptedException e) {
+                click(getAlternativeSelectFieldByName(baseXPath, "Namespace"));
+            }
             waitFor(ofMillis(1000L));
             WebElement option = elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));

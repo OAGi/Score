@@ -99,7 +99,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         click(getBranchSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + branch + "\")]"));
+                By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
         click(searchedSelectField);
         escape(getDriver());
     }

@@ -56,6 +56,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By ALTERNATIVE_NAMESPACE_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By CARDINALITY_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
@@ -397,11 +399,17 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void setNamespace(NamespaceObject namespace) {
-        click(getNamespaceField());
+        try {
+            click(getNamespaceField());
+        } catch (ElementClickInterceptedException e) {
+            click(elementToBeClickable(getDriver(), ALTERNATIVE_NAMESPACE_FIELD_LOCATOR));
+        }
         waitFor(ofMillis(1000L));
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
         click(option);
+        waitFor(ofMillis(1000L));
+        assert getNamespaceFieldValue().equals(namespace.getUri());
     }
 
     @Override

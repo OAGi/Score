@@ -32,6 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
@@ -173,7 +174,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public File hitGenerateButton(ExpressionFormat format, boolean compressed) {
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(Duration.ofMillis(30000), getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(30000), getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
