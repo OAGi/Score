@@ -434,4 +434,11 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
+  updateResourceName(newResourceName: string){
+  }
+
+  updateOperationId(newOperationId: string){
+
+
+  }
 }

@@ -2,18 +2,18 @@
   <mat-card class="pt-4 pb-2">
     <mat-card-header class="display-flow-root">
       <mat-card-title class="float-left">{{ title }}</mat-card-title>
-        <div class="action-group float-right mt-n2">
-          <div class="col-12 actions-wrap">
-            <button mat-raised-button color="primary" (click)="update()"
-                    [disabled]="!isChanged() || isDisabled(oasDoc)">
-              Update
-            </button>
-            <button mat-raised-button color="warn" (click)="discard()">
-              Discard
-            </button>
-          </div>
+      <div class="action-group float-right mt-n2">
+        <div class="col-12 actions-wrap">
+          <button mat-raised-button color="primary" (click)="update()"
+                  [disabled]="!isChanged() || isDisabled(oasDoc)">
+            Update
+          </button>
+          <button mat-raised-button color="warn" (click)="discard()">
+            Discard
+          </button>
         </div>
-      </mat-card-header>
+      </div>
+    </mat-card-header>
     <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <div class="row">
@@ -50,7 +50,7 @@
           Remove
         </button>
         <button mat-raised-button color="primary" (click)="generate()"
-            >
+        >
           Generate
         </button>
 
@@ -165,14 +165,18 @@
             <ng-container matColumnDef="resourceName">
               <th mat-header-cell *matHeaderCellDef> Resource Name</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.resourceName }}</div>
+                <mat-form-field class="ellipsis">
+                  <input matInput [(ngModel)]="element.resourceName" (ngModelChange)="updateResourceName($event)">
+                </mat-form-field>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="operationId">
               <th mat-header-cell *matHeaderCellDef> Operation Id</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.operationId }}</div>
+                <mat-form-field class="ellipsis">
+                  <input matInput [(ngModel)]="element.operationId" (ngModelChange)="updateOperationId($event)">
+                </mat-form-field>
               </td>
             </ng-container>
 
@@ -204,5 +208,4 @@
       </mat-card-content>
     </mat-card>
   </mat-card>
-  </div>
-
+</div>
