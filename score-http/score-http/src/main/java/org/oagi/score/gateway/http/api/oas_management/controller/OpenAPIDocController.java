@@ -201,7 +201,7 @@ public class OpenAPIDocController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public PageResponse<BieForOasDoc> getBieForOasDoc(
+    public PageResponse<BieForOasDoc> getBieListForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger oasDocId) {
 
@@ -218,6 +218,26 @@ public class OpenAPIDocController {
         pageResponse.setLength(bieForOasDocList.getLength());
 
         return pageResponse;
+    }
+
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/{topLevelAsbiepId:[\\d]+}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public BieForOasDoc getBieForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @PathVariable("oasDocId") BigInteger oasDocId,
+            @PathVariable("topLevelAsbiepId") BigInteger selectedTopLevelAsbiepId) {
+
+        BieForOasDoc bieForOasDoc = new BieForOasDoc();
+
+        GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
+
+        request.setOasDocId(oasDocId);
+
+        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
+
+        return  bieForOasDocList.getResults().stream()
+                .filter(c -> c.getTopLevelAsbiepId() == selectedTopLevelAsbiepId)
+                .findAny().get();
     }
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
