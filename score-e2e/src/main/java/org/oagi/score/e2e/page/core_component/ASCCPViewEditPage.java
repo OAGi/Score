@@ -264,6 +264,13 @@ public interface ASCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
+
     AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionField();
