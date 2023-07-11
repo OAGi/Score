@@ -41,8 +41,6 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
-    private static final By ALTERNATIVE_NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
@@ -198,11 +196,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void setNamespace(NamespaceObject namespace) {
-        try {
-            click(getNamespaceField());
-        } catch (ElementClickInterceptedException e) {
-            click(elementToBeClickable(getDriver(), ALTERNATIVE_NAMESPACE_FIELD_LOCATOR));
-        }
+        click(getNamespaceField());
         waitFor(ofMillis(1000L));
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
@@ -519,11 +513,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
         @Override
         public void setNamespace(String namespace) {
-            try {
-                click(getNamespaceSelectField());
-            } catch (ElementClickInterceptedException e) {
-                click(getAlternativeSelectFieldByName(baseXPath, "Namespace"));
-            }
+            click(getNamespaceSelectField());
             waitFor(ofMillis(1000L));
             WebElement option = elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
@@ -550,11 +540,6 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         private WebElement getSelectFieldByName(String baseXPath, String name) {
             return visibilityOfElementLocated(getDriver(), By.xpath(
                     baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
-        }
-
-        private WebElement getAlternativeSelectFieldByName(String baseXPath, String name) {
-            return visibilityOfElementLocated(getDriver(), By.xpath(
-                    baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]"));
         }
 
         private WebElement getInputFieldByName(String baseXPath, String name) {

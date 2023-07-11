@@ -23,16 +23,16 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditReleasePage {
 
     private static final By CREATOR_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By CREATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Created start date\")]");

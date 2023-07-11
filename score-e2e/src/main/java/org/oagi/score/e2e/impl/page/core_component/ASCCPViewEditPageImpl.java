@@ -544,11 +544,6 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
     }
 
-    private WebElement getAlternativeSelectFieldByName(String baseXPath, String name) {
-        return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]"));
-    }
-
     private WebElement getCheckboxByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
@@ -802,11 +797,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
         @Override
         public void setNamespace(String namespace) {
-            try {
-                click(getNamespaceSelectField());
-            } catch (ElementClickInterceptedException e) {
-                click(getAlternativeSelectFieldByName(baseXPath, "Namespace"));
-            }
+            click(getNamespaceSelectField());
             waitFor(ofMillis(1000L));
             WebElement option = elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));

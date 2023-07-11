@@ -1660,9 +1660,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
-            BIEMenu bieMenu = homePage.getBIEMenu();
-            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
             assertEquals("WIP", useraBIEWIP.getState());
             ASCCPObject asccp = bieASCCPMap.get(useraBIEWIP);
@@ -1773,6 +1773,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             } else {
                 assertDisabled(BBIEPPanel.getBusinessTermField());
             }
+
+            viewEditBIEPage.openPage();
         }
     }
 
