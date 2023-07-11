@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,18 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.oagi.score.e2e.page.module.CreateModuleSetReleasePage;
 import org.oagi.score.e2e.page.module.EditModuleSetReleasePage;
 import org.oagi.score.e2e.page.module.ModuleSetReleaseXMLSchemaValidationDialog;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetReleasePage;
-import org.oagi.score.e2e.page.release.CreateReleasePage;
-import org.oagi.score.e2e.page.release.EditReleasePage;
-import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
-import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
@@ -106,8 +99,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createModuleSetReleasePage.hitCreateButton();
         homePage.logout();
 
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
+        waitFor(ofMillis(500L));
         homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         editModuleSetReleasePage.setName("Release New Name");
@@ -135,8 +129,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         viewEditModuleSetReleasePage.openPage();
+
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         editModuleSetReleasePage.setName("Release New Name");
         editModuleSetReleasePage.setDescription("Release New Description");
@@ -175,8 +170,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createModuleSetReleasePage.hitCreateButton();
         homePage.logout();
 
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developer);
+        waitFor(ofMillis(500L));
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developer);
         viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         assertDisabled(editModuleSetReleasePage.getNameField());
@@ -210,8 +206,8 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         viewEditModuleSetReleasePage.openPage();
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         assertDoesNotThrow(() -> editModuleSetReleasePage.hitValidateButton());
     }
@@ -236,11 +232,11 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         viewEditModuleSetReleasePage.openPage();
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         ModuleSetReleaseXMLSchemaValidationDialog validateDialog = editModuleSetReleasePage.hitValidateButton();
-        waitFor(Duration.ofSeconds(15));
+        waitFor(Duration.ofSeconds(30));
         validateDialog.hitCopyToClipboardButton();
         assertTrue(getSnackBarMessage(getDriver()).equals("Copied to clipboard"));
     }
