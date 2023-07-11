@@ -4,10 +4,12 @@ import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
+import org.oagi.score.e2e.obj.LogObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.HistoryPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -42,6 +44,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By CHANGE_BDT_OPTION_LOCATOR =
             By.xpath("//button/span[contains(text(), \"Change BDT\")]");
+    private static final By SHOW_HISTORY_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Show History\")]");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
@@ -491,6 +495,29 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 }
             };
         });
+    }
+
+    @Override
+    public HistoryPage showHistory() {
+        String path = "/" + this.bccp.getPropertyTerm();
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        }
+        switchToNextTab(getDriver());
+
+        LogObject logObject = new LogObject();
+        logObject.setReference(this.bccp.getGuid());
+        logObject.setType("BCCP");
+        logObject.setManifestId(this.bccp.getBccpManifestId());
+
+        HistoryPage historyPage = new HistoryPageImpl(this, logObject);
+        assert historyPage.isOpened();
+        return historyPage;
     }
 
     @Override
