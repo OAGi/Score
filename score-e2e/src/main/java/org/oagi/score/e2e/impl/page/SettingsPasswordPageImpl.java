@@ -98,7 +98,7 @@ public class SettingsPasswordPageImpl extends BasePageImpl implements SettingsPa
         try {
             assert getSnackBar(getDriver(), "Updated").isDisplayed();
         } catch (TimeoutException e) {
-            String snackBarMessage = getSnackBarMessage(getDriver());
+            String snackBarMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
             throw new AccountUpdateException(snackBarMessage);
         }
         return loginIDMenuPage.getParent();

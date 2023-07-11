@@ -1,6 +1,8 @@
 package org.oagi.score.e2e.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oagi.score.e2e.impl.page.MultiActionSnackBarImpl;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -183,6 +185,10 @@ public abstract class PageHelper {
             element.sendKeys(Keys.SPACE);
         }
         return element;
+    }
+
+    public static MultiActionSnackBar getMultiActionSnackBar(WebDriver driver) {
+        return new MultiActionSnackBarImpl(driver);
     }
 
     /**
