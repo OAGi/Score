@@ -94,9 +94,11 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + branch + "\")]"));
+            click(searchedSelectField);
+            escape(getDriver());
         });
     }
 
@@ -107,12 +109,14 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            click(getOwnerSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+            click(searchedSelectField);
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -122,12 +126,14 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public void setUpdater(String updater) {
-        click(getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            click(getUpdaterSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
+            click(searchedSelectField);
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -193,7 +199,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public void hitSearchButton() {
-        click(getSearchButton());
+        retry(() -> click(getSearchButton()));
         invisibilityOfLoadingContainerElement(getDriver());
     }
 

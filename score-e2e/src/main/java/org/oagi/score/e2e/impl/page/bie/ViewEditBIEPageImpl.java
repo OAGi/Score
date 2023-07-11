@@ -57,7 +57,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//button[contains(@mattooltip, \"New BIE\")]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
+            By.xpath("//mat-icon[contains(text(), \"delete\")]//ancestor::button[1]");
 
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//button[contains(@mattooltip, \"Move to QA\")]");
@@ -96,12 +96,12 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public void setBranch(String branch) {
-        retry(() -> {
-            click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
-        });
+        click(getBranchSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[contains(text(), \"" + branch + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
     }
 
     @Override
@@ -253,7 +253,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public TransferBIEOwnershipDialog openTransferBIEOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
-        click(td.findElement(By.tagName("button")));
+        click(td.findElement(By.tagName("mat-icon")));
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
                 new TransferBIEOwnershipDialogImpl(this);
