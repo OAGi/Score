@@ -4,13 +4,17 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.ReleaseAPI;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.NAMESPACE;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.RELEASE;
 
 public class DSLContextReleaseAPIImpl implements ReleaseAPI {
@@ -62,6 +66,27 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
                 .where(RELEASE.CREATION_TIMESTAMP.lessThan(releaseNumber.getCreationTimestamp()))
                 .fetch(RELEASE.RELEASE_NUM);
         return earlierReleases;
+    }
+
+    @Override
+    public ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace) {
+        ReleaseObject release = ReleaseObject.createDraftRelease(creator, namespace);
+
+        ReleaseRecord releaseRecord = new ReleaseRecord();
+        releaseRecord.setGuid(release.getGuid());
+        releaseRecord.setReleaseNum(release.getReleaseNumber());
+        releaseRecord.setNamespaceId(ULong.valueOf(namespace.getNamespaceId()));
+        releaseRecord.setCreatedBy(ULong.valueOf(namespace.getCreatedBy()));
+        releaseRecord.setLastUpdatedBy(ULong.valueOf(namespace.getLastUpdatedBy()));
+        releaseRecord.setCreationTimestamp(namespace.getCreationTimestamp());
+        releaseRecord.setLastUpdateTimestamp(namespace.getLastUpdateTimestamp());
+        releaseRecord.setState(release.getState());
+        ULong releaseId = dslContext.insertInto(RELEASE)
+                .set(releaseRecord)
+                .returning(RELEASE.RELEASE_ID)
+                .fetchOne().getReleaseId();
+        release.setReleaseId(releaseId.toBigInteger());
+        return release;
     }
 
     private ReleaseObject mapper(ReleaseRecord releaseRecord) {

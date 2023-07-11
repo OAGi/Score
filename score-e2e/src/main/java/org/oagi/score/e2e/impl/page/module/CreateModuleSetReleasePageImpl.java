@@ -100,4 +100,18 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     public WebElement getCreateButton() {
         return elementToBeClickable(getDriver(), CREATE_BUTTON_LOCATOR);
     }
+
+    @Override
+    public void toggleDefault() {
+        click(getDefaultSelectField().findElement(By.tagName("label")));
+    }
+
+    @Override
+    public WebElement getDefaultSelectField() {
+        return getCheckboxByName("Default");
+    }
+    private WebElement getCheckboxByName(String name) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+    }
 }

@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.api;
 
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
@@ -36,4 +38,6 @@ public interface ReleaseAPI {
     ReleaseObject getTheLatestRelease();
 
     List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
+
+    ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace);
 }

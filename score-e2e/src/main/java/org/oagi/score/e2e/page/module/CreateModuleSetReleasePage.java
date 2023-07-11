@@ -23,4 +23,8 @@ public interface CreateModuleSetReleasePage extends Page {
     void hitCreateButton();
 
     WebElement getCreateButton();
+
+    void toggleDefault();
+
+    WebElement getDefaultSelectField();
 }
