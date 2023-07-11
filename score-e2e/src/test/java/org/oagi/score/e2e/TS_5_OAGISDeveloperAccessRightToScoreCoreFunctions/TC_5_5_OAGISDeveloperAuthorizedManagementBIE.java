@@ -150,7 +150,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         );
         BCCObject bccAbsenceTypeCode = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Code", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Open_ Code", nextRelease.getReleaseNumber()),
                 "Published"
         );
         ASCCObject asccFinancialAccountIdentifiersGroup = coreComponentAPI.appendASCC(
@@ -168,7 +168,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", nextRelease.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -387,7 +387,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 acc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", release.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", release.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -1114,9 +1114,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
             WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-            assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+            assertDisabled(td.findElement(By.tagName("input")));
 
-            assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+            assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
         }
     }
 
@@ -1147,9 +1147,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-        assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+        assertDisabled(td.findElement(By.tagName("input")));
 
-        assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+        assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
     }
 
     @Test
@@ -2473,7 +2473,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
                 viewEditBIEPage.openTransferBIEOwnershipDialog(tr);
@@ -2489,7 +2489,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         td = viewEditBIEPage.getColumnByName(tr, "businessContexts");
         assertEquals(randomBusinessContext.getName(), getText(td));
