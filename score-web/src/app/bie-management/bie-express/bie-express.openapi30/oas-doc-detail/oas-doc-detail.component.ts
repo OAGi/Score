@@ -303,8 +303,8 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
-
-  openDialog(bieForOasDoc?: BieForOasDoc) {
+  openDialog($event: any, bieForOasDoc?: BieForOasDoc) {
+    $event.stopPropagation();
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {};
