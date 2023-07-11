@@ -139,7 +139,7 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriByBdtScManifestIdAndDefaultIsTrueMap;
     private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriMap;
     private Map<BigInteger, CdtScAwdPriXpsTypeMap> findCdtScAwdPriXpsTypeMapMap;
-    private Map<BigInteger, Xbt> findXbtMap;
+    private Map<BigInteger, List<Xbt>> findXbtMap;
     private Map<BigInteger, CodeList> findCodeListMap;
     private Map<BigInteger, List<CodeListValue>> findCodeListValueByCodeListManifestIdMap;
     private Map<BigInteger, ACC> findACCMap;
@@ -195,9 +195,6 @@ public class GenerationContext implements InitializingBean {
         }
 
         Set<BigInteger> releaseIdSet = topLevelAsbieps.stream().map(e -> e.getReleaseId()).collect(Collectors.toSet());
-        if (releaseIdSet.size() != 1) {
-            throw new UnsupportedOperationException("`releaseId` for all `topLevelAsbieps` parameter must be same.");
-        }
 
         Set<TopLevelAsbiep> topLevelAsbiepSet = new HashSet();
         topLevelAsbiepSet.addAll(topLevelAsbieps);
@@ -206,7 +203,7 @@ public class GenerationContext implements InitializingBean {
         this.topLevelAsbiepMap = topLevelAsbiepSet.stream()
                 .collect(Collectors.toMap(TopLevelAsbiep::getTopLevelAsbiepId, Function.identity()));
 
-        init(topLevelAsbiepSet.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toList()), releaseIdSet.iterator().next());
+        init(topLevelAsbiepSet.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toList()), releaseIdSet);
     }
 
     private Set<TopLevelAsbiep> findRefTopLevelAsbieps(Set<TopLevelAsbiep> topLevelAsbiepSet) {
@@ -224,7 +221,11 @@ public class GenerationContext implements InitializingBean {
         return refTopLevelAsbiepSet;
     }
 
-    private void init(Collection<BigInteger> topLevelAsbiepIds, BigInteger releaseId) {
+    private void init(Collection<BigInteger> topLevelAsbiepIds, Collection<BigInteger> releaseIds) {
+        if (releaseIds == null || releaseIds.isEmpty()) {
+            throw new IllegalArgumentException("'releaseIds' parameter must not be null.");
+        }
+
         List<BdtPriRestri> bdtPriRestriList = bdtPriRestriRepository.findAll();
         findBdtPriRestriByBdtManifestIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
                 .filter(e -> e.isDefault())
@@ -249,10 +250,10 @@ public class GenerationContext implements InitializingBean {
 
         List<Xbt> xbtList = xbtRepository.findAll();
         findXbtMap = xbtList.stream()
-                .filter(e -> e.getReleaseId().equals(releaseId))
-                .collect(Collectors.toMap(e -> e.getXbtId(), Function.identity()));
+                .filter(e -> releaseIds.contains(e.getReleaseId()))
+                .collect(Collectors.groupingBy(e -> e.getXbtId()));
 
-        List<CodeList> codeLists = codeListRepository.findAllByReleaseId(releaseId);
+        List<CodeList> codeLists = codeListRepository.findAllByReleaseIds(releaseIds);
         findCodeListMap = codeLists.stream()
                 .collect(Collectors.toMap(e -> e.getCodeListManifestId(), Function.identity()));
 
@@ -260,41 +261,41 @@ public class GenerationContext implements InitializingBean {
         findCodeListValueByCodeListManifestIdMap = codeListValues.stream()
                 .collect(Collectors.groupingBy(e -> e.getCodeListManifestId()));
 
-        List<ACC> accList = accRepository.findAllByReleaseId(releaseId);
+        List<ACC> accList = accRepository.findAllByReleaseIds(releaseIds);
         findACCMap = accList.stream()
                 .collect(Collectors.toMap(e -> e.getAccManifestId(), Function.identity()));
 
-        List<BCC> bccList = bccRepository.findAllByReleaseId(releaseId);
+        List<BCC> bccList = bccRepository.findAllByReleaseIds(releaseIds);
         findBCCMap = bccList.stream()
                 .collect(Collectors.toMap(e -> e.getBccManifestId(), Function.identity()));
 
-        List<BCCP> bccpList = bccpRepository.findAllByReleaseId(releaseId);
+        List<BCCP> bccpList = bccpRepository.findAllByReleaseIds(releaseIds);
         findBCCPMap = bccpList.stream()
                 .collect(Collectors.toMap(e -> e.getBccpManifestId(), Function.identity()));
 
-        List<ASCC> asccList = asccRepository.findAllByReleaseId(releaseId);
+        List<ASCC> asccList = asccRepository.findAllByReleaseIds(releaseIds);
         findASCCMap = asccList.stream()
                 .collect(Collectors.toMap(e -> e.getAsccManifestId(), Function.identity()));
 
         findASCCByFromAccIdMap = asccList.stream().collect(Collectors.groupingBy(e -> e.getFromAccManifestId()));
         findBCCByFromAccIdMap = bccList.stream().collect(Collectors.groupingBy(e -> e.getFromAccManifestId()));
 
-        List<ASCCP> asccpList = asccpRepository.findAllByReleaseId(releaseId);
+        List<ASCCP> asccpList = asccpRepository.findAllByReleaseIds(releaseIds);
         findASCCPMap = asccpList.stream()
                 .collect(Collectors.toMap(e -> e.getAsccpManifestId(), Function.identity()));
 
         List<DT> dataTypeList = dataTypeRepository.findAll();
         findDTMap = dataTypeList.stream()
-                .filter(e -> e.getReleaseId().equals(releaseId))
+                .filter(e -> releaseIds.contains(e.getReleaseId()))
                 .collect(Collectors.toMap(e -> e.getDtManifestId(), Function.identity()));
 
-        List<DTSC> dtScList = dtScRepository.findAllByReleaseId(releaseId);
+        List<DTSC> dtScList = dtScRepository.findAllByReleaseIds(releaseIds);
         findDtScMap = dtScList.stream()
                 .collect(Collectors.toMap(e -> e.getDtScManifestId(), Function.identity()));
         findDtScByOwnerDtManifestIdMap = dtScList.stream()
                 .collect(Collectors.groupingBy(DTSC::getOwnerDtManifestId));
 
-        List<AgencyIdList> agencyIdLists = agencyIdListRepository.findAllByReleaseId(releaseId);
+        List<AgencyIdList> agencyIdLists = agencyIdListRepository.findAllByReleaseIds(releaseIds);
         findAgencyIdListMap = agencyIdLists.stream()
                 .collect(Collectors.toMap(e -> e.getAgencyIdListManifestId(), Function.identity()));
 
@@ -394,7 +395,13 @@ public class GenerationContext implements InitializingBean {
     }
 
     public Xbt findXbt(BigInteger xbtId) {
-        return (xbtId.longValue() > 0L) ? findXbtMap.get(xbtId) : null;
+        if (xbtId != null && xbtId.longValue() > 0L) {
+            List<Xbt> xbtList = findXbtMap.get(xbtId);
+            if (xbtList != null && !xbtList.isEmpty()) {
+                return xbtList.get(0);
+            }
+        }
+        return null;
     }
 
     public CodeList findCodeList(BigInteger codeListManifestId) {

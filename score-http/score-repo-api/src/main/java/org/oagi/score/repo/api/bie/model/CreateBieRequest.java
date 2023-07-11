@@ -4,6 +4,7 @@ import org.oagi.score.repo.api.base.Request;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,12 @@ public class CreateBieRequest extends Request {
     private List<WrappedBbie> bbieList;
 
     private List<WrappedBbieSc> bbieScList;
+
+    private BigInteger sourceTopLevelAsbiepId;
+
+    private String sourceAction;
+
+    private LocalDateTime sourceTimestamp;
 
     public CreateBieRequest(ScoreUser requester) {
         super(requester);
@@ -81,5 +88,29 @@ public class CreateBieRequest extends Request {
 
     public void setBbieScList(List<WrappedBbieSc> bbieScList) {
         this.bbieScList = bbieScList;
+    }
+
+    public BigInteger getSourceTopLevelAsbiepId() {
+        return sourceTopLevelAsbiepId;
+    }
+
+    public void setSourceTopLevelAsbiepId(BigInteger sourceTopLevelAsbiepId) {
+        this.sourceTopLevelAsbiepId = sourceTopLevelAsbiepId;
+    }
+
+    public String getSourceAction() {
+        return sourceAction;
+    }
+
+    public void setSourceAction(String sourceAction) {
+        this.sourceAction = sourceAction;
+    }
+
+    public LocalDateTime getSourceTimestamp() {
+        return sourceTimestamp;
+    }
+
+    public void setSourceTimestamp(LocalDateTime sourceTimestamp) {
+        this.sourceTimestamp = sourceTimestamp;
     }
 }

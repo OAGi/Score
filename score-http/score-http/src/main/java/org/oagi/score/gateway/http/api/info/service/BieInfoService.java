@@ -66,8 +66,8 @@ public class BieInfoService {
         pageRequest.setPageSize(5);
         request.setOwnerLoginIds(Arrays.asList(String.valueOf(requester.getLoginId())));
         request.setPageRequest(pageRequest);
-        if(releaseId != null) {
-            request.setReleaseId(releaseId);
+        if (releaseId != null) {
+            request.setReleaseIds(Arrays.asList(releaseId));
         }
 
         info.setMyRecentBIEs(bieService.getBieList(user, request).getList());

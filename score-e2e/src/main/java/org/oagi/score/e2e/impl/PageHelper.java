@@ -18,7 +18,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
 public abstract class PageHelper {
 
     private static final int DEFAULT_RETRY_COUNT = 2;
-    private static final long DEFAULT_SLEEP_TIMEOUT = 200;
+    private static final long DEFAULT_SLEEP_TIMEOUT = 500;
     private static final Duration DEFAULT_WAIT_DURATION = ofMillis(DEFAULT_SLEEP_TIMEOUT);
 
     private PageHelper() {
@@ -171,6 +171,16 @@ public abstract class PageHelper {
         if (element != null) {
             element.click();
             waitFor(DEFAULT_WAIT_DURATION);
+        }
+        return element;
+    }
+
+    public static WebElement checkElement(WebDriver driver, WebElement element) {
+        if (element != null) {
+            waitFor(ofMillis(500L));
+            Actions action = new Actions(driver);
+            action.moveToElement(element).perform();
+            element.sendKeys(Keys.SPACE);
         }
         return element;
     }

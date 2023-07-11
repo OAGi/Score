@@ -5,12 +5,17 @@ import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ASCC;
+import org.oagi.score.data.BCCP;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ASCCRepository implements ScoreRepository<ASCC> {
@@ -64,9 +69,16 @@ public class ASCCRepository implements ScoreRepository<ASCC> {
     }
 
     @Override
-    public List<ASCC> findAllByReleaseId(BigInteger releaseId) {
+    public List<ASCC> findAllByReleaseIds(Collection<BigInteger> releaseIds) {
+        if (releaseIds == null || releaseIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getSelectJoinStep()
-                .where(Tables.ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .where(
+                        (releaseIds.size() == 1) ?
+                                Tables.ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseIds.iterator().next())) :
+                                Tables.ASCC_MANIFEST.RELEASE_ID.in(releaseIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                )
                 .fetchInto(ASCC.class);
     }
 

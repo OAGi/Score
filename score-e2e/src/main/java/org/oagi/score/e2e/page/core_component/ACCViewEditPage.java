@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.WebElement;
@@ -438,6 +439,12 @@ public interface ACCViewEditPage extends Page {
      */
     WebElement getUpdateButton(boolean enabled);
 
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
 
     AddCommentDialog openCommentsDialog(String path);
 
@@ -630,6 +637,13 @@ public interface ACCViewEditPage extends Page {
         void setNamespace(String namespace);
 
         /**
+         * Set the 'Namespace' field with the given namespace object.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(NamespaceObject namespace);
+
+        /**
          * Return the UI element of the 'Definition Source' field.
          *
          * @return the UI element of the 'Definition Source' field
@@ -637,11 +651,25 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         * Set the 'Definition Source' field with the given text.
+         *
+         * @param definitionSource Definition Source
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * Set the 'Definition' field with the given text.
+         *
+         * @param definition Definition
+         */
+        void setDefinition(String definition);
 
     }
 
