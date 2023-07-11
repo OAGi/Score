@@ -3,9 +3,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
-import org.oagi.score.e2e.obj.ACCObject;
-import org.oagi.score.e2e.obj.ASCCPObject;
-import org.oagi.score.e2e.obj.BCCPObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.*;
@@ -108,6 +106,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
+
+    private static final By SHOW_HISTORY_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Show History\")]");
 
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
@@ -879,6 +880,29 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public HistoryPage showHistory() {
+        String path = "/" + this.acc.getDen();
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        }
+        switchToNextTab(getDriver());
+
+        LogObject logObject = new LogObject();
+        logObject.setReference(this.acc.getGuid());
+        logObject.setType("ACC");
+        logObject.setManifestId(this.acc.getAccManifestId());
+
+        HistoryPage historyPage = new HistoryPageImpl(this, logObject);
+        assert historyPage.isOpened();
+        return historyPage;
+    }
+
+    @Override
     public void moveToDraft() {
         click(getMoveToDraft(true));
         click(elementToBeClickable(getDriver(), By.xpath(
@@ -1010,13 +1034,28 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         }
 
         @Override
+        public void setNamespace(NamespaceObject namespace) {
+            setNamespace(namespace.getUri());
+        }
+
+        @Override
         public WebElement getDefinitionSourceField() {
             return getInputFieldByName(baseXPath, "Definition Source");
         }
 
         @Override
+        public void setDefinitionSource(String definitionSource) {
+            sendKeys(getDefinitionSourceField(), definitionSource);
+        }
+
+        @Override
         public WebElement getDefinitionField() {
             return getTextAreaFieldByName(baseXPath, "Definition");
+        }
+
+        @Override
+        public void setDefinition(String definition) {
+            sendKeys(getDefinitionField(), definition);
         }
     }
 

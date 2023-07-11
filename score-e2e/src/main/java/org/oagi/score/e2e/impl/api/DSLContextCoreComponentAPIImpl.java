@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -127,6 +127,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccp.setAsccpManifestId(record.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger());
         asccp.setReleaseId(record.get(ASCCP_MANIFEST.RELEASE_ID).toBigInteger());
         asccp.setAsccpId(record.get(ASCCP.ASCCP_ID).toBigInteger());
+        asccp.setGuid(record.get(ASCCP.GUID));
         asccp.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
         asccp.setDen(record.get(ASCCP.DEN));
         asccp.setDefinition(record.get(ASCCP.DEFINITION));
@@ -181,6 +182,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setBccpManifestId(record.get(BCCP_MANIFEST.BCCP_MANIFEST_ID).toBigInteger());
         bccp.setReleaseId(record.get(BCCP_MANIFEST.RELEASE_ID).toBigInteger());
         bccp.setBccpId(record.get(BCCP.BCCP_ID).toBigInteger());
+        bccp.setGuid(record.get(BCCP.GUID));
         bccp.setPropertyTerm(record.get(BCCP.PROPERTY_TERM));
         bccp.setRepresentationTerm(record.get(BCCP.REPRESENTATION_TERM));
         bccp.setDen(record.get(BCCP.DEN));
@@ -1552,8 +1554,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(REF_SPEC).on(CDT_SC_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
                 .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)).and(REF_SPEC.SPEC.eq("CCTS DT v3.1")))
                 .fetchMany();
-        for (Result<Record> r: result){
-            for (int i=0; i<r.size(); i++){
+        for (Result<Record> r : result) {
+            for (int i = 0; i < r.size(); i++) {
                 DTSCObject dtSC = dtSCMapper(r.get(i));
                 dtList.add(dtSC);
             }
@@ -1574,7 +1576,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                         RELEASE.RELEASE_NUM.eq(release), DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm), DT_SC.REPRESENTATION_TERM.eq(representationTerm),
                         DT_SC.PROPERTY_TERM.eq(propertyTerm)))
                 .fetchMany();
-        if (result.size()>1){
+        if (result.size() > 1) {
             return false;
         } else return true;
     }
@@ -1651,7 +1653,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .where(and(DT_SC.DT_SC_ID.eq(latestSCId)))
                 .fetchOne(record -> dtSCMapper(record));
     }
-
 
 
     private DTSCObject dtSCMapper(org.jooq.Record record) {
