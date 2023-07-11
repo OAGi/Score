@@ -1,9 +1,6 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -18,11 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_21_1_ManageModuleSet extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -66,7 +64,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
          */
         assertEquals("true", createModuleSetPage.getNameField().getAttribute("aria-required"));
         assertEquals("false", createModuleSetPage.getDescriptionField().getAttribute("aria-required"));
-        createModuleSetPage.setName("new module");
+        createModuleSetPage.setName("new module" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         /**
          * Test Assertion #21.1.2.a
@@ -90,13 +88,14 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
+        waitFor(ofMillis(500L));
 
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
         EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
-        editModuleSetPage.setName("Updated Module Set Name");
+        editModuleSetPage.setName("Updated Module Set Name" + randomAlphanumeric(5, 10));
         editModuleSetPage.setDescription("Updated Description");
         editModuleSetPage.hitUpdateButton();
     }
@@ -114,7 +113,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -127,7 +126,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
         assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
-        String moduleFileName = "New module file";
+        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
         createModuleFileDialog.setModuleFileVersionNumber("New version");
@@ -148,7 +147,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
         assertTrue(errorMessage.contains("Duplicate module name exist."));
         escape(getDriver());
-
+        editModuleSetPage.openPage();
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
         editModuleFileDialog.setModuleFileName("Changed module file name");
         editModuleFileDialog.setModuleFileVersionNumber("");
@@ -175,7 +174,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
         assertTrue(errorMessage.contains("Duplicate module name exist."));
         escape(getDriver());
-
+        editModuleSetPage.openPage();
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
         editModuleDirectoryDialog.setModuleDirectoryName("Directory A - changed");
         editModuleDirectoryDialog.updateModuleDirectory();
@@ -240,7 +239,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -255,7 +254,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         createModuleFileDialog.setModuleFileVersionNumber("New version");
         createModuleFileDialog.createModuleFile();
         waitFor(ofMillis(500L));
-
+        editModuleSetPage.openPage();
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
         /**
          * Test Assertion #21.1.5.b
@@ -272,7 +271,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
         waitFor(ofMillis(500L));
-
+        editModuleSetPage.openPage();
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
         click(editModuleDirectoryDialog.getDiscardModuleDirectoryButton());
 
@@ -300,7 +299,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -323,7 +322,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -331,7 +330,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test");
+        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
         createModuleSetReleasePage.setDescription("Description Test");
         createModuleSetReleasePage.setModuleSet(moduleSet.getName());
         createModuleSetReleasePage.setRelease(release.getReleaseNumber());
@@ -359,7 +358,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -389,7 +388,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set");
+        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
         createModuleSetPage.setDescription("Description");
         createModuleSetPage.hitCreateButton();
         waitFor(ofMillis(500L));
