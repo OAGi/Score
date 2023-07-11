@@ -1,10 +1,11 @@
 import {PageRequest} from '../../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode} from '../../../../common/utility';
+import {base64Decode, base64Encode, hashCode4String, md5} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
+import {ChangeListener} from '../../../domain/bie-flat-tree';
 
 export class OasDocListRequest {
   filters: {
@@ -270,9 +271,59 @@ export class BieForOasDoc {
   arrayIndicator: boolean;
   suppressRoot: boolean;
   messageBody: string[];
-  resourceName: string;
-  operationId: string;
+  private _resourceName: string;
+  private _operationId: string;
+  private $hashCode: number;
   tagName: string;
+  listeners: ChangeListener<BieForOasDoc>[] = [];
+  constructor(obj?: BieForOasDoc) {
+    this.oasDocId = obj && obj.oasDocId || 0;
+    this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
+    this.den = obj && obj.den || '';
+    this.propertyTerm = obj && obj.propertyTerm || '';
+    this.guid = obj && obj.guid || '';
+    this.bizCtxId = obj && obj.bizCtxId || 0;
+    this.bizCtxName = obj && obj.bizCtxName || '';
+    this.access = obj && obj.access || '';
+    this.releaseNum = obj && obj.releaseNum || '';
+    this.owner = obj && obj.owner || '';
+    this.version = obj && obj.version || '';
+    this.status = obj && obj.status || '';
+    this.state = obj && obj.state || '';
+    this.businessContexts = obj && obj.businessContexts || [];
+    this.lastUpdateUser = obj && obj.lastUpdateUser || '';
+    this.verbs = obj && obj.verbs || [];
+    this.arrayIndicator = obj && obj.arrayIndicator || false;
+    this.suppressRoot = obj && obj.suppressRoot || false;
+    this.messageBody = obj && obj.messageBody || [];
+    this.resourceName = obj && obj.resourceName || '';
+    this.operationId = obj && obj.operationId || '';
+    this.tagName = obj && obj.tagName || '';
+  }
+  get resourceName(): string {
+    return this._resourceName;
+  }
+  set resourceName(value: string) {
+    this._resourceName = value;
+    this.listeners.forEach(e => e.onChange(this, 'resourceName', value));
+  }
+  get operationId(): string {
+    return this._operationId;
+  }
+  set operationId(value: string) {
+    this._operationId = value;
+    this.listeners.forEach(e => e.onChange(this, 'operationId', value));
+  }
+  get hashCode(): number {
+    return ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
+      ((this.operationId) ? hashCode4String(this.operationId) : 0);
+  }
+  reset(): void {
+    this.$hashCode = this.hashCode;
+  }
+  get isChanged(): boolean {
+    return this.$hashCode !== this.hashCode;
+  }
 }
 export class AssignBieForOasDoc {
   isOasRequest: boolean;

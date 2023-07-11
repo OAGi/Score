@@ -42,7 +42,7 @@ export class OasDocDetailComponent implements OnInit {
   disabled: boolean;
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'businessContexts', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
+    'select', 'den', 'owner', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
@@ -54,7 +54,6 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
-
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -98,7 +97,7 @@ export class OasDocDetailComponent implements OnInit {
 
     forkJoin(
       this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieForOasDoc(oasDocId)
+      this.openAPIService.getBieListForOasDoc(oasDocId)
     )
       .subscribe(([simpleOasDoc, bieForOasDoc]) => {
         this.oasDoc = simpleOasDoc;
@@ -148,6 +147,8 @@ export class OasDocDetailComponent implements OnInit {
 
   isChanged() {
     return this.hashCode !== hashCode(this.oasDoc);
+  }
+  isDataSourceChanged(){
   }
 
   isDisabled(oasDoc1: OasDoc) {
@@ -434,11 +435,11 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
-  updateResourceName(newResourceName: string){
+  updateResourceName(changedResourceName: string){
+    console.log('Resource name is changed' + this.dataSource.data.map(e => e.resourceName));
   }
 
-  updateOperationId(newOperationId: string){
-
-
+  updateOperationId(changedOperationId: string){
+    console.log('OperationId is changed' + this.dataSource.data.map(e => e.operationId));
   }
 }
