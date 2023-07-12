@@ -17,6 +17,7 @@ import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
@@ -187,7 +188,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_6a")
-    public void test_TA_6() {
+    public void test_TA_6a() {
         AppUserObject developer;
         NamespaceObject namespace;
         CodeListObject codeListCandidate;
@@ -257,6 +258,46 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         coreComponentAssignmentPage.openPage();
         assertThrows(WebDriverException.class, () -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
+    }
+
+    @Test
+    @DisplayName("TC_21_2_TA_6b")
+    public void test_TA_6b() {
+        AppUserObject developer;
+        NamespaceObject namespace;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+
+        ReleaseObject newRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
+        createModuleSetReleasePage.setDescription("Description Test");
+        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
+
+        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
+
+        createModuleSetReleasePage.setRelease(newRelease.getReleaseNumber());
+        createModuleSetReleasePage.hitCreateButton();
+        waitFor(ofMillis(500L));
+
+        viewEditReleasePage.openPage();
+        viewEditReleasePage.hitDiscardButton(newRelease.getReleaseNumber());
+        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
+        assertTrue(errorMessage.contains("It cannot be discarded because there are dependent module set releases."));
     }
 
     @Test
