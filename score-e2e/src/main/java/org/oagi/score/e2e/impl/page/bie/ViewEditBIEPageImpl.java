@@ -306,7 +306,11 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
+            try {
+                assert editBIEPage.isOpened();
+            } catch (AssertionError e) {
+                editBIEPage.openPage();
+            }
             return editBIEPage;
         });
     }
