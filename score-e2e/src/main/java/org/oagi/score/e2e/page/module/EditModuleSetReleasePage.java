@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.module;
 
+import org.oagi.score.e2e.obj.ModuleSetReleaseObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -24,5 +25,9 @@ public interface EditModuleSetReleasePage extends Page {
 
     WebElement getValidateButton();
 
+    WebElement getAssignCCsbutton();
+
     ModuleSetReleaseXMLSchemaValidationDialog hitValidateButton();
+
+    CoreComponentAssignmentPage hitAssignCCsButton(ModuleSetReleaseObject moduleSetRelease);
 }

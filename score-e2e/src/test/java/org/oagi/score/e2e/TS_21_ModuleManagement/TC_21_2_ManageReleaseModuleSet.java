@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +10,15 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.module.CreateModuleSetReleasePage;
-import org.oagi.score.e2e.page.module.EditModuleSetReleasePage;
-import org.oagi.score.e2e.page.module.ModuleSetReleaseXMLSchemaValidationDialog;
-import org.oagi.score.e2e.page.module.ViewEditModuleSetReleasePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.oagi.score.e2e.page.module.*;
+import org.oagi.score.e2e.page.release.CreateReleasePage;
+import org.oagi.score.e2e.page.release.EditReleasePage;
+import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
+import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.time.Duration;
@@ -181,9 +186,77 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_21_2_TA_6")
+    @DisplayName("TC_21_2_TA_6a")
     public void test_TA_6() {
+        AppUserObject developer;
+        NamespaceObject namespace;
+        CodeListObject codeListCandidate;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            codeListCandidate = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developer, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
+        }
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
+        editCodeListPage.hitRevise();
+        editCodeListPage.setVersion("99");
+        editCodeListPage.setDefinition("random code list in candidate state");
+        editCodeListPage.hitUpdateButton();
+        editCodeListPage.moveToDraft();
+        editCodeListPage.moveToCandidate();
 
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
+
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
+        createModuleSetReleasePage.setDescription("Description Test");
+        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
+
+        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
+
+        createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
+        createModuleSetReleasePage.hitCreateButton();
+        waitFor(ofMillis(500L));
+        viewEditModuleSetReleasePage.openPage();
+        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developer);
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(latestModuleSetRelease);
+        assertDoesNotThrow(() -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
+        coreComponentAssignmentPage.hitAssignButton();
+
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Draft");
+        editReleasePage.backToInitialized();
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Initialized"));
+        viewEditModuleSetReleasePage.openPage();
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        coreComponentAssignmentPage.openPage();
+        assertThrows(WebDriverException.class, () -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
     }
 
     @Test

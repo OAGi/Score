@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.module;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ModuleSetReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.module.CoreComponentAssignmentPage;
 import org.oagi.score.e2e.page.module.EditModuleSetReleasePage;
 import org.oagi.score.e2e.page.module.ModuleSetReleaseXMLSchemaValidationDialog;
 import org.openqa.selenium.By;
@@ -31,6 +32,8 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
             By.xpath("//span[contains(text(), \"Export\")]//ancestor::button[1]");
     private static final By VALIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Validate\")]//ancestor::button[1]");
+    private static final By ASSIGN_CC_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Assign CCs\")]//ancestor::button[1]");
 
     private ModuleSetReleaseObject moduleSetRelease;
 
@@ -117,11 +120,25 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
     }
 
     @Override
+    public WebElement getAssignCCsbutton() {
+        return elementToBeClickable(getDriver(), ASSIGN_CC_BUTTON_LOCATOR);
+    }
+
+    @Override
     public ModuleSetReleaseXMLSchemaValidationDialog hitValidateButton() {
         click(getValidateButton());
         ModuleSetReleaseXMLSchemaValidationDialog validateDialog = new ModuleSetReleaseXMLSchemaValidationDialogImpl(this);
         assert validateDialog.isOpened();
         return  validateDialog;
+    }
+
+
+    @Override
+    public CoreComponentAssignmentPage hitAssignCCsButton(ModuleSetReleaseObject moduleSetRelease) {
+        click(getAssignCCsbutton());
+        CoreComponentAssignmentPage coreComponentAssignmentPage = new CoreComponentAssignmentPageImpl(this, moduleSetRelease);
+        assert coreComponentAssignmentPage.isOpened();
+        return coreComponentAssignmentPage;
     }
 
     private File waitForDownloadFile(Duration duration) throws IOException, InterruptedException {
