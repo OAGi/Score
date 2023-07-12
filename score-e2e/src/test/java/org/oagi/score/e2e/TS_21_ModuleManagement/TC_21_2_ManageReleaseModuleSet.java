@@ -187,8 +187,8 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_21_2_TA_6a")
-    public void test_TA_6a() {
+    @DisplayName("TC_21_2_TA_6a_and_6c")
+    public void test_TA_6a_and_6c() {
         AppUserObject developer;
         NamespaceObject namespace;
         CodeListObject codeListCandidate;
@@ -229,14 +229,15 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         } while (!newDraftRelease.getState().equals("Draft"));
 
+        /**
+         * Test Assertion #21.2.6
+         */
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
         createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
         createModuleSetReleasePage.setDescription("Description Test");
         List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-
         createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -245,8 +246,12 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(latestModuleSetRelease);
         assertDoesNotThrow(() -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
+        releaseAssignmentPage.hitAssignAllButton();
         coreComponentAssignmentPage.hitAssignButton();
 
+        /**
+         * Test Assertion #21.2.6.a
+         */
         viewEditReleasePage.openPage();
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Draft");
@@ -258,6 +263,21 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         coreComponentAssignmentPage.openPage();
         assertThrows(WebDriverException.class, () -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
+
+        /**
+         * Test Assertion #21.2.6.c
+         */
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        editReleasePage.hitCreateDraftButton();
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
+        viewEditModuleSetReleasePage.openPage();
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        coreComponentAssignmentPage.openPage();
+        assertDoesNotThrow(() -> coreComponentAssignmentPage.selectCCByDEN(codeListCandidate.getName()));
     }
 
     @Test
