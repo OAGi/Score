@@ -171,7 +171,17 @@ public abstract class PageHelper {
 
     public static WebElement click(WebElement element) {
         if (element != null) {
-            element.click();
+            String tagName = element.getTagName();
+            try {
+                element.click();
+            } catch (ElementClickInterceptedException e) {
+                if ("mat-select".equals(tagName)) {
+                    WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-select-arrow-wrapper"));
+                    click(arrowWrapper);
+                } else {
+                    throw e;
+                }
+            }
             waitFor(DEFAULT_WAIT_DURATION);
         }
         return element;

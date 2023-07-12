@@ -21,7 +21,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIEForSelectBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -42,7 +42,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
             By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-form-field//input");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
