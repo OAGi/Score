@@ -6,7 +6,6 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 
 public class UpdateBieForOasDocRequest extends Request {
-    private BigInteger bieForOasDocId;
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
     private BigInteger bizCtxId;
@@ -25,20 +24,6 @@ public class UpdateBieForOasDocRequest extends Request {
     public UpdateBieForOasDocRequest(ScoreUser requester) {
         super(requester);
     }
-
-    public UpdateBieForOasDocRequest withBieForOasDocId(BigInteger bieForOasDocId) {
-        this.setBieForOasDocId(bieForOasDocId);
-        return this;
-    }
-
-    public BigInteger getBieForOasDocId() {
-        return bieForOasDocId;
-    }
-
-    public void setBieForOasDocId(BigInteger bieForOasDocId) {
-        this.bieForOasDocId = bieForOasDocId;
-    }
-
     public BigInteger getTopLevelAsbiepId() {
         return topLevelAsbiepId;
     }
@@ -154,7 +139,6 @@ public class UpdateBieForOasDocRequest extends Request {
     @Override
     public String toString() {
         return "UpdateBieForOasDocRequest{" +
-                "bieForOasDocId=" + bieForOasDocId +
                 ", topLevelAsbiepId=" + topLevelAsbiepId +
                 ", oasDocId=" + oasDocId +
                 ", bizCtxId=" + bizCtxId +
