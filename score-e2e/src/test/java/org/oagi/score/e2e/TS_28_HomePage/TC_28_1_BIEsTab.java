@@ -78,6 +78,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.TotalBIEsByStatesPanel totalBIEsByStatesPanel = homePage.openTotalBIEsByStatesPanel();
@@ -91,6 +92,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForQA = totalBIEsByStatesPanel.clickStateProgressBar("QA");
         viewEditBIEPageForQA.setOwner(developer.getLoginId());
         viewEditBIEPageForQA.hitSearchButton();
@@ -100,6 +102,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForProduction = totalBIEsByStatesPanel.clickStateProgressBar("Production");
         viewEditBIEPageForProduction.setOwner(developer.getLoginId());
         viewEditBIEPageForProduction.hitSearchButton();
@@ -120,6 +123,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.MyBIEsByStatesPanel myBIEsByStatesPanel = homePage.openMyBIEsByStatesPanel();
@@ -147,31 +151,28 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.MyBIEsByStatesPanel myBIEsByStatesPanel = homePage.openMyBIEsByStatesPanel();
 
         ViewEditBIEPage viewEditBIEPageForWIP = myBIEsByStatesPanel.clickStateProgressBar("WIP");
-        viewEditBIEPageForWIP.setOwner(developer.getLoginId());
-        viewEditBIEPageForWIP.hitSearchButton();
 
         assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForQA = myBIEsByStatesPanel.clickStateProgressBar("QA");
-        viewEditBIEPageForQA.setOwner(developer.getLoginId());
-        viewEditBIEPageForQA.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForProduction = myBIEsByStatesPanel.clickStateProgressBar("Production");
-        viewEditBIEPageForProduction.setOwner(developer.getLoginId());
-        viewEditBIEPageForProduction.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
@@ -202,8 +203,30 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
         developer.setPassword("oagis");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-
         HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
+
+        homePage.setBranch("All");
+        for (AppUserObject appUser : developers) {
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(appUser.getLoginId());
+            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
+            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
+            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+
+            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfWIPBIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
+            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfQABIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
+            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfProductionBIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
+            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfWIPBIEs +
+                    containersFor10_8_3.get(appUser.getLoginId()).numberOfQABIEs +
+                    containersFor10_8_3.get(appUser.getLoginId()).numberOfProductionBIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfWIPBIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfQABIEs +
+                    containersFor10_8_4.get(appUser.getLoginId()).numberOfProductionBIEs <= Integer.valueOf(getText(td_Total)));
+        }
+
         homePage.setBranch("10.8.3");
         for (UserTopLevelASBIEPContainer container : containersFor10_8_3.values()) {
             biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
@@ -237,28 +260,6 @@ public class TC_28_1_BIEsTab extends BaseTest {
                     container.numberOfQABIEs +
                     container.numberOfProductionBIEs <=
                     Integer.valueOf(getText(td_Total)));
-        }
-
-        homePage.setBranch("All");
-        for (AppUserObject appUser : developers) {
-            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(appUser.getLoginId());
-            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
-            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
-            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
-            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
-
-            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfWIPBIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
-            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfQABIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
-            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfProductionBIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
-            assertTrue(containersFor10_8_3.get(appUser.getLoginId()).numberOfWIPBIEs +
-                    containersFor10_8_3.get(appUser.getLoginId()).numberOfQABIEs +
-                    containersFor10_8_3.get(appUser.getLoginId()).numberOfProductionBIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfWIPBIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfQABIEs +
-                    containersFor10_8_4.get(appUser.getLoginId()).numberOfProductionBIEs <= Integer.valueOf(getText(td_Total)));
         }
     }
 
@@ -337,7 +338,6 @@ public class TC_28_1_BIEsTab extends BaseTest {
         homePage.setBranch(releaseNumber);
         for (AppUserObject devUser : developers) {
             UserTopLevelASBIEPContainer container = containersFor10_8_4.get(devUser.getLoginId());
-            click(homePage.getScoreLogo()); // to go to the home page again.
 
             WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
             WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
@@ -353,6 +353,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertEquals(0, viewEditBIEPageByUserAndWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
             ViewEditBIEPage viewEditBIEPageByUserAndQA = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "QA");
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
@@ -360,6 +361,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
             ViewEditBIEPage viewEditBIEPageByUserAndProduction = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "Production");
             assertEquals(0, viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
@@ -367,6 +369,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
             ViewEditBIEPage viewEditBIEPageByUserAndTotal = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "total");
             // The total number of randomly-generated BIEs could be more than the default size of items, 10.
@@ -375,6 +378,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
             assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("QA"));
             assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("Production"));
+
+            click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
         }
     }
 
@@ -452,6 +458,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
                 // to go to homepage
                 click(homePage.getScoreLogo());
+                click(homePage.getBIEsTab());
             }
 
             homePage.logout();
