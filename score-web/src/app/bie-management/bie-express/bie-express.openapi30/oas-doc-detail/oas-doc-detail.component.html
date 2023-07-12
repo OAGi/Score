@@ -54,6 +54,13 @@
           Generate
         </button>
 
+        <button mat-raised-button color="primary" (click)="updateDetails()"
+                matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
+                [matBadgeHidden]="sizeOfChanges === 0"
+                [disabled]="updateDisabled">
+          Update
+        </button>
+
       </div>
     </mat-card-header>
 

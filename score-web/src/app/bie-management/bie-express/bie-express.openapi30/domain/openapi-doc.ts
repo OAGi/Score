@@ -5,7 +5,7 @@ import {base64Decode, base64Encode, hashCode4String, md5} from '../../../../comm
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
-import {ChangeListener} from '../../../domain/bie-flat-tree';
+import {BbieScDetail, ChangeListener} from '../../../domain/bie-flat-tree';
 
 export class OasDocListRequest {
   filters: {
@@ -267,12 +267,16 @@ export class BieForOasDoc {
   businessContexts: BusinessContext[];
   lastUpdateTimestamp: Date;
   lastUpdateUser: string;
-  verbs: string[];
+  private _verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
   messageBody: string[];
   private _resourceName: string;
   private _operationId: string;
+  private _verb: string;
+  private _arrayIndicator: boolean;
+  private _suppressRoot: boolean;
+  private _messageBody: string;
   private $hashCode: number;
   tagName: string;
   listeners: ChangeListener<BieForOasDoc>[] = [];
@@ -292,7 +296,7 @@ export class BieForOasDoc {
     this.state = obj && obj.state || '';
     this.businessContexts = obj && obj.businessContexts || [];
     this.lastUpdateUser = obj && obj.lastUpdateUser || '';
-    this.verbs = obj && obj.verbs || [];
+    this._verbs = obj && obj._verbs || [];
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRoot = obj && obj.suppressRoot || false;
     this.messageBody = obj && obj.messageBody || [];
@@ -314,6 +318,13 @@ export class BieForOasDoc {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
+  get verbs(): string[] {
+    return this._verbs;
+  }
+  set verbs(value: string[]) {
+    this._verbs = value;
+  }
+
   get hashCode(): number {
     return ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
       ((this.operationId) ? hashCode4String(this.operationId) : 0);
@@ -334,4 +345,13 @@ export class AssignBieForOasDoc {
   arrayIndicator: boolean;
   suppressRoot: boolean;
   messageBody: string;
+}
+export class BieForOasDocUpdateRequest {
+  bieForOasDocList: BieForOasDoc[];
+  constructor() {
+    this.bieForOasDocList = [];
+  }
+  get length(): number {
+    return this.bieForOasDocList.length;
+  }
 }

@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BieForOasDoc, BieForOasDocListRequest, OasDoc, simpleOasDoc} from '../domain/openapi-doc';
+import {BieForOasDoc, BieForOasDocListRequest, BieForOasDocUpdateRequest, OasDoc, simpleOasDoc} from '../domain/openapi-doc';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
@@ -24,6 +24,14 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {
+  BieEditAbieNodeDetail,
+  BieEditAsbiepNodeDetail,
+  BieEditBbiepNodeDetail,
+  BieEditBbieScNodeDetail,
+  BieFlatNode
+} from '../../../domain/bie-flat-tree';
+import {BieDetailUpdateRequest, BieDetailUpdateResponse} from '../../../bie-edit/domain/bie-edit-node';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -149,14 +157,8 @@ export class OasDocDetailComponent implements OnInit {
     if (!this.dataSource) {
       return [];
     }
-    const changed = [];
-    this.dataSource.data.forEach((elm: BieForOasDoc) => {
-      if (elm.isChanged){
-        changed.push(elm);
-      }
-    });
+    return this.dataSource.data.filter(e => e.isChanged);
   }
-
   isChanged() {
     return this.hashCode !== hashCode(this.oasDoc);
   }
@@ -451,4 +453,38 @@ export class OasDocDetailComponent implements OnInit {
   updateOperationId(changedOperationId: string){
     console.log('OperationId is changed' + this.dataSource.data.map(e => e.operationId));
   }
+
+  get sizeOfChanges(): number {
+    return this.getChanged().length;
+  }
+  get updateDisabled(): boolean {
+    return this.isUpdating || !this.isChanged;
+  }
+  updateDetails(callbackFn?) {
+    if (this.updateDisabled) {
+      if (callbackFn === undefined) {
+        return;
+      } else {
+        return callbackFn && callbackFn();
+      }
+    }
+    const request = new BieForOasDocUpdateRequest();
+    const nodes = this.getChanged();
+    request.bieForOasDocList = nodes;
+    this.loading = true;
+    this.isUpdating = true;
+    this.openAPIService.updateDetails(this.oasDoc.oasDocId, request).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe((resp: BieForOasDoc) => {
+      this.loadBieListForOasDoc(true);
+      });
+    if (callbackFn === undefined) {
+        this.snackBar.open('Updated', '', {
+          duration: 3000,
+        });
+      } else {
+        return callbackFn && callbackFn();
+      }
+    }
 }

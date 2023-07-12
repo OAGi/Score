@@ -1,10 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc, OasDocListRequest} from './openapi-doc';
+import {
+  AssignBieForOasDoc,
+  BieForOasDoc,
+  BieForOasDocListRequest,
+  BieForOasDocUpdateRequest,
+  OasDoc,
+  OasDocListRequest
+} from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
 import {BieExpressOption} from '../../domain/generate-expression';
 import {base64Encode} from '../../../../common/utility';
+import {BieDetailUpdateRequest, BieDetailUpdateResponse} from '../../../bie-edit/domain/bie-edit-node';
 
 @Injectable()
 export class OpenAPIService {
@@ -38,9 +46,11 @@ export class OpenAPIService {
   getBieForOasDoc(oasDocId: number, topLevelAsbiepId: number): Observable<BieForOasDoc> {
     return this.http.get<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepId);
   }
-
-  updateBieForOasDoc(oasDocId: number, topLevelAsbiepId: number): Observable<BieForOasDoc> {
-    return this.http.get<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepId);
+  updateBieForOasDoc(oasDocId: number, topLevelAsbiepId: number, request: BieForOasDocUpdateRequest): Observable<BieForOasDoc> {
+    return this.http.put<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepId, request);
+  }
+  updateDetails(oasDocId: number, request: BieForOasDocUpdateRequest): Observable<BieForOasDoc> {
+    return this.http.put<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/detail',  request);
   }
   delete(...oasDocIds): Observable<any> {
     if (oasDocIds.length === 1) {
