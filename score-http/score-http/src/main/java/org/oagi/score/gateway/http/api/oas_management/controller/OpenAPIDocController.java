@@ -269,12 +269,22 @@ public class OpenAPIDocController {
     }
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieForOasDocUpdateResponse updateBieForOasDoc(
+    public ResponseEntity updateBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody BieForOasDocUpdateRequest request) {
 
-        BieForOasDocUpdateResponse response = oasDocService.updateDetails(requester, request);
-        return response;
+        UpdateBieForOasDocRequest updateBieForOasDocRequest = new UpdateBieForOasDocRequest(authenticationService.asScoreUser(requester));
+
+        updateBieForOasDocRequest.setBieForOasDocList(request.getBieForOasDoclist());
+
+
+        UpdateBieForOasDocResponse response = oasDocService.updateDetails(requester, updateBieForOasDocRequest);
+
+        if (response.getOasDocId() != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}", method = RequestMethod.GET,

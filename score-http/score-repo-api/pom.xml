@@ -30,6 +30,12 @@
             <version>6.1.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.oagi</groupId>
+            <artifactId>score-http</artifactId>
+            <version>3.1.0-alpha</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,6 +1,8 @@
 package org.oagi.score.repo.api.impl.jooq.openapidoc;
 
 import org.jooq.DSLContext;
+import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
+import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateResponse;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;

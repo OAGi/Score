@@ -3,8 +3,6 @@ package org.oagi.score.gateway.http.api.oas_management.service;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
-import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUpdateDetailRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUpdateDetailResponse;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateResponse;
@@ -16,13 +14,8 @@ import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businessterm.model.UpdateBusinessTermResponse;
 import org.oagi.score.repo.api.openapidoc.model.*;
-import org.oagi.score.repo.component.abie.UpsertAbieRequest;
-import org.oagi.score.repo.component.asbie.UpsertAsbieRequest;
-import org.oagi.score.repo.component.asbiep.UpsertAsbiepRequest;
-import org.oagi.score.repo.component.bbie.UpsertBbieRequest;
-import org.oagi.score.repo.component.bbie_sc.UpsertBbieScRequest;
-import org.oagi.score.repo.component.bbiep.UpsertBbiepRequest;
 import org.oagi.score.repo.component.top_level_asbiep.UpdateTopLevelAsbiepRequest;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
@@ -41,8 +34,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -267,16 +258,11 @@ public class OpenAPIDocService {
         return oasDocRepository.checkOasDocTitleUniqueness(oasDoc);
     }
     @Transactional
-    public BieForOasDocUpdateResponse updateDetails(AuthenticatedPrincipal user, BieForOasDocUpdateRequest request) {
+    public UpdateBieForOasDocResponse updateDetails(AuthenticatedPrincipal user, UpdateBieForOasDocRequest request) {
 
-        LocalDateTime timestamp = LocalDateTime.now();
-
-
-        String status = request.getTopLevelAsbiepDetail().getStatus();
-        String version = request.getTopLevelAsbiepDetail().getVersion();
-        Boolean inverseMode = request.getTopLevelAsbiepDetail().getInverseMode();
-        UpdateTopLevelAsbiepRequest topLevelAsbiepRequest = new UpdateTopLevelAsbiepRequest(user, timestamp,
-                request.getTopLevelAsbiepId(), status, version, inverseMode);
-        topLevelAsbiepWriteRepository.updateTopLevelAsbiep(topLevelAsbiepRequest);
+        UpdateBieForOasDocResponse response =
+                scoreRepositoryFactory.createBieForOasDocWriteRepository()
+                        .updateBieForOasDoc(request);
         return response;
+    }
 }
