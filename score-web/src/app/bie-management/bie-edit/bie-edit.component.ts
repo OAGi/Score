@@ -74,13 +74,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   innerY: number = window.innerHeight;
   dataSource: BieFlatNodeDataSource<BieFlatNode>;
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
-
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
   isUpdating = false;
   _versionChanged: boolean;
   _changedVersionValue: string;
-
   /* Begin business context management */
   businessContextCtrl: FormControl;
   businessContexts: BusinessContext[] = [];
