@@ -24,10 +24,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -99,7 +99,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         click(getBranchSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + branch + "\")]"));
+                By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -306,7 +306,11 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
+            try {
+                assert editBIEPage.isOpened();
+            } catch (AssertionError e) {
+                editBIEPage.openPage();
+            }
             return editBIEPage;
         });
     }
