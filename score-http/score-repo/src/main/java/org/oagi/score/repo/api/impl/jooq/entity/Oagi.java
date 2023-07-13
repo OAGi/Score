@@ -87,6 +87,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDoc;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocBizCtx;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocMessageBody;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDocTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasExample;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasExternalDoc;
@@ -95,6 +97,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.OasHttpHeader;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMediaType;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMessageBody;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasOperation;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasOperationTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasParameter;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasParameterLink;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.OasRequest;
@@ -641,6 +644,16 @@ public class Oagi extends SchemaImpl {
     public final OasDoc OAS_DOC = OasDoc.OAS_DOC;
 
     /**
+     * The table <code>oagi.oas_doc_biz_ctx</code>.
+     */
+    public final OasDocBizCtx OAS_DOC_BIZ_CTX = OasDocBizCtx.OAS_DOC_BIZ_CTX;
+
+    /**
+     * The table <code>oagi.oas_doc_message_body</code>.
+     */
+    public final OasDocMessageBody OAS_DOC_MESSAGE_BODY = OasDocMessageBody.OAS_DOC_MESSAGE_BODY;
+
+    /**
      * The table <code>oagi.oas_doc_tag</code>.
      */
     public final OasDocTag OAS_DOC_TAG = OasDocTag.OAS_DOC_TAG;
@@ -679,6 +692,11 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.oas_operation</code>.
      */
     public final OasOperation OAS_OPERATION = OasOperation.OAS_OPERATION;
+
+    /**
+     * The table <code>oagi.oas_operation_tag</code>.
+     */
+    public final OasOperationTag OAS_OPERATION_TAG = OasOperationTag.OAS_OPERATION_TAG;
 
     /**
      * The table <code>oagi.oas_parameter</code>.
@@ -909,6 +927,8 @@ public class Oagi extends SchemaImpl {
             ModuleXbtManifest.MODULE_XBT_MANIFEST,
             Namespace.NAMESPACE,
             OasDoc.OAS_DOC,
+            OasDocBizCtx.OAS_DOC_BIZ_CTX,
+            OasDocMessageBody.OAS_DOC_MESSAGE_BODY,
             OasDocTag.OAS_DOC_TAG,
             OasExample.OAS_EXAMPLE,
             OasExternalDoc.OAS_EXTERNAL_DOC,
@@ -917,6 +937,7 @@ public class Oagi extends SchemaImpl {
             OasMediaType.OAS_MEDIA_TYPE,
             OasMessageBody.OAS_MESSAGE_BODY,
             OasOperation.OAS_OPERATION,
+            OasOperationTag.OAS_OPERATION_TAG,
             OasParameter.OAS_PARAMETER,
             OasParameterLink.OAS_PARAMETER_LINK,
             OasRequest.OAS_REQUEST,

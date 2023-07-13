@@ -63,7 +63,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
      * The column <code>oagi.oas_resource.oas_doc_id</code>. A reference of the
      * doc record.
      */
-    public final TableField<OasResourceRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the doc record.");
+    public final TableField<OasResourceRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the doc record.");
 
     /**
      * The column <code>oagi.oas_resource.path</code>. This will hold the BIE
