@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
-import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateResponse;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
@@ -237,10 +236,11 @@ public class OpenAPIDocController {
 
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
 
-        return  bieForOasDocList.getResults().stream()
+        return bieForOasDocList.getResults().stream()
                 .filter(c -> c.getTopLevelAsbiepId() == selectedTopLevelAsbiepId)
                 .findAny().get();
     }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AddBieForOasDocResponse addBieForOasDoc(
@@ -267,6 +267,7 @@ public class OpenAPIDocController {
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
         return response;
     }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateBieForOasDoc(
