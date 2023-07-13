@@ -133,6 +133,7 @@ export class OasDocDetailComponent implements OnInit {
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
+        elm = new BieForOasDoc(elm);
         elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
       });
 
@@ -152,8 +153,8 @@ export class OasDocDetailComponent implements OnInit {
     return this.dataSource.data.filter(e => e.isChanged);
   }
 
-  isChanged() {
-    return this.hashCode !== hashCode(this.oasDoc);
+  isChanged(): boolean {
+    return this.getChanged().length > 0;
   }
 
   isDisabled(oasDoc1: OasDoc) {
@@ -452,7 +453,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   get updateDisabled(): boolean {
-    return this.isUpdating || !this.isChanged;
+    return !this.isChanged;
   }
 
   updateDetails(callbackFn?) {
