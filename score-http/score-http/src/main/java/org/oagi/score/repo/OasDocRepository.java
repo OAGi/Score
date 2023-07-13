@@ -1126,8 +1126,6 @@ public class OasDocRepository {
                 .set(OAS_REQUEST.DESCRIPTION, arguments.getDescription())
                 .set(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR, (byte) (arguments.isSuppressRootIndicator() ? 1 : 0))
                 .set(OAS_REQUEST.MAKE_ARRAY_INDICATOR, (byte) (arguments.makeArrayIndicator ? 1 : 0) )
-                .set(OAS_REQUEST.INCLUDE_META_HEADER_INDICATOR,(byte) (arguments.includeMetaHeaderIndicator ? 1 : 0))
-                .set(OAS_REQUEST.INCLUDE_PAGINATION_INDICATOR,(byte) (arguments.includePaginationIndicator ? 1 : 0))
                 .set(OAS_REQUEST.IS_CALLBACK, (byte) 0)
                 .set(OAS_REQUEST.REQUIRED, (byte)(arguments.isRequired() ? 1 : 0))
                 .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
@@ -1272,8 +1270,6 @@ public class OasDocRepository {
                 .set(OAS_RESPONSE.DESCRIPTION, arguments.getDescription())
                 .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (arguments.isSuppressRootIndicator() ? 1 : 0))
                 .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (arguments.makeArrayIndicator ? 1 : 0) )
-                .set(OAS_RESPONSE.INCLUDE_META_HEADER_INDICATOR,(byte) (arguments.includeMetaHeaderIndicator ? 1 : 0))
-                .set(OAS_RESPONSE.INCLUDE_PAGINATION_INDICATOR,(byte) (arguments.includePaginationIndicator ? 1 : 0))
                 .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
                 .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                 .fetchOne().value1();
