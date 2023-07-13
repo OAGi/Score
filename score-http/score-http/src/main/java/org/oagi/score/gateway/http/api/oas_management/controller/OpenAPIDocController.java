@@ -1,13 +1,18 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
+import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -38,6 +43,12 @@ public class OpenAPIDocController {
     private AuthenticationService authenticationService;
     @Autowired
     private OpenAPIDocService oasDocService;
+    @Autowired
+    private BusinessContextService businessContextService;
+    @Autowired
+    private ApplicationConfigurationService applicationConfigurationService;
+    @Autowired
+    private SessionService sessionService;
 
     @RequestMapping(value = "/oas_docs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<OasDoc> getOasDocList(
@@ -212,6 +223,22 @@ public class OpenAPIDocController {
 
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
 
+        bieForOasDocList.getResults().forEach(bieList -> {
+
+                    GetBusinessContextListRequest getBusinessContextListRequest =
+                            new GetBusinessContextListRequest(authenticationService.asScoreUser(requester))
+                                    .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
+                                    .withName(request.getBusinessContext());
+
+                    getBusinessContextListRequest.setPageIndex(-1);
+                    getBusinessContextListRequest.setPageSize(-1);
+
+                    GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                            .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+
+                    bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+                });
+
         PageResponse<BieForOasDoc> pageResponse = new PageResponse<>();
         pageResponse.setList(bieForOasDocList.getResults());
         pageResponse.setPage(bieForOasDocList.getPage());
@@ -219,8 +246,8 @@ public class OpenAPIDocController {
         pageResponse.setLength(bieForOasDocList.getLength());
 
         return pageResponse;
-    }
 
+    }
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/{topLevelAsbiepId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieForOasDoc getBieForOasDoc(

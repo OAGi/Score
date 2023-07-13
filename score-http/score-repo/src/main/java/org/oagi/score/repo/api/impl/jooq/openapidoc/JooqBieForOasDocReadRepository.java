@@ -5,6 +5,8 @@ import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
@@ -142,15 +144,15 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
 
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        List<BieForOasDoc> bieForOasDoc = null;
+        List<BieForOasDoc> bieListForOasDoc = new ArrayList<>();
 
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
-            bieForOasDoc = select()
+            bieListForOasDoc = select()
                     .where(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)), OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))))
                     .fetch(mapper());
         }
-        return new GetBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
+        return new GetBieForOasDocResponse(bieListForOasDoc, 1, 1, 1);
     }
 
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})

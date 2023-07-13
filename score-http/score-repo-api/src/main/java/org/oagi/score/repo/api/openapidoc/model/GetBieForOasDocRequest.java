@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 public class GetBieForOasDocRequest extends Request {
     private BigInteger oasDocId;
+    private String businessContext;
     public GetBieForOasDocRequest(ScoreUser requester) {
         super(requester);
         this.oasDocId = oasDocId;
@@ -20,6 +21,13 @@ public class GetBieForOasDocRequest extends Request {
         this.oasDocId = oasDocId;
     }
 
+    public String getBusinessContext() {
+        return businessContext;
+    }
+
+    public void setBusinessContext(String businessContext) {
+        this.businessContext = businessContext;
+    }
     public GetBieForOasDocRequest withOasDocId(BigInteger oasDocId) {
         this.setOasDocId(oasDocId);
         return this;
