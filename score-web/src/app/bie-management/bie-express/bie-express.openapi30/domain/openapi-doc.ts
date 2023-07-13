@@ -253,6 +253,8 @@ export class BieForOasDocListRequest {
 export class BieForOasDoc {
   oasDocId: number;
   topLevelAsbiepId: number;
+  private _oasResourceId: number;
+  private _oasOperationId: number;
   den: string;
   propertyTerm: string;
   guid: string;
@@ -323,6 +325,12 @@ export class BieForOasDoc {
   }
   set verbs(value: string[]) {
     this._verbs = value;
+  }
+  get oasResourceId(): number {
+    return this._oasResourceId;
+  }
+  get oasOperationId(): number {
+    return this._oasOperationId;
   }
 
   get hashCode(): number {
