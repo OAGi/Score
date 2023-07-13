@@ -24,14 +24,6 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {
-  BieEditAbieNodeDetail,
-  BieEditAsbiepNodeDetail,
-  BieEditBbiepNodeDetail,
-  BieEditBbieScNodeDetail,
-  BieFlatNode
-} from '../../../domain/bie-flat-tree';
-import {BieDetailUpdateRequest, BieDetailUpdateResponse} from '../../../bie-edit/domain/bie-edit-node';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -153,15 +145,18 @@ export class OasDocDetailComponent implements OnInit {
       this.businessContextSelection = {};
     });
   }
+
   getChanged(): BieForOasDoc[] {
     if (!this.dataSource) {
       return [];
     }
     return this.dataSource.data.filter(e => e.isChanged);
   }
+
   isChanged() {
     return this.hashCode !== hashCode(this.oasDoc);
   }
+
   isDisabled(oasDoc1: OasDoc) {
     return (this.disabled) ||
       (oasDoc1.oasDocId === undefined || !oasDoc1.oasDocId) ||
@@ -178,15 +173,17 @@ export class OasDocDetailComponent implements OnInit {
   onPageChange(event: PageEvent) {
     this.loadBieListForOasDoc();
   }
-  onChange(property?: string, source?){
-    if (property === 'branch'){
+
+  onChange(property?: string, source?) {
+    if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-    if (property === 'filters.den'){
+    if (property === 'filters.den') {
       this.sort.active = '';
       this.sort.direction = '';
     }
   }
+
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
     switch (type) {
       case 'startDate':
@@ -208,6 +205,7 @@ export class OasDocDetailComponent implements OnInit {
         break;
     }
   }
+
   update() {
     this.checkUniqueness(this.oasDoc, (_) => {
       this.doUpdate();
@@ -315,6 +313,7 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
+
   openDialog($event: any, bieForOasDoc?: BieForOasDoc) {
     $event.stopPropagation();
     const dialogConfig = new MatDialogConfig();
@@ -376,6 +375,7 @@ export class OasDocDetailComponent implements OnInit {
     this.dataSource.data = data;
     this.oasDoc.bieList = data;
   }
+
   select(row: BieForOasDoc) {
     this.selection.select(row.topLevelAsbiepId);
   }
@@ -391,6 +391,7 @@ export class OasDocDetailComponent implements OnInit {
       this.select(row);
     }
   }
+
   isEditable(): boolean {
     return this.access === 'CanEdit';
   }
@@ -407,6 +408,7 @@ export class OasDocDetailComponent implements OnInit {
     }
     return false;
   }
+
   generate() {
     this.loading = true;
     this.openAPIService.generateOpenAPI(this.oasDoc.oasDocId).subscribe(resp => {
@@ -446,20 +448,23 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
-  updateResourceName(changedResourceName: string){
+
+  updateResourceName(changedResourceName: string) {
     console.log('Resource name is changed' + this.dataSource.data.map(e => e.resourceName));
   }
 
-  updateOperationId(changedOperationId: string){
+  updateOperationId(changedOperationId: string) {
     console.log('OperationId is changed' + this.dataSource.data.map(e => e.operationId));
   }
 
   get sizeOfChanges(): number {
     return this.getChanged().length;
   }
+
   get updateDisabled(): boolean {
     return this.isUpdating || !this.isChanged;
   }
+
   updateDetails(callbackFn?) {
     if (this.updateDisabled) {
       if (callbackFn === undefined) {
@@ -479,13 +484,13 @@ export class OasDocDetailComponent implements OnInit {
       this.loading = false;
     })).subscribe((resp: BieForOasDoc) => {
       this.loadBieListForOasDoc(true);
-      });
+    });
     if (callbackFn === undefined) {
-        this.snackBar.open('Updated', '', {
-          duration: 3000,
-        });
-      } else {
-        return callbackFn && callbackFn();
-      }
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+    } else {
+      return callbackFn && callbackFn();
     }
+  }
 }
