@@ -769,11 +769,78 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_25_1_11() {
+        ASCCPObject developer_asccp_root, developer_asccp_lv2;
+        ACCObject developer_acc, developer_acc_lv2;
+        AppUserObject anotherDeveloper, developer;
+        NamespaceObject developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject developerBIE, reusedBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherDeveloper);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
+        {
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+
+            /**
+             * The owner of the ASCCP is developer
+             */
+            developer_acc = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_acc_lv2 = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
+            developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
+            ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
+            coreComponentAPI.appendExtension(developer_acc_lv2, developer, developerNamespace, "Published");
+            developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
+
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+        }
+        HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        Boolean bieExisting = true;
+        viewEditBIEPage.setDEN(developer_asccp_root.getDen());
+        viewEditBIEPage.hitSearchButton();
+        bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + developer_asccp_root.getDen() + "\")]//ancestor::tr")).size();
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(developer_asccp_root.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+        editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setDEN(developer_asccp_root.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
+        click(td);
+
+        click(viewEditBIEPage.getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Failed to update BIE state"));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
     public void test_TA_25_1_12() {
+
 
     }
 
