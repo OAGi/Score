@@ -482,7 +482,7 @@ export class OasDocDetailComponent implements OnInit {
     this.openAPIService.updateDetails(request).pipe(finalize(() => {
       this.isUpdating = false;
       this.loading = false;
-    })).subscribe((resp: BieForOasDoc) => {
+    })).subscribe(_ => {
       this.loadBieListForOasDoc(true);
     });
     if (callbackFn === undefined) {
