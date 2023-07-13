@@ -40,7 +40,6 @@ export class OasDocDetailComponent implements OnInit {
   hashCode;
   bizCtxSearch: string;
   disabled: boolean;
-
   displayedColumns: string[] = [
     'select', 'den', 'owner', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
@@ -448,15 +447,6 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
-
-  updateResourceName(changedResourceName: string) {
-    console.log('Resource name is changed' + this.dataSource.data.map(e => e.resourceName));
-  }
-
-  updateOperationId(changedOperationId: string) {
-    console.log('OperationId is changed' + this.dataSource.data.map(e => e.operationId));
-  }
-
   get sizeOfChanges(): number {
     return this.getChanged().length;
   }

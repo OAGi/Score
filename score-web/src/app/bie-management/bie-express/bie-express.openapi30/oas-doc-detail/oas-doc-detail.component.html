@@ -146,7 +146,7 @@
               <th mat-header-cell *matHeaderCellDef> Resource Name</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.resourceName" (ngModelChange)="updateResourceName($event)">
+                  <input matInput [(ngModel)]="element.resourceName" >
                 </mat-form-field>
               </td>
             </ng-container>
@@ -155,7 +155,7 @@
               <th mat-header-cell *matHeaderCellDef> Operation Id</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.operationId" (ngModelChange)="updateOperationId($event)">
+                  <input matInput [(ngModel)]="element.operationId" >
                 </mat-form-field>
               </td>
             </ng-container>

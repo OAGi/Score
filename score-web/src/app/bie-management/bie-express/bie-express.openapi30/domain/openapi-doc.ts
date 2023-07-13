@@ -320,17 +320,17 @@ export class BieForOasDoc {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
-  get verbs(): string[] {
-    return this._verbs;
-  }
-  set verbs(value: string[]) {
-    this._verbs = value;
-  }
   get oasResourceId(): number {
     return this._oasResourceId;
   }
   get oasOperationId(): number {
     return this._oasOperationId;
+  }
+  get verbs(): string[] {
+    return this._verbs;
+  }
+  set verbs(value: string[]) {
+    this._verbs = value;
   }
 
   get hashCode(): number {
