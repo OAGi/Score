@@ -42,15 +42,13 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             throw new IllegalArgumentException("`oasDocId` parameter must not be null.");
         }
 
-        List<OasResourceRecord> oasResourceRecordList = dslContext().selectFrom(OAS_RESOURCE).where(OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(oasDocId))).fetch();
-        if (oasResourceRecordList == null) {
-            throw new ScoreDataAccessException(new IllegalArgumentException());
-        }
         List<Field<?>> oasResourceChangedField = new ArrayList();
         List<Field<?>> oasOperationChangedField = new ArrayList();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
-            OasResourceRecord oasResourceRecord = oasResourceRecordList.stream().filter(p -> p.getOasResourceId().equals(bieForOasDoc.getOasResourceId())).findFirst().orElse(null);
-
+            OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId()))).fetchOptional().orElse(null);
+            if (oasResourceRecord == null) {
+                throw new ScoreDataAccessException(new IllegalArgumentException());
+            }
             if (oasResourceRecord != null && !StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
                 oasResourceChangedField.add(OAS_RESOURCE.PATH);
                 oasResourceRecord.setPath(bieForOasDoc.getResourceName());
@@ -63,21 +61,22 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     throw new ScoreDataAccessException(new IllegalStateException());
                 }
 
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf((oasResourceRecord.getOasResourceId()).toBigInteger()))).fetchOptional().orElse(null);
-
-                if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
-                    oasOperationChangedField.add(OAS_OPERATION.OPERATION_ID);
-                    oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
-                    oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATED_BY);
-                    oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
-                    oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATE_TIMESTAMP);
-                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                    affectedRows = oasOperationRecord.update(oasOperationChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
+            }
+            OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+            if (oasResourceRecord == null) {
+                throw new ScoreDataAccessException(new IllegalArgumentException());
+            }
+            if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
+                oasOperationChangedField.add(OAS_OPERATION.OPERATION_ID);
+                oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
+                oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATED_BY);
+                oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
+                oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATE_TIMESTAMP);
+                oasResourceRecord.setLastUpdateTimestamp(timestamp);
+                int affectedRows = oasOperationRecord.update(oasOperationChangedField);
+                if (affectedRows != 1) {
+                    throw new ScoreDataAccessException(new IllegalStateException());
                 }
-
             }
         }
         return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty());

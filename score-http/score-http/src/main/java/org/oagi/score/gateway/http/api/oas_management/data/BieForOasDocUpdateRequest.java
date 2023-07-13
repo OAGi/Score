@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 public class BieForOasDocUpdateRequest {
     private BigInteger oasDocId;
-    private List<BieForOasDoc> bieForOasDoclist = Collections.emptyList();
+    private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
 
 }

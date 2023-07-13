@@ -305,7 +305,7 @@ public class OpenAPIDocController {
 
         updateBieForOasDocRequest.setOasDocId(request.getOasDocId());
 
-        updateBieForOasDocRequest.setBieForOasDocList(request.getBieForOasDoclist());
+        updateBieForOasDocRequest.setBieForOasDocList(request.getBieForOasDocList());
 
         UpdateBieForOasDocResponse response = oasDocService.updateDetails(requester, updateBieForOasDocRequest);
 
