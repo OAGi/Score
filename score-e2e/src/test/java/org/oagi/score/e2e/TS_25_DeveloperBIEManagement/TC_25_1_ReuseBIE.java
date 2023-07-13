@@ -1294,7 +1294,76 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
     @Test
     public void test_TA_25_1_18() {
+        ASCCPObject asccp, asccp_for_devx, asccp_lv2;
+        BCCPObject bccp;
+        ACCObject acc, acc_association, acc_lv2;
+        AppUserObject devx, devy, usera;
+        NamespaceObject developerNamespace;
+        BusinessContextObject context;
+        TopLevelASBIEPObject devxBIE, devyBIE;
+        String current_release = "10.8.8";
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
 
+        devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(devx);
+        {
+            devy = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(devy);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            /**
+             * The owner of the ASCCP is deva
+             */
+            acc = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", current_release);
+            bccp = coreComponentAPI.createRandomBCCP(dataType, devx, developerNamespace, "WIP");
+            BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
+            bcc.setCardinalityMax(1);
+            coreComponentAPI.updateBCC(bcc);
+            acc_lv2 = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace,  "Published");
+            acc_association = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, devx, developerNamespace, "Published");
+            ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp, "Published");
+            coreComponentAPI.appendASCC(acc_lv2, asccp, "Published");
+            asccp_lv2 = coreComponentAPI.createRandomASCCP(acc_association, devx, developerNamespace, "Published");
+            ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(acc_lv2, asccp_lv2, "Published");
+            asccp_for_devx = coreComponentAPI.createRandomASCCP(acc_lv2, devx, developerNamespace, "Published");
+            devxBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, devx, "WIP");
+            devyBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_for_devx, devy,"WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(devy.getLoginId(), devy.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
+        viewEditBIEPage.setDEN(devyBIE.getDen());
+        viewEditBIEPage.hitSearchButton();
+        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 2);
+        selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
+        editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        editBIEPage.openPage();
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm()  + "/" + asccp.getPropertyTerm(), 1);
+        selectProfileBIEToReuseDialog.selectBIEToReuse(devyBIE);
+        editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+
+        editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        editBIEPage.clickOnDropDownMenuByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
+
+        editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
     }
 
