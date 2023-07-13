@@ -470,10 +470,11 @@ export class OasDocDetailComponent implements OnInit {
     }
     const request = new BieForOasDocUpdateRequest();
     const nodes = this.getChanged();
+    request.oasDocId = this.oasDoc.oasDocId;
     request.bieForOasDocList = nodes;
     this.loading = true;
     this.isUpdating = true;
-    this.openAPIService.updateDetails(this.oasDoc.oasDocId, request).pipe(finalize(() => {
+    this.openAPIService.updateDetails(request).pipe(finalize(() => {
       this.isUpdating = false;
       this.loading = false;
     })).subscribe((resp: BieForOasDoc) => {

@@ -347,6 +347,7 @@ export class AssignBieForOasDoc {
   messageBody: string;
 }
 export class BieForOasDocUpdateRequest {
+  oasDocId: number;
   bieForOasDocList: BieForOasDoc[];
   constructor() {
     this.bieForOasDocList = [];
