@@ -38,6 +38,4 @@ public interface ReleaseAPI {
     ReleaseObject getTheLatestRelease();
 
     List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
-
-    ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace);
 }

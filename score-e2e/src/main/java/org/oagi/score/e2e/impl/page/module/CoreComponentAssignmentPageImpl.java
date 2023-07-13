@@ -12,10 +12,14 @@ import org.openqa.selenium.WebElement;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CoreComponentAssignmentPageImpl extends BasePageImpl implements CoreComponentAssignmentPage {
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Den\")]//ancestor::mat-form-field//input");
+    private static final By DEN_UNASSIGNED_FIELD_LOCATOR =
+            By.xpath("//h4[contains(text(),\"Unassigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-form-field//input");
+    private static final By DEN_ASSIGNED_FIELD_LOCATOR =
+            By.xpath("//h4[contains(text(),\"Assigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-form-field//input");
     private static final By ASSIGN_BUTTON_LOCATOR =
             By.xpath("//button[@mattooltip=\"Assign\"]");
+    private static final By UNASSIGN_BUTTON_LOCATOR =
+            By.xpath("//button[@mattooltip=\"Unassign\"]");
 
     private ModuleSetReleaseObject moduleSetRelease;
 
@@ -42,23 +46,33 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     }
 
     @Override
-    public void setDen(String name) {
-        sendKeys(getDenField(), name);
+    public void setDenUnassigned(String name) {
+        sendKeys(getDenUnassignedField(), name);
     }
 
     @Override
-    public WebElement getDenField(){
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+    public WebElement getDenAssignedField(){
+        return visibilityOfElementLocated(getDriver(), DEN_ASSIGNED_FIELD_LOCATOR);
     }
 
     @Override
-    public void selectCCByDEN(String name) {
-        setDen(name);
+    public void setDenAssigned(String name) {
+        sendKeys(getDenAssignedField(), name);
+    }
+
+    @Override
+    public WebElement getDenUnassignedField(){
+        return visibilityOfElementLocated(getDriver(), DEN_UNASSIGNED_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void selectUnassignedCCByDEN(String name) {
+        setDenUnassigned(name);
         retry(() -> {
             WebElement tr;
             WebElement td;
             try {
-                tr = getTableRecordAtIndex(1);
+                tr = getTableRecordAtIndexUnassignedCC(1);
                 td = getColumnByName(tr, "den");
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a Core Component using " + name, e);
@@ -73,8 +87,44 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     }
 
     @Override
-    public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    public void selectAssignedCCByDEN(String name) {
+        setDenAssigned(name);
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = getTableRecordAtIndexAssignedCC(1);
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a Core Component using " + name, e);
+            }
+            String denColumn = getText(td.findElement(By.tagName("a")));
+            if (!denColumn.contains(name)) {
+                throw new NoSuchElementException("Cannot locate a Core Component using " + name);
+            }
+            WebElement select = getColumnByName(tr, "checkbox");
+            click(select);
+        });
+    }
+    @Override
+    public WebElement getTableRecordByValueUnassignedCC(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
+    }
+
+    @Override
+    public WebElement getTableRecordByValueAssignedCC(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
+    }
+
+
+    @Override
+    public WebElement getTableRecordAtIndexAssignedCC(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getTableRecordAtIndexUnassignedCC(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//tbody/tr[" + idx + "]"));
     }
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
@@ -89,5 +139,25 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     @Override
     public WebElement getAssignButton(){
         return elementToBeClickable(getDriver(), ASSIGN_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void selectModule(String moduleName) {
+        click(getModuleByName(moduleName));
+    }
+
+    @Override
+    public WebElement getModuleByName(String moduleName) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//span[text() = \"" + moduleName + "\"]//ancestor::div[1]"));
+    }
+
+    @Override
+    public void hitUnassignButton() {
+        click(getUnassignButton());
+    }
+
+    @Override
+    public WebElement getUnassignButton(){
+        return elementToBeClickable(getDriver(), UNASSIGN_BUTTON_LOCATOR);
     }
 }

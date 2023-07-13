@@ -68,27 +68,6 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
         return earlierReleases;
     }
 
-    @Override
-    public ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace) {
-        ReleaseObject release = ReleaseObject.createDraftRelease(creator, namespace);
-
-        ReleaseRecord releaseRecord = new ReleaseRecord();
-        releaseRecord.setGuid(release.getGuid());
-        releaseRecord.setReleaseNum(release.getReleaseNumber());
-        releaseRecord.setNamespaceId(ULong.valueOf(namespace.getNamespaceId()));
-        releaseRecord.setCreatedBy(ULong.valueOf(namespace.getCreatedBy()));
-        releaseRecord.setLastUpdatedBy(ULong.valueOf(namespace.getLastUpdatedBy()));
-        releaseRecord.setCreationTimestamp(namespace.getCreationTimestamp());
-        releaseRecord.setLastUpdateTimestamp(namespace.getLastUpdateTimestamp());
-        releaseRecord.setState(release.getState());
-        ULong releaseId = dslContext.insertInto(RELEASE)
-                .set(releaseRecord)
-                .returning(RELEASE.RELEASE_ID)
-                .fetchOne().getReleaseId();
-        release.setReleaseId(releaseId.toBigInteger());
-        return release;
-    }
-
     private ReleaseObject mapper(ReleaseRecord releaseRecord) {
         if (releaseRecord == null) {
             return null;
