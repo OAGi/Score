@@ -4,8 +4,6 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
-import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
-import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.CoreComponentRepository;
@@ -14,9 +12,7 @@ import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.businessterm.model.UpdateBusinessTermResponse;
 import org.oagi.score.repo.api.openapidoc.model.*;
-import org.oagi.score.repo.component.top_level_asbiep.UpdateTopLevelAsbiepRequest;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -31,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -257,12 +252,13 @@ public class OpenAPIDocService {
     public boolean checkOasDocTitleUniqueness(OasDoc oasDoc) {
         return oasDocRepository.checkOasDocTitleUniqueness(oasDoc);
     }
+
     @Transactional
     public UpdateBieForOasDocResponse updateDetails(AuthenticatedPrincipal user, UpdateBieForOasDocRequest request) {
 
         UpdateBieForOasDocResponse response =
                 scoreRepositoryFactory.createBieForOasDocWriteRepository()
-                        .updateBieForOasDoc(request);
+                        .updateBieForOasDoc(user, request);
         return response;
     }
 }

@@ -12,7 +12,7 @@ public interface BieForOasDocWriteRepository {
                                                AddBieForOasDocRequest request) throws ScoreDataAccessException;
 
     //    todo
-    UpdateBieForOasDocResponse updateBieForOasDoc(
+    UpdateBieForOasDocResponse updateBieForOasDoc(AuthenticatedPrincipal user,
             UpdateBieForOasDocRequest request) throws ScoreDataAccessException;
 
     DeleteBieForOasDocResponse deleteBieForOasDoc(
