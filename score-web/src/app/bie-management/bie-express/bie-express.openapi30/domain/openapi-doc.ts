@@ -267,8 +267,6 @@ export class BieForOasDoc {
   state: string;
   businessContext: string;
   lastUpdateTimestamp: Date;
-  lastUpdatedBy: ScoreUser;
-  createdBy: ScoreUser;
   private _verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
@@ -305,9 +303,7 @@ export class BieForOasDoc {
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.tagName = obj && obj.tagName || '';
-    this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
-    this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
   }
   get resourceName(): string {
     return this._resourceName;
