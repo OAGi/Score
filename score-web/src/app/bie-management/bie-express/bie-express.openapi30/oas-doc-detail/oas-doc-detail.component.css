@@ -1,0 +1,28 @@
+.mat-column-owner {
+  width: 140px;
+  font-size: 13px;
+}
+
+.mat-column-verb {
+  width: 100px;
+}
+
+.mat-column-arrayIndicator, .mat-column-suppressRoot {
+  width: 100px;
+}
+
+.mat-column-messageBody {
+  width: 140px;
+}
+
+.mat-column-tagName {
+  width: 10%;
+}
+
+.mat-column-tagName .tagName:not(:last-child)::after {
+  content: ', ';
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}

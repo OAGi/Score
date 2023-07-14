@@ -131,7 +131,7 @@ export class OasDocListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => !row.used).length;
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -143,9 +143,7 @@ export class OasDocListComponent implements OnInit {
   }
 
   select(row: OasDoc) {
-    if (!row.used) {
-      this.selection.select(row.oasDocId);
-    }
+    this.selection.select(row.oasDocId);
   }
 
   toggle(row: OasDoc) {

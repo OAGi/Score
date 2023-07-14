@@ -1,5 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BieForOasDoc, BieForOasDocListRequest, BieForOasDocUpdateRequest, OasDoc, simpleOasDoc} from '../domain/openapi-doc';
+import {
+  BieForOasDoc,
+  BieForOasDocListRequest,
+  BieForOasDocUpdateRequest,
+  OasDoc,
+  simpleOasDoc
+} from '../domain/openapi-doc';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
@@ -31,13 +37,13 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
   styleUrls: ['./oas-doc-detail.component.css']
 })
 export class OasDocDetailComponent implements OnInit {
-  title = 'Edit Open API Doc';
+  title = 'Edit Open API Document';
   oasDocs: simpleOasDoc[];
   oasDoc: OasDoc;
   workingRelease = WorkingRelease;
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
-  hashCode;
+  hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
   displayedColumns: string[] = [
@@ -76,7 +82,7 @@ export class OasDocDetailComponent implements OnInit {
     // Default Open API expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
     this.oasDoc = new OasDoc();
-    this.oasDoc.used = true;
+
     const oasDocId = this.route.snapshot.params.id;
 
     // Init BIE list table for OasDoc
@@ -94,22 +100,20 @@ export class OasDocDetailComponent implements OnInit {
       this.loadBieListForOasDoc();
     });
 
-    forkJoin(
+    forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieListForOasDoc(oasDocId)
-    )
-      .subscribe(([simpleOasDoc, bieForOasDoc]) => {
-        this.oasDoc = simpleOasDoc;
-        this.hashCode = hashCode(this.oasDoc);
-        this.init(this.oasDoc);
-        this.loadBieListForOasDoc(true);
-      }, _ => {
-        this.isUpdating = false;
-      });
+      this.openAPIService.getBieListForOasDoc(oasDocId)]
+    ).subscribe(([simpleOasDoc, bieForOasDoc]) => {
+      this.oasDoc = simpleOasDoc;
+      this.init(this.oasDoc);
+      this.loadBieListForOasDoc(true);
+    }, _ => {
+      this.isUpdating = false;
+    });
   }
 
   init(oasDoc: OasDoc) {
-    this.hashCode = hashCode(oasDoc);
+    this.hashCodeForOasDoc = hashCode(oasDoc);
     this.oasDoc = oasDoc;
     this.isUpdating = false;
   }
@@ -128,13 +132,13 @@ export class OasDocDetailComponent implements OnInit {
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
+        elm = new BieForOasDoc(elm);
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
         return elm;
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
-        elm = new BieForOasDoc(elm);
-        elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
       });
 
       if (!isInit) {
@@ -154,7 +158,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   isChanged(): boolean {
-    return this.getChanged().length > 0;
+    return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0;
   }
 
   isDisabled(oasDoc1: OasDoc) {
@@ -252,11 +256,10 @@ export class OasDocDetailComponent implements OnInit {
 
   doUpdate() {
     this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
-      this.hashCode = hashCode(this.oasDoc);
+      this.init(this.oasDoc);
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
-      this.router.navigateByUrl('/profile_bie/express/oas_doc');
     });
   }
 
@@ -315,7 +318,9 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   openDialog($event: any, bieForOasDoc?: BieForOasDoc) {
+    $event.preventDefault();
     $event.stopPropagation();
+
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {};
@@ -448,12 +453,13 @@ export class OasDocDetailComponent implements OnInit {
         }
       });
   }
+
   get sizeOfChanges(): number {
     return this.getChanged().length;
   }
 
   get updateDisabled(): boolean {
-    return !this.isChanged;
+    return !this.isChanged();
   }
 
   updateDetails(callbackFn?) {

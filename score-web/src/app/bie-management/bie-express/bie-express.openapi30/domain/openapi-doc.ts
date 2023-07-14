@@ -111,7 +111,6 @@ export class OasDoc {
   creationTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
-  used: boolean;
   bieList: BieForOasDoc[];
 }
 
@@ -268,7 +267,7 @@ export class BieForOasDoc {
   state: string;
   businessContexts: BusinessContext[];
   lastUpdateTimestamp: Date;
-  lastUpdateUser: string;
+  lastUpdatedBy: ScoreUser;
   private _verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
@@ -282,6 +281,7 @@ export class BieForOasDoc {
   private $hashCode: number;
   tagName: string;
   listeners: ChangeListener<BieForOasDoc>[] = [];
+
   constructor(obj?: BieForOasDoc) {
     this.oasDocId = obj && obj.oasDocId || 0;
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
@@ -297,7 +297,6 @@ export class BieForOasDoc {
     this.status = obj && obj.status || '';
     this.state = obj && obj.state || '';
     this.businessContexts = obj && obj.businessContexts || [];
-    this.lastUpdateUser = obj && obj.lastUpdateUser || '';
     this.verbs = obj && obj.verbs || [];
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRoot = obj && obj.suppressRoot || false;
@@ -305,6 +304,9 @@ export class BieForOasDoc {
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.tagName = obj && obj.tagName || '';
+
+    this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
+    this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
   }
   get resourceName(): string {
     return this._resourceName;
