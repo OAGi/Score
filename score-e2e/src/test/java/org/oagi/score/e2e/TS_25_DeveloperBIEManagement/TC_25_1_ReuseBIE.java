@@ -794,7 +794,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             coreComponentAPI.appendExtension(developer_acc_lv2, developer, developerNamespace, "Published");
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
-            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
             reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "QA");
         }
         HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
@@ -824,6 +824,14 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
 
+        click(viewEditBIEPage.getMoveToQA(true));
+        viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(current_release);
+        viewEditBIEPage.setDEN(developer_asccp_root.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        td = viewEditBIEPage.getColumnByName(tr, "select");
+        click(td);
         click(viewEditBIEPage.getMoveToProduction(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
