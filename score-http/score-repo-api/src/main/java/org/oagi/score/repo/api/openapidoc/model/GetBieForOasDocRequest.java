@@ -8,6 +8,8 @@ import java.math.BigInteger;
 public class GetBieForOasDocRequest extends Request {
     private BigInteger oasDocId;
     private String businessContext;
+    private BigInteger topLevelAsbiepId;
+
     public GetBieForOasDocRequest(ScoreUser requester) {
         super(requester);
         this.oasDocId = oasDocId;
@@ -28,8 +30,22 @@ public class GetBieForOasDocRequest extends Request {
     public void setBusinessContext(String businessContext) {
         this.businessContext = businessContext;
     }
+
     public GetBieForOasDocRequest withOasDocId(BigInteger oasDocId) {
         this.setOasDocId(oasDocId);
+        return this;
+    }
+
+    public BigInteger getTopLevelAsbiepId() {
+        return topLevelAsbiepId;
+    }
+
+    public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        this.topLevelAsbiepId = topLevelAsbiepId;
+    }
+
+    public GetBieForOasDocRequest withTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        setTopLevelAsbiepId(topLevelAsbiepId);
         return this;
     }
 }

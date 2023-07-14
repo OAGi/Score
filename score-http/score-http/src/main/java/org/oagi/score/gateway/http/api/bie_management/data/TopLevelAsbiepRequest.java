@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.data;
 
 import lombok.Data;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
 
 import java.math.BigInteger;
 
@@ -11,5 +12,6 @@ public class TopLevelAsbiepRequest {
     private String version;
     private String status;
     private Boolean inverseMode;
+    private BieForOasDoc bieForOasDoc;
 
 }

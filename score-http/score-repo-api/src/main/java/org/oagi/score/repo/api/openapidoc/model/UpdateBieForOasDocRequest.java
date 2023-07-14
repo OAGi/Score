@@ -22,12 +22,22 @@ public class UpdateBieForOasDocRequest extends Request {
         this.bieForOasDocList = bieForOasDocList;
     }
 
+    public UpdateBieForOasDocRequest withBieForOasDocList(List<BieForOasDoc> bieForOasDocList) {
+        setBieForOasDocList(bieForOasDocList);
+        return this;
+    }
+
     public BigInteger getOasDocId() {
         return oasDocId;
     }
 
     public void setOasDocId(BigInteger oasDocId) {
         this.oasDocId = oasDocId;
+    }
+
+    public UpdateBieForOasDocRequest withOasDocId(BigInteger oasDocId) {
+        setOasDocId(oasDocId);
+        return this;
     }
 
     @Override

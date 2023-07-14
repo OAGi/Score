@@ -17,6 +17,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.BieEditT
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.DefaultBieEditTreeController;
 import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
 import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
@@ -26,6 +27,8 @@ import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
+import org.oagi.score.repo.api.openapidoc.model.UpdateBieForOasDocRequest;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.abie.AbieReadRepository;
 import org.oagi.score.repo.component.abie.AbieWriteRepository;
@@ -126,6 +129,9 @@ public class BieEditService implements InitializingBean {
 
     @Autowired
     private BieService bieService;
+
+    @Autowired
+    private OpenAPIDocService openAPIDocService;
 
     @Autowired
     private MessageService messageService;
@@ -378,6 +384,13 @@ public class BieEditService implements InitializingBean {
         UpdateTopLevelAsbiepRequest topLevelAsbiepRequest = new UpdateTopLevelAsbiepRequest(user, timestamp,
                 request.getTopLevelAsbiepId(), status, version, inverseMode);
         topLevelAsbiepWriteRepository.updateTopLevelAsbiep(topLevelAsbiepRequest);
+
+        BieForOasDoc bieForOasDoc = request.getTopLevelAsbiepDetail().getBieForOasDoc();
+        if (bieForOasDoc != null) {
+            openAPIDocService.updateDetails(user, new UpdateBieForOasDocRequest(sessionService.asScoreUser(user))
+                    .withOasDocId(bieForOasDoc.getOasDocId())
+                    .withBieForOasDocList(Arrays.asList(bieForOasDoc)));
+        }
         return response;
     }
 

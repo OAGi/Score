@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.bie_management.data.bie_edit;
 
 import lombok.Data;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
 
 import java.math.BigInteger;
 
@@ -27,5 +28,8 @@ public class BieEditNode {
     private String releaseNum;
     private BieState topLevelAsbiepState;
     private String ownerLoginId;
+
+    // Issue #1519
+    private BieForOasDoc bieForOasDoc;
 
 }

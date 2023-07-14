@@ -1,7 +1,7 @@
 import {PageRequest} from '../../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode4String, md5} from '../../../../common/utility';
+import {base64Decode, base64Encode, hashCode4Array, hashCode4String, md5} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
@@ -298,7 +298,7 @@ export class BieForOasDoc {
     this.state = obj && obj.state || '';
     this.businessContexts = obj && obj.businessContexts || [];
     this.lastUpdateUser = obj && obj.lastUpdateUser || '';
-    this._verbs = obj && obj._verbs || [];
+    this.verbs = obj && obj.verbs || [];
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRoot = obj && obj.suppressRoot || false;
     this.messageBody = obj && obj.messageBody || [];
@@ -334,9 +334,14 @@ export class BieForOasDoc {
   }
 
   get hashCode(): number {
-    return ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
-      ((this.operationId) ? hashCode4String(this.operationId) : 0);
+    return ((this.verbs) ? hashCode4Array(this.verbs) : 0) +
+      ((this.messageBody) ? hashCode4Array(this.messageBody) : 0) +
+      ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
+      ((this.operationId) ? hashCode4String(this.operationId) : 0) +
+      ((this.arrayIndicator) ? 1231 : 1237) +
+      ((this.suppressRoot) ? 1231 : 1237);
   }
+
   reset(): void {
     this.$hashCode = this.hashCode;
   }

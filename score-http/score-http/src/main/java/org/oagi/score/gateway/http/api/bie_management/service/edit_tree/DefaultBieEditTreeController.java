@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
@@ -19,6 +20,8 @@ import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.redisson.api.RLock;
@@ -64,6 +67,9 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
     @Autowired
     private BusinessInformationEntityRepository bieRepository;
+
+    @Autowired
+    private OpenAPIDocService openAPIDocService;
 
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
@@ -170,6 +176,14 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .fetchOneInto(BieEditAbieNode.class);
         rootNode.setHasChild(hasChild(rootNode));
         rootNode.setAccess(accessPrivilege);
+
+        // Issue #1519
+        GetBieForOasDocResponse getBieForOasDocResponse = openAPIDocService.getBieForOasDoc(
+                new GetBieForOasDocRequest(sessionService.asScoreUser(user))
+                        .withTopLevelAsbiepId(topLevelAsbiepId));
+        if (getBieForOasDocResponse.getLength() > 0) {
+            rootNode.setBieForOasDoc(getBieForOasDocResponse.getResults().get(0));
+        }
 
         return rootNode;
     }
