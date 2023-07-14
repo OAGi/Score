@@ -178,7 +178,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
-            DTObject dt_code = coreComponentAPI.getBDTByGuidAndReleaseNum("10ef56a1365842dc856007ca9fcc9021", current_release);
+            DTObject dt_code = coreComponentAPI.getBDTByGuidAndReleaseNum("8954f848e8f448c0a72785acd5a3a805", current_release);
             bccp_code_type = coreComponentAPI.createRandomBCCP(dt_code, developer, developerNamespace, "Published");
             bccp_code_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_code_type);
@@ -197,6 +197,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
