@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -547,12 +548,13 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -561,10 +563,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         escape(getDriver());
 
-        homePage.logout();
-        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
-        bieMenu = homePage.getBIEMenu();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developerBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -575,12 +575,15 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
         viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(reusedBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]")));
-        click(elementToBeClickable(getDriver(), By.xpath("//*[contains(text(),\"Find Reuses\")]//ancestor::li")));
-        assertTrue(getDriver().findElement(By.xpath("//mat-dialog-content//a[contains(text(),\"" + developer_asccp_root.getPropertyTerm() + "\")]//ancestor::tr/td[1]//label/span[1]")).isDisplayed());
+        click(elementToBeClickable(getDriver(), By.xpath("//span[contains(text(),\"Find Reuses\")]")));
+        waitFor(Duration.ofMillis(1000L));
+        assertTrue(getDriver().findElement(By.xpath("//mat-dialog-content//a[contains(text(),\"" + developer_asccp_root.getPropertyTerm() + "\")]//ancestor::tr/td[1]")).isDisplayed());
+        escape(getDriver());
 
         //Check ReUse Report
         ReuseReportPage reuseReportPage = bieMenu.openReuseReportSubMenu();
@@ -589,14 +592,14 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         getDriver().switchTo().window(tabs.get(1));
 
         String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1, currentUrl.indexOf("?")));
 
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
-        assertEquals(developer_asccp_root.getPropertyTerm(), editBIEPage.getTitle());
+        assertEquals(developer_asccp_root.getPropertyTerm(), getText(editBIEPage.getTitle()));
         assertTrue(editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm()).isDisplayed());
     }
 
