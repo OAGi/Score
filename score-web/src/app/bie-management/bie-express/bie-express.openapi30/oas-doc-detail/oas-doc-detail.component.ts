@@ -138,7 +138,7 @@ export class OasDocDetailComponent implements OnInit {
         return elm;
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
+        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
       });
 
       if (!isInit) {
@@ -256,7 +256,7 @@ export class OasDocDetailComponent implements OnInit {
 
   doUpdate() {
     // See #isChanged for the conditions in this method.
-    
+
     if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
       this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
         this.init(this.oasDoc);

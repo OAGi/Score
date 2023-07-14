@@ -12,7 +12,6 @@ import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
 import {BieExpressOption} from '../../domain/generate-expression';
 import {base64Encode} from '../../../../common/utility';
-import {BieDetailUpdateRequest, BieDetailUpdateResponse} from '../../../bie-edit/domain/bie-edit-node';
 
 @Injectable()
 export class OpenAPIService {
@@ -40,19 +39,24 @@ export class OpenAPIService {
   getOasDoc(id): Observable<OasDoc> {
     return this.http.get<OasDoc>('/api/oas_doc/' + id);
   }
+
   getBieListForOasDoc(id): Observable<BieForOasDoc> {
     return this.http.get<BieForOasDoc>('/api/oas_doc/' + id + '/bie_list');
   }
+
   getBieForOasDoc(oasDocId: number, topLevelAsbiepId: number): Observable<BieForOasDoc> {
     return this.http.get<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepId);
   }
+
   updateBieForOasDoc(oasDocId: number, topLevelAsbiepId: number, request: BieForOasDocUpdateRequest): Observable<BieForOasDoc> {
     return this.http.put<BieForOasDoc>('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepId, request);
   }
+
   updateDetails(request: BieForOasDocUpdateRequest): Observable<any> {
     console.log(request);
-    return this.http.put<BieForOasDoc>('/api/oas_doc/' + request.oasDocId + '/bie_list/detail',  request);
+    return this.http.put<BieForOasDoc>('/api/oas_doc/' + request.oasDocId + '/bie_list/detail', request);
   }
+
   delete(...oasDocIds): Observable<any> {
     if (oasDocIds.length === 1) {
       return this.http.delete('/api/oas_doc/' + oasDocIds[0]);
@@ -115,7 +119,7 @@ export class OpenAPIService {
     });
   }
 
-  getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>>{
+  getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -166,7 +170,7 @@ export class OpenAPIService {
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list', {params});
   }
 
-  selectBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>>{
+  selectBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -217,16 +221,18 @@ export class OpenAPIService {
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/select_bie', {params});
   }
 
-  assignBieForOasDoc(assignBieForOasDoc: AssignBieForOasDoc): Observable<PageResponse<any>>{
+  assignBieForOasDoc(assignBieForOasDoc: AssignBieForOasDoc): Observable<PageResponse<any>> {
     return this.http.post<PageResponse<BieForOasDoc>>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
-      {oasDocId: assignBieForOasDoc.oasDocId,
-            isOasRequest: assignBieForOasDoc.isOasRequest,
-            topLevelAsbiepId: assignBieForOasDoc.topLevelAsbiepId,
-            den: assignBieForOasDoc.den,
-            verb: assignBieForOasDoc.verb,
-            arrayIndicator: assignBieForOasDoc.arrayIndicator,
-            suppressRoot: assignBieForOasDoc.suppressRoot,
-            messageBody: assignBieForOasDoc.messageBody});
+      {
+        oasDocId: assignBieForOasDoc.oasDocId,
+        isOasRequest: assignBieForOasDoc.isOasRequest,
+        topLevelAsbiepId: assignBieForOasDoc.topLevelAsbiepId,
+        den: assignBieForOasDoc.den,
+        verb: assignBieForOasDoc.verb,
+        arrayIndicator: assignBieForOasDoc.arrayIndicator,
+        suppressRoot: assignBieForOasDoc.suppressRoot,
+        messageBody: assignBieForOasDoc.messageBody
+      });
   }
 
   generate(topLevelAsbiepIds: number[], option: BieExpressOption, oasDoc: OasDoc): Observable<HttpResponse<Blob>> {
@@ -254,6 +260,7 @@ export class OpenAPIService {
       responseType: 'blob'
     });
   }
+
   generateOpenAPI(oasDocId: number): Observable<HttpResponse<Blob>> {
     return this.http.get('api/oas_doc/' + oasDocId + '/generate', {
       observe: 'response',

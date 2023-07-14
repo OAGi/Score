@@ -135,7 +135,7 @@ export class OasDocAssignDialogComponent implements OnInit {
         return elm;
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContexts[0];
+        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
         this.verbSelection[elm.topLevelAsbiepId] = elm.verbs[0];
         this.messageBodySelection[elm.topLevelAsbiepId] = elm.messageBody[0];
       });

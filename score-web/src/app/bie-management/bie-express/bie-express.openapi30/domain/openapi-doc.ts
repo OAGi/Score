@@ -265,9 +265,10 @@ export class BieForOasDoc {
   version: string;
   status: string;
   state: string;
-  businessContexts: BusinessContext[];
+  businessContext: string;
   lastUpdateTimestamp: Date;
   lastUpdatedBy: ScoreUser;
+  createdBy: ScoreUser;
   private _verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
@@ -296,7 +297,7 @@ export class BieForOasDoc {
     this.version = obj && obj.version || '';
     this.status = obj && obj.status || '';
     this.state = obj && obj.state || '';
-    this.businessContexts = obj && obj.businessContexts || [];
+    this.businessContext = obj && obj.businessContext || '';
     this.verbs = obj && obj.verbs || [];
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRoot = obj && obj.suppressRoot || false;
@@ -304,7 +305,7 @@ export class BieForOasDoc {
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.tagName = obj && obj.tagName || '';
-
+    this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
   }
