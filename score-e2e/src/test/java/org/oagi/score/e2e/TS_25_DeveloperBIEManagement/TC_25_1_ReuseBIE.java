@@ -253,13 +253,14 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
         }
-        HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
         viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -280,8 +281,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
         viewEditBIEPage.openPage();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
-        assertEquals(developer_asccp.getPropertyTerm(), editBIEPage.getTitle());
+        viewEditBIEPage.setBranch(current_release);
+        viewEditBIEPage.setDEN(topLevelASBIEP.getDen());
+        viewEditBIEPage.hitSearchButton();
+        tr = viewEditBIEPage.getTableRecordAtIndex(1);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
+        assertEquals(developer_asccp.getPropertyTerm(), getText(editBIEPage.getTitle()));
     }
 
     @Test
