@@ -268,7 +268,6 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(latestModuleSetRelease);
         assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
-        releaseAssignmentPage.hitAssignAllButton();
         coreComponentAssignmentPage.hitAssignButton();
 
         /**
@@ -293,6 +292,8 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
         editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         } while (!newDraftRelease.getState().equals("Draft"));
