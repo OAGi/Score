@@ -30,4 +30,8 @@ public interface EditModuleSetReleasePage extends Page {
     ModuleSetReleaseXMLSchemaValidationDialog hitValidateButton();
 
     CoreComponentAssignmentPage hitAssignCCsButton(ModuleSetReleaseObject moduleSetRelease);
+
+    CoreComponentAssignmentPage viewAssignedCCs(ModuleSetReleaseObject latestModuleSetRelease);
+
+    WebElement getViewAssignedCCsbutton();
 }

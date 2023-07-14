@@ -34,6 +34,8 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
             By.xpath("//span[contains(text(), \"Validate\")]//ancestor::button[1]");
     private static final By ASSIGN_CC_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Assign CCs\")]//ancestor::button[1]");
+    private static final By VIEW_ASSIGNED_CC_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"View Assigned CCs\")]//ancestor::button[1]");
 
     private ModuleSetReleaseObject moduleSetRelease;
 
@@ -139,6 +141,19 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
         CoreComponentAssignmentPage coreComponentAssignmentPage = new CoreComponentAssignmentPageImpl(this, moduleSetRelease);
         assert coreComponentAssignmentPage.isOpened();
         return coreComponentAssignmentPage;
+    }
+
+    @Override
+    public CoreComponentAssignmentPage viewAssignedCCs(ModuleSetReleaseObject latestModuleSetRelease) {
+        click(getViewAssignedCCsbutton());
+        CoreComponentAssignmentPage coreComponentAssignmentPage = new CoreComponentAssignmentPageImpl(this, moduleSetRelease);
+        assert coreComponentAssignmentPage.isOpened();
+        return coreComponentAssignmentPage;
+    }
+
+    @Override
+    public WebElement getViewAssignedCCsbutton() {
+        return elementToBeClickable(getDriver(), VIEW_ASSIGNED_CC_BUTTON_LOCATOR);
     }
 
     private File waitForDownloadFile(Duration duration) throws IOException, InterruptedException {
