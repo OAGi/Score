@@ -10,7 +10,6 @@ import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -85,7 +84,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
@@ -402,6 +401,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement option = elementToBeClickable(getDriver(), By.xpath(
                 "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
         click(option);
+        waitFor(ofMillis(1000L));
+        assert getNamespaceFieldValue().equals(namespace.getUri());
     }
 
     @Override

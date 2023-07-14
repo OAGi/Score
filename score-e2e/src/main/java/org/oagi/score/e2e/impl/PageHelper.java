@@ -1,6 +1,8 @@
 package org.oagi.score.e2e.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oagi.score.e2e.impl.page.MultiActionSnackBarImpl;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -169,7 +171,17 @@ public abstract class PageHelper {
 
     public static WebElement click(WebElement element) {
         if (element != null) {
-            element.click();
+            String tagName = element.getTagName();
+            try {
+                element.click();
+            } catch (ElementClickInterceptedException e) {
+                if ("mat-select".equals(tagName)) {
+                    WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-select-arrow-wrapper"));
+                    click(arrowWrapper);
+                } else {
+                    throw e;
+                }
+            }
             waitFor(DEFAULT_WAIT_DURATION);
         }
         return element;
@@ -183,6 +195,10 @@ public abstract class PageHelper {
             element.sendKeys(Keys.SPACE);
         }
         return element;
+    }
+
+    public static MultiActionSnackBar getMultiActionSnackBar(WebDriver driver) {
+        return new MultiActionSnackBarImpl(driver);
     }
 
     /**

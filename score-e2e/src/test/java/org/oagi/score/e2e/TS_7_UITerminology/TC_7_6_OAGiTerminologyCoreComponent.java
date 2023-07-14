@@ -134,9 +134,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-        // TODO:
-        // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 

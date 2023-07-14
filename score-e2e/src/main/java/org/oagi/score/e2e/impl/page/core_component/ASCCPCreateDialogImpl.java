@@ -16,13 +16,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ASCCPCreateDialogImpl implements ASCCPCreateDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By TAG_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Tag\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Tag\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-container//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
