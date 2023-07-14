@@ -11,9 +11,11 @@ import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListReque
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.slf4j.Logger;
@@ -219,6 +221,8 @@ public class OpenAPIDocController {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
 
+        AppUser appUser = sessionService.getAppUserByUsername(requester);
+
         request.setOasDocId(oasDocId);
 
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
@@ -237,6 +241,8 @@ public class OpenAPIDocController {
                             .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
                     bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+                    bieList.setAccess(AccessPrivilege.toAccessPrivilege(appUser, bieList.getOwnerUserId(), bieList.getState()).toString()
+                    );
                 });
 
         PageResponse<BieForOasDoc> pageResponse = new PageResponse<>();
