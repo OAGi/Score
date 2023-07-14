@@ -255,12 +255,20 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   doUpdate() {
-    this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
-      this.init(this.oasDoc);
-      this.snackBar.open('Updated', '', {
-        duration: 3000,
+    // See #isChanged for the conditions in this method.
+    
+    if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
+      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
+        this.init(this.oasDoc);
+        this.snackBar.open('Updated', '', {
+          duration: 3000,
+        });
       });
-    });
+    }
+
+    if (this.getChanged().length > 0) {
+      this.updateDetails();
+    }
   }
 
   openDialogOasDocUpdate() {
