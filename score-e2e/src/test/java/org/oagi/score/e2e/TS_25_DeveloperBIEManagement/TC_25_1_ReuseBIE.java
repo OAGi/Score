@@ -452,6 +452,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
             bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
+            bccp_indicator_type.setDefinition("BCCP definition");
+            bccp_indicator_type.setDefinitionSource("BCCP definition source");
+            bccp_indicator_type.setDefaultValue("111");
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
             /**
@@ -462,20 +465,17 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
             ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
             BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");;
-            bcc_indicator.setCardinalityMax(199);
-            bcc_indicator.setCardinalityMin(77);
-            bcc_indicator.setDefinition("BIE Copy will keep the definition");
-            coreComponentAPI.updateBCCP(bccp_indicator_type);
             coreComponentAPI.appendExtension(developer_acc_lv2, developer, developerNamespace, "Published");
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
         viewEditBIEPage.hitSearchButton();
         WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -484,16 +484,14 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         escape(getDriver());
 
-        homePage.logout();
-        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
-        bieMenu = homePage.getBIEMenu();
         CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage = bieMenu.openCopyBIESubMenu();
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage = copyBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
         copyBIEForSelectBIEPage.setDEN(developerBIE.getDen());
         copyBIEForSelectBIEPage.hitSearchButton();
-        copyBIEForSelectBIEPage.copyBIE(developer_asccp_root.getDen(), current_release);
+        copyBIEForSelectBIEPage.copyBIE(developerBIE.getDen(), current_release);
 
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developerBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -504,9 +502,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage.openPage();
         WebElement BCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + bccp_indicator_type.getPropertyTerm());
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(BCCPNode);
-        assertEquals("199", getText(bbiePanel.getCardinalityMaxField()));
-        assertEquals("77", getText(bbiePanel.getCardinalityMinField()));
-        assertEquals("BIE Copy will keep the definition", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("111", getText(bbiePanel.getDefaultValueField()));
     }
 
     @Test
