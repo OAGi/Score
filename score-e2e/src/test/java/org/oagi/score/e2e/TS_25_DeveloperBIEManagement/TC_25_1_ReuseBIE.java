@@ -288,7 +288,6 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
         assertEquals(developer_asccp.getPropertyTerm(), getText(editBIEPage.getTitle()));
     }
-
     @Test
     public void test_TA_25_1_5() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
@@ -331,7 +330,6 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         WebElement reusedASCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
         asbiePanel.setRemark("aRemark");
-        asbiePanel.setContextDefinition("aContextDefinition");
         editBIEPage.hitUpdateButton();
 
         viewEditBIEPage.openPage();
@@ -349,7 +347,6 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         reusedASCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
         assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
-        assertEquals("aContextDefinition", getText(asbiePanel.getContextDefinitionField()));
     }
 
     @Test
@@ -426,12 +423,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         assertEquals("developerBIE remark", getText(reusedASBIEPanel.getRemarkField()));
         assertEquals("developerBIE business term", getText(reusedASBIEPanel.getLegacyBusinessTermField()));
         assertEquals("developerBIE status", getText(reusedASBIEPanel.getStatusField()));
-
-        asccpNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
-        assertDisabled(asbiePanel.getCardinalityMaxField());
-        assertDisabled(asbiePanel.getCardinalityMinField());
-        assertDisabled(asbiePanel.getContextDefinitionField());
+        assertDisabled(reusedASBIEPanel.getRemarkField());
+        assertDisabled(reusedASBIEPanel.getLegacyBusinessTermField());
+        assertDisabled(reusedASBIEPanel.getStatusField());
     }
 
     @Test
