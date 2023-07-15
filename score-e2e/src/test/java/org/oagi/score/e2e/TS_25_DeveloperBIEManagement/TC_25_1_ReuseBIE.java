@@ -1168,7 +1168,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -1184,6 +1184,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         topLevelASBIEPPanel.setBusinessTerm("developerBIE business term");
         topLevelASBIEPPanel.setStatus("developerBIE status");
         editBIEPage.hitUpdateButton();
+        editBIEPage.moveToQA();
 
         homePage.logout();
         homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
