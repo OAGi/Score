@@ -1097,9 +1097,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "QA");
         }
-        HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         Boolean bieExisting = true;
@@ -1117,10 +1117,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        homePage.logout();
-        homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        bieMenu = homePage.getBIEMenu();
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(reusedBIE.getDen());
         viewEditBIEPage.hitSearchButton();
@@ -1128,6 +1125,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
         click(viewEditBIEPage.getBackToWIP(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
         viewEditBIEPage.setDEN(reusedBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
