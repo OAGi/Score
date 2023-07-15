@@ -13,6 +13,7 @@ public final class ScoreUser implements Serializable {
     private String username;
 
     private Collection<ScoreRole> roles;
+    public ScoreUser(){}
 
     public ScoreUser(BigInteger userId, String username, ScoreRole role) {
         this(userId, username, Arrays.asList(role));

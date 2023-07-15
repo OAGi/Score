@@ -267,6 +267,8 @@ export class BieForOasDoc {
   state: string;
   businessContext: string;
   lastUpdateTimestamp: Date;
+  createdBy: ScoreUser;
+  lastUpdatedBy: ScoreUser;
   private _verbs: string[];
   arrayIndicator: boolean;
   suppressRoot: boolean;
@@ -306,6 +308,8 @@ export class BieForOasDoc {
     this.oasResourceId = obj && obj.oasResourceId || 0;
     this.tagName = obj && obj.tagName || '';
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
+    this.createdBy = obj && obj.createdBy || undefined;
+    this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
   }
   get resourceName(): string {
     return this._resourceName;
@@ -359,8 +363,5 @@ export class BieForOasDocUpdateRequest {
   bieForOasDocList: BieForOasDoc[];
   constructor() {
     this.bieForOasDocList = [];
-  }
-  get length(): number {
-    return this.bieForOasDocList.length;
   }
 }

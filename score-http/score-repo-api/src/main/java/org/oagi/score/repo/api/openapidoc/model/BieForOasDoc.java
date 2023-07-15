@@ -265,9 +265,34 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger oasDocId) {
+    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, BigInteger oasResourceId, BigInteger oasOperationId, String den, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, List<String> messageBody, String _verb, boolean _arrayIndicator, boolean _suppressRootIndicator, String _resourceName, String _operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
         this.topLevelAsbiepId = topLevelAsbiepId;
+        this.releaseId = releaseId;
         this.oasDocId = oasDocId;
+        this.oasResourceId = oasResourceId;
+        this.oasOperationId = oasOperationId;
+        this.den = den;
+        this.propertyTerm = propertyTerm;
+        this.guid = guid;
+        this.businessContexts = businessContexts;
+        this.ownerUserId = ownerUserId;
+        this.owner = owner;
+        this.version = version;
+        this.status = status;
+        this.state = state;
+        this.access = access;
+        this.verbs = verbs;
+        this.messageBody = messageBody;
+        this._verb = _verb;
+        this._arrayIndicator = _arrayIndicator;
+        this._suppressRootIndicator = _suppressRootIndicator;
+        this._resourceName = _resourceName;
+        this._operationId = _operationId;
+        this.tagName = tagName;
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+        this.creationTimestamp = creationTimestamp;
+        this.createdBy = createdBy;
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     @Override
