@@ -797,7 +797,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
             reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "QA");
         }
-        HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         Boolean bieExisting = true;
@@ -824,7 +824,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
 
-        click(viewEditBIEPage.getMoveToQA(true));
+        viewEditBIEPage.moveToQA();
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
