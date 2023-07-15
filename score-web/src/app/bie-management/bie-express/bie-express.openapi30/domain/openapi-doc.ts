@@ -135,6 +135,8 @@ export class BieForOasDocListRequest {
   };
   excludePropertyTerms: string[] = [];
   excludeTopLevelAsbiepIds: number[] = [];
+  oasResourceId: number;
+  oasOperationId: number;
   access: string;
   states: string[] = [];
   types: string[] = [];
@@ -173,6 +175,8 @@ export class BieForOasDocListRequest {
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
+    this.oasResourceId = Number(params.get('oasResourceId')) || 0;
+    this.oasOperationId = Number(params.get('oasOperationId')) || 0;
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
@@ -205,6 +209,12 @@ export class BieForOasDocListRequest {
     }
     if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));
+    }
+    if (this.oasResourceId) {
+      params = params.set('oasResourceId', this.oasResourceId.toString());
+    }
+    if (this.oasOperationId) {
+      params = params.set('oasOperationId', this.oasOperationId.toString());
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
@@ -252,8 +262,8 @@ export class BieForOasDocListRequest {
 export class BieForOasDoc {
   oasDocId: number;
   topLevelAsbiepId: number;
-  private _oasResourceId: number;
-  private _oasOperationId: number;
+  oasResourceId: number;
+  oasOperationId: number;
   den: string;
   propertyTerm: string;
   guid: string;
@@ -302,6 +312,8 @@ export class BieForOasDoc {
     this.messageBody = obj && obj.messageBody || [];
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
+    this.oasOperationId = obj && obj.oasOperationId || 0;
+    this.oasResourceId = obj && obj.oasResourceId || 0;
     this.tagName = obj && obj.tagName || '';
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
   }
@@ -318,12 +330,6 @@ export class BieForOasDoc {
   set operationId(value: string) {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
-  }
-  get oasResourceId(): number {
-    return this._oasResourceId;
-  }
-  get oasOperationId(): number {
-    return this._oasOperationId;
   }
   get verbs(): string[] {
     return this._verbs;
