@@ -27,10 +27,11 @@ public class BieForOasDoc extends Auditable {
     private String access;
     private List<String> verbs;
     private List<String> messageBody;
-    private boolean arrayIndicator;
-    private boolean suppressRootIndicator;
-    private String resourceName;
-    private String operationId;
+    private String _verb;
+    private boolean _arrayIndicator;
+    private boolean _suppressRootIndicator;
+    private String _resourceName;
+    private String _operationId;
     private String tagName;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
@@ -144,12 +145,44 @@ public class BieForOasDoc extends Auditable {
         this.verbs = verbs;
     }
 
-    public boolean isArrayIndicator() {
-        return arrayIndicator;
+    public String get_verb() {
+        return _verb;
     }
 
-    public void setArrayIndicator(boolean arrayIndicator) {
-        this.arrayIndicator = arrayIndicator;
+    public void set_verb(String _verb) {
+        this._verb = _verb;
+    }
+
+    public boolean is_arrayIndicator() {
+        return _arrayIndicator;
+    }
+
+    public void set_arrayIndicator(boolean _arrayIndicator) {
+        this._arrayIndicator = _arrayIndicator;
+    }
+
+    public boolean is_suppressRootIndicator() {
+        return _suppressRootIndicator;
+    }
+
+    public void set_suppressRootIndicator(boolean _suppressRootIndicator) {
+        this._suppressRootIndicator = _suppressRootIndicator;
+    }
+
+    public String get_resourceName() {
+        return _resourceName;
+    }
+
+    public void set_resourceName(String _resourceName) {
+        this._resourceName = _resourceName;
+    }
+
+    public String get_operationId() {
+        return _operationId;
+    }
+
+    public void set_operationId(String _operationId) {
+        this._operationId = _operationId;
     }
 
     public List<BusinessContext> getBusinessContexts() {
@@ -160,36 +193,12 @@ public class BieForOasDoc extends Auditable {
         this.businessContexts = businessContexts;
     }
 
-    public boolean isSuppressRootIndicator() {
-        return suppressRootIndicator;
-    }
-
-    public void setSuppressRootIndicator(boolean suppressRootIndicator) {
-        this.suppressRootIndicator = suppressRootIndicator;
-    }
-
     public List<String> getMessageBody() {
         return messageBody;
     }
 
     public void setMessageBody(List<String> messageBody) {
         this.messageBody = messageBody;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
     }
 
     public BigInteger getOasResourceId() {
@@ -281,10 +290,11 @@ public class BieForOasDoc extends Auditable {
                 ", access='" + access + '\'' +
                 ", verbs=" + verbs +
                 ", messageBody=" + messageBody +
-                ", arrayIndicator=" + arrayIndicator +
-                ", suppressRootIndicator=" + suppressRootIndicator +
-                ", resourceName='" + resourceName + '\'' +
-                ", operationId='" + operationId + '\'' +
+                ", _verb='" + _verb + '\'' +
+                ", _arrayIndicator=" + _arrayIndicator +
+                ", _suppressRootIndicator=" + _suppressRootIndicator +
+                ", _resourceName='" + _resourceName + '\'' +
+                ", _operationId='" + _operationId + '\'' +
                 ", tagName='" + tagName + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +

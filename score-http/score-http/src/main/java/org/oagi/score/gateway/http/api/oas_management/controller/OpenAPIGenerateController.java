@@ -56,13 +56,13 @@ public class OpenAPIGenerateController {
                 switch (verbOption) {
                     case "GET":
                         openAPIGenerateExpressionOption.setOpenAPI30GetTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.isArrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.is_arrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.is_suppressRootIndicator());
                         break;
                     case "POST":
                         openAPIGenerateExpressionOption.setOpenAPI30PostTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.isArrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.is_arrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.is_suppressRootIndicator());
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
