@@ -1257,7 +1257,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "QA");
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -1273,10 +1273,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         topLevelASBIEPPanel.setBusinessTerm("developerBIE business term");
         topLevelASBIEPPanel.setStatus("developerBIE status");
         editBIEPage.hitUpdateButton();
+        editBIEPage.moveToQA();
 
-        homePage.logout();
-        homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
-        bieMenu = homePage.getBIEMenu();
+        viewEditBIEPage.openPage();
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         Boolean bieExisting = true;
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
@@ -1284,6 +1283,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         bieExisting = 0 < getDriver().findElements(By.xpath("//*[contains(text(),\"" + developer_asccp_root.getDen() + "\")]//ancestor::tr")).size();
 
         viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(developer_asccp_root.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -1450,6 +1450,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             bieExisting = true;
         }
         viewEditBIEPage.openPage();
+        viewEditBIEPage.setBranch(current_release);
         viewEditBIEPage.setDEN(asccp_for_devx.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
