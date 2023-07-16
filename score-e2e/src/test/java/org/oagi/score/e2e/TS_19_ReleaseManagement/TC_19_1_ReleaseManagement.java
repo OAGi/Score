@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_19_ReleaseManagement;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -44,7 +45,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
     String existingReleaseNum = null;
-    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
     CodeListObject codeListCandidate;
     RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
     RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
@@ -52,6 +53,70 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
+        if (existingReleaseNum == null) {
+            draft_creation();
+            existingReleaseNum = newReleaseNum;
+        }
+    }
+
+    public void draft_creation() {
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        List<String> ccStates = new ArrayList<>();
+        ccStates.add("WIP");
+        ccStates.add("Draft");
+        ccStates.add("Candidate");
+        ccStates.add("Deleted");
+        developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
+        ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACC.getAccManifestId());
+        accViewEditPage.backToWIP();
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACC.getDen());
+        appendAssociationDialog.selectAssociation("Adjusted Total Tax Amount");
+        accViewEditPage.moveToDraft();
+        accViewEditPage.moveToCandidate();
+
+        codeListCandidate = getAPIFactory().getCodeListAPI().
+                createRandomCodeList(developer, namespace, workingBranch, "Published");
+        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
+
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
+        editCodeListPage.hitRevise();
+        editCodeListPage.setVersion("99");
+        editCodeListPage.setDefinition("random code list in candidate state");
+        editCodeListPage.hitUpdateButton();
+        editCodeListPage.moveToDraft();
+        editCodeListPage.moveToCandidate();
+
+        List<String> euCCStates = new ArrayList<>();
+        euCCStates.add("WIP");
+        euCCStates.add("QA");
+        euCCStates.add("Production");
+
+        euCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, euBranch, euNamespace, euCCStates);
+
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
+        homePage.logout();
     }
 
     @AfterEach
@@ -141,86 +206,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
-        createReleasePage.setReleaseNumber(newReleaseNum);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        createReleasePage.setReleaseNamespace(namespace);
-        createReleasePage.setReleaseNote("A release note");
-        createReleasePage.setReleaseLicense("A release license");
-        createReleasePage.hitCreateButton();
-
-        if (existingReleaseNum == null) {
-            draft_creation();
-            existingReleaseNum = newReleaseNum;
-        }
-
-        viewEditReleasePage.openPage();
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(existingReleaseNum, "Draft");
         assertEquals(existingReleaseNum, getText(editReleasePage.getReleaseNumberField()));
     }
 
-    public void draft_creation() {
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        List<String> ccStates = new ArrayList<>();
-        ccStates.add("WIP");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
-        ccStates.add("Deleted");
-        developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
-        ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACC.getAccManifestId());
-        accViewEditPage.backToWIP();
-        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACC.getDen());
-        appendAssociationDialog.selectAssociation("Adjusted Total Tax Amount");
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
 
-        codeListCandidate = getAPIFactory().getCodeListAPI().
-                createRandomCodeList(developer, namespace, workingBranch, "Published");
-        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
-
-        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
-        editCodeListPage.hitRevise();
-        editCodeListPage.setVersion("99");
-        editCodeListPage.setDefinition("random code list in candidate state");
-        editCodeListPage.hitUpdateButton();
-        editCodeListPage.moveToDraft();
-        editCodeListPage.moveToCandidate();
-
-        List<String> euCCStates = new ArrayList<>();
-        euCCStates.add("WIP");
-        euCCStates.add("QA");
-        euCCStates.add("Production");
-
-        euCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, euBranch, euNamespace, euCCStates);
-
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
-        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        createReleasePage.setReleaseNumber(newReleaseNum);
-        createReleasePage.setReleaseNamespace(namespace);
-        createReleasePage.hitCreateButton();
-        viewEditReleasePage.openPage();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
-        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
-        releaseAssignmentPage.hitAssignAllButton();
-        releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
-        homePage.logout();
-    }
     @Test
     public void test_TA_19_1_3b() {
+
+
 
     }
     @Test
