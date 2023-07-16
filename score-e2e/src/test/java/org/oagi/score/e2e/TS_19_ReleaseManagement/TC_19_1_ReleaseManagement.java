@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_19_ReleaseManagement;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,9 +8,22 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
+import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
+import org.oagi.score.e2e.page.release.CreateReleasePage;
+import org.oagi.score.e2e.page.release.EditReleasePage;
+import org.oagi.score.e2e.page.release.ViewEditReleasePage;
+import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_19_1_ReleaseManagement extends BaseTest {
@@ -36,7 +50,23 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_1() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        assertThrows(TimeoutException.class, () -> createReleasePage.hitCreateButton());
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.setReleaseNote("A release note");
+        createReleasePage.setReleaseLicense("A release license");
+        createReleasePage.hitCreateButton();
 
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
+        assertEquals(newReleaseNum, getText(editReleasePage.getReleaseNumberField()));
     }
     @Test
     public void test_TA_19_1_2() {
