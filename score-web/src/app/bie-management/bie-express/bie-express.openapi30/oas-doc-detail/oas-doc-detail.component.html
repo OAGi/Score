@@ -38,7 +38,7 @@
     <mat-card-header class="align-items-baseline">
       <mat-card-title>BIE List</mat-card-title>
       <div style="padding: 8px 0 8px 12px;">
-        <button mat-raised-button class="mr-2" (click)="openDialog($event)"  color="primary">
+        <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary">
           <mat-icon>add</mat-icon>
           Add
         </button>
@@ -137,7 +137,7 @@
               <th mat-header-cell *matHeaderCellDef> Resource Name</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.resourceName"  >
+                  <input matInput [(ngModel)]="element.resourceName">
                 </mat-form-field>
               </td>
             </ng-container>
@@ -146,7 +146,7 @@
               <th mat-header-cell *matHeaderCellDef> Operation ID</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.operationId">>
+                  <input matInput [(ngModel)]="element.operationId">
                 </mat-form-field>
               </td>
             </ng-container>
