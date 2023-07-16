@@ -1421,7 +1421,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             asccp_for_devx = coreComponentAPI.createRandomASCCP(acc_association, devx, developerNamespace, "Published");
             devxBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, devx, "WIP");
         }
-        HomePage homePage = loginPage().signIn(devx.getLoginId(), devy.getPassword());
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         viewEditBIEPage.setBranch(current_release);
