@@ -1370,7 +1370,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         editBIEPage.openPage();
         selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm()  + "/" + asccp.getPropertyTerm(), 1);
-        selectProfileBIEToReuseDialog.selectBIEToReuse(devyBIE);
+        selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
