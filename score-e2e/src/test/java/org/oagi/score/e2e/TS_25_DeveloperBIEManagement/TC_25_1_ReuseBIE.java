@@ -289,6 +289,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
         assertEquals(developer_asccp.getPropertyTerm(), getText(editBIEPage.getTitle()));
     }
+
     @Test
     public void test_TA_25_1_5() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
@@ -465,7 +466,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_acc_lv2 = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
             developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
             ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
-            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");;
+            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");
+            ;
             coreComponentAPI.appendExtension(developer_acc_lv2, developer, developerNamespace, "Published");
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
@@ -539,7 +541,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_acc_lv2 = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
             developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
             ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
-            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");;
+            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");
+            ;
             bcc_indicator.setCardinalityMax(199);
             bcc_indicator.setCardinalityMin(77);
             bcc_indicator.setDefinition("BIE Copy will keep the definition");
@@ -587,7 +590,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         //Check ReUse Report
         ReuseReportPage reuseReportPage = bieMenu.openReuseReportSubMenu();
-        click(elementToBeClickable(getDriver(), By.xpath("//tr/td[3]//*[contains(text(),\""+developer_asccp_root.getPropertyTerm()+"\")]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//tr/td[3]//*[contains(text(),\"" + developer_asccp_root.getPropertyTerm() + "\")]")));
         ArrayList<String> tabs = new ArrayList<>(getDriver().getWindowHandles());
         getDriver().switchTo().window(tabs.get(1));
 
@@ -636,7 +639,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_acc_lv2 = coreComponentAPI.createRandomACC(developer, currentReleaseObject, developerNamespace, "Published");
             developer_asccp_lv2 = coreComponentAPI.createRandomASCCP(developer_acc_lv2, developer, developerNamespace, "Published");
             ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(developer_acc, developer_asccp_lv2, "Published");
-            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");;
+            BCCObject bcc_indicator = coreComponentAPI.appendBCC(developer_acc, bccp_indicator_type, "Published");
+            ;
             bcc_indicator.setCardinalityMax(199);
             bcc_indicator.setCardinalityMin(77);
             bcc_indicator.setDefinition("BIE Copy will keep the definition");
@@ -986,6 +990,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals("Production", getText(topLevelASBIEPPanel.getStateField()));
     }
+
     @Test
     public void test_TA_25_1_14() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
@@ -1066,6 +1071,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
                 "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
     }
+
     @Test
     public void test_TA_25_1_15() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
@@ -1343,7 +1349,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            acc_lv2 = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace,  "Published");
+            acc_lv2 = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
             acc_association = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, devx, developerNamespace, "Published");
             ASCCObject ascc = coreComponentAPI.appendASCC(acc_association, asccp, "Published");
@@ -1352,7 +1358,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             ASCCObject ascc_lv2 = coreComponentAPI.appendASCC(acc_lv2, asccp_lv2, "Published");
             asccp_for_devx = coreComponentAPI.createRandomASCCP(acc_lv2, devx, developerNamespace, "Published");
             devxBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, devx, "WIP");
-            devyBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_for_devx, devy,"WIP");
+            devyBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp_for_devx, devy, "WIP");
         }
 
         HomePage homePage = loginPage().signIn(devy.getLoginId(), devy.getPassword());
@@ -1369,7 +1375,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
         editBIEPage.openPage();
-        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm()  + "/" + asccp.getPropertyTerm(), 1);
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 1);
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
