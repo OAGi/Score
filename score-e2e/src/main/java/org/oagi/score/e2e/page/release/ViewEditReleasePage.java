@@ -149,6 +149,15 @@ public interface ViewEditReleasePage extends Page {
     void hitSearchButton();
 
     /**
+     * Return the UI element of the table record at the given index, which starts from 1.
+     *
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
+     */
+    WebElement getTableRecordAtIndex(int idx);
+
+
+    /**
      * Open the page of the Release filtered by `Release Num` and `state`.
      *
      * @param releaseNum Release Num text
@@ -218,4 +227,11 @@ public interface ViewEditReleasePage extends Page {
      * @param releaseNum release Number
      */
     void MoveBackToInitialized(String releaseNum);
+
+    /**
+     * Return the UI element of the 'Discard' button.
+     *
+     * @return the UI element of the 'Discard' button
+     */
+    WebElement getDiscardButton();
 }

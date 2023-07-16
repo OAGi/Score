@@ -45,6 +45,8 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+    private static final By DISCARD_BUTTON_LOCATOR =
+            By.xpath("//*[contains(text(),\"Discard\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -212,6 +214,10 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
 
     @Override
     public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State) {
@@ -310,4 +316,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofSeconds(120));
     }
+
+    @Override
+    public WebElement getDiscardButton() {
+        return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+    }
+
+
 }

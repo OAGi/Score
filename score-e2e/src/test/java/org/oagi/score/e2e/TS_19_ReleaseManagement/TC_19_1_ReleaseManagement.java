@@ -15,7 +15,10 @@ import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +26,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_19_1_ReleaseManagement extends BaseTest {
@@ -70,7 +74,31 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
     @Test
     public void test_TA_19_1_2() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.setReleaseNote("A release note");
+        createReleasePage.setReleaseLicense("A release license");
+        createReleasePage.hitCreateButton();
 
+        viewEditReleasePage.openPage();
+        viewEditReleasePage.setReleaseNum(newReleaseNum);
+        viewEditReleasePage.hitSearchButton();
+        WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+        WebElement td = viewEditReleasePage.getColumnByName(tr, "select");
+        click(td);
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]")));
+        click(viewEditReleasePage.getDiscardButton());
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
+        viewEditReleasePage.openPage();
+        assertThrows(NoSuchElementException.class, () ->viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized"));
     }
     @Test
     public void test_TA_19_1_3a() {
