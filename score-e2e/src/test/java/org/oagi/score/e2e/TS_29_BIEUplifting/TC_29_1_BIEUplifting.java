@@ -499,6 +499,70 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setDefaultValue("99");
         editBIEPage.hitUpdateButton();
 
+        bbieSCNode = editBIEPage.getNodeByPath("/BOM Item Data/Supplier Item Identification/Item Identifier Set/Identifier/Scheme Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        if (!bbiescPanel.getUsedCheckbox().isSelected()){
+            bbiescPanel.toggleUsed();
+        }
+        bbiescPanel.setRemark("aRemark");
+        bbiescPanel.setExample("anExample");
+        bbiescPanel.setContextDefinition("defcon");
+        assertEquals("1", getText(bbiescPanel.getCardinalityMaxField()));
+        editBIEPage.hitUpdateButton();
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
+
+        //BIEBOMDoubleNested previousRelease
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("BOM. BOM", prev_release);
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIEBOMDoubleNested")){
+            testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        }
+
+        bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Header/Document Identifier Set/Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        if (!bbiescPanel.getUsedCheckbox().isSelected()){
+            bbiescPanel.toggleUsed();
+        }
+
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/BOM/BOM Item Data");
+        reusedBIE = testingBIEs.get("BIEBOMItemData");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+
+        asbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/BOM Item Data/Hazardous Material");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/BOM/BOM Option/BOM Item Data");
+        reusedBIE = testingBIEs.get("BBIEBOMItemData");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+
+        homePage.logout();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
