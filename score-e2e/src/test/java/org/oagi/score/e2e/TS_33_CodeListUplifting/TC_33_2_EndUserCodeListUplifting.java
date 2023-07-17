@@ -383,19 +383,15 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     public void test_TA_10() {
         AppUserObject endUser;
         CodeListObject codeListEU;
-        CodeListObject codeListDev;
-        List<CodeListValueObject> baseCodeListValues = new ArrayList<>();
-        CodeListValueObject devCLValue;
+        List<CodeListValueObject> baseCodeListValues;
+        CodeListValueObject euCLValue;
         ReleaseObject release;
         ReleaseObject targetRelease;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
-            thisAccountWillBeDeletedAfterTests(developer);
 
             NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            NamespaceObject namespaceDev = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
             targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
             CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
@@ -404,9 +400,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
             codeListEU = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, endUser, namespaceEU, release, "WIP");
 
-            codeListDev = getAPIFactory().getCodeListAPI().createDerivedCodeList(baseCodeList, developer, namespaceDev, targetRelease, "Published");
-
-            devCLValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDev, developer);
+            euCLValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListEU, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
@@ -428,10 +422,10 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         }
 
         /**
-         * If the developer code list of the target release and the uplifted end user code list contain some same values,
-         * the developer code list values are used.
+         * If the code list of the target release and the uplifted end user code list contain some same values,
+         * the code list values are used.
          */
-        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(devCLValue.getValue()));
+        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(euCLValue.getValue()));
     }
 
     @AfterEach
