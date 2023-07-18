@@ -6,11 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers.TC_18_2_CodeListAccess;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.context.CreateBusinessContextPage;
 import org.oagi.score.e2e.page.context.ViewEditBusinessContextPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
@@ -22,8 +25,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_29_1_BIEUplifting extends BaseTest {
@@ -548,81 +550,105 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
 
         homePage.logout();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        List<String> euCLStates = new ArrayList<>();
+        euCLStates.add("WIP");
+        euCLStates.add("QA");
+        euCLStates.add("Production");
+        euCLStates.add("Deleted");
+        ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
+        RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(usera, prev_releaseObject, euNamespace, euCLStates);
+        CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
+        CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(CLaccessUseraDeprecated.getName(), prev_release);
+        editCodeListPage.hitAmendButton();
+        click(editCodeListPage.getDeprecatedSelectField());
+        editCodeListPage.setDefinition("Check the Deprecated Checkbox");
+        editCodeListPage.hitUpdateButton();
+        editCodeListPage.moveToQA();
+        editCodeListPage.moveToProduction();
+
+        viewEditCodeListPage.openPage();
+        editCodeListPage =  viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
+        editCodeListPage.hitDeriveCodeListBasedOnThisButton();
+        editCodeListPage.setName("CLuserderived_BIEUp");
+        editCodeListPage.setNamespace(euNamespace);
+        editCodeListPage.setDefinition("aDefinition");
+        editCodeListPage.hitUpdateButton();
+
+        //BIECAGUplift prev_release
+        bieMenu = homePage.getBIEMenu();
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Child Item Reference. Child Item Reference", prev_release);
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIECAGUplift")){
+            testingBIEs.put("BIECAGUplift", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIECAGUplift", topLevelASBIEP);
+        }
+
+        accExtensionViewEditPage =
+                editBIEPage.extendBIEGloballyOnNode("/Child Item Reference/Extension");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Effectivity Relation Code. Code");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Validation Indicator. Indicator");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Method Consequence Text. Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Reference Identifier. Identifier");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Total Number. Number");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Latest Start Date Time. Date Time");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Request Language Code. Code");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Transport Temperature. Measure");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Correlation Identifier. Identifier");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Reason. Sequenced_ Open_ Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Save Indicator. Indicator");
+
+        accExtensionViewEditPage.setNamespace(euNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.moveToProduction();
+        homePage.logout();
+
+    }
+
+    private class RandomCodeListWithStateContainer {
+        private final AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private final HashMap<String, CodeListObject> stateCodeLists = new HashMap<>();
+        private final HashMap<String, CodeListValueObject> stateCodeListValues = new HashMap<>();
+
+        public RandomCodeListWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                CodeListObject codeList;
+                CodeListValueObject codeListValue;
+                String state = this.states.get(i);
+                {
+                    codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(this.appUser, namespace, release, state);
+                    codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, this.appUser);
+                    stateCodeLists.put(state, codeList);
+                    stateCodeListValues.put(state, codeListValue);
+                }
+            }
+        }
 
     }
 
