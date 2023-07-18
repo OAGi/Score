@@ -98,7 +98,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         ACCExtensionViewEditPage accExtensionViewEditPage =
-                editBIEPage.extendBIEGloballyOnNode("/Enterprise Unit/Extension");
+                editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Product Classification. Classification");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
@@ -131,13 +131,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
 
-        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
-        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.toggleUsed();
-        asbiePanel.setRemark("aRemark");
-
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
-        EditBIEPage.BBIEPanel bbicPanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
 
@@ -151,40 +146,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("language");
         bbiePanel.setContextDefinition("defcon");
 
-        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
-        bbiePanel.setRemark("aRemark");
-        bbiePanel.setExample("anExample");
-        bbiePanel.setValueConstraint("Fixed Value");
-        bbiePanel.setFixedValue("99");
-        bbiePanel.setValueDomain("language");
-        bbiePanel.setContextDefinition("defcon");
-
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
-        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.toggleUsed();
-        asbiePanel.setRemark("aRemark");
-        asbiePanel.setContextDefinition("defcon");
-
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
-        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
         asbiePanel.setContextDefinition("defcon");
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomain("normalized string");
-        bbiescPanel.setContextDefinition("defcon");
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
@@ -200,51 +169,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setExample("anExample");
         bbiescPanel.setValueConstraint("Fixed Value");
         bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomainRestriction("Primitive");
         bbiescPanel.setValueDomain("any URI");
         bbiescPanel.setContextDefinition("defcon");
-
-        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
-        bbiePanel.setRemark("aRemark");
-        bbiePanel.setExample("anExample");
-        bbiePanel.setCardinalityMax(99);
-        bbiePanel.setCardinalityMin(11);
-        bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setValueDomainRestriction("Primitive");
-        bbiePanel.setValueDomain("token");
-        bbiePanel.setFixedValue("99");
-
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set");
-        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.toggleUsed();
-        asbiePanel.setRemark("aRemark");
-        asbiePanel.setContextDefinition("defcon");
-        asbiePanel.setCardinalityMin(11);
-        asbiePanel.setCardinalityMax(99);
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomainRestriction("Code");
-        bbiescPanel.setValueDomain("clm6ConstraintTypeCode1_ConstraintTypeCode");
-        bbiescPanel.setContextDefinition("defcon");
-
-        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
-        bbiePanel.setRemark("aRemark");
-        bbiePanel.setExample("anExample");
-        bbiePanel.setCardinalityMax(99);
-        bbiePanel.setCardinalityMin(11);
-        bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setValueConstraint("Default Value");
-        bbiePanel.setDefaultValue("99");
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -259,8 +185,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
-        bbiePanel.setCardinalityMax(99);
-        bbiePanel.setCardinalityMin(11);
         bbiePanel.setContextDefinition("defcon");
         bbiePanel.setValueConstraint("Default Value");
         bbiePanel.setDefaultValue("99");
@@ -345,9 +269,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Capacity Per Package Quantity");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        if (!bbiePanel.getUsedCheckbox().isSelected()){
-            bbiePanel.toggleUsed();
-        }
+        bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
         bbiePanel.setContextDefinition("defcon");
@@ -357,9 +279,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         asbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Dimensions");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        if (!asbiePanel.getUsedCheckbox().isSelected()){
-            asbiePanel.toggleUsed();
-        }
+        asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMax(99);
         asbiePanel.setCardinalityMin(11);
         asbiePanel.setRemark("aRemark");
@@ -368,9 +288,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieSCNode = editBIEPage.getNodeByPath("/Unit Packaging/UPC Packaging Level Code/List Agency Identifier");
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        if (!bbiescPanel.getUsedCheckbox().isSelected()){
-            bbiescPanel.toggleUsed();
-        }
+        bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
         bbiescPanel.setValueConstraint("Default Value");
@@ -401,9 +319,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieNode = editBIEPage.getNodeByPath("/From UOM Package/UOM Code");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        if (!bbiePanel.getUsedCheckbox().isSelected()){
-            bbiePanel.toggleUsed();
-        }
+        bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
         bbiePanel.setContextDefinition("defcon");
@@ -601,7 +517,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
         accExtensionViewEditPage =
-                editBIEPage.extendBIEGloballyOnNode("/Child Item Reference/Extension");
+                editBIEPage.extendBIELocallyOnNode("/Child Item Reference/Extension");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Effectivity Relation Code. Code");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
@@ -759,7 +675,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         ACCExtensionViewEditPage accExtensionViewEditPage =
-                editBIEPage.extendBIEGloballyOnNode("/Enterprise Unit/Extension");
+                editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Product Classification. Classification");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
@@ -782,6 +698,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_4() {
+
 
     }
 

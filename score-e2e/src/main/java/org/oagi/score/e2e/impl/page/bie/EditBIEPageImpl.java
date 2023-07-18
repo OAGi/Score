@@ -537,7 +537,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(asccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new ASBIEPanelImpl();
         });
     }
@@ -549,7 +549,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIEPanelImpl();
         });
     }
@@ -561,7 +561,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIESCPanelImpl();
         });
     }
