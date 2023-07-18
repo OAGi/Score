@@ -317,9 +317,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
         bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setValueConstraint("Default Value");
+        bbiePanel.setValueConstraint("Fixed Value");
         bbiePanel.setFixedValue("99");
-        bbiePanel.setValueDomainRestriction("Primitive");
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
 
@@ -451,10 +450,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-
-        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/BOM/BOM Option/BOM Item Data");
-        reusedBIE = testingBIEs.get("BBIEBOMItemData");
-        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
 
         homePage.logout();
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
