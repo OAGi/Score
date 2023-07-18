@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers.TC_18_2_CodeListAccess;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
@@ -14,29 +13,36 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.context.CreateBusinessContextPage;
-import org.oagi.score.e2e.page.context.ViewEditBusinessContextPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
     String prev_release = "10.8.6";
     String curr_release = "10.8.8";
     AppUserObject usera, userb, developer;
+    boolean precondition_created = false;
+    Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
 
     @BeforeEach
     public void init() {
         super.init();
+        if (!precondition_created){
+            preconditions();
+        }
+        precondition_created = true;
     }
 
     @AfterEach
@@ -65,7 +71,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
+
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
 
@@ -720,10 +726,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setContextDefinition("a definition");
         editBIEPage.hitUpdateButton();
         editBIEPage.moveToQA();
-
-
-
-
 
 
     }
