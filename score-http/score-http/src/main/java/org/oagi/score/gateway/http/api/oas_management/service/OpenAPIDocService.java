@@ -258,7 +258,7 @@ public class OpenAPIDocService {
 
         UpdateBieForOasDocResponse response =
                 scoreRepositoryFactory.createBieForOasDocWriteRepository()
-                        .updateBieForOasDoc(user, request);
+                        .updateBieForOasDoc(request);
         return response;
     }
 }

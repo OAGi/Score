@@ -11,7 +11,7 @@ import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
-import org.springframework.security.core.AuthenticatedPrincipal;
+
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -27,12 +27,12 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
     }
 
     @Override
-    public AddBieForOasDocResponse assignBieForOasDoc(AuthenticatedPrincipal user, AddBieForOasDocRequest request) throws ScoreDataAccessException {
+    public AddBieForOasDocResponse assignBieForOasDoc(AddBieForOasDocRequest request) throws ScoreDataAccessException {
         return null;
     }
 
     @Override
-    public UpdateBieForOasDocResponse updateBieForOasDoc(AuthenticatedPrincipal user, UpdateBieForOasDocRequest request) throws ScoreDataAccessException {
+    public UpdateBieForOasDocResponse updateBieForOasDoc(UpdateBieForOasDocRequest request) throws ScoreDataAccessException {
         ScoreUser requester = request.getRequester();
         BigInteger requesterUserId = requester.getUserId();
         LocalDateTime timestamp = LocalDateTime.now();
