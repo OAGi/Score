@@ -7,6 +7,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.impl.page.bie.CreateBIEForSelectBusinessContextsPageImpl;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -787,52 +788,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_3() {
-        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(usera);
-
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
-
-        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
-        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Enterprise Unit. Enterprise Unit", prev_release);
-        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        CreateBIEForSelectTopLevelConceptPage  createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Batch Certificate Of Analysis. Batch Certificate Of Analysis", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-        topLevelASBIEPPanel.setBusinessTerm("aBusinessTerm");
-        topLevelASBIEPPanel.setRemark("aRemark");
-        topLevelASBIEPPanel.setStatus("aStatus");
-        editBIEPage.hitUpdateButton();
-
-        ACCExtensionViewEditPage accExtensionViewEditPage =
-                editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
-        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Product Classification. Classification");
-        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Incorporation Location. Location");
-        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Code List. Code List");
-        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Revised Item Status. Status");
-        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Usage Description. Text");
-        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Last Modification Date Time. Date Time");
-
-        accExtensionViewEditPage.setNamespace(euNamespace);
-        accExtensionViewEditPage.hitUpdateButton();
-        accExtensionViewEditPage.moveToQA();
-        accExtensionViewEditPage.moveToProduction();
-
+        if (!testingBIEs.containsKey("BIEUserbWIP")){
+            testingBIEs.put("BIEUserbWIP", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIEUserbWIP", topLevelASBIEP);
+        }
+        homePage.logout();
+        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject BIEUserbWIP = testingBIEs.get("BIEUserbWIP");
+        upliftBIEPage.setPropertyTerm(BIEUserbWIP.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIEUserbWIP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
 
     @Test
