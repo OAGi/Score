@@ -18,14 +18,16 @@ import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
@@ -566,62 +568,37 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_2() {
-        ASCCPObject asccp;
-        ACCObject acc;
-        AppUserObject usera, userb, developer;
-        String prev_release = "10.8.6";
-        String curr_release = "10.8.8";
-        NamespaceObject useraNamespace;
-        TopLevelASBIEPObject useraBIEWIP;
-        {
-            ReleaseObject prev_Release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
-            ReleaseObject curr_Release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(curr_release);
-            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developer);
-
-            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-            acc = coreComponentAPI.createRandomACC(developer, prev_Release, namespace, "Published");
-            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
-
-            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-            thisAccountWillBeDeletedAfterTests(usera);
-
-            userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(userb);
-
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
-                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
 
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
-
         BIEMenu bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(asccp.getPropertyTerm());
+        TopLevelASBIEPObject BIECAGUplift = testingBIEs.get("BIECAGUplift");
+        upliftBIEPage.setPropertyTerm(BIECAGUplift.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + asccp.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIECAGUplift.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
 
         homePage.logout();
-        homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         bieMenu = homePage.getBIEMenu();
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage  editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm());
-        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
-        asbiePanel.setRemark("aRemark");
-        asbiePanel.setCardinalityMin(7);
-        asbiePanel.setCardinalityMax(13);
-        asbiePanel.setContextDefinition("a definition");
-        editBIEPage.hitUpdateButton();
-        editBIEPage.moveToQA();
+        upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        upliftBIEPage.setState("QA");
+        TopLevelASBIEPObject BIE1QA = testingBIEs.get("BIE1QA");
+        upliftBIEPage.setPropertyTerm(BIE1QA.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        click(upliftBIEPage.getNextButton());
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+
+
+
+
 
 
     }
