@@ -224,18 +224,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        if (!asbiePanel.getUsedCheckbox().isSelected()){
-            asbiePanel.toggleUsed();
-        }
         asbiePanel.setRemark("aRemark");
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
         bbieSCNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        if (!bbiescPanel.getUsedCheckbox().isSelected()){
-            bbiescPanel.toggleUsed();
-        }
+        bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
         bbiescPanel.setValueConstraint("Fixed Value");
@@ -291,9 +286,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Default Value");
+        bbiescPanel.setValueConstraint("Fixed Value");
         bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomainRestriction("Primitive");
         bbiescPanel.setValueDomain("token");
         bbiescPanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
@@ -378,9 +372,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieNode = editBIEPage.getNodeByPath("/Customer Item Identification/Revision Identifier");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        if (!bbiePanel.getUsedCheckbox().isSelected()){
-            bbiePanel.toggleUsed();
-        }
+        bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
         bbiePanel.setContextDefinition("defcon");
@@ -413,9 +405,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieNode = editBIEPage.getNodeByPath("/BOM Item Data/Reference Designator Identifier");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        if (!bbiePanel.getUsedCheckbox().isSelected()){
-            bbiePanel.toggleUsed();
-        }
+        bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         bbiePanel.setExample("anExample");
         bbiePanel.setContextDefinition("defcon");
@@ -425,9 +415,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieSCNode = editBIEPage.getNodeByPath("/BOM Item Data/Supplier Item Identification/Item Identifier Set/Identifier/Scheme Version Identifier");
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        if (!bbiescPanel.getUsedCheckbox().isSelected()){
-            bbiescPanel.toggleUsed();
-        }
+        bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
         bbiescPanel.setContextDefinition("defcon");
@@ -454,10 +442,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Header/Document Identifier Set/Identifier/Scheme Agency Identifier");
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        if (!bbiescPanel.getUsedCheckbox().isSelected()){
-            bbiescPanel.toggleUsed();
-        }
-
+        bbiescPanel.toggleUsed();
         selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/BOM/BOM Item Data");
         reusedBIE = testingBIEs.get("BIEBOMItemData");
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
