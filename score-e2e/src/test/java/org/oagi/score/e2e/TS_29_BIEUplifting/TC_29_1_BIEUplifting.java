@@ -568,7 +568,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_2() {
-
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
