@@ -520,11 +520,23 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofSeconds(12000));
         new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
 
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-
-
-
-
+        if (!upliftedBIEs.containsKey("BIE1QA")){
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }else{
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        assertTrue(editBIEPage.isOpened());
     }
 
     @Test
