@@ -98,6 +98,11 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         return visibilityOfElementLocated(getDriver(), TARGET_SEARCH_INPUT_LOCATOR);
     }
     @Override
+    public WebElement getCheckBoxOfNodeInTargetBIE(String node) {
+        return visibilityOfElementLocated(getDriver() ,By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\""+node+"\")]//ancestor::div[1]/mat-checkbox[1]/label/span[1]"));
+    }
+
+    @Override
     public void next() {
         click(getNextButton());
     }

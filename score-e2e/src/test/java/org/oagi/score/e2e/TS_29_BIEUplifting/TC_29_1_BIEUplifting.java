@@ -20,6 +20,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.sound.midi.ShortMessage;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
@@ -191,29 +192,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setValueConstraint("Fixed Value");
         bbiescPanel.setFixedValue("99");
         bbiescPanel.setValueDomain("normalized string");
-        bbiescPanel.setContextDefinition("defcon");
-        editBIEPage.hitUpdateButton();
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomain("normalized string");
-        bbiescPanel.setContextDefinition("defcon");
-        editBIEPage.hitUpdateButton();
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomainRestriction("Code");
-        bbiescPanel.setValueDomain("clm6ConstraintTypeCode1_ConstraintTypeCode");
         bbiescPanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
@@ -614,13 +592,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
 
-        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Indicator");
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Version Identifier");
         assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
         assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("Enterprise Unit/Profit Center Identifier");
         assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+        homePage.logout();
     }
 
     @Test
@@ -638,16 +617,35 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        //different green
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Indicator");
+        WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Profit Center Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Profit Center Identifier"));
+        escape(getDriver());
 
-        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
-        WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Version Identifier");
-        assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+        //different blue
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Identifier Set");
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
-        assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("Enterprise Unit/Profit Center Identifier");
-        assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
+        escape(getDriver());
 
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
 
+        if (!upliftedBIEs.containsKey("BIE1QA")){
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }else{
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        assertTrue(editBIEPage.isOpened());
     }
 
     @Test

@@ -17,6 +17,8 @@ public interface UpliftBIEVerificationPage extends Page {
 
     WebElement getSearchInputOfTargetTree();
 
+    WebElement getCheckBoxOfNodeInTargetBIE(String node);
+
     /**
      * Return the UI element of the 'Next' button in the paginator.
      *
