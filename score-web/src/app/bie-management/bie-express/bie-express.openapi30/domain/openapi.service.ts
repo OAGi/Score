@@ -227,11 +227,10 @@ export class OpenAPIService {
         oasDocId: assignBieForOasDoc.oasDocId,
         isOasRequest: assignBieForOasDoc.isOasRequest,
         topLevelAsbiepId: assignBieForOasDoc.topLevelAsbiepId,
-        den: assignBieForOasDoc.den,
+        propertyTerm: assignBieForOasDoc.propertyTerm,
         verb: assignBieForOasDoc.verb,
         arrayIndicator: assignBieForOasDoc.arrayIndicator,
-        suppressRoot: assignBieForOasDoc.suppressRoot,
-        messageBody: assignBieForOasDoc.messageBody
+        suppressRootIndicator: assignBieForOasDoc.suppressRootIndicator,
       });
   }
 

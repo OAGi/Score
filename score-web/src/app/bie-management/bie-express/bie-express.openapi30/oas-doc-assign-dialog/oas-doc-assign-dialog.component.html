@@ -218,7 +218,7 @@
             <td mat-cell *matCellDef="let element">
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? arrayIndicator != arrayIndicator: null"
-                            [checked]="arrayIndicator">
+                            [(ngModel)]="arrayIndicator">
               </mat-checkbox>
             </td>
           </ng-container>
@@ -228,7 +228,7 @@
             <td mat-cell *matCellDef="let element">
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? suppressRootIndicator != suppressRootIndicator: null"
-                            [checked]="suppressRootIndicator">
+                            [(ngModel)]="suppressRootIndicator">
               </mat-checkbox>
             </td>
           </ng-container>

@@ -352,10 +352,10 @@ export class AssignBieForOasDoc {
   isOasRequest: boolean;
   oasDocId: number;
   topLevelAsbiepId: number;
-  den: string;
+  propertyTerm: string;
   verb: string;
   arrayIndicator: boolean;
-  suppressRoot: boolean;
+  suppressRootIndicator: boolean;
   messageBody: string;
 }
 export class BieForOasDocUpdateRequest {

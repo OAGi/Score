@@ -201,19 +201,18 @@ export class OasDocAssignDialogComponent implements OnInit {
   addBieForOasDoc() {
     const selectedBieForOasDocs = this.selection.selected;
     for (const bieForOasDoc of selectedBieForOasDocs) {
-      this.assignBieForOasDoc.den = bieForOasDoc.den;
+      this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
       this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
-      if (this.assignBieForOasDoc.verb === 'GET') {
+      if (this.assignBieForOasDoc.messageBody === 'requestBody') {
         this.assignBieForOasDoc.isOasRequest = true;
-        this.assignBieForOasDoc.messageBody = 'responseBody';
-      } else {
+      } else if (this.assignBieForOasDoc.messageBody === 'responseBody')
+      {
         this.assignBieForOasDoc.isOasRequest = false;
-        this.assignBieForOasDoc.messageBody = 'requestBody';
       }
       this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
       this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
-      this.assignBieForOasDoc.suppressRoot = bieForOasDoc.suppressRoot;
+      this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRoot;
     }
     this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
       this.snackBar.open('Added', '', {
