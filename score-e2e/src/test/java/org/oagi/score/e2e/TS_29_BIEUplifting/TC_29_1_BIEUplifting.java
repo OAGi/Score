@@ -745,7 +745,75 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("anExample", getText(bbiePanel.getExampleField()));
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
         assertEquals("99", getText(bbiePanel.getDefaultValueField()));
-        
+
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Status");
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Profit Center Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
+        assertEquals("language", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Description");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Codes");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEnabled(bbiescPanel.getUsedCheckbox());
+        assertChecked(bbiescPanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
+        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+
+        bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEnabled(bbiescPanel.getUsedCheckbox());
+        assertChecked(bbiescPanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
+        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
     }
 
     @Test
