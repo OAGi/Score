@@ -681,15 +681,44 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         //different green
-        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Indicator");
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Profit Center Identifier");
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Profit Center Identifier"));
         escape(getDriver());
 
+        //same green
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Usage Description");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Description");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Description"));
+        escape(getDriver());
+
         //different blue
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Identifier Set");
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
+        escape(getDriver());
+
+        //same blue
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Code List/Code List Value");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Code List Value");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
+        escape(getDriver());
+
+        //different red
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
+        escape(getDriver());
+
+        //same red
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Identifier/Scheme Agency Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Agency Identifier"));
+        escape(getDriver());
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Status/Reason Code");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
         escape(getDriver());
 
         By UPLIFT_BUTTON_LOCATOR =
@@ -708,7 +737,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
-        assertTrue(editBIEPage.isOpened());
+        WebElement bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Status/Reason Code");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getDefaultValueField()));
+        
     }
 
     @Test
