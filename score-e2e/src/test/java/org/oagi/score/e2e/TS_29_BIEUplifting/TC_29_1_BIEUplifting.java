@@ -138,19 +138,20 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
-        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.toggleUsed();
-        asbiePanel.setRemark("aRemark");
-        editBIEPage.hitUpdateButton();
-
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Identifier");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
+
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Name");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setRemark("aRemark");
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
@@ -170,6 +171,19 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Last Modification Date Time");
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark("aRemark");
+        bbiePanel.setExample("anExample");
+        bbiePanel.setValueConstraint("Fixed Value");
+        bbiePanel.setFixedValue("99");
+        bbiePanel.setValueDomain("normalized string");
+        bbiePanel.setContextDefinition("defcon");
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
@@ -177,13 +191,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
+        waitFor(Duration.ofMillis(3000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
@@ -195,6 +214,57 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setRemark("aRemark");
+        bbiescPanel.setExample("anExample");
+        bbiescPanel.setValueConstraint("Fixed Value");
+        bbiescPanel.setFixedValue("99");
+        bbiescPanel.setValueDomain("normalized string");
+        bbiescPanel.setContextDefinition("defcon");
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setCardinalityMin(11);
+        bbiePanel.setCardinalityMax(99);
+        bbiePanel.setExample("anExample");
+        bbiePanel.setRemark("aRemark");
+        bbiePanel.setContextDefinition("defcon");
+        bbiePanel.setFixedValue("99");
+        bbiePanel.setValueDomain("token");
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setExample("anExample");
+        bbiePanel.setRemark("aRemark");
+        bbiePanel.setContextDefinition("defcon");
+        bbiePanel.setFixedValue("99");
+        bbiePanel.setValueDomain("any URI");
+        editBIEPage.hitUpdateButton();
+
+
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setRemark("aRemark");
+        bbiescPanel.setExample("anExample");
+        bbiescPanel.setValueConstraint("Fixed Value");
+        bbiescPanel.setFixedValue("99");
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6ConstraintTypeCode1_ConstraintTypeCode");
+        bbiescPanel.setContextDefinition("defcon");
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
@@ -203,19 +273,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setExample("anExample");
         bbiePanel.setRemark("aRemark");
         bbiePanel.setContextDefinition("defcon");
+        bbiePanel.setFixedValue("99");
+        bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
 
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator/Type Code");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomain("any URI");
-        bbiescPanel.setContextDefinition("defcon");
-        editBIEPage.hitUpdateButton();
-
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
@@ -225,6 +287,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setCardinalityMax(99);
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
