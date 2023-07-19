@@ -285,16 +285,16 @@ public class OpenAPIDocController {
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
         request.setVerb(assignBieForOasDoc.getVerb());
-        request.setOperationId(request.getVerb() + ' ' + assignBieForOasDoc.getDen());
+        request.setOperationId(request.getVerb() + ' ' + assignBieForOasDoc.getPropertyTerm());
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
         if (request.isOasRequest()) {
             request.setRequiredForRequestBody(true);
         }
         if (request.isMakeArrayIndicator()) {
-            request.setPath("/" + assignBieForOasDoc.getDen() + "/list");
+            request.setPath("/" + assignBieForOasDoc.getPropertyTerm() + "/list");
         } else {
-            request.setPath("/" + assignBieForOasDoc.getDen());
+            request.setPath("/" + assignBieForOasDoc.getPropertyTerm());
         }
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
