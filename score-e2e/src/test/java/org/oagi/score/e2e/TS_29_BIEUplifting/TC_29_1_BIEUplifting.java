@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.api.CoreComponentAPI;
-import org.oagi.score.e2e.impl.page.bie.CreateBIEForSelectBusinessContextsPageImpl;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -699,7 +697,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
-
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set");
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
@@ -815,9 +812,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIEUserbWIP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
-
     @Test
     public void test_TA_29_1_5a() {
+
 
     }
 
