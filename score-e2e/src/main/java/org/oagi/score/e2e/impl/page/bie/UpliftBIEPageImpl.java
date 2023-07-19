@@ -2,13 +2,19 @@ package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.UpliftBIEPage;
+import org.oagi.score.e2e.page.bie.UpliftBIEVerificationPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
@@ -212,5 +218,15 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     @Override
     public WebElement getNextButton() {
         return elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public UpliftBIEVerificationPage Next() {
+        click(getNextButton());
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        UpliftBIEVerificationPage upliftBIEVerificationPage = new UpliftBIEVerificationPageImpl(this);
+        assert upliftBIEVerificationPage.isOpened();
+        return upliftBIEVerificationPage;
     }
 }

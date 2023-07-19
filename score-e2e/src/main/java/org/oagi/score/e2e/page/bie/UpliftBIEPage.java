@@ -178,4 +178,11 @@ public interface UpliftBIEPage extends Page {
      * @return the UI element of the 'Next' button in the paginator
      */
     WebElement getNextButton();
+
+    /**
+     * Go to the next step for BIE uplift verfication
+     *
+     * @return 'UpliftBIEVerification' page object
+     */
+    UpliftBIEVerificationPage Next();
 }
