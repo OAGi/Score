@@ -2,12 +2,12 @@ package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.UpliftBIEVerificationPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class UpliftBIEVerificationPageImpl extends BasePageImpl implements UpliftBIEVerificationPage {
@@ -102,6 +102,26 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         return visibilityOfElementLocated(getDriver() ,By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\""+node+"\")]//ancestor::div[1]/mat-checkbox[1]/label/span[1]"));
     }
 
+    @Override
+    public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path, String nodeName) {
+        WebElement nodeInTargetBIE = goToNodeInTargetBIE(path);
+        try {
+            click(getReusedIconOfNodeInTargetBIE(nodeName));
+        } catch (TimeoutException e) {
+            click(nodeInTargetBIE);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(getReusedIconOfNodeInTargetBIE(nodeName));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
+        assert selectProfileBIEToReuse.isOpened();
+        return selectProfileBIEToReuse;
+    }
+    @Override
+    public WebElement getReusedIconOfNodeInTargetBIE(String nodeName){
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\""+nodeName+"\")]//ancestor::div[1]//mat-icon[@mattooltip=\"Select BIE\"]"));
+    }
     @Override
     public void next() {
         click(getNextButton());

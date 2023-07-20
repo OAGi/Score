@@ -18,12 +18,13 @@ public interface UpliftBIEVerificationPage extends Page {
     WebElement getSearchInputOfTargetTree();
 
     WebElement getCheckBoxOfNodeInTargetBIE(String node);
-
+    SelectProfileBIEToReuseDialog reuseBIEOnNode(String path, String nodeName);
     /**
      * Return the UI element of the 'Next' button in the paginator.
      *
      * @return the UI element of the 'Next' button in the paginator
      */
+    WebElement getReusedIconOfNodeInTargetBIE(String nodeName);
     WebElement getNextButton();
 
     void next();
