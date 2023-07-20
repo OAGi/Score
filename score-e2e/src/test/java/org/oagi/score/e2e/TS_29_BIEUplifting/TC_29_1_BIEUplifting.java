@@ -1596,53 +1596,50 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Revision Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Document Reference/Status/Effective Time Period/Inclusive Indicator");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("xbt boolean", getText(bbiePanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Authorization Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("language", getText(bbiePanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Size Quantity");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("positive integer", getText(bbiePanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/Document Date Time");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("gregorian day", getText(bbiePanel.getValueDomainField()));
 
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("token", getText(bbiePanel.getValueDomainField()));
 
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Preference/Priority Sequence Value");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("float", getText(bbiePanel.getValueDomainField()));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEquals("string", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
-
     }
 
     @Test
