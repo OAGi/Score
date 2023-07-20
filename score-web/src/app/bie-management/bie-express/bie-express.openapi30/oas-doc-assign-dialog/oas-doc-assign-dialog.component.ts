@@ -129,6 +129,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
+        elm = new BieForOasDoc(elm);
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
@@ -199,6 +200,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   addBieForOasDoc() {
     const selectedBieForOasDocs = this.selection.selected;
     for (const bieForOasDoc of selectedBieForOasDocs) {
+      this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
       this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
       this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];

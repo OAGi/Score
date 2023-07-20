@@ -221,8 +221,8 @@ export class OpenAPIService {
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/select_bie', {params});
   }
 
-  assignBieForOasDoc(assignBieForOasDoc: AssignBieForOasDoc): Observable<PageResponse<any>> {
-    return this.http.post<PageResponse<BieForOasDoc>>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
+  assignBieForOasDoc(assignBieForOasDoc: AssignBieForOasDoc): Observable<any> {
+    return this.http.post<any>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
       {
         oasDocId: assignBieForOasDoc.oasDocId,
         oasRequest: assignBieForOasDoc.oasRequest,
@@ -232,6 +232,7 @@ export class OpenAPIService {
         required: assignBieForOasDoc.required,
         arrayIndicator: assignBieForOasDoc.arrayIndicator,
         suppressRootIndicator: assignBieForOasDoc.suppressRootIndicator,
+        messageBody: assignBieForOasDoc.messageBody
       });
   }
 
