@@ -7,24 +7,25 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class AssignBieForOasDoc extends Auditable {
-    private boolean isOasRequest;
+    private boolean oasRequest;
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
     private String propertyTerm;
     private String verb;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
+    private boolean required;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private ScoreUser createdBy;
     private ScoreUser lastUpdatedBy;
 
     public boolean isOasRequest() {
-        return isOasRequest;
+        return oasRequest;
     }
 
     public void setOasRequest(boolean oasRequest) {
-        isOasRequest = oasRequest;
+        this.oasRequest = oasRequest;
     }
 
     public BigInteger getTopLevelAsbiepId() {
@@ -57,6 +58,14 @@ public class AssignBieForOasDoc extends Auditable {
 
     public void setVerb(String verb) {
         this.verb = verb;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 
     public boolean isArrayIndicator() {
@@ -115,34 +124,17 @@ public class AssignBieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public AssignBieForOasDoc(boolean isOasRequest, BigInteger topLevelAsbiepId, BigInteger oasDocId, String propertyTerm, String verb, boolean arrayIndicator, boolean suppressRootIndicator, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
-        this.isOasRequest = isOasRequest;
-        this.topLevelAsbiepId = topLevelAsbiepId;
-        this.oasDocId = oasDocId;
-        this.propertyTerm = propertyTerm;
-        this.verb = verb;
-        this.arrayIndicator = arrayIndicator;
-        this.suppressRootIndicator = suppressRootIndicator;
-        this.lastUpdateTimestamp = lastUpdateTimestamp;
-        this.creationTimestamp = creationTimestamp;
-        this.createdBy = createdBy;
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    public AssignBieForOasDoc() {
-
-    }
-
     @Override
     public String toString() {
         return "AssignBieForOasDoc{" +
-                "isOasRequest=" + isOasRequest +
+                "oasRequest=" + oasRequest +
                 ", topLevelAsbiepId=" + topLevelAsbiepId +
                 ", oasDocId=" + oasDocId +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", verb='" + verb + '\'' +
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
+                ", required=" + required +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +

@@ -163,8 +163,6 @@ public class OpenAPIDocService {
                     .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
             bieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
-            bieForOasDoc.setVerbs(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE"));
-            bieForOasDoc.setMessageBody(Arrays.asList("", "requestBody", "responseBody"));
         });
 
         PageResponse<BieForOasDoc> response = new PageResponse();

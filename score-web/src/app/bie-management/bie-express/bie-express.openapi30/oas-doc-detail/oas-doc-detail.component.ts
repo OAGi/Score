@@ -47,7 +47,7 @@ export class OasDocDetailComponent implements OnInit {
   bizCtxSearch: string;
   disabled: boolean;
   displayedColumns: string[] = [
-    'select', 'den', 'owner', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
+    'select', 'den', 'owner', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
@@ -347,40 +347,7 @@ export class OasDocDetailComponent implements OnInit {
         return;
       }
 
-      const data = this.dataSource.data;
-      if (isAddAction) {
-        for (const bieAdded of data) {
-          if (bieAdded.propertyTerm === result.propertyTerm) {
-            this.snackBar.open(result.propertyTerm + ' already exist', '', {
-              duration: 3000,
-            });
-
-            return;
-          }
-        }
-
-        result.guid = uuid();
-        data.push(result);
-
-        this._updateDataSource(data);
-      } else {
-        for (const bieAdded of data) {
-          if (bieAdded.guid !== result.guid && bieAdded.propertyTerm === result.propertyTerm) {
-            this.snackBar.open(result.value + ' already exist', '', {
-              duration: 3000,
-            });
-            return;
-          }
-        }
-
-        this._updateDataSource(data.map(row => {
-          if (row.guid === result.guid) {
-            return result;
-          } else {
-            return row;
-          }
-        }));
-      }
+      this.loadBieListForOasDoc();
     });
   }
 

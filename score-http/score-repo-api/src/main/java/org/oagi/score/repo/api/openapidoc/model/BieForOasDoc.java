@@ -25,13 +25,12 @@ public class BieForOasDoc extends Auditable {
     private String status;
     private BieState state;
     private String access;
-    private List<String> verbs;
-    private List<String> messageBody;
-    private String _verb;
-    private boolean _arrayIndicator;
-    private boolean _suppressRootIndicator;
-    private String _resourceName;
-    private String _operationId;
+    private String verb;
+    private String messageBody;
+    private boolean arrayIndicator;
+    private boolean suppressRootIndicator;
+    private String resourceName;
+    private String operationId;
     private String tagName;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
@@ -137,54 +136,6 @@ public class BieForOasDoc extends Auditable {
         this.access = access;
     }
 
-    public List<String> getVerbs() {
-        return verbs;
-    }
-
-    public void setVerbs(List<String> verbs) {
-        this.verbs = verbs;
-    }
-
-    public String get_verb() {
-        return _verb;
-    }
-
-    public void set_verb(String _verb) {
-        this._verb = _verb;
-    }
-
-    public boolean is_arrayIndicator() {
-        return _arrayIndicator;
-    }
-
-    public void set_arrayIndicator(boolean _arrayIndicator) {
-        this._arrayIndicator = _arrayIndicator;
-    }
-
-    public boolean is_suppressRootIndicator() {
-        return _suppressRootIndicator;
-    }
-
-    public void set_suppressRootIndicator(boolean _suppressRootIndicator) {
-        this._suppressRootIndicator = _suppressRootIndicator;
-    }
-
-    public String get_resourceName() {
-        return _resourceName;
-    }
-
-    public void set_resourceName(String _resourceName) {
-        this._resourceName = _resourceName;
-    }
-
-    public String get_operationId() {
-        return _operationId;
-    }
-
-    public void set_operationId(String _operationId) {
-        this._operationId = _operationId;
-    }
-
     public List<BusinessContext> getBusinessContexts() {
         return businessContexts;
     }
@@ -193,12 +144,52 @@ public class BieForOasDoc extends Auditable {
         this.businessContexts = businessContexts;
     }
 
-    public List<String> getMessageBody() {
+    public String getVerb() {
+        return verb;
+    }
+
+    public void setVerb(String verb) {
+        this.verb = verb;
+    }
+
+    public String getMessageBody() {
         return messageBody;
     }
 
-    public void setMessageBody(List<String> messageBody) {
+    public void setMessageBody(String messageBody) {
         this.messageBody = messageBody;
+    }
+
+    public boolean isArrayIndicator() {
+        return arrayIndicator;
+    }
+
+    public void setArrayIndicator(boolean arrayIndicator) {
+        this.arrayIndicator = arrayIndicator;
+    }
+
+    public boolean isSuppressRootIndicator() {
+        return suppressRootIndicator;
+    }
+
+    public void setSuppressRootIndicator(boolean suppressRootIndicator) {
+        this.suppressRootIndicator = suppressRootIndicator;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     public BigInteger getOasResourceId() {
@@ -265,36 +256,6 @@ public class BieForOasDoc extends Auditable {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public BieForOasDoc(BigInteger topLevelAsbiepId, BigInteger releaseId, BigInteger oasDocId, BigInteger oasResourceId, BigInteger oasOperationId, String den, String propertyTerm, String guid, List<BusinessContext> businessContexts, BigInteger ownerUserId, String owner, String version, String status, BieState state, String access, List<String> verbs, List<String> messageBody, String _verb, boolean _arrayIndicator, boolean _suppressRootIndicator, String _resourceName, String _operationId, String tagName, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
-        this.topLevelAsbiepId = topLevelAsbiepId;
-        this.releaseId = releaseId;
-        this.oasDocId = oasDocId;
-        this.oasResourceId = oasResourceId;
-        this.oasOperationId = oasOperationId;
-        this.den = den;
-        this.propertyTerm = propertyTerm;
-        this.guid = guid;
-        this.businessContexts = businessContexts;
-        this.ownerUserId = ownerUserId;
-        this.owner = owner;
-        this.version = version;
-        this.status = status;
-        this.state = state;
-        this.access = access;
-        this.verbs = verbs;
-        this.messageBody = messageBody;
-        this._verb = _verb;
-        this._arrayIndicator = _arrayIndicator;
-        this._suppressRootIndicator = _suppressRootIndicator;
-        this._resourceName = _resourceName;
-        this._operationId = _operationId;
-        this.tagName = tagName;
-        this.lastUpdateTimestamp = lastUpdateTimestamp;
-        this.creationTimestamp = creationTimestamp;
-        this.createdBy = createdBy;
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
     @Override
     public String toString() {
         return "BieForOasDoc{" +
@@ -313,13 +274,11 @@ public class BieForOasDoc extends Auditable {
                 ", status='" + status + '\'' +
                 ", state=" + state +
                 ", access='" + access + '\'' +
-                ", verbs=" + verbs +
-                ", messageBody=" + messageBody +
-                ", _verb='" + _verb + '\'' +
-                ", _arrayIndicator=" + _arrayIndicator +
-                ", _suppressRootIndicator=" + _suppressRootIndicator +
-                ", _resourceName='" + _resourceName + '\'' +
-                ", _operationId='" + _operationId + '\'' +
+                ", verb='" + verb + '\'' +
+                ", arrayIndicator=" + arrayIndicator +
+                ", suppressRootIndicator=" + suppressRootIndicator +
+                ", resourceName='" + resourceName + '\'' +
+                ", operationId='" + operationId + '\'' +
                 ", tagName='" + tagName + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +

@@ -108,28 +108,40 @@
             <ng-container matColumnDef="verb">
               <th mat-header-cell *matHeaderCellDef> Verb</th>
               <td mat-cell *matCellDef="let element">
-                <div [matTooltip]="element.verbs">{{ element.verbs }}</div>
+                <mat-select [(ngModel)]="element.verb">
+                  <mat-option value="GET">GET</mat-option>
+                  <mat-option value="PUT">PUT</mat-option>
+                  <mat-option value="POST">POST</mat-option>
+                  <mat-option value="DELETE">DELETE</mat-option>
+                  <mat-option value="OPTIONS">OPTIONS</mat-option>
+                  <mat-option value="HEAD">HEAD</mat-option>
+                  <mat-option value="PATCH">PATCH</mat-option>
+                  <mat-option value="TRACE">TRACE</mat-option>
+                </mat-select>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="arrayIndicator">
               <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
               <td mat-cell *matCellDef="let element">
-                <div [matTooltip]="element.arrayIndicator">{{ element.arrayIndicator }}</div>
+                <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="suppressRoot">
+            <ng-container matColumnDef="suppressRootIndicator">
               <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
               <td mat-cell *matCellDef="let element">
-                <div [matTooltip]="element.suppressRoot">{{ element.suppressRoot }}</div>
+                <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="messageBody">
               <th mat-header-cell *matHeaderCellDef> Message Body</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.messageBody }}</div>
+                <mat-select [(ngModel)]="element.messageBody">
+                  <mat-option value="Request">Request</mat-option>
+                  <mat-option value="Response">Response</mat-option>
+                </mat-select>
               </td>
             </ng-container>
 

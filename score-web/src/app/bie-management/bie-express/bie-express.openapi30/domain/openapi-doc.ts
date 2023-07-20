@@ -269,15 +269,14 @@ export class BieForOasDoc {
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
-  private _verbs: string[];
   arrayIndicator: boolean;
-  suppressRoot: boolean;
+  suppressRootIndicator: boolean;
   messageBody: string[];
   private _resourceName: string;
   private _operationId: string;
   private _verb: string;
   private _arrayIndicator: boolean;
-  private _suppressRoot: boolean;
+  private _suppressRootIndicator: boolean;
   private _messageBody: string;
   private $hashCode: number;
   tagName: string;
@@ -298,9 +297,9 @@ export class BieForOasDoc {
     this.status = obj && obj.status || '';
     this.state = obj && obj.state || '';
     this.businessContext = obj && obj.businessContext || '';
-    this.verbs = obj && obj.verbs || [];
+    this.verb = obj && obj.verb || '';
     this.arrayIndicator = obj && obj.arrayIndicator || false;
-    this.suppressRoot = obj && obj.suppressRoot || false;
+    this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
     this.messageBody = obj && obj.messageBody || [];
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
@@ -325,20 +324,20 @@ export class BieForOasDoc {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
-  get verbs(): string[] {
-    return this._verbs;
+  get verb(): string {
+    return this._verb;
   }
-  set verbs(value: string[]) {
-    this._verbs = value;
+  set verb(value: string) {
+    this._verb = value;
   }
 
   get hashCode(): number {
-    return ((this.verbs) ? hashCode4Array(this.verbs) : 0) +
+    return ((this.verb) ? hashCode4String(this.verb) : 0) +
       ((this.messageBody) ? hashCode4Array(this.messageBody) : 0) +
       ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
       ((this.operationId) ? hashCode4String(this.operationId) : 0) +
       ((this.arrayIndicator) ? 1231 : 1237) +
-      ((this.suppressRoot) ? 1231 : 1237);
+      ((this.suppressRootIndicator) ? 1231 : 1237);
   }
 
   reset(): void {
@@ -349,11 +348,12 @@ export class BieForOasDoc {
   }
 }
 export class AssignBieForOasDoc {
-  isOasRequest: boolean;
+  oasRequest: boolean;
   oasDocId: number;
   topLevelAsbiepId: number;
   propertyTerm: string;
   verb: string;
+  required: boolean;
   arrayIndicator: boolean;
   suppressRootIndicator: boolean;
   messageBody: string;

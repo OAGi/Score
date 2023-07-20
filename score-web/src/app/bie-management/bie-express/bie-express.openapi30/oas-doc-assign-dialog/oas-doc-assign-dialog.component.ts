@@ -31,7 +31,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
+    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
     'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
@@ -41,8 +41,6 @@ export class OasDocAssignDialogComponent implements OnInit {
   messageBodySelection = {};
   loading = false;
   oasDoc: OasDoc;
-  arrayIndicator: boolean;
-  suppressRootIndicator: boolean;
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
@@ -136,8 +134,8 @@ export class OasDocAssignDialogComponent implements OnInit {
       });
       this.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
-        this.verbSelection[elm.topLevelAsbiepId] = elm.verbs[0];
-        this.messageBodySelection[elm.topLevelAsbiepId] = elm.messageBody[0];
+        this.verbSelection[elm.topLevelAsbiepId] = elm.verb;
+        this.messageBodySelection[elm.topLevelAsbiepId] = elm.messageBody;
       });
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -204,21 +202,25 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
       this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
-      if (this.assignBieForOasDoc.messageBody === 'requestBody') {
-        this.assignBieForOasDoc.isOasRequest = true;
-      } else if (this.assignBieForOasDoc.messageBody === 'responseBody')
-      {
-        this.assignBieForOasDoc.isOasRequest = false;
+      this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
+      if (this.assignBieForOasDoc.messageBody === 'Request') {
+        this.assignBieForOasDoc.oasRequest = true;
+      } else if (this.assignBieForOasDoc.messageBody === 'Response') {
+        this.assignBieForOasDoc.oasRequest = false;
       }
       this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
       this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
-      this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRoot;
+      this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRootIndicator;
     }
     this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
       this.snackBar.open('Added', '', {
         duration: 3000,
       });
-      this.router.navigateByUrl('/profile_bie/express/oas_doc/' + this.oasDoc.oasDocId);
+      this.dialogRef.close({
+        result: {
+          status: 'OK'
+        }
+      });
     });
 
   }

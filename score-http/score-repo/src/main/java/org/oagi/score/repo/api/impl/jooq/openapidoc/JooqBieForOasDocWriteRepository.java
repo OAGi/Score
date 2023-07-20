@@ -51,9 +51,9 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             if (oasResourceRecord == null) {
                 throw new ScoreDataAccessException(new IllegalArgumentException());
             }
-            if (oasResourceRecord != null && !StringUtils.equals(bieForOasDoc.get_resourceName(), oasResourceRecord.getPath())) {
+            if (oasResourceRecord != null && !StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
                 oasResourceChangedField.add(OAS_RESOURCE.PATH);
-                oasResourceRecord.setPath(bieForOasDoc.get_resourceName());
+                oasResourceRecord.setPath(bieForOasDoc.getResourceName());
                 oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATED_BY);
                 oasResourceRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
                 oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATE_TIMESTAMP);
@@ -69,9 +69,9 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             if (oasResourceRecord == null) {
                 throw new ScoreDataAccessException(new IllegalArgumentException());
             }
-            if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.get_operationId(), oasOperationRecord.getOperationId())) {
+            if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
                 oasOperationChangedField.add(OAS_OPERATION.OPERATION_ID);
-                oasOperationRecord.setOperationId(bieForOasDoc.get_operationId());
+                oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
                 oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATED_BY);
                 oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
                 oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATE_TIMESTAMP);

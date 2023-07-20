@@ -289,19 +289,28 @@ public class OpenAPIDocController {
         request.setVerb(verbOption);
         switch (verbOption) {
             case "GET":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_get" +assignBieForOasDoc.getPropertyTerm();
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_get" + assignBieForOasDoc.getPropertyTerm();
                 break;
             case "POST":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_create" +assignBieForOasDoc.getPropertyTerm();
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_create" + assignBieForOasDoc.getPropertyTerm();
                 break;
             case "PUT":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" +assignBieForOasDoc.getPropertyTerm();
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" + assignBieForOasDoc.getPropertyTerm();
                 break;
             case "PATCH":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" +assignBieForOasDoc.getPropertyTerm();
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" + assignBieForOasDoc.getPropertyTerm();
                 break;
             case "DELETE":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_delete" +assignBieForOasDoc.getPropertyTerm();
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_delete" + assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "OPTIONS":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_options" + assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "HEAD":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_head" + assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "TRACE":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_trace" + assignBieForOasDoc.getPropertyTerm();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown verb option: " + verbOption);
@@ -309,9 +318,7 @@ public class OpenAPIDocController {
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
-        if (request.isOasRequest()) {
-            request.setRequiredForRequestBody(true);
-        }
+        request.setRequiredForRequestBody(assignBieForOasDoc.isRequired());
         if (request.isMakeArrayIndicator()) {
             request.setPath("/" + assignBieForOasDoc.getPropertyTerm() + "-list");
         } else {

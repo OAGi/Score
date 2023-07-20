@@ -18,10 +18,10 @@ public class RedisFlushAllInitializer implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        logger.info("Remove all keys from redis databases.");
-        try (RedisConnection connection = redisTemplate.getConnectionFactory().getConnection()) {
-            connection.serverCommands().flushAll();
-        }
+//        logger.info("Remove all keys from redis databases.");
+//        try (RedisConnection connection = redisTemplate.getConnectionFactory().getConnection()) {
+//            connection.serverCommands().flushAll();
+//        }
     }
 
 }

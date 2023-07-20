@@ -35,7 +35,7 @@ export class OasDocBieListComponent implements OnInit {
   releaseId: number;
   releases: Release[] = [];
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRoot', 'messageBody',
+    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();

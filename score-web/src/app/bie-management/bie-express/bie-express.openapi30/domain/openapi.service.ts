@@ -225,10 +225,11 @@ export class OpenAPIService {
     return this.http.post<PageResponse<BieForOasDoc>>('/api/oas_doc/' + assignBieForOasDoc.oasDocId + '/bie_list',
       {
         oasDocId: assignBieForOasDoc.oasDocId,
-        isOasRequest: assignBieForOasDoc.isOasRequest,
+        oasRequest: assignBieForOasDoc.oasRequest,
         topLevelAsbiepId: assignBieForOasDoc.topLevelAsbiepId,
         propertyTerm: assignBieForOasDoc.propertyTerm,
         verb: assignBieForOasDoc.verb,
+        required: assignBieForOasDoc.required,
         arrayIndicator: assignBieForOasDoc.arrayIndicator,
         suppressRootIndicator: assignBieForOasDoc.suppressRootIndicator,
       });

@@ -204,11 +204,14 @@
             <th mat-header-cell *matHeaderCellDef> Verb</th>
             <td mat-cell *matCellDef="let element">
               <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
-                <mat-option *ngFor="let verb of element.verbs" [value]="verb">
-                  <span>
-                    {{ verb}}
-                  </span>
-                </mat-option>
+                <mat-option value="GET">GET</mat-option>
+                <mat-option value="PUT">PUT</mat-option>
+                <mat-option value="POST">POST</mat-option>
+                <mat-option value="DELETE">DELETE</mat-option>
+                <mat-option value="OPTIONS">OPTIONS</mat-option>
+                <mat-option value="HEAD">HEAD</mat-option>
+                <mat-option value="PATCH">PATCH</mat-option>
+                <mat-option value="TRACE">TRACE</mat-option>
               </mat-select>
             </td>
           </ng-container>
@@ -216,20 +219,14 @@
           <ng-container matColumnDef="arrayIndicator">
             <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
             <td mat-cell *matCellDef="let element">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? arrayIndicator != arrayIndicator: null"
-                            [(ngModel)]="arrayIndicator">
-              </mat-checkbox>
+              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="suppressRoot">
+          <ng-container matColumnDef="suppressRootIndicator">
             <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
             <td mat-cell *matCellDef="let element">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? suppressRootIndicator != suppressRootIndicator: null"
-                            [(ngModel)]="suppressRootIndicator">
-              </mat-checkbox>
+              <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
             </td>
           </ng-container>
 
@@ -237,11 +234,8 @@
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
             <td mat-cell *matCellDef="let element">
               <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
-                <mat-option *ngFor="let messageBody of element.messageBody" [value]="messageBody">
-                  <span>
-                    {{ messageBody}}
-                  </span>
-                </mat-option>
+                <mat-option value="Request">Request</mat-option>
+                <mat-option value="Response">Response</mat-option>
               </mat-select>
             </td>
           </ng-container>
@@ -267,16 +261,15 @@
   </mat-card>
 
   <div class="actions mt-4">
-    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary">
+    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary" [disabled]="selection.isEmpty()">
       <mat-icon>add</mat-icon>
       Add
     </button>
-  </div>
-
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
       Close
     </button>
+  </div>
 </div>
 
 

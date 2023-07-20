@@ -51,18 +51,18 @@ public class OpenAPIGenerateController {
         if (bieListForOasDoc != null) {
             for (BieForOasDoc bieForOasDoc : bieListForOasDoc) {
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
-                openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerbs().get(0));
+                openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 switch (verbOption) {
                     case "GET":
                         openAPIGenerateExpressionOption.setOpenAPI30GetTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.is_arrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.is_suppressRootIndicator());
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.isArrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.isSuppressRootIndicator());
                         break;
                     case "POST":
                         openAPIGenerateExpressionOption.setOpenAPI30PostTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.is_arrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.is_suppressRootIndicator());
+                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.isArrayIndicator());
+                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.isSuppressRootIndicator());
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
