@@ -1049,84 +1049,65 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
-
-        WebElement bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Status/Reason Code");
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEnabled(bbiePanel.getUsedCheckbox());
-        assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getDefaultValueField()));
-
-        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Status");
+        WebElement asbieNode = editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging/Dimensions");
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
-
-        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Profit Center Identifier");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEnabled(bbiePanel.getUsedCheckbox());
-        assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
-        assertEquals("language", getText(bbiePanel.getValueDomainField()));
-
-        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Description");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEnabled(bbiePanel.getUsedCheckbox());
-        assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
-
-        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Codes");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEnabled(bbiePanel.getUsedCheckbox());
-        assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
-        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        assertEnabled(asbiePanel.getUsedCheckbox());
-        assertChecked(asbiePanel.getUsedCheckbox());
+        assertNotChecked(asbiePanel.getNillableCheckbox());
+        assertDisabled(asbiePanel.getNillableCheckbox());
+        assertDisabled(asbiePanel.getCardinalityMinField());
+        assertDisabled(asbiePanel.getCardinalityMaxField());
         assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("11", getText(asbiePanel.getCardinalityMinField()));
+        assertEquals("99", getText(asbiePanel.getCardinalityMaxField()));
+        assertEquals("defcon", getText(asbiePanel.getContextDefinitionField()));
 
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEnabled(bbiescPanel.getUsedCheckbox());
-        assertChecked(bbiescPanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
-        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
-
-        bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEnabled(bbiescPanel.getUsedCheckbox());
-        assertChecked(bbiescPanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
-        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
-
-        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier");
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        WebElement bbieNode =  editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging/Capacity Per Package Quantity");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertDisabled(bbiePanel.getRemarkField());
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertDisabled(bbiePanel.getExampleField());
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
 
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification");
+        editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
+        bbieNode =  editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/UOM Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getNillableCheckbox());
+        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
+        assertDisabled(bbiePanel.getCardinalityMinField());
+        assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
+        assertDisabled(bbiePanel.getCardinalityMaxField());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertDisabled(bbiePanel.getRemarkField());
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertDisabled(bbiePanel.getExampleField());
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
+        assertEquals("token", getText(bbiePanel.getValueDomainField()));
+
+        asbieNode = editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
+        assertNotChecked(asbiePanel.getNillableCheckbox());
+        assertDisabled(asbiePanel.getNillableCheckbox());
+
+
+
+
         homePage.logout();
 
 
