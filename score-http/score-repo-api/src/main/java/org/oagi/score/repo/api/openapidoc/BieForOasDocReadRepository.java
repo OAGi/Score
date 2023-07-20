@@ -7,6 +7,4 @@ public interface BieForOasDocReadRepository {
     GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException;
 
     GetBieForOasDocListResponse getBieForOasDocList(GetBieForOasDocListRequest request) throws ScoreDataAccessException;
-
-    AddBieForOasDocResponse addBieForOasDoc(AddBieForOasDocRequest request) throws ScoreDataAccessException;
 }

@@ -276,7 +276,7 @@ public class OpenAPIDocController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public AddBieForOasDocResponse addBieForOasDoc(
+    public ResponseEntity addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
 
@@ -284,21 +284,46 @@ public class OpenAPIDocController {
         request.setOasRequest(assignBieForOasDoc.isOasRequest());
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
-        request.setVerb(assignBieForOasDoc.getVerb());
-        request.setOperationId(request.getVerb() + ' ' + assignBieForOasDoc.getPropertyTerm());
+        String verbOption = assignBieForOasDoc.getVerb();
+        String operationId = null;
+        request.setVerb(verbOption);
+        switch (verbOption) {
+            case "GET":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_get" +assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "POST":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_create" +assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "PUT":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" +assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "PATCH":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" +assignBieForOasDoc.getPropertyTerm();
+                break;
+            case "DELETE":
+                operationId = assignBieForOasDoc.getPropertyTerm() + "_delete" +assignBieForOasDoc.getPropertyTerm();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown verb option: " + verbOption);
+        }
+        request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
         if (request.isOasRequest()) {
             request.setRequiredForRequestBody(true);
         }
         if (request.isMakeArrayIndicator()) {
-            request.setPath("/" + assignBieForOasDoc.getPropertyTerm() + "/list");
+            request.setPath("/" + assignBieForOasDoc.getPropertyTerm() + "-list");
         } else {
             request.setPath("/" + assignBieForOasDoc.getPropertyTerm());
         }
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
-        return response;
+        if (response.getOasResponseId() != null || response.getOasRequestId() != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,

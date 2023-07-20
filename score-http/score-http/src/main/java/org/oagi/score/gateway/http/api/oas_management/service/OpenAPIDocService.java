@@ -214,9 +214,10 @@ public class OpenAPIDocService {
                 .setDeprecated(request.isDeprecatedForOperation())
                 .setTimestamp(millis)
                 .execute();
-
+        ULong oasRequestId = null;
+        ULong oasResponseId = null;
         if (request.isOasRequest()) {
-            ULong oasRequestId = oasDocRepository.insertOasRequest()
+            oasRequestId = oasDocRepository.insertOasRequest()
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
                     .setOasMessageBodyId(oasMessageBodyId)
@@ -229,7 +230,7 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         } else {
-            ULong oasResponseId = oasDocRepository.insertOasResponse()
+            oasResponseId = oasDocRepository.insertOasResponse()
                     .setUserId(userId)
                     .setOasOperationId(oasOperationId)
                     .setOasMessageBodyId(oasMessageBodyId)
@@ -241,8 +242,8 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
-        AddBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().addBieForOasDoc(request);
-        return response;
+        return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId.toBigInteger() : null,
+                                           oasResponseId != null ? oasResponseId.toBigInteger(): null);
     }
 
     public boolean checkOasDocUniqueness(OasDoc oasDoc) {

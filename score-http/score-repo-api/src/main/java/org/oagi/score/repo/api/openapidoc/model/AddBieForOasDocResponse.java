@@ -1,14 +1,27 @@
 package org.oagi.score.repo.api.openapidoc.model;
 
+import org.oagi.score.repo.api.base.Auditable;
 import org.oagi.score.repo.api.base.PaginationResponse;
 import org.oagi.score.repo.api.base.Response;
 
 import java.math.BigInteger;
 import java.util.List;
 
-public class AddBieForOasDocResponse extends PaginationResponse<BieForOasDoc> {
+public class AddBieForOasDocResponse extends Auditable {
 
-    public AddBieForOasDocResponse(List<BieForOasDoc> results, int page, int size, int length) {
-        super(results, page, size, length);
+    private final BigInteger oasRequestId;
+    private final BigInteger oasResponseId;
+
+    public AddBieForOasDocResponse(BigInteger oasRequestId, BigInteger oasResponseId) {
+        this.oasRequestId = oasRequestId;
+        this.oasResponseId = oasResponseId;
+    }
+
+    public BigInteger getOasRequestId() {
+        return oasRequestId;
+    }
+
+    public BigInteger getOasResponseId() {
+        return oasResponseId;
     }
 }

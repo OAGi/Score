@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_OPERATION;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_RESOURCE;
 
@@ -45,7 +46,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
         List<Field<?>> oasResourceChangedField = new ArrayList();
         List<Field<?>> oasOperationChangedField = new ArrayList();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
-            OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId()))).fetchOptional().orElse(null);
+            OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE).where(and(OAS_RESOURCE.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                    OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(bieForOasDoc.getOasDocId())))).fetchOptional().orElse(null);
             if (oasResourceRecord == null) {
                 throw new ScoreDataAccessException(new IllegalArgumentException());
             }
@@ -62,7 +64,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 }
 
             }
-            OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+            OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(and(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                  OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
             if (oasResourceRecord == null) {
                 throw new ScoreDataAccessException(new IllegalArgumentException());
             }

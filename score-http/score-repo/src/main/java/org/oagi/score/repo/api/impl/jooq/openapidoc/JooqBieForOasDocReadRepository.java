@@ -113,7 +113,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name")));
                 bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.as("req_oas_resource_id")).toBigInteger());
                 bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.as("req_oas_operation_id")).toBigInteger());
-                bieForOasDoc.setMessageBody(Arrays.asList("Request"));
             } else if (record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")) != null) {
                 bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")).toBigInteger());
                 bieForOasDoc.setVerbs(Arrays.asList(record.get(OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb"))));
@@ -124,7 +123,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 bieForOasDoc.setTagName(record.get(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name")));
                 bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.as("res_oas_resource_id")).toBigInteger());
                 bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.as("res_oas_operation_id")).toBigInteger());
-                bieForOasDoc.setMessageBody(Arrays.asList("Response"));
             }
             bieForOasDoc.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
             bieForOasDoc.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")).toString());
@@ -167,26 +165,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         }
         return new GetBieForOasDocResponse(bieListForOasDoc, 1, 1, bieListForOasDoc.size());
     }
-
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public AddBieForOasDocResponse addBieForOasDoc(AddBieForOasDocRequest request) throws ScoreDataAccessException {
-        List<BieForOasDoc> bieForOasDoc = new ArrayList<>();
-
-        BigInteger oasDocId = request.getOasDocId();
-        if (oasDocId != null && request.isOasRequest()) {
-            bieForOasDoc = select()
-                    .where(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
-                    .fetch(mapper());
-        }
-
-        if (oasDocId != null && !request.isOasRequest()) {
-            bieForOasDoc = select()
-                    .where(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
-                    .fetch(mapper());
-        }
-        return new AddBieForOasDocResponse(bieForOasDoc, 1, 1, 1);
-    }
-
     private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
         List<Condition> conditions = new ArrayList();
         if (request.getOasDocId() != null) {
