@@ -271,7 +271,7 @@ export class BieForOasDoc {
   lastUpdatedBy: ScoreUser;
   arrayIndicator: boolean;
   suppressRootIndicator: boolean;
-  messageBody: string[];
+  messageBody: string;
   private _resourceName: string;
   private _operationId: string;
   private _verb: string;
@@ -300,7 +300,7 @@ export class BieForOasDoc {
     this.verb = obj && obj.verb || '';
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
-    this.messageBody = obj && obj.messageBody || [];
+    this.messageBody = obj && obj.messageBody || '';
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.oasOperationId = obj && obj.oasOperationId || 0;
