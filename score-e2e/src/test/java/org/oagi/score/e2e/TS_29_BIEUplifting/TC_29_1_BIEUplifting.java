@@ -814,10 +814,288 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
+        homePage.logout();
     }
 
+    public void preconditions_TA_29_1_5d(){
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        //BIEuserbReusedChild previousRelease
+        BusinessContextObject contextForUserb = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectBusinessContextsPage  createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Unit Packaging. Packaging", prev_release);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIEUserbReusedChild")){
+            testingBIEs.put("BIEUserbReusedChild", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIEUserbReusedChild", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("BIEUserbReusedChild")){
+            BIEContexts.put("BIEUserbReusedChild", contextForUserb.getName());
+        }else{
+            BIEContexts.put("BIEUserbReusedChild", contextForUserb.getName());
+        }
+
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Capacity Per Package Quantity");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark("aRemark");
+        bbiePanel.setExample("anExample");
+        bbiePanel.setContextDefinition("defcon");
+        bbiePanel.setValueConstraint("Fixed Value");
+        bbiePanel.setFixedValue("99");
+        editBIEPage.hitUpdateButton();
+
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Dimensions");
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setCardinalityMax(99);
+        asbiePanel.setCardinalityMin(11);
+        asbiePanel.setRemark("aRemark");
+        asbiePanel.setContextDefinition("defcon");
+        editBIEPage.hitUpdateButton();
+
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Unit Packaging/UPC Packaging Level Code/List Agency Identifier");
+        EditBIEPage.BBIESCPanel  bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setRemark("aRemark");
+        bbiescPanel.setExample("anExample");
+        bbiescPanel.setValueConstraint("Fixed Value");
+        bbiescPanel.setFixedValue("99");
+        bbiescPanel.setValueDomain("token");
+        bbiescPanel.setContextDefinition("defcon");
+        editBIEPage.hitUpdateButton();
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
+
+        //BIEuserbReusedParent previousRelease
+
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("From UOM Package. UOM Package", prev_release);
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIEUserbReusedParent")){
+            testingBIEs.put("BIEUserbReusedParent", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIEUserbReusedParent", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("BIEUserbReusedParent")){
+            BIEContexts.put("BIEUserbReusedParent", contextForUserb.getName());
+        }else{
+            BIEContexts.put("BIEUserbReusedParent", contextForUserb.getName());
+        }
+
+        bbieNode = editBIEPage.getNodeByPath("/From UOM Package/UOM Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark("aRemark");
+        bbiePanel.setExample("anExample");
+        bbiePanel.setContextDefinition("defcon");
+        bbiePanel.setValueConstraint("Fixed Value");
+        bbiePanel.setFixedValue("99");
+        bbiePanel.setValueDomain("token");
+        editBIEPage.hitUpdateButton();
+
+        asbieNode = editBIEPage.getNodeByPath("/From UOM Package/Unit Packaging");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/From UOM Package/Unit Packaging");
+        TopLevelASBIEPObject reusedBIE = testingBIEs.get("BIEUserbReusedChild");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
+
+        //BIEUserbReusedScenario previousRelease
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("UOM Code Conversion Rate. UOM Code Conversion Rate", prev_release);
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIEUserbReusedScenario")){
+            testingBIEs.put("BIEUserbReusedScenario", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BBIEUserbReusedScenario", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("BIEUserbReusedScenario")){
+            BIEContexts.put("BIEUserbReusedScenario", contextForUserb.getName());
+        }else{
+            BIEContexts.put("BIEUserbReusedScenario", contextForUserb.getName());
+        }
+
+        selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/UOM Code Conversion Rate/From UOM Package");
+        reusedBIE = testingBIEs.get("BIEUserbReusedParent");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
+        editBIEPage.moveToQA();
+
+    }
     @Test
     public void test_TA_29_1_5d() {
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject BIEUserbReusedChild = testingBIEs.get("BIEUserbReusedChild");
+        upliftBIEPage.setPropertyTerm(BIEUserbReusedChild.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        //different green
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
+        WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Profit Center Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Profit Center Identifier"));
+        escape(getDriver());
+
+        //same green
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Usage Description");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Description");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Description"));
+        escape(getDriver());
+
+        //different blue
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
+        escape(getDriver());
+
+        //same blue
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Code List/Code List Value");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Code List Value");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
+        escape(getDriver());
+
+        //different red
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
+        escape(getDriver());
+
+        //same red
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Identifier/Scheme Agency Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Agency Identifier"));
+        escape(getDriver());
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Status/Reason Code");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
+        escape(getDriver());
+
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!upliftedBIEs.containsKey("BIE1QA")){
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }else{
+            upliftedBIEs.put("BIE1QA", topLevelASBIEP);
+        }
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        WebElement bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Status/Reason Code");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getDefaultValueField()));
+
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Status");
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Profit Center Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
+        assertEquals("language", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Description");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiePanel.getExampleField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiePanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Codes");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
+        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEnabled(bbiescPanel.getUsedCheckbox());
+        assertChecked(bbiescPanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
+        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+
+        bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEnabled(bbiescPanel.getUsedCheckbox());
+        assertChecked(bbiescPanel.getUsedCheckbox());
+        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
+        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
+        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
+        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+
+        bbieNode =  editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEnabled(bbiePanel.getUsedCheckbox());
+        assertChecked(bbiePanel.getUsedCheckbox());
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+        homePage.logout();
+
+
 
     }
 
@@ -912,132 +1190,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 //        public void preconditions(){
 //
 //
-//            homePage.logout();
-//            homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
-//            //BIEuserbReusedChild previousRelease
-//            BusinessContextObject contextForUserb = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
-//            bieMenu = homePage.getBIEMenu();
-//            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-//            createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-//            createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
-//            editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Unit Packaging. Packaging", prev_release);
-//            currentUrl = getDriver().getCurrentUrl();
-//            topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-//            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-//                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-//
-//            if (!testingBIEs.containsKey("BIEUserbReusedChild")){
-//                testingBIEs.put("BIEUserbReusedChild", topLevelASBIEP);
-//            }else{
-//                testingBIEs.put("BIEUserbReusedChild", topLevelASBIEP);
-//            }
-//
-//            if (!BIEContexts.containsKey("BIEUserbReusedChild")){
-//                BIEContexts.put("BIEUserbReusedChild", contextForUserb.getName());
-//            }else{
-//                BIEContexts.put("BIEUserbReusedChild", contextForUserb.getName());
-//            }
-//
-//            bbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Capacity Per Package Quantity");
-//            bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-//            bbiePanel.toggleUsed();
-//            bbiePanel.setRemark("aRemark");
-//            bbiePanel.setExample("anExample");
-//            bbiePanel.setContextDefinition("defcon");
-//            bbiePanel.setValueConstraint("Fixed Value");
-//            bbiePanel.setFixedValue("99");
-//            editBIEPage.hitUpdateButton();
-//
-//            WebElement asbieNode = editBIEPage.getNodeByPath("/Unit Packaging/Dimensions");
-//            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-//            asbiePanel.toggleUsed();
-//            asbiePanel.setCardinalityMax(99);
-//            asbiePanel.setCardinalityMin(11);
-//            asbiePanel.setRemark("aRemark");
-//            asbiePanel.setContextDefinition("defcon");
-//            editBIEPage.hitUpdateButton();
-//
-//            WebElement bbieSCNode = editBIEPage.getNodeByPath("/Unit Packaging/UPC Packaging Level Code/List Agency Identifier");
-//            EditBIEPage.BBIESCPanel  bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-//            bbiescPanel.toggleUsed();
-//            bbiescPanel.setRemark("aRemark");
-//            bbiescPanel.setExample("anExample");
-//            bbiescPanel.setValueConstraint("Fixed Value");
-//            bbiescPanel.setFixedValue("99");
-//            bbiescPanel.setValueDomain("token");
-//            bbiescPanel.setContextDefinition("defcon");
-//            editBIEPage.hitUpdateButton();
-//            editBIEPage.moveToQA();
-//            editBIEPage.moveToProduction();
-//
-//            //BIEuserbReusedParent previousRelease
-//
-//            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-//            createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-//            createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
-//            editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("From UOM Package. UOM Package", prev_release);
-//            currentUrl = getDriver().getCurrentUrl();
-//            topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-//            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-//                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-//
-//            if (!testingBIEs.containsKey("BIEUserbReusedParent")){
-//                testingBIEs.put("BIEUserbReusedParent", topLevelASBIEP);
-//            }else{
-//                testingBIEs.put("BIEUserbReusedParent", topLevelASBIEP);
-//            }
-//
-//            if (!BIEContexts.containsKey("BIEUserbReusedParent")){
-//                BIEContexts.put("BIEUserbReusedParent", contextForUserb.getName());
-//            }else{
-//                BIEContexts.put("BIEUserbReusedParent", contextForUserb.getName());
-//            }
-//
-//            bbieNode = editBIEPage.getNodeByPath("/From UOM Package/UOM Code");
-//            bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-//            bbiePanel.toggleUsed();
-//            bbiePanel.setRemark("aRemark");
-//            bbiePanel.setExample("anExample");
-//            bbiePanel.setContextDefinition("defcon");
-//            bbiePanel.setValueConstraint("Fixed Value");
-//            bbiePanel.setFixedValue("99");
-//            bbiePanel.setValueDomain("token");
-//            editBIEPage.hitUpdateButton();
-//
-//            asbieNode = editBIEPage.getNodeByPath("/From UOM Package/Unit Packaging");
-//            asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-//            SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/From UOM Package/Unit Packaging");
-//            TopLevelASBIEPObject reusedBIE = testingBIEs.get("BIEUserbReusedChild");
-//            selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
-//            editBIEPage.moveToQA();
-//            editBIEPage.moveToProduction();
-//
-//            //BIEUserbReusedScenario previousRelease
-//            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-//            createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-//            createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
-//            editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("UOM Code Conversion Rate. UOM Code Conversion Rate", prev_release);
-//            currentUrl = getDriver().getCurrentUrl();
-//            topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-//            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-//                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-//
-//            if (!testingBIEs.containsKey("BIEUserbReusedScenario")){
-//                testingBIEs.put("BIEUserbReusedScenario", topLevelASBIEP);
-//            }else{
-//                testingBIEs.put("BBIEUserbReusedScenario", topLevelASBIEP);
-//            }
-//
-//            if (!BIEContexts.containsKey("BIEUserbReusedScenario")){
-//                BIEContexts.put("BIEUserbReusedScenario", contextForUserb.getName());
-//            }else{
-//                BIEContexts.put("BIEUserbReusedScenario", contextForUserb.getName());
-//            }
-//
-//            selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/UOM Code Conversion Rate/From UOM Package");
-//            reusedBIE = testingBIEs.get("BIEUserbReusedParent");
-//            selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
-//            editBIEPage.moveToQA();
+
 //
 //            homePage.logout();
 //            homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
