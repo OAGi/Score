@@ -1105,13 +1105,65 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertNotChecked(asbiePanel.getNillableCheckbox());
         assertDisabled(asbiePanel.getNillableCheckbox());
 
+        //unreuse FROM UOM Package
+        viewEditBIEPage.openPage();
+        TopLevelASBIEPObject topLevelASBIEPObject = upliftedBIEs.get("BIEUserbReusedScenario");
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
+        editBIEPage.clickOnDropDownMenuByPath("/UOM Code Conversion Rate/From UOM Package");
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
+        waitFor(Duration.ofMillis(2500));
+        editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
+        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
+        editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging");
+        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
 
-
-
+        //Test part where only the association information are transferred
         homePage.logout();
+        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
 
+        upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject BIE1QA = testingBIEs.get("BIE1QA");
+        upliftBIEPage.setPropertyTerm(BIEUserbReusedScenario.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        tr = upliftBIEPage.getTableRecordAtIndex(1);
+        td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status");
+        upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
+        upliftBIEVerificationPage.next();
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
 
+        if (!upliftedBIEs.containsKey("BIE1QA_TA5D")){
+            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
+        }else{
+            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
+        }
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element");
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+        assertEquals("unbounded", asbiePanel.getCardinalityMaxField());
 
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element/Element/Sequence Number Number");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertNotChecked(bbiescPanel.getUsedCheckbox());
+        assertDisabled(bbiescPanel.getRemarkField());
+        homePage.logout();
     }
 
     @Test
