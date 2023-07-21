@@ -10,6 +10,8 @@ import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.By;
@@ -1872,9 +1874,134 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("clm6ConditionTypeCode1_ConditionTypeCode", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
-
     @Test
     public void test_TA_29_1_11a() {
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+        List<String> euCLStates = new ArrayList<>();
+        euCLStates.add("WIP");
+        euCLStates.add("QA");
+        euCLStates.add("Production");
+        euCLStates.add("Deleted");
+        ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
+        RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(usera, prev_releaseObject, euNamespace, euCLStates);
+        CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
+        CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(CLaccessUseraDeprecated.getName(), prev_release);
+        editCodeListPage.hitAmendButton();
+        click(editCodeListPage.getDeprecatedSelectField());
+        editCodeListPage.setDefinition("Check the Deprecated Checkbox");
+        editCodeListPage.hitUpdateButton();
+        editCodeListPage.moveToQA();
+        editCodeListPage.moveToProduction();
+
+        viewEditCodeListPage.openPage();
+        editCodeListPage =  viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
+        editCodeListPage.hitDeriveCodeListBasedOnThisButton();
+        editCodeListPage.setName("CLuserderived_BIEUp");
+        editCodeListPage.setNamespace(euNamespace);
+        editCodeListPage.setDefinition("aDefinition");
+        editCodeListPage.hitUpdateButton();
+
+       //BIECAGUplift prev_release
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Child Item Reference. Child Item Reference", prev_release);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIECAGUplift")){
+            testingBIEs.put("BIECAGUplift", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIECAGUplift", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("BIECAGUplift")){
+            BIEContexts.put("BIECAGUplift", context.getName());
+        }else{
+            BIEContexts.put("BIECAGUplift", context.getName());
+        }
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/Child Item Reference/Extension");
+        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Effectivity Relation Code. Code");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Validation Indicator. Indicator");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Method Consequence Text. Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Reference Identifier. Identifier");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Total Number. Number");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Latest Start Date Time. Date Time");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Request Language Code. Code");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Transport Temperature. Measure");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Correlation Identifier. Identifier");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Reason. Sequenced_ Open_ Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Record Set Save Indicator. Indicator");
+
+        accExtensionViewEditPage.setNamespace(euNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.moveToProduction();
+
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Effectivity Relation Code");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        String CLaccessendUserwip = euCodeListWithStateContainer.stateCodeLists.get("WIP").toString();
+        bbiePanel.setValueDomain(CLaccessendUserwip);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Validation Indicator");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        String CLaccessendUserqa = euCodeListWithStateContainer.stateCodeLists.get("QA").toString();
+        bbiePanel.setValueDomain(CLaccessendUserqa);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Method Consequence Text");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        String CLaccessendUserproduction = euCodeListWithStateContainer.stateCodeLists.get("Production").toString();
+        bbiePanel.setValueDomain(CLaccessendUserproduction);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Method Consequence Text");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        String CLaccessendUserproduction = euCodeListWithStateContainer.stateCodeLists.get("Production").toString();
+        bbiePanel.setValueDomain(CLaccessendUserproduction);
+        editBIEPage.hitUpdateButton();
+
+
+
+
+
+
+
+
+        homePage.logout();
+
+
 
     }
 
@@ -2007,89 +2134,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 //
 
 //
-//            homePage.logout();
-//            homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-//            List<String> euCLStates = new ArrayList<>();
-//            euCLStates.add("WIP");
-//            euCLStates.add("QA");
-//            euCLStates.add("Production");
-//            euCLStates.add("Deleted");
-//            ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
-//            RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(usera, prev_releaseObject, euNamespace, euCLStates);
-//            CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
-//            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
-//            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-//            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(CLaccessUseraDeprecated.getName(), prev_release);
-//            editCodeListPage.hitAmendButton();
-//            click(editCodeListPage.getDeprecatedSelectField());
-//            editCodeListPage.setDefinition("Check the Deprecated Checkbox");
-//            editCodeListPage.hitUpdateButton();
-//            editCodeListPage.moveToQA();
-//            editCodeListPage.moveToProduction();
-//
-//            viewEditCodeListPage.openPage();
-//            editCodeListPage =  viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
-//            editCodeListPage.hitDeriveCodeListBasedOnThisButton();
-//            editCodeListPage.setName("CLuserderived_BIEUp");
-//            editCodeListPage.setNamespace(euNamespace);
-//            editCodeListPage.setDefinition("aDefinition");
-//            editCodeListPage.hitUpdateButton();
-//
-//            //BIECAGUplift prev_release
-//            bieMenu = homePage.getBIEMenu();
-//            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-//            createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-//            createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
-//            editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Child Item Reference. Child Item Reference", prev_release);
-//            currentUrl = getDriver().getCurrentUrl();
-//            topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-//            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-//                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-//
-//            if (!testingBIEs.containsKey("BIECAGUplift")){
-//                testingBIEs.put("BIECAGUplift", topLevelASBIEP);
-//            }else{
-//                testingBIEs.put("BIECAGUplift", topLevelASBIEP);
-//            }
-//
-//            if (!BIEContexts.containsKey("BIECAGUplift")){
-//                BIEContexts.put("BIECAGUplift", context.getName());
-//            }else{
-//                BIEContexts.put("BIECAGUplift", context.getName());
-//            }
-//
-//            accExtensionViewEditPage =
-//                    editBIEPage.extendBIELocallyOnNode("/Child Item Reference/Extension");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Effectivity Relation Code. Code");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Validation Indicator. Indicator");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Method Consequence Text. Text");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Record Set Reference Identifier. Identifier");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Record Set Total Number. Number");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Latest Start Date Time. Date Time");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Request Language Code. Code");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Transport Temperature. Measure");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Correlation Identifier. Identifier");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Reason. Sequenced_ Open_ Text");
-//            selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-//            selectCCPropertyPage.selectAssociation("Record Set Save Indicator. Indicator");
-//
-//            accExtensionViewEditPage.setNamespace(euNamespace);
-//            accExtensionViewEditPage.hitUpdateButton();
-//            accExtensionViewEditPage.moveToQA();
-//            accExtensionViewEditPage.moveToProduction();
-//            homePage.logout();
-//
-//        }
+
 
     }
 
