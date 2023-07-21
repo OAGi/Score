@@ -1984,24 +1984,241 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain(CLaccessendUserproduction);
         editBIEPage.hitUpdateButton();
 
-        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Method Consequence Text");
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Record Set Total Number");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
-        String CLaccessendUserproduction = euCodeListWithStateContainer.stateCodeLists.get("Production").toString();
+        String CLaccessendUserdeleted = euCodeListWithStateContainer.stateCodeLists.get("Deleted").toString();
+        bbiePanel.setValueDomain(CLaccessendUserdeleted);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Latest Start Date Time");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain(CLaccessUseraDeprecated.getName());
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Transport Temperature");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("CLuserderived_BIEUp");
+        editBIEPage.hitUpdateButton();
+
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Reason/Sequence Number Number");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain(CLaccessendUserqa);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain(CLaccessendUserwip);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain(CLaccessendUserqa);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
         bbiePanel.setValueDomain(CLaccessendUserproduction);
         editBIEPage.hitUpdateButton();
 
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("CLuserderived_BIEUp");
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain(CLaccessendUserdeleted);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain(CLaccessUseraDeprecated.getName());
+        editBIEPage.hitUpdateButton();
+
+        bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain(CLaccessendUserwip);
+        editBIEPage.hitUpdateButton();
+
+        bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain(CLaccessendUserqa);
+        editBIEPage.hitUpdateButton();
+
+        bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("CLuserderived_BIEUp");
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Certification Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject BIECAGUplift = testingBIEs.get("BIECAUplift");
+        upliftBIEPage.setPropertyTerm(BIECAGUplift.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Latest Start Date Time");
+        WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CCRID"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Transport Temperature");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Account Identifier"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Validation Indicator");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CAGEID"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Method Consequence Text");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("DODAACID"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Record Set Total Number");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("SCACID"));
 
 
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Effectivity Relation Code");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Revision Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Reason/Sequence Number Number");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("//Child Item Reference/Child Line/Document Reference/Revision Identifier/Scheme Version Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Version Identifier"));
+
+        upliftBIEVerificationPage.next();
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!upliftedBIEs.containsKey("BIECAGUplift")) {
+            upliftedBIEs.put("BIECAGUplift", topLevelASBIEP);
+        } else {
+            upliftedBIEs.put("BIECAGUplift", topLevelASBIEP);
+        }
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("decimal", getText(bbiePanel.getValueDomainField()));
+
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Certification Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
 
 
 
 
         homePage.logout();
-
-
 
     }
 
