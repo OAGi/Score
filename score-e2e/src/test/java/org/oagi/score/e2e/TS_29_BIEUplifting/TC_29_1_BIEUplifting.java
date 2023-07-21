@@ -1369,7 +1369,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     }
 
     @Test
-    public void test_TA_29_1_9b() {
+    public void test_TA_29_1_9b_and_TA_29_1_9c() {
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -1642,13 +1642,103 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    @Test
-    public void test_TA_29_1_9c() {
+    public void preconditions_TA_29_1_10(){
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        //BIEBOMDoubleNested previousRelease
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("BOM. BOM", prev_release);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("BIEBOMDoubleNested")){
+            testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        }else{
+            testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("BIEBOMDoubleNested")){
+            BIEContexts.put("BIEBOMDoubleNested", context.getName());
+        }else{
+            BIEContexts.put("BIEBOMDoubleNested", context.getName());
+        }
+
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        WebElement bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Agency");
+        bbiescPanel.setValueDomain("clm63055D16B_AgencyIdentification");
+        editBIEPage.hitUpdateButton();
+
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject BIEBOMDoubleNested = testingBIEs.get("BIEBOMDoubleNested");
+        upliftBIEPage.setPropertyTerm(BIEBOMDoubleNested.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage.next();
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!upliftedBIEs.containsKey("BIEBOMDoubleNested")) {
+            upliftedBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        } else {
+            upliftedBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
+        }
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("clm63055D16B_AgencyIdentification", getText(bbiescPanel.getValueDomainField()));
 
     }
 
     @Test
     public void test_TA_29_1_10a() {
+
 
     }
 
@@ -1789,39 +1879,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 //            editBIEPage.moveToQA();
 //            editBIEPage.moveToProduction();
 //
-//            //BIEBOMDoubleNested previousRelease
-//            viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-//            createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-//            createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
-//            editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("BOM. BOM", prev_release);
-//            currentUrl = getDriver().getCurrentUrl();
-//            topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-//            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-//                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-//
-//            if (!testingBIEs.containsKey("BIEBOMDoubleNested")){
-//                testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
-//            }else{
-//                testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
-//            }
-//
-//            if (!BIEContexts.containsKey("BIEBOMDoubleNested")){
-//                BIEContexts.put("BIEBOMDoubleNested", context.getName());
-//            }else{
-//                BIEContexts.put("BIEBOMDoubleNested", context.getName());
-//            }
-//
-//            bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Header/Document Identifier Set/Identifier/Scheme Agency Identifier");
-//            bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-//            bbiescPanel.toggleUsed();
-//            selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/BOM/BOM Item Data");
-//            reusedBIE = testingBIEs.get("BIEBOMItemData");
-//            selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
-//
-//            asbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/BOM Item Data/Hazardous Material");
-//            asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-//            asbiePanel.toggleUsed();
-//            editBIEPage.hitUpdateButton();
+
 //
 //            homePage.logout();
 //            homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
