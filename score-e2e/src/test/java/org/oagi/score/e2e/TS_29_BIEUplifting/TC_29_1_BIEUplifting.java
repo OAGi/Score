@@ -1642,8 +1642,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    public void preconditions_TA_29_1_10(){
-
+    @Test
+    public void test_TA_29_1_10a() {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
@@ -1733,18 +1733,144 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm63055D16B_AgencyIdentification", getText(bbiescPanel.getValueDomainField()));
-
-    }
-
-    @Test
-    public void test_TA_29_1_10a() {
-
-
+        homePage.logout();
     }
 
     @Test
     public void test_TA_29_1_10b() {
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        //JournalEntry prev_release
+        bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prev_release);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
 
+        if (!testingBIEs.containsKey("JournalEntry")){
+            testingBIEs.put("JournalEntry", topLevelASBIEP);
+        }else{
+            testingBIEs.put("JournalEntry", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("JournalEntry")){
+            BIEContexts.put("JournalEntry", context.getName());
+        }else{
+            BIEContexts.put("JournalEntry", context.getName());
+        }
+
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension");
+        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Usage Description. Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Control Objective Category. Code");
+        accExtensionViewEditPage.setNamespace(euNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.moveToProduction();
+
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("oacl_RiskCode");
+        editBIEPage.hitUpdateButton();
+
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+
+        bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6ConditionTypeCode1_ConditionTypeCode");
+        editBIEPage.hitUpdateButton();
+
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject JournalEntry = testingBIEs.get("JournalEntry");
+        upliftBIEPage.setPropertyTerm(JournalEntry.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+
+        WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Debit Credit Code"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Action Code"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Tax Base Functional Amount"));
+
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
+
+        upliftBIEVerificationPage.next();
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        By UPLIFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        waitFor(Duration.ofMillis(2500));
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!upliftedBIEs.containsKey("JournalEntry")) {
+            upliftedBIEs.put("JournalEntry", topLevelASBIEP);
+        } else {
+            upliftedBIEs.put("JournalEntry", topLevelASBIEP);
+        }
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+
+        bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("oacl_DebitCreditCode", getText(bbiePanel.getValueDomainField()));
+
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("oacl_ResponseActionCode", getText(bbiescPanel.getValueDomainField()));
+
+        bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("oacl_RiskCode", getText(bbiePanel.getValueDomainField()));
+
+        bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        assertEquals("clm6ConditionTypeCode1_ConditionTypeCode", getText(bbiescPanel.getValueDomainField()));
+        homePage.logout();
     }
 
     @Test
