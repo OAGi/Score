@@ -21,6 +21,9 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
+    private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
@@ -113,11 +116,16 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
 
     @Override
     public WebElement getDeprecatedSelectField() {
-        return null;
+        return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setDeprecated(String deprecated) {
+        click(getStateSelectField());
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[contains(text(), \"" + deprecated + "\")]"));
+        click(optionField);
+        escape(getDriver());
 
     }
 

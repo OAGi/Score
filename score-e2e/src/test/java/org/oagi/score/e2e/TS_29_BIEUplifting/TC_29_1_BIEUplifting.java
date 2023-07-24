@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -37,6 +38,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
     Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
+    Map<String, CodeListObject> testingCodeLists = new HashMap<>();
+    Map<String, CodeListObject> upliftedCodeLists = new HashMap<>();
     Map<String, String> BIEContexts = new HashMap<>();
 
     @BeforeEach
@@ -2217,6 +2220,26 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //Uplift codeList page
         UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
+        upliftCodeListPage.setSourceBranch(prev_release);
+        upliftCodeListPage.setTargetBranch(curr_release);
+        upliftCodeListPage.setName("CLuserderived_BIEUp");
+        upliftCodeListPage.hitSearchButton();
+        tr = upliftCodeListPage.getTableRecordAtIndex(1);
+        td = upliftCodeListPage.getColumnByName(tr, "select");
+        click(td);
+        click(upliftCodeListPage.getUpliftButton());
+
+        currentUrl = getDriver().getCurrentUrl();
+        BigInteger codeListId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        CodeListObject codeListObject = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListId);
+
+        if (!upliftedCodeLists.containsKey("CLuserderived_BIEUp")) {
+            upliftedCodeLists.put("CLuserderived_BIEUp", codeListObject);
+        } else {
+            upliftedCodeLists.put("CLuserderived_BIEUp", codeListObject);
+        }
+
+
 
 
 
