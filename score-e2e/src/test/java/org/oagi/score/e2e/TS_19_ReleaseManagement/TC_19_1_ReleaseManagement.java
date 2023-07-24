@@ -59,10 +59,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-        if (existingReleaseNum == null) {
-            draft_creation();
-            existingReleaseNum = newReleaseNum;
-        }
     }
 
     public void draft_creation() {
@@ -325,13 +321,154 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 testingBCCPs.put("BCCPreleaseTA3devxcandidate",BCCPreleaseTA3devxcandidate);
             }
 
+            //Revision
+            viewEditCoreComponentPage.openPage();
+            if (!testingACCs.containsKey("ACCreleaseTA3revisionwip")){
+                ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Notify Corrective Action Request Data Area. Details", "Working");
+                accViewEditPage.hitReviseButton();
+                url = getDriver().getCurrentUrl();
+                BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ACCObject ACCreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+                if (!testingACCs.containsKey("ACCreleaseTA3revisionwip")) {
+                    testingACCs.put("ACCreleaseTA3revisionwip", ACCreleaseTA3revisionwip);
+                } else {
+                    testingACCs.put("ACCreleaseTA3revisionwip", ACCreleaseTA3revisionwip);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")){
+                ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Online Document Reference Base. Details", "Working");
+                accViewEditPage.hitReviseButton();
+                accViewEditPage.moveToDraft();
+                url = getDriver().getCurrentUrl();
+                BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ACCObject ACCreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+                if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")) {
+                    testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
+                } else {
+                    testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
+                }
+            }
+            viewEditCoreComponentPage.openPage();
+            if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")){
+                ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Order Commission Base. Details", "Working");
+                accViewEditPage.hitReviseButton();
+                accViewEditPage.moveToDraft();
+                accViewEditPage.moveToCandidate();
+                url = getDriver().getCurrentUrl();
+                BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ACCObject ACCreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+                if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")) {
+                    testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
+                } else {
+                    testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")){
+                asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Warning Process Message. Message", "Working");
+                asccpViewEditPage.hitReviseButton();
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")){
+                asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Transportation Term Reference. Document Reference", "Working");
+                asccpViewEditPage.hitReviseButton();
+                asccpViewEditPage.moveToDraft();
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
+                }
+            }
+
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")){
+                asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Shipping Route. Shipping Route", "Working");
+                asccpViewEditPage.hitReviseButton();
+                asccpViewEditPage.moveToDraft();
+                asccpViewEditPage.moveToCandidate();
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")){
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Accumulative Received Quantity. Quantity", "Working");
+                bccpViewEditPage.hitReviseButton();
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")){
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Allow Substitution Indicator. Indicator", "Working");
+                bccpViewEditPage.hitReviseButton();
+                bccpViewEditPage.moveToDraft();
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
+                }
+            }
+
+            viewEditCoreComponentPage.openPage();
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")){
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Appointment Required Indicator. Indicator", "Working");
+                bccpViewEditPage.hitReviseButton();
+                bccpViewEditPage.moveToDraft();
+                bccpViewEditPage.moveToCandidate();
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
+                }
+            }
+
         }
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(existingReleaseNum, "Draft");
-        assertEquals(existingReleaseNum, getText(editReleasePage.getReleaseNumberField()));
+
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(developerNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+
     }
 
     @Test
