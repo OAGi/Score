@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -1386,7 +1385,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject topLevelASBIEPObject = testingBIEs.get("TOPBIEGETBOM");
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEPObject);
         ACCExtensionViewEditPage accExtensionViewEditPage =
-                    editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
+                editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Effectivity Relation Code. Code");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
@@ -1663,15 +1662,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-        if (!testingBIEs.containsKey("BIEBOMDoubleNested")){
+        if (!testingBIEs.containsKey("BIEBOMDoubleNested")) {
             testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
-        }else{
+        } else {
             testingBIEs.put("BIEBOMDoubleNested", topLevelASBIEP);
         }
 
-        if (!BIEContexts.containsKey("BIEBOMDoubleNested")){
+        if (!BIEContexts.containsKey("BIEBOMDoubleNested")) {
             BIEContexts.put("BIEBOMDoubleNested", context.getName());
-        }else{
+        } else {
             BIEContexts.put("BIEBOMDoubleNested", context.getName());
         }
 
@@ -1759,15 +1758,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-        if (!testingBIEs.containsKey("JournalEntry")){
+        if (!testingBIEs.containsKey("JournalEntry")) {
             testingBIEs.put("JournalEntry", topLevelASBIEP);
-        }else{
+        } else {
             testingBIEs.put("JournalEntry", topLevelASBIEP);
         }
 
-        if (!BIEContexts.containsKey("JournalEntry")){
+        if (!BIEContexts.containsKey("JournalEntry")) {
             BIEContexts.put("JournalEntry", context.getName());
-        }else{
+        } else {
             BIEContexts.put("JournalEntry", context.getName());
         }
 
@@ -1878,6 +1877,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("clm6ConditionTypeCode1_ConditionTypeCode", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
+
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1901,14 +1901,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editCodeListPage.moveToProduction();
 
         viewEditCodeListPage.openPage();
-        editCodeListPage =  viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
         editCodeListPage.hitDeriveCodeListBasedOnThisButton();
         editCodeListPage.setName("CLuserderived_BIEUp");
         editCodeListPage.setNamespace(euNamespace);
         editCodeListPage.setDefinition("aDefinition");
         editCodeListPage.hitUpdateButton();
 
-       //BIECAGUplift prev_release
+        //BIECAGUplift prev_release
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1920,15 +1920,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-        if (!testingBIEs.containsKey("BIECAGUplift")){
+        if (!testingBIEs.containsKey("BIECAGUplift")) {
             testingBIEs.put("BIECAGUplift", topLevelASBIEP);
-        }else{
+        } else {
             testingBIEs.put("BIECAGUplift", topLevelASBIEP);
         }
 
-        if (!BIEContexts.containsKey("BIECAGUplift")){
+        if (!BIEContexts.containsKey("BIECAGUplift")) {
             BIEContexts.put("BIECAGUplift", context.getName());
-        }else{
+        } else {
             BIEContexts.put("BIECAGUplift", context.getName());
         }
         ACCExtensionViewEditPage accExtensionViewEditPage =
@@ -2220,8 +2220,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //Uplift codeList page
 
-        for (String codeListName: Arrays.asList(CLaccessendUserwip, CLaccessendUserqa, CLaccessendUserproduction, CLaccessendUserdeleted,
-                CLaccessUseraDeprecated.getName())){
+        for (String codeListName : Arrays.asList(CLaccessendUserwip, CLaccessendUserqa, CLaccessendUserproduction, CLaccessendUserdeleted,
+                CLaccessUseraDeprecated.getName())) {
             UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
             upliftCodeListPage.setSourceBranch(prev_release);
             upliftCodeListPage.setTargetBranch(curr_release);
@@ -2406,13 +2406,71 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_12() {
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        //JournalEntry prev_release
+        bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
+        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("ReusedJournalyEntry")) {
+            testingBIEs.put("ReusedJournalyEntry", topLevelASBIEP);
+        } else {
+            testingBIEs.put("ReusedJournalyEntry", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("ReusedJournalyEntry")) {
+            BIEContexts.put("ReusedJournalyEntry", context.getName());
+        } else {
+            BIEContexts.put("ReusedJournalyEntry", context.getName());
+        }
+
+        TopLevelASBIEPObject topLevelASBIEPObject = testingBIEs.get("JournalEntry");
+        TopLevelASBIEPObject reusedBIE = testingBIEs.get("ReusedJournalyEntry");
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEPObject);
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEPObject);
+        SelectProfileBIEToReuseDialog
+                selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/Post Acknowledge Journal Entry/Data Area/Journal Entry");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE.getDen());
+        editBIEPage.moveToQA();
+
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        TopLevelASBIEPObject JournalEntry = testingBIEs.get("JournalEntry");
+        upliftBIEPage.setPropertyTerm(JournalEntry.getPropertyTerm());
+        upliftBIEPage.setState("QA");
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage.next();
+        waitFor(Duration.ofSeconds(12000));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Usage Description\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Language Code\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Control Objective Category\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"List Version Identifier\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"BCCP\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"DT_SC\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"ASCCP\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Not selected\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"System\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Unmatched\")]")).isDisplayed());
     }
 
-    @Test
-    public void test_TA_29_1_13() {
-
-    }
 
     private class RandomCodeListWithStateContainer {
         private final AppUserObject appUser;
