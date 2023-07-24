@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
@@ -2213,6 +2214,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+
+        //Uplift codeList page
+        UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
+
+
+
+
+
 
 
 
