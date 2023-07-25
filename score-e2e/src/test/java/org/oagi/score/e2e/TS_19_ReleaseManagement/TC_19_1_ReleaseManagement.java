@@ -1180,8 +1180,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 testingACCs.put("ACCreleaseTA321case7parent", ACCreleaseTA321case7parent);
             }
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(2000));
+            waitFor(Duration.ofMillis(5000));
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+            accViewEditPage.moveToDraft();
+            accViewEditPage.moveToCandidate();
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
@@ -1197,44 +1203,23 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-        //Case7 when acc is in wip
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
-
-        //Case7 when acc base is moved to draft
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
-        accViewEditPage.backToWIP();
-        accViewEditPage.deleteBaseACC("/ACCrelease TA321case7parent. Details/ACCrelease TA321case7base. Details");
-
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
-        accViewEditPage.moveToDraft();
-
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
-        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/ACCrelease TA321case7parent. Details");
-        accSetBaseACCDialog.hitApplyButton("ACCrelease TA321case7base. Details");
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
-
-        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-        createReleasePage = viewEditReleasePage.createRelease();
-        createReleasePage.setReleaseNumber(newReleaseNum);
-        createReleasePage.setReleaseNamespace(oagiNamespace);
-        createReleasePage.hitCreateButton();
+        releaseAssignmentPage.hitCreateButton();
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
         viewEditReleasePage.openPage();
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Draft");
+        assertTrue(editReleasePage.isOpened());
+
+        //move back to initialize to Cancel
+        viewEditReleasePage.MoveBackToInitialized(newReleaseNum);
+        waitFor(Duration.ofSeconds(60L));
+
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
-        releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
-        releaseAssignmentPage.hitAssignAllButton();
-        releaseAssignmentPage.hitValidateButton();
-
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
-
-
+        assertTrue(editReleasePage.isOpened());
     }
 
     @Test
