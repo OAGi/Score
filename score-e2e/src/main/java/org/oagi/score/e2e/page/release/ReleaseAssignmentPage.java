@@ -27,4 +27,8 @@ public interface ReleaseAssignmentPage extends Page {
     WebElement getAssignAllButton();
 
     void hitAssignAllButton();
+
+    WebElement getValidateButton();
+
+    void hitValidateButton();
 }

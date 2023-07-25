@@ -557,7 +557,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_3b() {
+    public void test_TA_19_1_3b_case2() {
         String branch = "Working";
         Boolean Revise_Button_existing = false;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -691,14 +691,21 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 testingBCCPs.put("BCCPreleaseTA321candidate",BCCPreleaseTA321candidate);
             }
 
-            coreComponentAPI.appendASCC(ACCreleaseTA321, ASCCPreleaseTA321wip, "Published");
-            coreComponentAPI.appendASCC(ACCreleaseTA321, ASCCPreleaseTA321draft, "Published");
-            coreComponentAPI.appendASCC(ACCreleaseTA321, ASCCPreleaseTA321candidate, "Published");
-            coreComponentAPI.appendBCC(ACCreleaseTA321, BCCPreleaseTA321wip, "Published");
-            coreComponentAPI.appendBCC(ACCreleaseTA321, BCCPreleaseTA321draft, "Published");
-            coreComponentAPI.appendBCC(ACCreleaseTA321, BCCPreleaseTA321candidate, "Published");
             viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(2000));
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321.getAccManifestId());
+            SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(ASCCPreleaseTA321wip.getPropertyTerm());
+            selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(ASCCPreleaseTA321draft.getPropertyTerm());
+            selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(ASCCPreleaseTA321candidate.getPropertyTerm());
+            selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(BCCPreleaseTA321wip.getPropertyTerm());
+            selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(BCCPreleaseTA321draft.getPropertyTerm());
+            selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
+            selectAssociationDialog.selectAssociation(BCCPreleaseTA321candidate.getPropertyTerm());
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
@@ -713,15 +720,91 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
 
-        assertTrue(getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"Candidate\")]")).size() > 0);
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"WIP\")]")).size());
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"Draft\")]")).size());
+        //Case 2 ACC to ASCCP
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321wip. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321draft. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
 
+        //Case 3 ACC to BCCP
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321wip. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321draft. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+    }
 
+    @Test
+    public void test_TA_19_1_3b_case1() {
+        String branch = "Working";
+        Boolean Revise_Button_existing = false;
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        {
+            ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
+            ACCObject ACCreleaseTA321wip = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321wip.setObjectClassTerm("ACCrelease TA321case1wip");
+            coreComponentAPI.updateACC(ACCreleaseTA321wip);
+            if (!testingACCs.containsKey("ACCreleaseTA321wip")) {
+                testingACCs.put("ACCreleaseTA321wip", ACCreleaseTA321wip);
+            } else {
+                testingACCs.put("ACCreleaseTA321wip", ACCreleaseTA321wip);
+            }
 
+            ACCObject ACCreleaseTA321case1draft= coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "Draft");
+            ACCreleaseTA321case1draft.setObjectClassTerm("ACCrelease TA321case1draft");
+            coreComponentAPI.updateACC(ACCreleaseTA321case1draft);
+            if (!testingACCs.containsKey("ACCreleaseTA321case1draft")) {
+                testingACCs.put("ACCreleaseTA321case1draft", ACCreleaseTA321case1draft);
+            } else {
+                testingACCs.put("ACCreleaseTA321case1draft",ACCreleaseTA321case1draft);
+            }
 
+            ACCObject ACCreleaseTA321case1candidate = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "Candidate");
+            ACCreleaseTA321case1candidate.setObjectClassTerm("ACCrelease TA321case1candidate");
+            coreComponentAPI.updateACC(ACCreleaseTA321case1candidate);
+            if (!testingACCs.containsKey("ACCreleaseTA321case1candidate")) {
+                testingACCs.put("ACCreleaseTA321case1candidate", ACCreleaseTA321case1candidate);
+            } else {
+                testingACCs.put("ACCreleaseTA321case1candidate", ACCreleaseTA321case1candidate);
+            }
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(2000));
+            ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+            ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(ACCreleaseTA321wip.getDen());
+            String url = getDriver().getCurrentUrl();
+            BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+            ASCCPObject ASCCPreleaseTA321case1 = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA321case1")) {
+                testingASCCPs.put("ASCCPreleaseTA321case1", ASCCPreleaseTA321case1);
+            } else {
+                testingASCCPs.put("ASCCPreleaseTA321case1",ASCCPreleaseTA321case1);
+            }
+
+            asccpViewEditPage.moveToDraft();
+            asccpViewEditPage.moveToCandidate();
+        }
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+
+        //Case 2 ACC to ASCCP
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321wip. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321draft. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+
+        //Case 3 ACC to BCCP
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321wip. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321draft. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
     }
     @Test
     public void test_TA_19_1_3c() {
