@@ -11,16 +11,13 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.oagi.score.e2e.page.code_list.EditCodeListPage;
-import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -41,8 +38,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     String existingReleaseNum = null;
     String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
     CodeListObject codeListCandidate;
-    RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
-    RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
     Map<String, ACCObject> testingACCs = new HashMap<>();
     Map<String, ASCCPObject> testingASCCPs = new HashMap<>();
     Map<String, BCCPObject> testingBCCPs = new HashMap<>();
@@ -52,67 +47,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void init() {
         super.init();
     }
-
-    public void draft_creation() {
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        List<String> ccStates = new ArrayList<>();
-        ccStates.add("WIP");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
-        ccStates.add("Deleted");
-        developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(devx, workingBranch, namespace, ccStates);
-        ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
-        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACC.getAccManifestId());
-        accViewEditPage.backToWIP();
-        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACC.getDen());
-        appendAssociationDialog.selectAssociation("Adjusted Total Tax Amount");
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
-
-        codeListCandidate = getAPIFactory().getCodeListAPI().
-                createRandomCodeList(devx, namespace, workingBranch, "Published");
-        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, devx);
-
-        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
-        editCodeListPage.hitRevise();
-        editCodeListPage.setVersion("99");
-        editCodeListPage.setDefinition("random code list in candidate state");
-        editCodeListPage.hitUpdateButton();
-        editCodeListPage.moveToDraft();
-        editCodeListPage.moveToCandidate();
-
-        List<String> euCCStates = new ArrayList<>();
-        euCCStates.add("WIP");
-        euCCStates.add("QA");
-        euCCStates.add("Production");
-
-        euCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, euBranch, euNamespace, euCCStates);
-
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
-        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        createReleasePage.setReleaseNumber(newReleaseNum);
-        createReleasePage.setReleaseNamespace(namespace);
-        createReleasePage.hitCreateButton();
-        viewEditReleasePage.openPage();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
-        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
-        releaseAssignmentPage.hitAssignAllButton();
-        releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
-        homePage.logout();
-    }
-
     @AfterEach
     public void tearDown() {
         super.tearDown();
@@ -1282,48 +1216,4 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     }
 
-    private class RandomCoreComponentWithStateContainer {
-        private final AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private final HashMap<String, ACCObject> stateACCs = new HashMap<>();
-        private final HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private final HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
-            this.appUser = appUser;
-            this.states = states;
-
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccp;
-                ACCObject acc;
-                String state = this.states.get(i);
-
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
-                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
-                    bcc.setCardinalityMax(1);
-                    coreComponentAPI.updateBCC(bcc);
-
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
-                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
-                    ascc.setCardinalityMax(1);
-                    coreComponentAPI.updateASCC(ascc);
-                    stateACCs.put(state, acc);
-                    stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state, bccp);
-                }
-            }
-        }
-
-    }
 }
