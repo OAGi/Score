@@ -218,4 +218,10 @@ public interface ViewEditReleasePage extends Page {
      * @param releaseNum release Number
      */
     void MoveBackToInitialized(String releaseNum);
+
+    void hitDiscardButton(String releaseNumber);
+
+    WebElement getTableRecordAtIndex(int idx);
+
+    WebElement clickOnDropDownMenu(WebElement element);
 }

@@ -145,6 +145,8 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             deleteBusinessContextByAppUserId(txContext, appUserId);
             deleteContextSchemeByAppUserId(txContext, appUserId);
             deleteContextCategoryByAppUserId(txContext, appUserId);
+            deleteModuleSetReleaseByAppUserId(txContext, appUserId);
+            deleteModuleSetByAppUserId(txContext, appUserId);
             deleteNamespaceByAppUserId(txContext, appUserId);
             deleteReleaseByAppUserId(txContext, appUserId);
 
@@ -680,22 +682,76 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
     }
 
+    private void deleteModuleSetReleaseByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> moduleSetReleaseIdList = dslContext.select(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID)
+                .from(MODULE_SET_RELEASE)
+                .where(MODULE_SET_RELEASE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (moduleSetReleaseIdList != null && !moduleSetReleaseIdList.isEmpty()) {
+            dslContext.deleteFrom(MODULE_ACC_MANIFEST)
+                    .where(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_AGENCY_ID_LIST_MANIFEST)
+                    .where(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_ASCCP_MANIFEST)
+                    .where(MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_BCCP_MANIFEST)
+                    .where(MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_BLOB_CONTENT_MANIFEST)
+                    .where(MODULE_BLOB_CONTENT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_CODE_LIST_MANIFEST)
+                    .where(MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_DT_MANIFEST)
+                    .where(MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_XBT_MANIFEST)
+                    .where(MODULE_XBT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_SET_RELEASE)
+                    .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+        }
+    }
+
+    private void deleteModuleSetByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> moduleSetIdList = dslContext.select(MODULE_SET.MODULE_SET_ID)
+                .from(MODULE_SET)
+                .where(MODULE_SET.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (moduleSetIdList != null && !moduleSetIdList.isEmpty()) {
+            dslContext.deleteFrom(MODULE_SET)
+                    .where(MODULE_SET.MODULE_SET_ID.in(moduleSetIdList))
+                    .execute();
+        }
+    }
+
     private void deleteNamespaceByAppUserId(DSLContext dslContext, ULong appUserId) {
-        dslContext.deleteFrom(NAMESPACE)
-                .where(or(
-                        NAMESPACE.CREATED_BY.eq(appUserId),
-                        NAMESPACE.LAST_UPDATED_BY.eq(appUserId)
-                ))
-                .execute();
+        List<ULong> namespaceIdList = dslContext.select(NAMESPACE.NAMESPACE_ID)
+                .from(NAMESPACE)
+                .where(NAMESPACE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (namespaceIdList != null && !namespaceIdList.isEmpty()) {
+            dslContext.deleteFrom(NAMESPACE)
+                    .where(NAMESPACE.NAMESPACE_ID.in(namespaceIdList))
+                    .execute();
+        }
     }
 
     private void deleteReleaseByAppUserId(DSLContext dslContext, ULong appUserId) {
-        dslContext.deleteFrom(RELEASE)
-                .where(or(
-                        RELEASE.CREATED_BY.eq(appUserId),
-                        RELEASE.LAST_UPDATED_BY.eq(appUserId)
-                ))
-                .execute();
+        List<ULong> releaseIdList = dslContext.select(RELEASE.RELEASE_ID)
+                .from(RELEASE)
+                .where(RELEASE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (releaseIdList != null && !releaseIdList.isEmpty()) {
+            dslContext.deleteFrom(RELEASE)
+                    .where(RELEASE.RELEASE_ID.in(releaseIdList))
+                    .execute();
+        }
     }
 
 }
