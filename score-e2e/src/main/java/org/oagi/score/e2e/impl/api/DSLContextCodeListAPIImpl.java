@@ -275,6 +275,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dslContext.update(CODE_LIST)
                 .set(CODE_LIST.IS_DEPRECATED, (byte) (codeListWIP.isDeprecated() ? 1 : 0))
                 .set(CODE_LIST.VERSION_ID, codeListWIP.getVersionId())
+                .set(CODE_LIST.NAME, codeListWIP.getName())
                 .set(CODE_LIST.DEFINITION, codeListWIP.getDefinition())
                 .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeListWIP.getCodeListId())))
                 .execute();
@@ -370,6 +371,24 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public CodeListObject getCodeListByNameAndReleaseNumAndUser(String name, String releaseNum, AppUserObject createdBy) {
+        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+        List<Field<?>> fields = new ArrayList();
+        fields.add(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID);
+        fields.add(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID);
+        fields.add(CODE_LIST_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(CODE_LIST.fields()));
+        return dslContext.select(fields)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId),
+                        CODE_LIST.NAME.eq(name),
+                        CODE_LIST.CREATED_BY.eq(ULong.valueOf(createdBy.getAppUserId()))))
+                .fetchOne(record -> codeListMapper(record));
     }
 
     @Override

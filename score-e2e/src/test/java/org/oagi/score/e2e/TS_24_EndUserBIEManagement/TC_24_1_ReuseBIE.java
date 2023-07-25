@@ -10,6 +10,7 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
@@ -506,16 +507,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordByValue(useraBIE.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
-        click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]")));
         click(viewEditBIEPage.getDiscardButton(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Failed to discard BIE"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        assertEquals("Failed to discard BIE", getText(multiActionSnackBar.getMessageElement()));
     }
 
     @Test

@@ -10,6 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -45,8 +46,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
-    private static final By DISCARD_BUTTON_LOCATOR =
-            By.xpath("//*[contains(text(),\"Discard\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -58,6 +57,12 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    private static final By NAME_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+    private static final By DISCARD_RELEASE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Discard\")]");
+    private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
 
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);
@@ -214,10 +219,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
-    @Override
-    public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
-    }
 
     @Override
     public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State) {
@@ -318,9 +319,41 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     @Override
-    public WebElement getDiscardButton() {
-        return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+    public void hitDiscardButton(String releaseNumber) {
+        setReleaseNum(releaseNumber);
+        hitSearchButton();
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = getTableRecordAtIndex(1);
+                td = getColumnByName(tr, "releaseNum");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a Release using " + releaseNumber, e);
+            }
+            String nameColumn = getText(td.findElement(By.tagName("a")));
+            if (!nameColumn.contains(releaseNumber)) {
+                throw new NoSuchElementException("Cannot locate a Release using " + releaseNumber);
+            }
+            WebElement node = clickOnDropDownMenu(tr);
+            try {
+                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+            }
+        });
+
+        click(elementToBeClickable(getDriver(), CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR));
     }
 
-
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+    }
+    @Override
+    public WebElement clickOnDropDownMenu(WebElement element) {
+        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+    }
 }
