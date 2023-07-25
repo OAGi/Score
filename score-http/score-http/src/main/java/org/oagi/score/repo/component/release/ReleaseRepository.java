@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
 import org.oagi.score.gateway.http.api.code_list_management.service.CodeListService;
 import org.oagi.score.gateway.http.api.release_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.ScoreRepository;
@@ -341,7 +342,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_MANIFEST.as("target")).on(and(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
                                 DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_PRI_RESTRI.forceIndexForJoin("bdt_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_PRI_RESTRI.forceIndexForJoin(Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
                         .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
                                 BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.isNotNull(),
@@ -360,7 +361,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_MANIFEST.as("target")).on(and(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
                                 DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_PRI_RESTRI.forceIndexForJoin("bdt_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_PRI_RESTRI.forceIndexForJoin(Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
                         .join(CODE_LIST_MANIFEST).on(and(
                                 CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID),
@@ -382,7 +383,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_MANIFEST.as("target")).on(and(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(DT_MANIFEST.as("target").NEXT_DT_MANIFEST_ID),
                                 DT_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_PRI_RESTRI.forceIndexForJoin("bdt_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_PRI_RESTRI.forceIndexForJoin(Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_MANIFEST.as("working").DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID))
                         .join(AGENCY_ID_LIST_MANIFEST).on(and(
                                 AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID),
@@ -407,7 +408,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_SC_MANIFEST.as("target")).on(and(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
                                 DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin("bdt_sc_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin(Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
                         .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(ULong.valueOf(workingReleaseId)),
                                 BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.isNotNull(),
@@ -426,7 +427,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_SC_MANIFEST.as("target")).on(and(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
                                 DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin("bdt_sc_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin(Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
                         .join(CODE_LIST_MANIFEST).on(and(
                                 CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID),
@@ -448,7 +449,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .join(DT_SC_MANIFEST.as("target")).on(and(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("target").NEXT_DT_SC_MANIFEST_ID),
                                 DT_SC_MANIFEST.as("target").RELEASE_ID.eq(ULong.valueOf(releaseId))))
-                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin("bdt_sc_pri_restri_bdt_manifest_id_fk")).on(
+                        .join(BDT_SC_PRI_RESTRI.forceIndexForJoin(Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK.getName())).on(
                                 DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID))
                         .join(AGENCY_ID_LIST_MANIFEST).on(and(
                                 AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID),
