@@ -965,11 +965,89 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
     }
     @Test
-    public void test_TA_19_1_3c() {
-
-    }
-    @Test
     public void test_TA_19_1_3d() {
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
+        {
+            ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            ACCreleaseTA321case7base = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321case7base.setObjectClassTerm("ACCrelease TA321case7base");
+            coreComponentAPI.updateACC(ACCreleaseTA321case7base);
+            if (!testingACCs.containsKey("ACCreleaseTA321case7base")) {
+                testingACCs.put("ACCreleaseTA321case7base", ACCreleaseTA321case7base);
+            } else {
+                testingACCs.put("ACCreleaseTA321case7base", ACCreleaseTA321case7base);
+            }
+
+            ACCreleaseTA321case7parent = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321case7parent.setObjectClassTerm("ACCrelease TA321case7parent");
+            coreComponentAPI.updateBasedACC(ACCreleaseTA321case7parent, ACCreleaseTA321case7base);
+            coreComponentAPI.updateACC(ACCreleaseTA321case7parent);
+            if (!testingACCs.containsKey("ACCreleaseTA321case7parent")) {
+                testingACCs.put("ACCreleaseTA321case7parent", ACCreleaseTA321case7parent);
+            } else {
+                testingACCs.put("ACCreleaseTA321case7parent", ACCreleaseTA321case7parent);
+            }
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(2000));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+            accViewEditPage.moveToDraft();
+            accViewEditPage.moveToCandidate();
+        }
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+        //Case7 when acc is in wip
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+
+        //Case7 when acc base is moved to draft
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(2000));
+        ACCViewEditPage accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+        accViewEditPage.backToWIP();
+        accViewEditPage.deleteBaseACC("/ACCrelease TA321case7parent. Details/ACCrelease TA321case7base. Details");
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(2000));
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
+        accViewEditPage.moveToDraft();
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(2000));
+        accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/ACCrelease TA321case7parent. Details");
+        accSetBaseACCDialog.hitApplyButton("ACCrelease TA321case7base. Details");
+        accViewEditPage.moveToDraft();
+        accViewEditPage.moveToCandidate();
+
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+
 
     }
 
