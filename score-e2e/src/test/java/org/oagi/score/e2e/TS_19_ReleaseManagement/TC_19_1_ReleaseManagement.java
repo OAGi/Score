@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.TS_19_ReleaseManagement;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +23,10 @@ import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -722,6 +723,8 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
 
+        getElementByXPath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321wip. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]");
+
         //Case 2 ACC to ASCCP
         assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321wip. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
         assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321draft. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
@@ -731,6 +734,52 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321draft. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
     }
 
+    public WebElement getElementByXPath(String anXpath) {
+        String url = getDriver().getCurrentUrl();
+
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
+        try {
+            waitForPageLoaded(url);
+        }catch (Error | Exception retry){
+            getDriver().navigate().refresh();
+            waitFor(Duration.ofMillis(1000));
+            waitForPageLoaded(url);
+        }
+
+        try {
+            waitForElementToBecomePresent(By.xpath(anXpath));
+            //highlight elements
+            JavascriptExecutor js = (JavascriptExecutor) getDriver();
+            js.executeScript("arguments[0].setAttribute('style', arguments[1]);", getDriver().findElement(By.xpath(anXpath)), "color: red; border: 2px solid red;");
+        } catch (StaleElementReferenceException sere) {
+            System.out.println("stale exception prevented");
+        }
+        return getDriver().findElement(By.xpath(anXpath));
+    }
+
+    protected void waitForElementToBecomePresent(By by) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(4));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+    }
+
+    public void waitForPageLoaded(String url) {
+        ExpectedCondition<Boolean> expectation = new
+                ExpectedCondition<Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString().equals("complete");
+                    }
+                };
+        try {
+            //slow - change to 500
+            Thread.sleep(500);
+            WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(50));
+            wait.until(expectation);
+//            aRefresher.stopRefresher();
+        } catch (Throwable error) {
+            Assert.fail("Timeout waiting for Page Load Request to complete.");
+        }
+    }
+
     @Test
     public void test_TA_19_1_3b_case1() {
         String branch = "Working";
@@ -738,11 +787,13 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCObject ACCreleaseTA321wip, ACCreleaseTA321case1draft;
+        ASCCPObject ASCCPreleaseTA321case1;
         {
             ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            ACCObject ACCreleaseTA321wip = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321wip = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
             ACCreleaseTA321wip.setObjectClassTerm("ACCrelease TA321case1wip");
             coreComponentAPI.updateACC(ACCreleaseTA321wip);
             if (!testingACCs.containsKey("ACCreleaseTA321wip")) {
@@ -751,7 +802,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 testingACCs.put("ACCreleaseTA321wip", ACCreleaseTA321wip);
             }
 
-            ACCObject ACCreleaseTA321case1draft= coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "Draft");
+            ACCreleaseTA321case1draft = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "Draft");
             ACCreleaseTA321case1draft.setObjectClassTerm("ACCrelease TA321case1draft");
             coreComponentAPI.updateACC(ACCreleaseTA321case1draft);
             if (!testingACCs.containsKey("ACCreleaseTA321case1draft")) {
@@ -775,7 +826,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(ACCreleaseTA321wip.getDen());
             String url = getDriver().getCurrentUrl();
             BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-            ASCCPObject ASCCPreleaseTA321case1 = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+            ASCCPreleaseTA321case1 = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
             if (!testingASCCPs.containsKey("ASCCPreleaseTA321case1")) {
                 testingASCCPs.put("ASCCPreleaseTA321case1", ASCCPreleaseTA321case1);
             } else {
@@ -797,14 +848,31 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        //Case1 when acc wip
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case1wip. Details' is needed in the release assignment due to\")]");
 
-        //Case 2 ACC to ASCCP
-        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321wip. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ASCCPrelease TA321draft. Entity Identifiers Group' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        //Case1 when acc is moved to draft
+        viewEditCoreComponentPage.openPage();
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(ASCCPreleaseTA321case1.getAsccpManifestId());
+        asccpViewEditPage.backToWIP();
+        ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + ASCCPreleaseTA321case1.getPropertyTerm());
+        asccpChangeACCDialog.hitUpdateButton(ACCreleaseTA321case1draft.getDen());
+        asccpViewEditPage.moveToDraft();
+        asccpViewEditPage.moveToCandidate();
 
-        //Case 3 ACC to BCCP
-        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321wip. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'BCCPrelease TA321draft. Code' is needed in the release assignment due to 'ACCrelease TA321. Details'.\")]")).size());
+        createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+        //Case1 when acc wip
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case1draft. Details' is needed in the release assignment due to\")]");
+
     }
     @Test
     public void test_TA_19_1_3c() {
