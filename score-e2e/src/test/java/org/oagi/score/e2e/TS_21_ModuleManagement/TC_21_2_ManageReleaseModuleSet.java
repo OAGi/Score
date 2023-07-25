@@ -17,94 +17,182 @@ import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.*;
 
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
+
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
 
+    @AfterEach
+    public void tearDown() {
+        super.tearDown();
+        // Delete random accounts
+        this.randomAccounts.forEach(newUser -> {
+            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
+        });
+    }
+
     @Test
     @DisplayName("TC_21_2_TA_1")
-    public void test_TA_1() {
+    public void test_TA_1() throws InterruptedException {
         AppUserObject developer;
-        NamespaceObject namespace;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            ACCObject newACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, workingBranch, namespace, "Candidate");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
-        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
-        createReleasePage.setReleaseNumber(newReleaseNum);
-        createReleasePage.setReleaseNamespace(namespace);
-        createReleasePage.hitCreateButton();
-        viewEditReleasePage.openPage();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
-        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
-        releaseAssignmentPage.hitAssignAllButton();
-        releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
-
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
         List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        for (ModuleSetObject moduleSet : existingModuleSets){
+        for (ModuleSetObject moduleSet : existingModuleSets.stream().filter(e -> !e.getName().contains("Test")).collect(Collectors.toList())) {
             assertDoesNotThrow(() -> createModuleSetReleasePage.setModuleSet(moduleSet.getName()));
         }
         List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        for (ReleaseObject release : existingReleases){
-            assertDoesNotThrow(() ->  {
-                createModuleSetReleasePage.setRelease(release.getReleaseNumber());
-                escape(getDriver());});
+        for (ReleaseObject release : existingReleases.stream().filter(e -> e.getState().equals("Published")).collect(Collectors.toList())) {
+            assertDoesNotThrow(() -> createModuleSetReleasePage.setRelease(release.getReleaseNumber()));
         }
-        escape(getDriver());
-        createModuleSetReleasePage.toggleDefault();
+
         createModuleSetReleasePage.hitCreateButton();
+
+        viewEditModuleSetReleasePage.openPage();
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
+        assertTrue(getText(editModuleSetReleasePage.getDescriptionField()).contains(description));
+    }
+
+    @Test
+    @DisplayName("TC_21_2_TA_1_a")
+    public void test_TA_1_a() throws InterruptedException {
+        String releaseNumber = "10.8.4";
+        AppUserObject developer;
+        ModuleSetReleaseObject moduleSetRelease;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            moduleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getModuleSetReleaseByName(releaseNumber);
+            moduleSetRelease.setDefault(true);
+
+            getAPIFactory().getModuleSetReleaseAPI().updateModuleSetRelease(moduleSetRelease);
+        }
+
+        try {
+            HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+            CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+            String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+            createModuleSetReleasePage.setName(moduleSetReleaseName);
+            String description = randomPrint(50, 100);
+            createModuleSetReleasePage.setDescription(description);
+            createModuleSetReleasePage.setModuleSet(releaseNumber);
+            createModuleSetReleasePage.setRelease(releaseNumber);
+
+            createModuleSetReleasePage.toggleDefault();
+            assertThrows(TimeoutException.class, () -> createModuleSetReleasePage.hitCreateButton());
+
+            WebElement createButtonInDialog = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button/span"));
+            click(createButtonInDialog);
+
+            viewEditModuleSetReleasePage.openPage();
+            EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
+            assertTrue(getText(editModuleSetReleasePage.getDescriptionField()).contains(description));
+            assertEnabled(editModuleSetReleasePage.getDefaultCheckbox());
+        } finally {
+            // Roll the 'Default' option back
+            getAPIFactory().getModuleSetReleaseAPI().updateModuleSetRelease(moduleSetRelease);
+        }
     }
 
     @Test
     @DisplayName("TC_21_2_TA_2")
     public void test_TA_2() {
+        String releaseNumber = "10.8.2";
+        AppUserObject developer;
+        ModuleSetReleaseObject moduleSetRelease;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
 
+            moduleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getModuleSetReleaseByName(releaseNumber);
+            moduleSetRelease.setDefault(true);
+
+            getAPIFactory().getModuleSetReleaseAPI().updateModuleSetRelease(moduleSetRelease);
+        }
+
+        try {
+            HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+            CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+            String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+            createModuleSetReleasePage.setName(moduleSetReleaseName);
+            String description = randomPrint(50, 100);
+            createModuleSetReleasePage.setDescription(description);
+            createModuleSetReleasePage.setModuleSet(releaseNumber);
+            createModuleSetReleasePage.setRelease(releaseNumber);
+
+            createModuleSetReleasePage.toggleDefault();
+            assertThrows(TimeoutException.class, () -> createModuleSetReleasePage.hitCreateButton());
+
+            WebElement createButtonInDialog = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button/span"));
+            click(createButtonInDialog);
+
+            viewEditModuleSetReleasePage.openPage();
+            EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(releaseNumber);
+            editModuleSetReleasePage.toggleDefault();
+            EditModuleSetReleasePage finalEditModuleSetReleasePage = editModuleSetReleasePage;
+            assertThrows(TimeoutException.class, () -> finalEditModuleSetReleasePage.hitUpdateButton());
+
+            WebElement confirmDialogContent = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//score-confirm-dialog//div[@class = \"content\"]"));
+            assertTrue(getText(confirmDialogContent).contains("There is another default module set release"));
+
+            WebElement updateButtonInDialog = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span"));
+            click(updateButtonInDialog);
+
+            viewEditModuleSetReleasePage.openPage();
+            editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
+            assertDisabled(editModuleSetReleasePage.getDefaultCheckbox());
+        } finally {
+            // Roll the 'Default' option back
+            getAPIFactory().getModuleSetReleaseAPI().updateModuleSetRelease(moduleSetRelease);
+        }
     }
 
     @Test
     @DisplayName("TC_21_2_TA_3")
     public void test_TA_3() {
+        String releaseNumber = "10.8.3";
         AppUserObject developerA;
         AppUserObject developerB;
         {
@@ -114,58 +202,55 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet(releaseNumber);
+        createModuleSetReleasePage.setRelease(releaseNumber);
         createModuleSetReleasePage.hitCreateButton();
         homePage.logout();
-
         waitFor(ofMillis(500L));
+
         homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
-        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
-        editModuleSetReleasePage.setName("Release New Name");
-        editModuleSetReleasePage.setDescription("Release New Description");
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
+        String newModuleSetReleaseName = "Updated Test Module Set Release " + randomAlphanumeric(5, 10);
+        editModuleSetReleasePage.setName(newModuleSetReleaseName);
+        String newDescription = randomPrint(50, 100);
+        editModuleSetReleasePage.setDescription(newDescription);
         editModuleSetReleasePage.hitUpdateButton();
+        homePage.logout();
+        waitFor(ofMillis(500L));
+
+        homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(newModuleSetReleaseName);
+        assertTrue(getText(editModuleSetReleasePage.getDescriptionField()).contains(newDescription));
     }
 
     @Test
     @DisplayName("TC_21_2_TA_4")
     public void test_TA_4() {
+        String releaseNumber = "10.8.3";
         AppUserObject developerA;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
-        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
-        createModuleSetReleasePage.hitCreateButton();
-        waitFor(ofMillis(500L));
-        viewEditModuleSetReleasePage.openPage();
-
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
-        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
-        editModuleSetReleasePage.setName("Release New Name");
-        editModuleSetReleasePage.setDescription("Release New Description");
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(releaseNumber);
         File exportReleaseFile = null;
         try {
             exportReleaseFile = editModuleSetReleasePage.hitExportButton();
+            assertNotNull(exportReleaseFile);
+            assertTrue(exportReleaseFile.getName().endsWith(".zip"));
         } finally {
             if (exportReleaseFile != null) {
                 exportReleaseFile.delete();
@@ -176,6 +261,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
     @Test
     @DisplayName("TC_21_2_TA_5")
     public void test_TA_5() {
+        String releaseNumber = "10.8.3";
         AppUserObject developer;
         AppUserObject endUser;
         {
@@ -185,24 +271,24 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet(releaseNumber);
+        createModuleSetReleasePage.setRelease(releaseNumber);
         createModuleSetReleasePage.hitCreateButton();
         homePage.logout();
-
         waitFor(ofMillis(500L));
+
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developer);
         viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
-        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
+        assertTrue(getText(editModuleSetReleasePage.getDescriptionField()).contains(description));
         assertDisabled(editModuleSetReleasePage.getNameField());
         assertDisabled(editModuleSetReleasePage.getDescriptionField());
         assertThrows(TimeoutException.class, () -> editModuleSetReleasePage.getUpdateButton(true));
@@ -223,6 +309,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
                     createRandomCodeList(developer, namespace, workingBranch, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
@@ -240,33 +327,48 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
+
         viewEditReleasePage.openPage();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
+
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Initialized", state);
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
+
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
+        assertEquals("Draft", newDraftRelease.getState());
 
         /**
          * Test Assertion #21.2.6
          */
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet("10.8.1");
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
-        waitFor(ofMillis(500L));
+
         viewEditModuleSetReleasePage.openPage();
-        ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developer);
-        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
-        CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(latestModuleSetRelease);
+        ModuleSetReleaseObject moduleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getModuleSetReleaseByName(moduleSetReleaseName);
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
+        CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(moduleSetRelease);
         assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
         coreComponentAssignmentPage.hitAssignButton();
 
@@ -274,14 +376,26 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
          * Test Assertion #21.2.6.a
          */
         viewEditReleasePage.openPage();
-        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Draft");
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
         editReleasePage.backToInitialized();
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Initialized"));
+
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            if ("Initialized".equals(getText(viewEditReleasePage.getColumnByName(tr, "state")))) {
+                break;
+            }
+        }
+
+        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        assertEquals("Initialized", newDraftRelease.getState());
+
         viewEditModuleSetReleasePage.openPage();
-        viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
         coreComponentAssignmentPage.openPage();
         assertThrows(WebDriverException.class, () -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
 
@@ -289,16 +403,27 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
          * Test Assertion #21.2.6.c
          */
         viewEditReleasePage.openPage();
-        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
         editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
+
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Initialized", state);
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
+
         viewEditModuleSetReleasePage.openPage();
-        viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
         coreComponentAssignmentPage.openPage();
         assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
     }
@@ -313,6 +438,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
 
@@ -327,12 +453,11 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet("10.7.5");
         createModuleSetReleasePage.setRelease(newRelease.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
@@ -351,22 +476,27 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet("10.7.4");
+        createModuleSetReleasePage.setRelease("10.7.4");
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
+
         viewEditModuleSetReleasePage.openPage();
         ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         assertDoesNotThrow(() -> editModuleSetReleasePage.hitValidateButton());
+
+        WebElement dialogHeader = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-dialog-container//div[@class = \"header\"]"));
+        assertEquals("Module Set Release - XML Schema Validation", getText(dialogHeader));
     }
 
     @Test
@@ -377,33 +507,37 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        createModuleSetReleasePage.setModuleSet(existingModuleSets.get(0).getName());
-
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
-        createModuleSetReleasePage.setRelease(existingReleases.get(0).getReleaseNumber());
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet("10.7.3");
+        createModuleSetReleasePage.setRelease("10.7.3");
         createModuleSetReleasePage.hitCreateButton();
         waitFor(ofMillis(500L));
+
         viewEditModuleSetReleasePage.openPage();
         ModuleSetReleaseObject latestModuleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getTheLatestModuleSetReleaseCreatedBy(developerA);
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(latestModuleSetRelease);
         ModuleSetReleaseXMLSchemaValidationDialog validateDialog = editModuleSetReleasePage.hitValidateButton();
-        waitFor(Duration.ofSeconds(30));
+
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            WebElement progressBar = validateDialog.getProgressBar();
+            try {
+                if ("determinate".equals(progressBar.getAttribute("mode"))) {
+                    break;
+                }
+            } catch (StaleElementReferenceException ignore) {
+            }
+        }
+
         validateDialog.hitCopyToClipboardButton();
         assertTrue(getSnackBarMessage(getDriver()).equals("Copied to clipboard"));
-    }
-
-    @AfterEach
-    public void tearDown() {
-        super.tearDown();
-        // Delete random accounts
-        this.randomAccounts.forEach(newUser -> {
-            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
-        });
     }
 }

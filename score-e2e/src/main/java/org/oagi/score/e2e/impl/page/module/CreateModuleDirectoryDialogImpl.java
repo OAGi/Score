@@ -7,6 +7,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CreateModuleDirectoryDialogImpl implements CreateModuleDirectoryDialog {
@@ -52,6 +53,8 @@ public class CreateModuleDirectoryDialogImpl implements CreateModuleDirectoryDia
     @Override
     public void createModuleDirectory() {
         click(getCreateModuleDirectoryButton());
+        waitFor(ofMillis(500L));
+        assert "Created".equals(getSnackBarMessage(getDriver()));
     }
     @Override
     public WebElement getCreateModuleDirectoryButton() {

@@ -1,11 +1,14 @@
 package org.oagi.score.e2e.impl.page.module;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.module.CopyModuleFromExistingModuleSetDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -71,7 +74,13 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
     @Override
     public void copyModule() {
         click(getCopyButton());
+        waitFor(ofMillis(1000L));
+
+        // Copying modules would take a few minutes.
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
+        assert "Copied".equals(getSnackBarMessage(getDriver()));
     }
+
     private WebElement getCopyButton() {
         return elementToBeClickable(getDriver(), COPY_BUTTON_LOCATOR);
     }

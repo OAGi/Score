@@ -93,6 +93,8 @@ public class CreateModuleFileDialogImpl implements CreateModuleFileDialog {
     @Override
     public void createModuleFile() {
         click(getCreateModuleFileButton());
+        waitFor(ofMillis(500L));
+        assert "Created".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

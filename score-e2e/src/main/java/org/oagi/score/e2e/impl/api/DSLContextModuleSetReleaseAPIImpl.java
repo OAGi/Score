@@ -10,10 +10,13 @@ import org.oagi.score.e2e.api.ModuleSetReleaseAPI;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.ModuleSetReleaseObject;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE_SET;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE_SET_RELEASE;
 
 public class DSLContextModuleSetReleaseAPIImpl implements ModuleSetReleaseAPI {
@@ -24,6 +27,20 @@ public class DSLContextModuleSetReleaseAPIImpl implements ModuleSetReleaseAPI {
     public DSLContextModuleSetReleaseAPIImpl(DSLContext dslContext, APIFactory apiFactory) {
         this.dslContext = dslContext;
         this.apiFactory = apiFactory;
+    }
+
+    @Override
+    public ModuleSetReleaseObject getModuleSetReleaseById(BigInteger moduleSetReleaseId) {
+        return dslContext.selectFrom(MODULE_SET_RELEASE)
+                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(moduleSetReleaseId)))
+                .fetchOne(record -> moduleSetReleaseMapper(record));
+    }
+
+    @Override
+    public ModuleSetReleaseObject getModuleSetReleaseByName(String moduleSetReleaseName) {
+        return dslContext.selectFrom(MODULE_SET_RELEASE)
+                .where(MODULE_SET_RELEASE.NAME.like("%" + moduleSetReleaseName + "%"))
+                .fetchOne(record -> moduleSetReleaseMapper(record));
     }
 
     @Override
@@ -38,6 +55,30 @@ public class DSLContextModuleSetReleaseAPIImpl implements ModuleSetReleaseAPI {
                 .from(MODULE_SET_RELEASE)
                 .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(latestModuleSetReleaseIDByUser))
                 .fetchOne(record -> moduleSetReleaseMapper(record));
+    }
+
+    @Override
+    public void updateModuleSetRelease(ModuleSetReleaseObject moduleSetRelease) {
+        if (moduleSetRelease.isDefault()) {
+            dslContext.update(MODULE_SET_RELEASE)
+                    .set(MODULE_SET_RELEASE.IS_DEFAULT, (byte) 0)
+                    .where(MODULE_SET_RELEASE.RELEASE_ID.eq(ULong.valueOf(moduleSetRelease.getReleaseId())))
+                    .execute();
+            dslContext.update(MODULE_SET_RELEASE)
+                    .set(MODULE_SET_RELEASE.IS_DEFAULT, (byte) 1)
+                    .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(moduleSetRelease.getModuleSetReleaseId())))
+                    .execute();
+        }
+
+        dslContext.update(MODULE_SET_RELEASE)
+                .set(MODULE_SET_RELEASE.NAME, moduleSetRelease.getName())
+                .set(MODULE_SET_RELEASE.DESCRIPTION, moduleSetRelease.getDescription())
+                .set(MODULE_SET_RELEASE.CREATED_BY, ULong.valueOf(moduleSetRelease.getCreatedBy()))
+                .set(MODULE_SET_RELEASE.LAST_UPDATED_BY, ULong.valueOf(moduleSetRelease.getLastUpdatedBy()))
+                .set(MODULE_SET_RELEASE.CREATION_TIMESTAMP, moduleSetRelease.getCreationTimestamp())
+                .set(MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP, moduleSetRelease.getLastUpdateTimestamp())
+                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(ULong.valueOf(moduleSetRelease.getModuleSetReleaseId())))
+                .execute();
     }
 
     private ModuleSetReleaseObject moduleSetReleaseMapper(Record record) {

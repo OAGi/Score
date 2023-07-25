@@ -20,6 +20,9 @@ public interface CreateModuleSetReleasePage extends Page {
 
     WebElement getReleaseSelectField();
 
+    /**
+     * Hit the 'Create' button if enabled.
+     */
     void hitCreateButton();
 
     WebElement getCreateButton();

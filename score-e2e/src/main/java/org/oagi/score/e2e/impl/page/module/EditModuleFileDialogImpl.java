@@ -54,6 +54,7 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
     @Override
     public void updateModuleFile() {
         click(getUpdateModuleFileButton());
+        waitFor(ofMillis(500L));
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface ViewEditModuleSetPage extends Page {
 
     EditModuleSetPage openModuleSetByName(ModuleSetObject moduleSet);
 
+    EditModuleSetPage openModuleSetByName(String moduleSetName);
+
     WebElement getSearchButton();
 
     void hitSearchButton();

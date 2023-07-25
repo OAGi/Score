@@ -14,6 +14,8 @@ public interface ViewEditModuleSetReleasePage extends Page {
 
     EditModuleSetReleasePage openModuleSetReleaseByName(ModuleSetReleaseObject moduleSetRelease);
 
+    EditModuleSetReleasePage openModuleSetReleaseByName(String name);
+
     WebElement getSearchButton();
 
     void hitSearchButton();

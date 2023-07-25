@@ -105,8 +105,14 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     @Override
     public EditModuleFileDialog editModuleFile(String moduleFileName) {
-        click(getModuleByName(moduleFileName));
-        click(getModuleEditLink(moduleFileName));
+        retry(() -> {
+            click(getModuleByName(moduleFileName));
+            waitFor(ofMillis(1000L));
+
+            click(getModuleEditLink(moduleFileName));
+            waitFor(ofMillis(1000L));
+        });
+
         EditModuleFileDialog editModuleFileDialog = new EditModuleFileDialogImpl(this);
         assert editModuleFileDialog.isOpened();
         return  editModuleFileDialog;
@@ -136,8 +142,14 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     @Override
     public EditModuleDirectoryDialog editModuleDirectory(String moduleDirectoryName) {
-        click(getModuleByName(moduleDirectoryName));
-        click(getModuleEditLink(moduleDirectoryName));
+        retry(() -> {
+            click(getModuleByName(moduleDirectoryName));
+            waitFor(ofMillis(1000L));
+
+            click(getModuleEditLink(moduleDirectoryName));
+            waitFor(ofMillis(1000L));
+        });
+
         EditModuleDirectoryDialog editModuleDirectoryDialog = new EditModuleDirectoryDialogImpl(this);
         assert editModuleDirectoryDialog.isOpened();
         return editModuleDirectoryDialog;

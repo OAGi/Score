@@ -1,10 +1,13 @@
 package org.oagi.score.e2e.impl.page.module;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.module.CreateModuleSetPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -98,6 +101,11 @@ public class CreateModuleSetPageImpl extends BasePageImpl implements CreateModul
     @Override
     public void hitCreateButton() {
         click(getCreateButton());
+        waitFor(ofMillis(1000L));
+
+        // Creating module set along with the module set release would take a few minutes.
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
+        assert "Created".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

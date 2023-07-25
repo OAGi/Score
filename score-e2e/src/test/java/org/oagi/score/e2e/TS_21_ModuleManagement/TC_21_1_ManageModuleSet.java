@@ -1,33 +1,36 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.module.*;
-import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
-@Execution(ExecutionMode.SAME_THREAD)
+@Execution(ExecutionMode.CONCURRENT)
 public class TC_21_1_ManageModuleSet extends BaseTest {
+
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -38,14 +41,14 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
     @DisplayName("TC_21_1_TA_1")
     public void test_TA_1() {
         AppUserObject developer;
-
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        assertDoesNotThrow(() -> viewEditModuleSetPage.getNewModuleSetButton());
+        assertNotNull(viewEditModuleSetPage.getNewModuleSetButton());
     }
 
     @Test
@@ -56,25 +59,57 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        /**
-         * Test Assertion #21.1.2
-         */
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+
         assertEquals("true", createModuleSetPage.getNameField().getAttribute("aria-required"));
         assertEquals("false", createModuleSetPage.getDescriptionField().getAttribute("aria-required"));
-        createModuleSetPage.setName("new module" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
-        /**
-         * Test Assertion #21.1.2.a
-         */
+
+        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        viewEditModuleSetPage.openPage();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_2_a")
+    public void test_TA_2_a() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+
+        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+
         createModuleSetPage.toggleCreateModuleSetRelease();
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
         createModuleSetPage.setRelease(release.getReleaseNumber());
-        createModuleSetPage.setModuleSetRelease("connectSpec 10.9 Module Set Release");
+        createModuleSetPage.setModuleSetRelease(release.getReleaseNumber());
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
+
+        viewEditModuleSetPage.openPage();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetName);
+        assertEquals(moduleSetName, getText(editModuleSetReleasePage.getModuleSetSelectField()));
+        assertEquals(release.getReleaseNumber() + " " + release.getState(), getText(editModuleSetReleasePage.getReleaseSelectField()));
     }
 
     @Test
@@ -85,24 +120,34 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
 
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
-        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
-        editModuleSetPage.setName("Updated Module Set Name" + randomAlphanumeric(5, 10));
-        editModuleSetPage.setDescription("Updated Description");
+        viewEditModuleSetPage.openPage();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+
+        String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
+        editModuleSetPage.setName(newModuleSetName);
+        String newDescription = randomPrint(50, 100);
+        editModuleSetPage.setDescription(newDescription);
         editModuleSetPage.hitUpdateButton();
+
+        viewEditModuleSetPage.openPage();
+        editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(newModuleSetName);
+        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(newDescription));
     }
 
     @Test
-    @DisplayName("TC_21_1_TA_4")
-    public void test_TA_4() {
+    @DisplayName("TC_21_1_TA_4_a")
+    public void test_TA_4_a() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -110,125 +155,242 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
 
-        /**
-         * Test Assertion #21.1.4.a
-         */
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
-        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
         assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
         String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        createModuleFileDialog.setModuleFileVersionNumber("New version");
+        String version = "Version " + randomAlphanumeric(5, 10);
+        createModuleFileDialog.setModuleFileVersionNumber(version);
         assertEquals("false", createModuleFileDialog.getNamespaceField().getAttribute("aria-required"));
         assertEquals("false", createModuleFileDialog.getModuleFileVersionNumberField().getAttribute("aria-required"));
         createModuleFileDialog.createModuleFile();
-        waitFor(ofMillis(500L));
 
-        /**
-         * Test Assertion #21.1.4.b
-         */
+        EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
+        assertEquals(namespace.getUri(), getText(editModuleFileDialog.getNamespaceSelectField()));
+        assertEquals(version, getText(editModuleFileDialog.getModuleFileVersionNumberField()));
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4_b")
+    public void test_TA_4_b() {
+        AppUserObject developer;
+        NamespaceObject namespace;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        editModuleSetPage.addModule();
+        CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
+        assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
+        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
+        createModuleFileDialog.setModuleFileName(moduleFileName);
+        createModuleFileDialog.setNamespace(namespace.getUri());
+        String version = "Version " + randomAlphanumeric(5, 10);
+        createModuleFileDialog.setModuleFileVersionNumber(version);
+        assertEquals("false", createModuleFileDialog.getNamespaceField().getAttribute("aria-required"));
+        assertEquals("false", createModuleFileDialog.getModuleFileVersionNumberField().getAttribute("aria-required"));
+        createModuleFileDialog.createModuleFile();
+
         editModuleSetPage.addModule();
         createModuleFileDialog = editModuleSetPage.addNewModuleFile();
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        createModuleFileDialog.setModuleFileVersionNumber("New version");
-        createModuleFileDialog.createModuleFile();
-        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
-        assertTrue(errorMessage.contains("Duplicate module name exist."));
-        escape(getDriver());
+        createModuleFileDialog.setModuleFileVersionNumber(version);
+        CreateModuleFileDialog finalCreateModuleFileDialog = createModuleFileDialog;
+        assertThrows(TimeoutException.class, () -> finalCreateModuleFileDialog.createModuleFile());
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        assertTrue(getText(multiActionSnackBar.getMessageElement()).contains("Duplicate module name exist."));
+
         editModuleSetPage.openPage();
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
-        editModuleFileDialog.setModuleFileName("Changed module file name");
-        editModuleFileDialog.setModuleFileVersionNumber("");
+        String newModuleFileName = "Changed module file" + randomAlphanumeric(5, 10);
+        editModuleFileDialog.setModuleFileName(newModuleFileName);
+        String newVersion = "Version " + randomAlphanumeric(5, 10);
+        editModuleFileDialog.setModuleFileVersionNumber(newVersion);
         editModuleFileDialog.updateModuleFile();
 
-        /**
-         * Test Assertion #21.1.4.c
-         */
+        editModuleFileDialog = editModuleSetPage.editModuleFile(newModuleFileName);
+        assertEquals(namespace.getUri(), getText(editModuleFileDialog.getNamespaceSelectField()));
+        assertEquals(newVersion, getText(editModuleFileDialog.getModuleFileVersionNumberField()));
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4_c")
+    public void test_TA_4_c() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
-        String moduleDirectoryName = "Directory A";
+        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
         assertEquals("true", createModuleDirectoryDialog.getModuleDirectoryNameField().getAttribute("aria-required"));
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
-        waitFor(ofMillis(500L));
 
-        /**
-         * Test Assertion #21.1.4.d
-         */
+        EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
+        assertEquals(moduleDirectoryName, getText(editModuleDirectoryDialog.getModuleDirectoryNameField()));
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4_d")
+    public void test_TA_4_d() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        editModuleSetPage.addModule();
+        CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
+        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
+        createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
+        createModuleDirectoryDialog.createModuleDirectory();
+
         editModuleSetPage.addModule();
         createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
-        createModuleDirectoryDialog.createModuleDirectory();
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
-        assertTrue(errorMessage.contains("Duplicate module name exist."));
-        escape(getDriver());
+        CreateModuleDirectoryDialog finalCreateModuleDirectoryDialog = createModuleDirectoryDialog;
+        assertThrows(TimeoutException.class, () -> finalCreateModuleDirectoryDialog.createModuleDirectory());
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        assertTrue(getText(multiActionSnackBar.getMessageElement()).contains("Duplicate module name exist."));
+
         editModuleSetPage.openPage();
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
-        editModuleDirectoryDialog.setModuleDirectoryName("Directory A - changed");
+        String newModuleDirectoryName = "Changed Directory " + randomAlphanumeric(5, 10);
+        editModuleDirectoryDialog.setModuleDirectoryName(newModuleDirectoryName);
         editModuleDirectoryDialog.updateModuleDirectory();
 
-        /**
-         * Test Assertion #21.1.4.e
-         */
+        editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(newModuleDirectoryName);
+        assertEquals(newModuleDirectoryName, getText(editModuleDirectoryDialog.getModuleDirectoryNameField()));
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4_e")
+    public void test_TA_4_e() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CopyModuleFromExistingModuleSetDialog copyModuleFromExistingModuleSetDialog =
                 editModuleSetPage.copyFromExistingModuleSet();
         List<ModuleSetObject> existingModuleSet = getAPIFactory().getModuleSetAPI().getAllModuleSets();
-        ModuleSetObject selectedMduleSet = existingModuleSet.get(0);
-        copyModuleFromExistingModuleSetDialog.setModuleSet
-                (selectedMduleSet.getName());
+        ModuleSetObject selectedModuleSet = existingModuleSet.get(0);
+        copyModuleFromExistingModuleSetDialog.setModuleSet(selectedModuleSet.getName());
 
-        List<ModuleObject> modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedMduleSet.getModuleSetId());
-        ModuleObject selectedModule = modules.get(modules.size()-1);
+        List<ModuleObject> modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedModuleSet.getModuleSetId());
+        ModuleObject selectedModule = modules.get(modules.size() - 1);
         copyModuleFromExistingModuleSetDialog.selectModule(selectedModule.getName());
         copyModuleFromExistingModuleSetDialog.copyModule();
-        waitFor(Duration.ofSeconds(30));
 
-        assertDoesNotThrow(() -> editModuleSetPage.getModuleByName(selectedModule.getName()));
+        assertNotNull(editModuleSetPage.getModuleByName(selectedModule.getName()));
         click(editModuleSetPage.getModuleByName(selectedModule.getName()));
         List<ModuleObject> submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModule.getModuleId());
-        for (ModuleObject submodule: submodules){
-            assertDoesNotThrow(() -> editModuleSetPage.getModuleByName(submodule.getName()));
+        for (ModuleObject submodule : submodules) {
+            assertNotNull(editModuleSetPage.getModuleByName(submodule.getName()));
+        }
+    }
+
+    @Test
+    @DisplayName("TC_21_1_TA_4_f")
+    public void test_TA_4_f() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
         }
 
-        /**
-         * Test Assertion #21.1.4.f
-         */
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
-        editModuleSetPage.copyFromExistingModuleSet();
-        selectedMduleSet = existingModuleSet.get(1);
-        copyModuleFromExistingModuleSetDialog.setModuleSet
-                (selectedMduleSet.getName());
-        modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedMduleSet.getModuleSetId());
-        ModuleObject selectedModuleSecond = modules.get(modules.size()-1);
-        submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModuleSecond.getModuleId());
+        CopyModuleFromExistingModuleSetDialog copyModuleFromExistingModuleSetDialog = editModuleSetPage.copyFromExistingModuleSet();
+        List<ModuleSetObject> existingModuleSet = getAPIFactory().getModuleSetAPI().getAllModuleSets();
+        ModuleSetObject selectedModuleSet = existingModuleSet.get(1);
+        copyModuleFromExistingModuleSetDialog.setModuleSet(selectedModuleSet.getName());
+        List<ModuleObject> modules = getAPIFactory().getModuleAPI().getModulesByModuleSet(selectedModuleSet.getModuleSetId());
+        ModuleObject selectedModuleSecond = modules.get(modules.size() - 1);
+        List<ModuleObject> submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModuleSecond.getModuleId());
         ModuleObject selectedSubmodule = submodules.get(0);
         copyModuleFromExistingModuleSetDialog.selectModule(selectedModuleSecond.getName());
         copyModuleFromExistingModuleSetDialog.selectModule(selectedSubmodule.getName());
         copyModuleFromExistingModuleSetDialog.toggleCopyAllSubmodules();
         copyModuleFromExistingModuleSetDialog.copyModule();
-        click(editModuleSetPage.getModuleByName(selectedModuleSecond.getName()));
-        submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedSubmodule.getModuleId());
-        for (ModuleObject submodule: submodules){
-            assertThrows(WebDriverException.class, () -> editModuleSetPage.getModuleByName(submodule.getName()));
-        }
+
+        assertThrows(TimeoutException.class, () -> editModuleSetPage.getModuleByName(selectedModuleSecond.getName()));
+        assertNotNull(editModuleSetPage.getModuleByName(selectedSubmodule.getName()));
     }
 
     @Test
-    @DisplayName("TC_21_1_TA_5")
-    public void test_TA_5() {
+    @DisplayName("TC_21_1_TA_5_a_and_b")
+    public void test_TA_5_a_and_b() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -238,54 +400,50 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
 
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
-        EditModuleSetPage editModuleSetPage =  viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
-        String moduleFileName = "File A";
+        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        createModuleFileDialog.setModuleFileVersionNumber("New version");
+        String version = "Version " + randomAlphanumeric(5, 10);
+        createModuleFileDialog.setModuleFileVersionNumber(version);
         createModuleFileDialog.createModuleFile();
-        waitFor(ofMillis(500L));
+
         editModuleSetPage.openPage();
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
-        /**
-         * Test Assertion #21.1.5.b
-         */
-        String messageFileDiscard = "The CC assigned to this file will also be deleted.";
-
         click(editModuleFileDialog.getDiscardModuleFileButton());
+        String messageFileDiscard = "The CC assigned to this file will also be deleted.";
         assertEquals(messageFileDiscard, editModuleFileDialog.getDiscardFileMessage());
         click(editModuleFileDialog.getContinueToDiscardFileButton());
+        assertThrows(TimeoutException.class, () -> editModuleSetPage.getModuleByName(moduleFileName));
 
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
-        String moduleDirectoryName = "Directory A";
+        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
-        waitFor(ofMillis(500L));
+
         editModuleSetPage.openPage();
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
         click(editModuleDirectoryDialog.getDiscardModuleDirectoryButton());
 
-        /**
-         * Test Assertion #21.1.5.a
-         */
         String messageDirectoryDiscard = "Are you sure you want to discard this and sub modules?";
         assertEquals(messageDirectoryDiscard, editModuleDirectoryDialog.getDiscardDirectoryMessage());
         click(editModuleDirectoryDialog.getContinueToDiscardDirectoryButton());
+        assertThrows(TimeoutException.class, () -> editModuleSetPage.getModuleByName(moduleDirectoryName));
+    }
 
-        /**
-         * Test Assertion #21.1.5.c
-         */
-
+    @Test
+    @DisplayName("TC_21_1_TA_5_c")
+    public void test_TA_5_c() {
     }
 
     @Test
@@ -296,17 +454,19 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
+
         viewEditModuleSetPage.openPage();
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
-        viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
-        assert "Discarded".equals(getSnackBarMessage(getDriver()));
+        viewEditModuleSetPage.discardModuleSet(moduleSetName);
+        assertThrows(NoSuchElementException.class, () -> viewEditModuleSetPage.openModuleSetByName(moduleSetName));
     }
 
     @Test
@@ -319,30 +479,32 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
 
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
-        createModuleSetReleasePage.setDescription("Description Test");
-        createModuleSetReleasePage.setModuleSet(moduleSet.getName());
+        String moduleSetReleaseName = "Test Module Set Release for " + moduleSetName;
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String moduleSetReleaseDescription = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(moduleSetReleaseDescription);
+        createModuleSetReleasePage.setModuleSet(moduleSetName);
         createModuleSetReleasePage.setRelease(release.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
-        waitFor(ofMillis(500L));
 
         viewEditModuleSetPage.openPage();
-
-        viewEditModuleSetPage.discardModuleSet(moduleSet.getName());
-        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
-        assertTrue(errorMessage.contains("Module set in use cannot be discarded."));
+        assertThrows(TimeoutException.class, () -> viewEditModuleSetPage.discardModuleSet(moduleSetName));
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        assertTrue(getText(multiActionSnackBar.getMessageElement()).contains("Module set in use cannot be discarded."));
     }
+
     @Test
     @DisplayName("TC_21_1_TA_8")
     public void test_TA_8() {
@@ -355,19 +517,20 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
         homePage.logout();
 
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
-        homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSet);
+        viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         assertThrows(WebDriverException.class, () -> editModuleSetPage.setName("New Name EU"));
         assertThrows(WebDriverException.class, () -> editModuleSetPage.setDescription("New Description EU"));
         assertThrows(WebDriverException.class, () -> editModuleSetPage.hitUpdateButton());
@@ -385,22 +548,32 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
-        createModuleSetPage.setName("New Module Set" + randomAlphanumeric(5, 10));
-        createModuleSetPage.setDescription("Description");
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        String description = randomPrint(50, 100);
+        createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
-        waitFor(ofMillis(500L));
         homePage.logout();
 
         homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
-        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developerA);
-        homePage.getModuleMenu().openViewEditModuleSetSubMenu();
-        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSet);
-        assertDoesNotThrow(() -> editModuleSetPage.setName("New Name Developer B"));
-        assertDoesNotThrow(() -> editModuleSetPage.setDescription("New Description Developer B"));
-        assertDoesNotThrow(() -> editModuleSetPage.hitUpdateButton());
+        viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+
+        String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
+        editModuleSetPage.setName(newModuleSetName);
+        String newDescription = randomPrint(50, 100);
+        editModuleSetPage.setDescription(newDescription);
+        editModuleSetPage.hitUpdateButton();
+        homePage.logout();
+
+        homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
+        viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(newModuleSetName);
+        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(newDescription));
     }
 
     @AfterEach

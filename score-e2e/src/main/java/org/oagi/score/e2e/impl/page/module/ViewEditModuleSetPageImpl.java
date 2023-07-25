@@ -63,7 +63,12 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
 
     @Override
     public EditModuleSetPage openModuleSetByName(ModuleSetObject moduleSet) {
-        setName(moduleSet.getName());
+        return openModuleSetByName(moduleSet.getName());
+    }
+
+    @Override
+    public EditModuleSetPage openModuleSetByName(String moduleSetName) {
+        setName(moduleSetName);
         hitSearchButton();
 
         retry(() -> {
@@ -73,21 +78,24 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
                 tr = getTableRecordAtIndex(1);
                 td = getColumnByName(tr, "name");
             } catch (TimeoutException e) {
-                        throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSet.getName(), e);
+                throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSetName, e);
             }
             String nameColumn = getText(td.findElement(By.tagName("a")));
-            if (!nameColumn.contains(moduleSet.getName())) {
-                throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSet.getName());
+            if (!nameColumn.contains(moduleSetName)) {
+                throw new NoSuchElementException("Cannot locate a Module Set using " + moduleSetName);
             }
             WebElement tdModuleName = td.findElement(By.cssSelector("a"));
             // TODO:
             // 'click' does not work when the browser hides the link.
             getDriver().get(tdModuleName.getAttribute("href"));
         });
+
+        ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getModuleSetByName(moduleSetName);
         EditModuleSetPage editModuleSetPage = new EditModuleSetPageImpl(this, moduleSet);
         assert editModuleSetPage.isOpened();
         return editModuleSetPage;
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
@@ -143,6 +151,9 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
         });
 
         click(elementToBeClickable(getDriver(), CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR));
+        waitFor(ofMillis(500L));
+
+        assert "Discarded".equals(getSnackBarMessage(getDriver()));
 
     }
     @Override

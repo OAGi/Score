@@ -1,10 +1,13 @@
 package org.oagi.score.e2e.impl.page.module;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.module.CreateModuleSetReleasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -15,9 +18,11 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
     private static final By RELEASE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Release\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[text() = \"Release\"]//ancestor::mat-form-field[1]//mat-select");
     private static final By MODULE_SET_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Module Set\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[text() = \"Module Set\"]//ancestor::mat-form-field[1]//mat-select");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
@@ -65,12 +70,13 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     public void setModuleSet(String name) {
         retry(() -> {
             click(getModuleSetSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
+            WebElement optionField = elementToBeClickable(getDriver(),
                     By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]/span"));
             click(optionField);
             waitFor(ofMillis(500L));
         });
     }
+
     @Override
     public WebElement getModuleSetSelectField() {
         return visibilityOfElementLocated(getDriver(), MODULE_SET_SELECT_FIELD_LOCATOR);
@@ -80,10 +86,12 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     public void setRelease(String releaseNumber) {
         retry(() -> {
             click(getReleaseSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + releaseNumber + "\")]//ancestor::mat-option[1]/span"));
-            click(optionField);
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), releaseNumber);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + releaseNumber + "\")]"));
+            click(searchedSelectField);
             waitFor(ofMillis(500L));
+            escape(getDriver());
         });
     }
     @Override
@@ -94,6 +102,11 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     @Override
     public void hitCreateButton() {
         click(getCreateButton());
+        waitFor(ofMillis(500L));
+
+        // Creating the module set release would take a few minutes.
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
+        assert "Created".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

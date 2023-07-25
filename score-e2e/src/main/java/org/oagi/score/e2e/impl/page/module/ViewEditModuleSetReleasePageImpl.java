@@ -11,6 +11,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
+
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
@@ -59,7 +61,12 @@ public class ViewEditModuleSetReleasePageImpl extends BasePageImpl implements Vi
 
     @Override
     public EditModuleSetReleasePage openModuleSetReleaseByName(ModuleSetReleaseObject moduleSetRelease) {
-        setName(moduleSetRelease.getName());
+        return openModuleSetReleaseByName(moduleSetRelease.getName());
+    }
+
+    @Override
+    public EditModuleSetReleasePage openModuleSetReleaseByName(String moduleSetReleaseName) {
+        setName(moduleSetReleaseName);
         hitSearchButton();
 
         retry(() -> {
@@ -69,17 +76,22 @@ public class ViewEditModuleSetReleasePageImpl extends BasePageImpl implements Vi
                 tr = getTableRecordAtIndex(1);
                 td = getColumnByName(tr, "name");
             } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a Module Set Release using " + moduleSetRelease.getName(), e);
+                throw new NoSuchElementException("Cannot locate a Module Set Release using " + moduleSetReleaseName, e);
             }
             String nameColumn = getText(td.findElement(By.tagName("a")));
-            if (!nameColumn.contains(moduleSetRelease.getName())) {
-                throw new NoSuchElementException("Cannot locate a Module Set Release using " + moduleSetRelease.getName());
+            if (!nameColumn.contains(moduleSetReleaseName)) {
+                throw new NoSuchElementException("Cannot locate a Module Set Release using " + moduleSetReleaseName);
             }
             WebElement tdReleaseName = td.findElement(By.cssSelector("a"));
             // TODO:
             // 'click' does not work when the browser hides the link.
             getDriver().get(tdReleaseName.getAttribute("href"));
         });
+        waitFor(ofMillis(1000L));
+
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger moduleSetReleaseId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ModuleSetReleaseObject moduleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getModuleSetReleaseById(moduleSetReleaseId);
         EditModuleSetReleasePage editModuleSetReleasePage = new EditModuleSetReleasePageImpl(this, moduleSetRelease);
         assert editModuleSetReleasePage.isOpened();
         return editModuleSetReleasePage;

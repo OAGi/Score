@@ -4,11 +4,11 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ModuleSetReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.module.CoreComponentAssignmentPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CoreComponentAssignmentPageImpl extends BasePageImpl implements CoreComponentAssignmentPage {
@@ -48,6 +48,7 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     @Override
     public void setDenUnassigned(String name) {
         sendKeys(getDenUnassignedField(), name);
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -58,6 +59,7 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     @Override
     public void setDenAssigned(String name) {
         sendKeys(getDenAssignedField(), name);
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -81,8 +83,15 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
             if (!denColumn.contains(name)) {
                 throw new NoSuchElementException("Cannot locate a Core Component using " + name);
             }
+
             WebElement select = getColumnByName(tr, "checkbox");
+            waitFor(ofMillis(1000L));
             click(select);
+            waitFor(ofMillis(1000L));
+
+            if ("false".equals(select.findElement(By.tagName("mat-checkbox")).getAttribute("ng-reflect-checked"))) {
+                throw new WebDriverException();
+            }
         });
     }
 
@@ -102,8 +111,15 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
             if (!denColumn.contains(name)) {
                 throw new NoSuchElementException("Cannot locate a Core Component using " + name);
             }
+
             WebElement select = getColumnByName(tr, "checkbox");
+            waitFor(ofMillis(1000L));
             click(select);
+            waitFor(ofMillis(1000L));
+
+            if ("false".equals(select.findElement(By.tagName("mat-checkbox")).getAttribute("ng-reflect-checked"))) {
+                throw new WebDriverException();
+            }
         });
     }
     @Override
@@ -112,20 +128,20 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     }
 
     @Override
+    public WebElement getTableRecordAtIndexUnassignedCC(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
     public WebElement getTableRecordByValueAssignedCC(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
     }
-
 
     @Override
     public WebElement getTableRecordAtIndexAssignedCC(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//tbody/tr[" + idx + "]"));
     }
 
-    @Override
-    public WebElement getTableRecordAtIndexUnassignedCC(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//tbody/tr[" + idx + "]"));
-    }
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
@@ -134,6 +150,9 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     @Override
     public void hitAssignButton() {
         click(getAssignButton());
+        waitFor(ofMillis(1000L));
+
+        assert "Assigned".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -154,6 +173,9 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     @Override
     public void hitUnassignButton() {
         click(getUnassignButton());
+        waitFor(ofMillis(1000L));
+
+        assert "Unassigned".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

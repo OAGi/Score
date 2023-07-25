@@ -19,13 +19,19 @@ import java.util.concurrent.TimeUnit;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditModuleSetReleasePage {
+
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
+    private static final By MODULE_SET_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Module Set\")]//ancestor::mat-form-field[1]//mat-select");
+    private static final By RELEASE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Release\")]//ancestor::mat-form-field[1]//mat-select");
+    private static final By DEFAULT_CHECKBOX_LOCATOR =
+            By.xpath("//span[contains(text(), \"Default\")]//ancestor::mat-checkbox");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By EXPORT_BUTTON_LOCATOR =
@@ -82,6 +88,26 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
     }
 
     @Override
+    public WebElement getModuleSetSelectField() {
+        return visibilityOfElementLocated(getDriver(), MODULE_SET_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getReleaseSelectField() {
+        return visibilityOfElementLocated(getDriver(), RELEASE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getDefaultCheckbox() {
+        return visibilityOfElementLocated(getDriver(), DEFAULT_CHECKBOX_LOCATOR);
+    }
+
+    @Override
+    public void toggleDefault() {
+        click(getDefaultCheckbox().findElement(By.tagName("label")));
+    }
+
+    @Override
     public void hitUpdateButton() {
         retry(() -> {
             click(getUpdateButton(true));
@@ -131,7 +157,7 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
         click(getValidateButton());
         ModuleSetReleaseXMLSchemaValidationDialog validateDialog = new ModuleSetReleaseXMLSchemaValidationDialogImpl(this);
         assert validateDialog.isOpened();
-        return  validateDialog;
+        return validateDialog;
     }
 
 

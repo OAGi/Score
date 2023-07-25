@@ -61,6 +61,7 @@ public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog 
     @Override
     public void updateModuleDirectory() {
         click(getUpdateModuleDirectoryButton());
+        waitFor(ofMillis(500L));
     }
     @Override
     public WebElement getUpdateModuleDirectoryButton() {

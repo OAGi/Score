@@ -38,6 +38,12 @@ public class ModuleSetReleaseXMLSchemaValidationDialogImpl implements ModuleSetR
     }
 
     @Override
+    public WebElement getProgressBar() {
+        return visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-module-set-release-validation-dialog//mat-progress-bar"));
+    }
+
+    @Override
     public void hitCopyToClipboardButton() {
         click(getCopyToClipboardButton());
     }
