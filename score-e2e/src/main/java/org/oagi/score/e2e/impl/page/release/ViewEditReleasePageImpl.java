@@ -319,6 +319,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     @Override
+    public WebElement getDiscardButton() {
+        return visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR);
+    }
+
+    @Override
     public void hitDiscardButton(String releaseNumber) {
         setReleaseNum(releaseNumber);
         hitSearchButton();
