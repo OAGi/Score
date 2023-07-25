@@ -362,7 +362,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(2000));
             if (!testingACCs.containsKey("ACCreleaseTA3revisionwip")){
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Notify Corrective Action Request Data Area. Details", "Working");
-                accViewEditPage.hitReviseButton();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                if(Revise_Button_existing){
+                    accViewEditPage.hitReviseButton();
+                    Revise_Button_existing = false;
+                }
                 url = getDriver().getCurrentUrl();
                 BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
                 ACCObject ACCreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
@@ -377,40 +381,39 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(2000));
             if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")){
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Online Document Reference Base. Details", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if(Revise_Button_existing){
                     accViewEditPage.hitReviseButton();
                     accViewEditPage.moveToDraft();
-                    url = getDriver().getCurrentUrl();
-                    BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    ACCObject ACCreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
-                    if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")) {
-                        testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
-                    } else {
-                        testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
-                    }
                     Revise_Button_existing = false;
-
+                }
+                url = getDriver().getCurrentUrl();
+                BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ACCObject ACCreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+                if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")) {
+                    testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
+                } else {
+                    testingACCs.put("ACCreleaseTA3revisiondraft", ACCreleaseTA3revisiondraft);
                 }
             }
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")){
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Order Commission Base. Details", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     accViewEditPage.hitReviseButton();
                     accViewEditPage.moveToDraft();
                     accViewEditPage.moveToCandidate();
-                    url = getDriver().getCurrentUrl();
-                    BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    ACCObject ACCreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
-                    if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")) {
-                        testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
-                    } else {
-                        testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
-                    }
                     Revise_Button_existing = false;
+                }
+                url = getDriver().getCurrentUrl();
+                BigInteger accManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ACCObject ACCreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+                if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")) {
+                    testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
+                } else {
+                    testingACCs.put("ACCreleaseTA3revisioncandidate", ACCreleaseTA3revisioncandidate);
                 }
             }
 
@@ -418,19 +421,18 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(2000));
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")){
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Warning Process Message. Message", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     asccpViewEditPage.hitReviseButton();
-                    url = getDriver().getCurrentUrl();
-                    asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    ASCCPObject ASCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-                    if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")) {
-                        testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
-                    } else {
-                        testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
-                    }
                     Revise_Button_existing = false;
-
+                }
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisionwip", ASCCPreleaseTA3revisionwip);
                 }
             }
 
@@ -438,19 +440,19 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(2000));
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")){
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Transportation Term Reference. Document Reference", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     asccpViewEditPage.hitReviseButton();
                     asccpViewEditPage.moveToDraft();
-                    url = getDriver().getCurrentUrl();
-                    asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    ASCCPObject ASCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-                    if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")) {
-                        testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
-                    } else {
-                        testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
-                    }
                     Revise_Button_existing = false;
+                }
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisiondraft", ASCCPreleaseTA3revisiondraft);
                 }
             }
 
@@ -458,81 +460,80 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(2000));
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")){
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Shipping Route. Shipping Route", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     asccpViewEditPage.hitReviseButton();
                     asccpViewEditPage.moveToDraft();
                     asccpViewEditPage.moveToCandidate();
-                    url = getDriver().getCurrentUrl();
-                    asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    ASCCPObject ASCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
-                    if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")) {
-                        testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
-                    } else {
-                        testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
-                    }
                     Revise_Button_existing = false;
+                }
+                url = getDriver().getCurrentUrl();
+                asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                ASCCPObject ASCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+                if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")) {
+                    testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
+                } else {
+                    testingASCCPs.put("ASCCPreleaseTA3revisioncandidate", ASCCPreleaseTA3revisioncandidate);
                 }
             }
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")){
-                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Accumulative Received Quantity. Quantity", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Accumulative Received Quantity. Open_ Quantity", "Working");
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     bccpViewEditPage.hitReviseButton();
-                    url = getDriver().getCurrentUrl();
-                    bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    BCCPObject BCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
-                    if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")) {
-                        testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
-                    } else {
-                        testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
-                    }
                     Revise_Button_existing = false;
                 }
-
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisionwip = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisionwip", BCCPreleaseTA3revisionwip);
+                }
             }
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")){
-                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Allow Substitution Indicator. Indicator", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Allow Substitution Indicator. Open_ Indicator", "Working");
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if (Revise_Button_existing){
                     bccpViewEditPage.hitReviseButton();
                     bccpViewEditPage.moveToDraft();
-                    url = getDriver().getCurrentUrl();
-                    bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    BCCPObject BCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
-                    if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")) {
-                        testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
-                    } else {
-                        testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
-                    }
                     Revise_Button_existing = false;
+                }
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisiondraft = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisiondraft", BCCPreleaseTA3revisiondraft);
                 }
             }
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")){
-                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Appointment Required Indicator. Indicator", "Working");
-                Revise_Button_existing = 1 < getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
+                bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Appointment Required Indicator. Open_ Indicator", "Working");
+                Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
                 if(Revise_Button_existing){
                     bccpViewEditPage.hitReviseButton();
                     bccpViewEditPage.moveToDraft();
                     bccpViewEditPage.moveToCandidate();
-                    url = getDriver().getCurrentUrl();
-                    bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
-                    BCCPObject BCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
-                    if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")) {
-                        testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
-                    } else {
-                        testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
-                    }
                     Revise_Button_existing = false;
+                }
+                url = getDriver().getCurrentUrl();
+                bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+                BCCPObject BCCPreleaseTA3revisioncandidate = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+                if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")) {
+                    testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
+                } else {
+                    testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
                 }
             }
 
