@@ -205,6 +205,28 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
+    public ACCViewEditPage openACCViewEditPage(WebElement tr) {
+        return retry(() -> {
+            WebElement td;
+            try {
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an ACC using the table record", e);
+            }
+            WebElement link = td.findElement(By.tagName("a"));
+
+            String href = link.getAttribute("href");
+            String accId = href.substring(href.indexOf("/acc/") + "/acc/".length());
+            ACCObject accObject = getAPIFactory().getCoreComponentAPI().getACCByManifestId(new BigInteger(accId));
+            click(link);
+
+            ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, accObject);
+            assert accViewEditPage.isOpened();
+            return accViewEditPage;
+        });
+    }
+
+    @Override
     public ACCViewEditPage openACCViewEditPageByManifestID(BigInteger accManifestID) {
         ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestID);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);

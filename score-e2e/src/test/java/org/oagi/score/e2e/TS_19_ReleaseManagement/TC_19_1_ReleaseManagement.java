@@ -1089,10 +1089,40 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
 
+        //ACC extension in Candidate but the ASCCP in draft
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(5000L));
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        options = getDriver().findElements(By.cssSelector("mat-option"));
+        for (String ccState : Arrays.asList("ASCCP", "BCCP", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setOwner(devx.getLoginId());
+        escape(getDriver());
+        viewEditCoreComponentPage.setDEN("ACCrelease TA321case7parent Extension. Details");
+        viewEditCoreComponentPage.hitSearchButton();
+        tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPage(tr);
+        if (accViewEditPage.getMoveToDraft(true).isEnabled()){
+            accViewEditPage.moveToDraft();
+        }
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
 
-
-
-
+        //ACC extension in Candidate but the ASCCP in WIP
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
 
     }
 

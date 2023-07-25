@@ -183,6 +183,15 @@ public interface ViewEditCoreComponentPage extends Page {
     ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch);
 
     /**
+     * Open the 'ACC' page by the table record.
+     *
+     * @param tr the table record
+     * @return the 'ACC' page object
+     *
+     */
+    ACCViewEditPage openACCViewEditPage(WebElement tr);
+
+    /**
      * Open the page of the ACC by its manifest ID.
      *
      * @param accManifestID manifest ID
