@@ -33,8 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -538,18 +537,21 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
 
         }
-        homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
+        NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
-        createReleasePage.setReleaseNamespace(developerNamespace);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
         createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
+
+        assertTrue(getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"Candidate\")]")).size() > 0);
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"WIP\")]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(),\"Draft\")]")).size());
 
     }
 
