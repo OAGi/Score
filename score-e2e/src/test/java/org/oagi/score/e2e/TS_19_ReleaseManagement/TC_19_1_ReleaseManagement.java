@@ -1123,7 +1123,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         //ACC extension in Candidate but the ASCCP in WIP
         getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
-
     }
 
     @Test
