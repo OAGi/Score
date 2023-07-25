@@ -1,8 +1,10 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -32,6 +34,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             By.xpath("//span[contains(text(), \"ACC, ASCCP, BCCP, CDT, BDT\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+    private static final By OWNER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(),\"Owner\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
@@ -105,6 +109,21 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         WebElement optionField = visibilityOfElementLocated(getDriver(),
                 By.xpath("//span[.=\""+state+"\"]//ancestor::mat-option[1]"));
         click(optionField);
+    }
+
+    @Override
+    public WebElement getOwnerSelectField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        click(getOwnerSelectField());
+        waitFor(ofMillis(2000L));
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//span[.=\""+owner+"\"]//ancestor::mat-option[1]"));
+        click(optionField);
+
     }
 
     @Override
@@ -203,6 +222,30 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
         assert asccpViewEditPage.isOpened();
         return asccpViewEditPage;
+    }
+
+    @Override
+    public ASCCPViewEditPage openASCCPViewEditPage(WebElement tr) {
+        return retry(() -> {
+            WebElement td;
+            try {
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an ASCCP using the table record", e);
+            }
+            WebElement link = td.findElement(By.tagName("a"));
+
+            String href = link.getAttribute("href");
+            String asccpId = href.substring(href.indexOf("/asccp/") + "/asccp/".length());
+            ASCCPObject asccpObject = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(new BigInteger(asccpId));
+
+            click(link);
+
+            ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccpObject);
+
+            assert asccpViewEditPage.isOpened();
+            return asccpViewEditPage;
+        });
     }
 
     @Override

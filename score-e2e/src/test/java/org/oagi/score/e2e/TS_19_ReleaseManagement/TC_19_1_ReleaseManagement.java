@@ -3,13 +3,11 @@ package org.oagi.score.e2e.TS_19_ReleaseManagement;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers.TC_18_1_CoreComponentAccess;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -17,32 +15,26 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
-import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_19_1_ReleaseManagement extends BaseTest {
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
     AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
     NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
@@ -51,11 +43,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     CodeListObject codeListCandidate;
     RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
     RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
-
     Map<String, ACCObject> testingACCs = new HashMap<>();
     Map<String, ASCCPObject> testingASCCPs = new HashMap<>();
     Map<String, BCCPObject> testingBCCPs = new HashMap<>();
-
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -175,6 +166,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
         assertEquals(newReleaseNum, getText(editReleasePage.getReleaseNumberField()));
     }
+
     @Test
     public void test_TA_19_1_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -201,7 +193,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
         viewEditReleasePage.openPage();
-        assertThrows(NoSuchElementException.class, () ->viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized"));
+        assertThrows(NoSuchElementException.class, () -> viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized"));
     }
 
     @Test
@@ -258,7 +250,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3devxwip")) {
                 testingASCCPs.put("ASCCPreleaseTA3devxwip", ASCCPreleaseTA3devxwip);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA3devxwip",ASCCPreleaseTA3devxwip);
+                testingASCCPs.put("ASCCPreleaseTA3devxwip", ASCCPreleaseTA3devxwip);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -277,7 +269,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3devxdraft")) {
                 testingASCCPs.put("ASCCPreleaseTA3devxdraft", ASCCPreleaseTA3devxdraft);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA3devxdraft",ASCCPreleaseTA3devxdraft);
+                testingASCCPs.put("ASCCPreleaseTA3devxdraft", ASCCPreleaseTA3devxdraft);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -297,7 +289,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA3devxcandidate")) {
                 testingASCCPs.put("ASCCPreleaseTA3devxcandidate", ASCCPreleaseTA3devxcandidate);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA3devxcandidate",ASCCPreleaseTA3devxcandidate);
+                testingASCCPs.put("ASCCPreleaseTA3devxcandidate", ASCCPreleaseTA3devxcandidate);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -316,7 +308,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA3devxwip")) {
                 testingBCCPs.put("BCCPreleaseTA3devxwip", BCCPreleaseTA3devxwip);
             } else {
-                testingBCCPs.put("BCCPreleaseTA3devxwip",BCCPreleaseTA3devxwip);
+                testingBCCPs.put("BCCPreleaseTA3devxwip", BCCPreleaseTA3devxwip);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -335,7 +327,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA3devxdraft")) {
                 testingBCCPs.put("BCCPreleaseTA3devxdraft", BCCPreleaseTA3devxdraft);
             } else {
-                testingBCCPs.put("BCCPreleaseTA3devxdraft",BCCPreleaseTA3devxdraft);
+                testingBCCPs.put("BCCPreleaseTA3devxdraft", BCCPreleaseTA3devxdraft);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -355,16 +347,16 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA3devxcandidate")) {
                 testingBCCPs.put("BCCPreleaseTA3devxcandidate", BCCPreleaseTA3devxcandidate);
             } else {
-                testingBCCPs.put("BCCPreleaseTA3devxcandidate",BCCPreleaseTA3devxcandidate);
+                testingBCCPs.put("BCCPreleaseTA3devxcandidate", BCCPreleaseTA3devxcandidate);
             }
 
             //Revision
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingACCs.containsKey("ACCreleaseTA3revisionwip")){
+            if (!testingACCs.containsKey("ACCreleaseTA3revisionwip")) {
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Notify Corrective Action Request Data Area. Details", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if(Revise_Button_existing){
+                if (Revise_Button_existing) {
                     accViewEditPage.hitReviseButton();
                     Revise_Button_existing = false;
                 }
@@ -380,10 +372,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")){
+            if (!testingACCs.containsKey("ACCreleaseTA3revisiondraft")) {
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Online Document Reference Base. Details", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if(Revise_Button_existing){
+                if (Revise_Button_existing) {
                     accViewEditPage.hitReviseButton();
                     accViewEditPage.moveToDraft();
                     Revise_Button_existing = false;
@@ -399,10 +391,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")){
+            if (!testingACCs.containsKey("ACCreleaseTA3revisioncandidate")) {
                 ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Order Commission Base. Details", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     accViewEditPage.hitReviseButton();
                     accViewEditPage.moveToDraft();
                     accViewEditPage.moveToCandidate();
@@ -420,10 +412,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")){
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisionwip")) {
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Warning Process Message. Message", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     asccpViewEditPage.hitReviseButton();
                     Revise_Button_existing = false;
                 }
@@ -439,10 +431,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")){
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisiondraft")) {
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Transportation Term Reference. Document Reference", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     asccpViewEditPage.hitReviseButton();
                     asccpViewEditPage.moveToDraft();
                     Revise_Button_existing = false;
@@ -459,10 +451,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")){
+            if (!testingASCCPs.containsKey("ASCCPreleaseTA3revisioncandidate")) {
                 asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch("Shipping Route. Shipping Route", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     asccpViewEditPage.hitReviseButton();
                     asccpViewEditPage.moveToDraft();
                     asccpViewEditPage.moveToCandidate();
@@ -480,10 +472,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")){
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisionwip")) {
                 bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Accumulative Received Quantity. Open_ Quantity", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     bccpViewEditPage.hitReviseButton();
                     Revise_Button_existing = false;
                 }
@@ -499,10 +491,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")){
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisiondraft")) {
                 bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Allow Substitution Indicator. Open_ Indicator", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if (Revise_Button_existing){
+                if (Revise_Button_existing) {
                     bccpViewEditPage.hitReviseButton();
                     bccpViewEditPage.moveToDraft();
                     Revise_Button_existing = false;
@@ -519,10 +511,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
-            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")){
+            if (!testingBCCPs.containsKey("BCCPreleaseTA3revisioncandidate")) {
                 bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch("Appointment Required Indicator. Open_ Indicator", "Working");
                 Revise_Button_existing = 1 == getDriver().findElements(By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]")).size();
-                if(Revise_Button_existing){
+                if (Revise_Button_existing) {
                     bccpViewEditPage.hitReviseButton();
                     bccpViewEditPage.moveToDraft();
                     bccpViewEditPage.moveToCandidate();
@@ -592,7 +584,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA321wip")) {
                 testingASCCPs.put("ASCCPreleaseTA321wip", ASCCPreleaseTA321wip);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA321wip",ASCCPreleaseTA321wip);
+                testingASCCPs.put("ASCCPreleaseTA321wip", ASCCPreleaseTA321wip);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -631,7 +623,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA321candidate")) {
                 testingASCCPs.put("ASCCPreleaseTA321candidate", ASCCPreleaseTA321candidate);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA321candidate",ASCCPreleaseTA321candidate);
+                testingASCCPs.put("ASCCPreleaseTA321candidate", ASCCPreleaseTA321candidate);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -650,7 +642,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA321wip")) {
                 testingBCCPs.put("BCCPreleaseTA321wip", BCCPreleaseTA321wip);
             } else {
-                testingBCCPs.put("BCCPreleaseTA321wip",BCCPreleaseTA321wip);
+                testingBCCPs.put("BCCPreleaseTA321wip", BCCPreleaseTA321wip);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -669,7 +661,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA321draft")) {
                 testingBCCPs.put("BCCPreleaseTA321draft", BCCPreleaseTA321draft);
             } else {
-                testingBCCPs.put("BCCPreleaseTA321draft",BCCPreleaseTA321draft);
+                testingBCCPs.put("BCCPreleaseTA321draft", BCCPreleaseTA321draft);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -689,7 +681,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingBCCPs.containsKey("BCCPreleaseTA321candidate")) {
                 testingBCCPs.put("BCCPreleaseTA321candidate", BCCPreleaseTA321candidate);
             } else {
-                testingBCCPs.put("BCCPreleaseTA321candidate",BCCPreleaseTA321candidate);
+                testingBCCPs.put("BCCPreleaseTA321candidate", BCCPreleaseTA321candidate);
             }
 
             viewEditCoreComponentPage.openPage();
@@ -740,7 +732,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
         try {
             waitForPageLoaded(url);
-        }catch (Error | Exception retry){
+        } catch (Error | Exception retry) {
             getDriver().navigate().refresh();
             waitFor(Duration.ofMillis(1000));
             waitForPageLoaded(url);
@@ -808,7 +800,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingACCs.containsKey("ACCreleaseTA321case1draft")) {
                 testingACCs.put("ACCreleaseTA321case1draft", ACCreleaseTA321case1draft);
             } else {
-                testingACCs.put("ACCreleaseTA321case1draft",ACCreleaseTA321case1draft);
+                testingACCs.put("ACCreleaseTA321case1draft", ACCreleaseTA321case1draft);
             }
 
             ACCObject ACCreleaseTA321case1candidate = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "Candidate");
@@ -835,7 +827,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             if (!testingASCCPs.containsKey("ASCCPreleaseTA321case1")) {
                 testingASCCPs.put("ASCCPreleaseTA321case1", ASCCPreleaseTA321case1);
             } else {
-                testingASCCPs.put("ASCCPreleaseTA321case1",ASCCPreleaseTA321case1);
+                testingASCCPs.put("ASCCPreleaseTA321case1", ASCCPreleaseTA321case1);
             }
             asccpViewEditPage.moveToDraft();
             asccpViewEditPage.moveToCandidate();
@@ -933,7 +925,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         //Case7 when acc base is moved to draft
         viewEditCoreComponentPage.openPage();
         waitFor(Duration.ofMillis(2000));
-        ACCViewEditPage accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
         accViewEditPage.backToWIP();
         accViewEditPage.deleteBaseACC("/ACCrelease TA321case7parent. Details/ACCrelease TA321case7base. Details");
 
@@ -944,7 +936,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         waitFor(Duration.ofMillis(2000));
-        accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
         ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/ACCrelease TA321case7parent. Details");
         accSetBaseACCDialog.hitApplyButton("ACCrelease TA321case7base. Details");
         accViewEditPage.moveToDraft();
@@ -964,6 +956,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
     }
+
     @Test
     public void test_TA_19_1_3d() {
         String branch = "Working";
@@ -996,6 +989,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+            accViewEditPage.createOAGiExtensionComponent("/ACCrelease TA321case7parent. Details");
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]")));
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
@@ -1011,29 +1007,33 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-        //Case7 when acc is in wip
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+        //extension in WIP status
+        getElementByXPath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]");
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
 
-        //Case7 when acc base is moved to draft
+
+        //ACC ext is moved to draft
+        By MOVE_TO_DRAFT_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        ACCViewEditPage accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
-        accViewEditPage.backToWIP();
-        accViewEditPage.deleteBaseACC("/ACCrelease TA321case7parent. Details/ACCrelease TA321case7base. Details");
-
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
-        accViewEditPage.moveToDraft();
-
-        viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
-        accViewEditPage= viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
-        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/ACCrelease TA321case7parent. Details");
-        accSetBaseACCDialog.hitApplyButton("ACCrelease TA321case7base. Details");
-        accViewEditPage.moveToDraft();
-        accViewEditPage.moveToCandidate();
-
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+        options = getDriver().findElements(By.cssSelector("mat-option"));
+        for (String ccState : Arrays.asList("ACC", "BCCP", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setOwner(devx.getLoginId());
+        escape(getDriver());
+        viewEditCoreComponentPage.setDEN("Extension. ACCrelease TA321case7parent Extension");
+        viewEditCoreComponentPage.hitSearchButton();
+        WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPage(tr);
+        if (asccpViewEditPage.getMoveToDraft(true).isEnabled()){
+            asccpViewEditPage.moveToDraft();
+        }
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -1046,7 +1046,52 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
 
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+        //ACC extension in Draft
+        getElementByXPath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]");
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
+
+        //ACC ext is moved to Candidate
+        By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
+                By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(5000));
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        options = getDriver().findElements(By.cssSelector("mat-option"));
+        for (String ccState : Arrays.asList("ACC", "BCCP", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setOwner(devx.getLoginId());
+        escape(getDriver());
+        viewEditCoreComponentPage.setState("Draft");
+        escape(getDriver());
+        viewEditCoreComponentPage.setDEN("Extension. ACCrelease TA321case7parent Extension");
+        viewEditCoreComponentPage.hitSearchButton();
+        tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPage(tr);
+        if (asccpViewEditPage.getMoveToCandidate(true).isEnabled()){
+            asccpViewEditPage.moveToCandidate();
+        }
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+
+        //ACC extension in Candidate but the ASCCP in WIP
+        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
+
+
+
+
 
 
     }
@@ -1142,11 +1187,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     private class RandomCoreComponentWithStateContainer {
-        private AppUserObject appUser;
+        private final AppUserObject appUser;
         private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
-        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
+        private final HashMap<String, ACCObject> stateACCs = new HashMap<>();
+        private final HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
+        private final HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
 
         public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
             this.appUser = appUser;
