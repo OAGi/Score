@@ -823,7 +823,12 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             viewEditCoreComponentPage.openPage();
             waitFor(Duration.ofMillis(2000));
             ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
-            ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(ACCreleaseTA321wip.getDen());
+            ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create("ACCrelease TA321case1wip. Details");
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            asccpPanel.setPropertyTerm("ASCCPrelease TA321case1");
+            asccpPanel.setNamespace("http://www.openapplications.org/oagis/10");
+            asccpPanel.setDefinition("ASCCPrelease TA321case1");
+            asccpViewEditPage.hitUpdateButton();
             String url = getDriver().getCurrentUrl();
             BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
             ASCCPreleaseTA321case1 = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
@@ -832,7 +837,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             } else {
                 testingASCCPs.put("ASCCPreleaseTA321case1",ASCCPreleaseTA321case1);
             }
-
             asccpViewEditPage.moveToDraft();
             asccpViewEditPage.moveToCandidate();
         }
@@ -853,13 +857,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         //Case1 when acc is moved to draft
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(2000));
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(ASCCPreleaseTA321case1.getAsccpManifestId());
         asccpViewEditPage.backToWIP();
         ASCCPChangeACCDialog asccpChangeACCDialog = asccpViewEditPage.openChangeACCDialog("/" + ASCCPreleaseTA321case1.getPropertyTerm());
-        asccpChangeACCDialog.hitUpdateButton(ACCreleaseTA321case1draft.getDen());
+        asccpChangeACCDialog.hitUpdateButton("ACCrelease TA321case1draft. Details");
         asccpViewEditPage.moveToDraft();
         asccpViewEditPage.moveToCandidate();
 
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(oagiNamespace);
