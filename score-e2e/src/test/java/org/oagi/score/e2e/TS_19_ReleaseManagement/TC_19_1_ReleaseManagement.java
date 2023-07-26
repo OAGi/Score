@@ -13,7 +13,6 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
@@ -53,6 +52,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void init() {
         super.init();
     }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
@@ -971,7 +971,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPage(tr);
-        if (asccpViewEditPage.getMoveToDraft(true).isEnabled()){
+        if (asccpViewEditPage.getMoveToDraft(true).isEnabled()) {
             asccpViewEditPage.moveToDraft();
         }
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1010,7 +1010,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPage(tr);
-        if (asccpViewEditPage.getMoveToCandidate(true).isEnabled()){
+        if (asccpViewEditPage.getMoveToCandidate(true).isEnabled()) {
             asccpViewEditPage.moveToCandidate();
         }
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1045,7 +1045,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditCoreComponentPage.hitSearchButton();
         tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPage(tr);
-        if (accViewEditPage.getMoveToDraft(true).isEnabled()){
+        if (accViewEditPage.getMoveToDraft(true).isEnabled()) {
             accViewEditPage.moveToDraft();
         }
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1259,7 +1259,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         waitFor(Duration.ofMillis(5000));
         click(viewEditCoreComponentPage.getBranchSelectField());
         waitFor(ofSeconds(2L));
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\""+newReleaseNum+"\")]//ancestor::mat-option[1]/span")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + newReleaseNum + "\")]//ancestor::mat-option[1]/span")).size());
         escape(getDriver());
 
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
@@ -1267,7 +1267,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         click(createBIEForSelectTopLevelConceptPage.getBranchSelectField());
         waitFor(ofSeconds(2L));
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\""+newReleaseNum+"\")]//ancestor::mat-option[1]/span")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + newReleaseNum + "\")]//ancestor::mat-option[1]/span")).size());
         escape(getDriver());
     }
 
@@ -1275,6 +1275,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_5() {
         //cannot be checked needs two phase commit
     }
+
     @Test
     public void test_TA_19_1_6_and_TA_19_1_7_and_TA_19_1_8() {
         String branch = "Working";
@@ -1287,12 +1288,12 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         escape(getDriver());
         viewEditReleasePage.hitSearchButton();
         int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
-        if (resultRows > 0){
+        if (resultRows > 0) {
             WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
             EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
             assertTrue(editReleasePage.isOpened());
             existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
-            if (existingDraftRelease != null){
+            if (existingDraftRelease != null) {
                 editReleasePage.backToInitialized();
                 do {
                     existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
@@ -1332,7 +1333,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             waitFor(Duration.ofMillis(5000));
             ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
             ASCCPViewEditPage
-            asccpViewEditPage = asccpCreateDialog.create("ACCreleasedevxcandidate. Details");
+                    asccpViewEditPage = asccpCreateDialog.create("ACCreleasedevxcandidate. Details");
             ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
             asccpPanel.setPropertyTerm("ASCCPreleasedevxcandidate");
             asccpPanel.setNamespace("http://www.openapplications.org/oagis/10");
@@ -1401,9 +1402,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
 
-        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\""+ACCreleasedevxcandidate.getObjectClassTerm()+"\")]//ancestor::tr")).size() >= 1);
-        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\""+ASCCPreleasedevxcandidate.getPropertyTerm()+"\")]//ancestor::tr")).size() >= 1);
-        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\""+BCCPreleasedevxcandidate.getPropertyTerm()+"\")]//ancestor::tr")).size() >= 1);
+        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\"" + ACCreleasedevxcandidate.getObjectClassTerm() + "\")]//ancestor::tr")).size() >= 1);
+        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\"" + ASCCPreleasedevxcandidate.getPropertyTerm() + "\")]//ancestor::tr")).size() >= 1);
+        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\"" + BCCPreleasedevxcandidate.getPropertyTerm() + "\")]//ancestor::tr")).size() >= 1);
 
         viewEditCoreComponentPage.setDEN("ACCreleasedevxcandidate. Details");
         viewEditCoreComponentPage.hitSearchButton();
@@ -1419,7 +1420,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         click(createBIEForSelectTopLevelConceptPage.getBranchSelectField());
         waitFor(ofSeconds(2L));
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\""+newReleaseNum+"\")]//ancestor::mat-option[1]/span")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + newReleaseNum + "\")]//ancestor::mat-option[1]/span")).size());
         escape(getDriver());
 
         //move back to initialize to Cancel
@@ -1440,7 +1441,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
 
-        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\""+ACCreleasedevxcandidate.getObjectClassTerm()+"\")]//ancestor::tr")).size() >= 1);
+        assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\"" + ACCreleasedevxcandidate.getObjectClassTerm() + "\")]//ancestor::tr")).size() >= 1);
         viewEditCoreComponentPage.setDEN("/ACCreleasedevxcandidate. Details");
         viewEditCoreComponentPage.hitSearchButton();
         tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1452,14 +1453,147 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_9() {
+    public void test_TA_19_1_9_and_TA_19_1_10() {
+        String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject existingDraftReleaseObj;
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
 
+            editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(existingReleaseNum,
+                    "Initialized");
+            assertTrue(editReleasePage.isOpened());
+        }
+
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCObject ACCreleasedevxcandidate;
+        ASCCPObject ASCCPreleasedevxcandidate;
+        BCCPObject BCCPreleasedevxcandidate;
+        {
+            ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            ACCreleasedevxcandidate = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleasedevxcandidate.setObjectClassTerm("ACCreleasedevxcandidate");
+            coreComponentAPI.updateACC(ACCreleasedevxcandidate);
+            if (!testingACCs.containsKey("ACCreleasedevxcandidate")) {
+                testingACCs.put("ACCreleasedevxcandidate", ACCreleasedevxcandidate);
+            } else {
+                testingACCs.put("ACCreleasedevxcandidate", ACCreleasedevxcandidate);
+            }
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleasedevxcandidate.getAccManifestId());
+            accViewEditPage.moveToDraft();
+            accViewEditPage.moveToCandidate();
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
+            ASCCPViewEditPage
+                    asccpViewEditPage = asccpCreateDialog.create("ACCreleasedevxcandidate. Details");
+            ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+            asccpPanel.setPropertyTerm("ASCCPreleasedevxcandidate");
+            asccpPanel.setNamespace("http://www.openapplications.org/oagis/10");
+            asccpPanel.setDefinition("ASCCPreleasedevxcandidate");
+            asccpViewEditPage.hitUpdateButton();
+            String url = getDriver().getCurrentUrl();
+            BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+            ASCCPreleasedevxcandidate = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
+            if (!testingASCCPs.containsKey("ASCCPreleasedevxcandidate")) {
+                testingASCCPs.put("ASCCPreleasedevxcandidate", ASCCPreleasedevxcandidate);
+            } else {
+                testingASCCPs.put("ASCCPreleasedevxcandidate", ASCCPreleasedevxcandidate);
+            }
+            asccpViewEditPage.moveToDraft();
+            asccpViewEditPage.moveToCandidate();
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
+            BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
+            BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
+            bccpPanel.setPropertyTerm("BCCPreleasedevxcandidate");
+            bccpPanel.setNamespace("http://www.openapplications.org/oagis/10");
+            bccpPanel.setDefinition("BCCPreleasedevxcandidate");
+            bccpViewEditPage.hitUpdateButton();
+            url = getDriver().getCurrentUrl();
+            BigInteger bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
+            BCCPreleasedevxcandidate = getAPIFactory().getCoreComponentAPI().getBCCPByManifestId(bccpManifestId);
+
+            if (!testingBCCPs.containsKey("BCCPreleasedevxcandidate")) {
+                testingBCCPs.put("BCCPreleasedevxcandidate", BCCPreleasedevxcandidate);
+            } else {
+                testingBCCPs.put("BCCPreleasedevxcandidate", BCCPreleasedevxcandidate);
+            }
+            bccpViewEditPage.moveToDraft();
+            bccpViewEditPage.moveToCandidate();
+        }
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+        releaseAssignmentPage.hitCreateButton();
+
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Draft");
+        assertTrue(editReleasePage.isOpened());
+        editReleasePage.setReleaseNote("updated note");
+        editReleasePage.hitUpdateButton();
+
+        viewEditCoreComponentPage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
+        assertEquals("updated note", getText(editReleasePage.getReleaseNoteField()));
+
+        editReleasePage.publish();
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Published"));
+
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Published");
+        assertTrue(editReleasePage.isOpened());
+
+        viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.setDEN("/ACCreleasedevxcandidate. Details");
+        viewEditCoreComponentPage.hitSearchButton();
+        WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPage(tr);
+        WebElement accNode = accViewEditPage.getNodeByPath("/ACCreleasedevxcandidate. Details");
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
+        assertEquals("Published", getText(accPanel.getStateField()));
     }
 
-    @Test
-    public void test_TA_19_1_10() {
-
-    }
 
     @Test
     public void test_TA_19_1_11() {
