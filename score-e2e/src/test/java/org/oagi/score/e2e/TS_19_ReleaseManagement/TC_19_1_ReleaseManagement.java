@@ -1701,6 +1701,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         } while (!newDraftRelease.getState().equals("Draft"));
 
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
         editReleasePage.publish();
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
