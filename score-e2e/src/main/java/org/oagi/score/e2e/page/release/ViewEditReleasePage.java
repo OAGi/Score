@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.release;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -156,6 +157,15 @@ public interface ViewEditReleasePage extends Page {
      * @return the Release page object
      */
     EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State);
+
+    /**
+     * Open the page of the Release by the table record.
+     *
+     * @param tr the table record
+     * @return the 'Release' page object
+     *
+     */
+    EditReleasePage openReleaseViewEditPage(WebElement tr);
 
     /**
      * Open the page of the Release by its ID.

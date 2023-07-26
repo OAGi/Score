@@ -1,8 +1,11 @@
 package org.oagi.score.e2e.impl.page.release;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.core_component.ASCCPViewEditPageImpl;
+import org.oagi.score.e2e.obj.ASCCPObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
@@ -187,10 +190,10 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public void setState(String state) {
         retry(() -> {
-            click(getCreatorSelectField());
+            click(getStateSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + state + "\"]"));
+                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
             click(optionField);
         });
     }
@@ -222,6 +225,17 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State) {
+        openReleaseByReleaseNum(releaseNum);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
+        EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
+        editReleasePage.openPage();
+        assert editReleasePage.isOpened();
+        return editReleasePage;
+    }
+
+    @Override
+    public EditReleasePage openReleaseViewEditPage(WebElement tr) {
+        String releaseNum = getReleaseNumFieldFromTheTable(tr);
         openReleaseByReleaseNum(releaseNum);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
         EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
