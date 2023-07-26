@@ -1148,8 +1148,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertTrue(editReleasePage.isOpened());
 
         //move back to initialize to Cancel
-        viewEditReleasePage.MoveBackToInitialized(newReleaseNum);
-        waitFor(Duration.ofSeconds(60L));
+        editReleasePage.backToInitialized();
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Initialized"));
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
@@ -1163,6 +1165,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_4() {
+
 
     }
 
