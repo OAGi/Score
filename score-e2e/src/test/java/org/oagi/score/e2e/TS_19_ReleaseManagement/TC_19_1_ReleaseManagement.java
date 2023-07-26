@@ -11,6 +11,8 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
@@ -27,12 +29,13 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_19_1_ReleaseManagement extends BaseTest {
-    AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+    AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
     NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
     String existingReleaseNum = null;
@@ -1160,17 +1163,115 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3k() {
+        String branch = "Working";
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
+        {
+            ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
+            ACCreleaseTA321case7base = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321case7base.setObjectClassTerm("ACCrelease TA321case7base");
+            coreComponentAPI.updateACC(ACCreleaseTA321case7base);
+            if (!testingACCs.containsKey("ACCreleaseTA321case7base")) {
+                testingACCs.put("ACCreleaseTA321case7base", ACCreleaseTA321case7base);
+            } else {
+                testingACCs.put("ACCreleaseTA321case7base", ACCreleaseTA321case7base);
+            }
+
+            ACCreleaseTA321case7parent = coreComponentAPI.createRandomACC(devx, workingRelease, developerNamespace, "WIP");
+            ACCreleaseTA321case7parent.setObjectClassTerm("ACCrelease TA321case7parent");
+            coreComponentAPI.updateBasedACC(ACCreleaseTA321case7parent, ACCreleaseTA321case7base);
+            coreComponentAPI.updateACC(ACCreleaseTA321case7parent);
+            if (!testingACCs.containsKey("ACCreleaseTA321case7parent")) {
+                testingACCs.put("ACCreleaseTA321case7parent", ACCreleaseTA321case7parent);
+            } else {
+                testingACCs.put("ACCreleaseTA321case7parent", ACCreleaseTA321case7parent);
+            }
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
+            accViewEditPage.moveToDraft();
+            accViewEditPage.moveToCandidate();
+
+            viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(5000));
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
+            accViewEditPage.moveToDraft();
+            accViewEditPage.moveToCandidate();
+        }
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(oagiNamespace);
+        createReleasePage.hitCreateButton();
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+        releaseAssignmentPage.hitCreateButton();
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Draft"));
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Draft");
+        assertTrue(editReleasePage.isOpened());
+        editReleasePage.publish();
+        do {
+            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        } while (!newDraftRelease.getState().equals("Published"));
+
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
+                "Published");
+        assertTrue(editReleasePage.isOpened());
     }
 
     @Test
     public void test_TA_19_1_4() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.setReleaseNote("A release note");
+        createReleasePage.setReleaseLicense("A release license");
+        createReleasePage.hitCreateButton();
 
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
+        assertEquals(newReleaseNum, getText(editReleasePage.getReleaseNumberField()));
 
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        waitFor(Duration.ofMillis(5000));
+        click(viewEditCoreComponentPage.getBranchSelectField());
+        waitFor(ofSeconds(2L));
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\""+newReleaseNum+"\")]//ancestor::mat-option[1]/span")).size());
+        escape(getDriver());
+
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
+        click(createBIEForSelectTopLevelConceptPage.getBranchSelectField());
+        waitFor(ofSeconds(2L));
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\""+newReleaseNum+"\")]//ancestor::mat-option[1]/span")).size());
+        escape(getDriver());
     }
 
     @Test
     public void test_TA_19_1_5() {
+
+
 
     }
 

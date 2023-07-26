@@ -32,6 +32,8 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
             By.xpath("//span[contains(text(), \"Back to Initialized\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    private static final By PUBLISH_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Publish\")]//ancestor::button[1]");
 
     private final ReleaseObject release;
 
@@ -148,5 +150,15 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     @Override
     public WebElement getBackToInitializedButton() {
         return elementToBeClickable(getDriver(), BACK_TO_INITIALIZED_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getPublishButton() {
+        return elementToBeClickable(getDriver(), PUBLISH_BUTTON_LOCATOR);
+    }
+    @Override
+    public void publish() {
+        click(getPublishButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
     }
 }
