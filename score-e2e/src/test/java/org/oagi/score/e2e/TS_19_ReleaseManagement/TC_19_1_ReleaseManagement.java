@@ -1475,10 +1475,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                     existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
                 } while (!existingDraftReleaseObj.getState().equals("Initialized"));
             }
-
-            editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(existingReleaseNum,
-                    "Initialized");
-            assertTrue(editReleasePage.isOpened());
         }
 
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -1571,7 +1567,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         editReleasePage.setReleaseNote("updated note");
         editReleasePage.hitUpdateButton();
 
-        viewEditCoreComponentPage.openPage();
+        viewEditReleasePage.openPage();
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
         assertEquals("updated note", getText(editReleasePage.getReleaseNoteField()));
 
@@ -1585,7 +1581,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertTrue(editReleasePage.isOpened());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.setDEN("/ACCreleasedevxcandidate. Details");
+        waitFor(Duration.ofMillis(5000));
+        viewEditCoreComponentPage.setDEN("ACCreleasedevxcandidate. Details");
+        viewEditCoreComponentPage.setOwner(devx.getLoginId());
+        escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
         WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPage(tr);
