@@ -1714,7 +1714,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertDisabled(editReleasePage.getReleaseNoteField());
     }
     @Test
-    public void test_TA_19_1_12() {
+    public void test_TA_19_1_12_and_TA_19_1_13() {
         String branch = "Working";
         String existingDraftRelease = null;
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
@@ -1837,10 +1837,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         ViewEditReleasePage finalViewEditReleasePage = viewEditReleasePage;
         assertThrows(TimeoutException.class, ()-> finalViewEditReleasePage.createRelease());
+
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Published");
+        assertDisabled(editReleasePage.getReleaseNoteField());
     }
 
-    @Test
-    public void test_TA_19_1_13() {
-
-    }
 }
