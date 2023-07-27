@@ -8,14 +8,12 @@ import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
-import org.oagi.score.repo.api.user.model.GetScoreUserRequest;
-import org.oagi.score.repo.api.user.model.GetScoreUserResponse;
-import org.oagi.score.repo.api.user.model.ScoreRole;
-import org.oagi.score.repo.api.user.model.ScoreUser;
+import org.oagi.score.repo.api.user.model.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
@@ -25,6 +23,8 @@ import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 public class JooqScoreUserReadRepository
         extends JooqScoreRepository
         implements ScoreUserReadRepository {
+
+    private static final ULong SYSTEM_USER_ID = ULong.valueOf(BigInteger.ZERO);
 
     public JooqScoreUserReadRepository(DSLContext dslContext) {
         super(dslContext);
@@ -81,6 +81,36 @@ public class JooqScoreUserReadRepository
 
         ScoreUser user = (ScoreUser) select().where(conds).fetchAny(mapper());
         return new GetScoreUserResponse(user);
+    }
+
+    @Override
+    @AccessControl(ignore = true)
+    public GetScoreUsersResponse getScoreUsers(GetScoreUsersRequest request) throws ScoreDataAccessException {
+        List<Condition> conds = new ArrayList();
+
+        ScoreRole role = request.getRole();
+        if (role != null) {
+            conds.add(APP_USER.APP_USER_ID.notEqual(SYSTEM_USER_ID));
+
+            switch (role) {
+                case DEVELOPER:
+                    conds.add(APP_USER.IS_DEVELOPER.eq((byte) 1));
+                    break;
+                case END_USER:
+                    conds.add(APP_USER.IS_DEVELOPER.eq((byte) 0));
+                    break;
+                case ADMINISTRATOR:
+                    conds.add(APP_USER.IS_ADMIN.eq((byte) 1));
+                    break;
+            }
+        }
+
+        if (conds.isEmpty()) {
+            return new GetScoreUsersResponse(Collections.emptyList());
+        }
+
+        List<ScoreUser> users = select().where(conds).fetch(mapper());
+        return new GetScoreUsersResponse(users);
     }
 
 }
