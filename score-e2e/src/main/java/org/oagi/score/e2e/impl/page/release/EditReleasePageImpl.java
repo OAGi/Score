@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.release;
 
-import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
@@ -11,7 +10,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
-import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
@@ -30,6 +28,10 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CREATE_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create Draft\")]//ancestor::button[1]");
+    private static final By BACK_TO_INITIALIZED_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Back to Initialized\")]//ancestor::button[1]");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
 
     private final ReleaseObject release;
 
@@ -135,5 +137,16 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
         ReleaseAssignmentPage releaseAssignmentPage = new ReleaseAssignmentPageImpl(this, releaseObject);
         assert releaseAssignmentPage.isOpened();
         return releaseAssignmentPage;
+    }
+
+    @Override
+    public void backToInitialized() {
+        click(getBackToInitializedButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+    }
+
+    @Override
+    public WebElement getBackToInitializedButton() {
+        return elementToBeClickable(getDriver(), BACK_TO_INITIALIZED_BUTTON_LOCATOR);
     }
 }

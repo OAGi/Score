@@ -4,12 +4,17 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.ReleaseAPI;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.NAMESPACE;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.RELEASE;
 
 public class DSLContextReleaseAPIImpl implements ReleaseAPI {
@@ -52,6 +57,15 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
                 .where(RELEASE.RELEASE_ID.eq(maxReleaseId))
                 .fetchOptional().orElse(null);
         return mapper(release);
+    }
+
+    @Override
+    public List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber) {
+        List<String> earlierReleases = new ArrayList<>();
+        earlierReleases = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.CREATION_TIMESTAMP.lessThan(releaseNumber.getCreationTimestamp()))
+                .fetch(RELEASE.RELEASE_NUM);
+        return earlierReleases;
     }
 
     private ReleaseObject mapper(ReleaseRecord releaseRecord) {

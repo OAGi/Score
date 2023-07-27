@@ -30,4 +30,8 @@ public interface EditReleasePage extends Page {
     WebElement getCreateDraftButton();
 
     ReleaseAssignmentPage hitCreateDraftButton();
+
+    void backToInitialized();
+
+    WebElement getBackToInitializedButton();
 }
