@@ -1045,6 +1045,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         //extension in WIP status
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
 
@@ -1081,7 +1082,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-
+        waitFor(Duration.ofMillis(8000));
         //ACC extension in Draft
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
 
@@ -1119,9 +1120,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
 
         //ACC extension in Candidate but the ASCCP in WIP
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
 
         //ACC extension in Candidate but the ASCCP in draft
@@ -1154,7 +1155,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-
+        waitFor(Duration.ofMillis(8000));
         //ACC extension in Candidate but the ASCCP in WIP
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
     }
@@ -1162,7 +1163,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3i() {
         //Validate non-reusable ASCCP is ensured in UI
     }
-
     @Test
     public void test_TA_19_1_3j() {
         String branch = "Working";
