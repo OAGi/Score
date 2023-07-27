@@ -37,6 +37,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_19_1_ReleaseManagement extends BaseTest {
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
     AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
     NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
     String existingReleaseNum = null;
@@ -44,7 +45,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     Map<String, ACCObject> testingACCs = new HashMap<>();
     Map<String, ASCCPObject> testingASCCPs = new HashMap<>();
     Map<String, BCCPObject> testingBCCPs = new HashMap<>();
-    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -78,9 +78,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         }
 
     }
+
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
+
     @Test
     public void test_TA_19_1_1() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -130,6 +132,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditReleasePage.openPage();
         assertThrows(NoSuchElementException.class, () -> viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized"));
     }
+
     @Test
     public void test_TA_19_1_3a() {
 
@@ -866,6 +869,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         //Case1 when acc in draft state
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case1draft. Details' is needed in the release assignment due to\")]")).size() >= 1);
     }
+
     @Test
     public void test_TA_19_1_3c_case7() {
         String branch = "Working";
@@ -968,13 +972,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-        waitFor(Duration.ofMillis(9000L));
+        waitFor(Duration.ofMillis(9000));
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]")).size() >= 1);
     }
+
     @Ignore
-    public void test_TA_19_1_3c_case8_and_case9_and_case10_and_test_TA_19_1_3h(){
+    public void test_TA_19_1_3c_case8_and_case9_and_case10_and_test_TA_19_1_3h() {
         //replaced by field is not implemented yet
     }
+
     @Test
     public void test_TA_19_1_3d_and_1_3e_and_1_3f_and_1_3g() {
         String branch = "Working";
@@ -1159,14 +1165,36 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         //ACC extension in Candidate but the ASCCP in WIP
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
     }
+
     @Ignore
     public void test_TA_19_1_3i() {
         //Validate non-reusable ASCCP is ensured in UI
     }
+
     @Test
     public void test_TA_19_1_3j() {
         String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
+        }
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
@@ -1204,7 +1232,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -1216,8 +1244,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         } while (!newDraftRelease.getState().equals("Draft"));
@@ -1240,7 +1269,26 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     @Test
     public void test_TA_19_1_3k() {
         String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
+        }
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
@@ -1278,7 +1326,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -1290,6 +1338,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         do {
@@ -1311,10 +1360,29 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_4() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject existingDraftReleaseObj;
+        HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
+        }
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -1335,7 +1403,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"" + newReleaseNum + "\")]//ancestor::mat-option[1]/span")).size());
         escape(getDriver());
 
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(devx);
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
         click(createBIEForSelectTopLevelConceptPage.getBranchSelectField());
@@ -1456,6 +1524,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
 
         do {
@@ -1513,16 +1582,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         viewEditCoreComponentPage.setOwner(devx.getLoginId());
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
-
         assertTrue(getDriver().findElements(By.xpath("//*[contains(text(),\"" + ACCreleasedevxcandidate.getObjectClassTerm() + "\")]//ancestor::tr")).size() >= 1);
-        viewEditCoreComponentPage.setDEN("/ACCreleasedevxcandidate. Details");
+        viewEditCoreComponentPage.setDEN("ACCreleasedevxcandidate. Details");
         viewEditCoreComponentPage.hitSearchButton();
         tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPage(tr);
         accNode = accViewEditPage.getNodeByPath("/ACCreleasedevxcandidate. Details");
         accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Candidate", getText(accPanel.getStateField()));
-
     }
 
     @Test
@@ -1628,6 +1695,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
 
         do {
@@ -1665,6 +1733,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Published", getText(accPanel.getStateField()));
     }
+
     @Test
     public void test_TA_19_1_11() {
         String branch = "Working";
@@ -1768,6 +1837,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
 
         do {
@@ -1786,6 +1856,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertDisabled(editReleasePage.getReleaseNumberField());
         assertDisabled(editReleasePage.getReleaseNoteField());
     }
+
     @Test
     public void test_TA_19_1_12_and_TA_19_1_13() {
         String branch = "Working";
@@ -1889,6 +1960,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
 
         do {
@@ -1909,7 +1981,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         ViewEditReleasePage finalViewEditReleasePage = viewEditReleasePage;
-        assertThrows(TimeoutException.class, ()-> finalViewEditReleasePage.createRelease());
+        assertThrows(TimeoutException.class, () -> finalViewEditReleasePage.createRelease());
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Published");
         assertDisabled(editReleasePage.getReleaseNoteField());
