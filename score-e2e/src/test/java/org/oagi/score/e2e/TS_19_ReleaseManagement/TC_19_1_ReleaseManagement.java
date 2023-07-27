@@ -971,11 +971,34 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         waitFor(Duration.ofMillis(9000L));
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]")).size() >= 1);
     }
-
+    @Ignore
+    public void test_TA_19_1_3c_case8_and_case9_and_case10_and_test_TA_19_1_3h(){
+        //replaced by field is not implemented yet
+    }
     @Test
-    public void test_TA_19_1_3d() {
+    public void test_TA_19_1_3d_and_1_3e_and_1_3f_and_1_3g() {
         String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
+        }
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
@@ -1010,7 +1033,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -1023,15 +1046,13 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
         //extension in WIP status
-        getElementByXPath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
-
 
         //ACC ext is moved to draft
         By MOVE_TO_DRAFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
+        waitFor(Duration.ofMillis(5000L));
         click(viewEditCoreComponentPage.getTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
         options = getDriver().findElements(By.cssSelector("mat-option"));
@@ -1062,7 +1083,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitValidateButton();
 
         //ACC extension in Draft
-        getElementByXPath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'Extension. ACCrelease TA321case7parent Extension' is needed in the release\")]")).size() >= 1);
 
         //ACC ext is moved to Candidate
@@ -1136,33 +1156,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitValidateButton();
 
         //ACC extension in Candidate but the ASCCP in WIP
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]");
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7parent Extension. Details' is needed in the release assignment\")]")).size() >= 1);
     }
-
-    @Test
-    public void test_TA_19_1_3e() {
-
-    }
-
-    @Test
-    public void test_TA_19_1_3f() {
-
-    }
-
-    @Test
-    public void test_TA_19_1_3g() {
-
-    }
-
-    @Test
-    public void test_TA_19_1_3h() {
-
-    }
-
-    @Test
+    @Ignore
     public void test_TA_19_1_3i() {
-
+        //Validate non-reusable ASCCP is ensured in UI
     }
 
     @Test
