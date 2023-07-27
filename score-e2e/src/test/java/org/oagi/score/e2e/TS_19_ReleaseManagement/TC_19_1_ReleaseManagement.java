@@ -866,11 +866,30 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         //Case1 when acc in draft state
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case1draft. Details' is needed in the release assignment due to\")]")).size() >= 1);
     }
-
     @Test
     public void test_TA_19_1_3c_case7() {
         String branch = "Working";
+        String existingDraftRelease = null;
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        escape(getDriver());
+        viewEditReleasePage.hitSearchButton();
+        int resultRows = getDriver().findElements(By.xpath("//table/tbody/tr")).size();
+        if (resultRows > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            assertTrue(editReleasePage.isOpened());
+            existingDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            if (existingDraftRelease != null) {
+                editReleasePage.backToInitialized();
+                do {
+                    existingDraftReleaseObj = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(existingDraftRelease);
+                } while (!existingDraftReleaseObj.getState().equals("Initialized"));
+            }
+        }
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCObject ACCreleaseTA321case7parent, ACCreleaseTA321case7base;
@@ -902,7 +921,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
-        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
@@ -914,23 +933,24 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000L));
         //Case7 when acc is in wip
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]")).size() >= 1);
 
         //Case7 when acc base is moved to draft
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(5000));
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
         accViewEditPage.backToWIP();
         accViewEditPage.deleteBaseACC("/ACCrelease TA321case7parent. Details/ACCrelease TA321case7base. Details");
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(5000));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7base.getAccManifestId());
         accViewEditPage.moveToDraft();
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(5000));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321case7parent.getAccManifestId());
         ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/ACCrelease TA321case7parent. Details");
         accSetBaseACCDialog.hitApplyButton("ACCrelease TA321case7base. Details");
@@ -948,8 +968,8 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-
-        getElementByXPath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]");
+        waitFor(Duration.ofMillis(9000L));
+        assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case7base. Details' is needed in the release assignment\")]")).size() >= 1);
     }
 
     @Test
