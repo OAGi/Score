@@ -862,6 +862,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
+        waitFor(Duration.ofMillis(8000L));
         //Case1 when acc in draft state
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] 'ACCrelease TA321case1draft. Details' is needed in the release assignment due to\")]")).size() >= 1);
     }
