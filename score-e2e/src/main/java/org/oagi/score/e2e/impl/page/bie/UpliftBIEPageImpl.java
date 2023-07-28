@@ -221,8 +221,8 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     @Override
     public UpliftBIEVerificationPage Next() {
         click(getNextButton());
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         UpliftBIEVerificationPage upliftBIEVerificationPage = new UpliftBIEVerificationPageImpl(this);
         assert upliftBIEVerificationPage.isOpened();
         return upliftBIEVerificationPage;

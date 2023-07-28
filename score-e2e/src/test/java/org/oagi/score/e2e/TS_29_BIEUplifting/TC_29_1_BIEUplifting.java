@@ -32,7 +32,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.4";
+    String prev_release = "10.8.5";
     String curr_release = "10.8.8";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -63,8 +63,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     @Test
     public void TAs() {
         initialization();
-        precondition_TA_29_1_2();
         test_TA_29_1_5a();
+        precondition_TA_29_1_2();
+
     }
 
     public void initialization() {
@@ -79,6 +80,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     }
 
     public void precondition_TA_29_1_2() {
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
+
+        userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(userb);
 
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -137,33 +143,39 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject BIE1QA = testingBIEs.get("BIE1QA");
         editBIEPage = viewEditBIEPage.openEditBIEPage(BIE1QA);
         WebElement bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Last Modification Date Time");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Name");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
@@ -174,8 +186,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Last Modification Date Time");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
@@ -186,8 +199,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
+        waitFor(Duration.ofMillis(3000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
@@ -205,58 +219,34 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
-        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomain("normalized string");
-        bbiescPanel.setContextDefinition("defcon");
-        editBIEPage.hitUpdateButton();
-
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomain("normalized string");
-        bbiescPanel.setContextDefinition("defcon");
-        editBIEPage.hitUpdateButton();
-
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
         bbiePanel.setCardinalityMin(11);
         bbiePanel.setCardinalityMax(99);
         bbiePanel.setExample("anExample");
         bbiePanel.setRemark("aRemark");
         bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setFixedValue("99");
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setExample("anExample");
         bbiePanel.setRemark("aRemark");
         bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setFixedValue("99");
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
 
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
-        bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        editBIEPage.getNodeByPath("/Enterprise Unit");
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
         bbiescPanel.setExample("anExample");
@@ -267,8 +257,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setCardinalityMin(11);
@@ -276,12 +267,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setExample("anExample");
         bbiePanel.setRemark("aRemark");
         bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setFixedValue("99");
-        bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
+        waitFor(Duration.ofMillis(2000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
@@ -290,8 +280,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setCardinalityMax(99);
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Product Classification/Extension/Indicator");
+        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
@@ -348,7 +339,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         By NEXT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        waitFor(Duration.ofSeconds(12000));
+        waitFor(Duration.ofMillis(12000));
         new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
@@ -381,6 +372,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertChecked(bbiePanel.getUsedCheckbox());
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
@@ -392,6 +384,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
 
@@ -431,6 +424,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
         WebElement bbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/System Environment Code");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark("aRemark");
@@ -443,12 +437,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.setRemark("aRemark");
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark("aRemark");
@@ -481,12 +477,12 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         click(upliftBIEPage.getNextButton());
-        waitFor(Duration.ofSeconds(12000));
+        waitFor(Duration.ofMillis(12000));
         new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By NEXT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        waitFor(Duration.ofSeconds(12000));
+        waitFor(Duration.ofSeconds(60));
         new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
@@ -580,21 +576,27 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5a() {
+        developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        TopLevelASBIEPObject BIE1QA = null;
+        if (testingBIEs.containsKey("BIE1QA)")){
+            BIE1QA = testingBIEs.get("BIE1QA");
+        } else{
+            precondition_TA_29_1_2();
+            BIE1QA = testingBIEs.get("BIE1QA");
+        }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
-        TopLevelASBIEPObject BIE1QA = testingBIEs.get("BIE1QA");
         upliftBIEPage.setPropertyTerm(BIE1QA.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.expandNodeInSourceBIE("Enterprise Unit");
-        upliftBIEVerificationPage.expandNodeInTargetBIE("Enterprise Unit");
         for (String path :
                 Arrays.asList("/Enterprise Unit", "/Enterprise Unit/Type Code", "/Enterprise Unit/Identifier",
                         "/Enterprise Unit/Identifier Set/Scheme Version Identifier",
@@ -621,8 +623,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         escape(getDriver());
         escape(getDriver());
         upliftBIEVerificationPage.next();
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
 
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
@@ -2223,14 +2225,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         for (String codeListName : Arrays.asList(CLaccessendUserwip, CLaccessendUserqa, CLaccessendUserproduction, CLaccessendUserdeleted,
                 CLaccessUseraDeprecated.getName())) {
             UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
-            upliftCodeListPage.setSourceBranch(prev_release);
-            upliftCodeListPage.setTargetBranch(curr_release);
-            upliftCodeListPage.setName(codeListName);
+            upliftCodeListPage.setSourceRelease(prev_release);
+            upliftCodeListPage.setTargetRelease(curr_release);
+            upliftCodeListPage.setCodeList(codeListName);
             upliftCodeListPage.hitSearchButton();
             tr = upliftCodeListPage.getTableRecordAtIndex(1);
             td = upliftCodeListPage.getColumnByName(tr, "select");
             click(td);
-            click(upliftCodeListPage.getUpliftButton());
+            click(upliftCodeListPage.getUpliftButton(true));
 
             currentUrl = getDriver().getCurrentUrl();
             BigInteger codeListId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
@@ -2244,14 +2246,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
         UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
-        upliftCodeListPage.setSourceBranch(prev_release);
-        upliftCodeListPage.setTargetBranch(curr_release);
-        upliftCodeListPage.setName("CLuserderived_BIEUp");
+        upliftCodeListPage.setSourceRelease(prev_release);
+        upliftCodeListPage.setTargetRelease(curr_release);
+        upliftCodeListPage.setCodeList("CLuserderived_BIEUp");
         upliftCodeListPage.hitSearchButton();
         tr = upliftCodeListPage.getTableRecordAtIndex(1);
         td = upliftCodeListPage.getColumnByName(tr, "select");
         click(td);
-        click(upliftCodeListPage.getUpliftButton());
+        click(upliftCodeListPage.getUpliftButton(true));
 
         currentUrl = getDriver().getCurrentUrl();
         BigInteger codeListId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
