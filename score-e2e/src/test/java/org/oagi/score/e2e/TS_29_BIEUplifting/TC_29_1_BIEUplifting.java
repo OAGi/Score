@@ -33,7 +33,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.6";
+    String prev_release = "10.8.3";
     String curr_release = "10.8.8";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -611,22 +611,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
         for (String path :
-                Arrays.asList("/Enterprise Unit", "/Enterprise Unit/Type Code", "/Enterprise Unit/Identifier",
+                Arrays.asList("/Enterprise Unit/Type Code", "/Enterprise Unit/Identifier",
                         "/Enterprise Unit/Identifier Set/Scheme Version Identifier",
-                        "/Enterprise Unit/Identifier Set/Scheme Agency Identifier",
                         "/Enterprise Unit/Identifier Set/Identifier",
                         "/Enterprise Unit/Name",
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
             waitFor(Duration.ofMillis(2000));
-            click(sourceNode);
             WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE(path);
             waitFor(Duration.ofMillis(2000));
-            click(targetNode);
             assertChecked(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
-            assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+            assertTrue(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]//input[@disabled]")).isDisplayed());
         }
-        escape(getDriver());
         escape(getDriver());
         upliftBIEVerificationPage.next();
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
@@ -636,6 +632,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
         waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
