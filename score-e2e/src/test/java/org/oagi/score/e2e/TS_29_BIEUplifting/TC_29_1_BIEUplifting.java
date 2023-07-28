@@ -16,6 +16,7 @@ import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -32,7 +33,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.5";
+    String prev_release = "10.8.6";
     String curr_release = "10.8.8";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -605,7 +606,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                         "/Enterprise Unit/Name",
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
-            assertFalse(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")).isDisplayed());
+            waitFor(Duration.ofMillis(2000));
+            assertFalse(isElementPresent(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         }
 
         for (String path :
@@ -616,9 +618,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                         "/Enterprise Unit/Name",
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
+            waitFor(Duration.ofMillis(2000));
+            click(sourceNode);
             WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE(path);
-            assertChecked(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
-            assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+            waitFor(Duration.ofMillis(2000));
+            click(targetNode);
+            assertChecked(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+            assertDisabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         }
         escape(getDriver());
         escape(getDriver());
@@ -644,7 +650,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
         assertTrue(editBIEPage.isOpened());
     }
-
+    protected boolean isElementPresent(By by){
+        try{
+            getDriver().findElement(by);
+            return true;
+        }catch(NoSuchElementException e){
+            return false;
+        }
+    }
     @Test
     public void test_TA_29_1_5b() {
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
