@@ -38,4 +38,14 @@ public interface ReleaseAPI {
     ReleaseObject getTheLatestRelease();
 
     List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
+
+    /**
+     * Create a random release object.
+     *
+     * @param creator a creator
+     * @param namespace a namespace
+     * @return a random release object
+     */
+    ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace);
+
 }

@@ -38,10 +38,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_19_1_ReleaseManagement extends BaseTest {
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
-    AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
-    NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
     String existingReleaseNum = null;
-    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
     Map<String, ACCObject> testingACCs = new HashMap<>();
     Map<String, ASCCPObject> testingASCCPs = new HashMap<>();
     Map<String, BCCPObject> testingBCCPs = new HashMap<>();
@@ -61,24 +58,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         });
     }
 
-    public void cleanUp() {
-        if (existingReleaseNum != null) {
-            try {
-                // move the draft release back to initialized state
-                HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
-                ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-                viewEditReleasePage.MoveBackToInitialized(existingReleaseNum);
-                waitFor(Duration.ofSeconds(60L));
-            } finally {
-                existingReleaseNum = null;
-                getDriver().quit();
-
-            }
-
-        }
-
-    }
-
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
@@ -87,6 +66,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_1() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
@@ -108,6 +88,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
@@ -135,10 +116,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3a() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
 
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -158,6 +144,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 } while (!existingDraftReleaseObj.getState().equals("Initialized"));
             }
         }
+
         Boolean Revise_Button_existing = false;
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -487,8 +474,8 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                     testingBCCPs.put("BCCPreleaseTA3revisioncandidate", BCCPreleaseTA3revisioncandidate);
                 }
             }
-
         }
+
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         NamespaceObject oagiNamespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
@@ -496,8 +483,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         createReleasePage.setReleaseNamespace(oagiNamespace);
         createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
-        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
-                "Initialized");
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
 
@@ -508,9 +494,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3c_case2_and_case3() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -756,9 +748,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3c_case1() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -878,9 +876,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3c_case7() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -989,9 +993,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3d_and_1_3e_and_1_3f_and_1_3g() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1179,9 +1189,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3j() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1274,8 +1290,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_3k() {
-        String branch = "Working";
-        String existingDraftRelease = null;
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1346,7 +1368,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitValidateButton();
         waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
         } while (!newDraftRelease.getState().equals("Draft"));
@@ -1366,9 +1387,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_4() {
-        String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1390,7 +1416,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         }
         viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
         createReleasePage.setReleaseNumber(newReleaseNum);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         createReleasePage.setReleaseNamespace(namespace);
@@ -1425,9 +1450,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_6_and_TA_19_1_7_and_TA_19_1_8() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1600,9 +1631,16 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
     @Test
     public void test_TA_19_1_9_and_TA_19_1_10() {
+        // The account for this test must be an admin to publish a release.
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1731,6 +1769,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
         assertEquals("updated note", getText(editReleasePage.getReleaseNoteField()));
 
+        /*
+         * TODO: After publishing the release, test data must be reverted.
+         */
+        /*
         editReleasePage.publish();
         timeout = Duration.ofSeconds(300L).toMillis();
         begin = System.currentTimeMillis();
@@ -1761,13 +1803,20 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         WebElement accNode = accViewEditPage.getNodeByPath("/ACCreleasedevxcandidate. Details");
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertEquals("Published", getText(accPanel.getStateField()));
+        */
     }
 
     @Test
     public void test_TA_19_1_11() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1874,6 +1923,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         } while (!newDraftRelease.getState().equals("Draft"));
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
+
+        /*
+         * TODO: After publishing the release, test data must be reverted.
+         */
+        /*
         editReleasePage.publish();
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
@@ -1884,13 +1938,20 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertTrue(editReleasePage.isOpened());
         assertDisabled(editReleasePage.getReleaseNumberField());
         assertDisabled(editReleasePage.getReleaseNoteField());
+        */
     }
 
     @Test
     public void test_TA_19_1_12_and_TA_19_1_13() {
+        AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(devx);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        String newReleaseNum = newDraftRelease.getReleaseNumber();
+
         String branch = "Working";
-        String existingDraftRelease = null;
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        String existingDraftRelease;
         ReleaseObject existingDraftReleaseObj;
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
@@ -1997,6 +2058,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         } while (!newDraftRelease.getState().equals("Draft"));
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
+
+        /*
+         * TODO: After publishing the release, test data must be reverted.
+         */
+        /*
         editReleasePage.publish();
         do {
             newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
@@ -2014,6 +2080,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Published");
         assertDisabled(editReleasePage.getReleaseNoteField());
+        */
     }
 
 }

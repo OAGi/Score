@@ -37,7 +37,7 @@ public class NamespaceObject {
         namespace.setUri("https://test." + randomDomain + ".com");
         namespace.setPrefix(randomDomain);
         namespace.setDescription(randomPrint(50, 100).trim());
-        namespace.setStandardNamespace(false);
+        namespace.setStandardNamespace(creator.isDeveloper());
         namespace.setOwnerUserId(creator.getAppUserId());
         namespace.setCreatedBy(creator.getAppUserId());
         namespace.setLastUpdatedBy(creator.getAppUserId());

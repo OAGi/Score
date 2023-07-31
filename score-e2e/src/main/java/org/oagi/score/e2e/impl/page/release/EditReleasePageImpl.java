@@ -156,9 +156,11 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     public WebElement getPublishButton() {
         return elementToBeClickable(getDriver(), PUBLISH_BUTTON_LOCATOR);
     }
+
     @Override
     public void publish() {
         click(getPublishButton());
         click(elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
     }
+
 }
