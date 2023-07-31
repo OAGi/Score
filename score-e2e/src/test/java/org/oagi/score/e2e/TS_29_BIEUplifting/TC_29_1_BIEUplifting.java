@@ -711,24 +711,24 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         //different green
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
-        click(sourceNode);
+        clickOn(sourceNode);
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Profit Center Identifier");
-        click(targetNode);
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Profit Center Identifier"));
         escape(getDriver());
 
         //same green
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Usage Description");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Description");
-        click(sourceNode);
-        click(targetNode);
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Description"));
         escape(getDriver());
 
         //different blue
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
         clickOn(sourceNode);
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
         clickOn(targetNode);
         clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
         escape(getDriver());
