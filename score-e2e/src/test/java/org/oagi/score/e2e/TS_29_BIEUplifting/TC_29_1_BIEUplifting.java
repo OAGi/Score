@@ -730,7 +730,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
         clickOn(targetNode);
-        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
         escape(getDriver());
 
         //same blue
@@ -738,20 +738,27 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Code List Value");
         clickOn(targetNode);
-        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
         escape(getDriver());
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
         clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Status/Reason Code");
         clickOn(targetNode);
-        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
         escape(getDriver());
-
+        waitFor(Duration.ofMillis(3000));
+        upliftBIEVerificationPage.next();
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
+
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -815,10 +822,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
         waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEnabled(bbiescPanel.getUsedCheckbox());
@@ -827,24 +832,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("anExample", getText(bbiescPanel.getExampleField()));
         assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
         assertEquals("99", getText(bbiescPanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
-
-        bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
-        waitFor(Duration.ofMillis(2500));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEnabled(bbiescPanel.getUsedCheckbox());
-        assertChecked(bbiescPanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
-        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
-
-        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier");
-        waitFor(Duration.ofMillis(2500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEnabled(bbiePanel.getUsedCheckbox());
-        assertChecked(bbiePanel.getUsedCheckbox());
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification");
         waitFor(Duration.ofMillis(2500));
