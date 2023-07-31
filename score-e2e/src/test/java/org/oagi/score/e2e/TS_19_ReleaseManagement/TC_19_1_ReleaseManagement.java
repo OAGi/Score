@@ -1697,10 +1697,23 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         releaseAssignmentPage.hitValidateButton();
         waitFor(Duration.ofMillis(8000));
         releaseAssignmentPage.hitCreateButton();
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
 
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Initialized", state);
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
+        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        assertEquals("Draft", newDraftRelease.getState());
+
         viewEditReleasePage.openPage();
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Draft");
@@ -1713,10 +1726,20 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertEquals("updated note", getText(editReleasePage.getReleaseNoteField()));
 
         editReleasePage.publish();
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Published"));
+        timeout = Duration.ofSeconds(300L).toMillis();
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
 
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Draft", state);
+            if ("Published".equals(state)) {
+                break;
+            }
+        }
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Published");
         assertTrue(editReleasePage.isOpened());
