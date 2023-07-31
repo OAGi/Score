@@ -1831,6 +1831,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
         WebElement bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -1838,6 +1839,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -1845,6 +1847,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Agency");
@@ -1862,12 +1865,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1882,14 +1886,17 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm63055D16B_AgencyIdentification", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
@@ -1940,6 +1947,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -1947,6 +1955,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -1954,6 +1963,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -1961,6 +1971,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -1979,28 +1990,37 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        clickOn(sourceNode);
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Debit Credit Code"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Action Code"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Tax Base Functional Amount"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
 
         upliftBIEVerificationPage.next();
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2015,18 +2035,22 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("oacl_DebitCreditCode", getText(bbiePanel.getValueDomainField()));
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("oacl_ResponseActionCode", getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("oacl_RiskCode", getText(bbiePanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm6ConditionTypeCode1_ConditionTypeCode", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
