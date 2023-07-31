@@ -336,17 +336,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         click(upliftBIEPage.getNextButton());
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By NEXT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -479,17 +480,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         click(upliftBIEPage.getNextButton());
-        waitFor(Duration.ofMillis(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By NEXT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        waitFor(Duration.ofSeconds(60));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -510,6 +512,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(bizContext, getText(topLevelASBIEPPanel.getBusinessContextInputField()));
 
         WebElement bbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/System Environment Code");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
@@ -522,6 +525,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
         assertNotChecked(asbiePanel.getNillableCheckbox());
@@ -531,6 +535,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("defcon", getText(asbiePanel.getContextDefinitionField()));
 
         WebElement bbieScNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         assertChecked(bbiescPanel.getUsedCheckbox());
         assertEquals("0", getText(bbiescPanel.getCardinalityMinField()));
@@ -2143,6 +2148,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         WebElement bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Effectivity Relation Code");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2151,6 +2157,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Validation Indicator");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2159,6 +2166,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Method Consequence Text");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2167,6 +2175,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Record Set Total Number");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2175,6 +2184,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Latest Start Date Time");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2182,6 +2192,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Transport Temperature");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2189,6 +2200,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Extension/Reason/Sequence Number Number");
+        waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -2196,6 +2208,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2203,6 +2216,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2210,6 +2224,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2217,6 +2232,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2224,6 +2240,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2231,6 +2248,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2238,6 +2256,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -2245,6 +2264,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -2252,6 +2272,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -2259,6 +2280,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
+        waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomainRestriction("Code");
@@ -2266,6 +2288,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbiescNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Certification Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
@@ -2284,41 +2307,56 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Latest Start Date Time");
+        clickOn(sourceNode);
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CCRID"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Transport Temperature");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Account Identifier"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Validation Indicator");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CAGEID"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Method Consequence Text");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("DODAACID"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Record Set Total Number");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("SCACID"));
 
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Effectivity Relation Code");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Revision Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Reason/Sequence Number Number");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("//Child Item Reference/Child Line/Document Reference/Revision Identifier/Scheme Version Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Version Identifier"));
 
         upliftBIEVerificationPage.next();
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
