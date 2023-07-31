@@ -72,9 +72,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         String nodeName = nodes[nodes.length - 1];
 
         WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
-                "//score-bie-uplift/div/mat-card/mat-card-content/div[2]/div[1]" +
-                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]))")));
-
+                "//score-bie-uplift/div/mat-card/mat-card-content/div[2]/div[1]//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \""+nodeName+"\")]")));
         click(node);
         clear(getSearchInputOfSourceTree());
         return node;
@@ -96,7 +94,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
         WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
                 "//score-bie-uplift/div/mat-card/mat-card-content/div[2]/div[2]" +
-                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]))")));
+                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]")));
 
         click(node);
         clear(getSearchInputOfTargetTree());
