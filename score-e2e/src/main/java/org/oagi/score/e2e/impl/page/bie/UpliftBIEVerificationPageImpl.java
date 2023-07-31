@@ -50,8 +50,9 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         click(elementToBeClickable(getDriver(), chevronRightLocator));
 
     }
-    public void expandNodeInTargetBIE(String node){
-        By chevronRightLocator = By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\""+node+"\")]//ancestor::div[1]/button/span/mat-icon[contains(text(),\"chevron_right\")]//ancestor::span[1]"
+
+    public void expandNodeInTargetBIE(String node) {
+        By chevronRightLocator = By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(),\"chevron_right\")]//ancestor::span[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
     }
@@ -59,14 +60,21 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement goToNodeInSourceBIE(String nodePath) {
         click(getSearchInputOfSourceTree());
-        WebElement node = retry(() -> {
+        retry(() -> {
             WebElement e = sendKeys(getSearchInputOfSourceTree(), nodePath);
             if (!nodePath.equals(getText(getSearchInputOfSourceTree()))) {
                 throw new WebDriverException();
             }
-            return e;
+            e.sendKeys(Keys.ENTER);
         });
-        node.sendKeys(Keys.ENTER);
+
+        String[] nodes = nodePath.split("/");
+        String nodeName = nodes[nodes.length - 1];
+
+        WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
+                "//score-bie-uplift/div/mat-card/mat-card-content/div[2]/div[1]" +
+                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]))")));
+
         click(node);
         clear(getSearchInputOfSourceTree());
         return node;
@@ -75,14 +83,21 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement goToNodeInTargetBIE(String nodePath) {
         click(getSearchInputOfTargetTree());
-        WebElement node = retry(() -> {
+        retry(() -> {
             WebElement e = sendKeys(getSearchInputOfTargetTree(), nodePath);
             if (!nodePath.equals(getText(getSearchInputOfTargetTree()))) {
                 throw new WebDriverException();
             }
-            return e;
+            e.sendKeys(Keys.ENTER);
         });
-        node.sendKeys(Keys.ENTER);
+
+        String[] nodes = nodePath.split("/");
+        String nodeName = nodes[nodes.length - 1];
+
+        WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
+                "//score-bie-uplift/div/mat-card/mat-card-content/div[2]/div[2]" +
+                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]))")));
+
         click(node);
         clear(getSearchInputOfTargetTree());
         return node;
