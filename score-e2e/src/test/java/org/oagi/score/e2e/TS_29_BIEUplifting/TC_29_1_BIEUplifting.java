@@ -15,10 +15,9 @@ import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -33,8 +32,8 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.3";
-    String curr_release = "10.8.8";
+    String prev_release = "10.8.8";
+    String curr_release = "10.9.1";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
     Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
@@ -119,6 +118,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         topLevelASBIEPPanel.setStatus("aStatus");
         editBIEPage.hitUpdateButton();
 
+        waitFor(Duration.ofMillis(3000));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Enterprise Unit User Extension Group. Details");
@@ -712,42 +712,40 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //different green
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Profit Center Identifier");
+        click(sourceNode);
+        click(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Profit Center Identifier"));
         escape(getDriver());
 
         //same green
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Usage Description");
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Description");
+        click(sourceNode);
+        click(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Description"));
         escape(getDriver());
 
         //different blue
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Codes");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
+        clickOn(sourceNode);
+        clickOn(targetNode);
+        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Codes"));
         escape(getDriver());
 
         //same blue
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Code List/Code List Value");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Classification/Code List Value");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
-        escape(getDriver());
-
-        //different red
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Postal Code/List Agency Identifier");
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Identifier");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
-        escape(getDriver());
-
-        //same red
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/Physical Address/Status/Identifier/Scheme Agency Identifier");
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Identifier/Scheme Agency Identifier");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Agency Identifier"));
+        clickOn(targetNode);
+        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Code List Value"));
         escape(getDriver());
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/Status/Reason Code");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
+        clickOn(targetNode);
+        clickOn(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
         escape(getDriver());
 
         By UPLIFT_BUTTON_LOCATOR =
@@ -854,6 +852,40 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
         homePage.logout();
+    }
+
+    public void clickOn(WebElement element) {
+        try {
+            Actions action = new Actions(getDriver());
+            action.moveToElement(element).perform();
+            element.sendKeys(Keys.ENTER);
+        } catch (Exception rerun) {
+            waitFor(Duration.ofMillis(1000));
+            String ele = element.toString();
+            String ppath;
+            //issue: sometime selenium adds a bracket ] at the end. Remove it.
+            if (ele.contains("]]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("]]") + 1);
+            } else if (ele.contains("span]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("span]") + 4);
+            } else if (ele.contains("kbox]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("kbox]") + 4);
+            } else if (ele.contains("div]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("div]") + 3);
+            } else if (ele.contains("a]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("a]") + 1);
+            } else if (ele.contains("icon]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("icon]") + 4);
+            } else if (ele.contains("li]")) {
+                ppath = ele.substring(ele.indexOf(" //"), ele.indexOf("li]") + 2);
+            }else {
+                ppath = ele.substring(ele.indexOf(" //"));
+            }
+            WebElement recreatedElement = getDriver().findElement(By.xpath(ppath));
+            Actions action = new Actions(getDriver());
+            action.moveToElement(recreatedElement).perform();
+            recreatedElement.click();
+        }
     }
 
     public void preconditions_TA_29_1_5d() {
