@@ -666,16 +666,22 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCreleaseTA321.getAccManifestId());
             SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(ASCCPreleaseTA321wip.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(ASCCPreleaseTA321draft.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(ASCCPreleaseTA321candidate.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(BCCPreleaseTA321wip.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(BCCPreleaseTA321draft.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/ACCrelease TA321. Details");
             selectAssociationDialog.selectAssociation(BCCPreleaseTA321candidate.getPropertyTerm());
+            waitFor(Duration.ofMillis(1000));
             accViewEditPage.moveToDraft();
             accViewEditPage.moveToCandidate();
         }
