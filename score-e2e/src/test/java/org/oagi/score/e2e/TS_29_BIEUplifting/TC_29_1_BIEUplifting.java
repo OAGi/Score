@@ -33,8 +33,8 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.4";
-    String curr_release = "10.9.1";
+    String prev_release = "10.8.8";
+    String curr_release = "10.9.2";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
     Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
@@ -2007,12 +2007,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Debit Credit Code"));
 
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
-        clickOn(sourceNode);
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
-        clickOn(targetNode);
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Action Code"));
-
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
         clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
@@ -2050,18 +2044,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_DebitCreditCode"));
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
-        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Response Expression/Action Code");
-        waitFor(Duration.ofMillis(1500));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("oacl_ResponseActionCode"));
         editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_RiskCode"));
         editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
-        bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
         waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6ConditionTypeCode1_ConditionTypeCode"));
