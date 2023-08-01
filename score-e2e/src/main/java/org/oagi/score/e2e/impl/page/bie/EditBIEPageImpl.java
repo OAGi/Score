@@ -356,6 +356,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public WebElement goToNodeByPath(String path) {
+        click(getSearchInputTextField());
+        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        click(node);
+        clear(getSearchInputTextField());
+        return node;
+    }
+
+    @Override
     public boolean isDeprecated(WebElement node) {
         try {
             return node.findElement(By.xpath("//*[contains(@class, \"deprecated\")]")).isDisplayed();
