@@ -33,7 +33,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.5";
+    String prev_release = "10.8.4";
     String curr_release = "10.9.1";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -1981,18 +1981,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomainRestriction("Code");
         bbiePanel.setValueDomain("oacl_RiskCode");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
+        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
         waitFor(Duration.ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setValueDomainRestriction("Code");
-        bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
-        editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
-        bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
-        waitFor(Duration.ofMillis(1500));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
         bbiescPanel.setValueDomain("clm6ConditionTypeCode1_ConditionTypeCode");
