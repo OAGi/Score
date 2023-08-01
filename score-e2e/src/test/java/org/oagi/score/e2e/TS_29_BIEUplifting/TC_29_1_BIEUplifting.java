@@ -33,7 +33,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.8";
+    String prev_release = "10.8.5";
     String curr_release = "10.9.1";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -1950,7 +1950,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         } else {
             BIEContexts.put("JournalEntry", context.getName());
         }
-
+        viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension");
@@ -1984,7 +1984,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description/Language Code");
         waitFor(Duration.ofMillis(1500));
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieNode);
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
         bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
