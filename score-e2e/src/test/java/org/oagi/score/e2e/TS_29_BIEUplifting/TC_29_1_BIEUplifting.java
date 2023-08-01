@@ -1156,7 +1156,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getNillableCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));

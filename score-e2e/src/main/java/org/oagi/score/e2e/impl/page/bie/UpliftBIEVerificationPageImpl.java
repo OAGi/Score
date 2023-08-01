@@ -133,7 +133,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     }
     @Override
     public WebElement getReusedIconOfNodeInTargetBIE(String nodeName){
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\""+nodeName+"\")]//ancestor::div[1]//mat-icon[@mattooltip=\"Select BIE\"]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\""+nodeName+"\")]//ancestor::div[1]//fa-icon[@mattooltip=\"Select BIE\"]"));
     }
     @Override
     public void next() {
