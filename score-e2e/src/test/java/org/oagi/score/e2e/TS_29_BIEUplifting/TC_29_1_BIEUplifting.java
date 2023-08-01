@@ -1288,7 +1288,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1302,7 +1302,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1310,7 +1310,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("gregorian month");
         editBIEPage.hitUpdateButton();
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1319,14 +1319,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1334,7 +1334,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("integer");
         editBIEPage.hitUpdateButton();
 
-        //editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1423,6 +1423,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("date time", getText(bbiePanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1433,26 +1434,31 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         waitFor(Duration.ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("gregorian month", getText(bbiescPanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         waitFor(Duration.ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("xbt boolean", getText(bbiePanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("integer", getText(bbiePanel.getValueDomainField()));
 
+        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         waitFor(Duration.ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
