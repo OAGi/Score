@@ -460,10 +460,22 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
         editBIEPage.moveToQA();
         editBIEPage.moveToProduction();
+        homePage.logout();
     }
 
     @Test
     public void test_TA_29_1_2_Production_BIE_Uplift() {
+        developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
+        TopLevelASBIEPObject BIEUserbProduction = null;
+        if (testingBIEs.containsKey("BIEUserbProduction")){
+            BIEUserbProduction = testingBIEs.get("BIEUserbProduction");
+        } else{
+            precondtions_TA_29_1_2_Production_BIE_Uplift();
+            BIEUserbProduction = testingBIEs.get("BIEUserbProduction");
+        }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
@@ -473,7 +485,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("Production");
-        TopLevelASBIEPObject BIEUserbProduction = testingBIEs.get("BIEUserbProduction");
         upliftBIEPage.setPropertyTerm(BIEUserbProduction.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
@@ -553,6 +564,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_3() {
+        userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(userb);
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
