@@ -2043,7 +2043,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
         waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_DebitCreditCode"));
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         waitFor(Duration.ofMillis(1500));
