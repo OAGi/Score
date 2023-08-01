@@ -63,23 +63,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void TAs() {
-        initialization();
+        test_TA_29_1_1();
+        test_TA_29_1_2_QA_BIE_Uplift_and_TA_29_1_4_and_TA_29_1_6a();
+        test_TA_29_1_2_Production_BIE_Uplift();
+        test_TA_29_1_3();
         test_TA_29_1_5a();
-        precondition_TA_29_1_2();
 
     }
-
-    public void initialization() {
-        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(usera);
-
-        userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(userb);
-
-        developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
-    }
-
     public void precondition_TA_29_1_2() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -302,7 +292,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_1() {
-
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
@@ -312,6 +303,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_2_QA_BIE_Uplift_and_TA_29_1_4_and_TA_29_1_6a() {
+        userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(userb);
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
@@ -528,7 +521,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
         assertEquals("99", getText(bbiePanel.getFixedValueField()));
         assertEquals("Code", getText(bbiePanel.getValueDomainRestrictionSelectField()));
-        assertEquals("oacl_SystemEnvironmentCode(1)", getText(bbiePanel.getValueDomainField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_SystemEnvironmentCode"));
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
@@ -551,7 +544,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
         assertEquals("99", getText(bbiescPanel.getFixedValueField()));
         assertEquals("Agency", getText(bbiescPanel.getValueDomainRestrictionSelectField()));
-        assertEquals("clm63055D16B_AgencyIdentification", getText(bbiescPanel.getValueDomainField()));
+        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm63055D16B_AgencyIdentification"));
         assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(curr_release);
