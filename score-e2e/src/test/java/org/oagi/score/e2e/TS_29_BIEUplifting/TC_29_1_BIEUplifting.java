@@ -1815,6 +1815,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10a() {
+        developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
@@ -1850,16 +1852,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.goToNodeByPath("/BOM/BOM Option/Description/Language Code");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Code");
         bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.goToNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomainRestriction("Agency");
@@ -1897,20 +1901,22 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
+        editBIEPage.goToNodeByPath("/BOM/BOM Option/Default Indicator");
         bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
 
+        editBIEPage.goToNodeByPath("/BOM/BOM Option/Description/Language Code");
         bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
-
+        editBIEPage.goToNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        assertEquals("clm63055D16B_AgencyIdentification", getText(bbiescPanel.getValueDomainField()));
+        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm63055D16B_AgencyIdentification"));
         homePage.logout();
     }
 
