@@ -33,7 +33,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
-    String prev_release = "10.8.7.1";
+    String prev_release = "10.8.8";
     String curr_release = "10.9.1";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -1552,11 +1552,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(TOPBIEGETBOM);
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Reason/Sequence Number Number");
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Reason/Sequence Number Number");
-        waitFor(Duration.ofMillis(1500));
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        bbiescPanel.toggleUsed();
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
         WebElement bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
         waitFor(Duration.ofMillis(1500));
@@ -1577,13 +1572,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text/Language Code");
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text/Language Code");
-        waitFor(Duration.ofMillis(1500));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setValueDomain("normalized string");
-        editBIEPage.hitUpdateButton();
+
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
         waitFor(Duration.ofMillis(1500));
@@ -1613,9 +1602,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
         waitFor(Duration.ofMillis(1500));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         editBIEPage.hitUpdateButton();
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier");
@@ -1712,14 +1701,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Document Date Time"));
         escape(getDriver());
-        //BBIE_SC to BBIE_SC
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text/Language Code");
-        clickOn(sourceNode);
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
-        clickOn(targetNode);
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("List Agency Identifier"));
-        escape(getDriver());
-
         //BBIE to BBIE
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code");
         clickOn(sourceNode);

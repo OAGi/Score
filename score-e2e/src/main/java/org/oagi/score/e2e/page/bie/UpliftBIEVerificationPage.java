@@ -11,6 +11,14 @@ public interface UpliftBIEVerificationPage extends Page {
 
     WebElement goToNodeInSourceBIE(String nodePath);
 
+    /**
+     * Return the UI element of the tree node by the node path.
+     *
+     * @param path the node path
+     * @return the UI element of the tree node
+     */
+    WebElement goToNodeByPath(String path);
+
     WebElement goToNodeInTargetBIE(String nodePath);
 
     WebElement getSearchInputOfSourceTree();
