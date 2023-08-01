@@ -39,7 +39,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     Map<String, CodeListObject> testingCodeLists = new HashMap<>();
     Map<String, CodeListObject> upliftedCodeLists = new HashMap<>();
     Map<String, String> BIEContexts = new HashMap<>();
-    private List<AppUserObject> randomAccounts = new ArrayList<>();
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -76,6 +76,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         test_TA_29_1_11a_and_TA_29_11b();
         test_TA_29_1_12();
     }
+
     @Test
     public void test_TA_29_1_1() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -103,6 +104,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
 
     }
+
     @Test
     public void test_TA_29_1_2_Production_BIE_Uplift() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -198,7 +200,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(viewEditBIEPage.openEditBIEPage(topLevelASBIEP).isOpened());
     }
 
-    private void preconditions_TA_29_1_2_Uplift_BIEUserbProduction(){
+    private void preconditions_TA_29_1_2_Uplift_BIEUserbProduction() {
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -207,7 +209,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -277,7 +279,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Enterprise Unit. Enterprise Unit", prev_release);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         String currentUrl = getDriver().getCurrentUrl();
@@ -492,7 +494,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Batch Certificate Of Analysis. Batch Certificate Of Analysis", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -895,6 +897,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             recreatedElement.click();
         }
     }
+
     @Test
     public void test_TA_29_1_5d_and_TA_29_1_6ab() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1098,7 +1101,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(contextForUserb));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Unit Packaging. Packaging", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1156,7 +1159,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(List.of(contextForUserb));
         editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("From UOM Package. UOM Package", prev_release);
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1199,7 +1202,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //BIEUserbReusedScenario previousRelease
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(contextForUserb));
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(List.of(contextForUserb));
         editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("UOM Code Conversion Rate. UOM Code Conversion Rate", prev_release);
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1674,7 +1677,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Get BOM. Get BOM", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1757,7 +1760,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //BIEPrimitiveDate  previousRelease
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(List.of(context));
         editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Start Separate Date Time. Separate Date Time", prev_release);
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1794,7 +1797,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //BIEBOMDoubleNested previousRelease
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("BOM. BOM", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -1903,7 +1906,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -2066,7 +2069,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Child Item Reference. Child Item Reference", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
@@ -2653,7 +2656,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
 
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Arrays.asList(context));
+        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
