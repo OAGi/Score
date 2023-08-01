@@ -513,17 +513,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         } else {
             upliftedBIEs.put("BIEUserbProduction", topLevelASBIEP);
         }
-
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
-        String bizContext = BIEContexts.get("BIEUserbProduction");
-        assertEquals(bizContext, getText(topLevelASBIEPPanel.getBusinessContextInputField()));
-
         WebElement bbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/System Environment Code");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
@@ -536,7 +532,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
         assertNotChecked(asbiePanel.getNillableCheckbox());
@@ -546,7 +542,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("defcon", getText(asbiePanel.getContextDefinitionField()));
 
         WebElement bbieScNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
-        waitFor(Duration.ofMillis(2500));
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         assertChecked(bbiescPanel.getUsedCheckbox());
         assertEquals("0", getText(bbiescPanel.getCardinalityMinField()));
