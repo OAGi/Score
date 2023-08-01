@@ -844,6 +844,50 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
+
+        //Test part where only the association information are transferred
+        upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        upliftBIEPage.setPropertyTerm(BIE1QA.getPropertyTerm());
+        upliftBIEPage.hitSearchButton();
+        tr = upliftBIEPage.getTableRecordAtIndex(1);
+        td = upliftBIEPage.getColumnByName(tr, "select");
+        click(td);
+        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status");
+        upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
+        upliftBIEVerificationPage.next();
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!upliftedBIEs.containsKey("BIE1QA_TA5D")) {
+            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
+        } else {
+            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
+        }
+        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element");
+        waitFor(Duration.ofMillis(2500));
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertEnabled(asbiePanel.getUsedCheckbox());
+        assertChecked(asbiePanel.getUsedCheckbox());
+        assertEquals("unbounded", asbiePanel.getCardinalityMaxField());
+
+        bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element/Element/Sequence Number Number");
+        waitFor(Duration.ofMillis(2500));
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertNotChecked(bbiescPanel.getUsedCheckbox());
+        assertDisabled(bbiescPanel.getRemarkField());
         homePage.logout();
     }
 
@@ -1209,54 +1253,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging");
         assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
-
-        //Test part where only the association information are transferred
-        homePage.logout();
-        homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
-
-        upliftBIEPage = bieMenu.openUpliftBIESubMenu();
-        upliftBIEPage.setSourceBranch(prev_release);
-        upliftBIEPage.setTargetBranch(curr_release);
-        TopLevelASBIEPObject BIE1QA = testingBIEs.get("BIE1QA");
-        upliftBIEPage.setPropertyTerm(BIEUserbReusedScenario.getPropertyTerm());
-        upliftBIEPage.hitSearchButton();
-        tr = upliftBIEPage.getTableRecordAtIndex(1);
-        td = upliftBIEPage.getColumnByName(tr, "select");
-        click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status");
-        upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
-        upliftBIEVerificationPage.next();
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        if (!upliftedBIEs.containsKey("BIE1QA_TA5D")) {
-            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
-        } else {
-            upliftedBIEs.put("BIE1QA_TA5D", topLevelASBIEP);
-        }
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element");
-        waitFor(Duration.ofMillis(2500));
-        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        assertEnabled(asbiePanel.getUsedCheckbox());
-        assertChecked(asbiePanel.getUsedCheckbox());
-        assertEquals("unbounded", asbiePanel.getCardinalityMaxField());
-
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element/Element/Sequence Number Number");
-        waitFor(Duration.ofMillis(2500));
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertNotChecked(bbiescPanel.getUsedCheckbox());
-        assertDisabled(bbiescPanel.getRemarkField());
         homePage.logout();
     }
 
