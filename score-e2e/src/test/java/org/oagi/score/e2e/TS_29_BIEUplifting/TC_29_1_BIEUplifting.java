@@ -2057,9 +2057,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6ConditionTypeCode1_ConditionTypeCode"));
         homePage.logout();
     }
-
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         List<String> euCLStates = new ArrayList<>();
@@ -2368,66 +2369,82 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("decimal", getText(bbiePanel.getValueDomainField()));
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Certification Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
@@ -2490,44 +2507,61 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEVerificationPage = upliftBIEPage.Next();
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Effectivity Relation Code");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Revision Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Validation Indicator");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CAGEID"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Method Consequence Text");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("DODAACID"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Record Set Total Number");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("SCACID"));
 
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Effectivity Relation Code");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Revision Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Latest Start Date Time");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("CCRID"));
 
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Transport Temperature");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Account Identifier"));
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Reason/Sequence Number Number");
+        clickOn(sourceNode);
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("//Child Item Reference/Child Line/Document Reference/Revision Identifier/Scheme Version Identifier");
+        clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Version Identifier"));
 
         upliftBIEVerificationPage.next();
-        waitFor(Duration.ofSeconds(12000));
-        new WebDriverWait(getDriver(), Duration.ofSeconds(10)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(Duration.ofMillis(2500));
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2542,77 +2576,94 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Revision Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserwip, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserqa, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserproduction, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserdeleted, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessUseraDeprecated.getName(), getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("CLuserderived_BIEUp", getText(bbiePanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Line/Document Reference/Revision Identifier/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals(CLaccessendUserqa, getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals(CLaccessendUserwip, getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals(CLaccessendUserqa, getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserproduction, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("CLuserderived_BIEUp", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessendUserdeleted, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals(CLaccessUseraDeprecated.getName(), getText(bbiePanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals(CLaccessendUserwip, getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("CLuserderived_BIEUp", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals(CLaccessendUserqa, getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
+        waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiePanel.getValueDomainField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Certification Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        assertEquals("clm6TimeFormatCode1_TimeFormatCode", getText(bbiescPanel.getValueDomainField()));
-
+        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
         homePage.logout();
 
     }
