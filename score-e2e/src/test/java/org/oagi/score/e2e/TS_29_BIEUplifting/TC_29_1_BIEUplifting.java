@@ -107,7 +107,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("BIEUserbProduction")) {
             BIEUserbProduction = testingBIEs.get("BIEUserbProduction");
         } else {
-            precondtions_TA_29_1_2_Production_BIE_Uplift();
+            preconditions_TA_29_1_2_Uplift_BIEUserbProduction();
             BIEUserbProduction = testingBIEs.get("BIEUserbProduction");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -192,7 +192,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(viewEditBIEPage.openEditBIEPage(topLevelASBIEP).isOpened());
     }
 
-    private void precondtions_TA_29_1_2_Production_BIE_Uplift() {
+    private void preconditions_TA_29_1_2_Uplift_BIEUserbProduction(){
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -257,7 +257,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private void precondition_TA_29_1_2() {
+    private void precondition_TA_29_1_BIE1QA() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
 
@@ -517,7 +517,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("BIE1QA)")) {
             BIE1QA = testingBIEs.get("BIE1QA");
         } else {
-            precondition_TA_29_1_2();
+            precondition_TA_29_1_BIE1QA();
             BIE1QA = testingBIEs.get("BIE1QA");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -633,7 +633,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("BIE1QA)")) {
             BIE1QA = testingBIEs.get("BIE1QA");
         } else {
-            precondition_TA_29_1_2();
+            precondition_TA_29_1_BIE1QA();
             BIE1QA = testingBIEs.get("BIE1QA");
         }
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
@@ -665,7 +665,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("BIE1QA)")) {
             BIE1QA = testingBIEs.get("BIE1QA");
         } else {
-            precondition_TA_29_1_2();
+            precondition_TA_29_1_BIE1QA();
             BIE1QA = testingBIEs.get("BIE1QA");
         }
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
@@ -1229,7 +1229,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("TOPBIEGETBOM")) {
             TOPBIEGETBOM = testingBIEs.get("TOPBIEGETBOM");
         } else {
-            preconditions_TA_29_1_9();
+            preconditions_TA_29_1_TOPBIEGETBOM();
             TOPBIEGETBOM = testingBIEs.get("TOPBIEGETBOM");
         }
 
@@ -1357,7 +1357,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         if (testingBIEs.containsKey("TOPBIEGETBOM")) {
             TOPBIEGETBOM = testingBIEs.get("TOPBIEGETBOM");
         } else {
-            preconditions_TA_29_1_9();
+            preconditions_TA_29_1_TOPBIEGETBOM();
             TOPBIEGETBOM = testingBIEs.get("TOPBIEGETBOM");
         }
 
@@ -1661,7 +1661,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private void preconditions_TA_29_1_9() {
+    private void preconditions_TA_29_1_TOPBIEGETBOM() {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         //TOPBIEGETBOM previousRelease
         BIEMenu bieMenu = homePage.getBIEMenu();
