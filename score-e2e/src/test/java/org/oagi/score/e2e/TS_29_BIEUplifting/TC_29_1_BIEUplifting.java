@@ -67,7 +67,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         test_TA_29_1_2_Production_BIE_Uplift();
         test_TA_29_1_3();
         test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a();
-
+        test_TA_29_1_5c_and_TA_29_1_7_and_TA_29_1_8();
+        test_TA_29_1_5d_and_TA_29_1_6ab();
+        test_TA_29_1_9a();
+        test_TA_29_1_9b_and_TA_29_1_9c();
+        test_TA_29_1_10a();
+        test_TA_29_1_10b();
+        test_TA_29_1_11a_and_TA_29_11b();
         test_TA_29_1_12();
     }
     @Test
