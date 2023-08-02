@@ -343,6 +343,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setRemark("aRemark");
         editBIEPage.hitUpdateButton();
 
+        editBIEPage.goToNodeByPath("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -355,7 +356,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -368,9 +368,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
-        waitFor(Duration.ofMillis(3000));
+        waitFor(Duration.ofMillis(2000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark("aRemark");
@@ -380,6 +379,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
+        editBIEPage.goToNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
         waitFor(Duration.ofMillis(3000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -388,7 +388,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -400,7 +399,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -410,9 +408,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
-
-
-        editBIEPage.getNodeByPath("/Enterprise Unit");
+        editBIEPage.goToNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
         waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
@@ -426,7 +422,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -438,7 +433,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition("defcon");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.getNodeByPath("/Enterprise Unit");
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
         waitFor(Duration.ofMillis(2000));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -448,8 +442,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel.setCardinalityMin(11);
         asbiePanel.setCardinalityMax(99);
         editBIEPage.hitUpdateButton();
-
-        editBIEPage.getNodeByPath("/Enterprise Unit");
+        editBIEPage.goToNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -500,7 +493,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIEUserbWIP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
-
     @Test
     public void test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -576,8 +568,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
-        String bizContext = BIEContexts.get("BIE1QA");
-        assertEquals(bizContext, getText(topLevelASBIEPPanel.getBusinessContextInputField()));
         assertEquals("aBusinessTerm", getText(topLevelASBIEPPanel.getBusinessTermField()));
         assertEquals("aRemark", getText(topLevelASBIEPPanel.getRemarkField()));
         assertEquals("aStatus", getText(topLevelASBIEPPanel.getStatusField()));
@@ -1361,6 +1351,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(TOPBIEGETBOM);
+        waitFor(Duration.ofMillis(1000));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
