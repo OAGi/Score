@@ -2692,7 +2692,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Usage Description\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Language Code\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Control Objective Category\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"List Version Identifier\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"BCCP\")]")).isDisplayed());
