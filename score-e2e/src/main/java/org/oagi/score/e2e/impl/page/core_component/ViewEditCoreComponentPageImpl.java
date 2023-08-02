@@ -79,6 +79,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
+            escape(getDriver());
         });
     }
 
@@ -118,12 +119,14 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        waitFor(ofMillis(2000L));
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//span[.=\""+owner+"\"]//ancestor::mat-option[1]"));
-        click(optionField);
-
+        retry(() -> {
+            click(getOwnerSelectField());
+            waitFor(ofMillis(2000L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[.=\"" + owner + "\"]//ancestor::mat-option[1]"));
+            click(optionField);
+            escape(getDriver());
+        });
     }
 
     @Override

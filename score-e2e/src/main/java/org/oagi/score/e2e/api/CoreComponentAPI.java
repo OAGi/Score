@@ -116,6 +116,22 @@ public interface CoreComponentAPI {
     ACCObject createRandomACC(AppUserObject creator, ReleaseObject release,
                               NamespaceObject namespace, String state);
 
+
+    /**
+     * Create a random ACC.
+     *
+     * @param creator         account who creates this ACC
+     * @param release         release
+     * @param namespace       namespace
+     * @param state           ACC state
+     * @param type            ACC type
+     * @param objectClassTerm object class term
+     * @return created ACC object
+     */
+    ACCObject createRandomACC(AppUserObject creator, ReleaseObject release,
+                              NamespaceObject namespace, String state,
+                              ComponentType type, String objectClassTerm);
+
     /**
      * Create a random ASCCP.
      *

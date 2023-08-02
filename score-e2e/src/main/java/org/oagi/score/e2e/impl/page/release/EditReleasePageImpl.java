@@ -145,6 +145,8 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     public void backToInitialized() {
         click(getBackToInitializedButton());
         click(elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

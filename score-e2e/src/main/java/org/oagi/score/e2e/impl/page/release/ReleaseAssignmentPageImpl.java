@@ -158,6 +158,5 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
-
     }
 }

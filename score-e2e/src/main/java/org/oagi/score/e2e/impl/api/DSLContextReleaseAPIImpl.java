@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.RELEASE;
@@ -40,6 +41,16 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
     }
 
     @Override
+    public List<ReleaseObject> getReleasesByStates(List<String> states) {
+        if (states == null || states.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return dslContext.selectFrom(RELEASE)
+                .where(RELEASE.STATE.in(states))
+                .fetch(record -> mapper(record));
+    }
+
+    @Override
     public List<ReleaseObject> getReleases() {
         return dslContext.selectFrom(RELEASE)
                 .fetch(record -> mapper(record));
@@ -50,7 +61,6 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
         ULong maxReleaseId = dslContext.select(DSL.max(RELEASE.RELEASE_ID))
                 .from(RELEASE)
                 .fetchOneInto(ULong.class);
-        ;
         ReleaseRecord release = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(maxReleaseId))
                 .fetchOptional().orElse(null);

@@ -437,6 +437,10 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     @Override
     public ASCCPObject createRandomASCCP(ACCObject roleOfAcc, AppUserObject creator,
                                          NamespaceObject namespace, String state) {
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("'roleOfAcc' parameter must not be null.");
+        }
+
         ASCCPObject asccp = ASCCPObject.createRandomASCCP(roleOfAcc, creator, namespace, state);
         asccp.setReleaseId(roleOfAcc.getReleaseId());
 
