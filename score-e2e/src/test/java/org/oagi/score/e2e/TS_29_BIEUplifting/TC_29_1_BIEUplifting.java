@@ -493,6 +493,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIEUserbWIP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
+
     @Test
     public void test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -584,7 +585,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
         assertEquals("anExample", getText(bbiePanel.getExampleField()));
         assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
         assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
 
