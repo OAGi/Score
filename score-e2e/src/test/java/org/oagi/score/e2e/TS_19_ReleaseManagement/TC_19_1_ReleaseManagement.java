@@ -308,7 +308,6 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitValidateButton();
-
         // Case1 when acc wip
         assertTrue(getDriver().findElements(By.xpath("//span[contains(text(),\"[Error] '" + randomACC.getDen() + "' is needed in the release assignment due to '" + randomASCCP.getDen() + "'.\")]")).size() >= 1);
 
