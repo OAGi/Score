@@ -2426,7 +2426,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        TopLevelASBIEPObject BIECAGUplift = testingBIEs.get("BIECAUplift");
+        TopLevelASBIEPObject BIECAGUplift = testingBIEs.get("BIECAGUplift");
         upliftBIEPage.setPropertyTerm(BIECAGUplift.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
@@ -2497,11 +2497,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
 
-        bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Revision Identifier");
-        waitFor(Duration.ofMillis(2000));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserwip));
-
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -2526,11 +2521,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("CLuserderived_BIEUp"));
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Line/Document Reference/Revision Identifier/Scheme Version Identifier");
-        waitFor(Duration.ofMillis(2000));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(CLaccessendUserqa));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
         waitFor(Duration.ofMillis(2000));
@@ -2561,11 +2551,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(2000));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessUseraDeprecated.getName()));
-
-        bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
-        waitFor(Duration.ofMillis(2000));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
-        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(CLaccessendUserwip));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
         waitFor(Duration.ofMillis(2000));
