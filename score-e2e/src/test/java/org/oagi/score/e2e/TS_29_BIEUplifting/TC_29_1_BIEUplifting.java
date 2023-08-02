@@ -1608,7 +1608,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
         waitFor(Duration.ofMillis(1500));
@@ -1623,7 +1623,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("string", getText(bbiescPanel.getValueDomainField()));
+        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
 
