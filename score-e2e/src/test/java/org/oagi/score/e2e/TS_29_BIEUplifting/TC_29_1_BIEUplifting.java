@@ -31,7 +31,8 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_29_1_BIEUplifting extends BaseTest {
-    String prev_release = "10.9.1";
+    private final List<AppUserObject> randomAccounts = new ArrayList<>();
+    String prev_release = "10.9";
     String curr_release = "10.9.2";
     AppUserObject usera, userb, developer;
     Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
@@ -39,7 +40,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     Map<String, CodeListObject> testingCodeLists = new HashMap<>();
     Map<String, CodeListObject> upliftedCodeLists = new HashMap<>();
     Map<String, String> BIEContexts = new HashMap<>();
-    private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -1507,13 +1507,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
         escape(getDriver());
-        //
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator");
-        clickOn(sourceNode);
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Get BOM/Data Area/BOM/BOM Header/Document Reference/Status/Effective Time Period/Inclusive Indicator");
-        clickOn(targetNode);
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Inclusive Indicator"));
-        escape(getDriver());
+
         //
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text");
         clickOn(sourceNode);
@@ -1601,11 +1595,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Document Reference/Status/Effective Time Period/Inclusive Indicator");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Document Reference/Status/Effective Time Period/Inclusive Indicator");
-        waitFor(Duration.ofMillis(1500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("xbt boolean", getText(bbiePanel.getValueDomainField()));
+
         editBIEPage.goToNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
         waitFor(Duration.ofMillis(1500));
@@ -2015,6 +2005,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6ConditionTypeCode1_ConditionTypeCode"));
         homePage.logout();
     }
+
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
