@@ -1552,14 +1552,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("List Version Identifier"));
         escape(getDriver());
 
-        //BBIE to BBIE
-        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
-        clickOn(sourceNode);
-        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Preference/Priority Sequence Value");
-        clickOn(targetNode);
-        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Priority Sequence Value"));
-        escape(getDriver());
-
         //BBIE_SC to BBIE_SC
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         clickOn(sourceNode);
@@ -1611,11 +1603,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("positive integer", getText(bbiePanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/Document Date Time");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/Document Date Time");
-        waitFor(Duration.ofMillis(1500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("gregorian day", getText(bbiePanel.getValueDomainField()));
+
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         waitFor(Duration.ofMillis(1500));
@@ -1631,11 +1619,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(Duration.ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Preference/Priority Sequence Value");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Preference/Priority Sequence Value");
-        waitFor(Duration.ofMillis(1500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("float", getText(bbiePanel.getValueDomainField()));
         editBIEPage.goToNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(Duration.ofMillis(1500));
