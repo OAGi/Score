@@ -86,6 +86,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(curr_release);
         assertThrows(TimeoutException.class, () -> upliftBIEPage.setTargetBranch(prev_release));
     }
+
     @Test
     public void test_TA_29_1_2_BIE_Uplift() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -465,6 +466,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
 
     }
+
     @Test
     public void test_TA_29_1_3() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -2013,7 +2015,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6ConditionTypeCode1_ConditionTypeCode"));
         homePage.logout();
     }
-
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -2567,27 +2568,88 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
         homePage.logout();
-
     }
 
     @Test
     public void test_TA_29_1_12() {
+        prev_release = "10.8.8";
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
+
         //JournalEntry prev_release
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
-        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+
+        if (!testingBIEs.containsKey("JournalEntry")) {
+            testingBIEs.put("JournalEntry", topLevelASBIEP);
+        } else {
+            testingBIEs.put("JournalEntry", topLevelASBIEP);
+        }
+
+        if (!BIEContexts.containsKey("JournalEntry")) {
+            BIEContexts.put("JournalEntry", context.getName());
+        } else {
+            BIEContexts.put("JournalEntry", context.getName());
+        }
+
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension");
+        SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Usage Description. Text");
+        selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
+        selectCCPropertyPage.selectAssociation("Control Objective Category. Code");
+        accExtensionViewEditPage.setNamespace(euNamespace);
+        accExtensionViewEditPage.hitUpdateButton();
+        accExtensionViewEditPage.moveToQA();
+        accExtensionViewEditPage.moveToProduction();
+
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        waitFor(Duration.ofMillis(1500));
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
+        editBIEPage.hitUpdateButton();
+        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        waitFor(Duration.ofMillis(1500));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Code");
+        bbiePanel.setValueDomain("oacl_RiskCode");
+        editBIEPage.hitUpdateButton();
+        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        waitFor(Duration.ofMillis(1500));
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setValueDomainRestriction("Code");
+        bbiescPanel.setValueDomain("clm6ConditionTypeCode1_ConditionTypeCode");
+        editBIEPage.hitUpdateButton();
+
+        viewEditBIEPage.openPage();
+        createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
+        createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
+        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
+        currentUrl = getDriver().getCurrentUrl();
+        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
+        topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
         if (!testingBIEs.containsKey("ReusedJournalyEntry")) {
@@ -2601,7 +2663,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         } else {
             BIEContexts.put("ReusedJournalyEntry", context.getName());
         }
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
 
+        viewEditBIEPage.openPage();
         TopLevelASBIEPObject topLevelASBIEPObject = testingBIEs.get("JournalEntry");
         TopLevelASBIEPObject reusedBIE = testingBIEs.get("ReusedJournalyEntry");
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEPObject);
@@ -2609,7 +2674,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEPObject);
         SelectProfileBIEToReuseDialog
                 selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/Post Acknowledge Journal Entry/Data Area/Journal Entry");
-        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE.getDen());
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE.getPropertyTerm());
         editBIEPage.moveToQA();
 
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
@@ -2661,5 +2726,4 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             }
         }
     }
-
 }
