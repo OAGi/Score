@@ -63,8 +63,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     @Test
     public void TAs() {
         test_TA_29_1_1();
-        test_TA_29_1_2_QA_BIE_Uplift();
-        test_TA_29_1_2_Production_BIE_Uplift();
+        test_TA_29_1_2_BIE_Uplift();
         test_TA_29_1_3();
         test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a();
         test_TA_29_1_5c_and_TA_29_1_7_and_TA_29_1_8();
@@ -87,26 +86,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(curr_release);
         assertThrows(TimeoutException.class, () -> upliftBIEPage.setTargetBranch(prev_release));
     }
-
     @Test
-    public void test_TA_29_1_2_QA_BIE_Uplift() {
-        userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-        thisAccountWillBeDeletedAfterTests(userb);
-        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
-        upliftBIEPage.setSourceBranch(prev_release);
-        upliftBIEPage.setTargetBranch(curr_release);
-        TopLevelASBIEPObject BIECAGUplift = testingBIEs.get("BIECAGUplift");
-        upliftBIEPage.setPropertyTerm(BIECAGUplift.getPropertyTerm());
-        upliftBIEPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + BIECAGUplift.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
-        homePage.logout();
-
-    }
-
-    @Test
-    public void test_TA_29_1_2_Production_BIE_Uplift() {
+    public void test_TA_29_1_2_BIE_Uplift() {
         developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -484,9 +465,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
 
     }
-
     @Test
     public void test_TA_29_1_3() {
+        usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(usera);
         userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(userb);
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
@@ -495,7 +477,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
-        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Batch Certificate Of Analysis. Batch Certificate Of Analysis", prev_release);
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Receive Delivery. Receive Delivery", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1373,7 +1355,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
-        //BIECAGUplift prev_release
+        //TOPBIEGETBOM prev_release
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(TOPBIEGETBOM);
