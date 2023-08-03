@@ -34,4 +34,8 @@ public interface EditReleasePage extends Page {
     void backToInitialized();
 
     WebElement getBackToInitializedButton();
+
+    WebElement getPublishButton();
+
+    void publish();
 }

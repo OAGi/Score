@@ -16,9 +16,9 @@ public class CreateReleasePageImpl extends BasePageImpl implements CreateRelease
     private static final By RELEASE_NAMESPACE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Release Namespace\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By RELEASE_NOTE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release Note\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(),\"Release Note\")]//ancestor::div[1]/textarea");
     private static final By RELEASE_LICENSE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release License\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(),\"Release License\")]//ancestor::div[1]/textarea");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
