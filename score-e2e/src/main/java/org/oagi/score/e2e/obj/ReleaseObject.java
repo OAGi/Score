@@ -32,7 +32,11 @@ public class ReleaseObject {
 
     private String state;
 
-    public static ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace) {
+    public static ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace, String state) {
+        if (!namespace.isStandardNamespace()) {
+            throw new IllegalArgumentException("Standard namespace needs to create a new release.");
+        }
+
         ReleaseObject release = new ReleaseObject();
         release.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
         release.setReleaseNumber(String.valueOf((RandomUtils.nextInt(20230519, 20231231))));
@@ -41,7 +45,16 @@ public class ReleaseObject {
         release.setLastUpdatedBy(creator.getAppUserId());
         release.setCreationTimestamp(LocalDateTime.now());
         release.setLastUpdateTimestamp(LocalDateTime.now());
-        release.setState("Draft");
+        release.setState(state);
         return release;
     }
+
+    public static ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace) {
+        return createRandomRelease(creator, namespace, "Initialized");
+    }
+
+    public static ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace) {
+        return createRandomRelease(creator, namespace, "Draft");
+    }
+
 }

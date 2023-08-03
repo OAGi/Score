@@ -4,7 +4,6 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.ReleaseAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
@@ -12,9 +11,9 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.NAMESPACE;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.RELEASE;
 
 public class DSLContextReleaseAPIImpl implements ReleaseAPI {
@@ -42,6 +41,16 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
     }
 
     @Override
+    public List<ReleaseObject> getReleasesByStates(List<String> states) {
+        if (states == null || states.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return dslContext.selectFrom(RELEASE)
+                .where(RELEASE.STATE.in(states))
+                .fetch(record -> mapper(record));
+    }
+
+    @Override
     public List<ReleaseObject> getReleases() {
         return dslContext.selectFrom(RELEASE)
                 .fetch(record -> mapper(record));
@@ -52,7 +61,6 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
         ULong maxReleaseId = dslContext.select(DSL.max(RELEASE.RELEASE_ID))
                 .from(RELEASE)
                 .fetchOneInto(ULong.class);
-        ;
         ReleaseRecord release = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(maxReleaseId))
                 .fetchOptional().orElse(null);
@@ -66,6 +74,32 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
                 .where(RELEASE.CREATION_TIMESTAMP.lessThan(releaseNumber.getCreationTimestamp()))
                 .fetch(RELEASE.RELEASE_NUM);
         return earlierReleases;
+    }
+
+    @Override
+    public ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace) {
+        ReleaseObject randomRelease = ReleaseObject.createRandomRelease(creator, namespace);
+
+        ReleaseRecord releaseRecord = new ReleaseRecord();
+        releaseRecord.setGuid(randomRelease.getGuid());
+        releaseRecord.setReleaseNum(randomRelease.getReleaseNumber());
+        releaseRecord.setReleaseNote(randomRelease.getReleaseNote());
+        releaseRecord.setReleaseLicense(randomRelease.getReleaseLicence());
+        releaseRecord.setNamespaceId(ULong.valueOf(randomRelease.getNamespaceId()));
+        releaseRecord.setCreatedBy(ULong.valueOf(randomRelease.getCreatedby()));
+        releaseRecord.setLastUpdatedBy(ULong.valueOf(randomRelease.getLastUpdatedBy()));
+        releaseRecord.setCreationTimestamp(randomRelease.getCreationTimestamp());
+        releaseRecord.setLastUpdateTimestamp(randomRelease.getLastUpdateTimestamp());
+        releaseRecord.setState(randomRelease.getState());
+
+        randomRelease.setReleaseId(
+                dslContext.insertInto(RELEASE)
+                        .set(releaseRecord)
+                        .returning(RELEASE.RELEASE_ID)
+                        .fetchOne().getReleaseId().toBigInteger()
+        );
+
+        return randomRelease;
     }
 
     private ReleaseObject mapper(ReleaseRecord releaseRecord) {
