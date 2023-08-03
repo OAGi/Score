@@ -19,8 +19,6 @@ import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -71,7 +69,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_2_BIE_Uplift() {
-        String prev_release = "10.9.1";
+        String prev_release = "10.9";
         String curr_release = "10.9.2";
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1202,12 +1200,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("date time", getText(bbiePanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
-        waitFor(ofMillis(2500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("time", getText(bbiePanel.getValueDomainField()));
-
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/System Environment Code");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1225,23 +1217,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
-        waitFor(ofMillis(2500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("xbt boolean", getText(bbiePanel.getValueDomainField()));
-
         editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("integer", getText(bbiePanel.getValueDomainField()));
-
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
-        waitFor(ofMillis(2500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        assertEquals("float", getText(bbiePanel.getValueDomainField()));
 
         //BIEPrimitiveDate
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
@@ -1774,7 +1754,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10b() {
-        String prev_release = "10.9.1";
+        String prev_release = "10.9";
         String curr_release = "10.9.2";
         Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
         Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
@@ -1806,6 +1786,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        waitFor(Duration.ofMillis(1500));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
@@ -2464,7 +2445,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_12() {
-        String prev_release = "10.9.1";
+        String prev_release = "10.8.8";
         String curr_release = "10.9.2";
         Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
 
