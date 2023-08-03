@@ -100,18 +100,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         click(upliftBIEPage.getNextButton());
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By NEXT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -518,15 +515,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
         escape(getDriver());
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
 
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
         waitFor(ofMillis(2500));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -880,14 +875,12 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
 
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -918,11 +911,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         TopLevelASBIEPObject reusedBIE = testingBIEs.get("BIEUserbReusedChild");
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         upliftBIEVerificationPage.next();
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -956,11 +947,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
 
         upliftBIEVerificationPage.next();
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1189,13 +1178,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1268,11 +1255,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1514,13 +1499,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         escape(getDriver());
 
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1752,13 +1735,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -1893,13 +1874,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
 
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2199,13 +2178,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
 
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         By UPLIFT_BUTTON_LOCATOR =
                 By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2397,11 +2374,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Account Identifier"));
 
         upliftBIEVerificationPage.next();
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         currentUrl = getDriver().getCurrentUrl();
         topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2599,8 +2574,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Usage Description\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Control Objective Category\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"List Version Identifier\")]")).isDisplayed());
