@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.UpliftBIEPage;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
@@ -221,8 +223,7 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     @Override
     public UpliftBIEVerificationPage Next() {
         click(getNextButton());
-        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(180));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class, 'loading-container')]")));
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         UpliftBIEVerificationPage upliftBIEVerificationPage = new UpliftBIEVerificationPageImpl(this);
         assert upliftBIEVerificationPage.isOpened();
         return upliftBIEVerificationPage;
