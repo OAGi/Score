@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record10;
@@ -12,41 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace;
 
-import java.time.LocalDateTime;
-
 
 /**
  * This table stores information about a namespace. Namespace is the namespace
  * as in the XML schema specification.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implements Record10<ULong, String, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached NamespaceRecord
+     * Setter for <code>oagi.namespace.namespace_id</code>. Primary, internal
+     * database key.
      */
-    public NamespaceRecord() {
-        super(Namespace.NAMESPACE);
-    }
-
-    /**
-     * Create a detached, initialised NamespaceRecord
-     */
-    public NamespaceRecord(ULong namespaceId, String uri, String prefix, String description, Byte isStdNmsp, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(Namespace.NAMESPACE);
-
-        setNamespaceId(namespaceId);
-        setUri(uri);
-        setPrefix(prefix);
-        setDescription(description);
-        setIsStdNmsp(isStdNmsp);
-        setOwnerUserId(ownerUserId);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
+    public void setNamespaceId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -58,22 +41,6 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.namespace.namespace_id</code>. Primary, internal
-     * database key.
-     */
-    public void setNamespaceId(ULong value) {
-        set(0, value);
-    }
-
-    /**
-     * Getter for <code>oagi.namespace.uri</code>. This is the URI of the
-     * namespace.
-     */
-    public String getUri() {
-        return (String) get(1);
-    }
-
-    /**
      * Setter for <code>oagi.namespace.uri</code>. This is the URI of the
      * namespace.
      */
@@ -82,13 +49,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.prefix</code>. This is a default short
-     * name to represent the URI. It may be overridden during the expression
-     * generation. Null or empty means the same thing like the default prefix in
-     * an XML schema.
+     * Getter for <code>oagi.namespace.uri</code>. This is the URI of the
+     * namespace.
      */
-    public String getPrefix() {
-        return (String) get(2);
+    public String getUri() {
+        return (String) get(1);
     }
 
     /**
@@ -102,11 +67,13 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.description</code>. Description or
-     * explanation about the namespace or use of the namespace.
+     * Getter for <code>oagi.namespace.prefix</code>. This is a default short
+     * name to represent the URI. It may be overridden during the expression
+     * generation. Null or empty means the same thing like the default prefix in
+     * an XML schema.
      */
-    public String getDescription() {
-        return (String) get(3);
+    public String getPrefix() {
+        return (String) get(2);
     }
 
     /**
@@ -118,13 +85,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.is_std_nmsp</code>. This indicates
-     * whether the namespace is reserved for standard used (i.e., whether it is
-     * an OAGIS namespace). If it is true, then end users cannot user the
-     * namespace for the end user CCs.
+     * Getter for <code>oagi.namespace.description</code>. Description or
+     * explanation about the namespace or use of the namespace.
      */
-    public Byte getIsStdNmsp() {
-        return (Byte) get(4);
+    public String getDescription() {
+        return (String) get(3);
     }
 
     /**
@@ -138,11 +103,13 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.owner_user_id</code>. Foreign key to the
-     * APP_USER table identifying the user who can update or delete the record.
+     * Getter for <code>oagi.namespace.is_std_nmsp</code>. This indicates
+     * whether the namespace is reserved for standard used (i.e., whether it is
+     * an OAGIS namespace). If it is true, then end users cannot user the
+     * namespace for the end user CCs.
      */
-    public ULong getOwnerUserId() {
-        return (ULong) get(5);
+    public Byte getIsStdNmsp() {
+        return (Byte) get(4);
     }
 
     /**
@@ -154,11 +121,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Getter for <code>oagi.namespace.owner_user_id</code>. Foreign key to the
+     * APP_USER table identifying the user who can update or delete the record.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(6);
+    public ULong getOwnerUserId() {
+        return (ULong) get(5);
     }
 
     /**
@@ -170,11 +137,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.last_updated_by</code>. Foreign key to
-     * the APP_USER table identifying the user who last updated the record.
+     * Getter for <code>oagi.namespace.created_by</code>. Foreign key to the
+     * APP_USER table identifying user who created the namespace.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(7);
+    public ULong getCreatedBy() {
+        return (ULong) get(6);
     }
 
     /**
@@ -186,11 +153,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.namespace.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Getter for <code>oagi.namespace.last_updated_by</code>. Foreign key to
+     * the APP_USER table identifying the user who last updated the record.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(8);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(7);
     }
 
     /**
@@ -201,9 +168,21 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
         set(8, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.namespace.creation_timestamp</code>. The timestamp
+     * when the record was first created.
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(8);
+    }
+
+    /**
+     * Setter for <code>oagi.namespace.last_update_timestamp</code>. The
+     * timestamp when the record was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(9, value);
+    }
 
     /**
      * Getter for <code>oagi.namespace.last_update_timestamp</code>. The
@@ -214,21 +193,17 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
     }
 
     // -------------------------------------------------------------------------
-    // Record10 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.namespace.last_update_timestamp</code>. The
-     * timestamp when the record was last updated.
-     */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(9, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record10 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row10<ULong, String, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
@@ -444,10 +419,6 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public NamespaceRecord value10(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -467,5 +438,35 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
         value9(value9);
         value10(value10);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached NamespaceRecord
+     */
+    public NamespaceRecord() {
+        super(Namespace.NAMESPACE);
+    }
+
+    /**
+     * Create a detached, initialised NamespaceRecord
+     */
+    public NamespaceRecord(ULong namespaceId, String uri, String prefix, String description, Byte isStdNmsp, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(Namespace.NAMESPACE);
+
+        setNamespaceId(namespaceId);
+        setUri(uri);
+        setPrefix(prefix);
+        setDescription(description);
+        setIsStdNmsp(isStdNmsp);
+        setOwnerUserId(ownerUserId);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

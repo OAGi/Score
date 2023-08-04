@@ -6,7 +6,6 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DefaultDSLContext;
 import org.oagi.score.e2e.Configuration;
 import org.oagi.score.e2e.api.*;
-import org.oagi.score.e2e.impl.api.jooq.entity.DSLContextAssignedBusinessTermAPIImpl;
 
 public class DSLContextAPIFactory implements APIFactory {
 

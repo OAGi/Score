@@ -20,37 +20,10 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
  * record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not
  * both.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> implements Record4<ULong, ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Create a detached DtUsageRuleRecord
-     */
-    public DtUsageRuleRecord() {
-        super(DtUsageRule.DT_USAGE_RULE);
-    }
-
-    /**
-     * Create a detached, initialised DtUsageRuleRecord
-     */
-    public DtUsageRuleRecord(ULong dtUsageRuleId, ULong assignedUsageRuleId, ULong targetDtId, ULong targetDtScId) {
-        super(DtUsageRule.DT_USAGE_RULE);
-
-        setDtUsageRuleId(dtUsageRuleId);
-        setAssignedUsageRuleId(assignedUsageRuleId);
-        setTargetDtId(targetDtId);
-        setTargetDtScId(targetDtScId);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
-     * of the table.
-     */
-    public ULong getDtUsageRuleId() {
-        return (ULong) get(0);
-    }
 
     /**
      * Setter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
@@ -61,12 +34,11 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>.
-     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
-     * the DT content component or DT_SC.
+     * Getter for <code>oagi.dt_usage_rule.dt_usage_rule_id</code>. Primary key
+     * of the table.
      */
-    public ULong getAssignedUsageRuleId() {
-        return (ULong) get(1);
+    public ULong getDtUsageRuleId() {
+        return (ULong) get(0);
     }
 
     /**
@@ -79,12 +51,12 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
     }
 
     /**
-     * Getter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to
-     * the DT_ID for assigning a usage rule to the corresponding DT content
-     * component.
+     * Getter for <code>oagi.dt_usage_rule.assigned_usage_rule_id</code>.
+     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
+     * the DT content component or DT_SC.
      */
-    public ULong getTargetDtId() {
-        return (ULong) get(2);
+    public ULong getAssignedUsageRuleId() {
+        return (ULong) get(1);
     }
 
     /**
@@ -96,9 +68,22 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
         set(2, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.dt_usage_rule.target_dt_id</code>. Foreing key to
+     * the DT_ID for assigning a usage rule to the corresponding DT content
+     * component.
+     */
+    public ULong getTargetDtId() {
+        return (ULong) get(2);
+    }
+
+    /**
+     * Setter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
+     * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
+     */
+    public void setTargetDtScId(ULong value) {
+        set(3, value);
+    }
 
     /**
      * Getter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
@@ -109,21 +94,17 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
     }
 
     // -------------------------------------------------------------------------
-    // Record4 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
-     * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
-     */
-    public void setTargetDtScId(ULong value) {
-        set(3, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record4 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row4<ULong, ULong, ULong, ULong> fieldsRow() {
@@ -213,10 +194,6 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public DtUsageRuleRecord value4(ULong value) {
         setTargetDtScId(value);
@@ -230,5 +207,29 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
         value3(value3);
         value4(value4);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached DtUsageRuleRecord
+     */
+    public DtUsageRuleRecord() {
+        super(DtUsageRule.DT_USAGE_RULE);
+    }
+
+    /**
+     * Create a detached, initialised DtUsageRuleRecord
+     */
+    public DtUsageRuleRecord(ULong dtUsageRuleId, ULong assignedUsageRuleId, ULong targetDtId, ULong targetDtScId) {
+        super(DtUsageRule.DT_USAGE_RULE);
+
+        setDtUsageRuleId(dtUsageRuleId);
+        setAssignedUsageRuleId(assignedUsageRuleId);
+        setTargetDtId(targetDtId);
+        setTargetDtScId(targetDtScId);
+        resetChangedOnNotNull();
     }
 }

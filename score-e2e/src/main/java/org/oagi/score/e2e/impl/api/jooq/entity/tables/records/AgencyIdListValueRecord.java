@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record17;
@@ -12,47 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue;
 
-import java.time.LocalDateTime;
-
 
 /**
  * This table captures the values within an agency identification list.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListValueRecord> implements Record17<ULong, String, String, String, String, String, ULong, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached AgencyIdListValueRecord
+     * Setter for
+     * <code>oagi.agency_id_list_value.agency_id_list_value_id</code>. Primary
+     * key column.
      */
-    public AgencyIdListValueRecord() {
-        super(AgencyIdListValue.AGENCY_ID_LIST_VALUE);
-    }
-
-    /**
-     * Create a detached, initialised AgencyIdListValueRecord
-     */
-    public AgencyIdListValueRecord(ULong agencyIdListValueId, String guid, String value, String name, String definition, String definitionSource, ULong ownerListId, ULong basedAgencyIdListValueId, Byte isDeprecated, ULong replacementAgencyIdListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevAgencyIdListValueId, ULong nextAgencyIdListValueId) {
-        super(AgencyIdListValue.AGENCY_ID_LIST_VALUE);
-
-        setAgencyIdListValueId(agencyIdListValueId);
-        setGuid(guid);
-        setValue(value);
-        setName(name);
-        setDefinition(definition);
-        setDefinitionSource(definitionSource);
-        setOwnerListId(ownerListId);
-        setBasedAgencyIdListValueId(basedAgencyIdListValueId);
-        setIsDeprecated(isDeprecated);
-        setReplacementAgencyIdListValueId(replacementAgencyIdListValueId);
-        setCreatedBy(createdBy);
-        setOwnerUserId(ownerUserId);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setPrevAgencyIdListValueId(prevAgencyIdListValueId);
-        setNextAgencyIdListValueId(nextAgencyIdListValueId);
+    public void setAgencyIdListValueId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -65,12 +42,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Setter for
-     * <code>oagi.agency_id_list_value.agency_id_list_value_id</code>. Primary
-     * key column.
+     * Setter for <code>oagi.agency_id_list_value.guid</code>. A globally unique
+     * identifier (GUID).
      */
-    public void setAgencyIdListValueId(ULong value) {
-        set(0, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -82,11 +58,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Setter for <code>oagi.agency_id_list_value.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>oagi.agency_id_list_value.value</code>. A value in the
+     * agency identification list.
      */
-    public void setGuid(String value) {
-        set(1, value);
+    public void setValue(String value) {
+        set(2, value);
     }
 
     /**
@@ -98,11 +74,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Setter for <code>oagi.agency_id_list_value.value</code>. A value in the
-     * agency identification list.
+     * Setter for <code>oagi.agency_id_list_value.name</code>. Descriptive or
+     * short name of the value.
      */
-    public void setValue(String value) {
-        set(2, value);
+    public void setName(String value) {
+        set(3, value);
     }
 
     /**
@@ -114,22 +90,6 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Setter for <code>oagi.agency_id_list_value.name</code>. Descriptive or
-     * short name of the value.
-     */
-    public void setName(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>oagi.agency_id_list_value.definition</code>. The meaning
-     * of the value.
-     */
-    public String getDefinition() {
-        return (String) get(4);
-    }
-
-    /**
      * Setter for <code>oagi.agency_id_list_value.definition</code>. The meaning
      * of the value.
      */
@@ -138,12 +98,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.definition_source</code>. This
-     * is typically a URL which indicates the source of the agency id list value
-     * DEFINITION.
+     * Getter for <code>oagi.agency_id_list_value.definition</code>. The meaning
+     * of the value.
      */
-    public String getDefinitionSource() {
-        return (String) get(5);
+    public String getDefinition() {
+        return (String) get(4);
     }
 
     /**
@@ -156,12 +115,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.owner_list_id</code>. Foreign
-     * key to the agency identification list in the AGENCY_ID_LIST table this
-     * value belongs to.
+     * Getter for <code>oagi.agency_id_list_value.definition_source</code>. This
+     * is typically a URL which indicates the source of the agency id list value
+     * DEFINITION.
      */
-    public ULong getOwnerListId() {
-        return (ULong) get(6);
+    public String getDefinitionSource() {
+        return (String) get(5);
     }
 
     /**
@@ -174,14 +133,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for
-     * <code>oagi.agency_id_list_value.based_agency_id_list_value_id</code>.
-     * Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used
-     * when the AGENCY_ID_LIST_VALUE is derived from the based
-     * AGENCY_ID_LIST_VALUE.
+     * Getter for <code>oagi.agency_id_list_value.owner_list_id</code>. Foreign
+     * key to the agency identification list in the AGENCY_ID_LIST table this
+     * value belongs to.
      */
-    public ULong getBasedAgencyIdListValueId() {
-        return (ULong) get(7);
+    public ULong getOwnerListId() {
+        return (ULong) get(6);
     }
 
     /**
@@ -196,12 +153,14 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.is_deprecated</code>.
-     * Indicates whether the code list value is deprecated and should not be
-     * reused (i.e., no new reference to this record should be allowed).
+     * Getter for
+     * <code>oagi.agency_id_list_value.based_agency_id_list_value_id</code>.
+     * Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used
+     * when the AGENCY_ID_LIST_VALUE is derived from the based
+     * AGENCY_ID_LIST_VALUE.
      */
-    public Byte getIsDeprecated() {
-        return (Byte) get(8);
+    public ULong getBasedAgencyIdListValueId() {
+        return (ULong) get(7);
     }
 
     /**
@@ -214,12 +173,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for
-     * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
-     * This refers to a replacement if the record is deprecated.
+     * Getter for <code>oagi.agency_id_list_value.is_deprecated</code>.
+     * Indicates whether the code list value is deprecated and should not be
+     * reused (i.e., no new reference to this record should be allowed).
      */
-    public ULong getReplacementAgencyIdListValueId() {
-        return (ULong) get(9);
+    public Byte getIsDeprecated() {
+        return (Byte) get(8);
     }
 
     /**
@@ -232,11 +191,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.created_by</code>. Foreign key
-     * to the APP_USER table. It indicates the user who created the code list.
+     * Getter for
+     * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
+     * This refers to a replacement if the record is deprecated.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(10);
+    public ULong getReplacementAgencyIdListValueId() {
+        return (ULong) get(9);
     }
 
     /**
@@ -248,16 +208,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.owner_user_id</code>. Foreign
-     * key to the APP_USER table. This is the user who owns the entity, is
-     * allowed to edit the entity, and who can transfer the ownership to another
-     * user.
-     * <p>
-     * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership.
+     * Getter for <code>oagi.agency_id_list_value.created_by</code>. Foreign key
+     * to the APP_USER table. It indicates the user who created the code list.
      */
-    public ULong getOwnerUserId() {
-        return (ULong) get(11);
+    public ULong getCreatedBy() {
+        return (ULong) get(10);
     }
 
     /**
@@ -265,7 +220,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * key to the APP_USER table. This is the user who owns the entity, is
      * allowed to edit the entity, and who can transfer the ownership to another
      * user.
-     * <p>
+     * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -274,12 +229,16 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.last_updated_by</code>.
-     * Foreign key to the APP_USER table. It identifies the user who last
-     * updated the code list.
+     * Getter for <code>oagi.agency_id_list_value.owner_user_id</code>. Foreign
+     * key to the APP_USER table. This is the user who owns the entity, is
+     * allowed to edit the entity, and who can transfer the ownership to another
+     * user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(12);
+    public ULong getOwnerUserId() {
+        return (ULong) get(11);
     }
 
     /**
@@ -292,11 +251,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.creation_timestamp</code>.
-     * Timestamp when the code list was created.
+     * Getter for <code>oagi.agency_id_list_value.last_updated_by</code>.
+     * Foreign key to the APP_USER table. It identifies the user who last
+     * updated the code list.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(13);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(12);
     }
 
     /**
@@ -308,11 +268,11 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
-     * Getter for <code>oagi.agency_id_list_value.last_update_timestamp</code>.
-     * Timestamp when the code list was last updated.
+     * Getter for <code>oagi.agency_id_list_value.creation_timestamp</code>.
+     * Timestamp when the code list was created.
      */
-    public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(14);
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(13);
     }
 
     /**
@@ -321,6 +281,23 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(14, value);
+    }
+
+    /**
+     * Getter for <code>oagi.agency_id_list_value.last_update_timestamp</code>.
+     * Timestamp when the code list was last updated.
+     */
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(14);
+    }
+
+    /**
+     * Setter for
+     * <code>oagi.agency_id_list_value.prev_agency_id_list_value_id</code>. A
+     * self-foreign key to indicate the previous history record.
+     */
+    public void setPrevAgencyIdListValueId(ULong value) {
+        set(15, value);
     }
 
     /**
@@ -334,16 +311,12 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
 
     /**
      * Setter for
-     * <code>oagi.agency_id_list_value.prev_agency_id_list_value_id</code>. A
-     * self-foreign key to indicate the previous history record.
+     * <code>oagi.agency_id_list_value.next_agency_id_list_value_id</code>. A
+     * self-foreign key to indicate the next history record.
      */
-    public void setPrevAgencyIdListValueId(ULong value) {
-        set(15, value);
+    public void setNextAgencyIdListValueId(ULong value) {
+        set(16, value);
     }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
 
     /**
      * Getter for
@@ -355,22 +328,17 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     // -------------------------------------------------------------------------
-    // Record17 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for
-     * <code>oagi.agency_id_list_value.next_agency_id_list_value_id</code>. A
-     * self-foreign key to indicate the next history record.
-     */
-    public void setNextAgencyIdListValueId(ULong value) {
-        set(16, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record17 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row17<ULong, String, String, String, String, String, ULong, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
@@ -733,10 +701,6 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public AgencyIdListValueRecord value17(ULong value) {
         setNextAgencyIdListValueId(value);
@@ -763,5 +727,42 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
         value16(value16);
         value17(value17);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached AgencyIdListValueRecord
+     */
+    public AgencyIdListValueRecord() {
+        super(AgencyIdListValue.AGENCY_ID_LIST_VALUE);
+    }
+
+    /**
+     * Create a detached, initialised AgencyIdListValueRecord
+     */
+    public AgencyIdListValueRecord(ULong agencyIdListValueId, String guid, String value, String name, String definition, String definitionSource, ULong ownerListId, ULong basedAgencyIdListValueId, Byte isDeprecated, ULong replacementAgencyIdListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevAgencyIdListValueId, ULong nextAgencyIdListValueId) {
+        super(AgencyIdListValue.AGENCY_ID_LIST_VALUE);
+
+        setAgencyIdListValueId(agencyIdListValueId);
+        setGuid(guid);
+        setValue(value);
+        setName(name);
+        setDefinition(definition);
+        setDefinitionSource(definitionSource);
+        setOwnerListId(ownerListId);
+        setBasedAgencyIdListValueId(basedAgencyIdListValueId);
+        setIsDeprecated(isDeprecated);
+        setReplacementAgencyIdListValueId(replacementAgencyIdListValueId);
+        setCreatedBy(createdBy);
+        setOwnerUserId(ownerUserId);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setPrevAgencyIdListValueId(prevAgencyIdListValueId);
+        setNextAgencyIdListValueId(nextAgencyIdListValueId);
+        resetChangedOnNotNull();
     }
 }

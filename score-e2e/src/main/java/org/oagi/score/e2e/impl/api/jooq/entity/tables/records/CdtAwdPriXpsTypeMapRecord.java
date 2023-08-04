@@ -17,40 +17,30 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPriXpsTypeMap;
  * This table allows for concrete mapping between the CDT Primitives and types
  * in a particular expression such as XML Schema, JSON. At this point, it is not
  * clear whether a separate table will be needed for each expression. The
- * current table holds the map to XML Schema built-in types.
- * <p>
+ * current table holds the map to XML Schema built-in types. 
+ * 
  * For each additional expression, a column similar to the XBT_ID column will
  * need to be added to this table for mapping to data types in another
  * expression.
- * <p>
+ * 
  * If we use a separate table for each expression, then we need binding all the
  * way to BDT (or even BBIE) for every new expression. That would be almost like
  * just store a BDT file. But using a column may not work with all kinds of
  * expressions, particulary if it does not map well to the XML schema data
- * types.
+ * types. 
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsTypeMapRecord> implements Record4<ULong, ULong, ULong, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached CdtAwdPriXpsTypeMapRecord
+     * Setter for
+     * <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_xps_type_map_id</code>.
+     * Internal, primary database key.
      */
-    public CdtAwdPriXpsTypeMapRecord() {
-        super(CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP);
-    }
-
-    /**
-     * Create a detached, initialised CdtAwdPriXpsTypeMapRecord
-     */
-    public CdtAwdPriXpsTypeMapRecord(ULong cdtAwdPriXpsTypeMapId, ULong cdtAwdPriId, ULong xbtId, Byte isDefault) {
-        super(CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP);
-
-        setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
-        setCdtAwdPriId(cdtAwdPriId);
-        setXbtId(xbtId);
-        setIsDefault(isDefault);
+    public void setCdtAwdPriXpsTypeMapId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -63,12 +53,11 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
     }
 
     /**
-     * Setter for
-     * <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_xps_type_map_id</code>.
-     * Internal, primary database key.
+     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_id</code>.
+     * Foreign key to the CDT_AWD_PRI table.
      */
-    public void setCdtAwdPriXpsTypeMapId(ULong value) {
-        set(0, value);
+    public void setCdtAwdPriId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -80,11 +69,14 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
     }
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_id</code>.
-     * Foreign key to the CDT_AWD_PRI table.
+     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.xbt_id</code>. Foreign key
+     * and to the XBT table. It identifies the XML schema built-in types that
+     * can be mapped to the CDT primivite identified in the CDT_AWD_PRI_ID
+     * column. The CDT primitives are typically broad and hence it usually maps
+     * to more than one XML schema built-in types.
      */
-    public void setCdtAwdPriId(ULong value) {
-        set(1, value);
+    public void setXbtId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -99,19 +91,12 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
     }
 
     /**
-     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.xbt_id</code>. Foreign key
-     * and to the XBT table. It identifies the XML schema built-in types that
-     * can be mapped to the CDT primivite identified in the CDT_AWD_PRI_ID
-     * column. The CDT primitives are typically broad and hence it usually maps
-     * to more than one XML schema built-in types.
+     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.is_default</code>.
+     * Indicating a default value domain mapping.
      */
-    public void setXbtId(ULong value) {
-        set(2, value);
+    public void setIsDefault(Byte value) {
+        set(3, value);
     }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.cdt_awd_pri_xps_type_map.is_default</code>.
@@ -122,21 +107,17 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
     }
 
     // -------------------------------------------------------------------------
-    // Record4 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.cdt_awd_pri_xps_type_map.is_default</code>.
-     * Indicating a default value domain mapping.
-     */
-    public void setIsDefault(Byte value) {
-        set(3, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record4 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
@@ -226,10 +207,6 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public CdtAwdPriXpsTypeMapRecord value4(Byte value) {
         setIsDefault(value);
@@ -243,5 +220,29 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
         value3(value3);
         value4(value4);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached CdtAwdPriXpsTypeMapRecord
+     */
+    public CdtAwdPriXpsTypeMapRecord() {
+        super(CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP);
+    }
+
+    /**
+     * Create a detached, initialised CdtAwdPriXpsTypeMapRecord
+     */
+    public CdtAwdPriXpsTypeMapRecord(ULong cdtAwdPriXpsTypeMapId, ULong cdtAwdPriId, ULong xbtId, Byte isDefault) {
+        super(CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP);
+
+        setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
+        setCdtAwdPriId(cdtAwdPriId);
+        setXbtId(xbtId);
+        setIsDefault(isDefault);
+        resetChangedOnNotNull();
     }
 }
