@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record22;
@@ -12,54 +14,23 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
 
-import java.time.LocalDateTime;
-
 
 /**
  * This table stores information about a code list. When a code list is derived
  * from another code list, the whole set of code values belonging to the based
  * code list will be copied.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implements Record22<ULong, String, String, String, String, String, String, String, String, ULong, ULong, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached CodeListRecord
+     * Setter for <code>oagi.code_list.code_list_id</code>. Internal, primary
+     * database key.
      */
-    public CodeListRecord() {
-        super(CodeList.CODE_LIST);
-    }
-
-    /**
-     * Create a detached, initialised CodeListRecord
-     */
-    public CodeListRecord(ULong codeListId, String guid, String enumTypeGuid, String name, String listId, String versionId, String definition, String remark, String definitionSource, ULong namespaceId, ULong basedCodeListId, Byte extensibleIndicator, Byte isDeprecated, ULong replacementCodeListId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong prevCodeListId, ULong nextCodeListId) {
-        super(CodeList.CODE_LIST);
-
-        setCodeListId(codeListId);
-        setGuid(guid);
-        setEnumTypeGuid(enumTypeGuid);
-        setName(name);
-        setListId(listId);
-        setVersionId(versionId);
-        setDefinition(definition);
-        setRemark(remark);
-        setDefinitionSource(definitionSource);
-        setNamespaceId(namespaceId);
-        setBasedCodeListId(basedCodeListId);
-        setExtensibleIndicator(extensibleIndicator);
-        setIsDeprecated(isDeprecated);
-        setReplacementCodeListId(replacementCodeListId);
-        setCreatedBy(createdBy);
-        setOwnerUserId(ownerUserId);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setState(state);
-        setPrevCodeListId(prevCodeListId);
-        setNextCodeListId(nextCodeListId);
+    public void setCodeListId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -71,22 +42,6 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Setter for <code>oagi.code_list.code_list_id</code>. Internal, primary
-     * database key.
-     */
-    public void setCodeListId(ULong value) {
-        set(0, value);
-    }
-
-    /**
-     * Getter for <code>oagi.code_list.guid</code>. A globally unique identifier
-     * (GUID).
-     */
-    public String getGuid() {
-        return (String) get(1);
-    }
-
-    /**
      * Setter for <code>oagi.code_list.guid</code>. A globally unique identifier
      * (GUID).
      */
@@ -95,14 +50,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.enum_type_guid</code>. In the OAGIS Model
-     * XML schema, a type, which keeps all the enumerated values, is  defined
-     * separately from the type that represents a code list. This only applies
-     * to some code lists. When that is the case, this column stores the GUID of
-     * that enumeration type.
+     * Getter for <code>oagi.code_list.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public String getEnumTypeGuid() {
-        return (String) get(2);
+    public String getGuid() {
+        return (String) get(1);
     }
 
     /**
@@ -117,10 +69,14 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.name</code>. Name of the code list.
+     * Getter for <code>oagi.code_list.enum_type_guid</code>. In the OAGIS Model
+     * XML schema, a type, which keeps all the enumerated values, is  defined
+     * separately from the type that represents a code list. This only applies
+     * to some code lists. When that is the case, this column stores the GUID of
+     * that enumeration type.
      */
-    public String getName() {
-        return (String) get(3);
+    public String getEnumTypeGuid() {
+        return (String) get(2);
     }
 
     /**
@@ -131,10 +87,10 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.list_id</code>. External identifier.
+     * Getter for <code>oagi.code_list.name</code>. Name of the code list.
      */
-    public String getListId() {
-        return (String) get(4);
+    public String getName() {
+        return (String) get(3);
     }
 
     /**
@@ -145,11 +101,10 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.version_id</code>. Code list version
-     * number.
+     * Getter for <code>oagi.code_list.list_id</code>. External identifier.
      */
-    public String getVersionId() {
-        return (String) get(5);
+    public String getListId() {
+        return (String) get(4);
     }
 
     /**
@@ -161,11 +116,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.definition</code>. Description of the
-     * code list.
+     * Getter for <code>oagi.code_list.version_id</code>. Code list version
+     * number.
      */
-    public String getDefinition() {
-        return (String) get(6);
+    public String getVersionId() {
+        return (String) get(5);
     }
 
     /**
@@ -177,11 +132,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.remark</code>. Usage information about
-     * the code list.
+     * Getter for <code>oagi.code_list.definition</code>. Description of the
+     * code list.
      */
-    public String getRemark() {
-        return (String) get(7);
+    public String getDefinition() {
+        return (String) get(6);
     }
 
     /**
@@ -193,11 +148,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.definition_source</code>. This is
-     * typically a URL which indicates the source of the code list's DEFINITION.
+     * Getter for <code>oagi.code_list.remark</code>. Usage information about
+     * the code list.
      */
-    public String getDefinitionSource() {
-        return (String) get(8);
+    public String getRemark() {
+        return (String) get(7);
     }
 
     /**
@@ -209,14 +164,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Getter for <code>oagi.code_list.definition_source</code>. This is
+     * typically a URL which indicates the source of the code list's DEFINITION.
      */
-    public ULong getNamespaceId() {
-        return (ULong) get(9);
+    public String getDefinitionSource() {
+        return (String) get(8);
     }
 
     /**
@@ -231,13 +183,14 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.based_code_list_id</code>. This is a
-     * foreign key to the CODE_LIST table itself. This identifies the code list
-     * on which this code list is based, if any. The derivation may be
-     * restriction and/or extension.
+     * Getter for <code>oagi.code_list.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. This is the namespace to which the entity belongs. This
+     * namespace column is primarily used in the case the component is a user's
+     * component because there is also a namespace assigned at the release
+     * level.
      */
-    public ULong getBasedCodeListId() {
-        return (ULong) get(10);
+    public ULong getNamespaceId() {
+        return (ULong) get(9);
     }
 
     /**
@@ -251,12 +204,13 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.extensible_indicator</code>. This is a
-     * flag to indicate whether the code list is final and shall not be further
-     * derived.
+     * Getter for <code>oagi.code_list.based_code_list_id</code>. This is a
+     * foreign key to the CODE_LIST table itself. This identifies the code list
+     * on which this code list is based, if any. The derivation may be
+     * restriction and/or extension.
      */
-    public Byte getExtensibleIndicator() {
-        return (Byte) get(11);
+    public ULong getBasedCodeListId() {
+        return (ULong) get(10);
     }
 
     /**
@@ -269,12 +223,12 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.is_deprecated</code>. Indicates whether
-     * the code list is deprecated and should not be reused (i.e., no new
-     * reference to this record should be allowed).
+     * Getter for <code>oagi.code_list.extensible_indicator</code>. This is a
+     * flag to indicate whether the code list is final and shall not be further
+     * derived.
      */
-    public Byte getIsDeprecated() {
-        return (Byte) get(12);
+    public Byte getExtensibleIndicator() {
+        return (Byte) get(11);
     }
 
     /**
@@ -287,11 +241,12 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.replacement_code_list_id</code>. This
-     * refers to a replacement if the record is deprecated.
+     * Getter for <code>oagi.code_list.is_deprecated</code>. Indicates whether
+     * the code list is deprecated and should not be reused (i.e., no new
+     * reference to this record should be allowed).
      */
-    public ULong getReplacementCodeListId() {
-        return (ULong) get(13);
+    public Byte getIsDeprecated() {
+        return (Byte) get(12);
     }
 
     /**
@@ -303,11 +258,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the code list.
+     * Getter for <code>oagi.code_list.replacement_code_list_id</code>. This
+     * refers to a replacement if the record is deprecated.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(14);
+    public ULong getReplacementCodeListId() {
+        return (ULong) get(13);
     }
 
     /**
@@ -319,22 +274,18 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
-     * <p>
-     * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership.
+     * Getter for <code>oagi.code_list.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created the code list.
      */
-    public ULong getOwnerUserId() {
-        return (ULong) get(15);
+    public ULong getCreatedBy() {
+        return (ULong) get(14);
     }
 
     /**
      * Setter for <code>oagi.code_list.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * <p>
+     * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -343,12 +294,15 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the code
-     * list.
+     * Getter for <code>oagi.code_list.owner_user_id</code>. Foreign key to the
+     * APP_USER table. This is the user who owns the entity, is allowed to edit
+     * the entity, and who can transfer the ownership to another user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(16);
+    public ULong getOwnerUserId() {
+        return (ULong) get(15);
     }
 
     /**
@@ -361,11 +315,12 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.creation_timestamp</code>. Timestamp when
-     * the code list was created.
+     * Getter for <code>oagi.code_list.last_updated_by</code>. Foreign key to
+     * the APP_USER table. It identifies the user who last updated the code
+     * list.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(17);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(16);
     }
 
     /**
@@ -377,11 +332,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.last_update_timestamp</code>. Timestamp
-     * when the code list was last updated.
+     * Getter for <code>oagi.code_list.creation_timestamp</code>. Timestamp when
+     * the code list was created.
      */
-    public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(18);
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(17);
     }
 
     /**
@@ -393,10 +348,11 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Getter for <code>oagi.code_list.state</code>.
+     * Getter for <code>oagi.code_list.last_update_timestamp</code>. Timestamp
+     * when the code list was last updated.
      */
-    public String getState() {
-        return (String) get(19);
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(18);
     }
 
     /**
@@ -404,6 +360,21 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
      */
     public void setState(String value) {
         set(19, value);
+    }
+
+    /**
+     * Getter for <code>oagi.code_list.state</code>.
+     */
+    public String getState() {
+        return (String) get(19);
+    }
+
+    /**
+     * Setter for <code>oagi.code_list.prev_code_list_id</code>. A self-foreign
+     * key to indicate the previous history record.
+     */
+    public void setPrevCodeListId(ULong value) {
+        set(20, value);
     }
 
     /**
@@ -415,16 +386,12 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     /**
-     * Setter for <code>oagi.code_list.prev_code_list_id</code>. A self-foreign
-     * key to indicate the previous history record.
+     * Setter for <code>oagi.code_list.next_code_list_id</code>. A self-foreign
+     * key to indicate the next history record.
      */
-    public void setPrevCodeListId(ULong value) {
-        set(20, value);
+    public void setNextCodeListId(ULong value) {
+        set(21, value);
     }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.code_list.next_code_list_id</code>. A self-foreign
@@ -435,21 +402,17 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
     }
 
     // -------------------------------------------------------------------------
-    // Record22 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.code_list.next_code_list_id</code>. A self-foreign
-     * key to indicate the next history record.
-     */
-    public void setNextCodeListId(ULong value) {
-        set(21, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record22 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row22<ULong, String, String, String, String, String, String, String, String, ULong, ULong, Byte, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
@@ -917,10 +880,6 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public CodeListRecord value22(ULong value) {
         setNextCodeListId(value);
@@ -952,5 +911,47 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implemen
         value21(value21);
         value22(value22);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached CodeListRecord
+     */
+    public CodeListRecord() {
+        super(CodeList.CODE_LIST);
+    }
+
+    /**
+     * Create a detached, initialised CodeListRecord
+     */
+    public CodeListRecord(ULong codeListId, String guid, String enumTypeGuid, String name, String listId, String versionId, String definition, String remark, String definitionSource, ULong namespaceId, ULong basedCodeListId, Byte extensibleIndicator, Byte isDeprecated, ULong replacementCodeListId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong prevCodeListId, ULong nextCodeListId) {
+        super(CodeList.CODE_LIST);
+
+        setCodeListId(codeListId);
+        setGuid(guid);
+        setEnumTypeGuid(enumTypeGuid);
+        setName(name);
+        setListId(listId);
+        setVersionId(versionId);
+        setDefinition(definition);
+        setRemark(remark);
+        setDefinitionSource(definitionSource);
+        setNamespaceId(namespaceId);
+        setBasedCodeListId(basedCodeListId);
+        setExtensibleIndicator(extensibleIndicator);
+        setIsDeprecated(isDeprecated);
+        setReplacementCodeListId(replacementCodeListId);
+        setCreatedBy(createdBy);
+        setOwnerUserId(ownerUserId);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setState(state);
+        setPrevCodeListId(prevCodeListId);
+        setNextCodeListId(nextCodeListId);
+        resetChangedOnNotNull();
     }
 }

@@ -4,8 +4,24 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Function3;
+import org.jooq.Identity;
+import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Records;
+import org.jooq.Row3;
+import org.jooq.Schema;
+import org.jooq.SelectField;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -14,38 +30,44 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UserTenantRecord;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
 
 /**
  * This table captures the tenant roles of the user
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UserTenant extends TableImpl<UserTenantRecord> {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.user_tenant</code>
      */
     public static final UserTenant USER_TENANT = new UserTenant();
-    private static final long serialVersionUID = 1L;
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<UserTenantRecord> getRecordType() {
+        return UserTenantRecord.class;
+    }
+
     /**
      * The column <code>oagi.user_tenant.user_tenant_id</code>. Primary key
      * column.
      */
     public final TableField<UserTenantRecord, ULong> USER_TENANT_ID = createField(DSL.name("user_tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+
     /**
      * The column <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
      * the user.
      */
     public final TableField<UserTenantRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Assigned tenant to the user.");
+
     /**
      * The column <code>oagi.user_tenant.app_user_id</code>. Application user.
      */
     public final TableField<UserTenantRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Application user.");
-    private transient Tenant _tenant;
-    private transient AppUser _appUser;
 
     private UserTenant(Name alias, Table<UserTenantRecord> aliased) {
         this(alias, aliased, null);
@@ -80,14 +102,6 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
         super(child, key, USER_TENANT);
     }
 
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<UserTenantRecord> getRecordType() {
-        return UserTenantRecord.class;
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -112,6 +126,9 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     public List<ForeignKey<UserTenantRecord, ?>> getReferences() {
         return Arrays.asList(Keys.USER_TENANT_TENANT_ID_FK, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK);
     }
+
+    private transient Tenant _tenant;
+    private transient AppUser _appUser;
 
     /**
      * Get the implicit join path to the <code>oagi.tenant</code> table.

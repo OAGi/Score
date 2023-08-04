@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jooq.impl.DSL.and;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE_SET;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE_SET_RELEASE;
 
 public class DSLContextModuleSetReleaseAPIImpl implements ModuleSetReleaseAPI {

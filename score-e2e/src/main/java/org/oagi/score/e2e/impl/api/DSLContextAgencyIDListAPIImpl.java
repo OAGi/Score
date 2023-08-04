@@ -2,7 +2,6 @@ package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.JSON;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
@@ -70,7 +69,7 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(agencyIDList.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"agencyIdList\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"agencyIdList\"}");
         dummyLogRecord.setCreatedBy(agencyIdListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(agencyIdListRecord.getCreationTimestamp());
 
