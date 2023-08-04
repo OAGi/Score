@@ -69,13 +69,13 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
      * The column <code>oagi.ctx_scheme_value.value</code>. A short value for
      * the scheme value similar to the code list value.
      */
-    public final TableField<CtxSchemeValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "A short value for the scheme value similar to the code list value.");
+    public final TableField<CtxSchemeValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "A short value for the scheme value similar to the code list value.");
 
     /**
      * The column <code>oagi.ctx_scheme_value.meaning</code>. The description,
      * explanatiion of the scheme value.
      */
-    public final TableField<CtxSchemeValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB, this, "The description, explanatiion of the scheme value.");
+    public final TableField<CtxSchemeValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description, explanatiion of the scheme value.");
 
     /**
      * The column <code>oagi.ctx_scheme_value.owner_ctx_scheme_id</code>.

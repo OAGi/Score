@@ -60,7 +60,7 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     /**
      * The column <code>oagi.ascc_manifest.release_id</code>.
      */
-    public final TableField<AsccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.ascc_manifest.ascc_id</code>.
@@ -70,7 +70,7 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     /**
      * The column <code>oagi.ascc_manifest.seq_key_id</code>.
      */
-    public final TableField<AsccManifestRecord, ULong> SEQ_KEY_ID = createField(DSL.name("seq_key_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccManifestRecord, ULong> SEQ_KEY_ID = createField(DSL.name("seq_key_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.ascc_manifest.from_acc_manifest_id</code>.
@@ -86,23 +86,23 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
      * The column <code>oagi.ascc_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<AsccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<AsccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.ascc_manifest.replacement_ascc_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<AsccManifestRecord, ULong> REPLACEMENT_ASCC_MANIFEST_ID = createField(DSL.name("replacement_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<AsccManifestRecord, ULong> REPLACEMENT_ASCC_MANIFEST_ID = createField(DSL.name("replacement_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.ascc_manifest.prev_ascc_manifest_id</code>.
      */
-    public final TableField<AsccManifestRecord, ULong> PREV_ASCC_MANIFEST_ID = createField(DSL.name("prev_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccManifestRecord, ULong> PREV_ASCC_MANIFEST_ID = createField(DSL.name("prev_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.ascc_manifest.next_ascc_manifest_id</code>.
      */
-    public final TableField<AsccManifestRecord, ULong> NEXT_ASCC_MANIFEST_ID = createField(DSL.name("next_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccManifestRecord, ULong> NEXT_ASCC_MANIFEST_ID = createField(DSL.name("next_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AsccManifest(Name alias, Table<AsccManifestRecord> aliased) {
         this(alias, aliased, null);

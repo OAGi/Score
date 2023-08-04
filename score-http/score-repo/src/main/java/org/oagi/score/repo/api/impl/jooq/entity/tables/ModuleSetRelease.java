@@ -81,14 +81,14 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
      * The column <code>oagi.module_set_release.description</code>. Description
      * or explanation about the module set release.
      */
-    public final TableField<ModuleSetReleaseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Description or explanation about the module set release.");
+    public final TableField<ModuleSetReleaseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description or explanation about the module set release.");
 
     /**
      * The column <code>oagi.module_set_release.is_default</code>. It would be a
      * default module set if this indicator is checked. Otherwise, it would be
      * an optional.
      */
-    public final TableField<ModuleSetReleaseRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "It would be a default module set if this indicator is checked. Otherwise, it would be an optional.");
+    public final TableField<ModuleSetReleaseRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "It would be a default module set if this indicator is checked. Otherwise, it would be an optional.");
 
     /**
      * The column <code>oagi.module_set_release.created_by</code>. Foreign key

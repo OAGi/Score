@@ -11,7 +11,7 @@ cd ..
 
 echo "Preparing files..."
 cp score-http/target/score-http-3.1.0-alpha.war docker
-cp ~/.m2/repository/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar docker
+cp ~/.m2/repository/org/mariadb/jdbc/mariadb-java-client/3.1.4/mariadb-java-client-3.1.4.jar docker
 
 echo "Building docker image..."
 cd docker

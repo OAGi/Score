@@ -74,7 +74,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
      * The column <code>oagi.business_term.definition</code>. Definition of the
      * business term.
      */
-    public final TableField<BusinessTermRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Definition of the business term.");
+    public final TableField<BusinessTermRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Definition of the business term.");
 
     /**
      * The column <code>oagi.business_term.created_by</code>. A foreign key
@@ -112,13 +112,13 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
      * The column <code>oagi.business_term.external_ref_id</code>. TODO:
      * Definition is missing.
      */
-    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_ID = createField(DSL.name("external_ref_id"), SQLDataType.VARCHAR(100), this, "TODO: Definition is missing.");
+    public final TableField<BusinessTermRecord, String> EXTERNAL_REF_ID = createField(DSL.name("external_ref_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "TODO: Definition is missing.");
 
     /**
      * The column <code>oagi.business_term.comment</code>. Comment of the
      * business term.
      */
-    public final TableField<BusinessTermRecord, String> COMMENT = createField(DSL.name("comment"), SQLDataType.CLOB, this, "Comment of the business term.");
+    public final TableField<BusinessTermRecord, String> COMMENT = createField(DSL.name("comment"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Comment of the business term.");
 
     private BusinessTerm(Name alias, Table<BusinessTermRecord> aliased) {
         this(alias, aliased, null);

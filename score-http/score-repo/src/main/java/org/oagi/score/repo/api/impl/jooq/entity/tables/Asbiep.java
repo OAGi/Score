@@ -78,7 +78,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     /**
      * The column <code>oagi.asbiep.path</code>.
      */
-    public final TableField<AsbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB, this, "");
+    public final TableField<AsbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.asbiep.hash_path</code>. hash_path generated from
@@ -101,7 +101,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * derived from the based ASCCP on the UI, expression generation, and any
      * API.
      */
-    public final TableField<AsbiepRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "A definition to override the ASCCP's definition. If NULL, it means that the definition should be derived from the based ASCCP on the UI, expression generation, and any API.");
+    public final TableField<AsbiepRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A definition to override the ASCCP's definition. If NULL, it means that the definition should be derived from the based ASCCP on the UI, expression generation, and any API.");
 
     /**
      * The column <code>oagi.asbiep.remark</code>. This column allows the user
@@ -114,7 +114,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * captured in the Definition of the ASBIEP. A remark about that ASBIEP may
      * be "Type of BOM should be recognized in the BOM/typeCode."
      */
-    public final TableField<AsbiepRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225), this, "This column allows the user to specify a context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ASBIEP can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ASBIEP. A remark about that ASBIEP may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
+    public final TableField<AsbiepRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify a context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ASBIEP can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ASBIEP. A remark about that ASBIEP may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
 
     /**
      * The column <code>oagi.asbiep.biz_term</code>. This column represents a
@@ -122,7 +122,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * context. With this current design, only one business term is allowed per
      * business context.
      */
-    public final TableField<AsbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225), this, "This column represents a business term to indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
+    public final TableField<AsbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column represents a business term to indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
 
     /**
      * The column <code>oagi.asbiep.created_by</code>. A foreign key referring

@@ -60,19 +60,19 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
      * The column <code>oagi.configuration.name</code>. The name of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "The name of configuration property.");
+    public final TableField<ConfigurationRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of configuration property.");
 
     /**
      * The column <code>oagi.configuration.type</code>. The type of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(100), this, "The type of configuration property.");
+    public final TableField<ConfigurationRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The type of configuration property.");
 
     /**
      * The column <code>oagi.configuration.value</code>. The value of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100), this, "The value of configuration property.");
+    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The value of configuration property.");
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased) {
         this(alias, aliased, null);

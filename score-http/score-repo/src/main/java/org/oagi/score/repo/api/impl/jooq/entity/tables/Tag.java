@@ -67,7 +67,7 @@ public class Tag extends TableImpl<TagRecord> {
     /**
      * The column <code>oagi.tag.description</code>. The description of the tag.
      */
-    public final TableField<TagRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "The description of the tag.");
+    public final TableField<TagRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description of the tag.");
 
     /**
      * The column <code>oagi.tag.text_color</code>. The text color of the tag.

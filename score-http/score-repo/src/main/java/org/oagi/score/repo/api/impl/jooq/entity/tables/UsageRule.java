@@ -63,7 +63,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
      * The column <code>oagi.usage_rule.name</code>. Short nmenomic name of the
      * usage rule.
      */
-    public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB, this, "Short nmenomic name of the usage rule.");
+    public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Short nmenomic name of the usage rule.");
 
     /**
      * The column <code>oagi.usage_rule.condition_type</code>. Condition type

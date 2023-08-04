@@ -65,7 +65,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * The column <code>oagi.top_level_asbiep.asbiep_id</code>. Foreign key to
      * the ASBIEP table pointing to a record which is a top-level ASBIEP.
      */
-    public final TableField<TopLevelAsbiepRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the ASBIEP table pointing to a record which is a top-level ASBIEP.");
+    public final TableField<TopLevelAsbiepRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the ASBIEP table pointing to a record which is a top-level ASBIEP.");
 
     /**
      * The column <code>oagi.top_level_asbiep.owner_user_id</code>.
@@ -76,7 +76,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * The column <code>oagi.top_level_asbiep.last_update_timestamp</code>. The
      * timestamp when among all related bie records was last updated.
      */
-    public final TableField<TopLevelAsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "The timestamp when among all related bie records was last updated.");
+    public final TableField<TopLevelAsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "The timestamp when among all related bie records was last updated.");
 
     /**
      * The column <code>oagi.top_level_asbiep.last_updated_by</code>. A foreign
@@ -96,7 +96,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * version number assigned by the user. This column is only used by the
      * top-level ASBIEP. No format of version is enforced.
      */
-    public final TableField<TopLevelAsbiepRecord, String> VERSION = createField(DSL.name("version"), SQLDataType.VARCHAR(45), this, "This column hold a version number assigned by the user. This column is only used by the top-level ASBIEP. No format of version is enforced.");
+    public final TableField<TopLevelAsbiepRecord, String> VERSION = createField(DSL.name("version"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column hold a version number assigned by the user. This column is only used by the top-level ASBIEP. No format of version is enforced.");
 
     /**
      * The column <code>oagi.top_level_asbiep.status</code>. This is different
@@ -106,39 +106,39 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * Example values are ?Prototype?, ?Test?, and ?Production?. Only the
      * top-level ASBIEP can use this field.
      */
-    public final TableField<TopLevelAsbiepRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(45), this, "This is different from the STATE column which is CRUD life cycle of an entity. The use case for this is to allow the user to indicate the usage status of a top-level ASBIEP (a profile BOD). An integration architect can use this column. Example values are ?Prototype?, ?Test?, and ?Production?. Only the top-level ASBIEP can use this field.");
+    public final TableField<TopLevelAsbiepRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is different from the STATE column which is CRUD life cycle of an entity. The use case for this is to allow the user to indicate the usage status of a top-level ASBIEP (a profile BOD). An integration architect can use this column. Example values are ?Prototype?, ?Test?, and ?Production?. Only the top-level ASBIEP can use this field.");
 
     /**
      * The column <code>oagi.top_level_asbiep.state</code>.
      */
-    public final TableField<TopLevelAsbiepRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "");
+    public final TableField<TopLevelAsbiepRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.top_level_asbiep.inverse_mode</code>. If this is
      * true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be
      * treated as used BIEs.
      */
-    public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
+    public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
 
     /**
      * The column <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
      * A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has
      * linked to this record.
      */
-    public final TableField<TopLevelAsbiepRecord, ULong> SOURCE_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("source_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has linked to this record.");
+    public final TableField<TopLevelAsbiepRecord, ULong> SOURCE_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("source_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has linked to this record.");
 
     /**
      * The column <code>oagi.top_level_asbiep.source_action</code>. An action
      * that had used to create a reference from the source (e.g., 'Copy' or
      * 'Uplift'.)
      */
-    public final TableField<TopLevelAsbiepRecord, String> SOURCE_ACTION = createField(DSL.name("source_action"), SQLDataType.VARCHAR(20), this, "An action that had used to create a reference from the source (e.g., 'Copy' or 'Uplift'.)");
+    public final TableField<TopLevelAsbiepRecord, String> SOURCE_ACTION = createField(DSL.name("source_action"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "An action that had used to create a reference from the source (e.g., 'Copy' or 'Uplift'.)");
 
     /**
      * The column <code>oagi.top_level_asbiep.source_timestamp</code>. A
      * timestamp when a source reference had been made.
      */
-    public final TableField<TopLevelAsbiepRecord, LocalDateTime> SOURCE_TIMESTAMP = createField(DSL.name("source_timestamp"), SQLDataType.LOCALDATETIME(6), this, "A timestamp when a source reference had been made.");
+    public final TableField<TopLevelAsbiepRecord, LocalDateTime> SOURCE_TIMESTAMP = createField(DSL.name("source_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "A timestamp when a source reference had been made.");
 
     private TopLevelAsbiep(Name alias, Table<TopLevelAsbiepRecord> aliased) {
         this(alias, aliased, null);
