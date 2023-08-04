@@ -19,27 +19,17 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
  * USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create
  * a usage rule expression with the unstructured constraint type.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implements Record3<ULong, String, Integer> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached UsageRuleRecord
+     * Setter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * usage rule.
      */
-    public UsageRuleRecord() {
-        super(UsageRule.USAGE_RULE);
-    }
-
-    /**
-     * Create a detached, initialised UsageRuleRecord
-     */
-    public UsageRuleRecord(ULong usageRuleId, String name, Integer conditionType) {
-        super(UsageRule.USAGE_RULE);
-
-        setUsageRuleId(usageRuleId);
-        setName(name);
-        setConditionType(conditionType);
+    public void setUsageRuleId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -51,11 +41,11 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * Setter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
      * usage rule.
      */
-    public void setUsageRuleId(ULong value) {
-        set(0, value);
+    public void setName(String value) {
+        set(1, value);
     }
 
     /**
@@ -67,16 +57,13 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
-     * usage rule.
+     * Setter for <code>oagi.usage_rule.condition_type</code>. Condition type
+     * according to the CC specification. It is a value list column. 0 =
+     * pre-condition, 1 = post-condition, 2 = invariant.
      */
-    public void setName(String value) {
-        set(1, value);
+    public void setConditionType(Integer value) {
+        set(2, value);
     }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.usage_rule.condition_type</code>. Condition type
@@ -88,22 +75,17 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
     }
 
     // -------------------------------------------------------------------------
-    // Record3 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.usage_rule.condition_type</code>. Condition type
-     * according to the CC specification. It is a value list column. 0 =
-     * pre-condition, 1 = post-condition, 2 = invariant.
-     */
-    public void setConditionType(Integer value) {
-        set(2, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record3 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row3<ULong, String, Integer> fieldsRow() {
@@ -172,10 +154,6 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public UsageRuleRecord value3(Integer value) {
         setConditionType(value);
@@ -188,5 +166,28 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
         value2(value2);
         value3(value3);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached UsageRuleRecord
+     */
+    public UsageRuleRecord() {
+        super(UsageRule.USAGE_RULE);
+    }
+
+    /**
+     * Create a detached, initialised UsageRuleRecord
+     */
+    public UsageRuleRecord(ULong usageRuleId, String name, Integer conditionType) {
+        super(UsageRule.USAGE_RULE);
+
+        setUsageRuleId(usageRuleId);
+        setName(name);
+        setConditionType(conditionType);
+        resetChangedOnNotNull();
     }
 }

@@ -4,8 +4,22 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.util.function.Function;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Function4;
+import org.jooq.Identity;
+import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Records;
+import org.jooq.Row4;
+import org.jooq.Schema;
+import org.jooq.SelectField;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -14,47 +28,58 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ConfigurationRecord;
 
-import java.util.function.Function;
-
 
 /**
  * The table stores configuration properties of the application.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Configuration extends TableImpl<ConfigurationRecord> {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.configuration</code>
      */
     public static final Configuration CONFIGURATION = new Configuration();
-    private static final long serialVersionUID = 1L;
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<ConfigurationRecord> getRecordType() {
+        return ConfigurationRecord.class;
+    }
+
     /**
      * The column <code>oagi.configuration.configuration_id</code>. Primary key
      * column.
      */
     public final TableField<ConfigurationRecord, ULong> CONFIGURATION_ID = createField(DSL.name("configuration_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+
     /**
      * The column <code>oagi.configuration.name</code>. The name of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "The name of configuration property.");
+    public final TableField<ConfigurationRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of configuration property.");
+
     /**
      * The column <code>oagi.configuration.type</code>. The type of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(100), this, "The type of configuration property.");
+    public final TableField<ConfigurationRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The type of configuration property.");
+
     /**
      * The column <code>oagi.configuration.value</code>. The value of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100), this, "The value of configuration property.");
+    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The value of configuration property.");
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased) {
         this(alias, aliased, null);
     }
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application. "), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table());
     }
 
     /**
@@ -80,14 +105,6 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
 
     public <O extends Record> Configuration(Table<O> child, ForeignKey<O, ConfigurationRecord> key) {
         super(child, key, CONFIGURATION);
-    }
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<ConfigurationRecord> getRecordType() {
-        return ConfigurationRecord.class;
     }
 
     @Override

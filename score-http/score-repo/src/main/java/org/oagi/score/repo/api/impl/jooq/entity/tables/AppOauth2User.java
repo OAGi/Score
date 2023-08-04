@@ -64,7 +64,7 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
      * the record in `app_user`. If it is not set, this is treated as a pending
      * record.
      */
-    public final TableField<AppOauth2UserRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference to the record in `app_user`. If it is not set, this is treated as a pending record.");
+    public final TableField<AppOauth2UserRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference to the record in `app_user`. If it is not set, this is treated as a pending record.");
 
     /**
      * The column <code>oagi.app_oauth2_user.oauth2_app_id</code>. A reference
@@ -82,31 +82,31 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
      * The column <code>oagi.app_oauth2_user.name</code>. `name` claim defined
      * in OIDC spec.
      */
-    public final TableField<AppOauth2UserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(200), this, "`name` claim defined in OIDC spec.");
+    public final TableField<AppOauth2UserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "`name` claim defined in OIDC spec.");
 
     /**
      * The column <code>oagi.app_oauth2_user.email</code>. `email` claim defined
      * in OIDC spec.
      */
-    public final TableField<AppOauth2UserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200), this, "`email` claim defined in OIDC spec.");
+    public final TableField<AppOauth2UserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "`email` claim defined in OIDC spec.");
 
     /**
      * The column <code>oagi.app_oauth2_user.nickname</code>. `nickname` claim
      * defined in OIDC spec.
      */
-    public final TableField<AppOauth2UserRecord, String> NICKNAME = createField(DSL.name("nickname"), SQLDataType.VARCHAR(200), this, "`nickname` claim defined in OIDC spec.");
+    public final TableField<AppOauth2UserRecord, String> NICKNAME = createField(DSL.name("nickname"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "`nickname` claim defined in OIDC spec.");
 
     /**
      * The column <code>oagi.app_oauth2_user.preferred_username</code>.
      * `preferred_username` claim defined in OIDC spec.
      */
-    public final TableField<AppOauth2UserRecord, String> PREFERRED_USERNAME = createField(DSL.name("preferred_username"), SQLDataType.VARCHAR(200), this, "`preferred_username` claim defined in OIDC spec.");
+    public final TableField<AppOauth2UserRecord, String> PREFERRED_USERNAME = createField(DSL.name("preferred_username"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "`preferred_username` claim defined in OIDC spec.");
 
     /**
      * The column <code>oagi.app_oauth2_user.phone_number</code>. `phone_number`
      * claim defined in OIDC spec.
      */
-    public final TableField<AppOauth2UserRecord, String> PHONE_NUMBER = createField(DSL.name("phone_number"), SQLDataType.VARCHAR(200), this, "`phone_number` claim defined in OIDC spec.");
+    public final TableField<AppOauth2UserRecord, String> PHONE_NUMBER = createField(DSL.name("phone_number"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "`phone_number` claim defined in OIDC spec.");
 
     /**
      * The column <code>oagi.app_oauth2_user.creation_timestamp</code>.

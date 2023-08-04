@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record11;
@@ -12,41 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
 
-import java.time.LocalDateTime;
-
 
 /**
  * The is table store the release information.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements Record11<ULong, String, String, String, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached ReleaseRecord
+     * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
+     * interpreted to be released later than the other.
      */
-    public ReleaseRecord() {
-        super(Release.RELEASE);
-    }
-
-    /**
-     * Create a detached, initialised ReleaseRecord
-     */
-    public ReleaseRecord(ULong releaseId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state) {
-        super(Release.RELEASE);
-
-        setReleaseId(releaseId);
-        setGuid(guid);
-        setReleaseNum(releaseNum);
-        setReleaseNote(releaseNote);
-        setReleaseLicense(releaseLicense);
-        setNamespaceId(namespaceId);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setState(state);
+    public void setReleaseId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -59,12 +42,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
-     * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
-     * interpreted to be released later than the other.
+     * Setter for <code>oagi.release.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public void setReleaseId(ULong value) {
-        set(0, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -76,35 +58,19 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Setter for <code>oagi.release.guid</code>. A globally unique identifier
-     * (GUID).
-     */
-    public void setGuid(String value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>oagi.release.release_num</code>. Release number such has
-     * 10.0, 10.1, etc.
-     */
-    public String getReleaseNum() {
-        return (String) get(2);
-    }
-
-    /**
      * Setter for <code>oagi.release.release_num</code>. Release number such has
-     * 10.0, 10.1, etc.
+     * 10.0, 10.1, etc. 
      */
     public void setReleaseNum(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_note</code>. Description or note
-     * associated with the release.
+     * Getter for <code>oagi.release.release_num</code>. Release number such has
+     * 10.0, 10.1, etc. 
      */
-    public String getReleaseNote() {
-        return (String) get(3);
+    public String getReleaseNum() {
+        return (String) get(2);
     }
 
     /**
@@ -116,11 +82,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.release_license</code>. License associated
-     * with the release.
+     * Getter for <code>oagi.release.release_note</code>. Description or note
+     * associated with the release.
      */
-    public String getReleaseLicense() {
-        return (String) get(4);
+    public String getReleaseNote() {
+        return (String) get(3);
     }
 
     /**
@@ -132,15 +98,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. It identifies the namespace used with the release. It is
-     * particularly useful for a library that uses a single namespace such like
-     * the OAGIS 10.x. A library that uses multiple namespace but has a main
-     * namespace may also use this column as a specific namespace can be
-     * override at the module level.
+     * Getter for <code>oagi.release.release_license</code>. License associated
+     * with the release.
      */
-    public ULong getNamespaceId() {
-        return (ULong) get(5);
+    public String getReleaseLicense() {
+        return (String) get(4);
     }
 
     /**
@@ -156,11 +118,15 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Getter for <code>oagi.release.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. It identifies the namespace used with the release. It is
+     * particularly useful for a library that uses a single namespace such like
+     * the OAGIS 10.x. A library that uses multiple namespace but has a main
+     * namespace may also use this column as a specific namespace can be
+     * override at the module level.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(6);
+    public ULong getNamespaceId() {
+        return (ULong) get(5);
     }
 
     /**
@@ -172,11 +138,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.last_updated_by</code>. Foreign key to the
-     * APP_USER table identifying the user who last updated the record.
+     * Getter for <code>oagi.release.created_by</code>. Foreign key to the
+     * APP_USER table identifying user who created the namespace.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(7);
+    public ULong getCreatedBy() {
+        return (ULong) get(6);
     }
 
     /**
@@ -188,11 +154,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Getter for <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(8);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(7);
     }
 
     /**
@@ -204,11 +170,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     /**
-     * Getter for <code>oagi.release.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Getter for <code>oagi.release.creation_timestamp</code>. The timestamp
+     * when the record was first created.
      */
-    public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(9);
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(8);
     }
 
     /**
@@ -219,9 +185,21 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
         set(9, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.release.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
+     */
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(9);
+    }
+
+    /**
+     * Setter for <code>oagi.release.state</code>. This indicates the revision
+     * life cycle state of the Release.
+     */
+    public void setState(String value) {
+        set(10, value);
+    }
 
     /**
      * Getter for <code>oagi.release.state</code>. This indicates the revision
@@ -232,21 +210,17 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Record11 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.release.state</code>. This indicates the revision
-     * life cycle state of the Release.
-     */
-    public void setState(String value) {
-        set(10, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record11 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row11<ULong, String, String, String, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String> fieldsRow() {
@@ -483,10 +457,6 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public ReleaseRecord value11(String value) {
         setState(value);
@@ -507,5 +477,36 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
         value10(value10);
         value11(value11);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached ReleaseRecord
+     */
+    public ReleaseRecord() {
+        super(Release.RELEASE);
+    }
+
+    /**
+     * Create a detached, initialised ReleaseRecord
+     */
+    public ReleaseRecord(ULong releaseId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state) {
+        super(Release.RELEASE);
+
+        setReleaseId(releaseId);
+        setGuid(guid);
+        setReleaseNum(releaseNum);
+        setReleaseNote(releaseNote);
+        setReleaseLicense(releaseLicense);
+        setNamespaceId(namespaceId);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setState(state);
+        resetChangedOnNotNull();
     }
 }

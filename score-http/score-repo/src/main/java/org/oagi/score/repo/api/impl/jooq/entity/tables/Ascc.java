@@ -88,7 +88,7 @@ public class Ascc extends TableImpl<AsccRecord> {
      * other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs
      * of the former ACC starts at 1 again.
      */
-    public final TableField<AsccRecord, Integer> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.INTEGER, this, "@deprecated since 2.0.0. This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again.");
+    public final TableField<AsccRecord, Integer> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "@deprecated since 2.0.0. This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again.");
 
     /**
      * The column <code>oagi.ascc.from_acc_id</code>. FROM_ACC_ID is a foreign
@@ -121,26 +121,26 @@ public class Ascc extends TableImpl<AsccRecord> {
      * specific description about the relationship between the ACC (as in
      * FROM_ACC_ID) and the ASCCP.
      */
-    public final TableField<AsccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID column) and the ACC under that ASCCP, definition in the ASCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the ASCCP.");
+    public final TableField<AsccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID column) and the ACC under that ASCCP, definition in the ASCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the ASCCP.");
 
     /**
      * The column <code>oagi.ascc.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<AsccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<AsccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.ascc.is_deprecated</code>. Indicates whether the CC
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
-    public final TableField<AsccRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
+    public final TableField<AsccRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
      * The column <code>oagi.ascc.replacement_ascc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<AsccRecord, ULong> REPLACEMENT_ASCC_ID = createField(DSL.name("replacement_ascc_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<AsccRecord, ULong> REPLACEMENT_ASCC_ID = createField(DSL.name("replacement_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.ascc.created_by</code>. A foreign key to the
@@ -197,19 +197,19 @@ public class Ascc extends TableImpl<AsccRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<AsccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<AsccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.ascc.prev_ascc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<AsccRecord, ULong> PREV_ASCC_ID = createField(DSL.name("prev_ascc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<AsccRecord, ULong> PREV_ASCC_ID = createField(DSL.name("prev_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.ascc.next_ascc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<AsccRecord, ULong> NEXT_ASCC_ID = createField(DSL.name("next_ascc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<AsccRecord, ULong> NEXT_ASCC_ID = createField(DSL.name("next_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Ascc(Name alias, Table<AsccRecord> aliased) {
         this(alias, aliased, null);

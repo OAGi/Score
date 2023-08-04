@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record9;
@@ -12,40 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm;
 
-import java.time.LocalDateTime;
-
 
 /**
  * The bbie_bizterm table stores information about the aggregation between the
  * bbie_bizterm and BBIE. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
-public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> implements Record9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> {
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> implements Record9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached BbieBiztermRecord
+     * Setter for <code>oagi.bbie_bizterm.bbie_bizterm_id</code>. An internal,
+     * primary database key of an bbie_bizterm record.
      */
-    public BbieBiztermRecord() {
-        super(BbieBizterm.BBIE_BIZTERM);
-    }
-
-    /**
-     * Create a detached, initialised BbieBiztermRecord
-     */
-    public BbieBiztermRecord(ULong bbieBiztermId, ULong bccBiztermId, ULong bbieId, String primaryIndicator, String typeCode, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(BbieBizterm.BBIE_BIZTERM);
-
-        setBbieBiztermId(bbieBiztermId);
-        setBccBiztermId(bccBiztermId);
-        setBbieId(bbieId);
-        setPrimaryIndicator(primaryIndicator);
-        setTypeCode(typeCode);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
+    public void setBbieBiztermId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -57,11 +41,11 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bbie_bizterm_id</code>. An internal,
-     * primary database key of an bbie_bizterm record.
+     * Setter for <code>oagi.bbie_bizterm.bcc_bizterm_id</code>. An internal ID
+     * of the bbie_bizterm record.
      */
-    public void setBbieBiztermId(ULong value) {
-        set(0, value);
+    public void setBccBiztermId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -73,11 +57,11 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bcc_bizterm_id</code>. An internal ID
-     * of the bbie_bizterm record.
+     * Setter for <code>oagi.bbie_bizterm.bbie_id</code>. An internal ID of the
+     * associated BBIE
      */
-    public void setBccBiztermId(ULong value) {
-        set(1, value);
+    public void setBbieId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -89,35 +73,19 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bbie_id</code>. An internal ID of the
-     * associated BBIE
+     * Setter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
+     * indicator shows if the business term is primary for the assigned BBIE.
      */
-    public void setBbieId(ULong value) {
-        set(2, value);
+    public void setPrimaryIndicator(Byte value) {
+        set(3, value);
     }
 
     /**
      * Getter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
      * indicator shows if the business term is primary for the assigned BBIE.
      */
-    public String getPrimaryIndicator() {
-        return (String) get(3);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned BBIE.
-     */
-    public void setPrimaryIndicator(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie_bizterm.type_code</code>. The type code of the
-     * assignment.
-     */
-    public String getTypeCode() {
-        return (String) get(4);
+    public Byte getPrimaryIndicator() {
+        return (Byte) get(3);
     }
 
     /**
@@ -129,12 +97,11 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the bbie_bizterm record. The creator of
-     * the asbie_bizterm is also its owner by default.
+     * Getter for <code>oagi.bbie_bizterm.type_code</code>. The type code of the
+     * assignment.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(5);
+    public String getTypeCode() {
+        return (String) get(4);
     }
 
     /**
@@ -147,12 +114,12 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the bbie_bizterm record. This
-     * may be the user who is in the same group as the creator.
+     * Getter for <code>oagi.bbie_bizterm.created_by</code>. A foreign key
+     * referring to the user who creates the bbie_bizterm record. The creator of
+     * the asbie_bizterm is also its owner by default.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(6);
+    public ULong getCreatedBy() {
+        return (ULong) get(5);
     }
 
     /**
@@ -165,11 +132,12 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the bbie_bizterm record was first created.
+     * Getter for <code>oagi.bbie_bizterm.last_updated_by</code>. A foreign key
+     * referring to the last user who has updated the bbie_bizterm record. This
+     * may be the user who is in the same group as the creator.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(7);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(6);
     }
 
     /**
@@ -180,9 +148,21 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
         set(7, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.bbie_bizterm.creation_timestamp</code>. Timestamp
+     * when the bbie_bizterm record was first created.
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(7);
+    }
+
+    /**
+     * Setter for <code>oagi.bbie_bizterm.last_update_timestamp</code>. The
+     * timestamp when the bbie_bizterm was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(8, value);
+    }
 
     /**
      * Getter for <code>oagi.bbie_bizterm.last_update_timestamp</code>. The
@@ -193,29 +173,25 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     // -------------------------------------------------------------------------
-    // Record9 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.bbie_bizterm.last_update_timestamp</code>. The
-     * timestamp when the bbie_bizterm was last updated.
-     */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(8, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
 
+    // -------------------------------------------------------------------------
+    // Record9 type implementation
+    // -------------------------------------------------------------------------
+
     @Override
-    public Row9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 
     @Override
-    public Row9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
+    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
         return (Row9) super.valuesRow();
     }
 
@@ -235,7 +211,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public Field<String> field4() {
+    public Field<Byte> field4() {
         return BbieBizterm.BBIE_BIZTERM.PRIMARY_INDICATOR;
     }
 
@@ -280,7 +256,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public String component4() {
+    public Byte component4() {
         return getPrimaryIndicator();
     }
 
@@ -325,7 +301,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public String value4() {
+    public Byte value4() {
         return getPrimaryIndicator();
     }
 
@@ -373,7 +349,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public BbieBiztermRecord value4(String value) {
+    public BbieBiztermRecord value4(Byte value) {
         setPrimaryIndicator(value);
         return this;
     }
@@ -402,10 +378,6 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public BbieBiztermRecord value9(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -413,7 +385,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public BbieBiztermRecord values(ULong value1, ULong value2, ULong value3, String value4, String value5, ULong value6, ULong value7, LocalDateTime value8, LocalDateTime value9) {
+    public BbieBiztermRecord values(ULong value1, ULong value2, ULong value3, Byte value4, String value5, ULong value6, ULong value7, LocalDateTime value8, LocalDateTime value9) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -424,5 +396,34 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
         value8(value8);
         value9(value9);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached BbieBiztermRecord
+     */
+    public BbieBiztermRecord() {
+        super(BbieBizterm.BBIE_BIZTERM);
+    }
+
+    /**
+     * Create a detached, initialised BbieBiztermRecord
+     */
+    public BbieBiztermRecord(ULong bbieBiztermId, ULong bccBiztermId, ULong bbieId, Byte primaryIndicator, String typeCode, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(BbieBizterm.BBIE_BIZTERM);
+
+        setBbieBiztermId(bbieBiztermId);
+        setBccBiztermId(bccBiztermId);
+        setBbieId(bbieId);
+        setPrimaryIndicator(primaryIndicator);
+        setTypeCode(typeCode);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

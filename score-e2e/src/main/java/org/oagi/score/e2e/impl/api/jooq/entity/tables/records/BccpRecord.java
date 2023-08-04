@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record22;
@@ -12,53 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
 
-import java.time.LocalDateTime;
-
 
 /**
  * An BCCP specifies a property concept and data type associated with it. A BCCP
  * can be then added as a property of an ACC.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Record22<ULong, String, String, String, ULong, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached BccpRecord
+     * Setter for <code>oagi.bccp.bccp_id</code>. An internal, primary database
+     * key.
      */
-    public BccpRecord() {
-        super(Bccp.BCCP);
-    }
-
-    /**
-     * Create a detached, initialised BccpRecord
-     */
-    public BccpRecord(ULong bccpId, String guid, String propertyTerm, String representationTerm, ULong bdtId, String den, String definition, String definitionSource, ULong namespaceId, Byte isDeprecated, ULong replacementBccpId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, Byte isNillable, String defaultValue, String fixedValue, ULong prevBccpId, ULong nextBccpId) {
-        super(Bccp.BCCP);
-
-        setBccpId(bccpId);
-        setGuid(guid);
-        setPropertyTerm(propertyTerm);
-        setRepresentationTerm(representationTerm);
-        setBdtId(bdtId);
-        setDen(den);
-        setDefinition(definition);
-        setDefinitionSource(definitionSource);
-        setNamespaceId(namespaceId);
-        setIsDeprecated(isDeprecated);
-        setReplacementBccpId(replacementBccpId);
-        setCreatedBy(createdBy);
-        setOwnerUserId(ownerUserId);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
-        setState(state);
-        setIsNillable(isNillable);
-        setDefaultValue(defaultValue);
-        setFixedValue(fixedValue);
-        setPrevBccpId(prevBccpId);
-        setNextBccpId(nextBccpId);
+    public void setBccpId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -70,11 +41,11 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.bccp.bccp_id</code>. An internal, primary database
-     * key.
+     * Setter for <code>oagi.bccp.guid</code>. A globally unique identifier
+     * (GUID).
      */
-    public void setBccpId(ULong value) {
-        set(0, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -86,22 +57,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.bccp.guid</code>. A globally unique identifier
-     * (GUID).
-     */
-    public void setGuid(String value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bccp.property_term</code>. The property concept
-     * that the BCCP models.
-     */
-    public String getPropertyTerm() {
-        return (String) get(2);
-    }
-
-    /**
      * Setter for <code>oagi.bccp.property_term</code>. The property concept
      * that the BCCP models.
      */
@@ -110,13 +65,11 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.representation_term</code>. The representation
-     * term convey the format of the data the BCCP can take. The value is
-     * derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to
-     * by the BDT_ID column.
+     * Getter for <code>oagi.bccp.property_term</code>. The property concept
+     * that the BCCP models.
      */
-    public String getRepresentationTerm() {
-        return (String) get(3);
+    public String getPropertyTerm() {
+        return (String) get(2);
     }
 
     /**
@@ -130,12 +83,13 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.bdt_id</code>. Foreign key pointing to the DT
-     * table indicating the data typye or data format of the BCCP. Only DT_ID
-     * which DT_Type is BDT can be used.
+     * Getter for <code>oagi.bccp.representation_term</code>. The representation
+     * term convey the format of the data the BCCP can take. The value is
+     * derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to
+     * by the BDT_ID column.
      */
-    public ULong getBdtId() {
-        return (ULong) get(4);
+    public String getRepresentationTerm() {
+        return (String) get(3);
     }
 
     /**
@@ -148,11 +102,12 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.den</code>. The dictionary entry name of the
-     * BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
+     * Getter for <code>oagi.bccp.bdt_id</code>. Foreign key pointing to the DT
+     * table indicating the data typye or data format of the BCCP. Only DT_ID
+     * which DT_Type is BDT can be used.
      */
-    public String getDen() {
-        return (String) get(5);
+    public ULong getBdtId() {
+        return (ULong) get(4);
     }
 
     /**
@@ -164,10 +119,11 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.definition</code>. Description of the BCCP.
+     * Getter for <code>oagi.bccp.den</code>. The dictionary entry name of the
+     * BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
      */
-    public String getDefinition() {
-        return (String) get(6);
+    public String getDen() {
+        return (String) get(5);
     }
 
     /**
@@ -178,11 +134,10 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>oagi.bccp.definition</code>. Description of the BCCP.
      */
-    public String getDefinitionSource() {
-        return (String) get(7);
+    public String getDefinition() {
+        return (String) get(6);
     }
 
     /**
@@ -194,14 +149,11 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Getter for <code>oagi.bccp.definition_source</code>. This is typically a
+     * URL identifying the source of the DEFINITION column.
      */
-    public ULong getNamespaceId() {
-        return (ULong) get(8);
+    public String getDefinitionSource() {
+        return (String) get(7);
     }
 
     /**
@@ -216,12 +168,14 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
-     * record should be created).
+     * Getter for <code>oagi.bccp.namespace_id</code>. Foreign key to the
+     * NAMESPACE table. This is the namespace to which the entity belongs. This
+     * namespace column is primarily used in the case the component is a user's
+     * component because there is also a namespace assigned at the release
+     * level.
      */
-    public Byte getIsDeprecated() {
-        return (Byte) get(9);
+    public ULong getNamespaceId() {
+        return (ULong) get(8);
     }
 
     /**
@@ -234,11 +188,12 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.replacement_bccp_id</code>. This refers to a
-     * replacement if the record is deprecated.
+     * Getter for <code>oagi.bccp.is_deprecated</code>. Indicates whether the CC
+     * is deprecated and should not be reused (i.e., no new reference to this
+     * record should be created).
      */
-    public ULong getReplacementBccpId() {
-        return (ULong) get(10);
+    public Byte getIsDeprecated() {
+        return (Byte) get(9);
     }
 
     /**
@@ -250,21 +205,17 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity.
-     * <p>
-     * This column never change between the history and the current record for a
-     * given revision. The history record should have the same value as that of
-     * its current record.
+     * Getter for <code>oagi.bccp.replacement_bccp_id</code>. This refers to a
+     * replacement if the record is deprecated.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(11);
+    public ULong getReplacementBccpId() {
+        return (ULong) get(10);
     }
 
     /**
      * Setter for <code>oagi.bccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity.
-     * <p>
+     * table referring to the user who creates the entity. 
+     * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -274,22 +225,22 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
-     * <p>
-     * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership.
+     * Getter for <code>oagi.bccp.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
+     * 
+     * This column never change between the history and the current record for a
+     * given revision. The history record should have the same value as that of
+     * its current record.
      */
-    public ULong getOwnerUserId() {
-        return (ULong) get(12);
+    public ULong getCreatedBy() {
+        return (ULong) get(11);
     }
 
     /**
      * Setter for <code>oagi.bccp.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * <p>
+     * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -298,20 +249,21 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who has updated the record.
-     * <p>
-     * In the history record, this should always be the user who is editing the
-     * entity (perhaps except when the ownership has just been changed).
+     * Getter for <code>oagi.bccp.owner_user_id</code>. Foreign key to the
+     * APP_USER table. This is the user who owns the entity, is allowed to edit
+     * the entity, and who can transfer the ownership to another user.
+     * 
+     * The ownership can change throughout the history, but undoing shouldn't
+     * rollback the ownership.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(13);
+    public ULong getOwnerUserId() {
+        return (ULong) get(12);
     }
 
     /**
      * Setter for <code>oagi.bccp.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who has updated the record.
-     * <p>
+     * APP_USER table referring to the last user who has updated the record. 
+     * 
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -320,19 +272,20 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.creation_timestamp</code>. Timestamp when the
-     * revision of the BCCP was created.
-     * <p>
-     * This never change for a revision.
+     * Getter for <code>oagi.bccp.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who has updated the record. 
+     * 
+     * In the history record, this should always be the user who is editing the
+     * entity (perhaps except when the ownership has just been changed).
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(14);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(13);
     }
 
     /**
      * Setter for <code>oagi.bccp.creation_timestamp</code>. Timestamp when the
-     * revision of the BCCP was created.
-     * <p>
+     * revision of the BCCP was created. 
+     * 
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -340,21 +293,19 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
-     * <p>
-     * The value of this column in the latest history record should be the same
-     * as that of the current record. This column keeps the record of when the
-     * revision has occurred.
+     * Getter for <code>oagi.bccp.creation_timestamp</code>. Timestamp when the
+     * revision of the BCCP was created. 
+     * 
+     * This never change for a revision.
      */
-    public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(15);
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(14);
     }
 
     /**
      * Setter for <code>oagi.bccp.last_update_timestamp</code>. The timestamp
      * when the record was last updated.
-     * <p>
+     * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -364,22 +315,22 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the BCCP.
-     * <p>
-     * State change can't be undone. But the history record can still keep the
-     * records of when the state was changed.
+     * Getter for <code>oagi.bccp.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
+     * 
+     * The value of this column in the latest history record should be the same
+     * as that of the current record. This column keeps the record of when the
+     * revision has occurred.
      */
-    public String getState() {
-        return (String) get(16);
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(15);
     }
 
     /**
      * Setter for <code>oagi.bccp.state</code>. Deleted, WIP, Draft, QA,
      * Candidate, Production, Release Draft, Published. This the revision life
      * cycle state of the BCCP.
-     * <p>
+     * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -388,32 +339,35 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.is_nillable</code>. This is corresponding to
-     * the XML Schema nillable flag. Although the nillable may not apply to
-     * certain cases of the BCCP (e.g., when it is only used as XSD attribute),
-     * the value is default to false for simplification.
+     * Getter for <code>oagi.bccp.state</code>. Deleted, WIP, Draft, QA,
+     * Candidate, Production, Release Draft, Published. This the revision life
+     * cycle state of the BCCP.
+     * 
+     * State change can't be undone. But the history record can still keep the
+     * records of when the state was changed.
      */
-    public Byte getIsNillable() {
-        return (Byte) get(17);
+    public String getState() {
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>oagi.bccp.is_nillable</code>. This is corresponding to
      * the XML Schema nillable flag. Although the nillable may not apply to
      * certain cases of the BCCP (e.g., when it is only used as XSD attribute),
-     * the value is default to false for simplification.
+     * the value is default to false for simplification. 
      */
     public void setIsNillable(Byte value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>oagi.bccp.default_value</code>. This column specifies
-     * the default value constraint. Default and fixed value constraints cannot
-     * be used at the same time.
+     * Getter for <code>oagi.bccp.is_nillable</code>. This is corresponding to
+     * the XML Schema nillable flag. Although the nillable may not apply to
+     * certain cases of the BCCP (e.g., when it is only used as XSD attribute),
+     * the value is default to false for simplification. 
      */
-    public String getDefaultValue() {
-        return (String) get(18);
+    public Byte getIsNillable() {
+        return (Byte) get(17);
     }
 
     /**
@@ -426,12 +380,12 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.fixed_value</code>. This column captures the
-     * fixed value constraint. Default and fixed value constraints cannot be
-     * used at the same time.
+     * Getter for <code>oagi.bccp.default_value</code>. This column specifies
+     * the default value constraint. Default and fixed value constraints cannot
+     * be used at the same time.
      */
-    public String getFixedValue() {
-        return (String) get(19);
+    public String getDefaultValue() {
+        return (String) get(18);
     }
 
     /**
@@ -444,11 +398,12 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Getter for <code>oagi.bccp.prev_bccp_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Getter for <code>oagi.bccp.fixed_value</code>. This column captures the
+     * fixed value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
-    public ULong getPrevBccpId() {
-        return (ULong) get(20);
+    public String getFixedValue() {
+        return (String) get(19);
     }
 
     /**
@@ -459,9 +414,21 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         set(20, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.bccp.prev_bccp_id</code>. A self-foreign key to
+     * indicate the previous history record.
+     */
+    public ULong getPrevBccpId() {
+        return (ULong) get(20);
+    }
+
+    /**
+     * Setter for <code>oagi.bccp.next_bccp_id</code>. A self-foreign key to
+     * indicate the next history record.
+     */
+    public void setNextBccpId(ULong value) {
+        set(21, value);
+    }
 
     /**
      * Getter for <code>oagi.bccp.next_bccp_id</code>. A self-foreign key to
@@ -472,21 +439,17 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     // -------------------------------------------------------------------------
-    // Record22 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.bccp.next_bccp_id</code>. A self-foreign key to
-     * indicate the next history record.
-     */
-    public void setNextBccpId(ULong value) {
-        set(21, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record22 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row22<ULong, String, String, String, ULong, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> fieldsRow() {
@@ -954,10 +917,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public BccpRecord value22(ULong value) {
         setNextBccpId(value);
@@ -989,5 +948,47 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         value21(value21);
         value22(value22);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached BccpRecord
+     */
+    public BccpRecord() {
+        super(Bccp.BCCP);
+    }
+
+    /**
+     * Create a detached, initialised BccpRecord
+     */
+    public BccpRecord(ULong bccpId, String guid, String propertyTerm, String representationTerm, ULong bdtId, String den, String definition, String definitionSource, ULong namespaceId, Byte isDeprecated, ULong replacementBccpId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, Byte isNillable, String defaultValue, String fixedValue, ULong prevBccpId, ULong nextBccpId) {
+        super(Bccp.BCCP);
+
+        setBccpId(bccpId);
+        setGuid(guid);
+        setPropertyTerm(propertyTerm);
+        setRepresentationTerm(representationTerm);
+        setBdtId(bdtId);
+        setDen(den);
+        setDefinition(definition);
+        setDefinitionSource(definitionSource);
+        setNamespaceId(namespaceId);
+        setIsDeprecated(isDeprecated);
+        setReplacementBccpId(replacementBccpId);
+        setCreatedBy(createdBy);
+        setOwnerUserId(ownerUserId);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        setState(state);
+        setIsNillable(isNillable);
+        setDefaultValue(defaultValue);
+        setFixedValue(fixedValue);
+        setPrevBccpId(prevBccpId);
+        setNextBccpId(nextBccpId);
+        resetChangedOnNotNull();
     }
 }

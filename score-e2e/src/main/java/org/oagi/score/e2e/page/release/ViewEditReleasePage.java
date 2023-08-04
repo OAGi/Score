@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.release;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -158,6 +159,15 @@ public interface ViewEditReleasePage extends Page {
     EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State);
 
     /**
+     * Open the page of the Release by the table record.
+     *
+     * @param tr the table record
+     * @return the 'Release' page object
+     *
+     */
+    EditReleasePage openReleaseViewEditPage(WebElement tr);
+
+    /**
      * Open the page of the Release by its ID.
      *
      * @param releaseId release ID
@@ -178,23 +188,6 @@ public interface ViewEditReleasePage extends Page {
      * @return the Release page object
      */
     CreateReleasePage createRelease();
-
-    /**
-     * Return the UI element of the table record containing the given value.
-     *
-     * @param value value
-     * @return the UI element of the table record
-     */
-    WebElement getTableRecordByValue(String value);
-
-    /**
-     * Return the UI element of the column of the given table record with the column name.
-     *
-     * @param tableRecord the table record
-     * @param columnName  the column name
-     * @return the UI element of the column
-     */
-    WebElement getColumnByName(WebElement tableRecord, String columnName);
 
     /**
      * Return the UI element of the 'Context Menu' icon for the release node.
@@ -218,4 +211,63 @@ public interface ViewEditReleasePage extends Page {
      * @param releaseNum release Number
      */
     void MoveBackToInitialized(String releaseNum);
+
+    WebElement getDiscardButton();
+
+    void hitDiscardButton(String releaseNumber);
+
+    /**
+     * Return the UI element of the table record at the given index, which starts from 1.
+     *
+     * @param idx The index of the table record.
+     * @return the UI element of the table record at the given index
+     */
+    WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Return the UI element of the table record containing the given value.
+     *
+     * @param value value
+     * @return the UI element of the table record
+     */
+    WebElement getTableRecordByValue(String value);
+
+    /**
+     * Return the UI element of the column of the given table record with the column name.
+     *
+     * @param tableRecord the table record
+     * @param columnName  the column name
+     * @return the UI element of the column
+     */
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    /**
+     * Set the size of items to the 'Items per page' select field.
+     *
+     * @param items the size of items; 10, 25, 50
+     */
+    void setItemsPerPage(int items);
+
+    /**
+     * Return the total number of items being paged.
+     *
+     * @return the total number of items being paged
+     */
+    int getTotalNumberOfItems();
+
+    /**
+     * Return the UI element of the 'Previous Page' button in the paginator.
+     *
+     * @return the UI element of the 'Previous Page' button in the paginator
+     */
+    WebElement getPreviousPageButton();
+
+    /**
+     * Return the UI element of the 'Next Page' button in the paginator.
+     *
+     * @return the UI element of the 'Next Page' button in the paginator
+     */
+    WebElement getNextPageButton();
+
+    WebElement clickOnDropDownMenu(WebElement element);
 }

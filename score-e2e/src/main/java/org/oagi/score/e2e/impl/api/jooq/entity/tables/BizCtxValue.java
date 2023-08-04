@@ -4,8 +4,24 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Function3;
+import org.jooq.Identity;
+import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Records;
+import org.jooq.Row3;
+import org.jooq.Schema;
+import org.jooq.SelectField;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -14,41 +30,47 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxValueRecord;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
 
 /**
  * This table represents business context values for business contexts. It
  * provides the associations between a business context and a context scheme
  * value.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.biz_ctx_value</code>
      */
     public static final BizCtxValue BIZ_CTX_VALUE = new BizCtxValue();
-    private static final long serialVersionUID = 1L;
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<BizCtxValueRecord> getRecordType() {
+        return BizCtxValueRecord.class;
+    }
+
     /**
      * The column <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
      * internal database key.
      */
     public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_VALUE_ID = createField(DSL.name("biz_ctx_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+
     /**
      * The column <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
      * biz_ctx table.
      */
     public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the biz_ctx table.");
+
     /**
      * The column <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
      * key to the CTX_SCHEME_VALUE table.
      */
     public final TableField<BizCtxValueRecord, ULong> CTX_SCHEME_VALUE_ID = createField(DSL.name("ctx_scheme_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CTX_SCHEME_VALUE table.");
-    private transient BizCtx _bizCtx;
-    private transient CtxSchemeValue _ctxSchemeValue;
 
     private BizCtxValue(Name alias, Table<BizCtxValueRecord> aliased) {
         this(alias, aliased, null);
@@ -83,14 +105,6 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         super(child, key, BIZ_CTX_VALUE);
     }
 
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<BizCtxValueRecord> getRecordType() {
-        return BizCtxValueRecord.class;
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -110,6 +124,9 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     public List<ForeignKey<BizCtxValueRecord, ?>> getReferences() {
         return Arrays.asList(Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
     }
+
+    private transient BizCtx _bizCtx;
+    private transient CtxSchemeValue _ctxSchemeValue;
 
     /**
      * Get the implicit join path to the <code>oagi.biz_ctx</code> table.

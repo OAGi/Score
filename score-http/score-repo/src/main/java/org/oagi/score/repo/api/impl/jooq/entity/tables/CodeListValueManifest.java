@@ -78,32 +78,32 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
      * The column
      * <code>oagi.code_list_value_manifest.based_code_list_value_manifest_id</code>.
      */
-    public final TableField<CodeListValueManifestRecord, ULong> BASED_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("based_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListValueManifestRecord, ULong> BASED_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("based_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.code_list_value_manifest.conflict</code>. This
      * indicates that there is a conflict between self and relationship.
      */
-    public final TableField<CodeListValueManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<CodeListValueManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column
      * <code>oagi.code_list_value_manifest.replacement_code_list_value_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<CodeListValueManifestRecord, ULong> REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("replacement_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<CodeListValueManifestRecord, ULong> REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("replacement_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column
      * <code>oagi.code_list_value_manifest.prev_code_list_value_manifest_id</code>.
      */
-    public final TableField<CodeListValueManifestRecord, ULong> PREV_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("prev_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListValueManifestRecord, ULong> PREV_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("prev_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column
      * <code>oagi.code_list_value_manifest.next_code_list_value_manifest_id</code>.
      */
-    public final TableField<CodeListValueManifestRecord, ULong> NEXT_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("next_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListValueManifestRecord, ULong> NEXT_CODE_LIST_VALUE_MANIFEST_ID = createField(DSL.name("next_code_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private CodeListValueManifest(Name alias, Table<CodeListValueManifestRecord> aliased) {
         this(alias, aliased, null);

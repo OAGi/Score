@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.release;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -10,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -56,6 +58,12 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    private static final By NAME_FIELD_LOCATOR =
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+    private static final By DISCARD_RELEASE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Discard\")]");
+    private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
 
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);
@@ -180,12 +188,13 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public void setState(String state) {
         retry(() -> {
-            click(getCreatorSelectField());
+            click(getStateSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + state + "\"]"));
+                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
             click(optionField);
         });
+        escape(getDriver());
     }
 
     @Override
@@ -214,7 +223,19 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     @Override
-    public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String State) {
+    public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String state) {
+        openReleaseByReleaseNumAndState(releaseNum, state);
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
+        EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
+        editReleasePage.openPage();
+        assert editReleasePage.isOpened();
+        return editReleasePage;
+    }
+
+    @Override
+    public EditReleasePage openReleaseViewEditPage(WebElement tr) {
+        String releaseNum = getReleaseNumFieldFromTheTable(tr);
         openReleaseByReleaseNum(releaseNum);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
         EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
@@ -224,8 +245,14 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     private void openReleaseByReleaseNum(String releaseNum) {
+        openReleaseByReleaseNumAndState(releaseNum, null);
+    }
 
-        sendKeys(getReleaseNumField(), releaseNum);
+    private void openReleaseByReleaseNumAndState(String releaseNum, String state) {
+        setReleaseNum(releaseNum);
+        if (!StringUtils.isEmpty(state)) {
+            setState(state);
+        }
 
         retry(() -> {
             hitSearchButton();
@@ -236,11 +263,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
                 tr = getTableRecordByValue(releaseNum);
                 td = getColumnByName(tr, "releaseNum");
             } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a core component using " + releaseNum, e);
+                throw new NoSuchElementException("Cannot locate a release using " + releaseNum, e);
             }
             String releaseNumField = getReleaseNumFieldFromTheTable(td);
             if (!releaseNum.equals(releaseNumField)) {
-                throw new NoSuchElementException("Cannot locate a core component using " + releaseNum);
+                throw new NoSuchElementException("Cannot locate a release using " + releaseNum);
             }
             WebElement tdLoginID = td.findElement(By.cssSelector("a"));
             // TODO:
@@ -289,6 +316,40 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     }
 
     @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
+    public WebElement getPreviousPageButton() {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                        "//button[@aria-label = \"Previous page\"]"));
+    }
+
+    @Override
+    public WebElement getNextPageButton() {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                        "//button[@aria-label = \"Next page\"]"));
+    }
+
+    @Override
     public WebElement getContextMenuIconByReleaseNum(String releaseNum) {
         WebElement tr = getTableRecordByValue(releaseNum);
         return tr.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
@@ -309,5 +370,49 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofSeconds(120));
+    }
+
+    @Override
+    public WebElement getDiscardButton() {
+        return visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR);
+    }
+
+    @Override
+    public void hitDiscardButton(String releaseNumber) {
+        setReleaseNum(releaseNumber);
+        hitSearchButton();
+        retry(() -> {
+            WebElement tr;
+            WebElement td;
+            try {
+                tr = getTableRecordAtIndex(1);
+                td = getColumnByName(tr, "releaseNum");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a Release using " + releaseNumber, e);
+            }
+            String nameColumn = getText(td.findElement(By.tagName("a")));
+            if (!nameColumn.contains(releaseNumber)) {
+                throw new NoSuchElementException("Cannot locate a Release using " + releaseNumber);
+            }
+            WebElement node = clickOnDropDownMenu(tr);
+            try {
+                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+            }
+        });
+
+        click(elementToBeClickable(getDriver(), CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR));
+    }
+
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+    }
+    @Override
+    public WebElement clickOnDropDownMenu(WebElement element) {
+        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 }

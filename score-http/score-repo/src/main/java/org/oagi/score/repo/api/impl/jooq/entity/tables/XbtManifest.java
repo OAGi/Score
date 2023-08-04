@@ -71,23 +71,23 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
      * The column <code>oagi.xbt_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<XbtManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<XbtManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.xbt_manifest.log_id</code>. A foreign key pointed
      * to a log for the current record.
      */
-    public final TableField<XbtManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
+    public final TableField<XbtManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key pointed to a log for the current record.");
 
     /**
      * The column <code>oagi.xbt_manifest.prev_xbt_manifest_id</code>.
      */
-    public final TableField<XbtManifestRecord, ULong> PREV_XBT_MANIFEST_ID = createField(DSL.name("prev_xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<XbtManifestRecord, ULong> PREV_XBT_MANIFEST_ID = createField(DSL.name("prev_xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.xbt_manifest.next_xbt_manifest_id</code>.
      */
-    public final TableField<XbtManifestRecord, ULong> NEXT_XBT_MANIFEST_ID = createField(DSL.name("next_xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<XbtManifestRecord, ULong> NEXT_XBT_MANIFEST_ID = createField(DSL.name("next_xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private XbtManifest(Name alias, Table<XbtManifestRecord> aliased) {
         this(alias, aliased, null);

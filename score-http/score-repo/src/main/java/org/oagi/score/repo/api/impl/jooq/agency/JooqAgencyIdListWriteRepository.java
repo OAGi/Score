@@ -2,7 +2,6 @@ package org.oagi.score.repo.api.impl.jooq.agency;
 
 import com.google.gson.Gson;
 import org.jooq.DSLContext;
-import org.jooq.JSON;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.agency.AgencyIdListWriteRepository;
@@ -675,8 +674,8 @@ public class JooqAgencyIdListWriteRepository
                 ))
                 .fetch();
 
-        logRecord.setSnapshot(JSON.valueOf(serialize(agencyIdListManifestRecord, agencyIdListRecord,
-                agencyIdListValueManifestRecords, agencyIdListValueRecords)));
+        logRecord.setSnapshot(serialize(agencyIdListManifestRecord, agencyIdListRecord,
+                agencyIdListValueManifestRecords, agencyIdListValueRecords));
         logRecord.setReference(agencyIdListRecord.getGuid());
         logRecord.setCreatedBy(requesterId);
         logRecord.setCreationTimestamp(timestamp);
