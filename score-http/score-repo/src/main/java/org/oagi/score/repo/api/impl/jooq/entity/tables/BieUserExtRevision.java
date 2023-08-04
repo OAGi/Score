@@ -76,7 +76,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * the AllExtension because there is no corresponding ABIE for the
      * AllExtension ACC.
      */
-    public final TableField<BieUserExtRevisionRecord, ULong> EXT_ABIE_ID = createField(DSL.name("ext_abie_id"), SQLDataType.BIGINTUNSIGNED, this, "This points to an ABIE record corresponding to the EXTENSION_ACC_ID record. For example, this column can point to the ApplicationAreaExtension ABIE which is based on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID column). This column can be NULL only when the extension is the AllExtension because there is no corresponding ABIE for the AllExtension ACC.");
+    public final TableField<BieUserExtRevisionRecord, ULong> EXT_ABIE_ID = createField(DSL.name("ext_abie_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This points to an ABIE record corresponding to the EXTENSION_ACC_ID record. For example, this column can point to the ApplicationAreaExtension ABIE which is based on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID column). This column can be NULL only when the extension is the AllExtension because there is no corresponding ABIE for the AllExtension ACC.");
 
     /**
      * The column <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
@@ -105,7 +105,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
      * not current.
      */
-    public final TableField<BieUserExtRevisionRecord, Byte> REVISED_INDICATOR = createField(DSL.name("revised_indicator"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This column is a flag indicating to whether the User Extension ACC (as identified in the USER_EXT_ACC_ID column) has been revised, i.e., there is a newer version of the user extension ACC than the one currently used by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is not current.");
+    public final TableField<BieUserExtRevisionRecord, Byte> REVISED_INDICATOR = createField(DSL.name("revised_indicator"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This column is a flag indicating to whether the User Extension ACC (as identified in the USER_EXT_ACC_ID column) has been revised, i.e., there is a newer version of the user extension ACC than the one currently used by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is not current.");
 
     /**
      * The column <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.

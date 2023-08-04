@@ -76,30 +76,30 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
      * The column <code>oagi.asccp_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<AsccpManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<AsccpManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.asccp_manifest.log_id</code>. A foreign key pointed
      * to a log for the current record.
      */
-    public final TableField<AsccpManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
+    public final TableField<AsccpManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key pointed to a log for the current record.");
 
     /**
      * The column
      * <code>oagi.asccp_manifest.replacement_asccp_manifest_id</code>. This
      * refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<AsccpManifestRecord, ULong> REPLACEMENT_ASCCP_MANIFEST_ID = createField(DSL.name("replacement_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<AsccpManifestRecord, ULong> REPLACEMENT_ASCCP_MANIFEST_ID = createField(DSL.name("replacement_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.asccp_manifest.prev_asccp_manifest_id</code>.
      */
-    public final TableField<AsccpManifestRecord, ULong> PREV_ASCCP_MANIFEST_ID = createField(DSL.name("prev_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccpManifestRecord, ULong> PREV_ASCCP_MANIFEST_ID = createField(DSL.name("prev_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.asccp_manifest.next_asccp_manifest_id</code>.
      */
-    public final TableField<AsccpManifestRecord, ULong> NEXT_ASCCP_MANIFEST_ID = createField(DSL.name("next_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AsccpManifestRecord, ULong> NEXT_ASCCP_MANIFEST_ID = createField(DSL.name("next_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AsccpManifest(Name alias, Table<AsccpManifestRecord> aliased) {
         this(alias, aliased, null);

@@ -83,7 +83,7 @@ public class Abie extends TableImpl<AbieRecord> {
     /**
      * The column <code>oagi.abie.path</code>.
      */
-    public final TableField<AbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB, this, "");
+    public final TableField<AbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.abie.hash_path</code>. hash_path generated from the
@@ -97,14 +97,14 @@ public class Abie extends TableImpl<AbieRecord> {
      * to the BIZ_CTX table. This column stores the business context assigned to
      * the ABIE.
      */
-    public final TableField<AbieRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED, this, "(Deprecated) A foreign key to the BIZ_CTX table. This column stores the business context assigned to the ABIE.");
+    public final TableField<AbieRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "(Deprecated) A foreign key to the BIZ_CTX table. This column stores the business context assigned to the ABIE.");
 
     /**
      * The column <code>oagi.abie.definition</code>. Definition to override the
      * ACC's definition. If NULL, it means that the definition should be
      * inherited from the based CC.
      */
-    public final TableField<AbieRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Definition to override the ACC's definition. If NULL, it means that the definition should be inherited from the based CC.");
+    public final TableField<AbieRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Definition to override the ACC's definition. If NULL, it means that the definition should be inherited from the based CC.");
 
     /**
      * The column <code>oagi.abie.created_by</code>. A foreign key referring to
@@ -142,7 +142,7 @@ public class Abie extends TableImpl<AbieRecord> {
      * environment, a logic can apply that other users in the group can see the
      * top-level ABIE only when it is in the 'Published' state.
      */
-    public final TableField<AbieRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER, this, "2 = EDITING, 4 = PUBLISHED. This column is only used with a top-level ABIE, because that is the only entry point for editing. The state value indicates the visibility of the top-level ABIE to users other than the owner. In the user group environment, a logic can apply that other users in the group can see the top-level ABIE only when it is in the 'Published' state.");
+    public final TableField<AbieRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "2 = EDITING, 4 = PUBLISHED. This column is only used with a top-level ABIE, because that is the only entry point for editing. The state value indicates the visibility of the top-level ABIE to users other than the owner. In the user group environment, a logic can apply that other users in the group can see the top-level ABIE only when it is in the 'Published' state.");
 
     /**
      * The column <code>oagi.abie.remark</code>. This column allows the user to
@@ -155,14 +155,14 @@ public class Abie extends TableImpl<AbieRecord> {
      * captured in the Definition of the ABIE. A remark about that ABIE may be
      * "Type of BOM should be recognized in the BOM/typeCode."
      */
-    public final TableField<AbieRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
+    public final TableField<AbieRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
 
     /**
      * The column <code>oagi.abie.biz_term</code>. To indicate what the BIE is
      * called in a particular business context. With this current design, only
      * one business term is allowed per business context.
      */
-    public final TableField<AbieRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225), this, "To indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
+    public final TableField<AbieRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "To indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
 
     /**
      * The column <code>oagi.abie.owner_top_level_asbiep_id</code>. This is a

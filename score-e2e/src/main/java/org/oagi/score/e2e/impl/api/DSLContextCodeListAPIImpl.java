@@ -1,7 +1,9 @@
 package org.oagi.score.e2e.impl.api;
 
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -118,7 +120,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -198,7 +200,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -426,7 +428,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -580,7 +582,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 

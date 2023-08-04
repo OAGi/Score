@@ -4,8 +4,24 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Function2;
+import org.jooq.Identity;
+import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Records;
+import org.jooq.Row2;
+import org.jooq.Schema;
+import org.jooq.SelectField;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -14,27 +30,34 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CdtPriRecord;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
 
 /**
  * This table stores the CDT primitives.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtPri extends TableImpl<CdtPriRecord> {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.cdt_pri</code>
      */
     public static final CdtPri CDT_PRI = new CdtPri();
-    private static final long serialVersionUID = 1L;
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<CdtPriRecord> getRecordType() {
+        return CdtPriRecord.class;
+    }
+
     /**
      * The column <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
      * database key.
      */
     public final TableField<CdtPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
+
     /**
      * The column <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
      * the CCTS datatype catalog, e.g., Decimal.
@@ -72,14 +95,6 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
 
     public <O extends Record> CdtPri(Table<O> child, ForeignKey<O, CdtPriRecord> key) {
         super(child, key, CDT_PRI);
-    }
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<CdtPriRecord> getRecordType() {
-        return CdtPriRecord.class;
     }
 
     @Override

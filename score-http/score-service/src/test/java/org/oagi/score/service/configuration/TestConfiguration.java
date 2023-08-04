@@ -20,8 +20,8 @@ public class TestConfiguration {
     @Bean
     public DataSource dataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceBuilder.url("jdbc:mysql://127.0.0.1:3306/oagi");
+        dataSourceBuilder.driverClassName("org.mariadb.jdbc.Driver");
+        dataSourceBuilder.url("jdbc:mariadb://127.0.0.1:3306/oagi");
         dataSourceBuilder.username("oagi");
         dataSourceBuilder.password("oagi");
         return dataSourceBuilder.build();
@@ -29,7 +29,7 @@ public class TestConfiguration {
 
     @Bean
     public DSLContext dslContext() {
-        return new DefaultDSLContext(dataSource(), SQLDialect.MYSQL);
+        return new DefaultDSLContext(dataSource(), SQLDialect.MARIADB);
     }
 
     @Bean

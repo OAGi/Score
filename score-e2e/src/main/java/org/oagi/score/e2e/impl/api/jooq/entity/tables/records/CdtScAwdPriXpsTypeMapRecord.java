@@ -17,30 +17,20 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
  * The purpose of this table is the same as that of the
  * CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It
  * allows for the concrete mapping between the CDT Primitives and types in a
- * particular expression such as XML Schema, JSON.
+ * particular expression such as XML Schema, JSON. 
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> implements Record4<ULong, ULong, ULong, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached CdtScAwdPriXpsTypeMapRecord
+     * Setter for
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>.
+     * Internal, primary database key.
      */
-    public CdtScAwdPriXpsTypeMapRecord() {
-        super(CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP);
-    }
-
-    /**
-     * Create a detached, initialised CdtScAwdPriXpsTypeMapRecord
-     */
-    public CdtScAwdPriXpsTypeMapRecord(ULong cdtScAwdPriXpsTypeMapId, ULong cdtScAwdPriId, ULong xbtId, Byte isDefault) {
-        super(CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP);
-
-        setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
-        setCdtScAwdPriId(cdtScAwdPriId);
-        setXbtId(xbtId);
-        setIsDefault(isDefault);
+    public void setCdtScAwdPriXpsTypeMapId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -54,11 +44,11 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
 
     /**
      * Setter for
-     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>.
-     * Internal, primary database key.
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign
+     * key to the CDT_SC_AWD_PRI table.
      */
-    public void setCdtScAwdPriXpsTypeMapId(ULong value) {
-        set(0, value);
+    public void setCdtScAwdPriId(ULong value) {
+        set(1, value);
     }
 
     /**
@@ -71,12 +61,12 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     /**
-     * Setter for
-     * <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_id</code>. Foreign
-     * key to the CDT_SC_AWD_PRI table.
+     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign
+     * key to the Xbt table. It identifies an XML schema built-in type that maps
+     * to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
      */
-    public void setCdtScAwdPriId(ULong value) {
-        set(1, value);
+    public void setXbtId(ULong value) {
+        set(2, value);
     }
 
     /**
@@ -89,17 +79,12 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     /**
-     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.xbt_id</code>. Foreign
-     * key to the Xbt table. It identifies an XML schema built-in type that maps
-     * to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.
+     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.is_default</code>.
+     * Indicating a default value domain mapping.
      */
-    public void setXbtId(ULong value) {
-        set(2, value);
+    public void setIsDefault(Byte value) {
+        set(3, value);
     }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>oagi.cdt_sc_awd_pri_xps_type_map.is_default</code>.
@@ -110,21 +95,17 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
     }
 
     // -------------------------------------------------------------------------
-    // Record4 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.is_default</code>.
-     * Indicating a default value domain mapping.
-     */
-    public void setIsDefault(Byte value) {
-        set(3, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record4 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
@@ -214,10 +195,6 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public CdtScAwdPriXpsTypeMapRecord value4(Byte value) {
         setIsDefault(value);
@@ -231,5 +208,29 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
         value3(value3);
         value4(value4);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached CdtScAwdPriXpsTypeMapRecord
+     */
+    public CdtScAwdPriXpsTypeMapRecord() {
+        super(CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP);
+    }
+
+    /**
+     * Create a detached, initialised CdtScAwdPriXpsTypeMapRecord
+     */
+    public CdtScAwdPriXpsTypeMapRecord(ULong cdtScAwdPriXpsTypeMapId, ULong cdtScAwdPriId, ULong xbtId, Byte isDefault) {
+        super(CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP);
+
+        setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
+        setCdtScAwdPriId(cdtScAwdPriId);
+        setXbtId(xbtId);
+        setIsDefault(isDefault);
+        resetChangedOnNotNull();
     }
 }

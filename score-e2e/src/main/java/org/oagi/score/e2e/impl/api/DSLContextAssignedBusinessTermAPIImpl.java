@@ -1,4 +1,4 @@
-package org.oagi.score.e2e.impl.api.jooq.entity;
+package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
 import org.oagi.score.e2e.api.APIFactory;

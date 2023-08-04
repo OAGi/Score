@@ -8,7 +8,6 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.ModuleAPI;
 import org.oagi.score.e2e.obj.ModuleObject;
-import org.oagi.score.e2e.obj.ModuleSetObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.MODULE_SET;
 
 public class DSLContextModuleAPIImpl implements ModuleAPI {
 
