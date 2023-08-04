@@ -98,13 +98,13 @@ public class Bccp extends TableImpl<BccpRecord> {
     /**
      * The column <code>oagi.bccp.definition</code>. Description of the BCCP.
      */
-    public final TableField<BccpRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Description of the BCCP.");
+    public final TableField<BccpRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the BCCP.");
 
     /**
      * The column <code>oagi.bccp.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<BccpRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<BccpRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.bccp.namespace_id</code>. Foreign key to the
@@ -113,20 +113,20 @@ public class Bccp extends TableImpl<BccpRecord> {
      * component because there is also a namespace assigned at the release
      * level.
      */
-    public final TableField<BccpRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
+    public final TableField<BccpRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
      * The column <code>oagi.bccp.is_deprecated</code>. Indicates whether the CC
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
-    public final TableField<BccpRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
+    public final TableField<BccpRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
      * The column <code>oagi.bccp.replacement_bccp_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<BccpRecord, ULong> REPLACEMENT_BCCP_ID = createField(DSL.name("replacement_bccp_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<BccpRecord, ULong> REPLACEMENT_BCCP_ID = createField(DSL.name("replacement_bccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.bccp.created_by</code>. Foreign key to the APP_USER
@@ -183,7 +183,7 @@ public class Bccp extends TableImpl<BccpRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<BccpRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCCP.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<BccpRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCCP.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.bccp.is_nillable</code>. This is corresponding to
@@ -198,26 +198,26 @@ public class Bccp extends TableImpl<BccpRecord> {
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
      */
-    public final TableField<BccpRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB, this, "This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.");
+    public final TableField<BccpRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
      * The column <code>oagi.bccp.fixed_value</code>. This column captures the
      * fixed value constraint. Default and fixed value constraints cannot be
      * used at the same time.
      */
-    public final TableField<BccpRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB, this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
+    public final TableField<BccpRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
      * The column <code>oagi.bccp.prev_bccp_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<BccpRecord, ULong> PREV_BCCP_ID = createField(DSL.name("prev_bccp_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<BccpRecord, ULong> PREV_BCCP_ID = createField(DSL.name("prev_bccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.bccp.next_bccp_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<BccpRecord, ULong> NEXT_BCCP_ID = createField(DSL.name("next_bccp_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<BccpRecord, ULong> NEXT_BCCP_ID = createField(DSL.name("next_bccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Bccp(Name alias, Table<BccpRecord> aliased) {
         this(alias, aliased, null);

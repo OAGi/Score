@@ -92,7 +92,7 @@ public class ProductInfoService {
 
     public ProductInfo databaseMetadata() {
         ProductInfo metadata = new ProductInfo();
-        metadata.setProductName("MySQL");
+        metadata.setProductName("MariaDB");
 
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData databaseMetaData = conn.getMetaData();

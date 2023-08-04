@@ -79,32 +79,32 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * The column
      * <code>oagi.agency_id_list_value_manifest.based_agency_id_list_value_manifest_id</code>.
      */
-    public final TableField<AgencyIdListValueManifestRecord, ULong> BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("based_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AgencyIdListValueManifestRecord, ULong> BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("based_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.agency_id_list_value_manifest.conflict</code>. This
      * indicates that there is a conflict between self and relationship.
      */
-    public final TableField<AgencyIdListValueManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<AgencyIdListValueManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value_manifest.replacement_agency_id_list_value_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<AgencyIdListValueManifestRecord, ULong> REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("replacement_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<AgencyIdListValueManifestRecord, ULong> REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("replacement_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value_manifest.prev_agency_id_list_value_manifest_id</code>.
      */
-    public final TableField<AgencyIdListValueManifestRecord, ULong> PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("prev_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AgencyIdListValueManifestRecord, ULong> PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("prev_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value_manifest.next_agency_id_list_value_manifest_id</code>.
      */
-    public final TableField<AgencyIdListValueManifestRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("next_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AgencyIdListValueManifestRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("next_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AgencyIdListValueManifest(Name alias, Table<AgencyIdListValueManifestRecord> aliased) {
         this(alias, aliased, null);

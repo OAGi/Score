@@ -75,30 +75,30 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     /**
      * The column <code>oagi.dt_sc_manifest.based_dt_sc_manifest_id</code>.
      */
-    public final TableField<DtScManifestRecord, ULong> BASED_DT_SC_MANIFEST_ID = createField(DSL.name("based_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<DtScManifestRecord, ULong> BASED_DT_SC_MANIFEST_ID = createField(DSL.name("based_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.dt_sc_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<DtScManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<DtScManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column
      * <code>oagi.dt_sc_manifest.replacement_dt_sc_manifest_id</code>. This
      * refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<DtScManifestRecord, ULong> REPLACEMENT_DT_SC_MANIFEST_ID = createField(DSL.name("replacement_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<DtScManifestRecord, ULong> REPLACEMENT_DT_SC_MANIFEST_ID = createField(DSL.name("replacement_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.dt_sc_manifest.prev_dt_sc_manifest_id</code>.
      */
-    public final TableField<DtScManifestRecord, ULong> PREV_DT_SC_MANIFEST_ID = createField(DSL.name("prev_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<DtScManifestRecord, ULong> PREV_DT_SC_MANIFEST_ID = createField(DSL.name("prev_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.dt_sc_manifest.next_dt_sc_manifest_id</code>.
      */
-    public final TableField<DtScManifestRecord, ULong> NEXT_DT_SC_MANIFEST_ID = createField(DSL.name("next_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<DtScManifestRecord, ULong> NEXT_DT_SC_MANIFEST_ID = createField(DSL.name("next_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private DtScManifest(Name alias, Table<DtScManifestRecord> aliased) {
         this(alias, aliased, null);

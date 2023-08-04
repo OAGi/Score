@@ -70,35 +70,35 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
     /**
      * The column <code>oagi.acc_manifest.based_acc_manifest_id</code>.
      */
-    public final TableField<AccManifestRecord, ULong> BASED_ACC_MANIFEST_ID = createField(DSL.name("based_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AccManifestRecord, ULong> BASED_ACC_MANIFEST_ID = createField(DSL.name("based_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.acc_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<AccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<AccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.acc_manifest.log_id</code>. A foreign key pointed
      * to a log for the current record.
      */
-    public final TableField<AccManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
+    public final TableField<AccManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key pointed to a log for the current record.");
 
     /**
      * The column <code>oagi.acc_manifest.replacement_acc_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<AccManifestRecord, ULong> REPLACEMENT_ACC_MANIFEST_ID = createField(DSL.name("replacement_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<AccManifestRecord, ULong> REPLACEMENT_ACC_MANIFEST_ID = createField(DSL.name("replacement_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.acc_manifest.prev_acc_manifest_id</code>.
      */
-    public final TableField<AccManifestRecord, ULong> PREV_ACC_MANIFEST_ID = createField(DSL.name("prev_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AccManifestRecord, ULong> PREV_ACC_MANIFEST_ID = createField(DSL.name("prev_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.acc_manifest.next_acc_manifest_id</code>.
      */
-    public final TableField<AccManifestRecord, ULong> NEXT_ACC_MANIFEST_ID = createField(DSL.name("next_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<AccManifestRecord, ULong> NEXT_ACC_MANIFEST_ID = createField(DSL.name("next_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AccManifest(Name alias, Table<AccManifestRecord> aliased) {
         this(alias, aliased, null);

@@ -74,12 +74,12 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * to some code lists. When that is the case, this column stores the GUID of
      * that enumeration type.
      */
-    public final TableField<CodeListRecord, String> ENUM_TYPE_GUID = createField(DSL.name("enum_type_guid"), SQLDataType.VARCHAR(41), this, "In the OAGIS Model XML schema, a type, which keeps all the enumerated values, is  defined separately from the type that represents a code list. This only applies to some code lists. When that is the case, this column stores the GUID of that enumeration type.");
+    public final TableField<CodeListRecord, String> ENUM_TYPE_GUID = createField(DSL.name("enum_type_guid"), SQLDataType.VARCHAR(41).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "In the OAGIS Model XML schema, a type, which keeps all the enumerated values, is  defined separately from the type that represents a code list. This only applies to some code lists. When that is the case, this column stores the GUID of that enumeration type.");
 
     /**
      * The column <code>oagi.code_list.name</code>. Name of the code list.
      */
-    public final TableField<CodeListRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Name of the code list.");
+    public final TableField<CodeListRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Name of the code list.");
 
     /**
      * The column <code>oagi.code_list.list_id</code>. External identifier.
@@ -96,19 +96,19 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * The column <code>oagi.code_list.definition</code>. Description of the
      * code list.
      */
-    public final TableField<CodeListRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Description of the code list.");
+    public final TableField<CodeListRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the code list.");
 
     /**
      * The column <code>oagi.code_list.remark</code>. Usage information about
      * the code list.
      */
-    public final TableField<CodeListRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225), this, "Usage information about the code list.");
+    public final TableField<CodeListRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Usage information about the code list.");
 
     /**
      * The column <code>oagi.code_list.definition_source</code>. This is
      * typically a URL which indicates the source of the code list's DEFINITION.
      */
-    public final TableField<CodeListRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL which indicates the source of the code list's DEFINITION.");
+    public final TableField<CodeListRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL which indicates the source of the code list's DEFINITION.");
 
     /**
      * The column <code>oagi.code_list.namespace_id</code>. Foreign key to the
@@ -117,7 +117,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * component because there is also a namespace assigned at the release
      * level.
      */
-    public final TableField<CodeListRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
+    public final TableField<CodeListRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
      * The column <code>oagi.code_list.based_code_list_id</code>. This is a
@@ -125,7 +125,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * on which this code list is based, if any. The derivation may be
      * restriction and/or extension.
      */
-    public final TableField<CodeListRecord, ULong> BASED_CODE_LIST_ID = createField(DSL.name("based_code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the CODE_LIST table itself. This identifies the code list on which this code list is based, if any. The derivation may be restriction and/or extension.");
+    public final TableField<CodeListRecord, ULong> BASED_CODE_LIST_ID = createField(DSL.name("based_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the CODE_LIST table itself. This identifies the code list on which this code list is based, if any. The derivation may be restriction and/or extension.");
 
     /**
      * The column <code>oagi.code_list.extensible_indicator</code>. This is a
@@ -139,13 +139,13 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * the code list is deprecated and should not be reused (i.e., no new
      * reference to this record should be allowed).
      */
-    public final TableField<CodeListRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the code list is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
+    public final TableField<CodeListRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
      * The column <code>oagi.code_list.replacement_code_list_id</code>. This
      * refers to a replacement if the record is deprecated.
      */
-    public final TableField<CodeListRecord, ULong> REPLACEMENT_CODE_LIST_ID = createField(DSL.name("replacement_code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<CodeListRecord, ULong> REPLACEMENT_CODE_LIST_ID = createField(DSL.name("replacement_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.code_list.created_by</code>. Foreign key to the
@@ -185,19 +185,19 @@ public class CodeList extends TableImpl<CodeListRecord> {
     /**
      * The column <code>oagi.code_list.state</code>.
      */
-    public final TableField<CodeListRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "");
+    public final TableField<CodeListRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.code_list.prev_code_list_id</code>. A self-foreign
      * key to indicate the previous history record.
      */
-    public final TableField<CodeListRecord, ULong> PREV_CODE_LIST_ID = createField(DSL.name("prev_code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<CodeListRecord, ULong> PREV_CODE_LIST_ID = createField(DSL.name("prev_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.code_list.next_code_list_id</code>. A self-foreign
      * key to indicate the next history record.
      */
-    public final TableField<CodeListRecord, ULong> NEXT_CODE_LIST_ID = createField(DSL.name("next_code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<CodeListRecord, ULong> NEXT_CODE_LIST_ID = createField(DSL.name("next_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private CodeList(Name alias, Table<CodeListRecord> aliased) {
         this(alias, aliased, null);

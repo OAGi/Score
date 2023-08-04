@@ -70,19 +70,19 @@ public class Release extends TableImpl<ReleaseRecord> {
      * The column <code>oagi.release.release_num</code>. Release number such has
      * 10.0, 10.1, etc. 
      */
-    public final TableField<ReleaseRecord, String> RELEASE_NUM = createField(DSL.name("release_num"), SQLDataType.VARCHAR(45), this, "Release number such has 10.0, 10.1, etc. ");
+    public final TableField<ReleaseRecord, String> RELEASE_NUM = createField(DSL.name("release_num"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Release number such has 10.0, 10.1, etc. ");
 
     /**
      * The column <code>oagi.release.release_note</code>. Description or note
      * associated with the release.
      */
-    public final TableField<ReleaseRecord, String> RELEASE_NOTE = createField(DSL.name("release_note"), SQLDataType.CLOB, this, "Description or note associated with the release.");
+    public final TableField<ReleaseRecord, String> RELEASE_NOTE = createField(DSL.name("release_note"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description or note associated with the release.");
 
     /**
      * The column <code>oagi.release.release_license</code>. License associated
      * with the release.
      */
-    public final TableField<ReleaseRecord, String> RELEASE_LICENSE = createField(DSL.name("release_license"), SQLDataType.CLOB, this, "License associated with the release.");
+    public final TableField<ReleaseRecord, String> RELEASE_LICENSE = createField(DSL.name("release_license"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "License associated with the release.");
 
     /**
      * The column <code>oagi.release.namespace_id</code>. Foreign key to the
@@ -92,7 +92,7 @@ public class Release extends TableImpl<ReleaseRecord> {
      * namespace may also use this column as a specific namespace can be
      * override at the module level.
      */
-    public final TableField<ReleaseRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.");
+    public final TableField<ReleaseRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.");
 
     /**
      * The column <code>oagi.release.created_by</code>. Foreign key to the
@@ -122,7 +122,7 @@ public class Release extends TableImpl<ReleaseRecord> {
      * The column <code>oagi.release.state</code>. This indicates the revision
      * life cycle state of the Release.
      */
-    public final TableField<ReleaseRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.inline("Initialized", SQLDataType.VARCHAR)), this, "This indicates the revision life cycle state of the Release.");
+    public final TableField<ReleaseRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("'Initialized'"), SQLDataType.VARCHAR)), this, "This indicates the revision life cycle state of the Release.");
 
     private Release(Name alias, Table<ReleaseRecord> aliased) {
         this(alias, aliased, null);

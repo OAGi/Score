@@ -91,7 +91,7 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
      * The column <code>oagi.cdt_awd_pri_xps_type_map.is_default</code>.
      * Indicating a default value domain mapping.
      */
-    public final TableField<CdtAwdPriXpsTypeMapRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicating a default value domain mapping.");
+    public final TableField<CdtAwdPriXpsTypeMapRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicating a default value domain mapping.");
 
     private CdtAwdPriXpsTypeMap(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased) {
         this(alias, aliased, null);
