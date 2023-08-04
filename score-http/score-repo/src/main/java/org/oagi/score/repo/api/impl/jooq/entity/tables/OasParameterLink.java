@@ -72,18 +72,18 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
     /**
      * The column <code>oagi.oas_parameter_link.oas_operation_id</code>.
      */
-    public final TableField<OasParameterLinkRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<OasParameterLinkRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.oas_parameter_link.expression</code>. jsonPathSnip
      * for example '$response.body#/purchaseOrderHeader.identifier'
      */
-    public final TableField<OasParameterLinkRecord, String> EXPRESSION = createField(DSL.name("expression"), SQLDataType.CLOB, this, "jsonPathSnip for example '$response.body#/purchaseOrderHeader.identifier'");
+    public final TableField<OasParameterLinkRecord, String> EXPRESSION = createField(DSL.name("expression"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "jsonPathSnip for example '$response.body#/purchaseOrderHeader.identifier'");
 
     /**
      * The column <code>oagi.oas_parameter_link.description</code>.
      */
-    public final TableField<OasParameterLinkRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "");
+    public final TableField<OasParameterLinkRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.oas_parameter_link.created_by</code>. The user who

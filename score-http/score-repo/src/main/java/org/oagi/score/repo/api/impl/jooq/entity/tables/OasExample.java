@@ -63,14 +63,14 @@ public class OasExample extends TableImpl<OasExampleRecord> {
      * The column <code>oagi.oas_example.summary</code>. Short description for
      * the example.
      */
-    public final TableField<OasExampleRecord, String> SUMMARY = createField(DSL.name("summary"), SQLDataType.CLOB, this, "Short description for the example.");
+    public final TableField<OasExampleRecord, String> SUMMARY = createField(DSL.name("summary"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Short description for the example.");
 
     /**
      * The column <code>oagi.oas_example.description</code>. Long description
      * for the example. CommonMark syntax MAY be used for rich text
      * representation.
      */
-    public final TableField<OasExampleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Long description for the example. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasExampleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Long description for the example. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_example.ref</code>. A URL that points to the
@@ -78,7 +78,7 @@ public class OasExample extends TableImpl<OasExampleRecord> {
      * cannot easily be included in JSON or YAML documents. The value field and
      * externalValue field are mutually exclusive.
      */
-    public final TableField<OasExampleRecord, String> REF = createField(DSL.name("ref"), SQLDataType.VARCHAR(250), this, "A URL that points to the literal example. This provides the capability to reference examples that cannot easily be included in JSON or YAML documents. The value field and externalValue field are mutually exclusive.");
+    public final TableField<OasExampleRecord, String> REF = createField(DSL.name("ref"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL that points to the literal example. This provides the capability to reference examples that cannot easily be included in JSON or YAML documents. The value field and externalValue field are mutually exclusive.");
 
     /**
      * The column <code>oagi.oas_example.value</code>. Embedded literal example.
@@ -87,7 +87,7 @@ public class OasExample extends TableImpl<OasExampleRecord> {
      * JSON or YAML, use a string value to contain the example, escaping where
      * necessary.
      */
-    public final TableField<OasExampleRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB, this, "Embedded literal example. The value field and externalValue field are mutually exclusive. To represent examples of media types that cannot naturally represented in JSON or YAML, use a string value to contain the example, escaping where necessary.");
+    public final TableField<OasExampleRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Embedded literal example. The value field and externalValue field are mutually exclusive. To represent examples of media types that cannot naturally represented in JSON or YAML, use a string value to contain the example, escaping where necessary.");
 
     /**
      * The column <code>oagi.oas_example.created_by</code>. The user who creates

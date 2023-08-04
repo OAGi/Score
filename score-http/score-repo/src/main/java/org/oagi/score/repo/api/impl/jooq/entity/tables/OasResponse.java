@@ -67,14 +67,14 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     /**
      * The column <code>oagi.oas_response.http_status_code</code>.
      */
-    public final TableField<OasResponseRecord, Integer> HTTP_STATUS_CODE = createField(DSL.name("http_status_code"), SQLDataType.INTEGER, this, "");
+    public final TableField<OasResponseRecord, Integer> HTTP_STATUS_CODE = createField(DSL.name("http_status_code"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>oagi.oas_response.description</code>. A brief
      * description of the response body. This could contain examples of use.
      * CommonMark syntax MAY be used for rich text representation.
      */
-    public final TableField<OasResponseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A brief description of the response body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasResponseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the response body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_response.oas_message_body_id</code>.
@@ -84,28 +84,27 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     /**
      * The column <code>oagi.oas_response.make_array_indicator</code>.
      */
-    public final TableField<OasResponseRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_response.suppress_root_indicator</code>.
      */
-    public final TableField<OasResponseRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
-     * The column
-     * <code>oagi.oas_response.meta_header_top_level_asbiep_id</code>.
+     * The column <code>oagi.oas_response.include_meta_header_indicator</code>.
      */
-    public final TableField<OasResponseRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<OasResponseRecord, Byte> INCLUDE_META_HEADER_INDICATOR = createField(DSL.name("include_meta_header_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
-     * The column <code>oagi.oas_response.pagination_top_level_asbiep_id</code>.
+     * The column <code>oagi.oas_response.include_pagination_indicator</code>.
      */
-    public final TableField<OasResponseRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<OasResponseRecord, Byte> INCLUDE_PAGINATION_INDICATOR = createField(DSL.name("include_pagination_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_response.include_confirm_indicator</code>.
      */
-    public final TableField<OasResponseRecord, Byte> INCLUDE_CONFIRM_INDICATOR = createField(DSL.name("include_confirm_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> INCLUDE_CONFIRM_INDICATOR = createField(DSL.name("include_confirm_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_response.created_by</code>. The user who
@@ -181,13 +180,11 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
 
     @Override
     public List<ForeignKey<OasResponseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK);
     }
 
     private transient OasOperation _oasOperation;
     private transient OasMessageBody _oasMessageBody;
-    private transient TopLevelAsbiep _oasResponseMetaHeaderTopLevelAsbiepIdFk;
-    private transient TopLevelAsbiep _oasResponsePaginationTopLevelAsbiepIdFk;
     private transient AppUser _oasResponseCreatedByFk;
     private transient AppUser _oasResponseLastUpdatedByFk;
 
@@ -210,30 +207,6 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
             _oasMessageBody = new OasMessageBody(this, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK);
 
         return _oasMessageBody;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the
-     * <code>oas_response_meta_header_top_level_asbiep_id_fk</code> key.
-     */
-    public TopLevelAsbiep oasResponseMetaHeaderTopLevelAsbiepIdFk() {
-        if (_oasResponseMetaHeaderTopLevelAsbiepIdFk == null)
-            _oasResponseMetaHeaderTopLevelAsbiepIdFk = new TopLevelAsbiep(this, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK);
-
-        return _oasResponseMetaHeaderTopLevelAsbiepIdFk;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the
-     * <code>oas_response_pagination_top_level_asbiep_id_fk</code> key.
-     */
-    public TopLevelAsbiep oasResponsePaginationTopLevelAsbiepIdFk() {
-        if (_oasResponsePaginationTopLevelAsbiepIdFk == null)
-            _oasResponsePaginationTopLevelAsbiepIdFk = new TopLevelAsbiep(this, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK);
-
-        return _oasResponsePaginationTopLevelAsbiepIdFk;
     }
 
     /**
@@ -302,14 +275,14 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<ULong, ULong, Integer, String, ULong, Byte, Byte, ULong, ULong, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row14<ULong, ULong, Integer, String, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row14) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -317,7 +290,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super Integer, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

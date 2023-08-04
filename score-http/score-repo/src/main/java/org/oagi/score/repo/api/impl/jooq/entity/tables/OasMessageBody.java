@@ -13,7 +13,6 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Function6;
 import org.jooq.Identity;
-import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
@@ -28,7 +27,6 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
-import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasMessageBodyRecord;
@@ -65,7 +63,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      * The column <code>oagi.oas_message_body.top_level_asbiep_id</code>. A
      * reference of the ASBIEP record.
      */
-    public final TableField<OasMessageBodyRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the ASBIEP record.");
+    public final TableField<OasMessageBodyRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the ASBIEP record.");
 
     /**
      * The column <code>oagi.oas_message_body.created_by</code>. The user who
@@ -130,11 +128,6 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     }
 
     @Override
-    public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.OAS_MESSAGE_BODY_OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK);
-    }
-
-    @Override
     public Identity<OasMessageBodyRecord, ULong> getIdentity() {
         return (Identity<OasMessageBodyRecord, ULong>) super.getIdentity();
     }
@@ -146,7 +139,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
     @Override
     public List<ForeignKey<OasMessageBodyRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
     }
 
     private transient TopLevelAsbiep _topLevelAsbiep;
@@ -159,7 +152,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      */
     public TopLevelAsbiep topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK);
 
         return _topLevelAsbiep;
     }

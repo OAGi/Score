@@ -89,14 +89,14 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
      * property is REQUIRED and its value MUST be true. Otherwise, the property
      * MAY be included and its default value is false.
      */
-    public final TableField<OasParameterRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Determines whether this parameter is mandatory. If the parameter location is \"path\", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false.");
+    public final TableField<OasParameterRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Determines whether this parameter is mandatory. If the parameter location is \"path\", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false.");
 
     /**
      * The column <code>oagi.oas_parameter.description</code>. A brief
      * description of the parameter. This could contain examples of use.
      * CommonMark syntax MAY be used for rich text representation.
      */
-    public final TableField<OasParameterRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasParameterRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_parameter.schema_type_reference</code>. A
@@ -111,20 +111,20 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
      * percent-encoding. This property only applies to parameters with an in
      * value of query. The default value is false.
      */
-    public final TableField<OasParameterRecord, Byte> ALLOW_RESERVED = createField(DSL.name("allow_reserved"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. This property only applies to parameters with an in value of query. The default value is false.");
+    public final TableField<OasParameterRecord, Byte> ALLOW_RESERVED = createField(DSL.name("allow_reserved"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. This property only applies to parameters with an in value of query. The default value is false.");
 
     /**
      * The column <code>oagi.oas_parameter.deprecated</code>. Specifies that a
      * parameter is deprecated and SHOULD be transitioned out of usage. Default
      * value is false.
      */
-    public final TableField<OasParameterRecord, Byte> DEPRECATED = createField(DSL.name("deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. Default value is false.");
+    public final TableField<OasParameterRecord, Byte> DEPRECATED = createField(DSL.name("deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. Default value is false.");
 
     /**
      * The column <code>oagi.oas_parameter.oas_http_header_id</code>. IF IN =
      * Header, Then select form OAS_HTTP_HEADER table
      */
-    public final TableField<OasParameterRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED, this, "IF IN = Header, Then select form OAS_HTTP_HEADER table");
+    public final TableField<OasParameterRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "IF IN = Header, Then select form OAS_HTTP_HEADER table");
 
     /**
      * The column <code>oagi.oas_parameter.created_by</code>. The user who

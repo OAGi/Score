@@ -88,7 +88,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.terms_of_service</code>. A URL to the Terms
      * of Service for the API. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> TERMS_OF_SERVICE = createField(DSL.name("terms_of_service"), SQLDataType.VARCHAR(250), this, "A URL to the Terms of Service for the API. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> TERMS_OF_SERVICE = createField(DSL.name("terms_of_service"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL to the Terms of Service for the API. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.version</code>. REQUIRED. The version of
@@ -101,32 +101,32 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.contact_name</code>. The identifying name
      * of the contact person/organization.
      */
-    public final TableField<OasDocRecord, String> CONTACT_NAME = createField(DSL.name("contact_name"), SQLDataType.CLOB, this, "The identifying name of the contact person/organization.");
+    public final TableField<OasDocRecord, String> CONTACT_NAME = createField(DSL.name("contact_name"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The identifying name of the contact person/organization.");
 
     /**
      * The column <code>oagi.oas_doc.contact_url</code>. The URL pointing to the
      * contact information. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> CONTACT_URL = createField(DSL.name("contact_url"), SQLDataType.VARCHAR(250), this, "The URL pointing to the contact information. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> CONTACT_URL = createField(DSL.name("contact_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The URL pointing to the contact information. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.contact_email</code>. The email address of
      * the contact person/organization. MUST be in the format of an email
      * address.
      */
-    public final TableField<OasDocRecord, String> CONTACT_EMAIL = createField(DSL.name("contact_email"), SQLDataType.CLOB, this, "The email address of the contact person/organization. MUST be in the format of an email address.");
+    public final TableField<OasDocRecord, String> CONTACT_EMAIL = createField(DSL.name("contact_email"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The email address of the contact person/organization. MUST be in the format of an email address.");
 
     /**
      * The column <code>oagi.oas_doc.license_name</code>. REQUIRED if the
      * license used for the API. The license name used for the API.
      */
-    public final TableField<OasDocRecord, String> LICENSE_NAME = createField(DSL.name("license_name"), SQLDataType.VARCHAR(100), this, "REQUIRED if the license used for the API. The license name used for the API.");
+    public final TableField<OasDocRecord, String> LICENSE_NAME = createField(DSL.name("license_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED if the license used for the API. The license name used for the API.");
 
     /**
      * The column <code>oagi.oas_doc.license_url</code>. A URL to the license
      * used for the API. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> LICENSE_URL = createField(DSL.name("license_url"), SQLDataType.VARCHAR(250), this, "A URL to the license used for the API. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> LICENSE_URL = createField(DSL.name("license_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL to the license used for the API. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.owner_user_id</code>. The user who owns the

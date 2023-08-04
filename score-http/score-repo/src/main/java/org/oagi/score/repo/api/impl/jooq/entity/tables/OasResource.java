@@ -63,7 +63,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
      * The column <code>oagi.oas_resource.oas_doc_id</code>. A reference of the
      * doc record.
      */
-    public final TableField<OasResourceRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED, this, "A reference of the doc record.");
+    public final TableField<OasResourceRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the doc record.");
 
     /**
      * The column <code>oagi.oas_resource.path</code>. This will hold the BIE
@@ -74,7 +74,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
     /**
      * The column <code>oagi.oas_resource.ref</code>.
      */
-    public final TableField<OasResourceRecord, String> REF = createField(DSL.name("ref"), SQLDataType.CLOB, this, "");
+    public final TableField<OasResourceRecord, String> REF = createField(DSL.name("ref"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.oas_resource.created_by</code>. The user who
@@ -84,9 +84,9 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
     /**
      * The column <code>oagi.oas_resource.last_updated_by</code>. The user who
-     * last updates the record.
+     * last updates the oas_message_bodyrecord.
      */
-    public final TableField<OasResourceRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
+    public final TableField<OasResourceRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the oas_message_bodyrecord.");
 
     /**
      * The column <code>oagi.oas_resource.creation_timestamp</code>. The

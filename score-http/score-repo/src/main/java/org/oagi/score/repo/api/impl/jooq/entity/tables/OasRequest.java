@@ -69,13 +69,13 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * of the request body. This could contain examples of use. CommonMark
      * syntax MAY be used for rich text representation.
      */
-    public final TableField<OasRequestRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A brief description of the request body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasRequestRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the request body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_request.required</code>. Determines if the
      * request body is required in the request. Defaults to false.
      */
-    public final TableField<OasRequestRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Determines if the request body is required in the request. Defaults to false.");
+    public final TableField<OasRequestRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Determines if the request body is required in the request. Defaults to false.");
 
     /**
      * The column <code>oagi.oas_request.oas_message_body_id</code>.
@@ -85,22 +85,22 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     /**
      * The column <code>oagi.oas_request.make_array_indicator</code>.
      */
-    public final TableField<OasRequestRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<OasRequestRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_request.suppress_root_indicator</code>.
      */
-    public final TableField<OasRequestRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<OasRequestRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
-     * The column <code>oagi.oas_request.meta_header_top_level_asbiep_id</code>.
+     * The column <code>oagi.oas_request.include_meta_header_indicator</code>.
      */
-    public final TableField<OasRequestRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<OasRequestRecord, Byte> INCLUDE_META_HEADER_INDICATOR = createField(DSL.name("include_meta_header_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
-     * The column <code>oagi.oas_request.pagination_top_level_asbiep_id</code>.
+     * The column <code>oagi.oas_request.include_pagination_indicator</code>.
      */
-    public final TableField<OasRequestRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<OasRequestRecord, Byte> INCLUDE_PAGINATION_INDICATOR = createField(DSL.name("include_pagination_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.oas_request.is_callback</code>. If is_callback ==
@@ -108,7 +108,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * Failed values to allow different endpoints to be called when a successful
      * request is processed, or failure endpoint when an exception occurs.
      */
-    public final TableField<OasRequestRecord, Byte> IS_CALLBACK = createField(DSL.name("is_callback"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "If is_callback == true, oas_callback table has URL rows in it, with eventType=Success or Failed values to allow different endpoints to be called when a successful request is processed, or failure endpoint when an exception occurs.");
+    public final TableField<OasRequestRecord, Byte> IS_CALLBACK = createField(DSL.name("is_callback"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "If is_callback == true, oas_callback table has URL rows in it, with eventType=Success or Failed values to allow different endpoints to be called when a successful request is processed, or failure endpoint when an exception occurs.");
 
     /**
      * The column <code>oagi.oas_request.created_by</code>. The user who creates
@@ -184,13 +184,11 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
 
     @Override
     public List<ForeignKey<OasRequestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_REQUEST_OAS_OPERATION_ID_FK, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_REQUEST_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_REQUEST_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_REQUEST_CREATED_BY_FK, Keys.OAS_REQUEST_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_REQUEST_OAS_OPERATION_ID_FK, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_REQUEST_CREATED_BY_FK, Keys.OAS_REQUEST_LAST_UPDATED_BY_FK);
     }
 
     private transient OasOperation _oasOperation;
     private transient OasMessageBody _oasMessageBody;
-    private transient TopLevelAsbiep _oasRequestMetaHeaderTopLevelAsbiepIdFk;
-    private transient TopLevelAsbiep _oasRequestPaginationTopLevelAsbiepIdFk;
     private transient AppUser _oasRequestCreatedByFk;
     private transient AppUser _oasRequestLastUpdatedByFk;
 
@@ -213,30 +211,6 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
             _oasMessageBody = new OasMessageBody(this, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK);
 
         return _oasMessageBody;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the
-     * <code>oas_request_meta_header_top_level_asbiep_id_fk</code> key.
-     */
-    public TopLevelAsbiep oasRequestMetaHeaderTopLevelAsbiepIdFk() {
-        if (_oasRequestMetaHeaderTopLevelAsbiepIdFk == null)
-            _oasRequestMetaHeaderTopLevelAsbiepIdFk = new TopLevelAsbiep(this, Keys.OAS_REQUEST_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK);
-
-        return _oasRequestMetaHeaderTopLevelAsbiepIdFk;
-    }
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the <code>oas_request_pagination_top_level_asbiep_id_fk</code>
-     * key.
-     */
-    public TopLevelAsbiep oasRequestPaginationTopLevelAsbiepIdFk() {
-        if (_oasRequestPaginationTopLevelAsbiepIdFk == null)
-            _oasRequestPaginationTopLevelAsbiepIdFk = new TopLevelAsbiep(this, Keys.OAS_REQUEST_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK);
-
-        return _oasRequestPaginationTopLevelAsbiepIdFk;
     }
 
     /**
@@ -305,14 +279,14 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<ULong, ULong, String, Byte, ULong, Byte, Byte, ULong, ULong, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row14<ULong, ULong, String, Byte, ULong, Byte, Byte, Byte, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row14) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -320,7 +294,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

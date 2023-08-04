@@ -75,7 +75,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
      * describing the host designated by the URL. CommonMark syntax MAY be used
      * for rich text representation.
      */
-    public final TableField<OasServerRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "An optional string describing the host designated by the URL. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasServerRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "An optional string describing the host designated by the URL. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_server.url</code>. REQUIRED. A URL to the
@@ -91,7 +91,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
      * variable name and its value. The value is used for substitution in the
      * server's URL template.
      */
-    public final TableField<OasServerRecord, String> VARIABLES = createField(DSL.name("variables"), SQLDataType.CLOB, this, "A map between a variable name and its value. The value is used for substitution in the server's URL template.");
+    public final TableField<OasServerRecord, String> VARIABLES = createField(DSL.name("variables"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A map between a variable name and its value. The value is used for substitution in the server's URL template.");
 
     /**
      * The column <code>oagi.oas_server.owner_user_id</code>. The user who owns

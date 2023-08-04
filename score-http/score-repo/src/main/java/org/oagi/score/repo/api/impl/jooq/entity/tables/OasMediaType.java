@@ -68,7 +68,7 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
      * The column <code>oagi.oas_media_type.description</code>. On POST, PUT,
      * and PATCH, $ref is present
      */
-    public final TableField<OasMediaTypeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "On POST, PUT, and PATCH, $ref is present");
+    public final TableField<OasMediaTypeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "On POST, PUT, and PATCH, $ref is present");
 
     /**
      * The column <code>oagi.oas_media_type.owner_user_id</code>. The user who

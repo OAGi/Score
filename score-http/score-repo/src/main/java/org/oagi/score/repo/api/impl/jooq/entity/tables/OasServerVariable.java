@@ -69,14 +69,14 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
      * The column <code>oagi.oas_server_variable.name</code>. "port",
      * "username", "basePath" are the examples in the OpenAPI Specification.
      */
-    public final TableField<OasServerVariableRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "\"port\", \"username\", \"basePath\" are the examples in the OpenAPI Specification.");
+    public final TableField<OasServerVariableRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "\"port\", \"username\", \"basePath\" are the examples in the OpenAPI Specification.");
 
     /**
      * The column <code>oagi.oas_server_variable.description</code>. An optional
      * description for the server variable. CommonMark syntax MAY be used for
      * rich text representation.
      */
-    public final TableField<OasServerVariableRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "An optional description for the server variable. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasServerVariableRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "An optional description for the server variable. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_server_variable.default</code>. REQUIRED. The
@@ -86,14 +86,14 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
      * parameter values are optional. If the enum is defined, the value SHOULD
      * exist in the enum's values.
      */
-    public final TableField<OasServerVariableRecord, String> DEFAULT = createField(DSL.name("default"), SQLDataType.CLOB, this, "REQUIRED. The default value to use for substitution, which SHALL be sent if an alternate value is not supplied. Note this behavior is different than the Schema Object's treatment of default values, because in those cases parameter values are optional. If the enum is defined, the value SHOULD exist in the enum's values.");
+    public final TableField<OasServerVariableRecord, String> DEFAULT = createField(DSL.name("default"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "REQUIRED. The default value to use for substitution, which SHALL be sent if an alternate value is not supplied. Note this behavior is different than the Schema Object's treatment of default values, because in those cases parameter values are optional. If the enum is defined, the value SHOULD exist in the enum's values.");
 
     /**
      * The column <code>oagi.oas_server_variable.enum</code>. An enumeration of
      * string values to be used if the substitution options are from a limited
      * set. The array SHOULD NOT be empty.
      */
-    public final TableField<OasServerVariableRecord, String> ENUM = createField(DSL.name("enum"), SQLDataType.CLOB, this, "An enumeration of string values to be used if the substitution options are from a limited set. The array SHOULD NOT be empty.");
+    public final TableField<OasServerVariableRecord, String> ENUM = createField(DSL.name("enum"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "An enumeration of string values to be used if the substitution options are from a limited set. The array SHOULD NOT be empty.");
 
     /**
      * The column <code>oagi.oas_server_variable.created_by</code>. The user who

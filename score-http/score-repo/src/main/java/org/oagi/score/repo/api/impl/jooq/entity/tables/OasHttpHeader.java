@@ -69,14 +69,14 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
      * The column <code>oagi.oas_http_header.header</code>. REQUIRED. The name
      * of the header. Header names are case sensitive. 
      */
-    public final TableField<OasHttpHeaderRecord, String> HEADER = createField(DSL.name("header"), SQLDataType.VARCHAR(200), this, "REQUIRED. The name of the header. Header names are case sensitive. ");
+    public final TableField<OasHttpHeaderRecord, String> HEADER = createField(DSL.name("header"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED. The name of the header. Header names are case sensitive. ");
 
     /**
      * The column <code>oagi.oas_http_header.description</code>. A brief
      * description of the header. This could contain examples of use. CommonMark
      * syntax MAY be used for rich text representation.
      */
-    public final TableField<OasHttpHeaderRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A brief description of the header. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasHttpHeaderRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the header. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_http_header.agency_id_list_value_id</code>. A

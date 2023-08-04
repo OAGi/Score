@@ -73,7 +73,7 @@ public class OasTag extends TableImpl<OasTagRecord> {
      * The column <code>oagi.oas_tag.description</code>. A short description for
      * the tag. CommonMark syntax MAY be used for rich text representation.
      */
-    public final TableField<OasTagRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A short description for the tag. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasTagRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A short description for the tag. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_tag.created_by</code>. The user who creates the

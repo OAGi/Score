@@ -70,7 +70,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      * description of the target documentation. CommonMark syntax MAY be used
      * for rich text representation.
      */
-    public final TableField<OasExternalDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "A short description of the target documentation. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasExternalDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A short description of the target documentation. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_external_doc.created_by</code>. The user who
