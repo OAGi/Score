@@ -1893,7 +1893,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
-        String prev_release = "10.9.1";
+        String prev_release = "10.9";
         String curr_release = "10.9.2";
         Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
         Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
