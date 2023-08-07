@@ -1,7 +1,5 @@
 package org.oagi.score.e2e.TS_29_BIEUplifting;
 
-import com.sun.java.accessibility.util.EventID;
-import org.jooq.TableOptions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,16 +16,10 @@ import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.oagi.score.e2e.page.help.UserGuidePage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import javax.swing.*;
-import javax.swing.text.View;
-import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
@@ -163,45 +155,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2912.bbieScContextDefinition, getText(bbiescPanel.getContextDefinitionField()));
     }
 
-    private class Preconditions_TA_29_1_2 {
-
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private String asbiePath = "/Change Acknowledge Shipment Status/Application Area";
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private String bbiePath  = "/Change Acknowledge Shipment Status/System Environment Code";
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private String bbieScPath = "/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier";
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_2(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-
-    }
-
     private Preconditions_TA_29_1_2 preconditions_TA_29_1_2_Uplift_BIEUserbProduction(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_2 preconditionsTa2912 = new Preconditions_TA_29_1_2(usera, prevRelease);
 
@@ -249,61 +202,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2912;
     }
 
-    private class Preconditions_TA_29_1_BIE1QA {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_BIE1QA(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Enterprise Unit. Enterprise Unit", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-
-            asbiePaths.add("/Enterprise Unit/Extension/Incorporation Location");
-            asbiePaths.add("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
-            asbiePaths.add("/Enterprise Unit/Extension/Code List/Code List Value");
-            asbiePaths.add("/Enterprise Unit/Extension/Revised Item Status");
-
-            bbiePaths.add("/Enterprise Unit/Extension/Last Modification Date Time");
-            bbiePaths.add("/Enterprise Unit/Extension/Identifier");
-            bbiePaths.add("/Enterprise Unit/Extension/Name");
-            bbiePaths.add("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
-            bbiePaths.add("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
-            bbiePaths.add("/Enterprise Unit/Extension/Usage Description");
-            bbiePaths.add("/Enterprise Unit/Identifier");
-            bbiePaths.add("/Enterprise Unit/Type Code");
-            bbiePaths.add("/Enterprise Unit/Extension/Indicator");
-            bbiePaths.add("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
-
-            bbieScPaths.add("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
-        }
-    }
-
     private Preconditions_TA_29_1_BIE1QA preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_BIE1QA preconditionsTa2914 = new Preconditions_TA_29_1_BIE1QA(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -342,7 +240,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.setBranch(prevRelease);
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2914.topLevelASBIEP);
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths){
+        for (String bbiePath : preconditionsTa2914.bbiePaths) {
             editBIEPage.goToNodeByPath(bbiePath);
             WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
             waitFor(ofMillis(2000));
@@ -358,7 +256,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             editBIEPage.hitUpdateButton();
         }
 
-        for (String asbiePath: preconditionsTa2914.asbiePaths){
+        for (String asbiePath : preconditionsTa2914.asbiePaths) {
             editBIEPage.getNodeByPath(asbiePath);
             WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
             waitFor(ofMillis(2000));
@@ -368,7 +266,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             editBIEPage.hitUpdateButton();
         }
 
-        for (String bbieScPath : preconditionsTa2914.bbieScPaths){
+        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
             WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
             waitFor(ofMillis(2000));
             EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
@@ -489,7 +387,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("aRemark", getText(topLevelASBIEPPanel.getRemarkField()));
         assertEquals("aStatus", getText(topLevelASBIEPPanel.getStatusField()));
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths){
+        for (String bbiePath : preconditionsTa2914.bbiePaths) {
             editBIEPage.goToNodeByPath(bbiePath);
             WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
             waitFor(ofMillis(2000));
@@ -501,10 +399,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             assertEquals(preconditionsTa2914.bbieRemark, getText(bbiePanel.getRemarkField()));
             assertEquals(preconditionsTa2914.bbieValueDomainRestriction, getText(bbiePanel.getValueDomainRestrictionSelectField()));
             assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2914.bbieValueDomain));
-            assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()))
+            assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
         }
 
-        for (String asbiePath: preconditionsTa2914.asbiePaths){
+        for (String asbiePath : preconditionsTa2914.asbiePaths) {
             editBIEPage.goToNodeByPath(asbiePath);
             WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
             waitFor(ofMillis(2000));
@@ -517,7 +415,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             assertEquals(preconditionsTa2914.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
         }
 
-        for (String bbieScPath: preconditionsTa2914.bbieScPaths){
+        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
             editBIEPage.goToNodeByPath(bbieScPath);
             WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
             waitFor(ofMillis(2000));
@@ -534,6 +432,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
     }
+
     protected boolean isElementPresent(By by) {
         try {
             getDriver().findElement(by);
@@ -981,81 +880,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private class Preconditions_TA_29_1_5d_BIEReusedChild {
-        private TopLevelASBIEPObject topLevelASBIEP;
-        // ASBIE
-        private String asbiePath = "/Unit Packaging/Dimensions";
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private String bbiePath = "/Unit Packaging/Capacity Per Package Quantity";
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private String bbieScPath =  "/Unit Packaging/UPC Packaging Level Code/List Agency Identifier";
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_5d_BIEReusedChild(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Unit Packaging. Packaging", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
-
-    private class Preconditions_TA_29_1_5d_BIEReusedParent {
-        private TopLevelASBIEPObject topLevelASBIEP;
-        // ASBIE
-        private String asbiePath = "/From UOM Package/Unit Packaging";
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private String bbiePath = "/From UOM Package/UOM Code";
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        Preconditions_TA_29_1_5d_BIEReusedParent(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "From UOM Package. UOM Package", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
-
-    private class Preconditions_TA_29_1_5d_BIEReusedScenario {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        Preconditions_TA_29_1_5d_BIEReusedScenario(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "UOM Code Conversion Rate. UOM Code Conversion Rate", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
-
-    private Preconditions_TA_29_1_5d_BIEReusedChild  preconditions_ta_29_1_5d_ReusedChild(AppUserObject usera, String prevRelease){
+    private Preconditions_TA_29_1_5d_BIEReusedChild preconditions_ta_29_1_5d_ReusedChild(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedChild(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1106,7 +931,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2915d;
     }
 
-    private Preconditions_TA_29_1_5d_BIEReusedParent  preconditions_ta_29_1_5d_ReusedParent(AppUserObject usera, String prevRelease){
+    private Preconditions_TA_29_1_5d_BIEReusedParent preconditions_ta_29_1_5d_ReusedParent(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedParent(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1141,6 +966,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
         return preconditionsTa2915d;
     }
+
     @Test
     public void test_TA_29_1_9a() {
         String prev_release = "10.9.1";
@@ -1233,42 +1059,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("date", getText(bbiePanel.getValueDomainField()));
         homePage.logout();
     }
-    private class Preconditions_TA_29_1_TOPBIEGETBOM {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Get BOM. Get BOM", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
 
     private Preconditions_TA_29_1_TOPBIEGETBOM preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919a = new Preconditions_TA_29_1_TOPBIEGETBOM(usera, prevRelease);
@@ -1338,43 +1128,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
         homePage.logout();
         return preconditionsTa2919a;
-    }
-
-    private class Preconditions_TA_29_1_BIEPrimitiveDate {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Start Separate Date Time. Separate Date Time", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
     }
 
     private Preconditions_TA_29_1_BIEPrimitiveDate preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, String prevRelease) {
@@ -1668,6 +1421,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
+
     @Test
     public void test_TA_29_1_10a() {
         String prev_release = "10.9.1";
@@ -1724,43 +1478,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm63055D16B_AgencyIdentification"));
         homePage.logout();
-    }
-
-    private class Preconditions_TA_29_1_BIEBOMDoubleNested {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "BOM. BOM", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
     }
 
     private Preconditions_TA_29_1_BIEBOMDoubleNested preconditions_TA_29_10a_BIEBOMDoubleNested(AppUserObject usera, String prevRelease) {
@@ -1877,43 +1594,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private class Preconditions_TA_29_1_JournalEntry {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_JournalEntry(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
-
     private Preconditions_TA_29_1_JournalEntry preconditions_TA_29_10b_JournalEntry(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_JournalEntry preconditionsTa2910b = new Preconditions_TA_29_1_JournalEntry(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -1962,6 +1642,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
         return preconditionsTa2910b;
     }
+
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
         String prev_release = "10.9";
@@ -2456,43 +2137,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private class Preconditions_TA_29_1_BIECAGUplift {
-        private TopLevelASBIEPObject topLevelASBIEP;
-
-        // ASBIE
-        private ArrayList<String> asbiePaths = new ArrayList<>();
-        private String asbieRemark = randomPrint(50, 100).trim();
-        private String asbieContextDefinition = randomPrint(50, 100).trim();
-
-        // BBIE
-        private ArrayList<String> bbiePaths = new ArrayList<>();
-        private String bbieRemark = randomPrint(50, 100).trim();
-        private String bbieExample = randomPrint(50, 100).trim();
-        private String bbieContextDefinition = randomPrint(50, 100).trim();
-        private String bbieValueConstraint = "Fixed Value";
-        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieValueDomainRestriction = "Code";
-        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
-
-        // BBIE_SC
-        private ArrayList<String> bbieScPaths = new ArrayList<>();
-        private String bbieScRemark = randomPrint(50, 100).trim();
-        private String bbieScExample = randomPrint(50, 100).trim();
-        private String bbieScContextDefinition = randomPrint(50, 100).trim();
-        private String bbieScValueConstraint = "Fixed Value";
-        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
-        private String bbieScValueDomainRestriction = "Agency";
-        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
-
-        Preconditions_TA_29_1_BIECAGUplift(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
-                    "Child Item Reference. Child Item Reference", prevRelease);
-            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
-        }
-    }
-
     private Preconditions_TA_29_1_BIECAGUplift preconditions_TA_29_11_BIECAGUplift(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911 = new Preconditions_TA_29_1_BIECAGUplift(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -2619,6 +2263,359 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Not selected\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"System\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Unmatched\")]")).isDisplayed());
+    }
+
+    private class Preconditions_TA_29_1_2 {
+
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final String asbiePath = "/Change Acknowledge Shipment Status/Application Area";
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final String bbiePath = "/Change Acknowledge Shipment Status/System Environment Code";
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final String bbieScPath = "/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier";
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_2(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+
+    }
+
+    private class Preconditions_TA_29_1_BIE1QA {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_BIE1QA(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Enterprise Unit. Enterprise Unit", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+
+            asbiePaths.add("/Enterprise Unit/Extension/Incorporation Location");
+            asbiePaths.add("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
+            asbiePaths.add("/Enterprise Unit/Extension/Code List/Code List Value");
+            asbiePaths.add("/Enterprise Unit/Extension/Revised Item Status");
+
+            bbiePaths.add("/Enterprise Unit/Extension/Last Modification Date Time");
+            bbiePaths.add("/Enterprise Unit/Extension/Identifier");
+            bbiePaths.add("/Enterprise Unit/Extension/Name");
+            bbiePaths.add("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
+            bbiePaths.add("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
+            bbiePaths.add("/Enterprise Unit/Extension/Usage Description");
+            bbiePaths.add("/Enterprise Unit/Identifier");
+            bbiePaths.add("/Enterprise Unit/Type Code");
+            bbiePaths.add("/Enterprise Unit/Extension/Indicator");
+            bbiePaths.add("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+
+            bbieScPaths.add("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
+        }
+    }
+
+    private class Preconditions_TA_29_1_5d_BIEReusedChild {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+        // ASBIE
+        private final String asbiePath = "/Unit Packaging/Dimensions";
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final String bbiePath = "/Unit Packaging/Capacity Per Package Quantity";
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final String bbieScPath = "/Unit Packaging/UPC Packaging Level Code/List Agency Identifier";
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_5d_BIEReusedChild(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Unit Packaging. Packaging", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_5d_BIEReusedParent {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+        // ASBIE
+        private final String asbiePath = "/From UOM Package/Unit Packaging";
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final String bbiePath = "/From UOM Package/UOM Code";
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        Preconditions_TA_29_1_5d_BIEReusedParent(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "From UOM Package. UOM Package", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_5d_BIEReusedScenario {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        Preconditions_TA_29_1_5d_BIEReusedScenario(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "UOM Code Conversion Rate. UOM Code Conversion Rate", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_TOPBIEGETBOM {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Get BOM. Get BOM", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_BIEPrimitiveDate {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Start Separate Date Time. Separate Date Time", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_BIEBOMDoubleNested {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "BOM. BOM", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_JournalEntry {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_JournalEntry(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
+    }
+
+    private class Preconditions_TA_29_1_BIECAGUplift {
+        private final TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private final ArrayList<String> asbiePaths = new ArrayList<>();
+        private final String asbieRemark = randomPrint(50, 100).trim();
+        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private final ArrayList<String> bbiePaths = new ArrayList<>();
+        private final String bbieRemark = randomPrint(50, 100).trim();
+        private final String bbieExample = randomPrint(50, 100).trim();
+        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieValueConstraint = "Fixed Value";
+        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieValueDomainRestriction = "Code";
+        private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private final ArrayList<String> bbieScPaths = new ArrayList<>();
+        private final String bbieScRemark = randomPrint(50, 100).trim();
+        private final String bbieScExample = randomPrint(50, 100).trim();
+        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScValueConstraint = "Fixed Value";
+        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScValueDomainRestriction = "Agency";
+        private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_BIECAGUplift(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Child Item Reference. Child Item Reference", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+        }
     }
 
     private class RandomCodeListWithStateContainer {
